@@ -61,7 +61,9 @@ class WorkoutViewModel : ViewModel() {
     }
 
     fun addWarmUpSets(warmUpSetModel: List<SetModel>) {
-        _exerciseSets.addAll(0, warmUpSetModel)
+        for (index in 0 until warmUpSetModel.size) {
+            _exerciseSets.add(index, warmUpSetModel[index].copy(id = newID()))
+        }
     }
 }
 
@@ -133,5 +135,5 @@ private fun initexerciseSets(): List<SetModel> {
 
 @RequiresApi(Build.VERSION_CODES.O)
 public fun newID(): Long {
-    return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 1000))
+    return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 999))
 }
