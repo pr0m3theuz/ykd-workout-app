@@ -44,18 +44,18 @@ fun exerciseOptionsDropdownMenu() {
                 text = { Text("Create Superset") },
                 onClick = { /* TODO */ }
             )
-            DropdownMenuItem(
-                text = { Text("Create Giant Set") },
-                onClick = { /* TODO */ }
-            )
-            DropdownMenuItem(
-                text = { Text("Create Drop Set") },
-                onClick = { /* TODO */ }
-            )
-            DropdownMenuItem(
-                text = { Text("Create Myo-Rep Set") },
-                onClick = { /* TODO */ }
-            )
+//            DropdownMenuItem(
+//                text = { Text("Create Giant Set") },
+//                onClick = { /* TODO */ }
+//            )
+//            DropdownMenuItem(
+//                text = { Text("Create Drop Set") },
+//                onClick = { /* TODO */ }
+//            )
+//            DropdownMenuItem(
+//                text = { Text("Create Myo-Rep Set") },
+//                onClick = { /* TODO */ }
+//            )
             Divider()
             DropdownMenuItem(
                 text = { Text("Replace Exercise") },

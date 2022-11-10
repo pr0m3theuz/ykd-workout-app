@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.SetTypeModel
 import com.example.myapplication.ui.theme.PurpleGrey80
 import kotlin.math.roundToInt
 
@@ -34,7 +35,8 @@ fun exerciseSetLayout(
     newWeight: (newWeight: Double?) -> Unit,
     newReps: (newReps: Int?) -> Unit,
     newRIR: (newRIR: Double?) -> Unit,
-    newRPE: (newRPE: Double?) -> Unit
+    newRPE: (newRPE: Double?) -> Unit,
+    updateSetType: (setType: SetTypeModel) -> Unit
 ) {
     var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
     var exerciseWeightText by remember {
@@ -87,6 +89,28 @@ fun exerciseSetLayout(
         )
     }
 
+    var iconText by remember { mutableStateOf("") }
+
+    iconText = if (exerciseSet.setType.name == "Normal") {
+        setIndex.inc().toString()
+    } else {
+        exerciseSet.setType.name[0].toString()
+    }
+
+    fun changeIconText() {
+        iconText = if (exerciseSet.setType.name == "Normal") {
+            setIndex.inc().toString()
+        } else {
+            exerciseSet.setType.name[0].toString()
+        }
+    }
+
+    var iconColor: Color = exerciseSet.setType.textColor
+
+    fun changeIconColor() {
+        iconColor = exerciseSet.setType.textColor
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -101,13 +125,20 @@ fun exerciseSetLayout(
                 modifier = Modifier.padding(8.dp).size(32.dp),
                 shape = RoundedCornerShape(size = 8.dp),
                 contentPadding = PaddingValues(0.dp),
-                onClick = { expandedSetTypeOptionsDropdownMenu = true }
-            ) { Text(setIndex.inc().toString()) }
+                onClick = {
+                    expandedSetTypeOptionsDropdownMenu = true
+                }
+            ) {
+                Text(text = iconText, color = iconColor)
+            }
 
             SetTypeOptionsMenu(
                 // selectedSetType = exerciseSet.setType, TODO Not if this is needed
                 expandMenu = { expandedSetTypeOptionsDropdownMenu },
-                onDismiss = { expandedSetTypeOptionsDropdownMenu = false }
+                onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
+                updateSetType = { setType -> updateSetType(setType) },
+                changeIconText = { changeIconText() },
+                changeIconColor = { changeIconColor() }
             )
         }
 
@@ -153,6 +184,12 @@ fun exerciseSetLayout(
                             null
                         }
                     )
+//                    exerciseSet.exerciseWeight =
+//                        if (it.text.isNotBlank()) {
+//                            it.text.toDouble()
+//                        } else {
+//                            null
+//                        }
                 }
             )
         }

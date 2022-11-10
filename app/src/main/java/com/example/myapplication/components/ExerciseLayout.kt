@@ -11,22 +11,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.ExerciseViewModel
 import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.SetTypeModel
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ExerciseScreen(workoutViewModel: WorkoutViewModel = viewModel()) {
+fun ExerciseScreen(exerciseViewModel: ExerciseViewModel = viewModel()) {
     exerciseLayout(
-        workoutViewModel.exerciseSets,
-        { workoutViewModel.addSet() },
-        { id: Long -> workoutViewModel.remove(id) },
-        { id: Long, newWeight: Double? -> workoutViewModel.updateSetWeight(id, newWeight) },
-        { id: Long, newReps: Int? -> workoutViewModel.updateSetReps(id, newReps) },
-        { id: Long, newRIR: Double? -> workoutViewModel.updateSetRIR(id, newRIR) },
-        { id: Long, newRPE: Double? -> workoutViewModel.updateSetRPE(id, newRPE) },
-        { id: Long, setComplete: Boolean -> workoutViewModel.setComplete(id, setComplete) }
+        exerciseViewModel.exerciseSets,
+        { exerciseViewModel.addSet() },
+        { id: Long -> exerciseViewModel.remove(id) },
+        { id: Long, newWeight: Double? -> exerciseViewModel.updateSetWeight(id, newWeight) },
+        { id: Long, newReps: Int? -> exerciseViewModel.updateSetReps(id, newReps) },
+        { id: Long, newRIR: Double? -> exerciseViewModel.updateSetRIR(id, newRIR) },
+        { id: Long, newRPE: Double? -> exerciseViewModel.updateSetRPE(id, newRPE) },
+        { id: Long, setComplete: Boolean -> exerciseViewModel.setComplete(id, setComplete) },
+        { id: Long, setType: SetTypeModel -> exerciseViewModel.updateSetType(id, setType) }
     )
 }
 
@@ -41,7 +43,8 @@ fun exerciseLayout(
     updateSetReps: (id: Long, newReps: Int?) -> Unit,
     updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
-    setComplete: (id: Long, setComplete: Boolean) -> Unit
+    setComplete: (id: Long, setComplete: Boolean) -> Unit,
+    updateSetType: (id: Long, setType: SetTypeModel) -> Unit
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Column {
@@ -117,7 +120,8 @@ fun exerciseLayout(
                 { id: Long, newReps: Int? -> updateSetReps(id, newReps) },
                 { id: Long, newRIR: Double? -> updateSetWeight(id, newRIR) },
                 { id: Long, newRPE: Double? -> updateSetWeight(id, newRPE) },
-                { id: Long, setComplete: Boolean -> setComplete(id, setComplete) }
+                { id: Long, setComplete: Boolean -> setComplete(id, setComplete) },
+                { id: Long, setType: SetTypeModel -> updateSetType(id, setType) }
             )
 
             Row(

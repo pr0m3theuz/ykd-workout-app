@@ -4,10 +4,11 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.components.formatter
 import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.SetTypeModel
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-class WorkoutViewModel : ViewModel() {
+class ExerciseViewModel : ViewModel() {
 
     private val _exerciseSets = initExerciseSets().toMutableStateList()
     val exerciseSets: List<SetModel>
@@ -55,6 +56,10 @@ class WorkoutViewModel : ViewModel() {
 
     fun setComplete(id: Long, setComplete: Boolean) {
         _exerciseSets.forEach { if (it.id == id) it.setCompleted = setComplete }
+    }
+
+    fun updateSetType(id: Long, setType: SetTypeModel) {
+        _exerciseSets.forEach { if (it.id == id) it.setType = setType }
     }
 
     fun addWarmUpSets(warmUpSetModel: List<SetModel>) {

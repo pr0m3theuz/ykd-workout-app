@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.SetTypeModel
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
@@ -38,7 +39,8 @@ fun ExerciseSetLazyColumn(
     updateSetReps: (id: Long, newReps: Int?) -> Unit,
     updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
-    setComplete: (id: Long, setComplete: Boolean) -> Unit
+    setComplete: (id: Long, setComplete: Boolean) -> Unit,
+    updateSetType: (id: Long, setType: SetTypeModel) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
@@ -71,6 +73,10 @@ fun ExerciseSetLazyColumn(
 
             fun newRPE(newRPE: Double?) {
                 updateSetRPE(exerciseSet.id, newRPE)
+            }
+
+            fun newSetType(setType: SetTypeModel) {
+                updateSetType(exerciseSet.id, setType)
             }
 
             fun deleteCompletedSet(delete: Boolean) {
@@ -156,7 +162,14 @@ fun ExerciseSetLazyColumn(
                         { newWeight -> newWeight(newWeight) },
                         { newReps -> newReps(newReps) },
                         { newRIR -> newRIR(newRIR) },
-                        { newRPE -> newRPE(newRPE) }
+                        { newRPE -> newRPE(newRPE) },
+                        { setType -> newSetType(setType) }
+//                        iconText = if (exerciseSet.setType.name == "Normal") {
+//                            index.inc().toString()
+//                        } else {
+//                            exerciseSet.setType.name[0].toString()
+//                        },
+//                        iconColor = exerciseSet.setType.textColor
                     )
                 }
             }

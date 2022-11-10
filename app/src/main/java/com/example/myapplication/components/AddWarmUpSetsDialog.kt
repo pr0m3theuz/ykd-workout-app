@@ -20,8 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.ExerciseViewModel
 import com.example.myapplication.WarmUpViewModel
-import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
 import kotlin.math.roundToInt
@@ -31,7 +31,7 @@ import kotlin.math.roundToInt
 @Composable
 fun AddWarmUpSetsScreen(
     warmUpViewModel: WarmUpViewModel = viewModel(),
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    exerciseViewModel: ExerciseViewModel = viewModel(),
     openDialog: (Boolean) -> Unit
 ) {
     AddWarmUpSetsDialog(
@@ -43,7 +43,7 @@ fun AddWarmUpSetsScreen(
         { id: Long -> warmUpViewModel.remove(id) },
         { id: Long, newWeight: Double -> warmUpViewModel.updateWarmUpSetWeight(id, newWeight) },
         { id: Long, newReps: Int -> warmUpViewModel.updateWarmUpSetReps(id, newReps) },
-        { warmUpSets -> workoutViewModel.addWarmUpSets(warmUpSets) }
+        { warmUpSets -> exerciseViewModel.addWarmUpSets(warmUpSets) }
     )
 }
 

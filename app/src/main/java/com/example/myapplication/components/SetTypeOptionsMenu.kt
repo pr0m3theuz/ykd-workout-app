@@ -24,7 +24,10 @@ fun SetTypeOptionsMenu(
     menuItems: List<SetTypeModel> = setTypes.toList(),
     // selectedSetType: SetTypeModel, TODO Not if this is needed
     expandMenu: () -> Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    updateSetType: (setType: SetTypeModel) -> Unit,
+    changeIconText: () -> Unit,
+    changeIconColor: () -> Unit
 ) {
     DropdownMenu(
         expanded = expandMenu(),
@@ -38,13 +41,17 @@ fun SetTypeOptionsMenu(
                  onClick = { *//* onDismiss(); onClickArrowBack() *//* }
         )*/
 
-        menuItems.forEachIndexed { index, setTypeModel ->
+        menuItems.forEachIndexed { index, setType ->
             DropdownMenuItem(
-                text = { Text(setTypeModel.name) },
+                text = { Text(setType.name) },
                 leadingIcon = {
                     Text(
-                        setTypeModel.name.get(0).toString(),
-                        color = setTypeModel.textColor
+                        setType.name.get(0).toString(),
+                        color = if (setType.name == "Normal") {
+                            Color.Black
+                        } else {
+                            setType.textColor
+                        }
                     )
                 },
                 trailingIcon = {
@@ -55,7 +62,12 @@ fun SetTypeOptionsMenu(
                         )
                     }
                 },
-                onClick = { /* TODO */ } // TODO Assign Set Type to Set
+                onClick = {
+                    onDismiss()
+                    updateSetType(setType)
+                    changeIconText()
+                    changeIconColor()
+                } // TODO Assign Set Type to Set
             )
         }
     }
@@ -69,7 +81,7 @@ private fun create(): ArrayList<SetTypeModel> {
             newID(),
             "Normal",
             description = "Normal",
-            textColor = Color.Black
+            textColor = Color.White
         )
     )
 
@@ -87,7 +99,7 @@ private fun create(): ArrayList<SetTypeModel> {
             newID(),
             "Drop Set",
             description = /*TODO*/"",
-            textColor = Color(108, 74, 182) /* Color: Purple */
+            textColor = Color.LightGray /* Color: Purple */
         )
     )
 
