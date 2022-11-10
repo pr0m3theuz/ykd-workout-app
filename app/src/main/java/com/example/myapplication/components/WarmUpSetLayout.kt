@@ -74,7 +74,12 @@ fun WarmUpSetLayout(
                 shape = RoundedCornerShape(size = 8.dp),
                 contentPadding = PaddingValues(0.dp),
                 onClick = { }
-            ) { Text("W") }
+            ) {
+                Text(
+                    text = warmUpSet.setType.name[0].toString(),
+                    color = warmUpSet.setType.textColor
+                )
+            }
         }
 
         Box(

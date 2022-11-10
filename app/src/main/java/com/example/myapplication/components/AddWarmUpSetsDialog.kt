@@ -36,7 +36,7 @@ fun AddWarmUpSetsScreen(
 ) {
     AddWarmUpSetsDialog(
         { close -> openDialog(close) },
-        warmUpViewModel.workingSetWeight,
+        exerciseViewModel.getWorkingSetWeight(),
         { newWorkingWeight -> warmUpViewModel.changeWorkingSetWeight(newWorkingWeight) },
         warmUpViewModel.warmUpSets,
         { warmUpViewModel.addSet() },
@@ -50,7 +50,7 @@ fun AddWarmUpSetsScreen(
 @Composable
 fun AddWarmUpSetsDialog(
     openDialog: (Boolean) -> Unit,
-    _workingSetWeight: Double,
+    _workingSetWeight: Double?,
     changeWorkingSetWeight: (Double) -> Unit,
     warmUpSets: List<SetModel>,
     addSet: () -> Unit,
@@ -59,7 +59,13 @@ fun AddWarmUpSetsDialog(
     updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit,
     insertWarmUpSets: (warmUpSets: List<SetModel>) -> Unit
 ) {
-    var workingSetWeight: Double by remember { mutableStateOf(_workingSetWeight) }
+    var workingSetWeight: Double by remember {
+        if (_workingSetWeight != null) {
+            mutableStateOf(_workingSetWeight)
+        } else {
+            mutableStateOf(0.0)
+        }
+    }
 
     var workingSetWeightText by remember {
         mutableStateOf(

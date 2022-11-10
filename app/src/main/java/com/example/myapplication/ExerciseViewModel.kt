@@ -67,60 +67,15 @@ class ExerciseViewModel : ViewModel() {
             _exerciseSets.add(index, warmUpSetModel[index].copy(id = newID()))
         }
     }
-}
 
-class WarmUpViewModel : ViewModel() {
-    private var _workingSetWeight: Double = 100.0
-    val workingSetWeight: Double
-        get() = _workingSetWeight
-
-    private val _warmUpSets = initWarmUpSets().toMutableStateList()
-    val warmUpSets: List<SetModel>
-        get() = _warmUpSets
-
-    fun changeWorkingSetWeight(newWorkingWeight: Double) {
-        _workingSetWeight = newWorkingWeight
-    }
-
-    fun addSet() {
-        if (warmUpSets.isNotEmpty()) {
-            _warmUpSets.add(
-                _warmUpSets.last().copy(
-                    id = newID()
-                )
-            )
-        } else {
-            _warmUpSets.add(
-                SetModel()
-            )
-        }
-    }
-
-    fun remove(id: Long) {
-        for (index in _warmUpSets.indices) {
-            if (_warmUpSets[index].id == id) {
-                _warmUpSets.removeAt(index)
+    fun getWorkingSetWeight(): Double? {
+        for (index in _exerciseSets.indices) {
+            if (_exerciseSets[index].setType.name != "Warm Up Set") {
+                return _exerciseSets[index].exerciseWeight
                 break
             }
         }
-    }
-
-    fun updateWarmUpSetWeight(id: Long, newWeight: Double) {
-        _warmUpSets.forEach { if (it.id == id) it.exerciseWeight = newWeight }
-    }
-
-    fun updateWarmUpSetReps(id: Long, newReps: Int) {
-        _warmUpSets.forEach { if (it.id == id) it.repetitions = newReps }
-    }
-}
-
-private fun initWarmUpSets(): List<SetModel> {
-    return List(6) { index ->
-        SetModel(
-            setNumber = index,
-            exerciseWeight = 100.00,
-            repetitions = 10
-        )
+        return null
     }
 }
 
