@@ -62,7 +62,8 @@ private fun initWarmUpSets(): List<SetModel> {
                 textColor = Color(255, 178, 0) /* Color: Orange */
             ),
             exerciseWeight = 100.00,
-            repetitions = 10
+            repetitions = 10,
+            percentage1RM = 1.0f
         )
     }
 }

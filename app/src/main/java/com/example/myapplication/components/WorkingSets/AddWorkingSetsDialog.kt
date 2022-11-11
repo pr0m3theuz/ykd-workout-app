@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ExerciseViewModel
 import com.example.myapplication.WorkingSetViewModel
+import com.example.myapplication.components.WorkingSets.WorkingSetLazyColumn
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
 import kotlin.math.roundToInt
@@ -42,9 +43,15 @@ fun AddWorkingSetsScreen(
         workingSetViewModel.sets,
         { workingSetViewModel.addSet() },
         { id: Long -> workingSetViewModel.remove(id) },
-        { id: Long, newWeight: Double -> workingSetViewModel.updateWarmUpSetWeight(id, newWeight) },
-        { id: Long, newReps: Int -> workingSetViewModel.updateWarmUpSetReps(id, newReps) },
-        { warmUpSets -> exerciseViewModel.addWarmUpSets(warmUpSets) }
+        { id: Long, newWeight: Double -> workingSetViewModel.updateSetWeight(id, newWeight) },
+        { id: Long, newReps: Int -> workingSetViewModel.updateSetReps(id, newReps) },
+        { id: Long, newPercentage: Float ->
+            workingSetViewModel.updateSetPercentage(
+                id,
+                newPercentage
+            )
+        },
+        { sets -> exerciseViewModel.addWarmUpSets(sets) }
     )
 }
 
@@ -53,12 +60,13 @@ fun AddWorkingSetsDialog(
     openDialog: (Boolean) -> Unit,
     _oneRepMax: Double?,
     changeWorkingSetWeight: (Double) -> Unit,
-    warmUpSets: List<SetModel>,
+    sets: List<SetModel>,
     addSet: () -> Unit,
     removeSet: (id: Long) -> Unit,
-    updateWarmUpSetWeight: (id: Long, newWeight: Double) -> Unit,
-    updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit,
-    insertWarmUpSets: (warmUpSets: List<SetModel>) -> Unit
+    updateSetWeight: (id: Long, newWeight: Double) -> Unit,
+    updateSetReps: (id: Long, newReps: Int) -> Unit,
+    updateSetPercentage: (id: Long, newPercentage: Float) -> Unit,
+    insertSets: (warmUpSets: List<SetModel>) -> Unit
 ) {
     var workingSetWeight: Double by remember {
         if (_oneRepMax != null) {
@@ -174,12 +182,13 @@ fun AddWorkingSetsDialog(
                     ) { Text("Warm-up") }
                 }
 
-                WarmUpSetLazyColumn(
-                    warmUpSets,
+                WorkingSetLazyColumn(
+                    sets,
                     workingSetWeight,
                     { id: Long -> removeSet(id) },
-                    { id: Long, newWeight: Double -> updateWarmUpSetWeight(id, newWeight) },
-                    { id: Long, newReps: Int -> updateWarmUpSetReps(id, newReps) }
+                    { id: Long, newWeight: Double -> updateSetWeight(id, newWeight) },
+                    { id: Long, newReps: Int -> updateSetReps(id, newReps) },
+                    { id: Long, newPercentage: Float -> updateSetPercentage(id, newPercentage) }
                 )
 
                 Row(
@@ -197,7 +206,7 @@ fun AddWorkingSetsDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    run { insertWarmUpSets(warmUpSets) }
+                    run { insertSets(sets) }
 //                    TODO Add warm up sets to the beginning of current exercise sets
                 }
             ) {

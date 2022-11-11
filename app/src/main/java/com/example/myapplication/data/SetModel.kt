@@ -21,6 +21,7 @@ data class SetModel(
     var repetitions: Int? = null,
     var ratePerceivedEffort: Double? = null,
     var repetitionsInReserve: Double? = null,
+    var percentage1RM: Float? = null,
     var setCompleted: Boolean = false
 )
 

@@ -2,11 +2,8 @@ package com.example.myapplication
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.components.formatter
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
-import java.time.LocalDateTime
-import kotlin.random.Random
 
 class ExerciseViewModel : ViewModel() {
 
@@ -30,12 +27,13 @@ class ExerciseViewModel : ViewModel() {
     }
 
     fun remove(id: Long) {
-        for (index in 0 until _exerciseSets.size) {
-            if (exerciseSets[index].id == id) {
-                _exerciseSets.removeAt(index)
-                break
-            }
-        }
+//        for (index in 0 until _exerciseSets.size) {
+//            if (exerciseSets[index].id == id) {
+//                _exerciseSets.removeAt(index)
+//                break
+//            }
+//        }
+        _exerciseSets.removeIf { it.id == id }
     }
 
     fun updateSetWeight(id: Long, newWeight: Double?) {
@@ -62,20 +60,32 @@ class ExerciseViewModel : ViewModel() {
         _exerciseSets.forEach { if (it.id == id) it.setType = setType }
     }
 
-    fun addWarmUpSets(warmUpSetModel: List<SetModel>) {
-        for (index in warmUpSetModel.indices) {
-            _exerciseSets.add(index, warmUpSetModel[index].copy(id = newID()))
+    fun addWarmUpSets(warmUpSets: List<SetModel>) {
+        for (index in warmUpSets.indices) {
+            _exerciseSets.add(index, warmUpSets[index].copy(id = newID()))
         }
     }
 
     fun getWorkingSetWeight(): Double? {
-        for (index in _exerciseSets.indices) {
-            if (_exerciseSets[index].setType.name != "Warm Up Set") {
-                return _exerciseSets[index].exerciseWeight
-                break
-            }
-        }
-        return null
+//        for (index in _exerciseSets.indices) {
+//            if (_exerciseSets[index].setType.name != "Warm Up Set") {
+//                return _exerciseSets[index].exerciseWeight
+//                break
+//            }
+//        }
+//        return null
+
+        return _exerciseSets.filter { it.setType.name != "Warm Up Set" }.first().exerciseWeight
+    }
+
+    fun addWorkingSets(workingSets: List<SetModel>) {
+//        for (index in _exerciseSets.indices) {
+//            if (_exerciseSets[index].setType.name != "Warm Up Set") {
+//                _exerciseSets.removeAt(index = index)
+//            }
+//        }
+        _exerciseSets.removeAll { it.setType.name != "Warm Up Set" }
+        _exerciseSets.addAll(workingSets)
     }
 }
 
@@ -87,8 +97,4 @@ private fun initExerciseSets(): List<SetModel> {
             repetitions = 10
         )
     }
-}
-
-public fun newID(): Long {
-    return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 999))
 }

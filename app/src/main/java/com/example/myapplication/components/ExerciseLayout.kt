@@ -53,6 +53,7 @@ fun exerciseLayout(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // TODO Change to a button that takes the user to a new screen with more info about the exercise
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = "Exercise Name"

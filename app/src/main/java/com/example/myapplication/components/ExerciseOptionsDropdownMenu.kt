@@ -15,9 +15,14 @@ fun exerciseOptionsDropdownMenu() {
     var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedBarTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
     val openAddWarmUpSetsDialog = remember { mutableStateOf(false) }
+    val openAddWorkingSetsDialog = remember { mutableStateOf(false) }
 
     fun closeAddWarmUpSetsDialog(close: Boolean) {
         openAddWarmUpSetsDialog.value = close
+    }
+
+    fun closeWorkingSetsDialog(close: Boolean) {
+        openAddWorkingSetsDialog.value = close
     }
 
     Box {
@@ -38,7 +43,7 @@ fun exerciseOptionsDropdownMenu() {
             )
             DropdownMenuItem(
                 text = { Text("Create Working Sets") },
-                onClick = { /* TODO */ }
+                onClick = { openAddWorkingSetsDialog.value = true }
             )
             DropdownMenuItem(
                 text = { Text("Create Superset") },
@@ -101,6 +106,9 @@ fun exerciseOptionsDropdownMenu() {
         )
         if (openAddWarmUpSetsDialog.value) {
             AddWarmUpSetsScreen(openDialog = { close -> closeAddWarmUpSetsDialog(close) })
+        }
+        if (openAddWorkingSetsDialog.value) {
+            AddWorkingSetsScreen(openDialog = { close -> closeAddWarmUpSetsDialog(close) })
         }
     }
 }
