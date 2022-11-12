@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.util.Log
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.SetModel
@@ -19,7 +18,7 @@ class WorkingSetViewModel : ViewModel() {
     }
 
     fun addSet() {
-        Log.i("workingSetViewModel.addSet(): ", "workingSets List: ${_Sets.toList()}")
+//        Log.i("workingSetViewModel.addSet(): ", "workingSets List: ${_Sets.toList()}")
         if (_Sets.isNotEmpty()) {
             _Sets.add(
                 _Sets.last().copy(
@@ -31,7 +30,7 @@ class WorkingSetViewModel : ViewModel() {
                 SetModel()
             )
         }
-        Log.i("workingSetViewModel.addSet(): ", "New set added: ${_Sets.toList()}")
+//        Log.i("workingSetViewModel.addSet(): ", "New set added: ${_Sets.toList()}")
     }
 
     fun remove(id: Long) {

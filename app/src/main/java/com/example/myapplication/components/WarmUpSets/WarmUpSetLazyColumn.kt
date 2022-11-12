@@ -3,11 +3,9 @@ package com.example.myapplication.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -22,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.White
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 // @Preview
@@ -31,10 +30,16 @@ fun WarmUpSetLazyColumn(
     _workingWeight: Double,
     deleteSet: (id: Long) -> Unit,
     updateWarmUpSetWeight: (id: Long, newWeight: Double) -> Unit,
-    updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit
+    updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit,
+    addSet: () -> Unit
 ) {
+    val listState = rememberLazyListState()
+    // Remember a CoroutineScope to be able to launch
+    val coroutineScope = rememberCoroutineScope()
+
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        state = listState,
+        modifier = Modifier.fillMaxWidth().height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(count = warmUpSets.size, key = { index -> warmUpSets[index].id }) { index ->
@@ -118,6 +123,24 @@ fun WarmUpSetLazyColumn(
                     )
                 }
             }
+        }
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        androidx.compose.material3.TextButton(
+            onClick = {
+                addSet()
+                coroutineScope.launch {
+                    // Animate scroll to the last item
+                    listState.animateScrollToItem(index = warmUpSets.size.dec())
+                }
+            }
+        ) {
+            androidx.compose.material3.Text("Add Set")
         }
     }
 }

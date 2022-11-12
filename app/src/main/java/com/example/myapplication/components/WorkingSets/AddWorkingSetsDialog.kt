@@ -51,7 +51,8 @@ fun AddWorkingSetsScreen(
                 newPercentage
             )
         },
-        { sets -> exerciseViewModel.addWarmUpSets(sets) }
+        { sets -> exerciseViewModel.addWorkingSets(sets) },
+        { sets -> exerciseViewModel.addBackOffSets(sets) }
     )
 }
 
@@ -66,7 +67,8 @@ fun AddWorkingSetsDialog(
     updateSetWeight: (id: Long, newWeight: Double) -> Unit,
     updateSetReps: (id: Long, newReps: Int) -> Unit,
     updateSetPercentage: (id: Long, newPercentage: Float) -> Unit,
-    insertSets: (warmUpSets: List<SetModel>) -> Unit
+    insertSets: (workingSets: List<SetModel>) -> Unit,
+    insertBackOffSets: (backOffSets: List<SetModel>) -> Unit
 ) {
     var workingSetWeight: Double by remember {
         if (_oneRepMax != null) {
@@ -146,6 +148,7 @@ fun AddWorkingSetsDialog(
                         }
                     )
                 }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -182,13 +185,24 @@ fun AddWorkingSetsDialog(
                     ) { Text("Warm-up") }
                 }
 
+/*                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = { addSet() }) {
+                        Text("Add Set")
+                    }
+                }*/
+
                 WorkingSetLazyColumn(
                     sets,
                     workingSetWeight,
                     { id: Long -> removeSet(id) },
                     { id: Long, newWeight: Double -> updateSetWeight(id, newWeight) },
                     { id: Long, newReps: Int -> updateSetReps(id, newReps) },
-                    { id: Long, newPercentage: Float -> updateSetPercentage(id, newPercentage) }
+                    { id: Long, newPercentage: Float -> updateSetPercentage(id, newPercentage) },
+                    { addSet() }
                 )
 
                 Row(
@@ -196,8 +210,13 @@ fun AddWorkingSetsDialog(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(onClick = { addSet() }) {
-                        Text("Add Set")
+                    TextButton(
+                        onClick = {
+                            openDialog(false)
+                            insertBackOffSets(sets)
+                        }
+                    ) {
+                        Text("Insert Back Off Sets")
                     }
                 }
             }
@@ -206,11 +225,10 @@ fun AddWorkingSetsDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    run { insertSets(sets) }
-//                    TODO Add warm up sets to the beginning of current exercise sets
+                    insertSets(sets)
                 }
             ) {
-                Text("Insert")
+                Text("Insert Working Sets")
             }
         },
         dismissButton = {
@@ -222,6 +240,5 @@ fun AddWorkingSetsDialog(
                 Text("Cancel")
             }
         }
-
     )
 }

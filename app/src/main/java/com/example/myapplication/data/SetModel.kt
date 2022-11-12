@@ -9,20 +9,20 @@ import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
 data class SetModel(
-    val id: Long = LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 1000)),
+    var id: Long = LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 1000)),
     val setNumber: Int? = null,
-    var setType: SetTypeModel = SetTypeModel(
-        newID(),
-        "Normal",
-        description = "Normal",
-        textColor = Color.White
-    ),
     var exerciseWeight: Double? = null,
     var repetitions: Int? = null,
     var ratePerceivedEffort: Double? = null,
     var repetitionsInReserve: Double? = null,
     var percentage1RM: Float? = null,
-    var setCompleted: Boolean = false
+    var setCompleted: Boolean = false,
+    var setType: SetTypeModel = SetTypeModel(
+        newID(),
+        "Normal",
+        description = "Normal",
+        textColor = Color.White
+    )
 )
 
 // TODO Remove

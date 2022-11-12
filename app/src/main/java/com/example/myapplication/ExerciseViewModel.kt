@@ -74,8 +74,14 @@ class ExerciseViewModel : ViewModel() {
 //            }
 //        }
 //        return null
-
-        return _exerciseSets.filter { it.setType.name != "Warm Up Set" }.first().exerciseWeight
+        // TODO Add If Not Empty
+        var workingSetWeight =
+            _exerciseSets.filter { it.setType.name != "Warm Up Set" }.first().exerciseWeight
+        if (workingSetWeight != null) {
+            return workingSetWeight
+        } else {
+            return null
+        }
     }
 
     fun addWorkingSets(workingSets: List<SetModel>) {
@@ -84,8 +90,21 @@ class ExerciseViewModel : ViewModel() {
 //                _exerciseSets.removeAt(index = index)
 //            }
 //        }
+        workingSets.forEach { it.id = newID() }
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Before: ${_exerciseSets.toList()}")
         _exerciseSets.removeAll { it.setType.name != "Warm Up Set" }
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Removed Old Sets: ${_exerciseSets.toList()}")
         _exerciseSets.addAll(workingSets)
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Added New Sets: ${_exerciseSets.toList()}")
+    }
+
+    fun addBackOffSets(backOffSets: List<SetModel>) {
+        for (index in backOffSets.indices) {
+            _exerciseSets.add(backOffSets[index].copy(id = newID()))
+        }
+
+//        backOffSets.forEach { it.id = newID() }
+//        _exerciseSets.addAll(backOffSets)
     }
 }
 

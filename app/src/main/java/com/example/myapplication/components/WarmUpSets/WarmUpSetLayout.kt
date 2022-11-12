@@ -76,7 +76,7 @@ fun WarmUpSetLayout(
                 onClick = { }
             ) {
                 Text(
-                    text = warmUpSet.setType.name[0].toString(),
+                    text = setIndex.inc().toString(),
                     color = warmUpSet.setType.textColor
                 )
             }

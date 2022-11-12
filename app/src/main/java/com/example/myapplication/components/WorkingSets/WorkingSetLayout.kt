@@ -84,7 +84,7 @@ fun WorkingSetLayout(
                 onClick = { }
             ) {
                 Text(
-                    text = workingSet.setType.name[0].toString(),
+                    text = setIndex.inc().toString(),
                     color = workingSet.setType.textColor
                 )
             }

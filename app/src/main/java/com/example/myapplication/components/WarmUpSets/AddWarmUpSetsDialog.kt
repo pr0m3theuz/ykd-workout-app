@@ -178,10 +178,11 @@ fun AddWarmUpSetsDialog(
                     workingSetWeight,
                     { id: Long -> removeSet(id) },
                     { id: Long, newWeight: Double -> updateWarmUpSetWeight(id, newWeight) },
-                    { id: Long, newReps: Int -> updateWarmUpSetReps(id, newReps) }
+                    { id: Long, newReps: Int -> updateWarmUpSetReps(id, newReps) },
+                    { addSet() }
                 )
 
-                Row(
+/*                Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
@@ -189,7 +190,7 @@ fun AddWarmUpSetsDialog(
                     TextButton(onClick = { addSet() }) {
                         Text("Add Set")
                     }
-                }
+                }*/
             }
         },
         confirmButton = {

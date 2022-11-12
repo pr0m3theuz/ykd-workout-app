@@ -143,6 +143,7 @@ fun exerciseSetLayout(
         }
 
         // TODO Get Previous Set Data by Exercise, Workout, Block, Plan
+        // TODO If Previous RIR is null, text = "110 x 10" or "110 x 10 @ 1RM%"
         Text(
             "110 x 10 @ RIR 0",
             color = Color.Gray
