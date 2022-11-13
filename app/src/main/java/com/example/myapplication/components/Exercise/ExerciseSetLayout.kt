@@ -122,7 +122,7 @@ fun exerciseSetLayout(
             propagateMinConstraints = true
         ) {
             Button(
-                modifier = Modifier.padding(8.dp).size(32.dp),
+                modifier = Modifier.padding(horizontal = 16.dp).size(32.dp),
                 shape = RoundedCornerShape(size = 8.dp),
                 contentPadding = PaddingValues(0.dp),
                 onClick = {

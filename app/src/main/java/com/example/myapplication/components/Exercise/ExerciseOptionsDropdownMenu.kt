@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+
 // import com.example.myapplication.components.RestTimer.RestTimePicker
 
 @Preview
@@ -17,7 +18,7 @@ fun exerciseOptionsDropdownMenu() {
     var expandedBarTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
     val openAddWarmUpSetsDialog = remember { mutableStateOf(false) }
     val openAddWorkingSetsDialog = remember { mutableStateOf(false) }
-    var openRestTimePicker by remember { mutableStateOf(false) }
+    var openRestTimePicker by remember { mutableStateOf(true) }
 
     fun closeAddWarmUpSetsDialog(close: Boolean) {
         openAddWarmUpSetsDialog.value = close
@@ -25,6 +26,10 @@ fun exerciseOptionsDropdownMenu() {
 
     fun closeWorkingSetsDialog(close: Boolean) {
         openAddWorkingSetsDialog.value = close
+    }
+
+    fun closeRestTimerDialog(close: Boolean) {
+        openRestTimePicker = close
     }
 
     Box {
@@ -114,7 +119,7 @@ fun exerciseOptionsDropdownMenu() {
         }
 
         if (openRestTimePicker) {
-//            RestTimePicker()
+            RestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) })
         }
     }
 }
