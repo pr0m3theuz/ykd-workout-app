@@ -24,26 +24,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
-@Preview
+// @Preview
 @Composable
-fun GoogleClockTimer() {
+fun GoogleClockTimer(
+    openDialog: () -> Unit,
+    tabRowState: Int,
+    workSetRestTime: Duration,
+    warmUpSetRestTime: Duration,
+    setTimer: (restTime: Duration) -> Unit,
+    time: String
+) {
     var timeString by remember { mutableStateOf("") }
-//    val timeString: MutableList<String> = mutableListOf()
-//    var timeString: String = ""
+
+    if (tabRowState == 0) {
+        workSetRestTime.toComponents { hours, minutes, seconds, nanoseconds ->
+            (
+                hours.toString().padStart(2, '0') +
+                    minutes.toString().padStart(2, '0') +
+                    seconds.toString().padStart(2, '0')
+                ).toInt().toString().removePrefix("0")
+        }
+    } else {
+        warmUpSetRestTime.toComponents { hours, minutes, seconds, nanoseconds ->
+            (
+                hours.toString().padStart(2, '0') +
+                    minutes.toString().padStart(2, '0') +
+                    seconds.toString().padStart(2, '0')
+                ).toInt().toString().removePrefix("0")
+        }
+    }
+    Log.i("GoogleClockTimer() time", time)
+    Log.i("GoogleClockTimer() timeString", timeString)
 
     val buttonModifier = Modifier
-        .size(90.dp)
+        .size(80.dp)
 //        .wrapContentSize(align = Alignment.Center)
         .padding(0.dp)
 
-    val iconSizeModifier = Modifier.size(28.dp)
+    val iconSizeModifier = Modifier.size(24.dp)
 
     val buttonTextSize = 36.sp
     val timeTextSize = 48.sp
@@ -53,6 +78,17 @@ fun GoogleClockTimer() {
     val buttonTextWeight = FontWeight(375)
     var visible by remember {
         mutableStateOf(false)
+    }
+    val windows = timeString.padStart(6, '0').windowed(2, 2)
+
+    val restTime = windows[0].toInt().toDuration(DurationUnit.HOURS) +
+        windows[1].toInt().toDuration(DurationUnit.MINUTES) +
+        windows[2].toInt().toDuration(DurationUnit.SECONDS)
+    Log.i("GoogleClockTimer() windows", windows.toList().toString())
+    Log.i("GoogleClockTimer() restTime", restTime.toString())
+
+    if (timeString.isNotEmpty()) {
+        visible = true
     }
 
     fun add(input: String) {
@@ -72,7 +108,7 @@ fun GoogleClockTimer() {
     }
 
     fun remove() {
-        if (timeString.length > 0) {
+        if (timeString.isNotEmpty()) {
 //            Log.i("GoogleClockTimer().remove() timeString.last()", timeString.last().toString())
             timeString = timeString.dropLast(1)
             Log.i("GoogleClockTimer().remove()", timeString)
@@ -84,7 +120,7 @@ fun GoogleClockTimer() {
     }
 
     fun removeAll() {
-        if (timeString.length > 0) {
+        if (timeString.isNotEmpty()) {
             timeString = ""
         }
 
@@ -93,23 +129,13 @@ fun GoogleClockTimer() {
         }
     }
 
-//    if (timeString.toInt() < 100) {
-//        timeString.toInt().toDuration(DurationUnit.SECONDS)
-//    } else if (timeString.toInt() < 10000) {}
-    val windows = timeString.padStart(6, '0').windowed(2, 2)
-//    val restTime = kotlinx.datetime.LocalTime(hour = windows[0].toInt().toDuration(DurationUnit.HOURS), minute = windows[1].toInt(), second = windows[2].toInt())
-    val restTime = windows[0].toInt().toDuration(DurationUnit.HOURS) + windows[1].toInt()
-        .toDuration(DurationUnit.MINUTES) + windows[2].toInt().toDuration(DurationUnit.SECONDS)
-    Log.i("GoogleClockTimer() windows", windows.toList().toString())
-    Log.i("GoogleClockTimer() restTime", restTime.toString())
-
     Row(horizontalArrangement = Arrangement.Center) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(/*modifier = Modifier.height(40.dp)*/) {
+            Row {
                 Text(
                     text = when (timeString.length) {
                         5 -> timeString[0].toString().padStart(2, '0')
@@ -185,7 +211,7 @@ fun GoogleClockTimer() {
                     },
                     modifier = Modifier.padding(0.dp).alignByBaseline(),
                     fontSize = timeTextSize,
-                    color = if (timeString.length >= 1) {
+                    color = if (timeString.isNotEmpty()) {
                         timeEnabledTextColor
                     } else {
                         timeDisabledTextColor
@@ -198,7 +224,7 @@ fun GoogleClockTimer() {
                     modifier = Modifier.alignByBaseline(),
                     fontSize = timeUnitTextSize,
                     fontWeight = FontWeight.Light,
-                    color = if (timeString.length >= 1) {
+                    color = if (timeString.isNotEmpty()) {
                         timeEnabledTextColor
                     } else {
                         timeDisabledTextColor
@@ -359,15 +385,14 @@ fun GoogleClockTimer() {
                 }
                 Button(
                     onClick = { remove() },
-                    modifier = buttonModifier.then(
-                        Modifier.combinedClickable(
-                            onLongClickLabel = "Clear All",
+                    modifier =
+                    Modifier.combinedClickable(
+                        onLongClickLabel = "Clear All",
 //                            TODO May not work
-                            onLongClick = { removeAll() },
-                            onClickLabel = "Backspace",
-                            onClick = { remove() }
-                        )
-                    ),
+                        onLongClick = { removeAll() },
+                        onClickLabel = "Backspace",
+                        onClick = { remove() }
+                    ).then(buttonModifier),
                     shape = RoundedCornerShape(100),
                     contentPadding = PaddingValues(0.dp)
                 ) {
@@ -391,15 +416,17 @@ fun GoogleClockTimer() {
                         modifier = iconSizeModifier
                     )
                 }
-                Box(modifier = Modifier.width(90.dp)) {
+                Box(modifier = Modifier.width(80.dp).padding(0.dp)) {
                     this@Row.AnimatedVisibility(
                         visible = visible,
                         enter = scaleIn(animationSpec = tween(500)),
                         exit = scaleOut(animationSpec = tween(500))
                     ) {
                         Button(
-
-                            onClick = { /* TODO */ },
+                            onClick = {
+                                setTimer(restTime)
+                                openDialog()
+                            },
                             modifier = buttonModifier,
                             shape = RoundedCornerShape(100),
                             contentPadding = PaddingValues(0.dp)
@@ -412,7 +439,7 @@ fun GoogleClockTimer() {
                         }
                     }
                 }
-                Spacer(modifier = Modifier.width(90.dp))
+                Spacer(modifier = Modifier.width(80.dp))
             }
         }
     }

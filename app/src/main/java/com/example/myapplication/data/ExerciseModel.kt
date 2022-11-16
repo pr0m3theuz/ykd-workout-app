@@ -1,5 +1,7 @@
 package com.example.myapplication.data
 
+import kotlin.time.DurationUnit
+
 data class ExerciseModel(
     val id: Int = 0,
     var name: String,
@@ -10,6 +12,6 @@ data class ExerciseModel(
     var notesPinned: Boolean,
     var barType: String, // TODO Could be :BarType
     var weight: String, // TODO Could be ENUM -> Default, KG, LBS
-    var workingSetRest: Long,
-    var warmUpSetRest: Long
+    var workingSetRest: DurationUnit,
+    var warmUpSetRest: DurationUnit
 )

@@ -1,4 +1,4 @@
-package com.example.myapplication.components.WorkingSets
+package com.example.myapplication.components.workingSets
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState

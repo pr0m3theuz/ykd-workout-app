@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ExerciseViewModel
 import com.example.myapplication.WorkingSetViewModel
-import com.example.myapplication.components.WorkingSets.WorkingSetLazyColumn
+import com.example.myapplication.components.workingSets.WorkingSetLazyColumn
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
 import kotlin.math.roundToInt

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.myapplication.components.setRestTimer.setRestTimerScreen
 
 // import com.example.myapplication.components.RestTimer.RestTimePicker
 
@@ -119,7 +120,7 @@ fun exerciseOptionsDropdownMenu() {
         }
 
         if (openRestTimePicker) {
-            RestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) })
+            setRestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) })
         }
     }
 }

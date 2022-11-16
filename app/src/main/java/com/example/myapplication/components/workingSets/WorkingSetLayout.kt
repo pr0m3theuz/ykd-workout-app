@@ -1,4 +1,4 @@
-package com.example.myapplication.components.WorkingSets
+package com.example.myapplication.components.workingSets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
