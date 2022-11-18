@@ -1,8 +1,8 @@
 package com.example.myapplication.components
 
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 
 @Composable

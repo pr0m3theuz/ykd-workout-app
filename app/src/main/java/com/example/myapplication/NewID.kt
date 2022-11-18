@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import com.example.myapplication.components.formatter
+import com.example.myapplication.components.exercise.formatter
 import java.time.LocalDateTime
 import kotlin.random.Random
 

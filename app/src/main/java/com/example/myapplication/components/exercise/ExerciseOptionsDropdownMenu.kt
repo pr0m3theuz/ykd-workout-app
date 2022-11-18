@@ -7,19 +7,21 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.components.setRestTimer.setRestTimerScreen
+import com.example.myapplication.components.setRestTimer.SetRestTimerScreen
 
 // import com.example.myapplication.components.RestTimer.RestTimePicker
 
 @Preview
 @Composable
-fun exerciseOptionsDropdownMenu() {
+fun ExerciseOptionsDropdownMenu(
+    addNotes: () -> Unit
+) {
     var expandedExerciseOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedBarTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
     val openAddWarmUpSetsDialog = remember { mutableStateOf(false) }
     val openAddWorkingSetsDialog = remember { mutableStateOf(false) }
-    var openRestTimePicker by remember { mutableStateOf(true) }
+    var openRestTimePicker by remember { mutableStateOf(false) }
 
     fun closeAddWarmUpSetsDialog(close: Boolean) {
         openAddWarmUpSetsDialog.value = close
@@ -43,7 +45,7 @@ fun exerciseOptionsDropdownMenu() {
         ) {
             DropdownMenuItem(
                 text = { Text("Add Note") },
-                onClick = { /* TODO */ }
+                onClick = { addNotes() }
             )
             DropdownMenuItem(
                 text = { Text("Add Warm-up Sets") },
@@ -120,7 +122,7 @@ fun exerciseOptionsDropdownMenu() {
         }
 
         if (openRestTimePicker) {
-            setRestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) })
+            SetRestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) })
         }
     }
 }

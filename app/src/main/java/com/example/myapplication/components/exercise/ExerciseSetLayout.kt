@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
 // TODO exerciseSetLayout() takes in Set Data to populate row
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun exerciseSetLayout(
+fun ExerciseSetLayout(
     setIndex: Int,
     exerciseSet: SetModel,
     isSetCompleted: (Boolean) -> Unit,
@@ -122,7 +122,7 @@ fun exerciseSetLayout(
             propagateMinConstraints = true
         ) {
             Button(
-                modifier = Modifier.padding(horizontal = 16.dp).size(32.dp),
+                modifier = Modifier.padding(horizontal = 8.dp).size(32.dp),
                 shape = RoundedCornerShape(size = 8.dp),
                 contentPadding = PaddingValues(0.dp),
                 onClick = {

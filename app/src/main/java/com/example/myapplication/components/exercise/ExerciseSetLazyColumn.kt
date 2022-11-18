@@ -155,7 +155,7 @@ fun ExerciseSetLazyColumn(
                     backgroundColor = if (setCompletedState) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(CornerSize(0f))
                 ) {
-                    exerciseSetLayout(
+                    ExerciseSetLayout(
                         index,
                         exerciseSet,
                         { completed -> changesetCompletedState(completed) },

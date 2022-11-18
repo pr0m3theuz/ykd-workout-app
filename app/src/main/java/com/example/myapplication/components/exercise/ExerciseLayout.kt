@@ -1,25 +1,39 @@
-package com.example.myapplication.components
+package com.example.myapplication.components.exercise
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ExerciseViewModel
+import com.example.myapplication.components.ExerciseOptionsDropdownMenu
+import com.example.myapplication.components.ExerciseSetLazyColumn
+import com.example.myapplication.data.ExerciseModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
+import com.example.myapplication.ui.theme.PurpleGrey80
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExerciseScreen(exerciseViewModel: ExerciseViewModel = viewModel()) {
-    exerciseLayout(
+    ExerciseLayout(
+        exercise = ExerciseModel(name = "Exercise Name"),
         exerciseViewModel.exerciseSets,
         { exerciseViewModel.addSet() },
         { id: Long -> exerciseViewModel.remove(id) },
@@ -32,10 +46,10 @@ fun ExerciseScreen(exerciseViewModel: ExerciseViewModel = viewModel()) {
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun exerciseLayout(
+fun ExerciseLayout(
+    exercise: ExerciseModel,
     exerciseSets: List<SetModel>,
     addSet: () -> Unit,
     removeSet: (id: Long) -> Unit,
@@ -46,6 +60,22 @@ fun exerciseLayout(
     setComplete: (id: Long, setComplete: Boolean) -> Unit,
     updateSetType: (id: Long, setType: SetTypeModel) -> Unit
 ) {
+    var exerciseNotes by remember {
+        mutableStateOf(
+            TextFieldValue(
+                if (exercise.notesPinned && (exercise.pinnedNotes?.isNotEmpty() == true)) {
+                    exercise.pinnedNotes.orEmpty()
+                } else {
+                    exercise.notes.orEmpty()
+                }
+            )
+        )
+    }
+
+    var visible by remember { mutableStateOf(false) }
+
+//    TODO fun updateExerciseNotes() updates notes when workout is completed
+
     Row(modifier = Modifier.fillMaxWidth()) {
         Column {
             Row(
@@ -59,11 +89,47 @@ fun exerciseLayout(
                     text = "Exercise Name"
                 )
 
-                exerciseOptionsDropdownMenu()
+                ExerciseOptionsDropdownMenu(addNotes = { visible = !visible })
             }
 
-            Spacer(Modifier.height(8.dp))
-
+            this@Row.AnimatedVisibility(
+                visible = visible,
+                enter = scaleIn(animationSpec = tween(500)),
+                exit = scaleOut(animationSpec = tween(500))
+            ) {
+                Row {
+                    Box(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(PurpleGrey80)
+                            .fillMaxWidth(),
+                        propagateMinConstraints = true
+                    ) {
+                        BasicTextField(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            textStyle = TextStyle(
+                                fontSize = 5.em,
+                                color = MaterialTheme.colorScheme.onBackground
+                            ),
+                            value = exerciseNotes,
+                            onValueChange = {
+                                exerciseNotes = it
+                            }
+                        )
+                        IconButton(
+                            onClick = { /* TODO fun pinNote() {exercise.notesPinned = !exercise.notesPinned}*/ },
+                            modifier = Modifier.align(Alignment.CenterEnd).size(24.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.PushPin,
+                                contentDescription = "Localized description"
+                            )
+                        }
+                    }
+                }
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -139,12 +205,10 @@ fun exerciseLayout(
 }
 
 // TODO Remove
-@RequiresApi(Build.VERSION_CODES.O)
-val formatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
+val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
 
-@RequiresApi(Build.VERSION_CODES.O)
 private fun initExerciseSets(): List<SetModel> {
-    return List<SetModel>(6) { index ->
+    return List(6) { index ->
         SetModel(
             setNumber = index,
             exerciseWeight = 100.00,

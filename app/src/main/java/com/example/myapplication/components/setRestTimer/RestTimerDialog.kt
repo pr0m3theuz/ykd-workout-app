@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package com.example.myapplication.components.setRestTimer
 
 import android.util.Log
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,24 +20,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
 // @Preview
 @Composable
-fun setRestTimerScreen(
+fun RestTimerScreen(
     openDialog: (Boolean) -> Unit
 ) {
-    setRestTimerDialog(
-        { close -> openDialog(close) }
+    RestTimerDialog(
+        { close -> openDialog(close) },
+        workSetRestTime = 0.toDuration(DurationUnit.SECONDS),
+        warmUpSetRestTime = 90.toDuration(DurationUnit.SECONDS)
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTime::class)
 @Composable
-fun setRestTimerDialog(
-    openDialog: (Boolean) -> Unit
+fun RestTimerDialog(
+    openDialog: (Boolean) -> Unit,
+    workSetRestTime: Duration,
+    warmUpSetRestTime: Duration
 ) {
     val titles = listOf("Work Set", "Warm Up Set")
     var tabRowState by remember { mutableStateOf(0) }
@@ -45,6 +53,14 @@ fun setRestTimerDialog(
     var visible by remember {
         mutableStateOf(false)
     }
+
+    val buttonModifier = Modifier
+        .requiredSize(80.dp)
+        /*.aspectRatio(0.5F)*/
+//        .wrapContentSize(align = Alignment.Center)
+        .padding(0.dp)
+
+    val iconSizeModifier = Modifier.size(24.dp)
 
     val icon: (@Composable () -> Unit)? = if (timerEnabled[tabRowState]) {
         {
@@ -57,9 +73,6 @@ fun setRestTimerDialog(
     } else {
         null
     }
-
-    var workSetRestTime = 0.toDuration(DurationUnit.SECONDS)
-    var warmUpSetRestTime = 90.toDuration(DurationUnit.SECONDS)
 
     var workSetRestTimeString by remember { mutableStateOf("") }
     var warmUpSetRestTimeString by remember { mutableStateOf("") }
@@ -123,10 +136,11 @@ fun setRestTimerDialog(
     }
 
     fun remove() {
+        Log.i("setGoogleClockTimer().remove()", "Called")
         if (timeString.isNotEmpty()) {
 //            Log.i("GoogleClockTimer().remove() timeString.last()", timeString.last().toString())
             timeString = timeString.dropLast(1)
-            Log.i("setGoogleClockTimer().remove()", timeString)
+//            Log.i("setGoogleClockTimer().remove()", timeString)
         }
 
         restTimes[tabRowState] = timeString
@@ -146,6 +160,8 @@ fun setRestTimerDialog(
         if (timeString.isEmpty()) {
             visible = false
         }
+
+        Log.i("setGoogleClockTimer().removeAll()", timeString)
     }
 
     Log.i("setRestTimerDialog() tabRowState", tabRowState.toString())
@@ -235,40 +251,62 @@ fun setRestTimerDialog(
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        setGoogleClockTimer(
+                        TimerNumberPad(
                             { openDialog(false) },
                             /*tabRowState = tabRowState,*/
                             setTimer = { setTimer() },
                             /*workSetRestTime = workSetRestTime,
                         warmUpSetRestTime = warmUpSetRestTime,*/
-                            time = timeString,
                             add = { input -> add(input) },
                             remove = { remove() },
                             removeAll = { removeAll() },
                             visible = visible
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        /*Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Button(
+                                onClick = { *//* TODO *//* },
+                                modifier = buttonModifier,
+                                shape = RoundedCornerShape(100),
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
+                                Icon(
+                                    Icons.Outlined.Delete,
+                                    contentDescription = "Localized description",
+                                    modifier = iconSizeModifier
+                                )
+                            }
+                            Box(modifier = Modifier.width(80.dp).padding(0.dp)) {
+                                this@Row.AnimatedVisibility(
+                                    visible = visible,
+                                    enter = scaleIn(animationSpec = tween(500)),
+                                    exit = scaleOut(animationSpec = tween(500))
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            setTimer()
+                                            openDialog(false)
+                                        },
+                                        modifier = buttonModifier,
+                                        shape = RoundedCornerShape(100),
+                                        contentPadding = PaddingValues(0.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.PlayArrow,
+                                            contentDescription = "Localized description",
+                                            modifier = iconSizeModifier
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(80.dp))
+                        }*/
                     }
                 }
             }
         },
-        confirmButton = {
-            /* TextButton(
-                 onClick = {
-                     openDialog(false)
-                     run { insertWarmUpSets(warmUpSets) }
-                 }
-             ) {
-                 Text("Insert")
-             }*/
-        },
-        dismissButton = {
-/*            TextButton(
-                onClick = {
-                    openDialog(false)
-                }
-            ) {
-                Text("Cancel")
-            }*/
-        }
+        confirmButton = { },
+        dismissButton = { }
     )
 }
