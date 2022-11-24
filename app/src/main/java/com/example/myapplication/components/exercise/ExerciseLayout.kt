@@ -1,25 +1,13 @@
 package com.example.myapplication.components.exercise
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ExerciseViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
@@ -27,7 +15,6 @@ import com.example.myapplication.components.ExerciseSetLazyColumn
 import com.example.myapplication.data.ExerciseModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
-import com.example.myapplication.ui.theme.PurpleGrey80
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -60,19 +47,7 @@ fun ExerciseLayout(
     setComplete: (id: Long, setComplete: Boolean) -> Unit,
     updateSetType: (id: Long, setType: SetTypeModel) -> Unit
 ) {
-    var exerciseNotes by remember {
-        mutableStateOf(
-            TextFieldValue(
-                if (exercise.notesPinned && (exercise.pinnedNotes?.isNotEmpty() == true)) {
-                    exercise.pinnedNotes.orEmpty()
-                } else {
-                    exercise.notes.orEmpty()
-                }
-            )
-        )
-    }
-
-    var visible by remember { mutableStateOf(false) }
+    var notesVisible by remember { mutableStateOf(exercise.notesPinned) }
 
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
@@ -89,47 +64,18 @@ fun ExerciseLayout(
                     text = "Exercise Name"
                 )
 
-                ExerciseOptionsDropdownMenu(addNotes = { visible = !visible })
+                ExerciseOptionsDropdownMenu(addNotes = { notesVisible = true })
             }
 
-            this@Row.AnimatedVisibility(
-                visible = visible,
-                enter = scaleIn(animationSpec = tween(500)),
-                exit = scaleOut(animationSpec = tween(500))
+            AnimatedVisibility(
+                visible = notesVisible,
+                enter = slideInHorizontally(animationSpec = tween(250)),
+                exit = slideOutHorizontally(animationSpec = tween(250))
             ) {
-                Row {
-                    Box(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(PurpleGrey80)
-                            .fillMaxWidth(),
-                        propagateMinConstraints = true
-                    ) {
-                        BasicTextField(
-                            modifier = Modifier
-                                .padding(8.dp),
-                            textStyle = TextStyle(
-                                fontSize = 5.em,
-                                color = MaterialTheme.colorScheme.onBackground
-                            ),
-                            value = exerciseNotes,
-                            onValueChange = {
-                                exerciseNotes = it
-                            }
-                        )
-                        IconButton(
-                            onClick = { /* TODO fun pinNote() {exercise.notesPinned = !exercise.notesPinned}*/ },
-                            modifier = Modifier.align(Alignment.CenterEnd).size(24.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.PushPin,
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    }
-                }
+// TODO Add swipe to dismiss functionality and maybe wrap in a LazyColumn
+                ExerciseNotes(exercise = exercise)
             }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

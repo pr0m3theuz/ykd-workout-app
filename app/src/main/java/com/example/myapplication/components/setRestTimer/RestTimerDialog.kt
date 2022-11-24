@@ -25,7 +25,8 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
-// @Preview
+// TODO Pass in exercise: ExerciseModel to be able to update rest timers
+
 @Composable
 fun RestTimerScreen(
     openDialog: (Boolean) -> Unit
@@ -263,45 +264,6 @@ fun RestTimerDialog(
                             visible = visible
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-
-                        /*Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Button(
-                                onClick = { *//* TODO *//* },
-                                modifier = buttonModifier,
-                                shape = RoundedCornerShape(100),
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Icon(
-                                    Icons.Outlined.Delete,
-                                    contentDescription = "Localized description",
-                                    modifier = iconSizeModifier
-                                )
-                            }
-                            Box(modifier = Modifier.width(80.dp).padding(0.dp)) {
-                                this@Row.AnimatedVisibility(
-                                    visible = visible,
-                                    enter = scaleIn(animationSpec = tween(500)),
-                                    exit = scaleOut(animationSpec = tween(500))
-                                ) {
-                                    Button(
-                                        onClick = {
-                                            setTimer()
-                                            openDialog(false)
-                                        },
-                                        modifier = buttonModifier,
-                                        shape = RoundedCornerShape(100),
-                                        contentPadding = PaddingValues(0.dp)
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.PlayArrow,
-                                            contentDescription = "Localized description",
-                                            modifier = iconSizeModifier
-                                        )
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.width(80.dp))
-                        }*/
                     }
                 }
             }

@@ -20,3 +20,24 @@ data class ExerciseModel(
     var workingSetRestTimerEnabled: Boolean = true,
     var warmUpSetRestTimerEnabled: Boolean = false
 )
+
+// TODO These are unnecessary. Remove
+fun ExerciseModel.pinNotes(pinned: Boolean) {
+    notesPinned = pinned
+}
+
+fun ExerciseModel.updateWorkingSetRestTimer(time: Duration) {
+    workingSetRestTimer = time
+}
+
+fun ExerciseModel.updateWarmUpSetRestTimer(time: Duration) {
+    warmUpSetRestTimer = time
+}
+
+fun ExerciseModel.enableworkingSetRestTimer(enable: Boolean) {
+    workingSetRestTimerEnabled = enable
+}
+
+fun ExerciseModel.enableWarmUpSetRestTimer(enable: Boolean) {
+    warmUpSetRestTimerEnabled = enable
+}

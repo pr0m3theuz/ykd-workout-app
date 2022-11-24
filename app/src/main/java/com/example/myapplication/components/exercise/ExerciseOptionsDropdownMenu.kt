@@ -45,7 +45,10 @@ fun ExerciseOptionsDropdownMenu(
         ) {
             DropdownMenuItem(
                 text = { Text("Add Note") },
-                onClick = { addNotes() }
+                onClick = {
+                    addNotes()
+                    expandedExerciseOptionsDropdownMenu = false
+                }
             )
             DropdownMenuItem(
                 text = { Text("Add Warm-up Sets") },

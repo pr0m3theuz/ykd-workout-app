@@ -1,12 +1,22 @@
 package com.example.myapplication.data
 
-import java.util.*
+import android.util.Log
+import com.example.myapplication.newID
 import kotlin.time.Duration
 
 data class WorkoutModel(
-    val id: Int = 0,
+    val id: Long = newID(),
     var name: String,
-    var notes: String,
-    var workoutDuration: Duration,
-    var workoutDate: Date
+    var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
+    var pinnedNotes: String? = null,
+    var notesPinned: Boolean = false,
+    var workoutDuration: Duration? = Duration.ZERO
+//    val workoutStarted = LocalDateTime.now(), TODO
+//    val workoutEnded = LocalDateTime.now(), TODO
+//    var workoutDate: Date? = LocalDateTime.now()
 )
+
+fun WorkoutModel.pinNotes(pinned: Boolean) {
+    notesPinned = pinned
+    Log.i("pinNotes()", notesPinned.toString())
+}
