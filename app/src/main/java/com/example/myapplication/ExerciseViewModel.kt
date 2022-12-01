@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
 
+// TODO Take ExerciseSet, exercise & List<SetModel>
 class ExerciseViewModel : ViewModel() {
 
     private val _exerciseSets = initExerciseSets().toMutableStateList()
@@ -75,13 +76,7 @@ class ExerciseViewModel : ViewModel() {
 //        }
 //        return null
         // TODO Add If Not Empty
-        var workingSetWeight =
-            _exerciseSets.filter { it.setType.name != "Warm Up Set" }.first().exerciseWeight
-        if (workingSetWeight != null) {
-            return workingSetWeight
-        } else {
-            return null
-        }
+        return _exerciseSets.first { it.setType.name != "Warm Up Set" }.exerciseWeight
     }
 
     fun addWorkingSets(workingSets: List<SetModel>) {

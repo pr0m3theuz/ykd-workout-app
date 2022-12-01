@@ -11,25 +11,31 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ExerciseViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
-import com.example.myapplication.components.ExerciseSetLazyColumn
+import com.example.myapplication.components.SetLazyColumn
 import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun ExerciseScreen(exerciseViewModel: ExerciseViewModel = viewModel()) {
+fun ExerciseScreen(
+    exerciseViewModel: ExerciseViewModel = viewModel(),
+    exerciseSet: ExerciseSetModel,
+    startRestTimer: (setID: Long) -> Unit
+) {
     ExerciseLayout(
         exercise = ExerciseModel(name = "Exercise Name"),
         exerciseViewModel.exerciseSets,
         { exerciseViewModel.addSet() },
-        { id: Long -> exerciseViewModel.remove(id) },
-        { id: Long, newWeight: Double? -> exerciseViewModel.updateSetWeight(id, newWeight) },
-        { id: Long, newReps: Int? -> exerciseViewModel.updateSetReps(id, newReps) },
-        { id: Long, newRIR: Double? -> exerciseViewModel.updateSetRIR(id, newRIR) },
-        { id: Long, newRPE: Double? -> exerciseViewModel.updateSetRPE(id, newRPE) },
-        { id: Long, setComplete: Boolean -> exerciseViewModel.setComplete(id, setComplete) },
-        { id: Long, setType: SetTypeModel -> exerciseViewModel.updateSetType(id, setType) }
+        { setID: Long -> exerciseViewModel.remove(setID) },
+        { setID: Long, newWeight: Double? -> exerciseViewModel.updateSetWeight(setID, newWeight) },
+        { setID: Long, newReps: Int? -> exerciseViewModel.updateSetReps(setID, newReps) },
+        { setID: Long, newRIR: Double? -> exerciseViewModel.updateSetRIR(setID, newRIR) },
+        { setID: Long, newRPE: Double? -> exerciseViewModel.updateSetRPE(setID, newRPE) },
+        { setID: Long, setComplete: Boolean -> exerciseViewModel.setComplete(setID, setComplete) },
+        { setID: Long, setType: SetTypeModel -> exerciseViewModel.updateSetType(setID, setType) },
+        { setID: Long -> startRestTimer(setID) }
     )
 }
 
@@ -39,13 +45,14 @@ fun ExerciseLayout(
     exercise: ExerciseModel,
     exerciseSets: List<SetModel>,
     addSet: () -> Unit,
-    removeSet: (id: Long) -> Unit,
-    updateSetWeight: (id: Long, newWeight: Double?) -> Unit,
-    updateSetReps: (id: Long, newReps: Int?) -> Unit,
-    updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
-    updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
-    setComplete: (id: Long, setComplete: Boolean) -> Unit,
-    updateSetType: (id: Long, setType: SetTypeModel) -> Unit
+    removeSet: (setID: Long) -> Unit,
+    updateSetWeight: (setID: Long, newWeight: Double?) -> Unit,
+    updateSetReps: (setID: Long, newReps: Int?) -> Unit,
+    updateSetRIR: (setID: Long, newRIR: Double?) -> Unit,
+    updateSetRPE: (setID: Long, newRPE: Double?) -> Unit,
+    setComplete: (setID: Long, setComplete: Boolean) -> Unit,
+    updateSetType: (setID: Long, setType: SetTypeModel) -> Unit,
+    startRestTimer: (setID: Long) -> Unit
 ) {
     var notesVisible by remember { mutableStateOf(exercise.notesPinned) }
 
@@ -126,15 +133,16 @@ fun ExerciseLayout(
                 )
             }
 
-            ExerciseSetLazyColumn(
+            SetLazyColumn(
                 exerciseSets,
-                { id: Long -> removeSet(id) },
-                { id: Long, newWeight: Double? -> updateSetWeight(id, newWeight) },
-                { id: Long, newReps: Int? -> updateSetReps(id, newReps) },
-                { id: Long, newRIR: Double? -> updateSetWeight(id, newRIR) },
-                { id: Long, newRPE: Double? -> updateSetWeight(id, newRPE) },
-                { id: Long, setComplete: Boolean -> setComplete(id, setComplete) },
-                { id: Long, setType: SetTypeModel -> updateSetType(id, setType) }
+                { setID: Long -> removeSet(setID) },
+                { setID: Long, newWeight: Double? -> updateSetWeight(setID, newWeight) },
+                { setID: Long, newReps: Int? -> updateSetReps(setID, newReps) },
+                { setID: Long, newRIR: Double? -> updateSetWeight(setID, newRIR) },
+                { setID: Long, newRPE: Double? -> updateSetWeight(setID, newRPE) },
+                { setID: Long, setComplete: Boolean -> setComplete(setID, setComplete) },
+                { setID: Long, setType: SetTypeModel -> updateSetType(setID, setType) },
+                { setID: Long -> startRestTimer(setID) }
             )
 
             Row(

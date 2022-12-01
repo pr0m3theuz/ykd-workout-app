@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.DiscardWorkoutDialog
-import com.example.myapplication.components.exercise.ExerciseScreen
 import com.example.myapplication.components.exercise.WorkoutNotes
 import com.example.myapplication.components.workoutOptionsDropdownMenu
+import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.WorkoutModel
 
 // TODO Takes a Workout Object
@@ -41,9 +41,7 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
     var workoutName by remember {
         mutableStateOf(
             TextFieldValue(
-                if (workout.name.isNotEmpty() == true) {
-                    workout.name
-                } else {
+                workout.name.ifEmpty {
                     "Workout"
                 }
             )
@@ -82,7 +80,22 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
                 placeholder = "Workout Note"
             )
 
-            ExerciseScreen()
+            ExerciseSetLazyColumn(
+                exercisesSets = workoutViewModel.exercisesSets,
+                startRestTimer = { exerciseSet: ExerciseSetModel, setID: Long ->
+                    workoutViewModel.startSetCompletedTimer(
+                        exerciseSet,
+                        setID
+                    )
+                }
+            )
+
+            /*ExerciseScreen(startRestTimer = { exerciseSet: ExerciseSetModel, setID: Long ->
+                workoutViewModel.startSetCompletedTimer(
+                    exerciseSet,
+                    setID
+                )
+            })*/
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

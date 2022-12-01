@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 // @Preview
 @Composable
-fun ExerciseSetLazyColumn(
+fun SetLazyColumn(
     exerciseSets: List<SetModel>,
     deleteSet: (id: Long) -> Unit,
     updateSetWeight: (id: Long, newWeight: Double?) -> Unit,
@@ -40,7 +40,8 @@ fun ExerciseSetLazyColumn(
     updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
     setComplete: (id: Long, setComplete: Boolean) -> Unit,
-    updateSetType: (id: Long, setType: SetTypeModel) -> Unit
+    updateSetType: (id: Long, setType: SetTypeModel) -> Unit,
+    startRestTimer: (id: Long) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
@@ -98,6 +99,8 @@ fun ExerciseSetLazyColumn(
                 setCompletedState = status
                 setComplete(exerciseSet.id, status)
             }
+
+            if (setCompletedState) startRestTimer(exerciseSet.id)
 
             fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
                 openDialog.value = open

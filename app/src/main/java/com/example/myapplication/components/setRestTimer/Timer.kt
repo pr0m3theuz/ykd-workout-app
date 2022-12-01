@@ -45,7 +45,7 @@ class Timer(
             return max(0, timeSinceStart)
         }
 
-    // TODO Convert remainingTime to
+    // TODO Convert remainingTime to String
     val remainingTimeString: Duration
         get() {
             return remainingTime.toDuration(DurationUnit.MILLISECONDS)
@@ -116,6 +116,24 @@ class Timer(
             System.currentTimeMillis(),
             remainingTime
         )
+    }
+
+    /**
+     * @return a copy of this timer that is reset
+     */
+    fun reset(): Timer {
+        return if (state == timerState.RESET) {
+            this
+        } else {
+            Timer(
+                timerState.RESET,
+                0L,
+                0L,
+                0L,
+                0L,
+                0L
+            )
+        }
     }
 
     /**
