@@ -35,7 +35,7 @@ fun ExerciseOptionsDropdownMenu(
     }
 
     fun closeReplaceExerciseDialog(close: Boolean) {
-        openRestTimePicker = close
+        openReplaceExerciseDialog = close
     }
 
     Box {
@@ -131,7 +131,7 @@ fun ExerciseOptionsDropdownMenu(
             SetRestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) })
         }
 
-        if (openRestTimePicker) {
+        if (openReplaceExerciseDialog) {
             ReplaceExerciseDialog(openDialog = { close -> closeReplaceExerciseDialog(close) })
         }
     }

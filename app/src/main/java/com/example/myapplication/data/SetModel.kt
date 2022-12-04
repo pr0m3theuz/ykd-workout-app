@@ -1,16 +1,11 @@
 package com.example.myapplication.data
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import com.example.myapplication.newID
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import kotlin.random.Random
 
 data class SetModel(
-    var id: Long = LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 1000)),
-    val setNumber: Int? = null,
+    var id: Long = newID(),
+    var setNumber: Int? = null,
     var exerciseWeight: Double? = null,
     var repetitions: Int? = null,
     var ratePerceivedEffort: Double? = null,
@@ -24,10 +19,6 @@ data class SetModel(
         textColor = Color.White
     )
 )
-
-// TODO Remove
-@RequiresApi(Build.VERSION_CODES.O)
-val formatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
 
 class Set(_setModel: SetModel) {
 
@@ -52,4 +43,8 @@ class Set(_setModel: SetModel) {
     fun setComplete(setComplete: Boolean) {
         setModel.setCompleted = setComplete
     }
+}
+
+fun SetModel.setVolume(): Double? {
+    return exerciseWeight?.times(repetitions!!)
 }

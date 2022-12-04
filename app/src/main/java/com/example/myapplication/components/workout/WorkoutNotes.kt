@@ -76,9 +76,9 @@ fun WorkoutNotes(
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
     TextField(
-        placeholder = { Text("$placeholderText", color = Color.DarkGray) },
+        placeholder = { Text(placeholderText, color = Color.DarkGray) },
         modifier = Modifier
-            .padding(horizontal = 8.dp)
+            .padding(/*horizontal = */8.dp)
             .fillMaxWidth(),
         textStyle = TextStyle(
             fontSize = 5.em,

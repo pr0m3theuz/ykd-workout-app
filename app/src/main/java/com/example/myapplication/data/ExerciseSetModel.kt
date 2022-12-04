@@ -1,9 +1,139 @@
 package com.example.myapplication.data
 
+import android.util.Log
 import com.example.myapplication.newID
 
 data class ExerciseSetModel(
     val id: Long = newID(),
     val exercise: ExerciseModel,
-    val sets: List<SetModel>
+    var sets: MutableList<SetModel>
 )
+
+fun ExerciseSetModel.addSet() {
+    if (sets.isNotEmpty()) {
+        sets.add(
+            sets.last().copy(
+                id = newID(),
+                setNumber = sets.last().setNumber?.plus(1),
+                setCompleted = false
+            )
+        )
+    } else {
+        sets.add(
+            SetModel()
+        )
+    }
+
+    Log.i("workoutViewModel.addSet()", "${sets.size}")
+}
+
+fun ExerciseSetModel.removeSet(id: Long) {
+    sets.removeIf { it.id == id }
+}
+
+fun ExerciseSetModel.updateSetWeight(id: Long, newWeight: Double?) {
+    sets.forEach { if (it.id == id) it.exerciseWeight = newWeight }
+}
+
+fun ExerciseSetModel.updateSetReps(id: Long, newReps: Int?) {
+    sets.forEach { if (it.id == id) it.repetitions = newReps }
+}
+
+fun ExerciseSetModel.updateSetRIR(id: Long, newRIR: Double?) {
+    sets.forEach { if (it.id == id) it.ratePerceivedEffort = newRIR }
+}
+
+fun ExerciseSetModel.updateSetRPE(id: Long, newRPE: Double?) {
+    sets.forEach { if (it.id == id) it.ratePerceivedEffort = newRPE }
+}
+
+fun ExerciseSetModel.setComplete(id: Long, setComplete: Boolean) {
+    sets.forEach { if (it.id == id) it.setCompleted = setComplete }
+}
+
+fun ExerciseSetModel.updateSetType(id: Long, setType: SetTypeModel) {
+    sets.forEach { if (it.id == id) it.setType = setType }
+}
+
+fun ExerciseSetModel.addWarmUpSets(warmUpSets: List<SetModel>) {
+    for (index in warmUpSets.indices) {
+        sets.add(index, warmUpSets[index].copy(id = newID()))
+    }
+}
+
+fun ExerciseSetModel.getWorkingSetWeight(): Double? {
+//        for (index in sets.indices) {
+//            if (sets[index].setType.name != "Warm Up Set") {
+//                return sets[index].exerciseWeight
+//                break
+//            }
+//        }
+//        return null
+    // TODO Add If Not Empty
+    return sets.first { it.setType.name != "Warm Up Set" }.exerciseWeight
+}
+
+fun ExerciseSetModel.addWorkingSets(workingSets: List<SetModel>) {
+//        for (index in sets.indices) {
+//            if (sets[index].setType.name != "Warm Up Set") {
+//                sets.removeAt(index = index)
+//            }
+//        }
+    workingSets.forEach { it.id = newID() }
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Before: ${sets.toList()}")
+    sets.removeAll { it.setType.name != "Warm Up Set" }
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Removed Old Sets: ${sets.toList()}")
+    sets.addAll(workingSets)
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Added New Sets: ${sets.toList()}")
+}
+
+fun ExerciseSetModel.addBackOffSets(backOffSets: List<SetModel>) {
+    for (index in backOffSets.indices) {
+        sets.add(backOffSets[index].copy(id = newID()))
+    }
+
+//        backOffSets.forEach { it.id = newID() }
+//        sets.addAll(backOffSets)
+}
+
+// TODO Create Feature to Volume Equated Working Sets
+
+fun ExerciseSetModel.totalWorkingSetVolume(): Double {
+    val totalVolume: Double = 0.0
+
+    sets.filter { it.setType.name != "Warm Up Set" }.forEach { totalVolume.plus(it.setVolume()!!) }
+
+    return totalVolume
+}
+
+fun ExerciseSetModel.equateWorkingSetVolumeByWeight(weight: Double?): Double {
+    val totalVolume: Double = 0.0
+    var numberOfWorkingSets: Int = 0
+
+    sets.filter { it.setType.name != "Warm Up Set" }.forEach {
+        totalVolume.plus(it.setVolume()!!)
+        numberOfWorkingSets++
+    }
+
+    return if (numberOfWorkingSets > 0 && weight != null) {
+        totalVolume.div(weight).div(numberOfWorkingSets)
+    } else {
+        0.0
+    }
+}
+
+fun ExerciseSetModel.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double {
+    val totalVolume: Double = 0.0
+    var numberOfWorkingSets: Int = 0
+
+    sets.filter { it.setType.name != "Warm Up Set" }.forEach {
+        totalVolume.plus(it.setVolume()!!)
+        numberOfWorkingSets++
+    }
+
+    return if (numberOfWorkingSets > 0 && repetitions != null) {
+        totalVolume.div(repetitions).div(numberOfWorkingSets)
+    } else {
+        0.0
+    }
+}

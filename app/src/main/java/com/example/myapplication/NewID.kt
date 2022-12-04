@@ -1,9 +1,11 @@
 package com.example.myapplication
 
-import com.example.myapplication.components.exercise.formatter
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
 fun newID(): Long {
     return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 999))
 }
+
+val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")

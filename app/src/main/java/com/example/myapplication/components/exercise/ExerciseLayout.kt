@@ -9,32 +9,43 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.ExerciseViewModel
+import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
-import com.example.myapplication.components.SetLazyColumn
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.components.SetColumn
 import com.example.myapplication.data.ExerciseSetModel
-import com.example.myapplication.data.SetModel
-import com.example.myapplication.data.SetTypeModel
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ExerciseScreen(
-    exerciseViewModel: ExerciseViewModel = viewModel(),
-    exerciseSet: ExerciseSetModel,
+    workoutViewModel: WorkoutViewModel = viewModel(),
+    _exerciseSets: ExerciseSetModel,
+    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
     startRestTimer: (setID: Long) -> Unit
 ) {
+    val exerciseSet = remember { mutableStateOf(_exerciseSets) }
+
     ExerciseLayout(
-        exercise = ExerciseModel(name = "Exercise Name"),
-        exerciseViewModel.exerciseSets,
-        { exerciseViewModel.addSet() },
-        { setID: Long -> exerciseViewModel.remove(setID) },
-        { setID: Long, newWeight: Double? -> exerciseViewModel.updateSetWeight(setID, newWeight) },
-        { setID: Long, newReps: Int? -> exerciseViewModel.updateSetReps(setID, newReps) },
-        { setID: Long, newRIR: Double? -> exerciseViewModel.updateSetRIR(setID, newRIR) },
-        { setID: Long, newRPE: Double? -> exerciseViewModel.updateSetRPE(setID, newRPE) },
-        { setID: Long, setComplete: Boolean -> exerciseViewModel.setComplete(setID, setComplete) },
-        { setID: Long, setType: SetTypeModel -> exerciseViewModel.updateSetType(setID, setType) },
+/*        exerciseSet.exercise,
+        exerciseSet.sets,*/
+        exerciseSet.value,
+        { exerciseSets: ExerciseSetModel -> addSet(exerciseSets) },
+        { exerciseSets: ExerciseSetModel, setID: Long ->
+            workoutViewModel.removeSet(
+                exerciseSets,
+                setID
+            )
+        },
+/*        { setID: Long, newWeight: Double? -> workoutViewModel.updateSetWeight(setID, newWeight) },
+        { setID: Long, newReps: Int? -> workoutViewModel.updateSetReps(setID, newReps) },
+        { setID: Long, newRIR: Double? -> workoutViewModel.updateSetRIR(setID, newRIR) },
+        { setID: Long, newRPE: Double? -> workoutViewModel.updateSetRPE(setID, newRPE) },
+        { setID: Long, setType: SetTypeModel -> workoutViewModel.updateSetType(setID, setType) },*/
+        { exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean ->
+            workoutViewModel.setComplete(
+                exerciseSets,
+                setID,
+                setComplete
+            )
+        },
         { setID: Long -> startRestTimer(setID) }
     )
 }
@@ -42,19 +53,20 @@ fun ExerciseScreen(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ExerciseLayout(
-    exercise: ExerciseModel,
-    exerciseSets: List<SetModel>,
-    addSet: () -> Unit,
-    removeSet: (setID: Long) -> Unit,
-    updateSetWeight: (setID: Long, newWeight: Double?) -> Unit,
+/*    exercise: ExerciseModel,
+    exerciseSets: List<SetModel>,*/
+    exerciseSets: ExerciseSetModel,
+    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
+    removeSet: (exerciseSets: ExerciseSetModel, setID: Long) -> Unit,
+/*    updateSetWeight: (setID: Long, newWeight: Double?) -> Unit,
     updateSetReps: (setID: Long, newReps: Int?) -> Unit,
     updateSetRIR: (setID: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (setID: Long, newRPE: Double?) -> Unit,
-    setComplete: (setID: Long, setComplete: Boolean) -> Unit,
-    updateSetType: (setID: Long, setType: SetTypeModel) -> Unit,
+    updateSetType: (setID: Long, setType: SetTypeModel) -> Unit,*/
+    setComplete: (exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean) -> Unit,
     startRestTimer: (setID: Long) -> Unit
 ) {
-    var notesVisible by remember { mutableStateOf(exercise.notesPinned) }
+    var notesVisible by remember { mutableStateOf(exerciseSets.exercise.notesPinned) }
 
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
@@ -80,7 +92,7 @@ fun ExerciseLayout(
                 exit = slideOutHorizontally(animationSpec = tween(250))
             ) {
 // TODO Add swipe to dismiss functionality and maybe wrap in a LazyColumn
-                ExerciseNotes(exercise = exercise)
+                ExerciseNotes(exercise = exerciseSets.exercise)
             }
 
             Row(
@@ -133,15 +145,23 @@ fun ExerciseLayout(
                 )
             }
 
-            SetLazyColumn(
-                exerciseSets,
-                { setID: Long -> removeSet(setID) },
-                { setID: Long, newWeight: Double? -> updateSetWeight(setID, newWeight) },
-                { setID: Long, newReps: Int? -> updateSetReps(setID, newReps) },
-                { setID: Long, newRIR: Double? -> updateSetWeight(setID, newRIR) },
-                { setID: Long, newRPE: Double? -> updateSetWeight(setID, newRPE) },
-                { setID: Long, setComplete: Boolean -> setComplete(setID, setComplete) },
-                { setID: Long, setType: SetTypeModel -> updateSetType(setID, setType) },
+            SetColumn(
+                exerciseSets.sets,
+                { setID: Long -> removeSet(exerciseSets, setID) },
+/*                { *//*  setID: Long, newWeight: Double? -> updateSetWeight(setID, newWeight)  *//* },
+                { *//*  setID: Long, newReps: Int? -> updateSetReps(setID, newReps)  *//* },
+                { *//*  setID: Long, newRIR: Double? -> updateSetWeight(setID, newRIR)  *//* },
+                { *//*  setID: Long, newRPE: Double? -> updateSetWeight(setID, newRPE)  *//* },
+
+                { *//*  setID: Long, setType: SetTypeModel -> updateSetType(setID, setType)  *//* },*/
+
+                { setID: Long, setComplete: Boolean ->
+                    setComplete(
+                        exerciseSets,
+                        setID,
+                        setComplete
+                    )
+                },
                 { setID: Long -> startRestTimer(setID) }
             )
 
@@ -150,7 +170,7 @@ fun ExerciseLayout(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = { addSet() }) {
+                TextButton(onClick = { addSet(exerciseSets) }) {
                     Text("Add Set")
                 }
             }
@@ -158,15 +178,15 @@ fun ExerciseLayout(
     }
 }
 
-// TODO Remove
-val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
-
-private fun initExerciseSets(): List<SetModel> {
-    return List(6) { index ->
-        SetModel(
-            setNumber = index,
-            exerciseWeight = 100.00,
-            repetitions = 10
-        )
-    }
-}
+// // TODO Remove
+// val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
+//
+// private fun initExerciseSets(): List<SetModel> {
+//    return List(6) { index ->
+//        SetModel(
+//            setNumber = index,
+//            exerciseWeight = 100.00,
+//            repetitions = 10
+//        )
+//    }
+// }

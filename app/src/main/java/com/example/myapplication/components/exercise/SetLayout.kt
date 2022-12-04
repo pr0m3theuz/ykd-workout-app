@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
 // TODO exerciseSetLayout() takes in Set Data to populate row
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseSetLayout(
+fun SetLayout(
     setIndex: Int,
     exerciseSet: SetModel,
     isSetCompleted: (Boolean) -> Unit,
@@ -109,6 +109,10 @@ fun ExerciseSetLayout(
 
     fun changeIconColor() {
         iconColor = exerciseSet.setType.textColor
+    }
+
+    fun openTimerClock() {
+//        TODO openTimerClockDialog
     }
 
     Row(
