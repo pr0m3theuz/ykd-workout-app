@@ -12,7 +12,8 @@ import com.example.myapplication.components.setRestTimer.SetRestTimerScreen
 
 @Composable
 fun ExerciseOptionsDropdownMenu(
-    addNotes: () -> Unit
+    addNotes: () -> Unit,
+    removeExercise: () -> Unit
 ) {
     var expandedExerciseOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
@@ -107,7 +108,7 @@ fun ExerciseOptionsDropdownMenu(
             Divider()
             DropdownMenuItem(
                 text = { Text("Remove Exercise") },
-                onClick = { /* TODO */ }
+                onClick = { removeExercise() }
             )
         }
         WeightUnitOptionsDropdownMenu(

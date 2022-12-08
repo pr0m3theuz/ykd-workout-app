@@ -51,8 +51,8 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
     val workoutDuration by workoutViewModel.durationWorkout.collectAsState()
     val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
 
-    fun addSet(exerciseSet: ExerciseSetModel) {
-        workoutViewModel.addSet(exerciseSet)
+    fun removeExercise(exerciseSet: ExerciseSetModel) {
+//        workoutViewModel.addSet(exerciseSet)
     }
 
     Column {
@@ -85,51 +85,14 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
         )
 
         ExercisesSetsScreen(
-            exercises = exercisesSets,
-            addSet = { exerciseSet: ExerciseSetModel -> addSet(exerciseSet) },
+            exercises = exercisesSets
+/*            addSet = { exerciseSet: ExerciseSetModel -> removeExercise(exerciseSet) },
             startRestTimer = { exerciseSet: ExerciseSetModel, setID: Long ->
                 workoutViewModel.startSetCompletedTimer(
                     exerciseSet,
                     setID
                 )
-            }
+            }*/
         )
-
-//        ExerciseSetColumn(
-//                exercises = exercisesSets,
-//                addSet = { exerciseSet: ExerciseSetModel -> addSet(exerciseSet) },
-//                startRestTimer = { exerciseSet: ExerciseSetModel, setID: Long ->
-//                    workoutViewModel.startSetCompletedTimer(
-//                        exerciseSet,
-//                        setID
-//                    )
-//            }
-//        )
-
-        /*ExerciseScreen(startRestTimer = { exerciseSet: ExerciseSetModel, setID: Long ->
-            workoutViewModel.startSetCompletedTimer(
-                exerciseSet,
-                setID
-            )
-        })*/
-
-/*        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(onClick = { *//* TODO Do something! *//* }) {
-                Text("Add Exercise")
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(onClick = { closeDiscardWorkoutDialog(true) }) {
-                Text("Cancel Workout", color = Color.Red)
-            }
-        }*/
     }
 }

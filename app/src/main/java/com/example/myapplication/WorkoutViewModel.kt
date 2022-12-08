@@ -132,7 +132,33 @@ class WorkoutViewModel : ViewModel() {
         get() = _exercisesSets*/
 
     fun addSet(exerciseSets: ExerciseSetModel) {
-        removeExerciseSets(exerciseSets)
+        val index = _exercisesSetsData.indexOf(exerciseSets)
+
+        val temporarySets = exerciseSets.sets + exerciseSets.sets.last().copy(
+            id = newID(),
+            setNumber = exerciseSets.sets.last().setNumber?.plus(1),
+            setCompleted = false
+        )
+
+//        exerciseSets.sets.plus(
+//            exerciseSets.sets.last().copy(
+//                id = newID(),
+//                setNumber = exerciseSets.sets.last().setNumber?.plus(1),
+//                setCompleted = false
+//            )
+//        )
+
+        _exercisesSetsData[index] =
+            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
+
+        _exercisesSetsData[index]
+        _exercisesSetsData = _exercisesSetsData.toMutableList()
+        _exercisesSets.value = _exercisesSetsData
+
+//        Log.i(
+//            "workoutViewModel.addSet()",
+//            "${exerciseSets.id} & ${ _exercisesSetsData[index].id}"
+//        )
     }
 
     fun removeExerciseSets(exerciseSets: ExerciseSetModel) {
@@ -140,26 +166,32 @@ class WorkoutViewModel : ViewModel() {
         _exercisesSets.value = _exercisesSetsData
     }
 
-    fun removeSet(exerciseSets: ExerciseSetModel, setID: Long) {
-//        val exerciseSets = _exercisesSets.first { it.id == exerciseSetsID }
+    fun removeSet(exerciseSets: ExerciseSetModel, set: SetModel) {
+        val index = _exercisesSetsData.indexOf(exerciseSets)
+        val temporarySets = exerciseSets.sets.minusElement(set).toMutableList()
 
-        exerciseSets.removeSet(setID)
+        _exercisesSetsData[index] =
+            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
+        _exercisesSets.value = _exercisesSetsData.toMutableList()
     }
 
     fun updateSetWeight(exerciseSets: ExerciseSetModel, setID: Long, newWeight: Double?) {
-        exerciseSets.sets.forEach { if (it.id == setID) it.exerciseWeight = newWeight }
+        exerciseSets.updateSetWeight(
+            id = setID,
+            newWeight = newWeight
+        )
     }
 
     fun updateSetReps(exerciseSets: ExerciseSetModel, setID: Long, newReps: Int?) {
-        exerciseSets.sets.forEach { if (it.id == setID) it.repetitions = newReps }
+        exerciseSets.updateSetReps(id = setID, newReps = newReps)
     }
 
     fun updateSetRIR(exerciseSets: ExerciseSetModel, setID: Long, newRIR: Double?) {
-        exerciseSets.sets.forEach { if (it.id == setID) it.ratePerceivedEffort = newRIR }
+        exerciseSets.updateSetRIR(id = setID, newRIR = newRIR)
     }
 
     fun updateSetRPE(exerciseSets: ExerciseSetModel, setID: Long, newRPE: Double?) {
-        exerciseSets.sets.forEach { if (it.id == setID) it.ratePerceivedEffort = newRPE }
+        exerciseSets.updateSetRPE(id = setID, newRPE = newRPE)
     }
 
     fun setComplete(exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean) {
@@ -167,12 +199,57 @@ class WorkoutViewModel : ViewModel() {
     }
 
     fun updateSetType(exerciseSets: ExerciseSetModel, setID: Long, setType: SetTypeModel) {
-        exerciseSets.sets.forEach { if (it.id == setID) it.setType = setType }
+        exerciseSets.updateSetType(id = setID, setType = setType)
     }
 
     fun addWarmUpSets(exerciseSets: ExerciseSetModel, warmUpSets: List<SetModel>) {
+        val index = _exercisesSetsData.indexOf(exerciseSets)
         exerciseSets.addWarmUpSets(warmUpSets)
+
+        val temporarySets = exerciseSets.sets
+
+        _exercisesSetsData[index] =
+            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
+        _exercisesSets.value = _exercisesSetsData.toMutableList()
     }
+
+    fun getWorkingSetWeight(exerciseSets: ExerciseSetModel): Double? {
+        // TODO Add If Not Empty
+        return exerciseSets.sets.first { it.setType.name != "Warm Up Set" }.exerciseWeight
+    }
+
+    fun addWorkingSets(exerciseSets: ExerciseSetModel, workingSets: List<SetModel>) {
+        val index = _exercisesSetsData.indexOf(exerciseSets)
+
+        workingSets.forEach { it.id = newID() }
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Before: ${_exerciseSets.toList()}")
+        exerciseSets.sets.removeAll { it.setType.name != "Warm Up Set" }
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Removed Old Sets: ${_exerciseSets.toList()}")
+        exerciseSets.sets.addAll(workingSets)
+//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Added New Sets: ${_exerciseSets.toList()}")
+
+        val temporarySets = exerciseSets.sets
+
+        _exercisesSetsData[index] =
+            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
+        _exercisesSets.value = _exercisesSetsData.toMutableList()
+    }
+
+    fun addBackOffSets(exerciseSets: ExerciseSetModel, backOffSets: List<SetModel>) {
+        for (index in backOffSets.indices) {
+            exerciseSets.sets.add(backOffSets[index].copy(id = newID()))
+        }
+
+        val index = _exercisesSetsData.indexOf(exerciseSets)
+
+        val temporarySets = exerciseSets.sets
+
+        _exercisesSetsData[index] =
+            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
+        _exercisesSets.value = _exercisesSetsData.toMutableList()
+    }
+
+    // TODO Add function to Volume Equate Sets
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSetModel> {

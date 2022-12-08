@@ -32,9 +32,9 @@ fun ExerciseSetColumn(
         exercises.forEachIndexed { index, exerciseSets ->
             Log.i("ExerciseSetColumn() exerciseSets", "$exerciseSets")
             ExerciseScreen(
-                _exerciseSets = exerciseSets,
-                addSet = { addSet(exerciseSets) },
-                startRestTimer = { setID -> startRestTimer(exerciseSets, setID) }
+                _exerciseSets = exerciseSets
+/*                addSet = { addSet(exerciseSets) },
+                startRestTimer = { setID -> startRestTimer(exerciseSets, setID) }*/
             )
         }
 

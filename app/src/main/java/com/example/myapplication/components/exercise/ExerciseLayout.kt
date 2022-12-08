@@ -11,15 +11,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
-import com.example.myapplication.components.SetColumn
 import com.example.myapplication.data.ExerciseSetModel
 
 @Composable
 fun ExerciseScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
-    _exerciseSets: ExerciseSetModel,
-    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
-    startRestTimer: (setID: Long) -> Unit
+    _exerciseSets: ExerciseSetModel
+/*    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
+    startRestTimer: (setID: Long) -> Unit*/
 ) {
     val exerciseSet = remember { mutableStateOf(_exerciseSets) }
 
@@ -27,26 +26,27 @@ fun ExerciseScreen(
 /*        exerciseSet.exercise,
         exerciseSet.sets,*/
         exerciseSet.value,
-        { exerciseSets: ExerciseSetModel -> addSet(exerciseSets) },
+        /*{ exerciseSets: ExerciseSetModel -> workoutViewModel.addSet(exerciseSets) },
         { exerciseSets: ExerciseSetModel, setID: Long ->
             workoutViewModel.removeSet(
                 exerciseSets,
                 setID
             )
-        },
+        },*/
 /*        { setID: Long, newWeight: Double? -> workoutViewModel.updateSetWeight(setID, newWeight) },
         { setID: Long, newReps: Int? -> workoutViewModel.updateSetReps(setID, newReps) },
         { setID: Long, newRIR: Double? -> workoutViewModel.updateSetRIR(setID, newRIR) },
         { setID: Long, newRPE: Double? -> workoutViewModel.updateSetRPE(setID, newRPE) },
         { setID: Long, setType: SetTypeModel -> workoutViewModel.updateSetType(setID, setType) },*/
-        { exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean ->
+/*        { exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean ->
             workoutViewModel.setComplete(
                 exerciseSets,
                 setID,
                 setComplete
             )
         },
-        { setID: Long -> startRestTimer(setID) }
+        { setID: Long -> startRestTimer(setID) },*/
+        { exerciseSets: ExerciseSetModel -> workoutViewModel.removeExerciseSets(exerciseSets) }
     )
 }
 
@@ -56,15 +56,16 @@ fun ExerciseLayout(
 /*    exercise: ExerciseModel,
     exerciseSets: List<SetModel>,*/
     exerciseSets: ExerciseSetModel,
-    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
-    removeSet: (exerciseSets: ExerciseSetModel, setID: Long) -> Unit,
+//    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
+//    removeSet: (exerciseSets: ExerciseSetModel, setID: Long) -> Unit,
 /*    updateSetWeight: (setID: Long, newWeight: Double?) -> Unit,
     updateSetReps: (setID: Long, newReps: Int?) -> Unit,
     updateSetRIR: (setID: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (setID: Long, newRPE: Double?) -> Unit,
     updateSetType: (setID: Long, setType: SetTypeModel) -> Unit,*/
-    setComplete: (exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean) -> Unit,
-    startRestTimer: (setID: Long) -> Unit
+//    setComplete: (exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean) -> Unit,
+//    startRestTimer: (setID: Long) -> Unit,
+    removeExercise: (exerciseSets: ExerciseSetModel) -> Unit
 ) {
     var notesVisible by remember { mutableStateOf(exerciseSets.exercise.notesPinned) }
 
@@ -83,7 +84,10 @@ fun ExerciseLayout(
                     text = "Exercise Name"
                 )
 
-                ExerciseOptionsDropdownMenu(addNotes = { notesVisible = true })
+                ExerciseOptionsDropdownMenu(
+                    addNotes = { notesVisible = true },
+                    removeExercise = { removeExercise(exerciseSets) }
+                )
             }
 
             AnimatedVisibility(
@@ -101,9 +105,7 @@ fun ExerciseLayout(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .width(48.dp),
+                    modifier = Modifier.padding(0.dp).width(48.dp),
                     contentAlignment = Alignment.Center
 
                 ) {
@@ -118,36 +120,29 @@ fun ExerciseLayout(
                 ) { Text("PREVIOUS") }
 
                 Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp))
-                        .width(72.dp),
+                    modifier = Modifier.padding(PaddingValues(horizontal = 4.dp)).width(72.dp),
                     contentAlignment = Alignment.Center
                 ) { Text("WEIGHT") }
 
                 Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp))
-                        .width(60.dp),
+                    modifier = Modifier.padding(PaddingValues(horizontal = 4.dp)).width(60.dp),
                     contentAlignment = Alignment.Center
                 ) { Text("REPS") }
 
                 Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .width(40.dp),
+                    modifier = Modifier.padding(4.dp).width(40.dp),
                     contentAlignment = Alignment.Center
                 ) { Text("RIR") }
 
                 Spacer(
-                    Modifier
-                        .width(40.dp)
-                        .padding(PaddingValues(horizontal = 4.dp))
+                    Modifier.width(40.dp).padding(PaddingValues(horizontal = 4.dp))
                 )
             }
 
-            SetColumn(
-                exerciseSets.sets,
-                { setID: Long -> removeSet(exerciseSets, setID) },
+/*            Column {
+                SetsScreen(
+                    exerciseSets.sets,
+                    { setID: Long -> removeSet(exerciseSets, setID) },
 /*                { *//*  setID: Long, newWeight: Double? -> updateSetWeight(setID, newWeight)  *//* },
                 { *//*  setID: Long, newReps: Int? -> updateSetReps(setID, newReps)  *//* },
                 { *//*  setID: Long, newRIR: Double? -> updateSetWeight(setID, newRIR)  *//* },
@@ -155,25 +150,37 @@ fun ExerciseLayout(
 
                 { *//*  setID: Long, setType: SetTypeModel -> updateSetType(setID, setType)  *//* },*/
 
-                { setID: Long, setComplete: Boolean ->
-                    setComplete(
-                        exerciseSets,
-                        setID,
-                        setComplete
-                    )
-                },
-                { setID: Long -> startRestTimer(setID) }
-            )
+                    { setID: Long, setComplete: Boolean ->
+                        setComplete(
+                            exerciseSets,
+                            setID,
+                            setComplete
+                        )
+                    },
+                    { setID: Long -> startRestTimer(setID) }
+                )
+            } */
+//            SetColumn(
+//                exerciseSets.sets,
+//                { setID: Long -> removeSet(exerciseSets, setID) },
+// /*                { *//*  setID: Long, newWeight: Double? -> updateSetWeight(setID, newWeight)  *//* },
+//                { *//*  setID: Long, newReps: Int? -> updateSetReps(setID, newReps)  *//* },
+//                { *//*  setID: Long, newRIR: Double? -> updateSetWeight(setID, newRIR)  *//* },
+//                { *//*  setID: Long, newRPE: Double? -> updateSetWeight(setID, newRPE)  *//* },
+//
+//                { *//*  setID: Long, setType: SetTypeModel -> updateSetType(setID, setType)  *//* },*/
+//
+//                { setID: Long, setComplete: Boolean ->
+//                    setComplete(
+//                        exerciseSets,
+//                        setID,
+//                        setComplete
+//                    )
+//                },
+//                { setID: Long -> startRestTimer(setID) }
+//            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextButton(onClick = { addSet(exerciseSets) }) {
-                    Text("Add Set")
-                }
-            }
+//            AddSet { addSet(exerciseSets) }
         }
     }
 }
@@ -190,3 +197,17 @@ fun ExerciseLayout(
 //        )
 //    }
 // }
+
+@Composable
+fun AddSet(addSet: () -> Unit) {
+//    addSet(exerciseSets)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextButton(onClick = { addSet() }) {
+            Text("Add Set")
+        }
+    }
+}
