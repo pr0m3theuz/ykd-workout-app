@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import com.example.myapplication.data.ExerciseModel
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -27,32 +28,38 @@ import kotlin.time.toDuration
 
 // @Preview
 @Composable
-fun SetRestTimerScreen(
-    openDialog: (Boolean) -> Unit
+fun AutoRestTimerScreen(
+    openDialog: (Boolean) -> Unit,
+    exercise: ExerciseModel
 ) {
-    SetRestTimerDialog(
+    AutoRestTimerDialog(
         { close -> openDialog(close) },
-        workSetRestTime = 0.toDuration(DurationUnit.SECONDS),
-        warmUpSetRestTime = 90.toDuration(DurationUnit.SECONDS)
+        exercise,
+        workSetRestTime = exercise.workingSetRestDuration,
+        isWorkingSetRestTimerEnabled = exercise.workingSetRestTimerEnabled,
+        warmUpSetRestTime = exercise.warmUpSetRestDuration,
+        isWarmUpSetRestTimerEnabled = exercise.warmUpSetRestTimerEnabled
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTime::class)
 @Composable
-fun SetRestTimerDialog(
+fun AutoRestTimerDialog(
     openDialog: (Boolean) -> Unit,
+    exercise: ExerciseModel,
     workSetRestTime: Duration,
-    warmUpSetRestTime: Duration
+    isWorkingSetRestTimerEnabled: Boolean,
+    warmUpSetRestTime: Duration,
+    isWarmUpSetRestTimerEnabled: Boolean
+
 ) {
     val titles = listOf("Work Set", "Warm Up Set")
     var tabRowState by remember { mutableStateOf(0) }
     var checked by remember { mutableStateOf(true) }
-    var checkedWorkSet by remember { mutableStateOf(false) }
-    var checkedWarmUpSet by remember { mutableStateOf(false) }
-    val timerEnabled = mutableListOf(checkedWorkSet, checkedWarmUpSet)
-    var visible by remember {
-        mutableStateOf(false)
-    }
+    var enableWorkSetRestTimer by remember { mutableStateOf(isWorkingSetRestTimerEnabled) }
+    var enableWarmUpSetRestTimer by remember { mutableStateOf(isWarmUpSetRestTimerEnabled) }
+    val timerEnabled = mutableListOf(enableWorkSetRestTimer, enableWarmUpSetRestTimer)
+    var visible by remember { mutableStateOf(false) }
 
     val buttonModifier = Modifier
         .requiredSize(80.dp)
@@ -76,15 +83,15 @@ fun SetRestTimerDialog(
 
     var workSetRestTimeString by remember { mutableStateOf("") }
     var warmUpSetRestTimeString by remember { mutableStateOf("") }
-    val restTimes = mutableListOf(workSetRestTimeString, warmUpSetRestTimeString)
 
-    workSetRestTimeString = workSetRestTime.toComponents { hours, minutes, seconds, nanoseconds ->
-        (
-            hours.toString().padStart(2, '0') +
-                minutes.toString().padStart(2, '0') +
-                seconds.toString().padStart(2, '0')
-            ).toInt().toString().removePrefix("0")
-    }
+    workSetRestTimeString =
+        workSetRestTime.toComponents { hours, minutes, seconds, nanoseconds ->
+            (
+                hours.toString().padStart(2, '0') +
+                    minutes.toString().padStart(2, '0') +
+                    seconds.toString().padStart(2, '0')
+                ).toInt().toString().removePrefix("0")
+        }
 
     warmUpSetRestTimeString =
         warmUpSetRestTime.toComponents { hours, minutes, seconds, nanoseconds ->
@@ -95,15 +102,24 @@ fun SetRestTimerDialog(
                 ).toInt().toString().removePrefix("0")
         }
 
-    var timeString: String by remember { mutableStateOf("") }
+//    val restTimesList = mutableListOf(workSetRestTime, warmUpSetRestTime)
+    val restTimesStringsList = mutableListOf(workSetRestTimeString, warmUpSetRestTimeString)
 
-    val windows = timeString.padStart(6, '0').windowed(2, 2)
+    var timeString: String by remember { mutableStateOf(workSetRestTimeString) }
 
-    val restTime = windows[0].toInt().toDuration(DurationUnit.HOURS) +
-        windows[1].toInt().toDuration(DurationUnit.MINUTES) +
-        windows[2].toInt().toDuration(DurationUnit.SECONDS)
-    Log.i("setGoogleClockTimer() windows", windows.toList().toString())
-    Log.i("setGoogleClockTimer() restTime", restTime.toString())
+//    TODO Rename windows to better name
+
+    fun convertTimeStringToDuration(timeString: String): Duration {
+        val windows = timeString.padStart(6, '0').windowed(2, 2)
+
+        val restTime = windows[0].toInt().toDuration(DurationUnit.HOURS) +
+            windows[1].toInt().toDuration(DurationUnit.MINUTES) +
+            windows[2].toInt().toDuration(DurationUnit.SECONDS)
+        Log.i("setGoogleClockTimer() windows", windows.toList().toString())
+        Log.i("setGoogleClockTimer() restTime", restTime.toString())
+
+        return restTime
+    }
 
     fun onTabChange() {
         timeString = if (tabRowState == 0) {
@@ -124,7 +140,7 @@ fun SetRestTimerDialog(
             }
         }
 
-        restTimes[tabRowState] = timeString
+        restTimesStringsList[tabRowState] = timeString
 
         if (timeString.isNotEmpty()) {
             visible = true
@@ -143,7 +159,7 @@ fun SetRestTimerDialog(
 //            Log.i("setGoogleClockTimer().remove()", timeString)
         }
 
-        restTimes[tabRowState] = timeString
+        restTimesStringsList[tabRowState] = timeString
 
         if (timeString.isEmpty()) {
             visible = false
@@ -155,7 +171,7 @@ fun SetRestTimerDialog(
             timeString = ""
         }
 
-        restTimes[tabRowState] = timeString
+        restTimesStringsList[tabRowState] = timeString
 
         if (timeString.isEmpty()) {
             visible = false
@@ -167,12 +183,26 @@ fun SetRestTimerDialog(
     Log.i("setRestTimerDialog() tabRowState", tabRowState.toString())
     Log.i("setRestTimerDialog() timeString", timeString)
 
-    fun setTimer() {
-        if (tabRowState == 0) {
-//            TODO = restTime
-        } else {
-//            TODO = restTime
+    //    TODO Doesn't change enable or disable. FIX!
+    fun changeRestTimerStatus() {
+        if (tabRowState == 1) {
+            exercise.warmUpSetRestTimerEnabled = enableWarmUpSetRestTimer
+        } else if (tabRowState == 0) {
+            exercise.workingSetRestTimerEnabled = enableWorkSetRestTimer
         }
+    }
+
+    //    TODO Doesn't update duration. FIX!
+    fun setRestTimersDuration() {
+        if (tabRowState == 1) {
+            exercise.warmUpSetRestDuration =
+                convertTimeStringToDuration(restTimesStringsList[tabRowState])
+        } else if (tabRowState == 0) {
+            exercise.workingSetRestDuration =
+                convertTimeStringToDuration(restTimesStringsList[tabRowState])
+        }
+
+        changeRestTimerStatus()
     }
 
     AlertDialog(
@@ -234,9 +264,9 @@ fun SetRestTimerDialog(
                         onCheckedChange = {
                             checked = it
                             if (tabRowState == 0) {
-                                checkedWorkSet = it
+                                enableWorkSetRestTimer = it
                             } else {
-                                checkedWarmUpSet = it
+                                enableWarmUpSetRestTimer = it
                             }
                         }
                     )
@@ -254,7 +284,7 @@ fun SetRestTimerDialog(
                         TimerNumberPad(
                             { openDialog(false) },
                             /*tabRowState = tabRowState,*/
-                            setTimer = { setTimer() },
+                            setTimer = { setRestTimersDuration() },
                             /*workSetRestTime = workSetRestTime,
                         warmUpSetRestTime = warmUpSetRestTime,*/
                             add = { input -> add(input) },
@@ -310,7 +340,7 @@ fun SetRestTimerDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    setTimer()
+                    setRestTimersDuration()
                 }
             ) {
                 Text("Confirm")

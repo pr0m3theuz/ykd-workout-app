@@ -7,11 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.components.SetItem
 import com.example.myapplication.components.exercise.AddSet
 import com.example.myapplication.components.exercise.ExerciseScreen
+import com.example.myapplication.components.exercise.SetItem
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.SetTypeModel
 
 @Composable
 fun ExercisesSetsScreen(
@@ -41,44 +42,17 @@ fun ExercisesSetsScreen(
 fun ExerciseSetLazyColumn(
     workoutViewModel: WorkoutViewModel = viewModel(),
     exercises: List<ExerciseSetModel>
-//    addSet: (exerciseSet: ExerciseSetModel) -> Unit,
-//    startRestTimer: (exerciseSet: ExerciseSetModel, setID: Long) -> Unit
 ) {
-//    val _exercisesSets by workoutViewModel.exercisesSets.collectAsState()
-//    val exercisesSets = remember { mutableStateOf(_exercisesSets) }
-//    val exercises = exercisesSets
-
-//    val exerciseSets = exercises[0]
-
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-/*items(count = exercises.size, key = { index -> exercises[index].id }) { index ->
-            val item = exercises[index]
-
-            ExerciseScreen(
-                _exerciseSets = item,
-                addSet = { addSet(item) },
-                startRestTimer = { setID -> startRestTimer(item, setID) }
-            )
-        }*/
-/*        items(exercises, key = { item -> item.id }) { item ->
-            ExerciseScreen(
-                _exerciseSets = item,
-                addSet = { addSet(item) },
-                startRestTimer = { setID -> startRestTimer(item, setID) }
-            )
-        }*/
-
         items(
             exercises,
             key = { item -> item.id }
         ) { exerciseSets ->
             ExerciseScreen(
                 _exerciseSets = exerciseSets
-/*            addSet = { exerciseSets -> exerciseSets.addSet() },
-            startRestTimer = { setID -> setID.toULong() }*/
             )
 
             exerciseSets.sets.forEachIndexed { index: Int, set: SetModel ->
@@ -86,10 +60,39 @@ fun ExerciseSetLazyColumn(
                     index = index,
                     set = set,
                     removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
-                    startRestTimer = {
-                        workoutViewModel.startSetCompletedTimer(
-                            exerciseSets,
-                            set.id
+                    updateSetWeight = { setID: Long, newWeight: Double? ->
+                        workoutViewModel.updateSetWeight(
+                            exerciseSets = exerciseSets,
+                            setID = setID,
+                            newWeight = newWeight
+                        )
+                    },
+                    updateSetReps = { setID: Long, newReps: Int? ->
+                        workoutViewModel.updateSetReps(
+                            exerciseSets = exerciseSets,
+                            setID,
+                            newReps
+                        )
+                    },
+                    updateSetRIR = { setID: Long, newRIR: Double? ->
+                        workoutViewModel.updateSetRIR(
+                            exerciseSets = exerciseSets,
+                            setID,
+                            newRIR
+                        )
+                    },
+                    updateSetRPE = { setID: Long, newRPE: Double? ->
+                        workoutViewModel.updateSetRPE(
+                            exerciseSets = exerciseSets,
+                            setID,
+                            newRPE
+                        )
+                    },
+                    updateSetType = { setID: Long, setType: SetTypeModel ->
+                        workoutViewModel.updateSetType(
+                            exerciseSets = exerciseSets,
+                            setID,
+                            setType
                         )
                     },
                     setComplete = { setComplete: Boolean ->
@@ -97,6 +100,12 @@ fun ExerciseSetLazyColumn(
                             exerciseSets,
                             set.id,
                             setComplete
+                        )
+                    },
+                    startRestTimer = {
+                        workoutViewModel.startSetCompletedTimer(
+                            exerciseSets,
+                            set.id
                         )
                     }
                 )
@@ -113,38 +122,3 @@ fun ExerciseSetLazyColumn(
         }
     }
 }
-
-/*
-fun LazyListScope.exerciseSetsItem(
-    workoutViewModel: WorkoutViewModel = viewModel(),
-    exerciseSets: ExerciseSetModel
-) {
-    item {
-        ExerciseScreen(
-            _exerciseSets = exerciseSets
-*/
-/*            addSet = { exerciseSets -> exerciseSets.addSet() },
-            startRestTimer = { setID -> setID.toULong() }*//*
-
-        )
-    }
-
-    itemsIndexed(exerciseSets.sets) { index: Int, set: SetModel ->
-        SetItem(
-            index = index,
-            set = set,
-            removeSet = { workoutViewModel.removeSet(exerciseSets, set.id) },
-            startRestTimer = { workoutViewModel.startSetCompletedTimer(exerciseSets, set.id) },
-            setComplete = { setID: Long, setComplete: Boolean ->
-                workoutViewModel.setComplete(
-                    exerciseSets,
-                    setID,
-                    setComplete
-                )
-            }
-        )
-    }
-
-    item { AddSet(addSet = { workoutViewModel.addSet(exerciseSets) }) }
-}
-*/

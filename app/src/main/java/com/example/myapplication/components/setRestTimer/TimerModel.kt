@@ -9,7 +9,7 @@ class TimerModel {
     fun startTimer(length: Long): Timer {
         // Create the timer instance.
         val timer = Timer(
-            state = timerState.RUNNING,
+            state = TimerState.RUNNING,
             length = 60.toDuration(DurationUnit.SECONDS).toLong(DurationUnit.MILLISECONDS),
             totalLength = 60.toDuration(DurationUnit.SECONDS).toLong(DurationUnit.MILLISECONDS),
             startTime = System.currentTimeMillis(),

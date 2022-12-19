@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
 import com.example.myapplication.ui.theme.PurpleGrey80
@@ -111,8 +112,19 @@ fun SetLayout(
         iconColor = exerciseSet.setType.textColor
     }
 
-    fun openTimerClock() {
+    // Set Completed
+    val checkedState = remember { mutableStateOf(false) }
+
+    var openTimerScreen by remember { mutableStateOf(false) }
+
+    fun closeTimerScreen(close: Boolean) {
+        openTimerScreen = close
+    }
+
+    if (openTimerScreen) {
+//        TODO Navigate to
 //        TODO openTimerClockDialog
+        TimerScreen(openDialog = { close -> closeTimerScreen(close) })
     }
 
     Row(
@@ -269,13 +281,12 @@ fun SetLayout(
             )
         }
 
-        // Set Completed
-        val checkedState = remember { mutableStateOf(false) }
         Checkbox(
             checked = checkedState.value,
             onCheckedChange = {
                 checkedState.value = it
                 isSetCompleted(it)
+                closeTimerScreen(it)
             }
         )
     }

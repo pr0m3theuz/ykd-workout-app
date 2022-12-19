@@ -11,7 +11,7 @@ import kotlin.time.toDuration
 
 class Timer(
     /** The current state of the timer.  */
-    val state: timerState,
+    val state: TimerState,
     /** The original length of the timer in milliseconds when it was created.  */
     val length: Long,
     /** The length of the timer in milliseconds including additional time added by the user.  */
@@ -24,13 +24,13 @@ class Timer(
     val lastRemainingTime: Long
 ) {
     val isReset: Boolean
-        get() = state == timerState.RESET
+        get() = state == TimerState.RESET
 
     val isRunning: Boolean
-        get() = state == timerState.RUNNING
+        get() = state == TimerState.RUNNING
 
     val isExpired: Boolean
-        get() = state == timerState.EXPIRED
+        get() = state == TimerState.EXPIRED
 
     /**
      * @return the total amount of time remaining up to this moment; expired and missed timers will
@@ -56,7 +56,7 @@ class Timer(
      */
     val expirationTime: Long
         get() {
-            check(!(state != timerState.RUNNING && state != timerState.EXPIRED)) {
+            check(!(state != TimerState.RUNNING && state != TimerState.EXPIRED)) {
                 "cannot compute expiration time in timerState $state"
             }
             return startTime + remainingTime
@@ -67,7 +67,7 @@ class Timer(
      */
     val wallClockExpirationTime: Long
         get() {
-            check(!(state != timerState.RUNNING && state != timerState.EXPIRED)) {
+            check(!(state != TimerState.RUNNING && state != TimerState.EXPIRED)) {
                 "cannot compute expiration time in state $state"
             }
             return wallClockTime + remainingTime
@@ -85,11 +85,11 @@ class Timer(
      * @return a copy of this timer that is running, expired or missed
      */
     fun start(): Timer {
-        return if (state == timerState.RUNNING || state == timerState.EXPIRED) {
+        return if (state == TimerState.RUNNING || state == TimerState.EXPIRED) {
             this
         } else {
             Timer(
-                timerState.RUNNING,
+                TimerState.RUNNING,
                 length,
                 totalLength,
                 System.currentTimeMillis(),
@@ -103,13 +103,13 @@ class Timer(
      * @return a copy of this timer that is expired, missed or reset
      */
     fun expire(): Timer {
-        if (state == timerState.EXPIRED || state == timerState.RESET) {
+        if (state == TimerState.EXPIRED || state == TimerState.RESET) {
             return this
         }
 
         val remainingTime = min(0L, remainingTime)
         return Timer(
-            timerState.EXPIRED,
+            TimerState.EXPIRED,
             length,
             0L,
             System.currentTimeMillis(),
@@ -122,11 +122,11 @@ class Timer(
      * @return a copy of this timer that is reset
      */
     fun reset(): Timer {
-        return if (state == timerState.RESET) {
+        return if (state == TimerState.RESET) {
             this
         } else {
             Timer(
-                timerState.RESET,
+                TimerState.RESET,
                 0L,
                 0L,
                 0L,
@@ -140,7 +140,7 @@ class Timer(
      * @return a copy of this timer that has its times adjusted after time has been set
      */
     fun updateAfterTimeSet(): Timer {
-        if (state == timerState.RESET) {
+        if (state == TimerState.RESET) {
             return this
         }
         val timeSinceBoot = System.currentTimeMillis()
@@ -170,7 +170,7 @@ class Timer(
      */
     fun setRemainingTime(remainingTime: Long): Timer {
         // Do not change the remaining time of a reset timer.
-        if (lastRemainingTime == remainingTime || state == timerState.RESET) {
+        if (lastRemainingTime == remainingTime || state == TimerState.RESET) {
             return this
         }
 
@@ -179,9 +179,9 @@ class Timer(
 
         val lastStartTime: Long
         val lastWallClockTime: Long
-        val state: timerState?
-        if (remainingTime > 0 && (this.state == timerState.EXPIRED)) {
-            state = timerState.RUNNING
+        val state: TimerState?
+        if (remainingTime > 0 && (this.state == TimerState.EXPIRED)) {
+            state = TimerState.RUNNING
             lastStartTime = System.currentTimeMillis()
             lastWallClockTime = System.currentTimeMillis()
         } else {
@@ -205,7 +205,7 @@ class Timer(
      * length, or this Timer if the minute could not be added
      */
     fun addMinute(): Timer {
-        return if (state == timerState.EXPIRED) {
+        return if (state == TimerState.EXPIRED) {
             // Expired and missed timers restart with 60 seconds of remaining time.
             setRemainingTime(DateUtils.MINUTE_IN_MILLIS)
         } else {
@@ -215,7 +215,7 @@ class Timer(
     }
 }
 
-enum class timerState() {
+enum class TimerState() {
     RUNNING,
     EXPIRED,
     RESET

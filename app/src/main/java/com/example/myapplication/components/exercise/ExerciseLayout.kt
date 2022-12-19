@@ -17,8 +17,6 @@ import com.example.myapplication.data.ExerciseSetModel
 fun ExerciseScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
     _exerciseSets: ExerciseSetModel
-/*    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
-    startRestTimer: (setID: Long) -> Unit*/
 ) {
     val exerciseSet = remember { mutableStateOf(_exerciseSets) }
 
@@ -53,18 +51,7 @@ fun ExerciseScreen(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ExerciseLayout(
-/*    exercise: ExerciseModel,
-    exerciseSets: List<SetModel>,*/
     exerciseSets: ExerciseSetModel,
-//    addSet: (exerciseSets: ExerciseSetModel) -> Unit,
-//    removeSet: (exerciseSets: ExerciseSetModel, setID: Long) -> Unit,
-/*    updateSetWeight: (setID: Long, newWeight: Double?) -> Unit,
-    updateSetReps: (setID: Long, newReps: Int?) -> Unit,
-    updateSetRIR: (setID: Long, newRIR: Double?) -> Unit,
-    updateSetRPE: (setID: Long, newRPE: Double?) -> Unit,
-    updateSetType: (setID: Long, setType: SetTypeModel) -> Unit,*/
-//    setComplete: (exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean) -> Unit,
-//    startRestTimer: (setID: Long) -> Unit,
     removeExercise: (exerciseSets: ExerciseSetModel) -> Unit
 ) {
     var notesVisible by remember { mutableStateOf(exerciseSets.exercise.notesPinned) }
@@ -85,6 +72,7 @@ fun ExerciseLayout(
                 )
 
                 ExerciseOptionsDropdownMenu(
+                    exerciseSets = exerciseSets,
                     addNotes = { notesVisible = true },
                     removeExercise = { removeExercise(exerciseSets) }
                 )
@@ -138,76 +126,6 @@ fun ExerciseLayout(
                     Modifier.width(40.dp).padding(PaddingValues(horizontal = 4.dp))
                 )
             }
-
-/*            Column {
-                SetsScreen(
-                    exerciseSets.sets,
-                    { setID: Long -> removeSet(exerciseSets, setID) },
-/*                { *//*  setID: Long, newWeight: Double? -> updateSetWeight(setID, newWeight)  *//* },
-                { *//*  setID: Long, newReps: Int? -> updateSetReps(setID, newReps)  *//* },
-                { *//*  setID: Long, newRIR: Double? -> updateSetWeight(setID, newRIR)  *//* },
-                { *//*  setID: Long, newRPE: Double? -> updateSetWeight(setID, newRPE)  *//* },
-
-                { *//*  setID: Long, setType: SetTypeModel -> updateSetType(setID, setType)  *//* },*/
-
-                    { setID: Long, setComplete: Boolean ->
-                        setComplete(
-                            exerciseSets,
-                            setID,
-                            setComplete
-                        )
-                    },
-                    { setID: Long -> startRestTimer(setID) }
-                )
-            } */
-//            SetColumn(
-//                exerciseSets.sets,
-//                { setID: Long -> removeSet(exerciseSets, setID) },
-// /*                { *//*  setID: Long, newWeight: Double? -> updateSetWeight(setID, newWeight)  *//* },
-//                { *//*  setID: Long, newReps: Int? -> updateSetReps(setID, newReps)  *//* },
-//                { *//*  setID: Long, newRIR: Double? -> updateSetWeight(setID, newRIR)  *//* },
-//                { *//*  setID: Long, newRPE: Double? -> updateSetWeight(setID, newRPE)  *//* },
-//
-//                { *//*  setID: Long, setType: SetTypeModel -> updateSetType(setID, setType)  *//* },*/
-//
-//                { setID: Long, setComplete: Boolean ->
-//                    setComplete(
-//                        exerciseSets,
-//                        setID,
-//                        setComplete
-//                    )
-//                },
-//                { setID: Long -> startRestTimer(setID) }
-//            )
-
-//            AddSet { addSet(exerciseSets) }
-        }
-    }
-}
-
-// // TODO Remove
-// val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
-//
-// private fun initExerciseSets(): List<SetModel> {
-//    return List(6) { index ->
-//        SetModel(
-//            setNumber = index,
-//            exerciseWeight = 100.00,
-//            repetitions = 10
-//        )
-//    }
-// }
-
-@Composable
-fun AddSet(addSet: () -> Unit) {
-//    addSet(exerciseSets)
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TextButton(onClick = { addSet() }) {
-            Text("Add Set")
         }
     }
 }

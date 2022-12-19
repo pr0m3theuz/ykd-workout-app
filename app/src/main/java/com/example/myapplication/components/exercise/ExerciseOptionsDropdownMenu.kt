@@ -6,12 +6,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import com.example.myapplication.components.setRestTimer.SetRestTimerScreen
+import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
+import com.example.myapplication.data.ExerciseSetModel
 
 // import com.example.myapplication.components.RestTimer.RestTimePicker
 
 @Composable
 fun ExerciseOptionsDropdownMenu(
+    exerciseSets: ExerciseSetModel,
     addNotes: () -> Unit,
     removeExercise: () -> Unit
 ) {
@@ -86,7 +88,13 @@ fun ExerciseOptionsDropdownMenu(
             Divider()
             DropdownMenuItem(
                 text = { Text("Auto Rest Timer") },
-                trailingIcon = { Text("1:30") },
+                trailingIcon = {
+                    Text(
+                        exerciseSets.exercise.workingSetRestDuration.toComponents { minutes, seconds, _ ->
+                            "$minutes:${seconds.toString().padStart(2, '0')}"
+                        }
+                    )
+                },
                 onClick = { openRestTimePicker = true }
             )
             DropdownMenuItem(
@@ -121,19 +129,32 @@ fun ExerciseOptionsDropdownMenu(
             onClickArrowBack = { expandedExerciseOptionsDropdownMenu = true },
             onDismiss = { expandedBarTypeOptionsDropdownMenu = false }
         )
+
+        // TODO Add exerciseSets to each of the below functions
         if (openAddWarmUpSetsDialog.value) {
-            AddWarmUpSetsScreen(openDialog = { close -> closeAddWarmUpSetsDialog(close) })
+            AddWarmUpSetsScreen(
+                openDialog = { close -> closeAddWarmUpSetsDialog(close) },
+                exerciseSets = exerciseSets
+            )
         }
         if (openAddWorkingSetsDialog.value) {
-            AddWorkingSetsScreen(openDialog = { close -> closeWorkingSetsDialog(close) })
+            AddWorkingSetsScreen(
+                openDialog = { close -> closeWorkingSetsDialog(close) },
+                exerciseSets = exerciseSets
+            )
         }
 
         if (openRestTimePicker) {
-            SetRestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) })
+            AutoRestTimerScreen(
+                openDialog = { close -> closeRestTimerDialog(close) },
+                exercise = exerciseSets.exercise
+            )
         }
 
         if (openReplaceExerciseDialog) {
-            ReplaceExerciseDialog(openDialog = { close -> closeReplaceExerciseDialog(close) })
+            ReplaceExerciseDialog(
+                openDialog = { close -> closeReplaceExerciseDialog(close) }
+            )
         }
     }
 }

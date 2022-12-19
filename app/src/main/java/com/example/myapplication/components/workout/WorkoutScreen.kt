@@ -17,8 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.DiscardWorkoutDialog
 import com.example.myapplication.components.exercise.WorkoutNotes
+import com.example.myapplication.components.setRestTimer.RestTimerButton
 import com.example.myapplication.components.workoutOptionsDropdownMenu
-import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.WorkoutModel
 
 // TODO Takes a Workout Object
@@ -51,10 +51,6 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
     val workoutDuration by workoutViewModel.durationWorkout.collectAsState()
     val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
 
-    fun removeExercise(exerciseSet: ExerciseSetModel) {
-//        workoutViewModel.addSet(exerciseSet)
-    }
-
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -77,6 +73,7 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
 
             workoutOptionsDropdownMenu()
         }
+
         Text(modifier = Modifier.padding(8.dp), text = workoutDuration.toString())
 
         WorkoutNotes(
@@ -84,15 +81,10 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
             placeholder = "Workout Note"
         )
 
+        Row(modifier = Modifier.padding(start = 8.dp)) { RestTimerButton() }
+
         ExercisesSetsScreen(
             exercises = exercisesSets
-/*            addSet = { exerciseSet: ExerciseSetModel -> removeExercise(exerciseSet) },
-            startRestTimer = { exerciseSet: ExerciseSetModel, setID: Long ->
-                workoutViewModel.startSetCompletedTimer(
-                    exerciseSet,
-                    setID
-                )
-            }*/
         )
     }
 }

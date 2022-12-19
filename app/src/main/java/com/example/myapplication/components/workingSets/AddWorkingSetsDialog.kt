@@ -21,9 +21,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.ExerciseViewModel
 import com.example.myapplication.WorkingSetViewModel
+import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workingSets.WorkingSetLazyColumn
+import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
 import kotlin.math.roundToInt
@@ -33,12 +34,13 @@ import kotlin.math.roundToInt
 @Composable
 fun AddWorkingSetsScreen(
     workingSetViewModel: WorkingSetViewModel = viewModel(),
-    exerciseViewModel: ExerciseViewModel = viewModel(),
-    openDialog: (Boolean) -> Unit
+    workoutViewModel: WorkoutViewModel = viewModel(),
+    openDialog: (Boolean) -> Unit,
+    exerciseSets: ExerciseSetModel
 ) {
     AddWorkingSetsDialog(
         { close -> openDialog(close) },
-        exerciseViewModel.getWorkingSetWeight(), /* TODO Get User's One Rep Max or Estimated One Rep Max*/
+        workoutViewModel.getWorkingSetWeight(exerciseSets), /* TODO Get User's One Rep Max or Estimated One Rep Max*/
         { newWorkingWeight -> workingSetViewModel.changeWorkingSetWeight(newWorkingWeight) },
         workingSetViewModel.sets,
         { workingSetViewModel.addSet() },
@@ -51,8 +53,8 @@ fun AddWorkingSetsScreen(
                 newPercentage
             )
         },
-        { sets -> exerciseViewModel.addWorkingSets(sets) },
-        { sets -> exerciseViewModel.addBackOffSets(sets) }
+        { sets -> workoutViewModel.addWorkingSets(exerciseSets, sets) },
+        { sets -> workoutViewModel.addBackOffSets(exerciseSets, sets) }
     )
 }
 

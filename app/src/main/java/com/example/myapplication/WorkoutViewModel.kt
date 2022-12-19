@@ -4,6 +4,7 @@ import android.os.CountDownTimer
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,26 +29,44 @@ class WorkoutViewModel : ViewModel() {
     private val _workoutDuration = MutableStateFlow(workoutDuration)
     val durationWorkout: StateFlow<Long> = _workoutDuration.asStateFlow()
 
-    private var timerDuration: Long = 1L
+    private var _timerDuration: Long = 60000L
+    private var _timerDurationFormatted = _timerDuration.toDuration(DurationUnit.MILLISECONDS)
+        .toComponents { minutes, seconds, nanoseconds ->
+            "$minutes:${
+            seconds.toString().padStart(2, '0')
+            }"
+        }
+
+    private val _timerDurationString = MutableStateFlow(_timerDurationFormatted)
+    val timerDurationString: StateFlow<String>
+        get() = _timerDurationString.asStateFlow()
 
     //        TODO Store User Settings for Rest Timer Adjustments
-    private val restTimerAdjustment: Long =
-        30.toDuration(DurationUnit.MILLISECONDS).inWholeMilliseconds
+    private val _restTimerAdjustment: Long =
+        30.toDuration(DurationUnit.SECONDS).inWholeMilliseconds
+    val restTimerAdjustmentString =
+        _restTimerAdjustment.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString()
 
-    private var _remainingTime: Long = 0L
+    private var _remainingTime: Long = 60000L
     val remainingTime: Long
         get() = _remainingTime
 
-    private var _remainingTimeString = _remainingTime.toDuration(DurationUnit.SECONDS)
-        .toComponents { minutes, seconds, nanoseconds -> "$minutes:$seconds" }
+    private var _remainingTimeFormatted = _remainingTime.toDuration(DurationUnit.MILLISECONDS)
+        .toComponents { minutes, seconds, nanoseconds ->
+            "$minutes:${
+            seconds.toString().padStart(2, '0')
+            }"
+        }
 
-    private val _timeString = MutableStateFlow(_remainingTimeString)
-    val timeString: StateFlow<String> = _timeString.asStateFlow()
+    private val _remainingTimeString = MutableStateFlow(_remainingTimeFormatted)
+    val remainingTimeString: StateFlow<String>
+        get() = _remainingTimeString.asStateFlow()
 
-    private var timerProgress = _remainingTime.div(timerDuration).toFloat()
+    private var timerProgress = _remainingTime.div(_timerDuration).toFloat()
 
     private val _remainingTimeProgress = MutableStateFlow(timerProgress)
-    val remainingTimeProgress: StateFlow<Float> = _remainingTimeProgress.asStateFlow()
+    val remainingTimeProgress: StateFlow<Float>
+        get() = _remainingTimeProgress.asStateFlow()
 
     private var _timerFinished: Boolean = false
     val timerFinished: Boolean
@@ -60,61 +79,131 @@ class WorkoutViewModel : ViewModel() {
         }
     }
 
-    fun updateRemainingTime(): String {
-        //  TODO Return Remaining Time as String
-        return _remainingTimeString
-    }
-
+    //    TODO Implement as a Singleton
     private lateinit var timer: CountDownTimer
+
+// TODO Make it so that the timer doesn't get trigger multiple times when there is a subsequent UI Event from the same set
+// TODO Create Timer State Holder and for managing the Timer State
+// TODO Determine how I wanted quick sequential set completion events that start the timer, either restart the timer or don't, unless the new timer duration is longer than the initial timer duration then adjust remaining time by the difference between new timer duration and the initial timer duration
+
+    private var _state: TimerState = TimerState.RESET
+
+    private val _timerState = MutableStateFlow(_state)
+    val workoutTimerState: StateFlow<TimerState>
+        get() = _timerState.asStateFlow()
+
+    val isReset: Boolean
+        get() = _state == TimerState.RESET
+
+    val isRunning: Boolean
+        get() = _state == TimerState.RUNNING
+
+    val isExpired: Boolean
+        get() = _state == TimerState.EXPIRED
 
     private fun createTimer(timerDuration: Long) {
         viewModelScope.launch {
             timer = object : CountDownTimer(timerDuration, 1000L) {
                 override fun onTick(millisUntilFinished: Long) {
                     //        TODO Return Remaining Time as String
+                    _state = TimerState.RUNNING
+                    _timerState.value = TimerState.RUNNING
                     _remainingTime = millisUntilFinished
-                    _remainingTimeString = _remainingTime.toDuration(DurationUnit.SECONDS)
-                        .toComponents { minutes, seconds, nanoseconds -> "$minutes:$seconds" }
+                    _remainingTimeString.value =
+                        _remainingTime.toDuration(DurationUnit.MILLISECONDS)
+                            .toComponents { minutes, seconds, nanoseconds ->
+                                "$minutes:${
+                                seconds.toString().padStart(2, '0')
+                                }"
+                            }
+
+                    _timerDurationString.value =
+                        _timerDuration.toDuration(DurationUnit.MILLISECONDS)
+                            .toComponents { minutes, seconds, nanoseconds ->
+                                "$minutes:${
+                                seconds.toString().padStart(2, '0')
+                                }"
+                            }
+
+                    _remainingTimeProgress.value =
+                        _remainingTime.toFloat().div(_timerDuration.toFloat())
 
                     Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+                    Log.i("onTick(): timerDuration", "$_timerDuration")
+                    Log.i(
+                        "onTick(): _remainingTimeProgress",
+                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}"
+                    )
                 }
 
                 override fun onFinish() {
+                    _state = TimerState.EXPIRED
+                    _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
-                    _remainingTime = 0L
+                    resetTimerState()
                     setCompletedTimerFinished()
                 }
             }.start()
         }
     }
 
+    private fun resetTimerState() {
+        _remainingTime = 0L
+        _remainingTimeString.value = 0L.toDuration(DurationUnit.MILLISECONDS)
+            .toComponents { minutes, seconds, _ ->
+                "$minutes:${
+                seconds.toString().padStart(2, '0')
+                }"
+            }
+        _remainingTimeProgress.value = 0f
+        _timerState.value = TimerState.RESET
+    }
+
+    private var setThatStartedTimer: Long = 0
+
     fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setID: Long) {
         val exercise = exerciseSet.exercise
         val set = exerciseSet.sets.first { it.id == setID }
 
-        if (exercise.warmUpSetRestTimerEnabled && (set.setType.equals("Warm Up"))) {
-            timerDuration = exercise.warmUpSetRestTimer.inWholeMilliseconds
-            createTimer(timerDuration)
-        } else if (exercise.workingSetRestTimerEnabled && !(set.setType.equals("Warm Up"))) {
-            timerDuration = exercise.warmUpSetRestTimer.inWholeMilliseconds
-            createTimer(timerDuration)
+        if (setID != setThatStartedTimer) {
+            setThatStartedTimer = setID
+            if (_state == TimerState.RUNNING) {
+                timer.cancel()
+            }
+
+            if (exercise.warmUpSetRestTimerEnabled && (set.setType.equals("Warm Up"))) {
+                _timerDuration = exercise.warmUpSetRestDuration.inWholeMilliseconds
+                createTimer(_timerDuration)
+            } else if (exercise.workingSetRestTimerEnabled && !(set.setType.equals("Warm Up"))) {
+                _timerDuration = exercise.workingSetRestDuration.inWholeMilliseconds
+                createTimer(_timerDuration)
+            }
         }
     }
 
     fun cancelSetCompletedTimer() {
         timer.cancel()
+        resetTimerState()
     }
 
     fun moreRestTime() {
-        timerDuration = _remainingTime + restTimerAdjustment
+        _remainingTime += _restTimerAdjustment
+        _timerDuration += _restTimerAdjustment
         timer.cancel()
-        createTimer(timerDuration)
+        createTimer(_remainingTime)
     }
 
     fun lessRestTime() {
-        timerDuration = _remainingTime - restTimerAdjustment
-        timer.cancel()
-        createTimer(timerDuration)
+        _remainingTime -= _restTimerAdjustment
+        _timerDuration -= _restTimerAdjustment
+        cancelSetCompletedTimer()
+        if (_remainingTime < _timerDuration) {
+            createTimer(_remainingTime)
+        } else {
+            _state = TimerState.EXPIRED
+            _timerState.value = TimerState.EXPIRED
+            timer.cancel()
+        }
     }
 
     private var _exercisesSetsData = initExercisesSets()
@@ -250,6 +339,17 @@ class WorkoutViewModel : ViewModel() {
     }
 
     // TODO Add function to Volume Equate Sets
+    fun equateWorkingSetsVolume(exerciseSets: ExerciseSetModel, newWeight: Double?, newReps: Int?) {
+        val totalVolume = exerciseSets.totalWorkingSetVolume()
+
+        if (newWeight != null) {
+            totalVolume.div(newWeight)
+        } else if (newReps != null) {
+            totalVolume.div(newReps)
+        } else {
+            null
+        }
+    }
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSetModel> {

@@ -15,8 +15,8 @@ data class ExerciseModel(
     var notesPinned: Boolean = false,
     var barType: String? = null, // TODO Could be :BarType
     var weightUnit: String? = null, // TODO Could be ENUM -> Default, KG, LBS
-    var workingSetRestTimer: Duration = 1.toDuration(DurationUnit.MINUTES),
-    var warmUpSetRestTimer: Duration = 1.toDuration(DurationUnit.MINUTES),
+    var workingSetRestDuration: Duration = 1.toDuration(DurationUnit.MINUTES),
+    var warmUpSetRestDuration: Duration = 1.toDuration(DurationUnit.MINUTES),
     var workingSetRestTimerEnabled: Boolean = true,
     var warmUpSetRestTimerEnabled: Boolean = false
 )
@@ -27,11 +27,11 @@ fun ExerciseModel.pinNotes(pinned: Boolean) {
 }
 
 fun ExerciseModel.updateWorkingSetRestTimer(time: Duration) {
-    workingSetRestTimer = time
+    workingSetRestDuration = time
 }
 
 fun ExerciseModel.updateWarmUpSetRestTimer(time: Duration) {
-    warmUpSetRestTimer = time
+    warmUpSetRestDuration = time
 }
 
 fun ExerciseModel.enableworkingSetRestTimer(enable: Boolean) {
