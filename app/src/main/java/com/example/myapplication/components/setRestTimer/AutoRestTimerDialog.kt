@@ -20,6 +20,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.data.ExerciseModel
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -29,6 +31,7 @@ import kotlin.time.toDuration
 // @Preview
 @Composable
 fun AutoRestTimerScreen(
+    workoutViewModel: WorkoutViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
     exercise: ExerciseModel
 ) {
@@ -38,7 +41,22 @@ fun AutoRestTimerScreen(
         workSetRestTime = exercise.workingSetRestDuration,
         isWorkingSetRestTimerEnabled = exercise.workingSetRestTimerEnabled,
         warmUpSetRestTime = exercise.warmUpSetRestDuration,
-        isWarmUpSetRestTimerEnabled = exercise.warmUpSetRestTimerEnabled
+        isWarmUpSetRestTimerEnabled = exercise.warmUpSetRestTimerEnabled,
+        { tabRowState: Int, _exercise: ExerciseModel, time: Duration ->
+            workoutViewModel.updateExerciseAutoRestTimer(
+                tabRowState = tabRowState,
+                exercise = _exercise,
+                time = time
+            )
+        },
+        { tabRowState: Int, _exercise: ExerciseModel, enable: Boolean ->
+            workoutViewModel.enableExerciseAutoRestTimer(
+                tabRowState = tabRowState,
+                exercise = _exercise,
+                enable = enable
+            )
+        }
+
     )
 }
 
@@ -50,8 +68,9 @@ fun AutoRestTimerDialog(
     workSetRestTime: Duration,
     isWorkingSetRestTimerEnabled: Boolean,
     warmUpSetRestTime: Duration,
-    isWarmUpSetRestTimerEnabled: Boolean
-
+    isWarmUpSetRestTimerEnabled: Boolean,
+    updateExerciseAutoRestTimer: (tabRowState: Int, _exercise: ExerciseModel, time: Duration) -> Unit,
+    enableExerciseAutoRestTimer: (tabRowState: Int, exercise: ExerciseModel, enable: Boolean) -> Unit
 ) {
     val titles = listOf("Work Set", "Warm Up Set")
     var tabRowState by remember { mutableStateOf(0) }
@@ -186,21 +205,27 @@ fun AutoRestTimerDialog(
     //    TODO Doesn't change enable or disable. FIX!
     fun changeRestTimerStatus() {
         if (tabRowState == 1) {
-            exercise.warmUpSetRestTimerEnabled = enableWarmUpSetRestTimer
+            enableExerciseAutoRestTimer(tabRowState, exercise, enableWarmUpSetRestTimer)
         } else if (tabRowState == 0) {
-            exercise.workingSetRestTimerEnabled = enableWorkSetRestTimer
+            enableExerciseAutoRestTimer(tabRowState, exercise, enableWorkSetRestTimer)
         }
     }
 
     //    TODO Doesn't update duration. FIX!
     fun setRestTimersDuration() {
-        if (tabRowState == 1) {
-            exercise.warmUpSetRestDuration =
-                convertTimeStringToDuration(restTimesStringsList[tabRowState])
-        } else if (tabRowState == 0) {
-            exercise.workingSetRestDuration =
-                convertTimeStringToDuration(restTimesStringsList[tabRowState])
-        }
+        updateExerciseAutoRestTimer(
+            tabRowState,
+            exercise,
+            convertTimeStringToDuration(restTimesStringsList[tabRowState])
+        )
+
+//        if (tabRowState == 1) {
+//            exercise.warmUpSetRestDuration =
+//                convertTimeStringToDuration(restTimesStringsList[tabRowState])
+//        } else if (tabRowState == 0) {
+//            exercise.workingSetRestDuration =
+//                convertTimeStringToDuration(restTimesStringsList[tabRowState])
+//        }
 
         changeRestTimerStatus()
     }

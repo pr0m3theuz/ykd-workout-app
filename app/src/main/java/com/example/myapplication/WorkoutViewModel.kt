@@ -360,6 +360,22 @@ class WorkoutViewModel : ViewModel() {
             null
         }
     }
+
+    fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {
+        if (tabRowState == 1) {
+            exercise.warmUpSetRestDuration = time
+        } else if (tabRowState == 0) {
+            exercise.workingSetRestDuration = time
+        }
+    }
+
+    fun enableExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, enable: Boolean) {
+        if (tabRowState == 1) {
+            exercise.warmUpSetRestTimerEnabled = enable
+        } else if (tabRowState == 0) {
+            exercise.workingSetRestTimerEnabled = enable
+        }
+    }
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSetModel> {
