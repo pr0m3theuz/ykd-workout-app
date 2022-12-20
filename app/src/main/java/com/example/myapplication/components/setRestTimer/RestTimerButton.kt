@@ -1,6 +1,5 @@
 package com.example.myapplication.components.setRestTimer
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
@@ -47,8 +46,6 @@ fun RestTimerButton(
     val remainingTimeProgress by workoutViewModel.remainingTimeProgress.collectAsState()
     val timerState by workoutViewModel.workoutTimerState.collectAsState()
 
-    Log.i("RestTimerButton() timerState:", timerState.name)
-
     progress = remainingTimeProgress
 
     val remainingTimeString by workoutViewModel.remainingTimeString.collectAsState()
@@ -94,6 +91,16 @@ fun RestTimerButton(
         TimerScreen(openDialog = { close -> closeTimerScreen(close) })
     }
 
+    var openEnterTimeScreen by remember { mutableStateOf(false) }
+
+    fun closeEnterTimeScreen(close: Boolean) {
+        openEnterTimeScreen = close
+    }
+
+    if (openEnterTimeScreen) {
+        ManualRestTimerScreen(openDialog = { close -> closeEnterTimeScreen(close) })
+    }
+
     val timerIconModifier = Modifier.size(30.dp)
 
     val remainingTimeTextFontSize = 18.sp
@@ -105,7 +112,13 @@ fun RestTimerButton(
             .clip(RoundedCornerShape(25))
             .background(Color.LightGray)
             .clickable(
-                onClick = { openTimerScreen = true },
+                onClick = {
+                    if (timerState == TimerState.RUNNING) {
+                        openTimerScreen = true
+                    } else {
+                        openEnterTimeScreen = true
+                    }
+                },
                 onClickLabel = "Open Rest Timer",
                 indication = rememberRipple(),
                 interactionSource = remember { MutableInteractionSource() }

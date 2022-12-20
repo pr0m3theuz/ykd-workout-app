@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -145,6 +146,15 @@ class WorkoutViewModel : ViewModel() {
                 }
             }.start()
         }
+    }
+
+    fun startRestTimer(time: Duration) {
+        _timerDuration = time.inWholeMilliseconds
+        createTimer(_timerDuration)
+    }
+
+    fun startLastTimer() {
+        createTimer(_timerDuration)
     }
 
     private fun resetTimerState() {

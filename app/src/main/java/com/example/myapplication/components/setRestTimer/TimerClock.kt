@@ -1,11 +1,9 @@
 package com.example.myapplication.components.setRestTimer
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.progressSemantics
@@ -48,7 +46,8 @@ fun TimerScreen(
         { workoutViewModel.moreRestTime() },
         { workoutViewModel.lessRestTime() },
         { close -> openDialog(close) },
-        timerState
+        timerState,
+        { workoutViewModel.startLastTimer() }
     )
 }
 
@@ -64,7 +63,8 @@ fun TimerClock(
     moreTime: () -> Unit,
     lessTime: () -> Unit,
     openDialog: (Boolean) -> Unit,
-    timerState: TimerState
+    timerState: TimerState,
+    startTimer: () -> Unit
 ) {
 //    Log.i("TimerClock(): timerProgress", "$timerProgress")
     var progress by remember { mutableStateOf(1f) }
@@ -83,13 +83,14 @@ fun TimerClock(
 
     remainingTimeVisible = timerState == TimerState.RUNNING || timerState == TimerState.EXPIRED
 
-    var openRestTimePicker by remember { mutableStateOf(false) }
+    var openEnterTimeScreen by remember { mutableStateOf(false) }
 
-    fun closeRestTimerDialog(close: Boolean) {
-        openRestTimePicker = close
+    fun closeEnterTimeScreen(close: Boolean) {
+        openEnterTimeScreen = close
     }
 
-    if (openRestTimePicker) {
+    if (openEnterTimeScreen) {
+        ManualRestTimerScreen(openDialog = { close -> closeEnterTimeScreen(close) })
     }
 
     AlertDialog(
@@ -171,35 +172,33 @@ fun TimerClock(
                             style = stroke
                         )
                     }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        AnimatedVisibility(
-                            visible = remainingTimeVisible,
-                            enter = slideInHorizontally(animationSpec = tween(250)),
-                            exit = slideOutHorizontally(animationSpec = tween(250))
-                        ) {
-                            Row { Text(text = remainingTimeString, fontSize = 60.sp) }
-                            Row {
-                                Text(
-                                    text = timerDurationString,
-                                    fontSize = 30.sp,
-                                    color = Color.Gray
-                                )
-                            }
-                        }
 
-                        AnimatedVisibility(
-                            visible = !remainingTimeVisible,
-                            enter = slideInHorizontally(animationSpec = tween(250)),
-                            exit = slideOutHorizontally(animationSpec = tween(250))
-                        ) {
-                            Button(
-                                onClick = { openRestTimePicker = true }
-                            ) {
-                                Text("Enter Rest Timer")
-                            }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row { Text(text = remainingTimeString, fontSize = 60.sp) }
+                        Row {
+                            Text(
+                                text = timerDurationString,
+                                fontSize = 30.sp,
+                                color = Color.Gray
+                            )
                         }
                     }
                 }
+
+                AnimatedVisibility(
+                    visible = !remainingTimeVisible,
+                    enter = fadeIn(animationSpec = tween(250)),
+                    exit = fadeOut(animationSpec = tween(250))
+                ) {
+                    Row() {
+                        Button(
+                            onClick = { openEnterTimeScreen = true }
+                        ) {
+                            Text("Enter Rest Timer")
+                        }
+                    }
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
@@ -216,7 +215,7 @@ fun TimerClock(
                     }
                     Button(
                         onClick = {
-                            if (timerState == TimerState.RUNNING) cancelTimer() /* else  TODO */
+                            if (timerState == TimerState.RUNNING) cancelTimer() else startTimer()
 
 //                            openDialog(false)
                         }
