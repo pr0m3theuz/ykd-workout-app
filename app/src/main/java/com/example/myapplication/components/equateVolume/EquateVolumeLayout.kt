@@ -29,7 +29,7 @@ import kotlin.math.roundToInt
 fun EquateVolumeLayout(
     setIndex: Int,
     workingSet: SetModel,
-    workingWeight: Double,
+//    workingWeight: Double,
     newWeight: (newWeight: Double) -> Unit,
     newReps: (newReps: Int) -> Unit,
     newPercentage: (newPercentage: Float) -> Unit
@@ -65,7 +65,8 @@ fun EquateVolumeLayout(
         )
     }
 
-    newWeight(workingWeight.times(workingSetPercentage!!))
+    val workingWeight = workingSet.exerciseWeight
+//    newWeight(workingWeight.times(workingSetPercentage!!))
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -175,7 +176,7 @@ fun EquateVolumeLayout(
             Text(
                 fontSize = 4.em,
                 text =
-                if (workingWeight.times(workingSetPercentage!!).minus(
+                if (workingWeight?.times(workingSetPercentage!!)?.minus(
                         workingWeight.times(workingSetPercentage!!).roundToInt()
                     ) == 0.0
                 ) {
@@ -187,7 +188,7 @@ fun EquateVolumeLayout(
                     )
                 } else {
                     val formattedWorkingWeight =
-                        String.format("%.2f", workingWeight.times(workingSetPercentage!!))
+                        String.format("%.2f", workingWeight?.times(workingSetPercentage!!))
                             .toDouble()
 
                     if (formattedWorkingWeight.minus(formattedWorkingWeight.roundToInt()) == 0.0) {

@@ -1,6 +1,5 @@
 package com.example.myapplication.components.exercise
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,9 +31,13 @@ import kotlin.math.roundToInt
 fun EquateVolumeScreen(
     openDialog: (Boolean) -> Unit,
     workoutViewModel: WorkoutViewModel = viewModel(),
-    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
-    exerciseSets: ExerciseSetModel
+    exerciseSets: ExerciseSetModel,
+    equateVolumeViewModel: EquateVolumeViewModel = viewModel()
 ) {
+    equateVolumeViewModel.changeWorkingSets(exerciseSets.sets)
+    equateVolumeViewModel.setTotalVolume(exerciseSets.totalWorkingSetVolume())
+    val sets by equateVolumeViewModel.sets.collectAsState()
+
     EquateVolumeDialog(
         openDialog = { close -> openDialog(close) },
         _workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets),
@@ -44,7 +47,7 @@ fun EquateVolumeScreen(
                 newWorkingWeight
             )
         },
-        sets = equateVolumeViewModel.sets,
+        sets = sets,
         addSet = { equateVolumeViewModel.addSet() },
         removeSet = { id: Long -> equateVolumeViewModel.remove(id) },
         updateSetWeight = { id: Long, newWeight: Double ->
@@ -66,7 +69,19 @@ fun EquateVolumeScreen(
             )
         },
         insertSets = { sets -> workoutViewModel.addWorkingSets(exerciseSets, sets) },
-        totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume()
+        totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume(),
+        equateVolumeByWeight = { newWeight: Double? ->
+            equateVolumeViewModel.equateVolumeByWeight(
+                exerciseSets,
+                newWeight
+            )
+        },
+        equateVolumeByRepetitions = { newRepetitions: Int? ->
+            equateVolumeViewModel.equateVolumeByRepetitions(
+                exerciseSets,
+                newRepetitions
+            )
+        }
     )
 }
 
@@ -83,7 +98,9 @@ fun EquateVolumeDialog(
     updateSetReps: (id: Long, newReps: Int) -> Unit,
     updateSetPercentage: (id: Long, newPercentage: Float) -> Unit,
     insertSets: (workingSets: List<SetModel>) -> Unit,
-    totalWorkingSetVolume: Double?
+    totalWorkingSetVolume: Double?,
+    equateVolumeByWeight: (newWeight: Double?) -> Unit,
+    equateVolumeByRepetitions: (newRepetitions: Int?) -> Unit
 ) {
     var workingSetWeight: Double by remember {
         if (_workingSetWeight != null) {
@@ -129,7 +146,7 @@ fun EquateVolumeDialog(
         )
     }
 
-    Log.i("EquateVolumeScreen() workingSetRepetitions", "$workingSetRepetitions")
+//    Log.i("EquateVolumeScreen() workingSetRepetitions", "$workingSetRepetitions")
 
     var isByWeightSelected: Boolean by remember { mutableStateOf(true) }
     var isByRepetitionsSelected: Boolean by remember { mutableStateOf(false) }
@@ -179,7 +196,13 @@ fun EquateVolumeDialog(
         }
     }
 
-    Log.i("EquateVolumeScreen() totalWorkingSetVolume", "$totalWorkingSetVolume")
+    fun calculateNewValues() {
+        if (isByWeightSelected) {
+            equateVolumeByWeight(workingSetWeight)
+        } else if (isByRepetitionsSelected) {
+            equateVolumeByRepetitions(workingSetRepetitions)
+        }
+    }
 
     AlertDialog(
         onDismissRequest = {
@@ -199,6 +222,10 @@ fun EquateVolumeDialog(
 
                 Row {
                     Text("Total Volume: $totalWorkingSetVolume")
+                }
+
+                Row {
+                    Text("New Total Volume: $totalWorkingSetVolume")
                 }
 
                 Box(
@@ -228,14 +255,15 @@ fun EquateVolumeDialog(
                         onValueChange = {
                             setWorkingSetWeightOrWorkingSetRepetitionsText(it)
                             setWorkingSetWeightOrWorkingSetRepetitionsNumber(it)
+                            calculateNewValues()
                             /* TODO */
-                            changeWorkingSetWeight(
+/*                            changeWorkingSetWeight(
                                 if (it.text.isNotBlank()) {
                                     it.text.toDouble()
                                 } else {
                                     0.0
                                 }
-                            )
+                            )*/
                         }
                     )
                 }
@@ -294,7 +322,7 @@ fun EquateVolumeDialog(
 
                 EquateVolumeLazyColumn(
                     sets,
-                    workingSetWeight,
+//                    workingSetWeight,
                     { id: Long -> removeSet(id) },
                     { id: Long, newWeight: Double -> updateSetWeight(id, newWeight) },
                     { id: Long, newReps: Int -> updateSetReps(id, newReps) },

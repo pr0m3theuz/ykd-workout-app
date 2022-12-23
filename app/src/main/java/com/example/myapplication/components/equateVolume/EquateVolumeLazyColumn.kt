@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun EquateVolumeLazyColumn(
     workingSets: List<SetModel>,
-    _workingWeight: Double,
+//    _workingWeight: Double,
     deleteSet: (id: Long) -> Unit,
     updateWorkingWeight: (id: Long, newWeight: Double) -> Unit,
     updateWorkingSetReps: (id: Long, newReps: Int) -> Unit,
@@ -165,7 +165,7 @@ fun EquateVolumeLazyColumn(
                     EquateVolumeLayout(
                         index,
                         workingSet,
-                        _workingWeight,
+//                        _workingWeight,
                         { newWeight -> newWeight(newWeight) },
                         { newReps -> newReps(newReps) },
                         { newPercentage -> newPercentage(newPercentage) }

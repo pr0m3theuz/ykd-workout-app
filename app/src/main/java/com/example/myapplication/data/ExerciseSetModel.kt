@@ -104,8 +104,8 @@ fun ExerciseSetModel.totalWorkingSetVolume(): Double {
 
     sets.filter { it.setType.name != "Warm Up Set" }.forEach {
         totalVolume += (it.setVolume()!!)
-        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
-        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
+//        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
+//        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
     }
 
     return totalVolume
@@ -113,34 +113,41 @@ fun ExerciseSetModel.totalWorkingSetVolume(): Double {
 
 //    Returns the number of reps to be performed based on the new weight
 fun ExerciseSetModel.equateWorkingSetVolumeByWeight(weight: Double?): Int {
-    val totalVolume: Double = 0.0
+    var totalVolume: Double = 0.0
     var numberOfWorkingSets: Int = 0
+    var newRepetitions: Int = 0
 
     sets.filter { it.setType.name != "Warm Up Set" }.forEach {
-        totalVolume.plus(it.setVolume()!!)
+        totalVolume += (it.setVolume()!!)
         numberOfWorkingSets++
     }
 
-    return if (numberOfWorkingSets > 0 && weight != null) {
+    newRepetitions = if (numberOfWorkingSets > 0 && weight != null && weight > 0.0) {
         totalVolume.div(weight).div(numberOfWorkingSets).roundToInt()
     } else {
         0
     }
+
+    Log.i("ExerciseSetModel.equateWorkingSetVolumeByWeight() newReps", "$newRepetitions")
+    return newRepetitions
 }
 
 //    Returns the weight to be used based on the new repetitions
 fun ExerciseSetModel.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double {
-    val totalVolume: Double = 0.0
+    var totalVolume: Double = 0.0
     var numberOfWorkingSets: Int = 0
+    var newWeight: Double = 0.0
 
     sets.filter { it.setType.name != "Warm Up Set" }.forEach {
-        totalVolume.plus(it.setVolume()!!)
+        totalVolume += (it.setVolume()!!)
         numberOfWorkingSets++
     }
 
-    return if (numberOfWorkingSets > 0 && repetitions != null) {
+    newWeight = if (numberOfWorkingSets > 0 && repetitions != null && repetitions > 0) {
         totalVolume.div(repetitions).div(numberOfWorkingSets)
     } else {
         0.0
     }
+    Log.i("ExerciseSetModel.equateWorkingSetVolumeByWeight() newWeight", "$newWeight")
+    return newWeight
 }
