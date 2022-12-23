@@ -25,7 +25,7 @@ fun ExerciseOptionsDropdownMenu(
     val openAddWorkingSetsDialog = remember { mutableStateOf(false) }
     var openRestTimePicker by remember { mutableStateOf(false) }
     var openReplaceExerciseDialog by remember { mutableStateOf(false) }
-    var openEquateVolumeDialog by remember { mutableStateOf(true) }
+    var openEquateVolumeDialog by remember { mutableStateOf(false) }
 
     fun closeAddWarmUpSetsDialog(close: Boolean) {
         openAddWarmUpSetsDialog.value = close

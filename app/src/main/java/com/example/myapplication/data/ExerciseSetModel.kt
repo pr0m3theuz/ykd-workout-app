@@ -102,13 +102,29 @@ fun ExerciseSetModel.addBackOffSets(backOffSets: List<SetModel>) {
 fun ExerciseSetModel.totalWorkingSetVolume(): Double {
     var totalVolume: Double = 0.0
 
+//    Log.i("ExerciseSetModel sets", "$sets")
+
     sets.filter { it.setType.name != "Warm Up Set" }.forEach {
         totalVolume += (it.setVolume()!!)
+//        Log.i("ExerciseSetModel exerciseWeight", "${it.exerciseWeight}")
+//        Log.i("ExerciseSetModel repetitions", "${it.repetitions}")
 //        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
 //        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
     }
 
     return totalVolume
+}
+
+fun ExerciseSetModel.numberOfWorkingSets(): Int {
+    var numberOfWorkingSets: Int = 0
+
+    sets.filter { it.setType.name != "Warm Up Set" }.forEach {
+        numberOfWorkingSets++
+//        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
+//        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
+    }
+
+    return numberOfWorkingSets
 }
 
 //    Returns the number of reps to be performed based on the new weight

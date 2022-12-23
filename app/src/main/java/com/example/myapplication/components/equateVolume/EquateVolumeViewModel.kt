@@ -2,10 +2,12 @@ package com.example.myapplication.components.equateVolume
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.data.*
+import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.setVolume
 import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.roundToInt
 
 class EquateVolumeViewModel() : ViewModel() {
     private var _oneRepMax: Double = 100.0
@@ -20,6 +22,10 @@ class EquateVolumeViewModel() : ViewModel() {
     private val totalVolume: Double
         get() = _totalVolume
 
+    private var _newTotalVolume = MutableStateFlow(0.0)
+    val newTotalVolume: StateFlow<Double>
+        get() = _newTotalVolume
+
     fun setTotalVolume(totalVolume: Double) {
         _totalVolume = totalVolume
     }
@@ -30,83 +36,125 @@ class EquateVolumeViewModel() : ViewModel() {
 
     fun changeWorkingSets(sets: List<SetModel>) {
         _sets.value = sets.filter { it.setType.name != "Warm Up Set" }
+        calculateNewTotalVolume()
     }
 
     fun addSet() {
 //        Log.i("workingSetViewModel.addSet(): ", "workingSets List: ${_Sets.toList()}")
-//        var temporarySets: MutableList<SetModel>
+        val temporarySets: MutableList<SetModel> = _sets.value.toMutableList()
 
         if (_sets.value.isNotEmpty()) {
-            val temporarySets = _sets.value + sets.value.last().copy(
-                id = newID(),
-                setNumber = sets.value.last().setNumber?.plus(1),
-                setCompleted = false
+            temporarySets.add(
+                temporarySets.last().copy(
+                    id = newID(),
+                    setNumber = sets.value.last().setNumber?.plus(1),
+                    setCompleted = false
+                )
             )
-            _sets.value = temporarySets.toMutableList()
         } else {
-            val temporarySets = _sets.value
-            temporarySets.toMutableList().add(SetModel())
-
-            _sets.value = temporarySets
+            temporarySets.add(SetModel())
         }
-//        Log.i("workingSetViewModel.addSet(): ", "New set added: ${_Sets.toList()}")
+        _sets.value = temporarySets.toList()
+        calculateNewTotalVolume()
+
+        Log.i("EquateVolumeViewModel.addSet(): ", "temporarySets: $temporarySets")
+        Log.i("EquateVolumeViewModel.addSet(): ", "New set added: ${_sets.value}")
     }
 
     fun remove(id: Long) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.removeIf { it.id == id }
-        _sets.value = temporarySets
+
+        temporarySets.forEach { it.id = newID() }
+
+        _sets.value = temporarySets.toList()
+        calculateNewTotalVolume()
+
+        Log.i("EquateVolumeViewModel.remove(): ", "temporarySets: $temporarySets")
+        Log.i("EquateVolumeViewModel.remove(): ", "New set added: ${_sets.value}")
     }
 
     fun updateSetWeight(id: Long, newWeight: Double?) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.forEach { if (it.id == id) it.exerciseWeight = newWeight }
         _sets.value = temporarySets
+        calculateNewTotalVolume()
     }
 
     fun updateSetReps(id: Long, newReps: Int) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.forEach { if (it.id == id) it.repetitions = newReps }
         _sets.value = temporarySets
+        calculateNewTotalVolume()
     }
 
     fun updateSetPercentage(id: Long, newPercentage: Float) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.forEach { if (it.id == id) it.percentage1RM = newPercentage }
         _sets.value = temporarySets
+        calculateNewTotalVolume()
     }
 
-    fun equateVolumeByWeight(exerciseSets: ExerciseSetModel, newWeight: Double?) {
-        val newRepetitions: Int = exerciseSets.equateWorkingSetVolumeByWeight(newWeight)
+    fun equateVolumeByWeight(newWeight: Double?) {
+        val numberOfWorkingSets: Int = numberOfWorkingSets()
+        var newRepetitions: Int = 0
 
-        val newSets = exerciseSets.sets.filter { it.setType.name != "Warm Up Set" }
+        newRepetitions = if (numberOfWorkingSets > 0 && newWeight != null && newWeight > 0.0) {
+            totalVolume.div(newWeight).div(numberOfWorkingSets).roundToInt()
+        } else {
+            0
+        }
+
+        val newSets = _sets.value
         newSets.forEach {
             it.id = newID(); it.exerciseWeight = newWeight; it.repetitions = newRepetitions
         }
 
         _sets.value = newSets.toList()
+        calculateNewTotalVolume()
 
-        Log.i("equateVolumeByWeight()", "${exerciseSets.equateWorkingSetVolumeByWeight(newWeight)}")
+        Log.i("equateVolumeByWeight()", "$newRepetitions")
         Log.i("equateVolumeByWeight()", "$newSets")
         Log.i("equateVolumeByWeight()", "${_sets.value}")
     }
 
-    fun equateVolumeByRepetitions(exerciseSets: ExerciseSetModel, newRepetitions: Int?) {
-        val newWeight: Double = exerciseSets.equateWorkingSetVolumeByRepetitions(newRepetitions)
+    fun equateVolumeByRepetitions(newRepetitions: Int?) {
+        val numberOfWorkingSets: Int = numberOfWorkingSets()
+        var newWeight: Double = 0.0
 
-        val newSets = exerciseSets.sets.filter { it.setType.name != "Warm Up Set" }
+        newWeight =
+            if (numberOfWorkingSets > 0 && newRepetitions != null && newRepetitions > 0) {
+                totalVolume.div(numberOfWorkingSets).div(newRepetitions)
+            } else {
+                0.0
+            }
+
+        val newSets = sets.value
         newSets.forEach {
             it.id = newID(); it.exerciseWeight = newWeight; it.repetitions = newRepetitions
         }
 
         _sets.value = newSets.toList()
+        calculateNewTotalVolume()
 
         Log.i("equateVolumeByRepetitions()", "$newWeight")
         Log.i("equateVolumeByRepetitions()", "$newSets")
         Log.i("equateVolumeByRepetitions()", "${_sets.value}")
     }
 
-    fun newTotalVolume(): Double {
+    private fun numberOfWorkingSets(): Int {
+        var numberOfWorkingSets: Int = 0
+
+        _sets.value.filter { it.setType.name != "Warm Up Set" }.forEach { _ ->
+            numberOfWorkingSets++
+//        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
+//        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
+        }
+
+        return numberOfWorkingSets
+    }
+
+    private fun calculateNewTotalVolume() {
         val temporarySets = _sets.value
         var totalVolume: Double = 0.0
         var numberOfWorkingSets: Int = 0
@@ -117,7 +165,7 @@ class EquateVolumeViewModel() : ViewModel() {
 //        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
         }
 
-        return totalVolume
+        _newTotalVolume.value = totalVolume
     }
 }
 

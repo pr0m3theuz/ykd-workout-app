@@ -1,5 +1,6 @@
 package com.example.myapplication.components.exercise
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,10 +35,31 @@ fun EquateVolumeScreen(
     exerciseSets: ExerciseSetModel,
     equateVolumeViewModel: EquateVolumeViewModel = viewModel()
 ) {
-    equateVolumeViewModel.changeWorkingSets(exerciseSets.sets)
-    equateVolumeViewModel.setTotalVolume(exerciseSets.totalWorkingSetVolume())
-    val sets by equateVolumeViewModel.sets.collectAsState()
+    val totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume()
+    val workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets)
+    val workingSetRepetitions = workoutViewModel.getWorkingSetRepetitions(exerciseSets)
+    val sets = exerciseSets.sets
 
+//    Log.i("EquateVolumeScreen() totalWorkingSetVolume", "$totalWorkingSetVolume")
+//    Log.i("EquateVolumeScreen() exerciseSets", "$exerciseSets")
+
+    equateVolumeViewModel.changeWorkingSets(sets)
+    equateVolumeViewModel.setTotalVolume(totalWorkingSetVolume)
+//
+//    val sets by equateVolumeViewModel.sets.collectAsState()
+//
+//    val newTotalWorkingSetVolume by equateVolumeViewModel.newTotalVolume.collectAsState()
+
+    EquateVolumeInterface(
+        openDialog = { close -> openDialog(close) },
+        _workingSetWeight = workingSetWeight,
+        _workingSetRepetitions = workingSetRepetitions,
+        addWorkingSets = { newSets -> workoutViewModel.addWorkingSets(exerciseSets, newSets) },
+        totalWorkingSetVolume = totalWorkingSetVolume,
+        _sets = sets
+    )
+
+/*
     EquateVolumeDialog(
         openDialog = { close -> openDialog(close) },
         _workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets),
@@ -68,17 +90,84 @@ fun EquateVolumeScreen(
                 newPercentage
             )
         },
-        insertSets = { sets -> workoutViewModel.addWorkingSets(exerciseSets, sets) },
-        totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume(),
+        insertSets = { newSets -> workoutViewModel.addWorkingSets(exerciseSets, newSets) },
+        totalWorkingSetVolume = totalWorkingSetVolume,
+        newTotalWorkingSetVolume = newTotalWorkingSetVolume,
         equateVolumeByWeight = { newWeight: Double? ->
             equateVolumeViewModel.equateVolumeByWeight(
-                exerciseSets,
                 newWeight
             )
         },
         equateVolumeByRepetitions = { newRepetitions: Int? ->
             equateVolumeViewModel.equateVolumeByRepetitions(
-                exerciseSets,
+                newRepetitions
+            )
+        }
+    )
+*/
+}
+
+@Composable
+fun EquateVolumeInterface(
+    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
+    openDialog: (Boolean) -> Unit,
+    _workingSetWeight: Double?,
+    _workingSetRepetitions: Int?,
+    addWorkingSets: (workingSets: List<SetModel>) -> Unit,
+    totalWorkingSetVolume: Double,
+    _sets: List<SetModel>
+) {
+//    Log.i("EquateVolumeInterface() totalWorkingSetVolume", "$totalWorkingSetVolume")
+//    Log.i("EquateVolumeInterface() exerciseSets", "$_sets")
+
+//    equateVolumeViewModel.changeWorkingSets(_sets)
+//    equateVolumeViewModel.setTotalVolume(totalWorkingSetVolume)
+
+    val sets by equateVolumeViewModel.sets.collectAsState()
+    val newTotalWorkingSetVolume by equateVolumeViewModel.newTotalVolume.collectAsState()
+
+    Log.i("EquateVolumeInterface() sets", "$sets")
+
+    EquateVolumeDialog(
+        openDialog = { close -> openDialog(close) },
+        _workingSetWeight = _workingSetWeight,
+        _workingSetRepetitions = _workingSetRepetitions,
+        changeWorkingSetWeight = { newWorkingWeight ->
+            equateVolumeViewModel.changeWorkingSetWeight(
+                newWorkingWeight
+            )
+        },
+        sets = sets,
+        addSet = { equateVolumeViewModel.addSet() },
+        removeSet = { id: Long -> equateVolumeViewModel.remove(id) },
+        updateSetWeight = { id: Long, newWeight: Double ->
+            equateVolumeViewModel.updateSetWeight(
+                id,
+                newWeight
+            )
+        },
+        updateSetReps = { id: Long, newReps: Int ->
+            equateVolumeViewModel.updateSetReps(
+                id,
+                newReps
+            )
+        },
+        updateSetPercentage = { id: Long, newPercentage: Float ->
+            equateVolumeViewModel.updateSetPercentage(
+                id,
+                newPercentage
+            )
+        },
+        insertSets = { newSets -> addWorkingSets(newSets) },
+        totalWorkingSetVolume = totalWorkingSetVolume,
+        newTotalWorkingSetVolume = newTotalWorkingSetVolume,
+        equateVolumeByWeight = { newWeight: Double? ->
+            equateVolumeViewModel.equateVolumeByWeight(
+                newWeight
+            )
+        },
+        equateVolumeByRepetitions = { newRepetitions: Int? ->
+            equateVolumeViewModel.equateVolumeByRepetitions(
                 newRepetitions
             )
         }
@@ -99,6 +188,7 @@ fun EquateVolumeDialog(
     updateSetPercentage: (id: Long, newPercentage: Float) -> Unit,
     insertSets: (workingSets: List<SetModel>) -> Unit,
     totalWorkingSetVolume: Double?,
+    newTotalWorkingSetVolume: Double?,
     equateVolumeByWeight: (newWeight: Double?) -> Unit,
     equateVolumeByRepetitions: (newRepetitions: Int?) -> Unit
 ) {
@@ -225,7 +315,7 @@ fun EquateVolumeDialog(
                 }
 
                 Row {
-                    Text("New Total Volume: $totalWorkingSetVolume")
+                    Text("New Total Volume: $newTotalWorkingSetVolume")
                 }
 
                 Box(
