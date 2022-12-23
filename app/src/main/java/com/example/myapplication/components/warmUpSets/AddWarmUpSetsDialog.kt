@@ -20,8 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.WarmUpViewModel
 import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.warmUpSets.WarmUpViewModel
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
@@ -37,15 +37,34 @@ fun AddWarmUpSetsScreen(
     exerciseSets: ExerciseSetModel
 ) {
     AddWarmUpSetsDialog(
-        { close -> openDialog(close) },
-        workoutViewModel.getWorkingSetWeight(exerciseSets),
-        { newWorkingWeight -> warmUpViewModel.changeWorkingSetWeight(newWorkingWeight) },
-        warmUpViewModel.warmUpSets,
-        { warmUpViewModel.addSet() },
-        { id: Long -> warmUpViewModel.remove(id) },
-        { id: Long, newWeight: Double -> warmUpViewModel.updateWarmUpSetWeight(id, newWeight) },
-        { id: Long, newReps: Int -> warmUpViewModel.updateWarmUpSetReps(id, newReps) },
-        { warmUpSets -> workoutViewModel.addWarmUpSets(exerciseSets, warmUpSets) }
+        openDialog = { close -> openDialog(close) },
+        _workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets),
+        changeWorkingSetWeight = { newWorkingWeight ->
+            warmUpViewModel.changeWorkingSetWeight(
+                newWorkingWeight
+            )
+        },
+        warmUpSets = warmUpViewModel.warmUpSets,
+        addSet = { warmUpViewModel.addSet() },
+        removeSet = { id: Long -> warmUpViewModel.remove(id) },
+        updateWarmUpSetWeight = { id: Long, newWeight: Double ->
+            warmUpViewModel.updateWarmUpSetWeight(
+                id,
+                newWeight
+            )
+        },
+        updateWarmUpSetReps = { id: Long, newReps: Int ->
+            warmUpViewModel.updateWarmUpSetReps(
+                id,
+                newReps
+            )
+        },
+        insertWarmUpSets = { warmUpSets ->
+            workoutViewModel.addWarmUpSets(
+                exerciseSets,
+                warmUpSets
+            )
+        }
     )
 }
 
@@ -172,7 +191,7 @@ fun AddWarmUpSetsDialog(
                             .padding(PaddingValues(horizontal = 4.dp))
                             .width(60.dp),
                         contentAlignment = Alignment.Center
-                    ) { Text("Warm-up") }
+                    ) { /* TODO Put appropriate text here */ }
                 }
 
                 WarmUpSetLazyColumn(

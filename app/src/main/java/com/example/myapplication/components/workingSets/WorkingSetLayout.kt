@@ -34,20 +34,20 @@ fun WorkingSetLayout(
     newReps: (newReps: Int) -> Unit,
     newPercentage: (newPercentage: Float) -> Unit
 ) {
-    var warmUpPercentage: Float? by remember { mutableStateOf(workingSet.percentage1RM) }
+    var workingSetPercentage: Float? by remember { mutableStateOf(workingSet.percentage1RM) }
 
     val df = DecimalFormat("#.##")
     df.roundingMode = RoundingMode.HALF_UP
 
-    var reformattedPercentage = df.format(warmUpPercentage?.times(100.0)).toDouble()
+    val reformattedPercentage = df.format(workingSetPercentage?.times(100.0)).toDouble()
 
     var percentageText by remember {
         mutableStateOf(
             TextFieldValue(
-                if (reformattedPercentage?.minus(reformattedPercentage.roundToInt()) == 0.0) {
+                if (reformattedPercentage.minus(reformattedPercentage.roundToInt()) == 0.0) {
                     reformattedPercentage.roundToInt().toString().plus("%")
                 } else {
-                    reformattedPercentage?.toString().plus("%")
+                    reformattedPercentage.toString().plus("%")
                 }
             )
         )
@@ -65,7 +65,7 @@ fun WorkingSetLayout(
         )
     }
 
-    newWeight(workingWeight.times(warmUpPercentage!!))
+    newWeight(workingWeight.times(workingSetPercentage!!))
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -118,13 +118,13 @@ fun WorkingSetLayout(
                 value = percentageText,
                 onValueChange = {
                     percentageText = it
-                    warmUpPercentage =
+                    workingSetPercentage =
                         if (it.text.replace("%", "").isNotEmpty()) {
                             it.text.replace("%", "").toDouble().div(100.0).toFloat()
                         } else {
                             0.0f
                         }
-                    newPercentage(warmUpPercentage!!)
+                    newPercentage(workingSetPercentage!!)
                 }
             )
         }
@@ -175,29 +175,29 @@ fun WorkingSetLayout(
             Text(
                 fontSize = 4.em,
                 text =
-                if (workingWeight.times(warmUpPercentage!!).minus(
-                        workingWeight.times(warmUpPercentage!!).roundToInt()
+                if (workingWeight.times(workingSetPercentage!!).minus(
+                        workingWeight.times(workingSetPercentage!!).roundToInt()
                     ) == 0.0
                 ) {
 //                    String.format("%", workingWeight?.times(warmUpPercentage!!)!!.roundToInt())
                     String.format(
                         "%d x %s",
-                        workingWeight.times(warmUpPercentage!!).roundToInt(),
+                        workingWeight.times(workingSetPercentage!!).roundToInt(),
                         repetitionsText.text
                     )
                 } else {
-                    val formattedworkingWeight =
-                        String.format("%.2f", workingWeight.times(warmUpPercentage!!))
+                    val formattedWorkingWeight =
+                        String.format("%.2f", workingWeight.times(workingSetPercentage!!))
                             .toDouble()
 
-                    if (formattedworkingWeight.minus(formattedworkingWeight.roundToInt()) == 0.0) {
+                    if (formattedWorkingWeight.minus(formattedWorkingWeight.roundToInt()) == 0.0) {
                         String.format(
                             "%d x %s",
-                            formattedworkingWeight.roundToInt(),
+                            formattedWorkingWeight.roundToInt(),
                             repetitionsText.text
                         )
                     } else {
-                        String.format("%.2f x %s", formattedworkingWeight, repetitionsText.text)
+                        String.format("%.2f x %s", formattedWorkingWeight, repetitionsText.text)
                     }
                 }
             )

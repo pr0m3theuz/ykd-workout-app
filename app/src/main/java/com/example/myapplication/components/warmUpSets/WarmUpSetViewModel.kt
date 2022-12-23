@@ -1,10 +1,11 @@
-package com.example.myapplication
+package com.example.myapplication.components.warmUpSets
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
+import com.example.myapplication.newID
 
 class WarmUpViewModel : ViewModel() {
     private var _workingSetWeight: Double = 100.0
@@ -52,7 +53,7 @@ class WarmUpViewModel : ViewModel() {
 }
 
 private fun initWarmUpSets(): List<SetModel> {
-    return List(6) { index ->
+    return List(3) { index ->
         SetModel(
             setNumber = index,
             setType = SetTypeModel(

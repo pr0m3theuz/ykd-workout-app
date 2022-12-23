@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import com.example.myapplication.components.exercise.EquateVolumeScreen
 import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
 import com.example.myapplication.data.ExerciseSetModel
 
@@ -24,6 +25,7 @@ fun ExerciseOptionsDropdownMenu(
     val openAddWorkingSetsDialog = remember { mutableStateOf(false) }
     var openRestTimePicker by remember { mutableStateOf(false) }
     var openReplaceExerciseDialog by remember { mutableStateOf(false) }
+    var openEquateVolumeDialog by remember { mutableStateOf(true) }
 
     fun closeAddWarmUpSetsDialog(close: Boolean) {
         openAddWarmUpSetsDialog.value = close
@@ -39,6 +41,10 @@ fun ExerciseOptionsDropdownMenu(
 
     fun closeReplaceExerciseDialog(close: Boolean) {
         openReplaceExerciseDialog = close
+    }
+
+    fun closeEquateVolumeDialog(close: Boolean) {
+        openEquateVolumeDialog = close
     }
 
     Box {
@@ -63,6 +69,10 @@ fun ExerciseOptionsDropdownMenu(
             DropdownMenuItem(
                 text = { Text("Add Working Sets") },
                 onClick = { openAddWorkingSetsDialog.value = true }
+            )
+            DropdownMenuItem(
+                text = { Text("Equate Volume") },
+                onClick = { openEquateVolumeDialog = true }
             )
             DropdownMenuItem(
                 text = { Text("Create Superset") },
@@ -154,6 +164,13 @@ fun ExerciseOptionsDropdownMenu(
         if (openReplaceExerciseDialog) {
             ReplaceExerciseDialog(
                 openDialog = { close -> closeReplaceExerciseDialog(close) }
+            )
+        }
+
+        if (openEquateVolumeDialog) {
+            EquateVolumeScreen(
+                openDialog = { close -> closeEquateVolumeDialog(close) },
+                exerciseSets = exerciseSets
             )
         }
     }

@@ -88,7 +88,7 @@ fun WorkingSetLazyColumn(
 
         items(count = workingSets.size, key = { index -> workingSets[index].id }) { index ->
 
-            val warmUpSet = workingSets[index]
+            val workingSet = workingSets[index]
 
 //            var deletedState by remember { mutableStateOf(false) }
             val dismissState = rememberDismissState(
@@ -98,19 +98,19 @@ fun WorkingSetLazyColumn(
             )
 
             fun newWeight(newWeight: Double) {
-                updateWorkingWeight(warmUpSet.id, newWeight)
+                updateWorkingWeight(workingSet.id, newWeight)
             }
 
             fun newReps(newReps: Int) {
-                updateWorkingSetReps(warmUpSet.id, newReps)
+                updateWorkingSetReps(workingSet.id, newReps)
             }
 
             fun newPercentage(newPercentage: Float) {
-                updateWorkingSetPercentage(warmUpSet.id, newPercentage)
+                updateWorkingSetPercentage(workingSet.id, newPercentage)
             }
 
             if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                deleteSet(warmUpSet.id)
+                deleteSet(workingSet.id)
             }
 
             SwipeToDismiss(
@@ -164,7 +164,7 @@ fun WorkingSetLazyColumn(
                 ) {
                     WorkingSetLayout(
                         index,
-                        warmUpSet,
+                        workingSet,
                         _workingWeight,
                         { newWeight -> newWeight(newWeight) },
                         { newReps -> newReps(newReps) },

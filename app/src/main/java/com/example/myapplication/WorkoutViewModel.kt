@@ -317,6 +317,11 @@ class WorkoutViewModel : ViewModel() {
         return exerciseSets.sets.first { it.setType.name != "Warm Up Set" }.exerciseWeight
     }
 
+    fun getWorkingSetRepetitions(exerciseSets: ExerciseSetModel): Int? {
+        // TODO Add If Not Empty
+        return exerciseSets.sets.first { it.setType.name != "Warm Up Set" }.repetitions
+    }
+
     fun addWorkingSets(exerciseSets: ExerciseSetModel, workingSets: List<SetModel>) {
         val index = _exercisesSetsData.indexOf(exerciseSets)
 
@@ -348,17 +353,9 @@ class WorkoutViewModel : ViewModel() {
         _exercisesSets.value = _exercisesSetsData.toMutableList()
     }
 
-    // TODO Add function to Volume Equate Sets
+    // TODO Add function to Volume Equate Sets, Create Dialog for this
     fun equateWorkingSetsVolume(exerciseSets: ExerciseSetModel, newWeight: Double?, newReps: Int?) {
-        val totalVolume = exerciseSets.totalWorkingSetVolume()
-
-        if (newWeight != null) {
-            totalVolume.div(newWeight)
-        } else if (newReps != null) {
-            totalVolume.div(newReps)
-        } else {
-            null
-        }
+        // TODO
     }
 
     fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {

@@ -1,5 +1,6 @@
 package com.example.myapplication.data
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.example.myapplication.newID
 
@@ -46,5 +47,7 @@ class Set(_setModel: SetModel) {
 }
 
 fun SetModel.setVolume(): Double? {
+    Log.i("SetModel.setVolume()", "${exerciseWeight?.times(repetitions!!)}")
+
     return exerciseWeight?.times(repetitions!!)
 }

@@ -21,9 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.WorkingSetViewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workingSets.WorkingSetLazyColumn
+import com.example.myapplication.components.workingSets.WorkingSetViewModel
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
@@ -39,22 +39,36 @@ fun AddWorkingSetsScreen(
     exerciseSets: ExerciseSetModel
 ) {
     AddWorkingSetsDialog(
-        { close -> openDialog(close) },
-        workoutViewModel.getWorkingSetWeight(exerciseSets), /* TODO Get User's One Rep Max or Estimated One Rep Max*/
-        { newWorkingWeight -> workingSetViewModel.changeWorkingSetWeight(newWorkingWeight) },
-        workingSetViewModel.sets,
-        { workingSetViewModel.addSet() },
-        { id: Long -> workingSetViewModel.remove(id) },
-        { id: Long, newWeight: Double -> workingSetViewModel.updateSetWeight(id, newWeight) },
-        { id: Long, newReps: Int -> workingSetViewModel.updateSetReps(id, newReps) },
-        { id: Long, newPercentage: Float ->
+        openDialog = { close -> openDialog(close) },
+        _oneRepMax = workoutViewModel.getWorkingSetWeight(exerciseSets), /* TODO Get User's One Rep Max or Estimated One Rep Max*/
+        changeWorkingSetWeight = { newWorkingWeight ->
+            workingSetViewModel.changeWorkingSetWeight(
+                newWorkingWeight
+            )
+        },
+        sets = workingSetViewModel.sets,
+        addSet = { workingSetViewModel.addSet() },
+        removeSet = { id: Long -> workingSetViewModel.remove(id) },
+        updateSetWeight = { id: Long, newWeight: Double ->
+            workingSetViewModel.updateSetWeight(
+                id,
+                newWeight
+            )
+        },
+        updateSetReps = { id: Long, newReps: Int ->
+            workingSetViewModel.updateSetReps(
+                id,
+                newReps
+            )
+        },
+        updateSetPercentage = { id: Long, newPercentage: Float ->
             workingSetViewModel.updateSetPercentage(
                 id,
                 newPercentage
             )
         },
-        { sets -> workoutViewModel.addWorkingSets(exerciseSets, sets) },
-        { sets -> workoutViewModel.addBackOffSets(exerciseSets, sets) }
+        insertSets = { sets -> workoutViewModel.addWorkingSets(exerciseSets, sets) },
+        insertBackOffSets = { sets -> workoutViewModel.addBackOffSets(exerciseSets, sets) }
     )
 }
 
@@ -184,7 +198,7 @@ fun AddWorkingSetsDialog(
                             .padding(PaddingValues(horizontal = 4.dp))
                             .width(60.dp),
                         contentAlignment = Alignment.Center
-                    ) { Text("Warm-up") }
+                    ) { /* TODO Put appropriate text here */ }
                 }
 
 /*                Row(

@@ -1,17 +1,18 @@
-package com.example.myapplication
+package com.example.myapplication.components.workingSets
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.SetModel
+import com.example.myapplication.newID
 
 class WorkingSetViewModel : ViewModel() {
     private var _oneRepMax: Double = 100.0
     val oneRepMax: Double
         get() = _oneRepMax
 
-    private val _Sets = initSets().toMutableStateList()
+    private val _sets = initSets().toMutableStateList()
     val sets: List<SetModel>
-        get() = _Sets
+        get() = _sets
 
     fun changeWorkingSetWeight(newWorkingWeight: Double) {
         _oneRepMax = newWorkingWeight
@@ -19,14 +20,14 @@ class WorkingSetViewModel : ViewModel() {
 
     fun addSet() {
 //        Log.i("workingSetViewModel.addSet(): ", "workingSets List: ${_Sets.toList()}")
-        if (_Sets.isNotEmpty()) {
-            _Sets.add(
-                _Sets.last().copy(
+        if (_sets.isNotEmpty()) {
+            _sets.add(
+                _sets.last().copy(
                     id = newID()
                 )
             )
         } else {
-            _Sets.add(
+            _sets.add(
                 SetModel()
             )
         }
@@ -41,24 +42,24 @@ class WorkingSetViewModel : ViewModel() {
 //            }
 //        }
 
-        _Sets.removeIf { it.id == id }
+        _sets.removeIf { it.id == id }
     }
 
     fun updateSetWeight(id: Long, newWeight: Double?) {
-        _Sets.forEach { if (it.id == id) it.exerciseWeight = newWeight }
+        _sets.forEach { if (it.id == id) it.exerciseWeight = newWeight }
     }
 
     fun updateSetReps(id: Long, newReps: Int) {
-        _Sets.forEach { if (it.id == id) it.repetitions = newReps }
+        _sets.forEach { if (it.id == id) it.repetitions = newReps }
     }
 
     fun updateSetPercentage(id: Long, newPercentage: Float) {
-        _Sets.forEach { if (it.id == id) it.percentage1RM = newPercentage }
+        _sets.forEach { if (it.id == id) it.percentage1RM = newPercentage }
     }
 }
 
 private fun initSets(): List<SetModel> {
-    return List(6) { index ->
+    return List(3) { index ->
         SetModel(
             setNumber = index,
             exerciseWeight = 100.00,

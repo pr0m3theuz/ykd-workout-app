@@ -2,6 +2,7 @@ package com.example.myapplication.data
 
 import android.util.Log
 import com.example.myapplication.newID
+import kotlin.math.roundToInt
 
 data class ExerciseSetModel(
     val id: Long = newID(),
@@ -99,14 +100,19 @@ fun ExerciseSetModel.addBackOffSets(backOffSets: List<SetModel>) {
 // TODO Create Feature to Volume Equated Working Sets
 
 fun ExerciseSetModel.totalWorkingSetVolume(): Double {
-    val totalVolume: Double = 0.0
+    var totalVolume: Double = 0.0
 
-    sets.filter { it.setType.name != "Warm Up Set" }.forEach { totalVolume.plus(it.setVolume()!!) }
+    sets.filter { it.setType.name != "Warm Up Set" }.forEach {
+        totalVolume += (it.setVolume()!!)
+        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
+        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
+    }
 
     return totalVolume
 }
 
-fun ExerciseSetModel.equateWorkingSetVolumeByWeight(weight: Double?): Double {
+//    Returns the number of reps to be performed based on the new weight
+fun ExerciseSetModel.equateWorkingSetVolumeByWeight(weight: Double?): Int {
     val totalVolume: Double = 0.0
     var numberOfWorkingSets: Int = 0
 
@@ -116,12 +122,13 @@ fun ExerciseSetModel.equateWorkingSetVolumeByWeight(weight: Double?): Double {
     }
 
     return if (numberOfWorkingSets > 0 && weight != null) {
-        totalVolume.div(weight).div(numberOfWorkingSets)
+        totalVolume.div(weight).div(numberOfWorkingSets).roundToInt()
     } else {
-        0.0
+        0
     }
 }
 
+//    Returns the weight to be used based on the new repetitions
 fun ExerciseSetModel.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double {
     val totalVolume: Double = 0.0
     var numberOfWorkingSets: Int = 0
