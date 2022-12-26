@@ -74,6 +74,7 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
             workoutOptionsDropdownMenu()
         }
 
+//        TODO Fix Workout Duration
         Text(modifier = Modifier.padding(8.dp), text = workoutDuration.toString())
 
         WorkoutNotes(
