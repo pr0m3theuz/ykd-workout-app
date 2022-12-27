@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import com.example.myapplication.components.exercise.EquateVolumeScreen
 import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
 import com.example.myapplication.data.ExerciseSetModel
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 // import com.example.myapplication.components.RestTimer.RestTimePicker
 
@@ -100,7 +102,9 @@ fun ExerciseOptionsDropdownMenu(
                 text = { Text("Auto Rest Timer") },
                 trailingIcon = {
                     Text(
-                        exerciseSets.exercise.workingSetRestDuration.toComponents { minutes, seconds, _ ->
+                        exerciseSets.exercise.workingSetRestInWholeMilliseconds.toDuration(
+                            DurationUnit.MILLISECONDS
+                        ).toComponents { minutes, seconds, _ ->
                             "$minutes:${seconds.toString().padStart(2, '0')}"
                         }
                     )

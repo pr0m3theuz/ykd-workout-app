@@ -182,10 +182,10 @@ class WorkoutViewModel : ViewModel() {
             }
 
             if (exercise.warmUpSetRestTimerEnabled && (set.setType.equals("Warm Up"))) {
-                _timerDuration = exercise.warmUpSetRestDuration.inWholeMilliseconds
+                _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
                 createTimer(_timerDuration)
             } else if (exercise.workingSetRestTimerEnabled && !(set.setType.equals("Warm Up"))) {
-                _timerDuration = exercise.workingSetRestDuration.inWholeMilliseconds
+                _timerDuration = exercise.workingSetRestInWholeMilliseconds
                 createTimer(_timerDuration)
             }
         }
@@ -360,9 +360,9 @@ class WorkoutViewModel : ViewModel() {
 
     fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {
         if (tabRowState == 1) {
-            exercise.warmUpSetRestDuration = time
+            exercise.warmUpSetRestInWholeMilliseconds = time.inWholeMilliseconds
         } else if (tabRowState == 0) {
-            exercise.workingSetRestDuration = time
+            exercise.workingSetRestInWholeMilliseconds = time.inWholeMilliseconds
         }
     }
 

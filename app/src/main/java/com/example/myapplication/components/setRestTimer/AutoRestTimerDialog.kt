@@ -38,9 +38,9 @@ fun AutoRestTimerScreen(
     AutoRestTimerDialog(
         { close -> openDialog(close) },
         exercise,
-        workSetRestTime = exercise.workingSetRestDuration,
+        workSetRestTime = exercise.workingSetRestInWholeMilliseconds.toDuration(DurationUnit.MILLISECONDS),
         isWorkingSetRestTimerEnabled = exercise.workingSetRestTimerEnabled,
-        warmUpSetRestTime = exercise.warmUpSetRestDuration,
+        warmUpSetRestTime = exercise.warmUpSetRestInWholeMilliseconds.toDuration(DurationUnit.MILLISECONDS),
         isWarmUpSetRestTimerEnabled = exercise.warmUpSetRestTimerEnabled,
         { tabRowState: Int, _exercise: ExerciseModel, time: Duration ->
             workoutViewModel.updateExerciseAutoRestTimer(
