@@ -14,6 +14,8 @@ data class ExerciseModel(
     val exerciseCategory: String = "Exercise Category", // TODO Remove Assignment
     // TODO Make into a List<String> for Multiple Body Parts
     val bodyPart: String = "Exercise Body Part", // TODO Remove Assignment
+    var exerciseProgression: String? = null,
+    val equipment: String? = null,
     var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,

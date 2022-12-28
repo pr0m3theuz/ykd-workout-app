@@ -9,7 +9,7 @@ class Repository(private val dao: Dao) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    val allExercises: Flow<List<ExerciseModel>> = dao.getAllExercises()
+    fun getExercises(): Flow<List<ExerciseModel>> = dao.getAllExercises()
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
