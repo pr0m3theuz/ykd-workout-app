@@ -16,31 +16,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.Equipment
-import com.example.myapplication.data.MovementType
-import com.example.myapplication.data.MuscleGroup
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Preview
 @Composable
-fun ExercisesFilterMenu() {
+fun ExercisesFilterMenu(exercisesViewModel: ExercisesViewModel = viewModel()) {
 //    var expanded by remember { mutableStateOf(true) }
     var filterMenuExpanded by remember { mutableStateOf(false) }
     fun expandFilterMenu() {
         filterMenuExpanded = !filterMenuExpanded
     }
 
-    val muscleGroups = MuscleGroup.values().sortedBy { it.name }
+    val muscleGroups = exercisesViewModel.muscleGroups
     var muscleGroupsVisibility by remember { mutableStateOf(false) }
 
-    val equipments = Equipment.values().sortedBy { it.name }
+    val equipments = exercisesViewModel.equipments
     var equipmentVisibility by remember { mutableStateOf(false) }
 
-    val movementTypes = MovementType.values().sortedBy { it.name }
+    val movementTypes = exercisesViewModel.movementTypes
     var movementTypeVisibility by remember { mutableStateOf(false) }
 
-    val muscleGroupsChecked = remember { muscleGroups.map { it to false }.toMutableStateMap() }
-    val equipmentsChecked = remember { equipments.map { it to false }.toMutableStateMap() }
-    val movementTypesChecked = remember { movementTypes.map { it to false }.toMutableStateMap() }
+//    val muscleGroupsChecked = remember { exercisesViewModel.muscleGroupsChecked }
+//    val equipmentsChecked = remember { exercisesViewModel.equipmentsChecked }
+//    val movementTypesChecked = remember { exercisesViewModel.movementTypesChecked }
 
     fun expandMuscleGroups() {
         muscleGroupsVisibility = !muscleGroupsVisibility
@@ -129,8 +127,8 @@ fun ExercisesFilterMenu() {
                     muscleGroups.forEach { muscleGroup ->
                         Row() {
                             fun updateState() {
-                                muscleGroupsChecked[muscleGroup] =
-                                    !muscleGroupsChecked[muscleGroup]!!
+                                exercisesViewModel.muscleGroupsChecked[muscleGroup] =
+                                    !exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
                             }
                             DropdownMenuItem(
                                 text = {
@@ -141,7 +139,7 @@ fun ExercisesFilterMenu() {
                                     ) {
                                         Text(text = muscleGroup.printableName)
                                         Checkbox(
-                                            checked = muscleGroupsChecked[muscleGroup] == true,
+                                            checked = exercisesViewModel.muscleGroupsChecked[muscleGroup] == true,
                                             onCheckedChange = {
                                                 updateState()
 //
@@ -196,7 +194,8 @@ fun ExercisesFilterMenu() {
                     equipments.forEach { equipment ->
                         Row {
                             fun updateState() {
-                                equipmentsChecked[equipment] = !equipmentsChecked[equipment]!!
+                                exercisesViewModel.equipmentsChecked[equipment] =
+                                    !exercisesViewModel.equipmentsChecked[equipment]!!
                             }
                             DropdownMenuItem(
                                 text = {
@@ -207,7 +206,7 @@ fun ExercisesFilterMenu() {
                                     ) {
                                         Text(text = equipment.printableName)
                                         Checkbox(
-                                            checked = equipmentsChecked[equipment] == true,
+                                            checked = exercisesViewModel.equipmentsChecked[equipment] == true,
                                             onCheckedChange = {
                                                 updateState()
 //
@@ -261,8 +260,8 @@ fun ExercisesFilterMenu() {
                     movementTypes.forEach { movementType ->
                         Row {
                             fun updateState() {
-                                movementTypesChecked[movementType] =
-                                    !movementTypesChecked[movementType]!!
+                                exercisesViewModel.movementTypesChecked[movementType] =
+                                    !exercisesViewModel.movementTypesChecked[movementType]!!
                             }
                             DropdownMenuItem(
                                 text = {
@@ -273,7 +272,7 @@ fun ExercisesFilterMenu() {
                                     ) {
                                         Text(text = movementType.printableName)
                                         Checkbox(
-                                            checked = movementTypesChecked[movementType] == true,
+                                            checked = exercisesViewModel.movementTypesChecked[movementType] == true,
                                             onCheckedChange = {
                                                 updateState()
 //

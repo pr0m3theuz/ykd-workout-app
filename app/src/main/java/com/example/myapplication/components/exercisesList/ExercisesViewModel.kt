@@ -1,9 +1,9 @@
 package com.example.myapplication.components.exercisesList
 
+import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.ExerciseModel
-import com.example.myapplication.data.Repository
+import com.example.myapplication.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,4 +22,14 @@ public class ExercisesViewModel(repository: Repository) : ViewModel() {
             }
         }
     }
+
+    val muscleGroups = MuscleGroup.values().sortedBy { it.name }
+
+    val equipments = Equipment.values().sortedBy { it.name }
+
+    val movementTypes = MovementType.values().sortedBy { it.name }
+
+    val muscleGroupsChecked = muscleGroups.map { it to false }.toMutableStateMap()
+    val equipmentsChecked = equipments.map { it to false }.toMutableStateMap()
+    val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
 }
