@@ -114,7 +114,9 @@ fun ExercisesFilterMenu() {
                     }
                 },
                 onClick = {
-                    collapseOthers()
+                    if (!muscleGroupsVisibility) {
+                        collapseOthers()
+                    }
                     expandMuscleGroups()
                 }
             )
@@ -179,7 +181,9 @@ fun ExercisesFilterMenu() {
                     }
                 },
                 onClick = {
-                    collapseOthers()
+                    if (!equipmentVisibility) {
+                        collapseOthers()
+                    }
                     expandEquipment()
                 }
             )
@@ -196,7 +200,11 @@ fun ExercisesFilterMenu() {
                             }
                             DropdownMenuItem(
                                 text = {
-                                    Row {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
                                         Text(text = equipment.printableName)
                                         Checkbox(
                                             checked = equipmentsChecked[equipment] == true,
@@ -207,7 +215,7 @@ fun ExercisesFilterMenu() {
                                         )
                                     }
                                 },
-                                onClick = { /* TODO */ }
+                                onClick = { updateState() }
                             )
                         }
                     }
@@ -238,7 +246,9 @@ fun ExercisesFilterMenu() {
                     }
                 },
                 onClick = {
-                    collapseOthers()
+                    if (!movementTypeVisibility) {
+                        collapseOthers()
+                    }
                     expandMovementType()
                 }
             )
@@ -256,7 +266,11 @@ fun ExercisesFilterMenu() {
                             }
                             DropdownMenuItem(
                                 text = {
-                                    Row {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
                                         Text(text = movementType.printableName)
                                         Checkbox(
                                             checked = movementTypesChecked[movementType] == true,
@@ -267,7 +281,7 @@ fun ExercisesFilterMenu() {
                                         )
                                     }
                                 },
-                                onClick = { /* TODO */ }
+                                onClick = { updateState() }
                             )
                         }
                     }
