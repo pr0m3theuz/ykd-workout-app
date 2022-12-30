@@ -20,7 +20,7 @@ abstract class AppRoomDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    var dao = database.Dao()
+                    val dao = database.Dao()
 
                     // Delete all content here.
                     // dao.deleteAll()
