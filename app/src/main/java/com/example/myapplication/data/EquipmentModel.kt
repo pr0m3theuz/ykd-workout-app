@@ -1,14 +1,14 @@
 package com.example.myapplication.data
 
-enum class Equipment {
-    DUMBBELL,
-    BARBELL,
-    MACHINE,
-    KETTLEBELL,
-    BODY_WEIGHT,
-    CARDIO,
-    OTHER,
-    NO_EQUIPMENT
+enum class Equipment(val printableName: String) {
+    DUMBBELL("Dumbbell"),
+    BARBELL("Barbell"),
+    MACHINE("Machine"),
+    KETTLEBELL("Kettlebell"),
+    BODY_WEIGHT("Body Weight"),
+    CARDIO("Cardio"),
+    OTHER("Other"),
+    NO_EQUIPMENT("No Equipment")
 }
 
 enum class ExerciseProgression {
@@ -21,26 +21,26 @@ enum class ExerciseProgression {
     WEIGHT_DISTANCE_TIME
 }
 
-enum class BodyParts {
-    CORE,
-    CALVES,
-    BACK,
-    BICEPS,
-    CHEST,
-    FOREARMS,
-    GLUTES,
-    HAMSTRINGS,
-    LEGS,
-    QUADS,
-    SHOULDERS,
-    TRICEPS,
-    FULL_BODY
+enum class MuscleGroup(val printableName: String) {
+    CORE("Core"),
+    CALVES("Calves"),
+    BACK("Back"),
+    BICEPS("Biceps"),
+    CHEST("Chest"),
+    FOREARMS("Forearms"),
+    GLUTES("Glutes"),
+    HAMSTRINGS("Hamstring"),
+    LEGS("Legs"),
+    QUADS("Quad"),
+    SHOULDERS("Shoulders"),
+    TRICEPS("Triceps"),
+    FULL_BODY("Full Body")
 }
 
-enum class MovementType {
-    COMPOUND,
-    ISOLATION,
-    ISOMETRIC,
-    CARDIO,
-    STRETCH
+enum class MovementType(val printableName: String) {
+    COMPOUND("Compound"),
+    ISOLATION("Isolation"),
+    ISOMETRIC("Isometric"),
+    CARDIO("Cardio"),
+    STRETCH("Stretch")
 }

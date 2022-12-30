@@ -4,10 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
@@ -15,11 +12,13 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.BodyParts
 import com.example.myapplication.data.Equipment
+import com.example.myapplication.data.MovementType
+import com.example.myapplication.data.MuscleGroup
 
 @Preview
 @Composable
@@ -30,23 +29,49 @@ fun ExercisesFilterMenu() {
         filterMenuExpanded = !filterMenuExpanded
     }
 
-    val bodyParts = BodyParts.values().sortedBy { it.name }
-    var bodyPartsVisibility by remember { mutableStateOf(false) }
+    val muscleGroups = MuscleGroup.values().sortedBy { it.name }
+    var muscleGroupsVisibility by remember { mutableStateOf(false) }
 
     val equipments = Equipment.values().sortedBy { it.name }
     var equipmentVisibility by remember { mutableStateOf(false) }
 
-    fun expandBodyParts() {
-        bodyPartsVisibility = !bodyPartsVisibility
+    val movementTypes = MovementType.values().sortedBy { it.name }
+    var movementTypeVisibility by remember { mutableStateOf(false) }
+
+    val muscleGroupsChecked = remember { muscleGroups.map { it to false }.toMutableStateMap() }
+    val equipmentsChecked = remember { equipments.map { it to false }.toMutableStateMap() }
+    val movementTypesChecked = remember { movementTypes.map { it to false }.toMutableStateMap() }
+
+    fun expandMuscleGroups() {
+        muscleGroupsVisibility = !muscleGroupsVisibility
     }
 
     fun expandEquipment() {
         equipmentVisibility = !equipmentVisibility
     }
 
+    fun expandMovementType() {
+        movementTypeVisibility = !movementTypeVisibility
+    }
+
+    fun collapseOthers() {
+        if (muscleGroupsVisibility) {
+            muscleGroupsVisibility = false
+        }
+
+        if (equipmentVisibility) {
+            equipmentVisibility = false
+        }
+
+        if (movementTypeVisibility) {
+            movementTypeVisibility = false
+        }
+    }
+
     fun closeAll() {
-        bodyPartsVisibility = false
+        muscleGroupsVisibility = false
         equipmentVisibility = false
+        movementTypeVisibility = false
     }
 
     Box(modifier = Modifier.size(40.dp)) {
@@ -64,39 +89,67 @@ fun ExercisesFilterMenu() {
             onDismissRequest = {
                 expandFilterMenu()
                 closeAll()
-            }
+            },
+            modifier = Modifier.fillMaxWidth(0.5f)
         ) {
             DropdownMenuItem(
                 text = {
-                    Row {
-                        Text(text = "Body Parts")
-                        Crossfade(targetState = bodyPartsVisibility) { bodyPartsVisibility ->
-                            when (bodyPartsVisibility) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Muscle Groups")
+                        Crossfade(targetState = muscleGroupsVisibility) { muscleGroupsVisibility ->
+                            when (muscleGroupsVisibility) {
                                 true -> Icon(
                                     Icons.Default.ExpandLess,
-                                    contentDescription = "Hide body parts"
+                                    contentDescription = "Hide Muscle Groups"
                                 )
                                 false -> Icon(
                                     Icons.Default.ExpandMore,
-                                    contentDescription = "Show body parts"
+                                    contentDescription = "Show Muscle Groups"
                                 )
                             }
                         }
                     }
                 },
-                onClick = { expandBodyParts() }
+                onClick = {
+                    collapseOthers()
+                    expandMuscleGroups()
+                }
             )
             AnimatedVisibility(
-                visible = bodyPartsVisibility,
+                visible = muscleGroupsVisibility,
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
                 Column {
-                    bodyParts.forEach {
-                        Row {
+                    muscleGroups.forEach { muscleGroup ->
+                        Row() {
+                            fun updateState() {
+                                muscleGroupsChecked[muscleGroup] =
+                                    !muscleGroupsChecked[muscleGroup]!!
+                            }
                             DropdownMenuItem(
-                                text = { Text(text = it.name) },
-                                onClick = { /* TODO */ }
+                                text = {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(text = muscleGroup.printableName)
+                                        Checkbox(
+                                            checked = muscleGroupsChecked[muscleGroup] == true,
+                                            onCheckedChange = {
+                                                updateState()
+//
+                                            }
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    updateState()
+                                }
                             )
                         }
                     }
@@ -106,7 +159,10 @@ fun ExercisesFilterMenu() {
 
             DropdownMenuItem(
                 text = {
-                    Row {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(text = "Equipment")
                         Crossfade(targetState = equipmentVisibility) { equipmentVisibility ->
                             when (equipmentVisibility) {
@@ -122,7 +178,10 @@ fun ExercisesFilterMenu() {
                         }
                     }
                 },
-                onClick = { expandEquipment() }
+                onClick = {
+                    collapseOthers()
+                    expandEquipment()
+                }
             )
             AnimatedVisibility(
                 visible = equipmentVisibility,
@@ -130,10 +189,24 @@ fun ExercisesFilterMenu() {
                 exit = shrinkVertically()
             ) {
                 Column {
-                    equipments.forEach {
+                    equipments.forEach { equipment ->
                         Row {
+                            fun updateState() {
+                                equipmentsChecked[equipment] = !equipmentsChecked[equipment]!!
+                            }
                             DropdownMenuItem(
-                                text = { Text(text = it.name) },
+                                text = {
+                                    Row {
+                                        Text(text = equipment.printableName)
+                                        Checkbox(
+                                            checked = equipmentsChecked[equipment] == true,
+                                            onCheckedChange = {
+                                                updateState()
+//
+                                            }
+                                        )
+                                    }
+                                },
                                 onClick = { /* TODO */ }
                             )
                         }
@@ -145,10 +218,13 @@ fun ExercisesFilterMenu() {
 
             DropdownMenuItem(
                 text = {
-                    Row {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(text = "Movement Types")
-                        Crossfade(targetState = equipmentVisibility) { equipmentVisibility ->
-                            when (equipmentVisibility) {
+                        Crossfade(targetState = movementTypeVisibility) { movementTypeVisibility ->
+                            when (movementTypeVisibility) {
                                 true -> Icon(
                                     Icons.Default.ExpandLess,
                                     contentDescription = "Hide Movement Types"
@@ -161,18 +237,36 @@ fun ExercisesFilterMenu() {
                         }
                     }
                 },
-                onClick = { expandEquipment() }
+                onClick = {
+                    collapseOthers()
+                    expandMovementType()
+                }
             )
             AnimatedVisibility(
-                visible = equipmentVisibility,
+                visible = movementTypeVisibility,
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
                 Column {
-                    equipments.forEach {
+                    movementTypes.forEach { movementType ->
                         Row {
+                            fun updateState() {
+                                movementTypesChecked[movementType] =
+                                    !movementTypesChecked[movementType]!!
+                            }
                             DropdownMenuItem(
-                                text = { Text(text = it.name) },
+                                text = {
+                                    Row {
+                                        Text(text = movementType.printableName)
+                                        Checkbox(
+                                            checked = movementTypesChecked[movementType] == true,
+                                            onCheckedChange = {
+                                                updateState()
+//
+                                            }
+                                        )
+                                    }
+                                },
                                 onClick = { /* TODO */ }
                             )
                         }
