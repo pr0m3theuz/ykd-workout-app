@@ -32,4 +32,11 @@ public class ExercisesViewModel(repository: Repository) : ViewModel() {
     val muscleGroupsChecked = muscleGroups.map { it to false }.toMutableStateMap()
     val equipmentsChecked = equipments.map { it to false }.toMutableStateMap()
     val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
+
+//    private val all = muscleGroupsChecked + movementTypesChecked + equipmentsChecked
+//    private val _selected = all.filterValues { it }
+//
+//    private val _selectedCategories = MutableStateFlow(_selected)
+//    val selectedCategories: StateFlow<Map<Enum<*>, Boolean>>
+//        get() = _selectedCategories
 }
