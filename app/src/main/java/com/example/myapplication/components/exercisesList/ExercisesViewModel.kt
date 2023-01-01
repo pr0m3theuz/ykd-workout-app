@@ -33,10 +33,45 @@ public class ExercisesViewModel(repository: Repository) : ViewModel() {
     val equipmentsChecked = equipments.map { it to false }.toMutableStateMap()
     val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
 
-//    private val all = muscleGroupsChecked + movementTypesChecked + equipmentsChecked
-//    private val _selected = all.filterValues { it }
-//
-//    private val _selectedCategories = MutableStateFlow(_selected)
+    private val all = muscleGroupsChecked + movementTypesChecked + equipmentsChecked
+    val selected = all.filterValues { it }
+
+//    private val _selectedCategories = MutableStateFlow(_se lected)
 //    val selectedCategories: StateFlow<Map<Enum<*>, Boolean>>
 //        get() = _selectedCategories
+
+    fun onCategoryChange(category: Enum<*>) {
+        if (muscleGroupsChecked.containsKey(category)) {
+            muscleGroupsChecked[category as MuscleGroup] = false
+        } else if (equipmentsChecked.containsKey(category)) {
+            equipmentsChecked[category as Equipment] = false
+        } else if (movementTypesChecked.containsKey(category)) {
+            movementTypesChecked[category as MovementType] = false
+        }
+    }
+
+    fun getPrintableName(category: Enum<*>): String {
+        var printableName: String = ""
+
+        if (muscleGroups.contains(category)) {
+            muscleGroups.forEach {
+                if (it.name == category.name) {
+                    printableName = it.printableName
+                }
+            }
+        } else if (equipmentsChecked.containsKey(category)) {
+            equipments.forEach {
+                if (it.name == category.name) {
+                    printableName = it.printableName
+                }
+            }
+        } else if (movementTypesChecked.containsKey(category)) {
+            movementTypes.forEach {
+                if (it.name == category.name) {
+                    printableName = it.printableName
+                }
+            }
+        }
+        return printableName
+    }
 }

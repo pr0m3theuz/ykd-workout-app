@@ -41,7 +41,8 @@ fun ExercisesLazyColumn(
     exercisesViewModel: ExercisesViewModel = viewModel(),
     exercises: List<ExerciseModel>
 ) {
-//    val selectedCategories = exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
+//    val selectedCategoriesMap by exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
+//    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
 
     Column(
         modifier = Modifier.padding(horizontal = 8.dp)
@@ -73,7 +74,33 @@ fun ExercisesLazyColumn(
             horizontalArrangement = Arrangement.spacedBy(4.dp).also { Arrangement.Start },
             contentPadding = PaddingValues(0.dp)
         ) {
-            items(items = exercisesViewModel.muscleGroups) { muscleGroup ->
+//            items(items = exercisesViewModel.selected.keys.toList()) { category ->
+//
+//                val checked = exercisesViewModel.selected[category]!!
+//                fun updateState() {
+//                    exercisesViewModel.onCategoryChange(category = category)
+//                }
+//                if (checked) {
+//                    FilterChip(
+//                        selected = checked,
+//                        onClick = { updateState() },
+//                        selectedIcon = {
+//                            Icon(
+//                                imageVector = Icons.Filled.Done,
+//                                contentDescription = "Localized Description",
+//                                modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+//                            )
+//                        },
+//                        colors = ChipDefaults.filterChipColors(
+//                            backgroundColor = colors.primary,
+//                            contentColor = colors.onPrimary
+//                        )
+//                    ) {
+//                        Text(text = exercisesViewModel.getPrintableName(category = category))
+//                    }
+//                }
+
+            items(items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.toList()) { muscleGroup ->
                 val checked = exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
                 fun updateState() {
                     exercisesViewModel.muscleGroupsChecked[muscleGroup] =
@@ -99,7 +126,7 @@ fun ExercisesLazyColumn(
                     }
                 }
             }
-            items(items = exercisesViewModel.equipments) { equipment ->
+            items(items = exercisesViewModel.equipmentsChecked.filterValues { it }.keys.toList()) { equipment ->
                 val checked = exercisesViewModel.equipmentsChecked[equipment]!!
                 fun updateState() {
                     exercisesViewModel.equipmentsChecked[equipment] =
@@ -125,7 +152,7 @@ fun ExercisesLazyColumn(
                     }
                 }
             }
-            items(items = exercisesViewModel.movementTypes) {
+            items(items = exercisesViewModel.movementTypesChecked.filterValues { it }.keys.toList()) {
                     movementType
                 ->
                 val checked = exercisesViewModel.movementTypesChecked[movementType]!!

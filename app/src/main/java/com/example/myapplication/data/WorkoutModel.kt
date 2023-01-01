@@ -10,7 +10,8 @@ data class WorkoutModel(
     var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,
-    var workoutDuration: Duration? = Duration.ZERO
+    var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds,
+    var workoutType: String? = null
 //    val workoutStarted = LocalDateTime.now(), TODO
 //    val workoutEnded = LocalDateTime.now(), TODO
 //    var workoutDate: Date? = LocalDateTime.now()
