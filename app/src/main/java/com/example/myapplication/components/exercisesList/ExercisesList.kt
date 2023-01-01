@@ -100,7 +100,7 @@ fun ExercisesLazyColumn(
 //                    }
 //                }
 
-            items(items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.toList()) { muscleGroup ->
+            items(items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }) { muscleGroup ->
                 val checked = exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
                 fun updateState() {
                     exercisesViewModel.muscleGroupsChecked[muscleGroup] =
@@ -126,7 +126,7 @@ fun ExercisesLazyColumn(
                     }
                 }
             }
-            items(items = exercisesViewModel.equipmentsChecked.filterValues { it }.keys.toList()) { equipment ->
+            items(items = exercisesViewModel.equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }) { equipment ->
                 val checked = exercisesViewModel.equipmentsChecked[equipment]!!
                 fun updateState() {
                     exercisesViewModel.equipmentsChecked[equipment] =
@@ -152,7 +152,7 @@ fun ExercisesLazyColumn(
                     }
                 }
             }
-            items(items = exercisesViewModel.movementTypesChecked.filterValues { it }.keys.toList()) {
+            items(items = exercisesViewModel.movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }) {
                     movementType
                 ->
                 val checked = exercisesViewModel.movementTypesChecked[movementType]!!
