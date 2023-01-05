@@ -4,12 +4,16 @@ import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-public class ExercisesViewModel(repository: Repository) : ViewModel() {
+@HiltViewModel
+public class ExercisesViewModel @Inject constructor(private var repository: Repository) :
+    ViewModel() {
 
     private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
     val exercises: StateFlow<List<ExerciseModel>>
@@ -36,7 +40,7 @@ public class ExercisesViewModel(repository: Repository) : ViewModel() {
     private val all = muscleGroupsChecked + movementTypesChecked + equipmentsChecked
     val selected = all.filterValues { it }
 
-//    private val _selectedCategories = MutableStateFlow(_se lected)
+//    private val _selectedCategories = MutableStateFlow(_selected)
 //    val selectedCategories: StateFlow<Map<Enum<*>, Boolean>>
 //        get() = _selectedCategories
 
@@ -73,5 +77,34 @@ public class ExercisesViewModel(repository: Repository) : ViewModel() {
             }
         }
         return printableName
+    }
+
+    fun filterExercises(searchExerciseName: String = "%%") {
+        val selectedMuscleGroups = mutableListOf<String>()
+        muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.printableName }
+            .forEach { selectedMuscleGroups.add(it.printableName) }
+        val selectedEquipments = mutableListOf<String>()
+        equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }
+            .forEach { selectedEquipments.add(it.printableName) }
+        val selectedMovementTypes = mutableListOf<String>()
+        movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }
+            .forEach { selectedMovementTypes.add(it.printableName) }
+
+        if (selectedEquipments.isEmpty()) {
+            selectedEquipments.add("%%")
+        } else if (selectedMovementTypes.isEmpty()) {
+            selectedMovementTypes.add("%%")
+        } else if (selectedMuscleGroups.isEmpty()) {
+            selectedMuscleGroups.add("%%")
+        }
+
+        viewModelScope.launch {
+            repository.filterExercises(
+                searchExerciseName,
+                selectedMuscleGroups.toList(),
+                selectedEquipments.toList()
+//                movementTypes = selectedMovementTypes.toList()
+            )
+        }
     }
 }

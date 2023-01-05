@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun Dao(): Dao
 
-    private class DatabaseCallback(
+    class DatabaseCallback(
         private val scope: CoroutineScope
     ) : RoomDatabase.Callback() {
 

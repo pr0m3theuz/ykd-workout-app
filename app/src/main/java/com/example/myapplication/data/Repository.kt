@@ -2,10 +2,13 @@ package com.example.myapplication.data
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
-class Repository(private val dao: Dao) {
+@Singleton
+class Repository @Inject constructor(private val dao: Dao) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
@@ -23,5 +26,14 @@ class Repository(private val dao: Dao) {
     @WorkerThread
     suspend fun updateExercise(exercise: ExerciseModel) {
         dao.updateExercise(exercise)
+    }
+
+    fun filterExercises(
+        exercise: String,
+        bodyParts: List<String>,
+        equipments: List<String>
+//        movementTypes: List<String>
+    ) {
+        dao.filterExercises(exercise, bodyParts, equipments/*, movementTypes*/)
     }
 }

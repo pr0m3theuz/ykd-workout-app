@@ -42,5 +42,7 @@ enum class MovementType(val printableName: String) {
     ISOLATION("Isolation"),
     ISOMETRIC("Isometric"),
     CARDIO("Cardio"),
-    STRETCH("Stretch")
+    STRETCH("Stretch"),
+    UNILATERAL("Unilateral"),
+    BILATERAL("Bilateral")
 }
