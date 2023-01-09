@@ -3,6 +3,7 @@ package com.example.myapplication.data
 enum class Equipment(val printableName: String) {
     DUMBBELL("Dumbbell"),
     BARBELL("Barbell"),
+    PLATE_LOADED_MACHINE("Plate Loaded"),
     MACHINE("Machine"),
     KETTLEBELL("Kettlebell"),
     BODY_WEIGHT("Body Weight"),

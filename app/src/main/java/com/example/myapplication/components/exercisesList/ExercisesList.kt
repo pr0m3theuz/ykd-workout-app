@@ -44,6 +44,10 @@ fun ExercisesLazyColumn(
 //    val selectedCategoriesMap by exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
 //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
 
+    fun filterExercises(search: String) {
+        exercisesViewModel.filterExercises(search)
+    }
+
     Column(
         modifier = Modifier.padding(horizontal = 8.dp)
             .fillMaxWidth()
@@ -64,7 +68,7 @@ fun ExercisesLazyColumn(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SearchBar()
+            SearchBar(filterExercises = { search -> filterExercises(search) })
 
             ExercisesFilterMenu()
         }

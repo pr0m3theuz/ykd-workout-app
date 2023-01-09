@@ -9,18 +9,22 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 
-@Preview
+// @Preview
 @Composable
-fun SearchBar() {
+fun SearchBar(
+    filterExercises: (search: String) -> Unit
+) {
     var search by remember { mutableStateOf(TextFieldValue("")) }
 
     Box(modifier = Modifier.fillMaxWidth(0.9f)) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = search,
-            onValueChange = { search = it },
+            onValueChange = {
+                search = it
+                filterExercises("%${search.text}%")
+            },
             leadingIcon = {
                 Icon(
                     Icons.Default.Search,

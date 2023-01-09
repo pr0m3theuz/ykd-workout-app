@@ -29,11 +29,11 @@ class Repository @Inject constructor(private val dao: Dao) {
     }
 
     fun filterExercises(
-        exercise: String,
-        bodyParts: List<String>,
-        equipments: List<String>
+        exercise: String
+//        bodyParts: List<String>,
+//        equipments: List<String>
 //        movementTypes: List<String>
-    ) {
-        dao.filterExercises(exercise, bodyParts, equipments/*, movementTypes*/)
+    ): Flow<List<ExerciseModel>> {
+        return dao.filterExercises(exercise/*, bodyParts, equipments, movementTypes*/)
     }
 }

@@ -45,8 +45,12 @@ class Set(_setModel: SetModel) {
     }
 }
 
-fun SetModel.setVolume(): Double? {
+fun SetModel.setVolume(): Double {
 //    Log.i("SetModel.setVolume()", "${exerciseWeight?.times(repetitions!!)}")
 
-    return exerciseWeight?.times(repetitions!!)
+    return if (exerciseWeight != null && repetitions != null) {
+        exerciseWeight!!.times(repetitions!!)
+    } else {
+        0.0
+    }
 }

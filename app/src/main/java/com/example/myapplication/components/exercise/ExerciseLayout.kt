@@ -1,9 +1,11 @@
 package com.example.myapplication.components.exercise
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,6 +14,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
 import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.averageWeight
+import com.example.myapplication.data.totalRepetitions
+import com.example.myapplication.data.totalVolume
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 @Composable
 fun ExerciseScreen(
@@ -48,13 +55,18 @@ fun ExerciseScreen(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ExerciseLayout(
     exerciseSets: ExerciseSetModel,
     removeExercise: (exerciseSets: ExerciseSetModel) -> Unit
 ) {
     var notesVisible by remember { mutableStateOf(exerciseSets.exercise.notesPinned) }
+    val totalVolume by remember { mutableStateOf(exerciseSets.totalVolume()) }
+    val totalRepetitions by remember { mutableStateOf(exerciseSets.totalRepetitions()) }
+    val averageWeight by remember { mutableStateOf(exerciseSets.averageWeight()) }
+
+    val df = DecimalFormat("#,###.##")
+    df.roundingMode = RoundingMode.HALF_UP
 
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
@@ -76,6 +88,17 @@ fun ExerciseLayout(
                     addNotes = { notesVisible = true },
                     removeExercise = { removeExercise(exerciseSets) }
                 )
+            }
+
+//            TODO Give option to show either Total Volume or Total Working Volume
+//            TODO Update Values on user input
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise.weightUnit}")
+                Text(text = "Reps: $totalRepetitions")
+                Text(text = "Avg Weight: ${df.format(averageWeight)}")
             }
 
             AnimatedVisibility(

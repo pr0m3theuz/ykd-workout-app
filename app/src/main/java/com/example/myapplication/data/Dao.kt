@@ -13,11 +13,12 @@ interface Dao {
     @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise ORDER BY name ASC")
     fun searchExercises(exercise: String): Flow<List<ExerciseModel>>
 
-    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise AND bodyPart IN(:bodyParts) AND equipment IN(:equipments) ORDER BY name ASC")
+//    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise AND bodyPart IN(:bodyParts) AND equipment IN(:equipments) ORDER BY name ASC")
+    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise ORDER BY name ASC")
     fun filterExercises(
-        exercise: String = "%%",
-        bodyParts: List<String> = listOf("%%"),
-        equipments: List<String> = listOf("%%")
+        exercise: String
+//        bodyParts: List<String> = listOf("%%"),
+//        equipments: List<String> = listOf("%%")
 //        movementTypes: List<String> = listOf("%%")
     ): Flow<List<ExerciseModel>>
 

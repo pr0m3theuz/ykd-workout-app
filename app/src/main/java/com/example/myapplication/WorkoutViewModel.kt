@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import android.os.CountDownTimer
+import android.os.*
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -20,15 +19,49 @@ class WorkoutViewModel : ViewModel() {
 //    fun elapsedTimeMillis(): Long = System.
 
     private var workoutStartTime: Long = 0
+    private var workoutEndTime: Long = 0
 
-    init {
-        workoutStartTime = Clock.System.now().epochSeconds
-    }
+    private var workoutStartDuration: Long = 0
 
-    val workoutDuration: Long = Clock.System.now().epochSeconds - workoutStartTime
+    private var workoutDuration: Long = 0
 
     private val _workoutDuration = MutableStateFlow(workoutDuration)
     val durationWorkout: StateFlow<Long> = _workoutDuration.asStateFlow()
+
+    private var _workoutDurationFormatted = workoutDuration.toDuration(DurationUnit.MILLISECONDS)
+        .toComponents { minutes, seconds, nanoseconds ->
+            "$minutes:${
+            seconds.toString().padStart(2, '0')
+            }"
+        }
+
+    private val _workoutDurationString = MutableStateFlow(_workoutDurationFormatted)
+    val workoutDurationString: StateFlow<String>
+        get() = _workoutDurationString.asStateFlow()
+
+    private val workoutCountUpTimer = object : CountUpTimer(1000) {
+        override fun onTick(elapsedTime: Long) {
+            workoutDuration = elapsedTime
+
+            _workoutDurationString.value =
+                workoutDuration.toDuration(DurationUnit.MILLISECONDS)
+                    .toComponents { minutes, seconds, nanoseconds ->
+                        "${minutes.toString().padStart(2, '0')}:${
+                        seconds.toString().padStart(2, '0')
+                        }"
+                    }
+        }
+    }
+
+    init {
+        workoutStartTime = System.currentTimeMillis()
+        workoutStartDuration = SystemClock.elapsedRealtime()
+        workoutCountUpTimer.start()
+    }
+
+    fun finishWorkout() {
+        workoutEndTime = System.currentTimeMillis()
+    }
 
     private var _timerDuration: Long = 60000L
     private var _timerDurationFormatted = _timerDuration.toDuration(DurationUnit.MILLISECONDS)
@@ -387,5 +420,38 @@ private fun initExercisesSets(): MutableList<ExerciseSetModel> {
                 )
             }
         )
+    }
+}
+
+abstract class CountUpTimer(private val interval: Long) {
+    private var base: Long = 0
+
+    fun start() {
+        base = SystemClock.elapsedRealtime()
+        handler.sendMessage(handler.obtainMessage(MSG))
+    }
+
+    fun stop() {
+        handler.removeMessages(MSG)
+    }
+
+    fun reset() {
+        synchronized(this) { base = SystemClock.elapsedRealtime() }
+    }
+
+    abstract fun onTick(elapsedTime: Long)
+
+    private val handler: Handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            synchronized(this@CountUpTimer) {
+                val elapsedTime = SystemClock.elapsedRealtime() - base
+                onTick(elapsedTime)
+                sendMessageDelayed(obtainMessage(MSG), interval)
+            }
+        }
+    }
+
+    companion object {
+        private const val MSG = 1
     }
 }

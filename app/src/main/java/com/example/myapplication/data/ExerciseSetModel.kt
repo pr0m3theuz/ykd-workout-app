@@ -155,7 +155,7 @@ fun ExerciseSetModel.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Dou
     var newWeight: Double = 0.0
 
     sets.filter { it.setType.name != "Warm Up Set" }.forEach {
-        totalVolume += (it.setVolume()!!)
+        totalVolume += (it.setVolume())
         numberOfWorkingSets++
     }
 
@@ -166,4 +166,42 @@ fun ExerciseSetModel.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Dou
     }
     Log.i("ExerciseSetModel.equateWorkingSetVolumeByWeight() newWeight", "$newWeight")
     return newWeight
+}
+
+fun ExerciseSetModel.totalVolume(): Double {
+    var totalVolume = 0.0
+
+    sets.forEach { totalVolume += it.setVolume() }
+
+    Log.i("totalVolume():", "$totalVolume")
+
+    return totalVolume
+}
+
+fun ExerciseSetModel.totalRepetitions(): Int {
+    var totalRepetitions = 0
+
+    sets.forEach {
+        (if (it.repetitions != null) it.repetitions else 0)?.let { it1 ->
+            totalRepetitions += (it1)
+        }
+    }
+
+    Log.i("totalRepetitions():", "$totalRepetitions")
+
+    return totalRepetitions
+}
+
+fun ExerciseSetModel.averageWeight(): Double {
+    var averageWeight = 0.0
+
+    averageWeight = totalVolume() / totalRepetitions()
+
+    Log.i("averageWeight():", "$averageWeight")
+
+    return if (averageWeight.isNaN()) {
+        0.0
+    } else {
+        averageWeight
+    }
 }

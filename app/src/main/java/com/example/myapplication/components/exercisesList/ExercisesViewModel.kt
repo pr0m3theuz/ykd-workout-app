@@ -1,5 +1,6 @@
 package com.example.myapplication.components.exercisesList
 
+import android.util.Log
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -79,7 +80,13 @@ public class ExercisesViewModel @Inject constructor(private var repository: Repo
         return printableName
     }
 
-    fun filterExercises(searchExerciseName: String = "%%") {
+    fun filterExercises(search: String) {
+        var searchExerciseName = search
+
+        if (searchExerciseName.isEmpty()) {
+            searchExerciseName = "%%"
+        }
+
         val selectedMuscleGroups = mutableListOf<String>()
         muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.printableName }
             .forEach { selectedMuscleGroups.add(it.printableName) }
@@ -98,13 +105,17 @@ public class ExercisesViewModel @Inject constructor(private var repository: Repo
             selectedMuscleGroups.add("%%")
         }
 
+//        TODO If _exercises is empty, display "No results" Message
         viewModelScope.launch {
             repository.filterExercises(
-                searchExerciseName,
-                selectedMuscleGroups.toList(),
-                selectedEquipments.toList()
+                searchExerciseName
+//                selectedMuscleGroups.toList(),
+//                selectedEquipments.toList()
 //                movementTypes = selectedMovementTypes.toList()
-            )
+            ).collect() {
+                _exercises.value = it
+                Log.i("repository.filterExercises", it.toString())
+            }
         }
     }
 }
