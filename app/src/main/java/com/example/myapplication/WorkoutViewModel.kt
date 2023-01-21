@@ -61,6 +61,8 @@ class WorkoutViewModel : ViewModel() {
 
     fun finishWorkout() {
         workoutEndTime = System.currentTimeMillis()
+//        TODO Save Workout to Database
+//        TODO Navigate to Workout Complete Screen & Summary
     }
 
     private var _timerDuration: Long = 60000L
@@ -405,6 +407,22 @@ class WorkoutViewModel : ViewModel() {
         } else if (tabRowState == 0) {
             exercise.workingSetRestTimerEnabled = enable
         }
+    }
+
+    fun checkAllSetsComplete(): Boolean {
+        var countSets: Int = 0
+        var countSetsCompleted: Int = 0
+
+        _exercisesSetsData.forEach { exercisesSets ->
+            exercisesSets.sets.forEach { set ->
+                countSets++
+                if (set.setCompleted) {
+                    countSetsCompleted++
+                }
+            }
+        }
+
+        return countSetsCompleted == countSets
     }
 }
 

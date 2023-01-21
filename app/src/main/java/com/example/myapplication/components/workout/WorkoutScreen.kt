@@ -14,7 +14,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.DiscardWorkoutDialog
@@ -27,7 +26,7 @@ import com.example.myapplication.data.WorkoutModel
 // TODO Add Finish Workout Button
 // TODO Complete Running Workout Duration Timer
 // TODO Add Working Weight Total Volume and Total Reps, & Average Weight
-@OptIn(ExperimentalLifecycleComposeApi::class)
+
 @Composable
 fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = viewModel()) {
     val openDiscardWorkoutDialog = remember { mutableStateOf(false) }
