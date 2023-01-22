@@ -164,19 +164,19 @@ class WorkoutViewModel : ViewModel() {
                     _remainingTimeProgress.value =
                         _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-                    Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-                    Log.i("onTick(): timerDuration", "$_timerDuration")
-                    Log.i(
-                        "onTick(): _remainingTimeProgress",
-                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}"
-                    )
+//                    Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+//                    Log.i("onTick(): timerDuration", "$_timerDuration")
+//                    Log.i(
+//                        "onTick(): _remainingTimeProgress",
+//                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}"
+//                    )
                 }
 
                 override fun onFinish() {
                     _state = TimerState.EXPIRED
                     _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
-                    resetTimerState()
+//                    resetTimerState()
                     setCompletedTimerFinished()
                 }
             }.start()
@@ -229,6 +229,7 @@ class WorkoutViewModel : ViewModel() {
     fun cancelSetCompletedTimer() {
         timer.cancel()
         resetTimerState()
+//        TODO Investigate TimerState and Timer Behaviour, Skip Timer leaves Timer in a Paused State
     }
 
     fun moreRestTime() {

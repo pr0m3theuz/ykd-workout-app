@@ -1,9 +1,68 @@
 package com.example.myapplication.components
 
+import android.util.Log
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.WorkoutViewModel
+
+@Composable
+fun FinishWorkoutButton(
+    workoutViewModel: WorkoutViewModel = viewModel()
+) {
+    val openFinishWorkoutDialog = remember { mutableStateOf(false) }
+    val openPartialFinishWorkoutDialog = remember { mutableStateOf(false) }
+
+    fun closePartialFinishWorkoutDialog() {
+        openPartialFinishWorkoutDialog.value = false
+    }
+
+    fun closeFinishWorkoutDialog() {
+        openFinishWorkoutDialog.value = false
+    }
+
+    Log.i(
+        "workoutViewModel.checkAllSetsComplete()",
+        workoutViewModel.checkAllSetsComplete().toString()
+    )
+
+    fun openFinishWorkoutDialog() {
+        if (workoutViewModel.checkAllSetsComplete()) {
+            openFinishWorkoutDialog.value = true
+        } else {
+            openPartialFinishWorkoutDialog.value = true
+        }
+    }
+
+    if (openFinishWorkoutDialog.value) {
+        FinishWorkoutDialog(
+            openDialog = { closeFinishWorkoutDialog() },
+            confirmFinishWorkout = { /* TODO cancel -> (cancel) */ }
+        )
+    }
+
+    if (openPartialFinishWorkoutDialog.value) {
+        PartialFinishWorkoutDialog(
+            openDialog = { closePartialFinishWorkoutDialog() },
+            confirmFinishWorkout = { /* TODO cancel -> (cancel) */ }
+        )
+    }
+    Log.i("openPartialFinishWorkoutDialog.value", openPartialFinishWorkoutDialog.value.toString())
+
+    TextButton(
+        onClick = { openFinishWorkoutDialog() }
+    ) {
+        Text(
+            text = "FINISH",
+            fontSize = 16.sp
+        )
+    }
+}
 
 @Composable
 fun FinishWorkoutDialog(
@@ -20,12 +79,13 @@ fun FinishWorkoutDialog(
         title = {
             Text(text = "Finish workout?")
         },
-        text = { Text("Are you sure you want to discard this workout? This cannot be undone.") },
+        text = { /*Text("Are you sure you want to discard this workout? This cannot be undone.")*/ },
         confirmButton = {
             TextButton(
                 onClick = {
                     openDialog(false)
                     confirmFinishWorkout(true)
+                    // TODO Save workout
                 }
             ) {
                 Text("Finish")
@@ -35,7 +95,6 @@ fun FinishWorkoutDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    confirmFinishWorkout(false)
                 }
             ) {
                 Text("Cancel")
@@ -71,6 +130,7 @@ fun PartialFinishWorkoutDialog(
                 onClick = {
                     openDialog(false)
                     confirmFinishWorkout(true)
+                    // TODO Save workout
                 }
             ) {
                 Text("Finish Workout")
@@ -80,7 +140,6 @@ fun PartialFinishWorkoutDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    confirmFinishWorkout(false)
                 }
             ) {
                 Text("Cancel")

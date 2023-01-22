@@ -144,7 +144,7 @@ fun ExerciseSetModel.equateWorkingSetVolumeByWeight(weight: Double?): Int {
         0
     }
 
-    Log.i("ExerciseSetModel.equateWorkingSetVolumeByWeight() newReps", "$newRepetitions")
+//    Log.i("ExerciseSetModel.equateWorkingSetVolumeByWeight() newReps", "$newRepetitions")
     return newRepetitions
 }
 
@@ -164,7 +164,7 @@ fun ExerciseSetModel.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Dou
     } else {
         0.0
     }
-    Log.i("ExerciseSetModel.equateWorkingSetVolumeByWeight() newWeight", "$newWeight")
+//    Log.i("ExerciseSetModel.equateWorkingSetVolumeByWeight() newWeight", "$newWeight")
     return newWeight
 }
 
@@ -173,7 +173,7 @@ fun ExerciseSetModel.totalVolume(): Double {
 
     sets.forEach { totalVolume += it.setVolume() }
 
-    Log.i("totalVolume():", "$totalVolume")
+//    Log.i("totalVolume():", "$totalVolume")
 
     return totalVolume
 }
@@ -187,7 +187,7 @@ fun ExerciseSetModel.totalRepetitions(): Int {
         }
     }
 
-    Log.i("totalRepetitions():", "$totalRepetitions")
+//    Log.i("totalRepetitions():", "$totalRepetitions")
 
     return totalRepetitions
 }
@@ -197,7 +197,7 @@ fun ExerciseSetModel.averageWeight(): Double {
 
     averageWeight = totalVolume() / totalRepetitions()
 
-    Log.i("averageWeight():", "$averageWeight")
+//    Log.i("averageWeight():", "$averageWeight")
 
     return if (averageWeight.isNaN()) {
         0.0
