@@ -67,6 +67,10 @@ fun TimerClock(
     startTimer: () -> Unit
 ) {
 //    Log.i("TimerClock(): timerProgress", "$timerProgress")
+
+//    Log.i("Timer: ", System.currentTimeMillis().toString())
+//    Log.i("TimerState: ", timerState.toString())
+
     var progress by remember { mutableStateOf(1f) }
     progress = timerProgress
     val animatedProgress by animateFloatAsState(
@@ -215,12 +219,14 @@ fun TimerClock(
                     }
                     Button(
                         onClick = {
-                            if (timerState == TimerState.RUNNING) cancelTimer() else startTimer()
+                            cancelTimer()
+//                            if (timerState == TimerState.RUNNING) cancelTimer() else startTimer()
 
-//                            openDialog(false)
+                            openDialog(false)
                         }
                     ) {
-                        Text(if (timerState == TimerState.RUNNING) "Skip" else "Start")
+                        Text("Skip")
+//                        Text(if (timerState == TimerState.RUNNING) "Skip" else "Start")
                     }
                 }
             }

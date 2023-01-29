@@ -57,6 +57,7 @@ fun ExerciseSetLazyColumn(
 
             exerciseSets.sets.forEachIndexed { index: Int, set: SetModel ->
                 SetItem(
+                    exerciseSets = exerciseSets,
                     index = index,
                     set = set,
                     removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
@@ -101,13 +102,13 @@ fun ExerciseSetLazyColumn(
                             set.id,
                             setComplete
                         )
-                    },
-                    startRestTimer = {
-                        workoutViewModel.startSetCompletedTimer(
-                            exerciseSets,
-                            set.id
-                        )
                     }
+//                    startRestTimer = {
+//                        workoutViewModel.startSetCompletedTimer(
+//                            exerciseSets,
+//                            set.id
+//                        )
+//                    }
                 )
             }
 

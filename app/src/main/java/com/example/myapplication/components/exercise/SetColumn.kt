@@ -190,24 +190,23 @@ fun SetColumn(
                 backgroundColor = if (setCompletedState) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.background,
                 shape = RoundedCornerShape(CornerSize(0f))
             ) {
-                SetLayout(
-                    index,
-                    set,
-                    { completed -> changesetCompletedState(completed) },
-                    { /*  newWeight -> newWeight(newWeight)  */ },
-                    { /*  newReps -> newReps(newReps)  */ },
-                    { /*  newRIR -> newRIR(newRIR)  */ },
-                    { /*  newRPE -> newRPE(newRPE)  */ },
-                    { /*  setType -> newSetType(setType)  */ }
+//                SetLayout(
+//                    index,
+//                    set,
+//                    { completed -> changesetCompletedState(completed) },
+//                    { /*  newWeight -> newWeight(newWeight)  */ },
+//                    { /*  newReps -> newReps(newReps)  */ },
+//                    { /*  newRIR -> newRIR(newRIR)  */ },
+//                    { /*  newRPE -> newRPE(newRPE)  */ },
+//                    { /*  setType -> newSetType(setType)  */ }
 //                        iconText = if (exerciseSet.setType.name == "Normal") {
 //                            index.inc().toString()
 //                        } else {
 //                            exerciseSet.setType.name[0].toString()
 //                        },
 //                        iconColor = exerciseSet.setType.textColor
-                )
+//                )
             }
         }
     }
 }
-

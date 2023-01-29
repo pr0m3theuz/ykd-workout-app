@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
 import com.example.myapplication.components.SetLayout
+import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
 import com.example.myapplication.ui.theme.White
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SetItem(
+    exerciseSets: ExerciseSetModel,
     index: Int,
     set: SetModel,
     removeSet: () -> Unit,
@@ -37,8 +39,8 @@ fun SetItem(
     updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
     updateSetType: (id: Long, setType: SetTypeModel) -> Unit,
-    setComplete: (setComplete: Boolean) -> Unit,
-    startRestTimer: () -> Unit
+    setComplete: (setComplete: Boolean) -> Unit // ,
+//    startRestTimer: () -> Unit
 ) {
 //    Log.i("SetColumn()", "$set")
 
@@ -90,7 +92,7 @@ fun SetItem(
         setComplete(status)
     }
 
-    if (setCompletedState) startRestTimer()
+//    if (setCompletedState) startRestTimer()
 
     fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
         openDialog.value = open
@@ -149,6 +151,7 @@ fun SetItem(
             shape = RoundedCornerShape(CornerSize(0f))
         ) {
             SetLayout(
+                exerciseSets = exerciseSets,
                 index,
                 set,
                 { completed -> changesetCompletedState(completed) },

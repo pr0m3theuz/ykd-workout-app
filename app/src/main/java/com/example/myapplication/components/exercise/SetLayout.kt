@@ -18,7 +18,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.TimerScreen
+import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
 import com.example.myapplication.ui.theme.PurpleGrey80
@@ -30,6 +33,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetLayout(
+    exerciseSets: ExerciseSetModel,
     setIndex: Int,
     exerciseSet: SetModel,
     isSetCompleted: (Boolean) -> Unit,
@@ -37,7 +41,8 @@ fun SetLayout(
     newReps: (newReps: Int?) -> Unit,
     newRIR: (newRIR: Double?) -> Unit,
     newRPE: (newRPE: Double?) -> Unit,
-    updateSetType: (setType: SetTypeModel) -> Unit
+    updateSetType: (setType: SetTypeModel) -> Unit,
+    workoutViewModel: WorkoutViewModel = viewModel()
 ) {
     var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
     var exerciseWeightText by remember {
@@ -281,12 +286,17 @@ fun SetLayout(
             )
         }
 
+//        TODO Could use exercise instead of ExerciseSetsModel
         Checkbox(
             checked = checkedState.value,
             onCheckedChange = {
                 checkedState.value = it
                 isSetCompleted(it)
                 closeTimerScreen(it)
+                workoutViewModel.startSetCompletedTimer(
+                    exerciseSet = exerciseSets,
+                    setID = exerciseSet.id
+                )
             }
         )
     }

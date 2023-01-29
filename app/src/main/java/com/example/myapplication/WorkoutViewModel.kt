@@ -138,8 +138,12 @@ class WorkoutViewModel : ViewModel() {
         get() = _state == TimerState.EXPIRED
 
     private fun createTimer(timerDuration: Long) {
+        val timerVersion = System.currentTimeMillis().toString()
+        Log.i("createTimer()", "called")
+
         viewModelScope.launch {
             timer = object : CountDownTimer(timerDuration, 1000L) {
+
                 override fun onTick(millisUntilFinished: Long) {
                     //        TODO Return Remaining Time as String
                     _state = TimerState.RUNNING
@@ -164,26 +168,33 @@ class WorkoutViewModel : ViewModel() {
                     _remainingTimeProgress.value =
                         _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-//                    Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-//                    Log.i("onTick(): timerDuration", "$_timerDuration")
-//                    Log.i(
-//                        "onTick(): _remainingTimeProgress",
-//                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}"
-//                    )
+                    Log.i("Timer: ", timerVersion)
+                    Log.i("TimerState: ", _timerState.value.name)
+
+                    Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+                    Log.i("onTick(): timerDuration", "$_timerDuration")
+                    Log.i(
+                        "onTick(): _remainingTimeProgress",
+                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}"
+                    )
                 }
 
                 override fun onFinish() {
                     _state = TimerState.EXPIRED
                     _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
-//                    resetTimerState()
+                    resetTimerState()
                     setCompletedTimerFinished()
+
+                    Log.i("Timer: ", timerVersion)
+                    Log.i("TimerState: ", _timerState.value.name)
                 }
             }.start()
         }
     }
 
     fun startRestTimer(time: Duration) {
+        Log.i("startRestTimer() ", "called")
         _timerDuration = time.inWholeMilliseconds
         createTimer(_timerDuration)
     }
@@ -193,6 +204,7 @@ class WorkoutViewModel : ViewModel() {
     }
 
     private fun resetTimerState() {
+        Log.i("resetTimerState() ", "called")
         _remainingTime = 0L
         _remainingTimeString.value = 0L.toDuration(DurationUnit.MILLISECONDS)
             .toComponents { minutes, seconds, _ ->
@@ -202,16 +214,23 @@ class WorkoutViewModel : ViewModel() {
             }
         _remainingTimeProgress.value = 0f
         _timerState.value = TimerState.RESET
+        Log.i("TimerState: ", _timerState.value.name)
     }
 
+    //    TODO Rename Variable to be Clearer
     private var setThatStartedTimer: Long = 0
 
+    var completedSets = mutableListOf<Long>()
+
+    // TODO Create an array to store the setIDs that started the timer
     fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setID: Long) {
+        Log.i("startSetCompletedTimer() ", "called")
+
         val exercise = exerciseSet.exercise
         val set = exerciseSet.sets.first { it.id == setID }
 
-        if (setID != setThatStartedTimer) {
-            setThatStartedTimer = setID
+        if (!completedSets.contains(setID)) {
+            completedSets.add(setID)
             if (_state == TimerState.RUNNING) {
                 timer.cancel()
             }
@@ -227,6 +246,7 @@ class WorkoutViewModel : ViewModel() {
     }
 
     fun cancelSetCompletedTimer() {
+        Log.i("cancelSetCompletedTimer() ", "called")
         timer.cancel()
         resetTimerState()
 //        TODO Investigate TimerState and Timer Behaviour, Skip Timer leaves Timer in a Paused State
@@ -242,7 +262,7 @@ class WorkoutViewModel : ViewModel() {
     fun lessRestTime() {
         _remainingTime -= _restTimerAdjustment
         _timerDuration -= _restTimerAdjustment
-        cancelSetCompletedTimer()
+        timer.cancel()
         if (_remainingTime < _timerDuration) {
             createTimer(_remainingTime)
         } else {
