@@ -97,8 +97,6 @@ fun ExerciseSetModel.addBackOffSets(backOffSets: List<SetModel>) {
 //        sets.addAll(backOffSets)
 }
 
-// TODO Create Feature to Volume Equated Working Sets
-
 fun ExerciseSetModel.totalWorkingSetVolume(): Double {
     var totalVolume: Double = 0.0
 

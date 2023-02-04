@@ -122,14 +122,15 @@ fun AutoRestTimerDialog(
         }
 
 //    val restTimesList = mutableListOf(workSetRestTime, warmUpSetRestTime)
-    val restTimesStringsList = mutableListOf(workSetRestTimeString, warmUpSetRestTimeString)
+    val restTimesStringsList =
+        remember { mutableStateListOf(workSetRestTimeString, warmUpSetRestTimeString) }
 
     var timeString: String by remember { mutableStateOf(workSetRestTimeString) }
 
 //    TODO Rename windows to better name
 
-    fun convertTimeStringToDuration(timeString: String): Duration {
-        val windows = timeString.padStart(6, '0').windowed(2, 2)
+    fun convertTimeStringToDuration(newTimerDuration: String): Duration {
+        val windows = newTimerDuration.padStart(6, '0').windowed(2, 2)
 
         val restTime = windows[0].toInt().toDuration(DurationUnit.HOURS) +
             windows[1].toInt().toDuration(DurationUnit.MINUTES) +
@@ -158,7 +159,7 @@ fun AutoRestTimerDialog(
                 Log.i("setGoogleClockTimer().add() timeString.length >", timeString)
             }
         }
-
+//    TODO Figure out why value isn't changing
         restTimesStringsList[tabRowState] = timeString
 
         if (timeString.isNotEmpty()) {

@@ -235,10 +235,10 @@ class WorkoutViewModel : ViewModel() {
                 timer.cancel()
             }
 
-            if (exercise.warmUpSetRestTimerEnabled && (set.setType.equals("Warm Up"))) {
+            if (exercise.warmUpSetRestTimerEnabled && (set.setType.name == "Warm Up Set")) {
                 _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
                 createTimer(_timerDuration)
-            } else if (exercise.workingSetRestTimerEnabled && !(set.setType.equals("Warm Up"))) {
+            } else if (exercise.workingSetRestTimerEnabled && !(set.setType.name == "Warm Up Set")) {
                 _timerDuration = exercise.workingSetRestInWholeMilliseconds
                 createTimer(_timerDuration)
             }
@@ -415,6 +415,7 @@ class WorkoutViewModel : ViewModel() {
     }
 
     fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {
+//        TODO Fix, Doesn't change time
         if (tabRowState == 1) {
             exercise.warmUpSetRestInWholeMilliseconds = time.inWholeMilliseconds
         } else if (tabRowState == 0) {

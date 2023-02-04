@@ -126,7 +126,7 @@ fun SetLayout(
         openTimerScreen = close
     }
 
-    if (openTimerScreen) {
+    if (openTimerScreen && workoutViewModel.isRunning) {
 //        TODO Navigate to
 //        TODO openTimerClockDialog
         TimerScreen(openDialog = { close -> closeTimerScreen(close) })
@@ -292,11 +292,11 @@ fun SetLayout(
             onCheckedChange = {
                 checkedState.value = it
                 isSetCompleted(it)
-                closeTimerScreen(it)
                 workoutViewModel.startSetCompletedTimer(
                     exerciseSet = exerciseSets,
                     setID = exerciseSet.id
                 )
+                closeTimerScreen(it)
             }
         )
     }
