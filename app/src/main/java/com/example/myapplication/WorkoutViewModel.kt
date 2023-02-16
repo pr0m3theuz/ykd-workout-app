@@ -1,20 +1,30 @@
 package com.example.myapplication
 
+import android.Manifest
+import android.app.PendingIntent
+import android.content.pm.PackageManager
 import android.os.*
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-class WorkoutViewModel : ViewModel() {
+@HiltViewModel
+class WorkoutViewModel @Inject constructor(private val application: NameHereApplication) :
+    ViewModel() {
 //    fun currentTimeMillis(): Long = System.currentTimeMillis()
 //    fun elapsedTimeMillis(): Long = System.
 
@@ -193,12 +203,22 @@ class WorkoutViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Creates a new alarm, notification and timer
+     */
+
+    // TODO Add Notification Manager and AlarmManager
     fun startRestTimer(time: Duration) {
         Log.i("startRestTimer() ", "called")
         _timerDuration = time.inWholeMilliseconds
         createTimer(_timerDuration)
     }
 
+    /**
+     * Creates a new alarm, notification and timer
+     */
+
+    // TODO Add Notification Manager and AlarmManager
     fun startLastTimer() {
         createTimer(_timerDuration)
     }
@@ -220,7 +240,7 @@ class WorkoutViewModel : ViewModel() {
     //    TODO Rename Variable to be Clearer
     private var setThatStartedTimer: Long = 0
 
-    var completedSets = mutableListOf<Long>()
+    private var completedSets = mutableListOf<Long>()
 
     // TODO Create an array to store the setIDs that started the timer
     fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setID: Long) {
@@ -445,6 +465,44 @@ class WorkoutViewModel : ViewModel() {
         }
 
         return countSetsCompleted == countSets
+    }
+
+    private fun notifyUser() {
+        val context = application.applicationContext
+        val intent = MainActivity.newIntent(context)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        val resources = context.resources
+
+        val notification = NotificationCompat
+            .Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setTicker(resources.getString(R.string.new_timer_title))
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle(resources.getString(R.string.new_timer_title))
+            .setContentText(resources.getString(R.string.rest_timer_text))
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        NotificationManagerCompat.from(context).notify(0, notification)
     }
 }
 

@@ -3,6 +3,8 @@
 package com.example.myapplication
 
 // import androidx.compose.foundation.gestures.ModifierLocalScrollableContainerProvider.value
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,6 +36,12 @@ class MainActivity : ComponentActivity() {
 //                    ExercisesScreen(exercisesViewModel = exercisesViewModel)
                 }
             }
+        }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, MainActivity::class.java)
         }
     }
 }
