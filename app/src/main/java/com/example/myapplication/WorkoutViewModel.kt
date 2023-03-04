@@ -1,17 +1,15 @@
 package com.example.myapplication
 
-import android.Manifest
-import android.app.PendingIntent
-import android.content.pm.PackageManager
+import android.app.Application
+import android.app.NotificationManager
 import android.os.*
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.*
+import com.example.myapplication.utils.sendNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +21,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 @HiltViewModel
-class WorkoutViewModel @Inject constructor(private val application: NameHereApplication) :
+class WorkoutViewModel @Inject constructor(private val application: Application) :
     ViewModel() {
 //    fun currentTimeMillis(): Long = System.currentTimeMillis()
 //    fun elapsedTimeMillis(): Long = System.
@@ -41,7 +39,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
     private var _workoutDurationFormatted = workoutDuration.toDuration(DurationUnit.MILLISECONDS)
         .toComponents { minutes, seconds, nanoseconds ->
             "$minutes:${
-            seconds.toString().padStart(2, '0')
+                seconds.toString().padStart(2, '0')
             }"
         }
 
@@ -57,7 +55,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
                 workoutDuration.toDuration(DurationUnit.MILLISECONDS)
                     .toComponents { minutes, seconds, nanoseconds ->
                         "${minutes.toString().padStart(2, '0')}:${
-                        seconds.toString().padStart(2, '0')
+                            seconds.toString().padStart(2, '0')
                         }"
                     }
         }
@@ -79,7 +77,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
     private var _timerDurationFormatted = _timerDuration.toDuration(DurationUnit.MILLISECONDS)
         .toComponents { minutes, seconds, nanoseconds ->
             "$minutes:${
-            seconds.toString().padStart(2, '0')
+                seconds.toString().padStart(2, '0')
             }"
         }
 
@@ -100,7 +98,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
     private var _remainingTimeFormatted = _remainingTime.toDuration(DurationUnit.MILLISECONDS)
         .toComponents { minutes, seconds, nanoseconds ->
             "$minutes:${
-            seconds.toString().padStart(2, '0')
+                seconds.toString().padStart(2, '0')
             }"
         }
 
@@ -155,7 +153,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
             timer = object : CountDownTimer(timerDuration, 1000L) {
 
                 override fun onTick(millisUntilFinished: Long) {
-                    //        TODO Return Remaining Time as String
+                    // TODO Return Remaining Time as String
                     _state = TimerState.RUNNING
                     _timerState.value = TimerState.RUNNING
                     _remainingTime = millisUntilFinished
@@ -163,7 +161,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
                         _remainingTime.toDuration(DurationUnit.MILLISECONDS)
                             .toComponents { minutes, seconds, nanoseconds ->
                                 "$minutes:${
-                                seconds.toString().padStart(2, '0')
+                                    seconds.toString().padStart(2, '0')
                                 }"
                             }
 
@@ -171,7 +169,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
                         _timerDuration.toDuration(DurationUnit.MILLISECONDS)
                             .toComponents { minutes, seconds, nanoseconds ->
                                 "$minutes:${
-                                seconds.toString().padStart(2, '0')
+                                    seconds.toString().padStart(2, '0')
                                 }"
                             }
 
@@ -185,11 +183,12 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
                     Log.i("onTick(): timerDuration", "$_timerDuration")
                     Log.i(
                         "onTick(): _remainingTimeProgress",
-                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}"
+                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
                     )
                 }
 
                 override fun onFinish() {
+                    // TODO Refactor into resetTimerState()
                     _state = TimerState.EXPIRED
                     _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
@@ -206,12 +205,22 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
     /**
      * Creates a new alarm, notification and timer
      */
-
     // TODO Add Notification Manager and AlarmManager
     fun startRestTimer(time: Duration) {
         Log.i("startRestTimer() ", "called")
         _timerDuration = time.inWholeMilliseconds
+
+        // TODO: Step 1.5 get an instance of NotificationManager and call sendNotification
+        val notificationManager = ContextCompat.getSystemService(
+            application,
+            NotificationManager::class.java,
+        ) as NotificationManager
+        notificationManager.sendNotification(application.getString(R.string.rest_timer_text), application)
+
+        // TODO: Step 1.15 call cancel notification
+
         createTimer(_timerDuration)
+//        notifyUser()
     }
 
     /**
@@ -229,7 +238,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
         _remainingTimeString.value = 0L.toDuration(DurationUnit.MILLISECONDS)
             .toComponents { minutes, seconds, _ ->
                 "$minutes:${
-                seconds.toString().padStart(2, '0')
+                    seconds.toString().padStart(2, '0')
                 }"
             }
         _remainingTimeProgress.value = 0f
@@ -312,7 +321,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
         val temporarySets = exerciseSets.sets + exerciseSets.sets.last().copy(
             id = newID(),
             setNumber = exerciseSets.sets.last().setNumber?.plus(1),
-            setCompleted = false
+            setCompleted = false,
         )
 
 //        exerciseSets.sets.plus(
@@ -353,7 +362,7 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
     fun updateSetWeight(exerciseSets: ExerciseSetModel, setID: Long, newWeight: Double?) {
         exerciseSets.updateSetWeight(
             id = setID,
-            newWeight = newWeight
+            newWeight = newWeight,
         )
     }
 
@@ -467,43 +476,44 @@ class WorkoutViewModel @Inject constructor(private val application: NameHereAppl
         return countSetsCompleted == countSets
     }
 
-    private fun notifyUser() {
-        val context = application.applicationContext
-        val intent = MainActivity.newIntent(context)
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        val resources = context.resources
-
-        val notification = NotificationCompat
-            .Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setTicker(resources.getString(R.string.new_timer_title))
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle(resources.getString(R.string.new_timer_title))
-            .setContentText(resources.getString(R.string.rest_timer_text))
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-        NotificationManagerCompat.from(context).notify(0, notification)
-    }
+//    Android Programming_ The Big Nerd Ranch Guide - Notifying the User
+//    private fun notifyUser() {
+//        val context = application.applicationContext
+//        val intent = MainActivity.newIntent(context)
+//        val pendingIntent = PendingIntent.getActivity(
+//            context,
+//            0,
+//            intent,
+//            PendingIntent.FLAG_IMMUTABLE
+//        )
+//        val resources = context.resources
+//
+//        val notification = NotificationCompat
+//            .Builder(context, NOTIFICATION_CHANNEL_ID)
+//            .setTicker(resources.getString(R.string.new_timer_title))
+//            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+//            .setContentTitle(resources.getString(R.string.new_timer_title))
+//            .setContentText("Remaining Time:")
+//            .setContentIntent(pendingIntent)
+//            .setAutoCancel(false)
+//            .build()
+//
+//        if (ActivityCompat.checkSelfPermission(
+//                context,
+//                Manifest.permission.POST_NOTIFICATIONS
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return
+//        }
+//        NotificationManagerCompat.from(context).notify(1, notification)
+//    }
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSetModel> {
@@ -514,9 +524,9 @@ private fun initExercisesSets(): MutableList<ExerciseSetModel> {
                 SetModel(
                     setNumber = indices,
                     exerciseWeight = 100.00.times(it),
-                    repetitions = 10.times(it)
+                    repetitions = 10.times(it),
                 )
-            }
+            },
         )
     }
 }
