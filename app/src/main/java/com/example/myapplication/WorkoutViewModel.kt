@@ -1,7 +1,11 @@
 package com.example.myapplication
 
+import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.*
 import android.util.Log
 import androidx.core.content.ContextCompat
@@ -9,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.*
+import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.sendNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +28,10 @@ import kotlin.time.toDuration
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(private val application: Application) :
     ViewModel() {
-//    fun currentTimeMillis(): Long = System.currentTimeMillis()
+    //    fun currentTimeMillis(): Long = System.currentTimeMillis()
 //    fun elapsedTimeMillis(): Long = System.
+    private val REQUEST_CODE = 0
+    private val notifyPendingIntent: PendingIntent
 
     private var workoutStartTime: Long = 0
     private var workoutEndTime: Long = 0
@@ -61,10 +68,21 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         }
     }
 
+    private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    private val notifyIntent = Intent(application, AlarmReceiver::class.java)
+
     init {
         workoutStartTime = System.currentTimeMillis()
         workoutStartDuration = SystemClock.elapsedRealtime()
         workoutCountUpTimer.start()
+
+        notifyPendingIntent = PendingIntent.getBroadcast(
+            application,
+            REQUEST_CODE,
+            notifyIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
     }
 
     fun finishWorkout() {
@@ -147,7 +165,27 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
     private fun createTimer(timerDuration: Long) {
         val timerVersion = System.currentTimeMillis().toString()
+        val alarmTriggerTime = SystemClock.elapsedRealtime() + timerDuration
         Log.i("createTimer()", "called")
+        Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
+
+        // TODO: Step 1.5 get an instance of NotificationManager and call sendNotification
+        val notificationManager = ContextCompat.getSystemService(
+            application,
+            NotificationManager::class.java,
+        ) as NotificationManager
+        notificationManager.sendNotification(
+            application.getString(R.string.rest_timer_running_text),
+            application,
+        )
+
+        // TODO: Step 1.15 call cancel notification
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            alarmTriggerTime,
+            notifyPendingIntent,
+        )
 
         viewModelScope.launch {
             timer = object : CountDownTimer(timerDuration, 1000L) {
@@ -192,8 +230,14 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
                     _state = TimerState.EXPIRED
                     _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
-                    resetTimerState()
                     setCompletedTimerFinished()
+//                    notificationManager.cancelNotifications()
+
+//                    alarmManager.setExact(
+//                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//                        SystemClock.elapsedRealtime(),
+//                        notifyPendingIntent,
+//                    )
 
                     Log.i("Timer: ", timerVersion)
                     Log.i("TimerState: ", _timerState.value.name)
@@ -209,15 +253,6 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     fun startRestTimer(time: Duration) {
         Log.i("startRestTimer() ", "called")
         _timerDuration = time.inWholeMilliseconds
-
-        // TODO: Step 1.5 get an instance of NotificationManager and call sendNotification
-        val notificationManager = ContextCompat.getSystemService(
-            application,
-            NotificationManager::class.java,
-        ) as NotificationManager
-        notificationManager.sendNotification(application.getString(R.string.rest_timer_text), application)
-
-        // TODO: Step 1.15 call cancel notification
 
         createTimer(_timerDuration)
 //        notifyUser()

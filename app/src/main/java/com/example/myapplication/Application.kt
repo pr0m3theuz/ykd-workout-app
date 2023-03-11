@@ -36,8 +36,11 @@ class NameHereApplication : Application() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.notification_channel_name)
+            // TODO: Step 2.4 change importance
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance)
+
+            // TODO: Step 2.6 disable badges for this channel
 
             // TODO Insert notificationChannel customizations here
             channel.enableLights(true)
@@ -50,6 +53,7 @@ class NameHereApplication : Application() {
 
             notificationManager.createNotificationChannel(channel)
 
-            // TODO: Step 1.6 END create a channel}
+            // TODO: Step 1.6 END create a channel
+        }
     }
 }

@@ -39,7 +39,7 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         applicationContext,
         0,
         intent,
-        PendingIntent.FLAG_IMMUTABLE,
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 
     // TODO: Step 2.0 add style
@@ -53,6 +53,7 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
     val builder = NotificationCompat
         .Builder(
             applicationContext,
+            // TODO: Step 1.8 use the new 'breakfast' notification channel
             applicationContext.getString(R.string.notification_channel_id),
         )
         .setTicker(resources.getString(R.string.new_timer_title))
@@ -62,8 +63,6 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         .setContentIntent(pendingIntent)
         .setAutoCancel(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
-
-    // TODO: Step 1.8 use the new 'breakfast' notification channel
 
     // TODO: Step 1.3 set title, text and icon to builder
 

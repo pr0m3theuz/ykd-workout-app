@@ -33,7 +33,7 @@ fun EquateVolumeScreen(
     openDialog: (Boolean) -> Unit,
     workoutViewModel: WorkoutViewModel = viewModel(),
     exerciseSets: ExerciseSetModel,
-    equateVolumeViewModel: EquateVolumeViewModel = viewModel()
+    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
 ) {
     val totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume()
     val workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets)
@@ -56,7 +56,7 @@ fun EquateVolumeScreen(
         _workingSetRepetitions = workingSetRepetitions,
         addWorkingSets = { newSets -> workoutViewModel.addWorkingSets(exerciseSets, newSets) },
         totalWorkingSetVolume = totalWorkingSetVolume,
-        _sets = sets
+        _sets = sets,
     )
 
 /*
@@ -115,7 +115,7 @@ fun EquateVolumeInterface(
     _workingSetRepetitions: Int?,
     addWorkingSets: (workingSets: List<SetModel>) -> Unit,
     totalWorkingSetVolume: Double,
-    _sets: List<SetModel>
+    _sets: List<SetModel>,
 ) {
 //    Log.i("EquateVolumeInterface() totalWorkingSetVolume", "$totalWorkingSetVolume")
 //    Log.i("EquateVolumeInterface() exerciseSets", "$_sets")
@@ -134,7 +134,7 @@ fun EquateVolumeInterface(
         _workingSetRepetitions = _workingSetRepetitions,
         changeWorkingSetWeight = { newWorkingWeight ->
             equateVolumeViewModel.changeWorkingSetWeight(
-                newWorkingWeight
+                newWorkingWeight,
             )
         },
         sets = sets,
@@ -143,19 +143,19 @@ fun EquateVolumeInterface(
         updateSetWeight = { id: Long, newWeight: Double ->
             equateVolumeViewModel.updateSetWeight(
                 id,
-                newWeight
+                newWeight,
             )
         },
         updateSetReps = { id: Long, newReps: Int ->
             equateVolumeViewModel.updateSetReps(
                 id,
-                newReps
+                newReps,
             )
         },
         updateSetPercentage = { id: Long, newPercentage: Float ->
             equateVolumeViewModel.updateSetPercentage(
                 id,
-                newPercentage
+                newPercentage,
             )
         },
         insertSets = { newSets -> addWorkingSets(newSets) },
@@ -163,14 +163,14 @@ fun EquateVolumeInterface(
         newTotalWorkingSetVolume = newTotalWorkingSetVolume,
         equateVolumeByWeight = { newWeight: Double? ->
             equateVolumeViewModel.equateVolumeByWeight(
-                newWeight
+                newWeight,
             )
         },
         equateVolumeByRepetitions = { newRepetitions: Int? ->
             equateVolumeViewModel.equateVolumeByRepetitions(
-                newRepetitions
+                newRepetitions,
             )
-        }
+        },
     )
 }
 
@@ -190,7 +190,7 @@ fun EquateVolumeDialog(
     totalWorkingSetVolume: Double?,
     newTotalWorkingSetVolume: Double?,
     equateVolumeByWeight: (newWeight: Double?) -> Unit,
-    equateVolumeByRepetitions: (newRepetitions: Int?) -> Unit
+    equateVolumeByRepetitions: (newRepetitions: Int?) -> Unit,
 ) {
     var workingSetWeight: Double by remember {
         if (_workingSetWeight != null) {
@@ -211,8 +211,8 @@ fun EquateVolumeDialog(
                     } else {
                         workingSetWeight.toString()
                     }
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -231,8 +231,8 @@ fun EquateVolumeDialog(
                     ""
                 } else {
                     workingSetRepetitions.toString()
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -325,7 +325,7 @@ fun EquateVolumeDialog(
                         .background(PurpleGrey80)
                         .fillMaxWidth()
                         .wrapContentSize(Alignment.Center),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
 
                 ) {
                     BasicTextField(
@@ -335,11 +335,11 @@ fun EquateVolumeDialog(
                         textStyle = TextStyle(
                             fontSize = 5.em,
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onBackground,
                         ),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
+                            imeAction = ImeAction.Next,
                         ),
                         value = getWorkingSetWeightOrWorkingSetRepetitions(),
                         onValueChange = {
@@ -354,14 +354,14 @@ fun EquateVolumeDialog(
                                     0.0
                                 }
                             )*/
-                        }
+                        },
                     )
                 }
 
                 Row() {
                     RadioButton(
                         selected = isByWeightSelected,
-                        onClick = { selectByWeight() }
+                        onClick = { selectByWeight() },
                     )
                     Text(text = "By Weight")
                 }
@@ -369,7 +369,7 @@ fun EquateVolumeDialog(
                 Row() {
                     RadioButton(
                         selected = isByRepetitionsSelected,
-                        onClick = { selectByRepetitions() }
+                        onClick = { selectByRepetitions() },
                     )
                     Text(text = "By Repetitions")
                 }
@@ -377,13 +377,13 @@ fun EquateVolumeDialog(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(
                         modifier = Modifier
                             .padding(0.dp)
                             .width(48.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
 
                     ) {
                         Text("Set")
@@ -392,21 +392,21 @@ fun EquateVolumeDialog(
                     Box(
                         modifier = Modifier
                             .padding(PaddingValues(horizontal = 4.dp)),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) { Text("Weight") }
 
                     Box(
                         modifier = Modifier
                             .padding(PaddingValues(horizontal = 4.dp))
                             .width(50.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) { Text("Reps") }
 
                     Box(
                         modifier = Modifier
                             .padding(PaddingValues(horizontal = 4.dp))
                             .width(60.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) { /* TODO Put appropriate text here */ }
                 }
 
@@ -417,7 +417,7 @@ fun EquateVolumeDialog(
                     { id: Long, newWeight: Double -> updateSetWeight(id, newWeight) },
                     { id: Long, newReps: Int -> updateSetReps(id, newReps) },
                     { id: Long, newPercentage: Float -> updateSetPercentage(id, newPercentage) },
-                    { addSet() }
+                    { addSet() },
                 )
             }
         },
@@ -426,7 +426,7 @@ fun EquateVolumeDialog(
                 onClick = {
                     openDialog(false)
                     insertSets(sets)
-                }
+                },
             ) {
                 Text("Equate Volume")
             }
@@ -435,10 +435,10 @@ fun EquateVolumeDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                }
+                },
             ) {
                 Text("Cancel")
             }
-        }
+        },
     )
 }
