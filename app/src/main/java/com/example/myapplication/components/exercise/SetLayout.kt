@@ -24,7 +24,6 @@ import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetTypeModel
-import com.example.myapplication.ui.theme.PurpleGrey80
 import kotlin.math.roundToInt
 
 // TODO Create Set Data Type
@@ -42,8 +41,10 @@ fun SetLayout(
     newRIR: (newRIR: Double?) -> Unit,
     newRPE: (newRPE: Double?) -> Unit,
     updateSetType: (setType: SetTypeModel) -> Unit,
-    workoutViewModel: WorkoutViewModel = viewModel()
+    workoutViewModel: WorkoutViewModel = viewModel(),
 ) {
+    val textFieldColor = MaterialTheme.colorScheme.secondaryContainer
+
     var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
     var exerciseWeightText by remember {
         mutableStateOf(
@@ -126,7 +127,7 @@ fun SetLayout(
         openTimerScreen = close
     }
 
-    if (openTimerScreen && workoutViewModel.isRunning) {
+    if (openTimerScreen && workoutViewModel.isTimerRunning) {
 //        TODO Navigate to
 //        TODO openTimerClockDialog
         TimerScreen(openDialog = { close -> closeTimerScreen(close) })
@@ -167,14 +168,14 @@ fun SetLayout(
         // TODO If Previous RIR is null, text = "110 x 10" or "110 x 10 @ 1RM%"
         Text(
             "110 x 10 @ RIR 0",
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Box(
             modifier = Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(PurpleGrey80)
+                .background(textFieldColor)
                 .align(Alignment.CenterVertically)
                 .width(72.dp)
                 .wrapContentSize(Alignment.Center),
@@ -220,7 +221,7 @@ fun SetLayout(
             modifier = Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(PurpleGrey80)
+                .background(textFieldColor)
                 .align(Alignment.CenterVertically)
                 .width(60.dp)
                 .wrapContentSize(Alignment.Center),
@@ -255,7 +256,7 @@ fun SetLayout(
             modifier = Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(PurpleGrey80)
+                .background(textFieldColor)
                 .align(Alignment.CenterVertically)
                 .width(40.dp)
                 .wrapContentSize(Alignment.Center),
@@ -296,7 +297,9 @@ fun SetLayout(
                     exerciseSet = exerciseSets,
                     setID = exerciseSet.id
                 )
-                closeTimerScreen(it)
+                if (!workoutViewModel.isTimerRunning) {
+                    closeTimerScreen(it)
+                }
             }
         )
     }

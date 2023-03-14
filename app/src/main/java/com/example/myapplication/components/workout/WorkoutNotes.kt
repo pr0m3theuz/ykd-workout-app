@@ -12,19 +12,17 @@ import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.myapplication.data.WorkoutModel
-import com.example.myapplication.data.pinNotes
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutNotes(
     workout: WorkoutModel,
-    placeholder: String = "Write a note"
+    placeholder: String = "Write a note",
 ) {
     var exerciseNotes by remember {
         mutableStateOf(
@@ -40,13 +38,14 @@ fun WorkoutNotes(
 
     var placeholderText by remember { mutableStateOf(placeholder) }
 
+//    TODO Fix Notes don't stay pinned for workout, but stays pinned for exercises
 //    var notesVisible by remember { mutableStateOf(exercise.notesPinned) }
     var notesPinned by remember { mutableStateOf(false) }
 
     notesPinned = workout.notesPinned
 
     fun pinNote() {
-        workout.pinNotes(!workout.notesPinned)
+        workout.notesPinned = !workout.notesPinned
         notesPinned = workout.notesPinned
     }
 
@@ -76,7 +75,7 @@ fun WorkoutNotes(
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
     TextField(
-        placeholder = { Text(placeholderText, color = Color.DarkGray) },
+        placeholder = { Text(placeholderText) },
         modifier = Modifier
             .padding(/*horizontal = */8.dp)
             .fillMaxWidth(),

@@ -34,13 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.ui.theme.Purple40
 
 @OptIn(ExperimentalTextApi::class)
 @Preview
 @Composable
 fun RestTimerButton(
-    workoutViewModel: WorkoutViewModel = viewModel()
+    workoutViewModel: WorkoutViewModel = viewModel(),
 ) {
     var progress by remember { mutableStateOf(1f) }
     val remainingTimeProgress by workoutViewModel.remainingTimeProgress.collectAsState()
@@ -72,7 +71,7 @@ fun RestTimerButton(
     )
 
     val animatedProgressBarColor by animateColorAsState(
-        targetValue = if (timerState == TimerState.RUNNING) Purple40 else Color.Transparent
+        targetValue = if (timerState == TimerState.RUNNING) MaterialTheme.colorScheme.primary else Color.Transparent
     )
 
     var remainingTimeVisible by remember { mutableStateOf(false) }
@@ -110,7 +109,7 @@ fun RestTimerButton(
         modifier = Modifier
             .size(height = 40.dp, width = animatedBoxWidth)
             .clip(RoundedCornerShape(25))
-            .background(Color.LightGray)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .clickable(
                 onClick = {
                     if (timerState == TimerState.RUNNING) {
@@ -140,6 +139,7 @@ fun RestTimerButton(
                     Icons.Outlined.Timer,
                     contentScale = ContentScale.Crop,
                     contentDescription = "Localized description",
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                     modifier = timerIconModifier
                 )
 
@@ -154,7 +154,7 @@ fun RestTimerButton(
                         maxLines = 1,
                         overflow = TextOverflow.Clip,
                         style =
-                        androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                        androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.primary),
                         modifier = Modifier
                             .padding(start = 4.dp)
 

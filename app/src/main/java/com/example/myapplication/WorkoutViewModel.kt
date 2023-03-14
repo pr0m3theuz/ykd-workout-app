@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.*
 import com.example.myapplication.utils.AlarmReceiver
+import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.sendNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,6 +69,11 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         }
     }
 
+    private val notificationManager = ContextCompat.getSystemService(
+        application,
+        NotificationManager::class.java,
+    ) as NotificationManager
+
     private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     private val notifyIntent = Intent(application, AlarmReceiver::class.java)
@@ -81,7 +87,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
             application,
             REQUEST_CODE,
             notifyIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 
@@ -146,7 +152,10 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
 // TODO Make it so that the timer doesn't get trigger multiple times when there is a subsequent UI Event from the same set
 // TODO Create Timer State Holder and for managing the Timer State
-// TODO Determine how I wanted quick sequential set completion events that start the timer, either restart the timer or don't, unless the new timer duration is longer than the initial timer duration then adjust remaining time by the difference between new timer duration and the initial timer duration
+/* TODO Determine how I wanted quick sequential set completion events that start the timer, either
+restart the timer or don't, unless the new timer duration is longer than the initial timer duration
+ then adjust remaining time by the difference between new timer duration and the initial timer duration
+ */
 
     private var _state: TimerState = TimerState.RESET
 
@@ -157,7 +166,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     val isReset: Boolean
         get() = _state == TimerState.RESET
 
-    val isRunning: Boolean
+    val isTimerRunning: Boolean
         get() = _state == TimerState.RUNNING
 
     val isExpired: Boolean
@@ -170,22 +179,18 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
 
         // TODO: Step 1.5 get an instance of NotificationManager and call sendNotification
-        val notificationManager = ContextCompat.getSystemService(
-            application,
-            NotificationManager::class.java,
-        ) as NotificationManager
+
         notificationManager.sendNotification(
             application.getString(R.string.rest_timer_running_text),
-            application,
+            application
         )
-
-        // TODO: Step 1.15 call cancel notification
 
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.ELAPSED_REALTIME_WAKEUP,
             alarmTriggerTime,
-            notifyPendingIntent,
+            notifyPendingIntent
         )
+        // TODO: Step 1.15 call cancel notification
 
         viewModelScope.launch {
             timer = object : CountDownTimer(timerDuration, 1000L) {
@@ -231,13 +236,6 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
                     _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
                     setCompletedTimerFinished()
-//                    notificationManager.cancelNotifications()
-
-//                    alarmManager.setExact(
-//                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                        SystemClock.elapsedRealtime(),
-//                        notifyPendingIntent,
-//                    )
 
                     Log.i("Timer: ", timerVersion)
                     Log.i("TimerState: ", _timerState.value.name)
@@ -267,6 +265,32 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         createTimer(_timerDuration)
     }
 
+    private var completedSets = mutableListOf<Long>()
+
+    // TODO Create an array to store the setIDs that started the timer
+    fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setID: Long) {
+        Log.i("startSetCompletedTimer() ", "called")
+
+        val exercise = exerciseSet.exercise
+        val set = exerciseSet.sets.first { it.id == setID }
+
+        if (!completedSets.contains(setID)) {
+            completedSets.add(setID)
+            if (isTimerRunning) {
+//                timer.cancel()
+                return
+            }
+
+            if (exercise.warmUpSetRestTimerEnabled && (set.setType.name != "Warm Up Set")) {
+                _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
+                createTimer(_timerDuration)
+            } else if (exercise.workingSetRestTimerEnabled && (set.setType.name != "Warm Up Set")) {
+                _timerDuration = exercise.workingSetRestInWholeMilliseconds
+                createTimer(_timerDuration)
+            }
+        }
+    }
+
     private fun resetTimerState() {
         Log.i("resetTimerState() ", "called")
         _remainingTime = 0L
@@ -281,45 +305,21 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         Log.i("TimerState: ", _timerState.value.name)
     }
 
-    //    TODO Rename Variable to be Clearer
-    private var setThatStartedTimer: Long = 0
-
-    private var completedSets = mutableListOf<Long>()
-
-    // TODO Create an array to store the setIDs that started the timer
-    fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setID: Long) {
-        Log.i("startSetCompletedTimer() ", "called")
-
-        val exercise = exerciseSet.exercise
-        val set = exerciseSet.sets.first { it.id == setID }
-
-        if (!completedSets.contains(setID)) {
-            completedSets.add(setID)
-            if (_state == TimerState.RUNNING) {
-                timer.cancel()
-            }
-
-            if (exercise.warmUpSetRestTimerEnabled && (set.setType.name == "Warm Up Set")) {
-                _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
-                createTimer(_timerDuration)
-            } else if (exercise.workingSetRestTimerEnabled && !(set.setType.name == "Warm Up Set")) {
-                _timerDuration = exercise.workingSetRestInWholeMilliseconds
-                createTimer(_timerDuration)
-            }
-        }
-    }
-
     fun cancelSetCompletedTimer() {
         Log.i("cancelSetCompletedTimer() ", "called")
         timer.cancel()
         resetTimerState()
 //        TODO Investigate TimerState and Timer Behaviour, Skip Timer leaves Timer in a Paused State
+
+        notificationManager.cancelNotifications()
+        alarmManager.cancel(notifyPendingIntent)
     }
 
     fun moreRestTime() {
         _remainingTime += _restTimerAdjustment
         _timerDuration += _restTimerAdjustment
         timer.cancel()
+        alarmManager.cancel(notifyPendingIntent)
         createTimer(_remainingTime)
     }
 
@@ -327,6 +327,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         _remainingTime -= _restTimerAdjustment
         _timerDuration -= _restTimerAdjustment
         timer.cancel()
+        alarmManager.cancel(notifyPendingIntent)
         if (_remainingTime < _timerDuration) {
             createTimer(_remainingTime)
         } else {

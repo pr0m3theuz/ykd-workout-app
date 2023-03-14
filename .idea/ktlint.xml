@@ -4,6 +4,7 @@
     <disabledRules>
       <list>
         <option value="no-trailing-spaces" />
+        <option value="trailing-comma-on-call-site" />
       </list>
     </disabledRules>
   </component>

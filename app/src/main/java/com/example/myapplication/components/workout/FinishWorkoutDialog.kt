@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,7 +14,7 @@ import com.example.myapplication.WorkoutViewModel
 
 @Composable
 fun FinishWorkoutButton(
-    workoutViewModel: WorkoutViewModel = viewModel()
+    workoutViewModel: WorkoutViewModel = viewModel(),
 ) {
     val openFinishWorkoutDialog = remember { mutableStateOf(false) }
     val openPartialFinishWorkoutDialog = remember { mutableStateOf(false) }
@@ -59,6 +60,7 @@ fun FinishWorkoutButton(
     ) {
         Text(
             text = "FINISH",
+            color = MaterialTheme.colorScheme.primary,
             fontSize = 16.sp
         )
     }
@@ -67,7 +69,7 @@ fun FinishWorkoutButton(
 @Composable
 fun FinishWorkoutDialog(
     openDialog: (Boolean) -> Unit,
-    confirmFinishWorkout: (Boolean) -> Unit
+    confirmFinishWorkout: (Boolean) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -88,7 +90,7 @@ fun FinishWorkoutDialog(
                     // TODO Save workout
                 }
             ) {
-                Text("Finish")
+                Text("Finish", color = MaterialTheme.colorScheme.primary)
             }
         },
         dismissButton = {
@@ -97,7 +99,7 @@ fun FinishWorkoutDialog(
                     openDialog(false)
                 }
             ) {
-                Text("Cancel")
+                Text("Cancel", color = MaterialTheme.colorScheme.primary)
             }
         }
     )
@@ -112,7 +114,7 @@ fun FinishWorkoutDialog(
 @Composable
 fun PartialFinishWorkoutDialog(
     openDialog: (Boolean) -> Unit,
-    confirmFinishWorkout: (Boolean) -> Unit
+    confirmFinishWorkout: (Boolean) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = {

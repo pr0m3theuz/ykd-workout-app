@@ -25,7 +25,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         notificationManager.sendNotification(
             context.getText(R.string.rest_timer_ended_text).toString(),
-            context,
+            context
         )
     }
 }

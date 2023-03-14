@@ -25,12 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.ui.theme.Purple40
 
 @Composable
 fun TimerScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
-    openDialog: (Boolean) -> Unit
+    openDialog: (Boolean) -> Unit,
 ) {
     val remainingTimeString by workoutViewModel.remainingTimeString.collectAsState()
     val timerDurationString by workoutViewModel.timerDurationString.collectAsState()
@@ -64,12 +63,13 @@ fun TimerClock(
     lessTime: () -> Unit,
     openDialog: (Boolean) -> Unit,
     timerState: TimerState,
-    startTimer: () -> Unit
+    startTimer: () -> Unit,
 ) {
 //    Log.i("TimerClock(): timerProgress", "$timerProgress")
 
 //    Log.i("Timer: ", System.currentTimeMillis().toString())
 //    Log.i("TimerState: ", timerState.toString())
+    val primaryColor: Color = MaterialTheme.colorScheme.primary
 
     var progress by remember { mutableStateOf(1f) }
     progress = timerProgress
@@ -167,7 +167,7 @@ fun TimerClock(
                         )
 
                         drawArc(
-                            color = Purple40,
+                            color = primaryColor,
                             startAngle = startAngle,
                             sweepAngle = sweep,
                             useCenter = false,
@@ -183,7 +183,7 @@ fun TimerClock(
                             Text(
                                 text = timerDurationString,
                                 fontSize = 30.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }

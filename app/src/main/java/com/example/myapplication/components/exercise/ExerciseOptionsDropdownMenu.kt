@@ -18,7 +18,7 @@ import kotlin.time.toDuration
 fun ExerciseOptionsDropdownMenu(
     exerciseSets: ExerciseSetModel,
     addNotes: () -> Unit,
-    removeExercise: () -> Unit
+    removeExercise: () -> Unit,
 ) {
     var expandedExerciseOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
@@ -51,7 +51,11 @@ fun ExerciseOptionsDropdownMenu(
 
     Box {
         IconButton(onClick = { expandedExerciseOptionsDropdownMenu = true }) {
-            Icon(Icons.Outlined.MoreVert, contentDescription = "Exercise Options and Settings")
+            Icon(
+                Icons.Outlined.MoreVert,
+                contentDescription = "Exercise Options and Settings",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
         DropdownMenu(
             expanded = expandedExerciseOptionsDropdownMenu,

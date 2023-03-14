@@ -39,7 +39,7 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         applicationContext,
         0,
         intent,
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
 
     // TODO: Step 2.0 add style
@@ -54,7 +54,7 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         .Builder(
             applicationContext,
             // TODO: Step 1.8 use the new 'breakfast' notification channel
-            applicationContext.getString(R.string.notification_channel_id),
+            applicationContext.getString(R.string.notification_channel_id)
         )
         .setTicker(resources.getString(R.string.new_timer_title))
         .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
