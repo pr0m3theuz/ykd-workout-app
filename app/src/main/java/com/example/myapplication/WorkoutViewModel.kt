@@ -26,6 +26,8 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+private const val WARM_UP_SET = "Warm Up Set"
+
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(private val application: Application) :
     ViewModel() {
@@ -140,12 +142,12 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     val timerFinished: Boolean
         get() = _timerFinished
 
-    private fun setCompletedTimerFinished() {
-        //  TODO Trigger Notification & Sound, Update UI State
-        if (_timerFinished) {
-            Log.i("onFinish():  _timerFinished", "$_timerFinished")
-        }
-    }
+//    private fun setCompletedTimerFinished() {
+//        //  TODO Trigger Notification & Sound, Update UI State
+//        if (_timerFinished) {
+//            Log.i("onFinish():  _timerFinished", "$_timerFinished")
+//        }
+//    }
 
     //    TODO Implement as a Singleton
     private lateinit var timer: CountDownTimer
@@ -175,22 +177,12 @@ restart the timer or don't, unless the new timer duration is longer than the ini
     private fun createTimer(timerDuration: Long) {
         val timerVersion = System.currentTimeMillis().toString()
         val alarmTriggerTime = SystemClock.elapsedRealtime() + timerDuration
-        Log.i("createTimer()", "called")
-        Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
-
-        // TODO: Step 1.5 get an instance of NotificationManager and call sendNotification
-
-        notificationManager.sendNotification(
-            application.getString(R.string.rest_timer_running_text),
-            application
-        )
 
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.ELAPSED_REALTIME_WAKEUP,
             alarmTriggerTime,
             notifyPendingIntent
         )
-        // TODO: Step 1.15 call cancel notification
 
         viewModelScope.launch {
             timer = object : CountDownTimer(timerDuration, 1000L) {
@@ -235,7 +227,7 @@ restart the timer or don't, unless the new timer duration is longer than the ini
                     _state = TimerState.EXPIRED
                     _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
-                    setCompletedTimerFinished()
+//                    setCompletedTimerFinished()
 
                     Log.i("Timer: ", timerVersion)
                     Log.i("TimerState: ", _timerState.value.name)
@@ -244,30 +236,36 @@ restart the timer or don't, unless the new timer duration is longer than the ini
         }
     }
 
-    /**
-     * Creates a new alarm, notification and timer
-     */
-    // TODO Add Notification Manager and AlarmManager
+    private fun createRestTimerNotification() {
+        Log.i("createTimer()", "called")
+        Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
+
+        // TODO: Step 1.5 get an instance of NotificationManager and call sendNotification
+        //        TODO move notificationManager and alarmManager to separate function so it isn't called when time is add or taken away from the timer
+
+        notificationManager.sendNotification(
+            application.getString(R.string.rest_timer_running_text),
+            application
+        )
+
+        // TODO: Step 1.15 call cancel notification
+    }
+
     fun startRestTimer(time: Duration) {
         Log.i("startRestTimer() ", "called")
         _timerDuration = time.inWholeMilliseconds
 
+        createRestTimerNotification()
         createTimer(_timerDuration)
-//        notifyUser()
     }
 
-    /**
-     * Creates a new alarm, notification and timer
-     */
-
-    // TODO Add Notification Manager and AlarmManager
     fun startLastTimer() {
+        createRestTimerNotification()
         createTimer(_timerDuration)
     }
 
     private var completedSets = mutableListOf<Long>()
 
-    // TODO Create an array to store the setIDs that started the timer
     fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setID: Long) {
         Log.i("startSetCompletedTimer() ", "called")
 
@@ -276,17 +274,17 @@ restart the timer or don't, unless the new timer duration is longer than the ini
 
         if (!completedSets.contains(setID)) {
             completedSets.add(setID)
-            if (isTimerRunning) {
-//                timer.cancel()
-                return
-            }
-
-            if (exercise.warmUpSetRestTimerEnabled && (set.setType.name != "Warm Up Set")) {
-                _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
-                createTimer(_timerDuration)
-            } else if (exercise.workingSetRestTimerEnabled && (set.setType.name != "Warm Up Set")) {
-                _timerDuration = exercise.workingSetRestInWholeMilliseconds
-                createTimer(_timerDuration)
+            /*
+            * Doesn't allow the new completed set to cancel the timer if one is already running
+            */
+            if (_state != TimerState.RUNNING) {
+                if (exercise.warmUpSetRestTimerEnabled && (set.setType.name == WARM_UP_SET)) {
+                    _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
+                    startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
+                } else if (exercise.workingSetRestTimerEnabled && (set.setType.name != WARM_UP_SET)) {
+                    _timerDuration = exercise.workingSetRestInWholeMilliseconds
+                    startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
+                }
             }
         }
     }
@@ -294,7 +292,7 @@ restart the timer or don't, unless the new timer duration is longer than the ini
     private fun resetTimerState() {
         Log.i("resetTimerState() ", "called")
         _remainingTime = 0L
-        _remainingTimeString.value = 0L.toDuration(DurationUnit.MILLISECONDS)
+        _remainingTimeString.value = _remainingTime.toDuration(DurationUnit.MILLISECONDS)
             .toComponents { minutes, seconds, _ ->
                 "$minutes:${
                     seconds.toString().padStart(2, '0')
@@ -302,6 +300,7 @@ restart the timer or don't, unless the new timer duration is longer than the ini
             }
         _remainingTimeProgress.value = 0f
         _timerState.value = TimerState.RESET
+        _state = TimerState.RESET
         Log.i("TimerState: ", _timerState.value.name)
     }
 
@@ -309,8 +308,6 @@ restart the timer or don't, unless the new timer duration is longer than the ini
         Log.i("cancelSetCompletedTimer() ", "called")
         timer.cancel()
         resetTimerState()
-//        TODO Investigate TimerState and Timer Behaviour, Skip Timer leaves Timer in a Paused State
-
         notificationManager.cancelNotifications()
         alarmManager.cancel(notifyPendingIntent)
     }
@@ -334,6 +331,7 @@ restart the timer or don't, unless the new timer duration is longer than the ini
             _state = TimerState.EXPIRED
             _timerState.value = TimerState.EXPIRED
             timer.cancel()
+            alarmManager.cancel(notifyPendingIntent)
         }
     }
 
@@ -347,10 +345,6 @@ restart the timer or don't, unless the new timer duration is longer than the ini
             initialValue = _exercisesSetsData.toList()
         )*/
 
-/*    private var _exercisesSets = initExercisesSets()
-    val exercisesSets
-        get() = _exercisesSets*/
-
     fun addSet(exerciseSets: ExerciseSetModel) {
         val index = _exercisesSetsData.indexOf(exerciseSets)
 
@@ -359,14 +353,6 @@ restart the timer or don't, unless the new timer duration is longer than the ini
             setNumber = exerciseSets.sets.last().setNumber?.plus(1),
             setCompleted = false,
         )
-
-//        exerciseSets.sets.plus(
-//            exerciseSets.sets.last().copy(
-//                id = newID(),
-//                setNumber = exerciseSets.sets.last().setNumber?.plus(1),
-//                setCompleted = false
-//            )
-//        )
 
         _exercisesSetsData[index] =
             ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
@@ -435,12 +421,12 @@ restart the timer or don't, unless the new timer duration is longer than the ini
 
     fun getWorkingSetWeight(exerciseSets: ExerciseSetModel): Double? {
         // TODO Add If Not Empty
-        return exerciseSets.sets.first { it.setType.name != "Warm Up Set" }.exerciseWeight
+        return exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.exerciseWeight
     }
 
     fun getWorkingSetRepetitions(exerciseSets: ExerciseSetModel): Int? {
         // TODO Add If Not Empty
-        return exerciseSets.sets.first { it.setType.name != "Warm Up Set" }.repetitions
+        return exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.repetitions
     }
 
     fun addWorkingSets(exerciseSets: ExerciseSetModel, workingSets: List<SetModel>) {
@@ -448,7 +434,7 @@ restart the timer or don't, unless the new timer duration is longer than the ini
 
         workingSets.forEach { it.id = newID() }
 //        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Before: ${_exerciseSets.toList()}")
-        exerciseSets.sets.removeAll { it.setType.name != "Warm Up Set" }
+        exerciseSets.sets.removeAll { it.setType.name != WARM_UP_SET }
 //        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Removed Old Sets: ${_exerciseSets.toList()}")
         exerciseSets.sets.addAll(workingSets)
 //        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Added New Sets: ${_exerciseSets.toList()}")
@@ -472,11 +458,6 @@ restart the timer or don't, unless the new timer duration is longer than the ini
         _exercisesSetsData[index] =
             ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
         _exercisesSets.value = _exercisesSetsData.toMutableList()
-    }
-
-    // TODO Add function to Volume Equate Sets, Create Dialog for this
-    fun equateWorkingSetsVolume(exerciseSets: ExerciseSetModel, newWeight: Double?, newReps: Int?) {
-        // TODO
     }
 
     fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {
@@ -511,45 +492,6 @@ restart the timer or don't, unless the new timer duration is longer than the ini
 
         return countSetsCompleted == countSets
     }
-
-//    Android Programming_ The Big Nerd Ranch Guide - Notifying the User
-//    private fun notifyUser() {
-//        val context = application.applicationContext
-//        val intent = MainActivity.newIntent(context)
-//        val pendingIntent = PendingIntent.getActivity(
-//            context,
-//            0,
-//            intent,
-//            PendingIntent.FLAG_IMMUTABLE
-//        )
-//        val resources = context.resources
-//
-//        val notification = NotificationCompat
-//            .Builder(context, NOTIFICATION_CHANNEL_ID)
-//            .setTicker(resources.getString(R.string.new_timer_title))
-//            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-//            .setContentTitle(resources.getString(R.string.new_timer_title))
-//            .setContentText("Remaining Time:")
-//            .setContentIntent(pendingIntent)
-//            .setAutoCancel(false)
-//            .build()
-//
-//        if (ActivityCompat.checkSelfPermission(
-//                context,
-//                Manifest.permission.POST_NOTIFICATIONS
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return
-//        }
-//        NotificationManagerCompat.from(context).notify(1, notification)
-//    }
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSetModel> {

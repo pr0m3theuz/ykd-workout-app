@@ -37,16 +37,16 @@ fun TimerScreen(
     val timerProgress by workoutViewModel.remainingTimeProgress.collectAsState()
     val timerState by workoutViewModel.workoutTimerState.collectAsState()
     TimerClock(
-        remainingTimeString,
-        timerDurationString,
-        restTimerAdjustmentString,
-        timerProgress,
-        { workoutViewModel.cancelSetCompletedTimer() },
-        { workoutViewModel.moreRestTime() },
-        { workoutViewModel.lessRestTime() },
-        { close -> openDialog(close) },
-        timerState,
-        { workoutViewModel.startLastTimer() }
+        remainingTimeString = remainingTimeString,
+        timerDurationString = timerDurationString,
+        restTimerAdjustmentString = restTimerAdjustmentString,
+        timerProgress = timerProgress,
+        cancelTimer = { workoutViewModel.cancelSetCompletedTimer() },
+        moreTime = { workoutViewModel.moreRestTime() },
+        lessTime = { workoutViewModel.lessRestTime() },
+        openDialog = { close -> openDialog(close) },
+        timerState = timerState,
+        startTimer = { workoutViewModel.startLastTimer() }
     )
 }
 
