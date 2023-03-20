@@ -39,13 +39,13 @@ fun SetItem(
     updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
     updateSetType: (id: Long, setType: SetTypeModel) -> Unit,
-    setComplete: (setComplete: Boolean) -> Unit // ,
+    setComplete: (setComplete: Boolean) -> Unit, // ,
 //    startRestTimer: () -> Unit
 ) {
 //    Log.i("SetColumn()", "$set")
 
     val coroutineScope = rememberCoroutineScope()
-    var setCompletedState by remember { mutableStateOf(false) }
+    var setCompletedState by remember { mutableStateOf(set.setCompleted) }
     val openDialog = remember { mutableStateOf(true) }
 
     val dismissState = rememberDismissState(
@@ -147,7 +147,7 @@ fun SetItem(
         }
     ) {
         Card(
-            backgroundColor = if (setCompletedState) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.background,
+            backgroundColor = if (setCompletedState) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.background,
             shape = RoundedCornerShape(CornerSize(0f))
         ) {
             SetLayout(

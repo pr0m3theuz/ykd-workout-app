@@ -27,7 +27,7 @@ fun SetTypeOptionsMenu(
     onDismiss: () -> Unit,
     updateSetType: (setType: SetTypeModel) -> Unit,
     changeIconText: () -> Unit,
-    changeIconColor: () -> Unit
+    changeIconColor: () -> Unit,
 ) {
     DropdownMenu(
         expanded = expandMenu(),
@@ -74,7 +74,7 @@ fun SetTypeOptionsMenu(
 }
 
 private fun create(): ArrayList<SetTypeModel> {
-    var menu = ArrayList<SetTypeModel>()
+    val menu = ArrayList<SetTypeModel>()
 
     menu.add(
         SetTypeModel(

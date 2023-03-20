@@ -14,7 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import com.example.myapplication.components.*
 import com.example.myapplication.components.workout.WorkoutScreen
-import com.example.myapplication.data.WorkoutModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,7 +31,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 Surface {
-                    WorkoutScreen(workout = WorkoutModel(name = "Workout Name"))
+                    WorkoutScreen()
 //                    ExercisesScreen(exercisesViewModel = exercisesViewModel)
                 }
             }

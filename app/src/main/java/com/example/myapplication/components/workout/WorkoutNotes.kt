@@ -16,15 +16,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import com.example.myapplication.data.WorkoutModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.WorkoutViewModel
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutNotes(
-    workout: WorkoutModel,
+    workoutViewModel: WorkoutViewModel = viewModel(),
     placeholder: String = "Write a note",
+    pinNote: (Boolean) -> Unit,
+    notesPinned: Boolean,
 ) {
-    var exerciseNotes by remember {
+    val workout by workoutViewModel.workout.collectAsState()
+
+    var workoutNotes by remember {
         mutableStateOf(
             TextFieldValue(
                 if (workout.notesPinned && (workout.pinnedNotes?.isNotEmpty() == true)) {
@@ -37,17 +42,6 @@ fun WorkoutNotes(
     }
 
     var placeholderText by remember { mutableStateOf(placeholder) }
-
-//    TODO Fix Notes don't stay pinned for workout, but stays pinned for exercises
-//    var notesVisible by remember { mutableStateOf(exercise.notesPinned) }
-    var notesPinned by remember { mutableStateOf(false) }
-
-    notesPinned = workout.notesPinned
-
-    fun pinNote() {
-        workout.notesPinned = !workout.notesPinned
-        notesPinned = workout.notesPinned
-    }
 
     val noteButtonContainerColor =
         if (notesPinned) {
@@ -64,11 +58,11 @@ fun WorkoutNotes(
         }
 
     val animateNoteButtonContainerColor = animateColorAsState(noteButtonContainerColor)
-    var animateNoteButtonContentColor = animateColorAsState(noteButtonContentColor)
+    val animateNoteButtonContentColor = animateColorAsState(noteButtonContentColor)
 
-    if (exerciseNotes.text == "" && notesPinned) {
+    if (workoutNotes.text == "" && notesPinned) {
         placeholderText = "Pin a note for next time"
-    } else if (exerciseNotes.text == "") {
+    } else if (workoutNotes.text == "") {
         placeholderText = placeholder
     }
 
@@ -83,11 +77,14 @@ fun WorkoutNotes(
             fontSize = 5.em,
             color = MaterialTheme.colorScheme.onBackground
         ),
-        value = exerciseNotes,
-        onValueChange = { exerciseNotes = it },
+        value = workoutNotes,
+        onValueChange = {
+            workoutNotes = it
+            workoutViewModel.setWorkoutNote(it.text)
+        },
         trailingIcon = {
             Button(
-                onClick = { pinNote() },
+                onClick = { pinNote(!workout.notesPinned) },
                 shape = RoundedCornerShape(15),
                 contentPadding = PaddingValues(0.dp),
                 modifier = androidx.compose.ui.Modifier.padding(8.dp).size(36.dp),

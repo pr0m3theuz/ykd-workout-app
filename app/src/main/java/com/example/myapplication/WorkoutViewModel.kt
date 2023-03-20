@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -36,15 +37,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     private val REQUEST_CODE = 0
     private val notifyPendingIntent: PendingIntent
 
-    private var workoutStartTime: Long = 0
-    private var workoutEndTime: Long = 0
-
-    private var workoutStartDuration: Long = 0
-
     private var workoutDuration: Long = 0
-
-    private val _workoutDuration = MutableStateFlow(workoutDuration)
-    val durationWorkout: StateFlow<Long> = _workoutDuration.asStateFlow()
 
     private var _workoutDurationFormatted = workoutDuration.toDuration(DurationUnit.MILLISECONDS)
         .toComponents { minutes, seconds, nanoseconds ->
@@ -81,8 +74,6 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     private val notifyIntent = Intent(application, AlarmReceiver::class.java)
 
     init {
-        workoutStartTime = System.currentTimeMillis()
-        workoutStartDuration = SystemClock.elapsedRealtime()
         workoutCountUpTimer.start()
 
         notifyPendingIntent = PendingIntent.getBroadcast(
@@ -91,12 +82,6 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
             notifyIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-    }
-
-    fun finishWorkout() {
-        workoutEndTime = System.currentTimeMillis()
-//        TODO Save Workout to Database
-//        TODO Navigate to Workout Complete Screen & Summary
     }
 
     private var _timerDuration: Long = 60000L
@@ -118,8 +103,6 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         _restTimerAdjustment.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString()
 
     private var _remainingTime: Long = 60000L
-    val remainingTime: Long
-        get() = _remainingTime
 
     private var _remainingTimeFormatted = _remainingTime.toDuration(DurationUnit.MILLISECONDS)
         .toComponents { minutes, seconds, nanoseconds ->
@@ -142,22 +125,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     val timerFinished: Boolean
         get() = _timerFinished
 
-//    private fun setCompletedTimerFinished() {
-//        //  TODO Trigger Notification & Sound, Update UI State
-//        if (_timerFinished) {
-//            Log.i("onFinish():  _timerFinished", "$_timerFinished")
-//        }
-//    }
-
-    //    TODO Implement as a Singleton
     private lateinit var timer: CountDownTimer
-
-// TODO Make it so that the timer doesn't get trigger multiple times when there is a subsequent UI Event from the same set
-// TODO Create Timer State Holder and for managing the Timer State
-/* TODO Determine how I wanted quick sequential set completion events that start the timer, either
-restart the timer or don't, unless the new timer duration is longer than the initial timer duration
- then adjust remaining time by the difference between new timer duration and the initial timer duration
- */
 
     private var _state: TimerState = TimerState.RESET
 
@@ -188,7 +156,6 @@ restart the timer or don't, unless the new timer duration is longer than the ini
             timer = object : CountDownTimer(timerDuration, 1000L) {
 
                 override fun onTick(millisUntilFinished: Long) {
-                    // TODO Return Remaining Time as String
                     _state = TimerState.RUNNING
                     _timerState.value = TimerState.RUNNING
                     _remainingTime = millisUntilFinished
@@ -223,11 +190,9 @@ restart the timer or don't, unless the new timer duration is longer than the ini
                 }
 
                 override fun onFinish() {
-                    // TODO Refactor into resetTimerState()
                     _state = TimerState.EXPIRED
                     _timerState.value = TimerState.EXPIRED
                     _timerFinished = true
-//                    setCompletedTimerFinished()
 
                     Log.i("Timer: ", timerVersion)
                     Log.i("TimerState: ", _timerState.value.name)
@@ -240,15 +205,10 @@ restart the timer or don't, unless the new timer duration is longer than the ini
         Log.i("createTimer()", "called")
         Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
 
-        // TODO: Step 1.5 get an instance of NotificationManager and call sendNotification
-        //        TODO move notificationManager and alarmManager to separate function so it isn't called when time is add or taken away from the timer
-
         notificationManager.sendNotification(
             application.getString(R.string.rest_timer_running_text),
             application
         )
-
-        // TODO: Step 1.15 call cancel notification
     }
 
     fun startRestTimer(time: Duration) {
@@ -299,8 +259,8 @@ restart the timer or don't, unless the new timer duration is longer than the ini
                 }"
             }
         _remainingTimeProgress.value = 0f
-        _timerState.value = TimerState.RESET
         _state = TimerState.RESET
+        _timerState.value = TimerState.RESET
         Log.i("TimerState: ", _timerState.value.name)
     }
 
@@ -328,43 +288,67 @@ restart the timer or don't, unless the new timer duration is longer than the ini
         if (_remainingTime < _timerDuration) {
             createTimer(_remainingTime)
         } else {
-            _state = TimerState.EXPIRED
-            _timerState.value = TimerState.EXPIRED
-            timer.cancel()
-            alarmManager.cancel(notifyPendingIntent)
+            resetTimerState()
         }
+    }
+
+    private var _workoutData = initWorkout()
+    private var _workout = MutableStateFlow(_workoutData)
+    val workout
+        get() = _workout.asStateFlow()
+
+    private var _workoutName = MutableStateFlow(_workoutData.name)
+    val workoutName
+        get() = _workoutName.asStateFlow()
+
+    fun setWorkoutName(newName: String) {
+        _workoutData.name = newName
+        _workout.value = _workoutData
+    }
+
+    fun setWorkoutNote(note: String) {
+        _workoutData.notes = note
+        _workout.value = _workoutData
+    }
+
+    fun pinWorkoutNote(pinned: Boolean) {
+        _workoutData.pinNotes(pinned)
+        _workout.value = _workoutData
+    }
+
+    fun finishWorkout() {
+        workoutCountUpTimer.stop()
+        _workoutData.workoutEnded = LocalDateTime.now()
+        _workoutData.workoutDuration = workoutDuration
+        _workout.value = _workoutData
+//        TODO Save Workout to Database
+//        TODO Navigate to Workout Complete Screen & Summary
     }
 
     private var _exercisesSetsData = initExercisesSets()
 
     private var _exercisesSets = MutableStateFlow(_exercisesSetsData.toList())
     val exercisesSets
-        get() = _exercisesSets.asStateFlow()/*.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = _exercisesSetsData.toList()
-        )*/
+        get() = _exercisesSets.asStateFlow()
 
     fun addSet(exerciseSets: ExerciseSetModel) {
         val index = _exercisesSetsData.indexOf(exerciseSets)
 
-        val temporarySets = exerciseSets.sets + exerciseSets.sets.last().copy(
-            id = newID(),
-            setNumber = exerciseSets.sets.last().setNumber?.plus(1),
-            setCompleted = false,
-        )
+        val temporarySets: List<SetModel> = if (exerciseSets.sets.isNotEmpty()) {
+            exerciseSets.sets + exerciseSets.sets.last().copy(
+                id = newID(),
+                setNumber = exerciseSets.sets.last().setNumber?.plus(1),
+                setCompleted = false,
+            )
+        } else {
+            listOf(SetModel(id = newID(), setNumber = (index + 1)))
+        }
 
         _exercisesSetsData[index] =
             ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
 
-        _exercisesSetsData[index]
         _exercisesSetsData = _exercisesSetsData.toMutableList()
         _exercisesSets.value = _exercisesSetsData
-
-//        Log.i(
-//            "workoutViewModel.addSet()",
-//            "${exerciseSets.id} & ${ _exercisesSetsData[index].id}"
-//        )
     }
 
     fun removeExerciseSets(exerciseSets: ExerciseSetModel) {
@@ -420,13 +404,21 @@ restart the timer or don't, unless the new timer duration is longer than the ini
     }
 
     fun getWorkingSetWeight(exerciseSets: ExerciseSetModel): Double? {
-        // TODO Add If Not Empty
-        return exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.exerciseWeight
+        // TODO Get Previous Working Set if Sets is empty
+        var weight: Double? = null
+        if (exerciseSets.sets.isNotEmpty()) {
+            weight = exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.exerciseWeight
+        }
+        return weight
     }
 
     fun getWorkingSetRepetitions(exerciseSets: ExerciseSetModel): Int? {
-        // TODO Add If Not Empty
-        return exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.repetitions
+        // TODO Get Previous Working Set if Sets is empty
+        var repetitions: Int? = null
+        if (exerciseSets.sets.isNotEmpty()) {
+            repetitions = exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.repetitions
+        }
+        return repetitions
     }
 
     fun addWorkingSets(exerciseSets: ExerciseSetModel, workingSets: List<SetModel>) {
@@ -461,7 +453,6 @@ restart the timer or don't, unless the new timer duration is longer than the ini
     }
 
     fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {
-//        TODO Fix, Doesn't change time
         if (tabRowState == 1) {
             exercise.warmUpSetRestInWholeMilliseconds = time.inWholeMilliseconds
         } else if (tabRowState == 0) {
@@ -492,6 +483,10 @@ restart the timer or don't, unless the new timer duration is longer than the ini
 
         return countSetsCompleted == countSets
     }
+}
+
+private fun initWorkout(): WorkoutModel {
+    return WorkoutModel(name = "Workout Name")
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSetModel> {

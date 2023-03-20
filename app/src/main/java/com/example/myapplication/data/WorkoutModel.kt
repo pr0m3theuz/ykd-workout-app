@@ -2,6 +2,7 @@ package com.example.myapplication.data
 
 import android.util.Log
 import com.example.myapplication.newID
+import java.time.LocalDateTime
 import kotlin.time.Duration
 
 data class WorkoutModel(
@@ -11,10 +12,9 @@ data class WorkoutModel(
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,
     var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds,
-    var workoutType: String? = null
-//    val workoutStarted = LocalDateTime.now(), TODO
-//    val workoutEnded = LocalDateTime.now(), TODO
-//    var workoutDate: Date? = LocalDateTime.now()
+    var workoutType: String? = null,
+    val workoutStarted: LocalDateTime = LocalDateTime.now(),
+    var workoutEnded: LocalDateTime? = null,
 )
 
 fun WorkoutModel.pinNotes(pinned: Boolean) {

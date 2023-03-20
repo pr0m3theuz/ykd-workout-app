@@ -8,25 +8,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.FinishWorkoutButton
+import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.exercise.WorkoutNotes
 import com.example.myapplication.components.setRestTimer.RestTimerButton
-import com.example.myapplication.components.workoutOptionsDropdownMenu
-import com.example.myapplication.data.WorkoutModel
 
 // TODO Takes a Workout Object
-// TODO Add Finish Workout Button
-// TODO Complete Running Workout Duration Timer
-// TODO Add Working Weight Total Volume and Total Reps, & Average Weight
 
 @Composable
-fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = viewModel()) {
+fun WorkoutScreen(workoutViewModel: WorkoutViewModel = viewModel()) {
+    val workout by workoutViewModel.workout.collectAsState()
+
     val openFinishWorkoutDialog = remember { mutableStateOf(false) }
 
     if (openFinishWorkoutDialog.value) {
@@ -34,15 +31,7 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
         openFinishWorkoutDialog.value = false
     }
 
-    var workoutName by remember {
-        mutableStateOf(
-            TextFieldValue(
-                workout.name.ifEmpty {
-                    "Workout"
-                }
-            )
-        )
-    }
+    val workoutName by workoutViewModel.workoutName.collectAsState()
 
     val workoutDuration by workoutViewModel.workoutDurationString.collectAsState()
     val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
@@ -53,28 +42,20 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BasicTextField(
-                modifier = Modifier
-                    .padding(PaddingValues(4.dp)),
-                textStyle = TextStyle(
-                    fontSize = 5.em,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onBackground
-                ),
-                value = workoutName,
-                onValueChange = {
-                    workoutName = it
-                }
+            WorkoutNameTextField(
+                workoutName,
+                setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) }
             )
 
-            workoutOptionsDropdownMenu()
+            WorkoutOptionsDropdownMenu()
         }
 
         Text(modifier = Modifier.padding(8.dp), text = workoutDuration)
 
         WorkoutNotes(
-            workout = WorkoutModel(name = "Workout Name"),
-            placeholder = "Workout Note"
+            placeholder = "Workout Note",
+            pinNote = { pin -> workoutViewModel.pinWorkoutNote(pin) },
+            notesPinned = workout.notesPinned
         )
 
         Row(
@@ -91,4 +72,27 @@ fun WorkoutScreen(workout: WorkoutModel, workoutViewModel: WorkoutViewModel = vi
             exercises = exercisesSets
         )
     }
+}
+
+@Composable
+private fun WorkoutNameTextField(
+    workoutName: String,
+    setWorkoutName: (String) -> Unit,
+) {
+    var name by remember { mutableStateOf(workoutName) }
+
+    BasicTextField(
+        modifier = Modifier
+            .padding(PaddingValues(4.dp)),
+        textStyle = TextStyle(
+            fontSize = 5.em,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground
+        ),
+        value = name,
+        onValueChange = {
+            name = it
+            setWorkoutName(it)
+        }
+    )
 }

@@ -4,21 +4,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable
-fun workoutOptionsDropdownMenu() {
+fun WorkoutOptionsDropdownMenu() {
     var expanded by remember { mutableStateOf(false) }
 
     Box {
         IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Outlined.MoreVert, contentDescription = "Workout Options and Settings")
+            Icon(
+                Icons.Outlined.MoreVert,
+                contentDescription = "Workout Options and Settings",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
         DropdownMenu(
             expanded = expanded,

@@ -43,14 +43,14 @@ fun FinishWorkoutButton(
     if (openFinishWorkoutDialog.value) {
         FinishWorkoutDialog(
             openDialog = { closeFinishWorkoutDialog() },
-            confirmFinishWorkout = { /* TODO cancel -> (cancel) */ }
+            confirmFinishWorkout = { workoutViewModel.finishWorkout() }
         )
     }
 
     if (openPartialFinishWorkoutDialog.value) {
         PartialFinishWorkoutDialog(
             openDialog = { closePartialFinishWorkoutDialog() },
-            confirmFinishWorkout = { /* TODO cancel -> (cancel) */ }
+            confirmFinishWorkout = { workoutViewModel.finishWorkout() }
         )
     }
     Log.i("openPartialFinishWorkoutDialog.value", openPartialFinishWorkoutDialog.value.toString())
@@ -69,7 +69,7 @@ fun FinishWorkoutButton(
 @Composable
 fun FinishWorkoutDialog(
     openDialog: (Boolean) -> Unit,
-    confirmFinishWorkout: (Boolean) -> Unit,
+    confirmFinishWorkout: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -86,8 +86,7 @@ fun FinishWorkoutDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    confirmFinishWorkout(true)
-                    // TODO Save workout
+                    confirmFinishWorkout()
                 }
             ) {
                 Text("Finish", color = MaterialTheme.colorScheme.primary)
@@ -114,7 +113,7 @@ fun FinishWorkoutDialog(
 @Composable
 fun PartialFinishWorkoutDialog(
     openDialog: (Boolean) -> Unit,
-    confirmFinishWorkout: (Boolean) -> Unit,
+    confirmFinishWorkout: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -131,7 +130,7 @@ fun PartialFinishWorkoutDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    confirmFinishWorkout(true)
+                    confirmFinishWorkout()
                     // TODO Save workout
                 }
             ) {

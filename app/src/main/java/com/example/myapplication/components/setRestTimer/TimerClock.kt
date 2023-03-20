@@ -70,6 +70,7 @@ fun TimerClock(
 //    Log.i("Timer: ", System.currentTimeMillis().toString())
 //    Log.i("TimerState: ", timerState.toString())
     val primaryColor: Color = MaterialTheme.colorScheme.primary
+    val clockBackgroundColor = MaterialTheme.colorScheme.inversePrimary
 
     var progress by remember { mutableStateOf(1f) }
     progress = timerProgress
@@ -157,7 +158,7 @@ fun TimerClock(
                         val arcDimen = size.width - 2 * diameterOffset
 
                         drawArc(
-                            color = Color.LightGray,
+                            color = clockBackgroundColor,
                             startAngle = 270f,
                             sweepAngle = 360f,
                             useCenter = false,

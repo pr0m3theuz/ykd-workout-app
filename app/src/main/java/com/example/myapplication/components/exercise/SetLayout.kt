@@ -119,7 +119,7 @@ fun SetLayout(
     }
 
     // Set Completed
-    val checkedState = remember { mutableStateOf(false) }
+    val checkedState = remember { mutableStateOf(exerciseSet.setCompleted) }
 
     var openTimerScreen by remember { mutableStateOf(false) }
 
@@ -128,8 +128,6 @@ fun SetLayout(
     }
 
     if (openTimerScreen && workoutViewModel.isTimerRunning) {
-//        TODO Navigate to
-//        TODO openTimerClockDialog
         TimerScreen(openDialog = { close -> closeTimerScreen(close) })
     }
 
@@ -151,7 +149,7 @@ fun SetLayout(
                     expandedSetTypeOptionsDropdownMenu = true
                 }
             ) {
-                Text(text = iconText, color = iconColor)
+                Text(text = iconText, color = MaterialTheme.colorScheme.onPrimary)
             }
 
             SetTypeOptionsMenu(
