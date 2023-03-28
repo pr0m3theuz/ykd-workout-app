@@ -23,7 +23,6 @@ import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
 import com.example.myapplication.components.SetLayout
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
-import com.example.myapplication.data.SetTypeModel
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
@@ -34,12 +33,12 @@ fun SetItem(
     index: Int,
     set: SetModel,
     removeSet: () -> Unit,
-    updateSetWeight: (id: Long, newWeight: Double?) -> Unit,
-    updateSetReps: (id: Long, newReps: Int?) -> Unit,
-    updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
-    updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
-    updateSetType: (id: Long, setType: SetTypeModel) -> Unit,
-    setComplete: (setComplete: Boolean) -> Unit, // ,
+//    updateSetWeight: (id: Long, newWeight: Double?) -> Unit,
+//    updateSetReps: (id: Long, newReps: Int?) -> Unit,
+//    updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
+//    updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
+//    updateSetType: (id: Long, setType: SetTypeModel) -> Unit,
+//    setComplete: (setComplete: Boolean) -> Unit, // ,
 //    startRestTimer: () -> Unit
 ) {
 //    Log.i("SetColumn()", "$set")
@@ -54,25 +53,25 @@ fun SetItem(
         }
     )
 
-    fun newWeight(newWeight: Double?) {
-        updateSetWeight(set.id, newWeight)
-    }
-
-    fun newReps(newReps: Int?) {
-        updateSetReps(set.id, newReps)
-    }
-
-    fun newRIR(newRIR: Double?) {
-        updateSetRIR(set.id, newRIR)
-    }
-
-    fun newRPE(newRPE: Double?) {
-        updateSetRPE(set.id, newRPE)
-    }
-
-    fun newSetType(setType: SetTypeModel) {
-        updateSetType(set.id, setType)
-    }
+//    fun newWeight(newWeight: Double?) {
+//        updateSetWeight(set.id, newWeight)
+//    }
+//
+//    fun newReps(newReps: Int?) {
+//        updateSetReps(set.id, newReps)
+//    }
+//
+//    fun newRIR(newRIR: Double?) {
+//        updateSetRIR(set.id, newRIR)
+//    }
+//
+//    fun newRPE(newRPE: Double?) {
+//        updateSetRPE(set.id, newRPE)
+//    }
+//
+//    fun newSetType(setType: SetTypeModel) {
+//        updateSetType(set.id, setType)
+//    }
 
     fun deleteCompletedSet(delete: Boolean) {
         if (delete) {
@@ -87,12 +86,10 @@ fun SetItem(
         }
     }
 
-    fun changesetCompletedState(status: Boolean) {
-        setCompletedState = status
-        setComplete(status)
-    }
-
-//    if (setCompletedState) startRestTimer()
+//    fun changesetCompletedState(status: Boolean) {
+//        setCompletedState = status
+//        setComplete(status)
+//    }
 
     fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
         openDialog.value = open
@@ -153,13 +150,13 @@ fun SetItem(
             SetLayout(
                 exerciseSets = exerciseSets,
                 index,
-                set,
-                { completed -> changesetCompletedState(completed) },
-                { newWeight -> newWeight(newWeight) },
-                { newReps -> newReps(newReps) },
-                { newRIR -> newRIR(newRIR) },
-                { newRPE -> newRPE(newRPE) },
-                { setType -> newSetType(setType) }
+                set
+//                { completed -> changesetCompletedState(completed) },
+//                { newWeight -> newWeight(newWeight) },
+//                { newReps -> newReps(newReps) },
+//                { newRIR -> newRIR(newRIR) },
+//                { newRPE -> newRPE(newRPE) },
+//                { setType -> newSetType(setType) }
             )
         }
     }

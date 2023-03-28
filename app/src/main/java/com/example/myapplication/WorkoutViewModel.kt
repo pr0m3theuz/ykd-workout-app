@@ -357,9 +357,16 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     }
 
     fun removeSet(exerciseSets: ExerciseSetModel, set: SetModel) {
-        val index = _exercisesSetsData.indexOf(exerciseSets)
         val temporarySets = exerciseSets.sets.minusElement(set).toMutableList()
 
+        updateExercisesSetsData(exerciseSets, temporarySets)
+    }
+
+    private fun updateExercisesSetsData(
+        exerciseSets: ExerciseSetModel,
+        temporarySets: MutableList<SetModel>,
+    ) {
+        val index = _exercisesSetsData.indexOf(exerciseSets)
         _exercisesSetsData[index] =
             ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
         _exercisesSets.value = _exercisesSetsData.toMutableList()
@@ -370,37 +377,44 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
             id = setID,
             newWeight = newWeight,
         )
+
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun updateSetReps(exerciseSets: ExerciseSetModel, setID: Long, newReps: Int?) {
         exerciseSets.updateSetReps(id = setID, newReps = newReps)
+
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun updateSetRIR(exerciseSets: ExerciseSetModel, setID: Long, newRIR: Double?) {
         exerciseSets.updateSetRIR(id = setID, newRIR = newRIR)
+
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun updateSetRPE(exerciseSets: ExerciseSetModel, setID: Long, newRPE: Double?) {
         exerciseSets.updateSetRPE(id = setID, newRPE = newRPE)
+
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun setComplete(exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean) {
         exerciseSets.setComplete(setID, setComplete)
+
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun updateSetType(exerciseSets: ExerciseSetModel, setID: Long, setType: SetTypeModel) {
         exerciseSets.updateSetType(id = setID, setType = setType)
+
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun addWarmUpSets(exerciseSets: ExerciseSetModel, warmUpSets: List<SetModel>) {
-        val index = _exercisesSetsData.indexOf(exerciseSets)
         exerciseSets.addWarmUpSets(warmUpSets)
 
-        val temporarySets = exerciseSets.sets
-
-        _exercisesSetsData[index] =
-            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
-        _exercisesSets.value = _exercisesSetsData.toMutableList()
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun getWorkingSetWeight(exerciseSets: ExerciseSetModel): Double? {
@@ -422,8 +436,6 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     }
 
     fun addWorkingSets(exerciseSets: ExerciseSetModel, workingSets: List<SetModel>) {
-        val index = _exercisesSetsData.indexOf(exerciseSets)
-
         workingSets.forEach { it.id = newID() }
 //        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Before: ${_exerciseSets.toList()}")
         exerciseSets.sets.removeAll { it.setType.name != WARM_UP_SET }
@@ -431,25 +443,23 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         exerciseSets.sets.addAll(workingSets)
 //        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Added New Sets: ${_exerciseSets.toList()}")
 
-        val temporarySets = exerciseSets.sets
-
-        _exercisesSetsData[index] =
-            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
-        _exercisesSets.value = _exercisesSetsData.toMutableList()
+        updateExercisesSetsData(
+            exerciseSets = exerciseSets,
+            temporarySets = exerciseSets.sets
+        )
     }
 
     fun addBackOffSets(exerciseSets: ExerciseSetModel, backOffSets: List<SetModel>) {
+//        backOffSets.indices.forEach { index -> exerciseSets.sets.add(backOffSets[index].copy(id = newID())) }
+
         for (index in backOffSets.indices) {
             exerciseSets.sets.add(backOffSets[index].copy(id = newID()))
         }
 
-        val index = _exercisesSetsData.indexOf(exerciseSets)
-
-        val temporarySets = exerciseSets.sets
-
-        _exercisesSetsData[index] =
-            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
-        _exercisesSets.value = _exercisesSetsData.toMutableList()
+        updateExercisesSetsData(
+            exerciseSets = exerciseSets,
+            temporarySets = exerciseSets.sets
+        )
     }
 
     fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {

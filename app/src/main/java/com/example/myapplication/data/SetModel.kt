@@ -17,12 +17,12 @@ data class SetModel(
         "Normal",
         description = "Normal",
         textColor = Color.White
-    )
+    ),
 )
 
 class Set(_setModel: SetModel) {
 
-    val setModel: SetModel = _setModel
+    private val setModel: SetModel = _setModel
 
     fun updateSetWeight(newWeight: Double?) {
         setModel.exerciseWeight = newWeight

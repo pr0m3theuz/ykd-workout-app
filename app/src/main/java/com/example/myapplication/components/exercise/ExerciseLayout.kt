@@ -23,21 +23,22 @@ import java.text.DecimalFormat
 @Composable
 fun ExerciseScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
-    _exerciseSets: ExerciseSetModel
+    _exerciseSets: ExerciseSetModel,
 ) {
     val exerciseSet = remember { mutableStateOf(_exerciseSets) }
 
     ExerciseLayout(
 /*        exerciseSet.exercise,
         exerciseSet.sets,*/
-        exerciseSet.value,
-        /*{ exerciseSets: ExerciseSetModel -> workoutViewModel.addSet(exerciseSets) },
-        { exerciseSets: ExerciseSetModel, setID: Long ->
-            workoutViewModel.removeSet(
-                exerciseSets,
-                setID
-            )
-        },*/
+        exerciseSet.value
+    )
+    /*{ exerciseSets: ExerciseSetModel -> workoutViewModel.addSet(exerciseSets) },
+{ exerciseSets: ExerciseSetModel, setID: Long ->
+    workoutViewModel.removeSet(
+        exerciseSets,
+        setID
+    )
+},*/
 /*        { setID: Long, newWeight: Double? -> workoutViewModel.updateSetWeight(setID, newWeight) },
         { setID: Long, newReps: Int? -> workoutViewModel.updateSetReps(setID, newReps) },
         { setID: Long, newRIR: Double? -> workoutViewModel.updateSetRIR(setID, newRIR) },
@@ -51,22 +52,15 @@ fun ExerciseScreen(
             )
         },
         { setID: Long -> startRestTimer(setID) },*/
-        { exerciseSets: ExerciseSetModel -> workoutViewModel.removeExerciseSets(exerciseSets) }
-    )
+    { exerciseSets: ExerciseSetModel -> workoutViewModel.removeExerciseSets(exerciseSets) }
 }
 
 @Composable
 fun ExerciseLayout(
     exerciseSets: ExerciseSetModel,
-    removeExercise: (exerciseSets: ExerciseSetModel) -> Unit
+    removeExercise: (exerciseSets: ExerciseSetModel) -> Unit,
 ) {
     var notesVisible by remember { mutableStateOf(exerciseSets.exercise.notesPinned) }
-    val totalVolume by remember { mutableStateOf(exerciseSets.totalVolume()) }
-    val totalRepetitions by remember { mutableStateOf(exerciseSets.totalRepetitions()) }
-    val averageWeight by remember { mutableStateOf(exerciseSets.averageWeight()) }
-
-    val df = DecimalFormat("#,###.##")
-    df.roundingMode = RoundingMode.HALF_UP
 
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
@@ -90,16 +84,7 @@ fun ExerciseLayout(
                 )
             }
 
-//            TODO Give option to show either Total Volume or Total Working Volume
-//            TODO Update Values on user input
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise.weightUnit}")
-                Text(text = "Reps: $totalRepetitions")
-                Text(text = "Avg Weight: ${df.format(averageWeight)}")
-            }
+            ExerciseWorkoutSummary(_exerciseSets = exerciseSets)
 
             AnimatedVisibility(
                 visible = notesVisible,
@@ -150,5 +135,37 @@ fun ExerciseLayout(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ExerciseWorkoutSummary(
+    workoutViewModel: WorkoutViewModel = viewModel(),
+    _exerciseSets: ExerciseSetModel,
+) {
+// TODO Give option to show either Total Volume or Total Working Volume
+// TODO Update Values on user input
+
+    val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
+    val exerciseSets = exercisesSets.first { it == _exerciseSets }
+
+//    val exerciseSets = _exerciseSets
+
+    val totalVolume by remember { mutableStateOf(exerciseSets.totalVolume()) }
+    val totalRepetitions by remember { mutableStateOf(exerciseSets.totalRepetitions()) }
+    val averageWeight by remember { mutableStateOf(exerciseSets.averageWeight()) }
+
+    val df = DecimalFormat("#,###.##")
+    df.roundingMode = RoundingMode.HALF_UP
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise.weightUnit}")
+        Text(text = "Reps: $totalRepetitions")
+        Text(text = "Avg Weight: ${df.format(averageWeight)}")
     }
 }

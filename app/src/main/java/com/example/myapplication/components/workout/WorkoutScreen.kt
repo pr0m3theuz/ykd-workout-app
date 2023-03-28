@@ -69,7 +69,7 @@ fun WorkoutScreen(workoutViewModel: WorkoutViewModel = viewModel()) {
         }
 
         ExercisesSetsScreen(
-            exercises = exercisesSets
+//            exercises = exercisesSets
         )
     }
 }
