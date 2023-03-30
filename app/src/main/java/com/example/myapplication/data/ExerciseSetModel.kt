@@ -2,12 +2,14 @@ package com.example.myapplication.data
 
 import android.util.Log
 import com.example.myapplication.newID
+import java.util.*
 import kotlin.math.roundToInt
 
 data class ExerciseSetModel(
-    val id: Long = newID(),
+    val id: Long = newID(), // Used for LazyColumn
+    val uuid: UUID = UUID.randomUUID(),
     val exercise: ExerciseModel,
-    var sets: MutableList<SetModel>
+    var sets: MutableList<SetModel>,
 )
 
 fun ExerciseSetModel.addSet() {
@@ -28,37 +30,37 @@ fun ExerciseSetModel.addSet() {
     Log.i("workoutViewModel.addSet()", "${sets.size}")
 }
 
-fun ExerciseSetModel.removeSet(id: Long) {
-    sets.removeIf { it.id == id }
+fun ExerciseSetModel.removeSet(uuid: UUID) {
+    sets.removeIf { it.uuid == uuid }
 }
 
-fun ExerciseSetModel.updateSetWeight(id: Long, newWeight: Double?) {
-    sets.forEach { if (it.id == id) it.exerciseWeight = newWeight }
+fun ExerciseSetModel.updateSetWeight(uuid: UUID, newWeight: Double?) {
+    sets.forEach { if (it.uuid == uuid) it.exerciseWeight = newWeight }
 }
 
-fun ExerciseSetModel.updateSetReps(id: Long, newReps: Int?) {
-    sets.forEach { if (it.id == id) it.repetitions = newReps }
+fun ExerciseSetModel.updateSetReps(uuid: UUID, newReps: Int?) {
+    sets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
 }
 
-fun ExerciseSetModel.updateSetRIR(id: Long, newRIR: Double?) {
-    sets.forEach { if (it.id == id) it.ratePerceivedEffort = newRIR }
+fun ExerciseSetModel.updateSetRIR(uuid: UUID, newRIR: Double?) {
+    sets.forEach { if (it.uuid == uuid) it.ratePerceivedEffort = newRIR }
 }
 
-fun ExerciseSetModel.updateSetRPE(id: Long, newRPE: Double?) {
-    sets.forEach { if (it.id == id) it.ratePerceivedEffort = newRPE }
+fun ExerciseSetModel.updateSetRPE(uuid: UUID, newRPE: Double?) {
+    sets.forEach { if (it.uuid == uuid) it.ratePerceivedEffort = newRPE }
 }
 
-fun ExerciseSetModel.setComplete(id: Long, setComplete: Boolean) {
-    sets.forEach { if (it.id == id) it.setCompleted = setComplete }
+fun ExerciseSetModel.setComplete(uuid: UUID, setComplete: Boolean) {
+    sets.forEach { if (it.uuid == uuid) it.setCompleted = setComplete }
 }
 
-fun ExerciseSetModel.updateSetType(id: Long, setType: SetTypeModel) {
-    sets.forEach { if (it.id == id) it.setType = setType }
+fun ExerciseSetModel.updateSetType(uuid: UUID, setType: SetTypeModel) {
+    sets.forEach { if (it.uuid == uuid) it.setType = setType }
 }
 
 fun ExerciseSetModel.addWarmUpSets(warmUpSets: List<SetModel>) {
     for (index in warmUpSets.indices) {
-        sets.add(index, warmUpSets[index].copy(id = newID()))
+        sets.add(index, warmUpSets[index].copy(id = newID(), uuid = UUID.randomUUID()))
     }
 }
 
@@ -90,7 +92,7 @@ fun ExerciseSetModel.addWorkingSets(workingSets: List<SetModel>) {
 
 fun ExerciseSetModel.addBackOffSets(backOffSets: List<SetModel>) {
     for (index in backOffSets.indices) {
-        sets.add(backOffSets[index].copy(id = newID()))
+        sets.add(backOffSets[index].copy(id = newID(), uuid = UUID.randomUUID()))
     }
 
 //        backOffSets.forEach { it.id = newID() }
@@ -103,7 +105,7 @@ fun ExerciseSetModel.totalWorkingSetVolume(): Double {
 //    Log.i("ExerciseSetModel sets", "$sets")
 
     sets.filter { it.setType.name != "Warm Up Set" }.forEach {
-        totalVolume += (it.setVolume()!!)
+        totalVolume += (it.setVolume())
 //        Log.i("ExerciseSetModel exerciseWeight", "${it.exerciseWeight}")
 //        Log.i("ExerciseSetModel repetitions", "${it.repetitions}")
 //        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
@@ -132,7 +134,7 @@ fun ExerciseSetModel.equateWorkingSetVolumeByWeight(weight: Double?): Int {
     var newRepetitions: Int = 0
 
     sets.filter { it.setType.name != "Warm Up Set" }.forEach {
-        totalVolume += (it.setVolume()!!)
+        totalVolume += (it.setVolume())
         numberOfWorkingSets++
     }
 

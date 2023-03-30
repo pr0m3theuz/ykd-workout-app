@@ -3,10 +3,12 @@ package com.example.myapplication.data
 import android.util.Log
 import com.example.myapplication.newID
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.time.Duration
 
 data class WorkoutModel(
     val id: Long = newID(),
+    val uuid: UUID = UUID.randomUUID(),
     var name: String,
     var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
     var pinnedNotes: String? = null,

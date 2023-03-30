@@ -3,6 +3,7 @@ package com.example.myapplication.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myapplication.newID
+import java.util.*
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -10,6 +11,7 @@ import kotlin.time.toDuration
 data class ExerciseModel(
     @PrimaryKey(autoGenerate = true) val pId: Int = 0,
     val id: Long = newID(),
+    val uuid: UUID = UUID.randomUUID(),
     var name: String = "Exercise Name", // TODO Remove Assignment
     val exerciseCategory: String = "Exercise Category", // TODO Remove Assignment
     // TODO Make into a List<String> for Multiple Body Parts
@@ -25,7 +27,7 @@ data class ExerciseModel(
     var warmUpSetRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
     var workingSetRestTimerEnabled: Boolean = true,
     var warmUpSetRestTimerEnabled: Boolean = false,
-    var videoUri: String? = null
+    var videoUri: String? = null,
 )
 
 // TODO These are unnecessary. Remove

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.util.*
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -224,16 +225,16 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         createTimer(_timerDuration)
     }
 
-    private var completedSets = mutableListOf<Long>()
+    private var completedSets = mutableListOf<UUID>()
 
-    fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setID: Long) {
+    fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setUUID: UUID) {
         Log.i("startSetCompletedTimer() ", "called")
 
         val exercise = exerciseSet.exercise
-        val set = exerciseSet.sets.first { it.id == setID }
+        val set = exerciseSet.sets.first { it.uuid == setUUID }
 
-        if (!completedSets.contains(setID)) {
-            completedSets.add(setID)
+        if (!completedSets.contains(setUUID)) {
+            completedSets.add(setUUID)
             /*
             * Doesn't allow the new completed set to cancel the timer if one is already running
             */
@@ -331,9 +332,12 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     val exercisesSets
         get() = _exercisesSets.asStateFlow()
 
-    fun addSet(exerciseSets: ExerciseSetModel) {
-        val index = _exercisesSetsData.indexOf(exerciseSets)
+    private var _allSetsData: MutableList<SetModel> = allSets()
+    private var _allSets = MutableStateFlow(_allSetsData.toList())
+    val allSets
+        get() = _allSets.asStateFlow()
 
+    fun addSet(exerciseSets: ExerciseSetModel) {
         val temporarySets: List<SetModel> = if (exerciseSets.sets.isNotEmpty()) {
             exerciseSets.sets + exerciseSets.sets.last().copy(
                 id = newID(),
@@ -341,14 +345,10 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
                 setCompleted = false,
             )
         } else {
-            listOf(SetModel(id = newID(), setNumber = (index + 1)))
+            listOf(SetModel(id = newID(), setNumber = 0))
         }
 
-        _exercisesSetsData[index] =
-            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
-
-        _exercisesSetsData = _exercisesSetsData.toMutableList()
-        _exercisesSets.value = _exercisesSetsData
+        updateExercisesSetsData(exerciseSets, temporarySets.toMutableList())
     }
 
     fun removeExerciseSets(exerciseSets: ExerciseSetModel) {
@@ -366,49 +366,71 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         exerciseSets: ExerciseSetModel,
         temporarySets: MutableList<SetModel>,
     ) {
-        val index = _exercisesSetsData.indexOf(exerciseSets)
+        val index = _exercisesSetsData.indexOfFirst { it.uuid == exerciseSets.uuid }
         _exercisesSetsData[index] =
-            ExerciseSetModel(id = newID(), exerciseSets.exercise, temporarySets.toMutableList())
+            exerciseSets.copy(id = newID(), sets = temporarySets)
         _exercisesSets.value = _exercisesSetsData.toMutableList()
     }
 
-    fun updateSetWeight(exerciseSets: ExerciseSetModel, setID: Long, newWeight: Double?) {
+    private fun updateSetData(
+        exerciseSets: ExerciseSetModel,
+    ) {
+        val index = _exercisesSetsData.indexOfFirst { it.uuid == exerciseSets.uuid }
+        _exercisesSetsData[index] = exerciseSets.copy(id = newID())
+        _exercisesSets.value = _exercisesSetsData.toMutableList()
+        _allSets.value = allSets().toList()
+    }
+
+    private fun allSets(): MutableList<SetModel> {
+        val setsList = mutableListOf<SetModel>()
+        _exercisesSetsData.forEach { exerciseSet ->
+            exerciseSet.sets.forEach { set -> setsList.add(set) }
+        }
+
+        return setsList
+    }
+
+    fun getSetData(setUUID: UUID): SetModel {
+        return allSets().first { it.uuid == setUUID }
+    }
+
+    fun updateSetWeight(exerciseSets: ExerciseSetModel, setUUID: UUID, newWeight: Double?) {
         exerciseSets.updateSetWeight(
-            id = setID,
+            uuid = setUUID,
             newWeight = newWeight,
         )
 
-        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+        updateSetData(exerciseSets)
     }
 
-    fun updateSetReps(exerciseSets: ExerciseSetModel, setID: Long, newReps: Int?) {
-        exerciseSets.updateSetReps(id = setID, newReps = newReps)
-
-        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+    fun updateSetReps(exerciseSets: ExerciseSetModel, setUUID: UUID, newReps: Int?) {
+        exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
+        updateSetData(exerciseSets)
+//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun updateSetRIR(exerciseSets: ExerciseSetModel, setID: Long, newRIR: Double?) {
-        exerciseSets.updateSetRIR(id = setID, newRIR = newRIR)
-
-        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+    fun updateSetRIR(exerciseSets: ExerciseSetModel, setUUID: UUID, newRIR: Double?) {
+        exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
+        updateSetData(exerciseSets)
+//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun updateSetRPE(exerciseSets: ExerciseSetModel, setID: Long, newRPE: Double?) {
-        exerciseSets.updateSetRPE(id = setID, newRPE = newRPE)
-
-        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+    fun updateSetRPE(exerciseSets: ExerciseSetModel, setUUID: UUID, newRPE: Double?) {
+        exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
+        updateSetData(exerciseSets)
+//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun setComplete(exerciseSets: ExerciseSetModel, setID: Long, setComplete: Boolean) {
-        exerciseSets.setComplete(setID, setComplete)
-
-        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+    fun setComplete(exerciseSets: ExerciseSetModel, setUUID: UUID, setComplete: Boolean) {
+        exerciseSets.setComplete(setUUID, setComplete)
+        updateSetData(exerciseSets)
+//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun updateSetType(exerciseSets: ExerciseSetModel, setID: Long, setType: SetTypeModel) {
-        exerciseSets.updateSetType(id = setID, setType = setType)
-
-        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+    fun updateSetType(exerciseSets: ExerciseSetModel, setUUID: UUID, setType: SetTypeModel) {
+        exerciseSets.updateSetType(uuid = setUUID, setType = setType)
+        updateSetData(exerciseSets)
+//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
     fun addWarmUpSets(exerciseSets: ExerciseSetModel, warmUpSets: List<SetModel>) {

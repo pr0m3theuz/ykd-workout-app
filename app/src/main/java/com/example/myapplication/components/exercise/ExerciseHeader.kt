@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
@@ -27,7 +28,7 @@ fun ExerciseScreen(
 ) {
     val exerciseSet = remember { mutableStateOf(_exerciseSets) }
 
-    ExerciseLayout(
+    ExerciseHeader(
 /*        exerciseSet.exercise,
         exerciseSet.sets,*/
         exerciseSet.value
@@ -56,7 +57,7 @@ fun ExerciseScreen(
 }
 
 @Composable
-fun ExerciseLayout(
+fun ExerciseHeader(
     exerciseSets: ExerciseSetModel,
     removeExercise: (exerciseSets: ExerciseSetModel) -> Unit,
 ) {
@@ -84,7 +85,7 @@ fun ExerciseLayout(
                 )
             }
 
-            ExerciseWorkoutSummary(_exerciseSets = exerciseSets)
+            ExerciseSetsWorkoutSummary(_exerciseSets = exerciseSets)
 
             AnimatedVisibility(
                 visible = notesVisible,
@@ -95,59 +96,74 @@ fun ExerciseLayout(
                 ExerciseNotes(exercise = exerciseSets.exercise)
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier.padding(0.dp).width(48.dp),
-                    contentAlignment = Alignment.Center
-
-                ) {
-                    Text("SET")
-                }
-
-                Box(
-                    modifier = Modifier
-//                        .padding(4.dp)
-                        .width(128.dp),
-                    contentAlignment = Alignment.Center
-                ) { Text("PREVIOUS") }
-
-                Box(
-                    modifier = Modifier.padding(PaddingValues(horizontal = 4.dp)).width(72.dp),
-                    contentAlignment = Alignment.Center
-                ) { Text("WEIGHT") }
-
-                Box(
-                    modifier = Modifier.padding(PaddingValues(horizontal = 4.dp)).width(60.dp),
-                    contentAlignment = Alignment.Center
-                ) { Text("REPS") }
-
-                Box(
-                    modifier = Modifier.padding(4.dp).width(40.dp),
-                    contentAlignment = Alignment.Center
-                ) { Text("RIR") }
-
-                Spacer(
-                    Modifier.width(40.dp).padding(PaddingValues(horizontal = 4.dp))
-                )
-            }
+            SetContentHeader()
         }
     }
 }
 
 @Composable
-private fun ExerciseWorkoutSummary(
+private fun SetContentHeader() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(0.dp)
+                .width(48.dp),
+            contentAlignment = Alignment.Center
+
+        ) {
+            Text("SET")
+        }
+
+        Box(
+            modifier = Modifier
+//                        .padding(4.dp)
+                .width(128.dp),
+            contentAlignment = Alignment.Center
+        ) { Text("PREVIOUS") }
+
+        Box(
+            modifier = Modifier
+                .padding(PaddingValues(horizontal = 4.dp))
+                .width(72.dp),
+            contentAlignment = Alignment.Center
+        ) { Text("WEIGHT") }
+
+        Box(
+            modifier = Modifier
+                .padding(PaddingValues(horizontal = 4.dp))
+                .width(60.dp),
+            contentAlignment = Alignment.Center
+        ) { Text("REPS") }
+
+        Box(
+            modifier = Modifier
+                .padding(4.dp)
+                .width(40.dp),
+            contentAlignment = Alignment.Center
+        ) { Text("RIR") }
+
+        Spacer(
+            Modifier
+                .width(40.dp)
+                .padding(PaddingValues(horizontal = 4.dp))
+        )
+    }
+}
+
+@Composable
+private fun ExerciseSetsWorkoutSummary(
     workoutViewModel: WorkoutViewModel = viewModel(),
     _exerciseSets: ExerciseSetModel,
 ) {
 // TODO Give option to show either Total Volume or Total Working Volume
-// TODO Update Values on user input
+// TODO Update Values on user input, cause keyboard to
 
-    val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
-    val exerciseSets = exercisesSets.first { it == _exerciseSets }
+    val exercisesSets by workoutViewModel.exercisesSets.collectAsStateWithLifecycle()
+    val exerciseSets = exercisesSets.first { it.uuid == _exerciseSets.uuid }
 
 //    val exerciseSets = _exerciseSets
 

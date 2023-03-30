@@ -20,7 +20,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
-import com.example.myapplication.components.SetLayout
+import com.example.myapplication.components.SetContent
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.White
@@ -147,7 +147,7 @@ fun SetItem(
             backgroundColor = if (setCompletedState) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.background,
             shape = RoundedCornerShape(CornerSize(0f))
         ) {
-            SetLayout(
+            SetContent(
                 exerciseSets = exerciseSets,
                 index,
                 set

@@ -4,14 +4,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState.*
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
@@ -19,17 +26,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.exercise.ExerciseWeightState
+import com.example.myapplication.components.exercise.ExerciseWeightStateSaver
+import com.example.myapplication.components.exercise.TextFieldState
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
-// Put in a LazyColumn and had ability to rearrange sets
-@OptIn(ExperimentalMaterial3Api::class)
+// TODO Add ability to rearrange sets
+// TODO Behaviour when deleting for Weight String is weird, Fix
+// TODO RIR doesn't get updated in viewModel, Fix
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun SetLayout(
+fun SetContent(
     exerciseSets: ExerciseSetModel,
     setIndex: Int,
     set: SetModel,
@@ -41,7 +55,18 @@ fun SetLayout(
 //    updateSetType: (setType: SetTypeModel) -> Unit,
     workoutViewModel: WorkoutViewModel = viewModel(),
 ) {
-    val setID = set.id
+    val setUUID = set.uuid
+
+//    val sets = workoutViewModel.allSets.collectAsState()
+//
+//    val set = sets.value.first { it.uuid == setUUID }
+
+    val showKeyboard = remember { mutableStateOf(true) }
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    val repsFocusRequester = remember { FocusRequester() }
+    val rirFocusRequester = remember { FocusRequester() }
 
     val textFieldColor = MaterialTheme.colorScheme.secondaryContainer
 
@@ -49,7 +74,17 @@ fun SetLayout(
 
     val exerciseWeight = getExerciseWeight(set)
 
+    val weightState by rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
+        mutableStateOf(ExerciseWeightState(exerciseWeight))
+    }
+
+    var weightFocusState by remember { mutableStateOf(weightState.isFocusedDirty) }
+
+    weightState.isFocusedDirty = weightFocusState
+
     var exerciseWeightText by remember { mutableStateOf(exerciseWeight) }
+
+    var exerciseWeightFocused by remember { mutableStateOf(false) }
 
     val repetitions = getRepetitions(set)
 
@@ -61,7 +96,7 @@ fun SetLayout(
 
     val ratePerceivedEffort = getRatePerceivedEffort(set)
 
-    val ratePerceivedEffortText by remember { mutableStateOf(ratePerceivedEffort) }
+    var ratePerceivedEffortText by remember { mutableStateOf(ratePerceivedEffort) }
 
     var iconText by remember { mutableStateOf("") }
 
@@ -69,27 +104,36 @@ fun SetLayout(
 //        repetitionsText = checkIntInput(reps).toString()
         workoutViewModel.updateSetReps(
             exerciseSets = exerciseSets,
-            setID = setID,
+            setUUID = setUUID,
             newReps = checkIntInput(reps)
         )
     }
 
-    fun updateRPE(rpe: String) {
-//        repetitionsInReserveText = checkDoubleInput(rpe).toString()
+    fun updateRIR(rir: String) {
+        // TODO limit range to 0..10
+//        ?repetitionsInReserveText = parseTextFieldInputDouble(checkDoubleInput(rir).toString())
         workoutViewModel.updateSetRIR(
             exerciseSets = exerciseSets,
-            setID = setID,
-            newRIR = checkDoubleInput(rpe)
+            setUUID = setUUID,
+            newRIR = checkDoubleInput(rir),
         )
     }
 
     fun updateWeight(weight: String) {
-//        exerciseWeightText = checkDoubleInput(weight).toString()
+//        weightState.text = parse-TextFieldInputDouble(checkDoubleInput(weight).toString())
         workoutViewModel.updateSetWeight(
             exerciseSets = exerciseSets,
-            setID = setID,
+            setUUID = setUUID,
             newWeight = checkDoubleInput(weight)
         )
+        weightFocusState = true
+        weightState.isFocusedDirty = weightFocusState
+    }
+
+    fun updateSetData() {
+        updateWeight(exerciseWeightText)
+        updateReps(repetitionsText)
+        updateRIR(repetitionsInReserveText)
     }
 
     iconText = getSetIconText(set, setIndex)
@@ -147,7 +191,7 @@ fun SetLayout(
                 updateSetType = { setType ->
                     workoutViewModel.updateSetType(
                         exerciseSets = exerciseSets,
-                        setID = setID,
+                        setUUID = setUUID,
                         setType = setType
                     )
                 },
@@ -175,7 +219,15 @@ fun SetLayout(
             contentAlignment = Alignment.Center
 
         ) {
-            ExerciseWeightTextField(exerciseWeightText) { weight -> updateWeight(weight) }
+            ExerciseWeightTextField(
+                weightState,
+                modifier = Modifier.focusRequester(focusRequester),
+                onWeightChange = { weightState.text = doubleFormatted(checkDoubleInput(it)) },
+                onImeAction = {
+                    updateSetData()
+                    repsFocusRequester.requestFocus()
+                }
+            )
         }
 
         Box(
@@ -190,7 +242,15 @@ fun SetLayout(
             contentAlignment = Alignment.Center
 
         ) {
-            ExerciseRepsTextField(repetitionsText) { reps -> updateReps(reps) }
+            ExerciseRepsTextField(
+                repetitionsText = repetitionsText,
+                modifier = Modifier.focusRequester(repsFocusRequester),
+                onRepsChange = { reps -> repetitionsText = checkIntInput(reps).toString() },
+                onImeAction = {
+                    updateSetData()
+                    rirFocusRequester.requestFocus()
+                }
+            )
         }
 
         Box(
@@ -205,7 +265,19 @@ fun SetLayout(
             contentAlignment = Alignment.Center
 
         ) {
-            RpeTextField(repetitionsInReserveText) { rir -> updateRPE(rir) }
+            RirTextField(
+                repetitionsInReserveText,
+                modifier = Modifier.focusRequester(rirFocusRequester),
+                onRIRChange = { rir ->
+                    val rirDouble = checkDoubleInput(rir)
+                    if (rirDouble != null &&
+                        rirDouble in 0.0..10.0
+                    ) {
+                        repetitionsInReserveText = doubleFormatted(checkDoubleInput(rir))
+                    }
+                },
+                onImeAction = { updateSetData() }
+            )
         }
 
         Checkbox(
@@ -214,12 +286,12 @@ fun SetLayout(
                 checkedState.value = it
                 workoutViewModel.setComplete(
                     exerciseSets = exerciseSets,
-                    setID = setID,
+                    setUUID = setUUID,
                     setComplete = it
                 )
                 workoutViewModel.startSetCompletedTimer(
                     exerciseSet = exerciseSets,
-                    setID = setID
+                    setUUID = setUUID
                 )
                 if (!workoutViewModel.isTimerRunning) {
                     openTimerScreen(it)
@@ -229,26 +301,47 @@ fun SetLayout(
     }
 }
 
+// TODO Fix
 @Composable
-private fun RpeTextField(
+private fun RirTextField(
     repetitionsInReserveText: String,
-    newRIR: (newRIR: String) -> Unit,
+    modifier: Modifier = Modifier,
+    onRIRChange: (newRIR: String) -> Unit,
+    onImeAction: () -> Unit = {},
 ) {
+    val uneditedTextColor = MaterialTheme.colorScheme.onSecondaryContainer.copy()
+    var textColor by remember { mutableStateOf(uneditedTextColor) }
+
+    var changeTextColor by remember { mutableStateOf(false) }
+
+    fun changeTextColor() {
+        changeTextColor = true
+    }
+
+    if (changeTextColor) {
+        textColor = MaterialTheme.colorScheme.onBackground
+    }
+
     BasicTextField(
-        modifier = Modifier
+        modifier = modifier
             .padding(PaddingValues(4.dp)),
         textStyle = TextStyle(
             fontSize = 5.em,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground
+            color = textColor
         ),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Decimal,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onImeAction()
+            },
         ),
         value = repetitionsInReserveText,
         onValueChange = {
-            newRIR(it.take(4))
+            onRIRChange(it.take(7))
         }
     )
 }
@@ -256,10 +349,12 @@ private fun RpeTextField(
 @Composable
 private fun ExerciseRepsTextField(
     repetitionsText: String,
-    newReps: (newReps: String) -> Unit,
+    modifier: Modifier = Modifier,
+    onRepsChange: (newReps: String) -> Unit,
+    onImeAction: () -> Unit = {},
 ) {
     BasicTextField(
-        modifier = Modifier
+        modifier = modifier
             .padding(PaddingValues(4.dp)),
         textStyle = TextStyle(
             fontSize = 5.em,
@@ -268,23 +363,39 @@ private fun ExerciseRepsTextField(
         ),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onImeAction()
+            },
         ),
         value = repetitionsText,
         onValueChange = {
-            newReps(it.take(7))
+            onRepsChange(it.take(4))
         },
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ExerciseWeightTextField(
-    exerciseWeightText: String,
-    newWeight: (newWeight: String) -> Unit,
+    weightState: TextFieldState = remember { ExerciseWeightState() },
+    modifier: Modifier = Modifier,
+    onWeightChange: (newWeight: String) -> Unit,
+    onImeAction: () -> Unit = {},
 ) {
     BasicTextField(
-        modifier = Modifier
-            .padding(PaddingValues(4.dp)),
+        value = weightState.text,
+        onValueChange = {
+            weightState.text = it
+            onWeightChange(it.take(7))
+        },
+        modifier = modifier
+            .padding(PaddingValues(4.dp))
+            .onFocusChanged {
+                weightState.onFocusChange(it.isFocused)
+            },
         textStyle = TextStyle(
             fontSize = 5.em,
             textAlign = TextAlign.Center,
@@ -295,17 +406,18 @@ private fun ExerciseWeightTextField(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Next
         ),
-        value = exerciseWeightText,
-        onValueChange = {
-            newWeight(it.take(7))
-        }
+        keyboardActions = KeyboardActions(
+            onNext = {
+                onImeAction()
+            },
+        ),
     )
 }
 
 private fun parseTextFieldInputDouble(it: String): String {
     return if (it.isNotBlank()) {
         val paddedInput = it.padStart(16, '0')
-        DecimalFormat("#0.#")
+        DecimalFormat("##.##")
             .parse(NumberFormat.getInstance().parse(paddedInput)?.toString() ?: "0")
             ?.toDouble().toString()
     } else {
@@ -313,7 +425,7 @@ private fun parseTextFieldInputDouble(it: String): String {
     }
 }
 
-private fun parseTextFieldInputInt(it: String): String {
+/*private */fun parseTextFieldInputInt(it: String): String {
     return if (it.isNotBlank()) {
         val paddedInput = it.padStart(16, '0')
 
@@ -325,20 +437,49 @@ private fun parseTextFieldInputInt(it: String): String {
     }
 }
 
-private fun checkDoubleInput(it: String): Double? {
-    return if (it.isNotBlank()) {
-        val paddedInput = it.padStart(16, '0')
-        doubleFormatted(
-            DecimalFormat("#0.##")
-                .parse(NumberFormat.getInstance().parse(paddedInput)?.toString() ?: "0")
-                ?.toDouble()
-        ).toDouble()
-    } else {
-        null
-    }
+private const val DOUBLE_VALIDATION_REGEX = "^(-?\\d*)(\\.?)(\\d{0,2})(\\d*)\$"
+
+private fun isDoubleValid(double: String): Boolean {
+    return Pattern.matches(DOUBLE_VALIDATION_REGEX, double)
 }
 
-private fun checkIntInput(it: String): Int? {
+/*private*/ fun checkDoubleInput(it: String): Double? {
+//    TODO Add if padded input not == 0
+    val df = DecimalFormat("#####.##")
+    df.roundingMode = RoundingMode.FLOOR
+
+    var double: Double?
+
+    val reducedInput = it.replace(",", "")
+
+    if (isDoubleValid(reducedInput) && reducedInput.isNotBlank()) {
+        val doublePattern = Pattern.compile(DOUBLE_VALIDATION_REGEX)
+        val matcher = doublePattern.matcher(reducedInput)
+        matcher.matches()
+
+        val reconstructedInput = "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
+
+        val paddedInput: String =
+            NumberFormat.getInstance().parse(reconstructedInput)?.toDouble()
+                .toString() // = it.padStart(16, '0')
+
+        if (paddedInput.toDouble() != 0.0) {
+            double = NumberFormat.getInstance().parse(paddedInput)?.toDouble()
+
+//            double = DecimalFormat("##.##").parse(double.toString())?.toDouble()!!
+//
+//            double = df.format(double).toDouble()
+        } else {
+            double = null
+        }
+    } else {
+        double = null
+    }
+    double = doubleFormatted(double).toDoubleOrNull()
+    return double
+}
+
+/*private */fun checkIntInput(it: String): Int? {
     return if (it.isNotBlank()) {
         val paddedInput = it.padStart(16, '0')
         NumberFormat.getInstance().parse(paddedInput)?.toInt()
@@ -356,14 +497,14 @@ private fun getSetIconText(set: SetModel, setIndex: Int): String =
 
 private fun getRatePerceivedEffort(set: SetModel): String =
     if (set.ratePerceivedEffort != null) {
-        set.ratePerceivedEffort.toString()
+        doubleFormatted(set.ratePerceivedEffort)
     } else {
         ""
     }
 
 private fun getRepetitionsInReserve(set: SetModel): String =
     if (set.repetitionsInReserve != null) {
-        set.repetitionsInReserve.toString()
+        doubleFormatted(set.repetitionsInReserve)
     } else {
         ""
     }
@@ -383,51 +524,10 @@ private fun getExerciseWeight(set: SetModel): String =
     }
 
 private fun doubleFormatted(double: Double?) =
-    if (double?.minus(double.roundToInt()) == 0.0) {
+    if (double == null) {
+        ""
+    } else if (double.minus(double.roundToInt()) == 0.0) {
         double.roundToInt().toString()
     } else {
         double.toString()
     }
-
-class AmountVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val originalText = text.text.replace(",", "")
-        val formattedText = parseTextFieldInputInt(text.text)
-
-        val offsetMapping = object : OffsetMapping {
-
-            override fun originalToTransformed(offset: Int): Int {
-                if (originalText.isNotBlank()) {
-                    val commas = formattedText.count { it == ',' }
-                    return when {
-                        offset <= 1 -> offset
-                        offset <= 3 -> if (commas >= 1) offset + 1 else offset
-                        offset <= 5 -> if (commas == 2) offset + 2 else offset + 1
-                        else -> 8
-                    }
-                }
-                return offset
-            }
-
-            override fun transformedToOriginal(offset: Int): Int {
-                if (originalText.isNotBlank()) {
-                    val commas = formattedText.count { it == ',' }
-                    return when (offset) {
-                        8, 7 -> offset - 2
-                        6 -> if (commas == 1) 5 else 4
-                        5 -> if (commas == 1) 4 else if (commas == 2) 3 else offset
-                        4, 3 -> if (commas >= 1) offset - 1 else offset
-                        2 -> if (commas == 2) 1 else offset
-                        else -> offset
-                    }
-                }
-                return offset
-            }
-        }
-
-        return TransformedText(
-            text = AnnotatedString(formattedText),
-            offsetMapping = offsetMapping
-        )
-    }
-}
