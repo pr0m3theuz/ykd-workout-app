@@ -8,17 +8,26 @@ import org.junit.jupiter.api.Test
 class SetContentKtTest {
     @Test
     fun testCheckDoubleInput() {
+        // Test only decimal point input
+        assertEquals("0.", checkDoubleInput("."))
+
         // Test input string with padding
-        assertEquals(100.01, checkDoubleInput("00,000,100.01987"))
+        assertEquals("100.01", checkDoubleInput("00,000,100.01987"))
 
         // Test input string with valid positive value
-        assertEquals(50.0, checkDoubleInput("50")) // passed
+        assertEquals("50", checkDoubleInput("50")) // passed
 
         // Test input string with valid positive value
-        assertEquals(1.23, checkDoubleInput("1.23")) // passed
+        assertEquals("50.", checkDoubleInput("50.")) // passed
+
+        // Test input string with valid positive value
+        assertEquals(null, checkDoubleInput("950....")) // passed
+
+        // Test input string with valid positive value
+        assertEquals("1.23", checkDoubleInput("1.23")) // passed
 
         // Test input string with valid negative value
-        assertEquals(-1.23, checkDoubleInput("-1.23"))
+        assertEquals("-1.23", checkDoubleInput("-1.23"))
 
         // Test input string with invalid value
         assertEquals(null, checkDoubleInput("invalid"))
@@ -26,8 +35,17 @@ class SetContentKtTest {
         // Test empty input string
         assertEquals(null, checkDoubleInput(""))
 
+        // Test empty input string
+        assertEquals("0.1", checkDoubleInput(".1"))
+
         // Test input string with padding
-        assertEquals(0.01, checkDoubleInput("000000000000.01"))
+        assertEquals("0.01", checkDoubleInput("000000000000.01"))
+
+        // Test comma 0 input string
+        assertEquals("0", checkDoubleInput(",0"))
+
+        // Test comma input string
+        assertEquals(null, checkDoubleInput(","))
     }
 
     @Test

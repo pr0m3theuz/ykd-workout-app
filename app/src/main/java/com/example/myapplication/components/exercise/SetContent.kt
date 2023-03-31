@@ -32,7 +32,6 @@ import com.example.myapplication.components.exercise.TextFieldState
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
-import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.regex.Pattern
@@ -115,7 +114,7 @@ fun SetContent(
         workoutViewModel.updateSetRIR(
             exerciseSets = exerciseSets,
             setUUID = setUUID,
-            newRIR = checkDoubleInput(rir),
+            newRIR = repetitionsInReserveText.toDoubleOrNull(),
         )
     }
 
@@ -124,7 +123,7 @@ fun SetContent(
         workoutViewModel.updateSetWeight(
             exerciseSets = exerciseSets,
             setUUID = setUUID,
-            newWeight = checkDoubleInput(weight)
+            newWeight = weightState.text.toDoubleOrNull()
         )
         weightFocusState = true
         weightState.isFocusedDirty = weightFocusState
@@ -222,7 +221,7 @@ fun SetContent(
             ExerciseWeightTextField(
                 weightState,
                 modifier = Modifier.focusRequester(focusRequester),
-                onWeightChange = { weightState.text = doubleFormatted(checkDoubleInput(it)) },
+                onWeightChange = { weightState.text = checkDoubleInput(it) ?: weightState.text },
                 onImeAction = {
                     updateSetData()
                     repsFocusRequester.requestFocus()
@@ -270,11 +269,12 @@ fun SetContent(
                 modifier = Modifier.focusRequester(rirFocusRequester),
                 onRIRChange = { rir ->
                     val rirDouble = checkDoubleInput(rir)
-                    if (rirDouble != null &&
-                        rirDouble in 0.0..10.0
-                    ) {
-                        repetitionsInReserveText = doubleFormatted(checkDoubleInput(rir))
-                    }
+                    repetitionsInReserveText =
+                        if (rirDouble != null && rirDouble.toDouble() in 0.0..10.0) {
+                            checkDoubleInput(rir) ?: repetitionsInReserveText
+                        } else {
+                            repetitionsInReserveText
+                        }
                 },
                 onImeAction = { updateSetData() }
             )
@@ -341,7 +341,7 @@ private fun RirTextField(
         ),
         value = repetitionsInReserveText,
         onValueChange = {
-            onRIRChange(it.take(7))
+            onRIRChange(it.take(4))
         }
     )
 }
@@ -388,7 +388,6 @@ private fun ExerciseWeightTextField(
     BasicTextField(
         value = weightState.text,
         onValueChange = {
-            weightState.text = it
             onWeightChange(it.take(7))
         },
         modifier = modifier
@@ -443,39 +442,40 @@ private fun isDoubleValid(double: String): Boolean {
     return Pattern.matches(DOUBLE_VALIDATION_REGEX, double)
 }
 
-/*private*/ fun checkDoubleInput(it: String): Double? {
-//    TODO Add if padded input not == 0
-    val df = DecimalFormat("#####.##")
-    df.roundingMode = RoundingMode.FLOOR
+/*private*/ fun checkDoubleInput(it: String): String? {
+    var double: String?
 
-    var double: Double?
+    var manipulatedInput = it.replace(",", "")
 
-    val reducedInput = it.replace(",", "")
-
-    if (isDoubleValid(reducedInput) && reducedInput.isNotBlank()) {
+    manipulatedInput = if (manipulatedInput.count { it == '.' } <= 1) {
         val doublePattern = Pattern.compile(DOUBLE_VALIDATION_REGEX)
-        val matcher = doublePattern.matcher(reducedInput)
+        val matcher = doublePattern.matcher(manipulatedInput)
         matcher.matches()
+        "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
+    } else {
+        ""
+    }
 
-        val reconstructedInput = "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
-
-        val paddedInput: String =
-            NumberFormat.getInstance().parse(reconstructedInput)?.toDouble()
-                .toString() // = it.padStart(16, '0')
-
-        if (paddedInput.toDouble() != 0.0) {
-            double = NumberFormat.getInstance().parse(paddedInput)?.toDouble()
-
-//            double = DecimalFormat("##.##").parse(double.toString())?.toDouble()!!
-//
-//            double = df.format(double).toDouble()
+    if (isDoubleValid(manipulatedInput) && manipulatedInput.isNotBlank()) {
+        if (manipulatedInput == ".") {
+            double = "0." // Add leading zero
+        } else if (manipulatedInput.last() == '.') {
+            double = manipulatedInput // Prevent early removal of the decimal place
         } else {
-            double = null
+            val paddedInput: String =
+                NumberFormat.getInstance().parse(manipulatedInput)?.toDouble()
+                    .toString() // = it.padStart(16, '0')
+
+            double = if (paddedInput.toDouble() != 0.0) {
+                NumberFormat.getInstance().parse(paddedInput)?.toString()
+            } else {
+                "0"
+            }
         }
     } else {
         double = null
     }
-    double = doubleFormatted(double).toDoubleOrNull()
+
     return double
 }
 
@@ -523,7 +523,7 @@ private fun getExerciseWeight(set: SetModel): String =
         ""
     }
 
-private fun doubleFormatted(double: Double?) =
+/*private*/ fun doubleFormatted(double: Double?) =
     if (double == null) {
         ""
     } else if (double.minus(double.roundToInt()) == 0.0) {
