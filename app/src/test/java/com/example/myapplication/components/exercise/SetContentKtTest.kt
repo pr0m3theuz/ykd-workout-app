@@ -8,8 +8,14 @@ import org.junit.jupiter.api.Test
 class SetContentKtTest {
     @Test
     fun testCheckDoubleInput() {
+        // Test input string with valid positive value
+        assertEquals(null, checkDoubleInput("950....")) // passed
+
         // Test only decimal point input
         assertEquals("0.", checkDoubleInput("."))
+
+        // Test only decimal point input
+        assertEquals("0.", checkDoubleInput("0."))
 
         // Test input string with padding
         assertEquals("100.01", checkDoubleInput("00,000,100.01987"))
@@ -19,9 +25,6 @@ class SetContentKtTest {
 
         // Test input string with valid positive value
         assertEquals("50.", checkDoubleInput("50.")) // passed
-
-        // Test input string with valid positive value
-        assertEquals(null, checkDoubleInput("950....")) // passed
 
         // Test input string with valid positive value
         assertEquals("1.23", checkDoubleInput("1.23")) // passed

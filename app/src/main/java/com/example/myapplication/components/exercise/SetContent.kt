@@ -32,7 +32,6 @@ import com.example.myapplication.components.exercise.TextFieldState
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
-import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -268,13 +267,15 @@ fun SetContent(
                 repetitionsInReserveText,
                 modifier = Modifier.focusRequester(rirFocusRequester),
                 onRIRChange = { rir ->
-                    val rirDouble = checkDoubleInput(rir)
+//                    val rirDouble = checkDoubleInput(rir)
                     repetitionsInReserveText =
-                        if (rirDouble != null && rirDouble.toDouble() in 0.0..10.0) {
-                            checkDoubleInput(rir) ?: repetitionsInReserveText
-                        } else {
-                            repetitionsInReserveText
-                        }
+                        checkDoubleInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }?.toString()
+                            ?: repetitionsInReserveText
+                    /*if (rirDouble != null && rirDouble.toDouble() in 0.0..10.0) {
+                        checkDoubleInput(rir) ?: repetitionsInReserveText
+                    } else {
+                        repetitionsInReserveText
+                    }*/
                 },
                 onImeAction = { updateSetData() }
             )
@@ -413,36 +414,13 @@ private fun ExerciseWeightTextField(
     )
 }
 
-private fun parseTextFieldInputDouble(it: String): String {
-    return if (it.isNotBlank()) {
-        val paddedInput = it.padStart(16, '0')
-        DecimalFormat("##.##")
-            .parse(NumberFormat.getInstance().parse(paddedInput)?.toString() ?: "0")
-            ?.toDouble().toString()
-    } else {
-        ""
-    }
-}
-
-/*private */fun parseTextFieldInputInt(it: String): String {
-    return if (it.isNotBlank()) {
-        val paddedInput = it.padStart(16, '0')
-
-        DecimalFormat("###0")
-            .parse(NumberFormat.getIntegerInstance().parse(paddedInput)?.toString() ?: "0")
-            ?.toInt().toString()
-    } else {
-        ""
-    }
-}
-
 private const val DOUBLE_VALIDATION_REGEX = "^(-?\\d*)(\\.?)(\\d{0,2})(\\d*)\$"
 
 private fun isDoubleValid(double: String): Boolean {
     return Pattern.matches(DOUBLE_VALIDATION_REGEX, double)
 }
 
-/*private*/ fun checkDoubleInput(it: String): String? {
+/*private*/ fun oldCheckDoubleInput(it: String): String? {
     var double: String?
 
     var manipulatedInput = it.replace(",", "")
@@ -479,6 +457,63 @@ private fun isDoubleValid(double: String): Boolean {
     return double
 }
 
+private val DOUBLE_PATTERN = Pattern.compile("^(-?\\d*)(\\.?)(\\d{0,2})(\\d*)\$")
+
+fun checkDoubleInput(it: String): String? {
+    var manipulatedInput = it.replace(",", "")
+    val matcher = DOUBLE_PATTERN.matcher(manipulatedInput)
+    manipulatedInput = if (manipulatedInput.count { it == '.' } <= 1 && matcher.matches()) {
+        "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
+    } else {
+        return null
+    }
+
+    return if (manipulatedInput.isNotBlank()) {
+        when {
+            manipulatedInput == "." -> "0." // Add leading zero
+            manipulatedInput.last() == '.' -> manipulatedInput // Prevent early removal of the decimal place
+            else -> {
+                val paddedInput = NumberFormat.getInstance().parse(manipulatedInput)?.toString()
+                val parsedDouble = paddedInput?.toDoubleOrNull() ?: return null
+                if (parsedDouble == 0.0) "0" else paddedInput
+            }
+        }
+    } else {
+        null
+    }
+}
+
+/**
+ * Produced by OpenAI's ChatGPT
+ * Prompt "can you optimize the below code written in kotlin?" in referring to the function above.
+ * Extracts a valid double-precision floating-point number from the given input string,
+ * and returns the result as a string.
+ *
+ * @param input The input string to process. Must not be null.
+ *
+ * @return The double-precision floating-point number represented by the input string,
+ *         or null if the input string is not a valid representation of a number.
+ */
+fun chatgptCheckDoubleInput(input: String): String? {
+    val inputWithoutCommas = input.replace(",", "")
+    val matcher = DOUBLE_PATTERN.matcher(inputWithoutCommas)
+    val formattedInput = if (matcher.matches()) {
+        "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
+    } else {
+        return null
+    }
+
+    return when {
+        formattedInput == "." -> "0."
+        formattedInput.last() == '.' -> formattedInput
+        else -> {
+            val paddedInput = NumberFormat.getInstance().parse(formattedInput)?.toString()
+            val parsedDouble = paddedInput?.toDoubleOrNull() ?: return null
+            if (parsedDouble == 0.0) "0" else paddedInput
+        }
+    }
+}
+
 /*private */fun checkIntInput(it: String): Int? {
     return if (it.isNotBlank()) {
         val paddedInput = it.padStart(16, '0')
@@ -496,37 +531,19 @@ private fun getSetIconText(set: SetModel, setIndex: Int): String =
     }
 
 private fun getRatePerceivedEffort(set: SetModel): String =
-    if (set.ratePerceivedEffort != null) {
-        doubleFormatted(set.ratePerceivedEffort)
-    } else {
-        ""
-    }
+    doubleFormatted(set.ratePerceivedEffort) ?: ""
 
 private fun getRepetitionsInReserve(set: SetModel): String =
-    if (set.repetitionsInReserve != null) {
-        doubleFormatted(set.repetitionsInReserve)
-    } else {
-        ""
-    }
+    doubleFormatted(set.repetitionsInReserve) ?: ""
 
 private fun getRepetitions(set: SetModel): String =
-    if (set.repetitions != null) {
-        set.repetitions.toString()
-    } else {
-        ""
-    }
+    set.repetitions.toString() ?: ""
 
 private fun getExerciseWeight(set: SetModel): String =
-    if (set.exerciseWeight != null) {
-        doubleFormatted(set.exerciseWeight)
-    } else {
-        ""
-    }
+    doubleFormatted(set.exerciseWeight) ?: ""
 
 /*private*/ fun doubleFormatted(double: Double?) =
-    if (double == null) {
-        ""
-    } else if (double.minus(double.roundToInt()) == 0.0) {
+    if (double?.minus(double.roundToInt()) == 0.0) {
         double.roundToInt().toString()
     } else {
         double.toString()
