@@ -43,7 +43,7 @@ fun ExerciseSetModel.updateSetReps(uuid: UUID, newReps: Int?) {
 }
 
 fun ExerciseSetModel.updateSetRIR(uuid: UUID, newRIR: Double?) {
-    sets.forEach { if (it.uuid == uuid) it.ratePerceivedEffort = newRIR }
+    sets.forEach { if (it.uuid == uuid) it.repetitionsInReserve = newRIR }
 }
 
 fun ExerciseSetModel.updateSetRPE(uuid: UUID, newRPE: Double?) {

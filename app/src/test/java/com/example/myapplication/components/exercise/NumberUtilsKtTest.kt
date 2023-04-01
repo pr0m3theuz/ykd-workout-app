@@ -1,13 +1,16 @@
 package com.example.myapplication.components.exercise
 
-import com.example.myapplication.components.checkDoubleInput
-import com.example.myapplication.components.doubleFormatted
+import com.example.myapplication.utils.checkDoubleInput
+import com.example.myapplication.utils.doubleFormatted
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class SetContentKtTest {
+class NumberUtilsKtTest {
     @Test
     fun testCheckDoubleInput() {
+        // Test input string with valid negative value
+        assertEquals(null, checkDoubleInput("1.23-"))
+
         // Test input string with valid positive value
         assertEquals(null, checkDoubleInput("950....")) // passed
 
@@ -66,6 +69,6 @@ class SetContentKtTest {
         assertEquals("-2.5", doubleFormatted(-2.5))
 
         // Test input with null value
-        assertEquals("", doubleFormatted(null))
+        assertEquals(null, doubleFormatted(null))
     }
 }

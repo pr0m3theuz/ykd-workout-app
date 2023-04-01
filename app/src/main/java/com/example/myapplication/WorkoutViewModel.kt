@@ -341,6 +341,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         val temporarySets: List<SetModel> = if (exerciseSets.sets.isNotEmpty()) {
             exerciseSets.sets + exerciseSets.sets.last().copy(
                 id = newID(),
+                uuid = UUID.randomUUID(),
                 setNumber = exerciseSets.sets.last().setNumber?.plus(1),
                 setCompleted = false,
             )

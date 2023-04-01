@@ -32,13 +32,11 @@ import com.example.myapplication.components.exercise.TextFieldState
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
-import java.text.NumberFormat
-import java.util.regex.Pattern
-import kotlin.math.roundToInt
+import com.example.myapplication.utils.checkDoubleInput
+import com.example.myapplication.utils.checkIntInput
+import com.example.myapplication.utils.doubleFormatted
 
 // TODO Add ability to rearrange sets
-// TODO Behaviour when deleting for Weight String is weird, Fix
-// TODO RIR doesn't get updated in viewModel, Fix
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SetContent(
@@ -103,17 +101,16 @@ fun SetContent(
         workoutViewModel.updateSetReps(
             exerciseSets = exerciseSets,
             setUUID = setUUID,
-            newReps = checkIntInput(reps)
+            newReps = repetitionsText.toIntOrNull()
         )
     }
 
     fun updateRIR(rir: String) {
-        // TODO limit range to 0..10
 //        ?repetitionsInReserveText = parseTextFieldInputDouble(checkDoubleInput(rir).toString())
         workoutViewModel.updateSetRIR(
             exerciseSets = exerciseSets,
             setUUID = setUUID,
-            newRIR = repetitionsInReserveText.toDoubleOrNull(),
+            newRIR = rir.toDoubleOrNull(),
         )
     }
 
@@ -220,7 +217,13 @@ fun SetContent(
             ExerciseWeightTextField(
                 weightState,
                 modifier = Modifier.focusRequester(focusRequester),
-                onWeightChange = { weightState.text = checkDoubleInput(it) ?: weightState.text },
+                onWeightChange = {
+                    weightState.text =
+                        when {
+                            it.isBlank() -> ""
+                            else -> checkDoubleInput(it) ?: weightState.text
+                        }
+                },
                 onImeAction = {
                     updateSetData()
                     repsFocusRequester.requestFocus()
@@ -243,7 +246,7 @@ fun SetContent(
             ExerciseRepsTextField(
                 repetitionsText = repetitionsText,
                 modifier = Modifier.focusRequester(repsFocusRequester),
-                onRepsChange = { reps -> repetitionsText = checkIntInput(reps).toString() },
+                onRepsChange = { reps -> repetitionsText = checkIntInput(reps) },
                 onImeAction = {
                     updateSetData()
                     rirFocusRequester.requestFocus()
@@ -269,15 +272,20 @@ fun SetContent(
                 onRIRChange = { rir ->
 //                    val rirDouble = checkDoubleInput(rir)
                     repetitionsInReserveText =
-                        checkDoubleInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }?.toString()
-                            ?: repetitionsInReserveText
-                    /*if (rirDouble != null && rirDouble.toDouble() in 0.0..10.0) {
-                        checkDoubleInput(rir) ?: repetitionsInReserveText
-                    } else {
-                        repetitionsInReserveText
-                    }*/
+                        when {
+                            rir.isBlank() -> ""
+                            else -> checkDoubleInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }
+                                ?.toString()
+                                ?: repetitionsInReserveText
+                        }
+
+//                        if (rirDouble != null && rirDouble.toDouble() in 0.0..10.0) {
+//                            checkDoubleInput(rir) ?: repetitionsInReserveText
+//                        } else {
+//                            repetitionsInReserveText
+//                        }
                 },
-                onImeAction = { updateSetData() }
+                onImeAction = { updateRIR(repetitionsInReserveText) }
             )
         }
 
@@ -302,7 +310,6 @@ fun SetContent(
     }
 }
 
-// TODO Fix
 @Composable
 private fun RirTextField(
     repetitionsInReserveText: String,
@@ -414,115 +421,6 @@ private fun ExerciseWeightTextField(
     )
 }
 
-private const val DOUBLE_VALIDATION_REGEX = "^(-?\\d*)(\\.?)(\\d{0,2})(\\d*)\$"
-
-private fun isDoubleValid(double: String): Boolean {
-    return Pattern.matches(DOUBLE_VALIDATION_REGEX, double)
-}
-
-/*private*/ fun oldCheckDoubleInput(it: String): String? {
-    var double: String?
-
-    var manipulatedInput = it.replace(",", "")
-
-    manipulatedInput = if (manipulatedInput.count { it == '.' } <= 1) {
-        val doublePattern = Pattern.compile(DOUBLE_VALIDATION_REGEX)
-        val matcher = doublePattern.matcher(manipulatedInput)
-        matcher.matches()
-        "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
-    } else {
-        ""
-    }
-
-    if (isDoubleValid(manipulatedInput) && manipulatedInput.isNotBlank()) {
-        if (manipulatedInput == ".") {
-            double = "0." // Add leading zero
-        } else if (manipulatedInput.last() == '.') {
-            double = manipulatedInput // Prevent early removal of the decimal place
-        } else {
-            val paddedInput: String =
-                NumberFormat.getInstance().parse(manipulatedInput)?.toDouble()
-                    .toString() // = it.padStart(16, '0')
-
-            double = if (paddedInput.toDouble() != 0.0) {
-                NumberFormat.getInstance().parse(paddedInput)?.toString()
-            } else {
-                "0"
-            }
-        }
-    } else {
-        double = null
-    }
-
-    return double
-}
-
-private val DOUBLE_PATTERN = Pattern.compile("^(-?\\d*)(\\.?)(\\d{0,2})(\\d*)\$")
-
-fun checkDoubleInput(it: String): String? {
-    var manipulatedInput = it.replace(",", "")
-    val matcher = DOUBLE_PATTERN.matcher(manipulatedInput)
-    manipulatedInput = if (manipulatedInput.count { it == '.' } <= 1 && matcher.matches()) {
-        "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
-    } else {
-        return null
-    }
-
-    return if (manipulatedInput.isNotBlank()) {
-        when {
-            manipulatedInput == "." -> "0." // Add leading zero
-            manipulatedInput.last() == '.' -> manipulatedInput // Prevent early removal of the decimal place
-            else -> {
-                val paddedInput = NumberFormat.getInstance().parse(manipulatedInput)?.toString()
-                val parsedDouble = paddedInput?.toDoubleOrNull() ?: return null
-                if (parsedDouble == 0.0) "0" else paddedInput
-            }
-        }
-    } else {
-        null
-    }
-}
-
-/**
- * Produced by OpenAI's ChatGPT
- * Prompt "can you optimize the below code written in kotlin?" in referring to the function above.
- * Extracts a valid double-precision floating-point number from the given input string,
- * and returns the result as a string.
- *
- * @param input The input string to process. Must not be null.
- *
- * @return The double-precision floating-point number represented by the input string,
- *         or null if the input string is not a valid representation of a number.
- */
-fun chatgptCheckDoubleInput(input: String): String? {
-    val inputWithoutCommas = input.replace(",", "")
-    val matcher = DOUBLE_PATTERN.matcher(inputWithoutCommas)
-    val formattedInput = if (matcher.matches()) {
-        "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
-    } else {
-        return null
-    }
-
-    return when {
-        formattedInput == "." -> "0."
-        formattedInput.last() == '.' -> formattedInput
-        else -> {
-            val paddedInput = NumberFormat.getInstance().parse(formattedInput)?.toString()
-            val parsedDouble = paddedInput?.toDoubleOrNull() ?: return null
-            if (parsedDouble == 0.0) "0" else paddedInput
-        }
-    }
-}
-
-/*private */fun checkIntInput(it: String): Int? {
-    return if (it.isNotBlank()) {
-        val paddedInput = it.padStart(16, '0')
-        NumberFormat.getInstance().parse(paddedInput)?.toInt()
-    } else {
-        null
-    }
-}
-
 private fun getSetIconText(set: SetModel, setIndex: Int): String =
     if (set.setType.name == "Normal") {
         setIndex.inc().toString()
@@ -531,20 +429,16 @@ private fun getSetIconText(set: SetModel, setIndex: Int): String =
     }
 
 private fun getRatePerceivedEffort(set: SetModel): String =
-    doubleFormatted(set.ratePerceivedEffort) ?: ""
+    doubleFormatted(set.ratePerceivedEffort)
 
 private fun getRepetitionsInReserve(set: SetModel): String =
-    doubleFormatted(set.repetitionsInReserve) ?: ""
+    doubleFormatted(set.repetitionsInReserve)
 
 private fun getRepetitions(set: SetModel): String =
-    set.repetitions.toString() ?: ""
+    when (set.repetitions) {
+        null -> ""
+        else -> set.repetitions.toString()
+    }
 
 private fun getExerciseWeight(set: SetModel): String =
-    doubleFormatted(set.exerciseWeight) ?: ""
-
-/*private*/ fun doubleFormatted(double: Double?) =
-    if (double?.minus(double.roundToInt()) == 0.0) {
-        double.roundToInt().toString()
-    } else {
-        double.toString()
-    }
+    doubleFormatted(set.exerciseWeight)

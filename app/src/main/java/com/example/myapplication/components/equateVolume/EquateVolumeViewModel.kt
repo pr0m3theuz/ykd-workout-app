@@ -61,6 +61,41 @@ class EquateVolumeViewModel() : ViewModel() {
         Log.i("EquateVolumeViewModel.addSet(): ", "New set added: ${_sets.value}")
     }
 
+/*
+how would you improve this function?
+Here are some suggestions to improve the addSet() function:
+1. The function creates a new mutable list by converting the current list to mutable.
+    Instead, it's better to directly create a new mutable list and copy all the elements from the current list.
+2. The function accesses _sets.value multiple times, which is not optimal.
+    It's better to assign it to a local variable for better readability and performance.
+3. Instead of using an if-else statement to check if the _sets.value list is empty or not, we can use the lastOrNull() function to get the last item in the list if it exists, otherwise return null.
+4. The copy() function can be simplified by using named arguments instead of positional arguments.
+ */
+
+    /**
+     * Adds a new set to the list of sets and updates the total volume.
+     * If the list is empty, a new set is created.
+     * Otherwise, a new set is created as a copy of the last set in the list,
+     * with the set number incremented by 1 and the completion status set to false.
+     * The new set is then added to the list of sets and the total volume is recalculated.
+     */
+    fun chatgptAddSet() {
+        val currentSets = _sets.value.toMutableList()
+        val lastSet = currentSets.lastOrNull()
+
+        val newSet = lastSet?.copy(
+            id = newID(),
+            setNumber = lastSet.setNumber?.plus(1),
+            setCompleted = false
+        )
+            ?: SetModel()
+
+        currentSets.add(newSet)
+        _sets.value = currentSets.toList()
+
+        calculateNewTotalVolume()
+    }
+
     fun remove(id: Long) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.removeIf { it.id == id }

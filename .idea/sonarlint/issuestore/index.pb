@@ -11,5 +11,3 @@ n
 >app/src/test/java/com/example/myapplication/ExampleUnitTest.kt,e/1/e110aede2d9b606b5e7c8b653b7e7a4905cf45b6
 A
 gradle.properties,2/a/2afbb999f001938c88fa43fc2ef52abf0f8213e4
-l
-<app/src/main/java/com/example/myapplication/data/SetModel.kt,c/4/c44f014f78a45239cb26e12019a29a974f5aede6
