@@ -15,12 +15,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
+import com.example.myapplication.utils.checkDoubleInput
+import com.example.myapplication.utils.checkIntInput
 import kotlin.math.roundToInt
 
 @Composable
@@ -29,33 +30,21 @@ fun WarmUpSetLayout(
     warmUpSet: SetModel,
     workingWeight: Double,
     newWeight: (newWeight: Double) -> Unit,
-    newReps: (newReps: Int) -> Unit
+    newReps: (newReps: Int) -> Unit,
 ) {
     var warmUpPercentage: Double? by remember { mutableStateOf(1.0) }
 
     var percentageText by remember {
         mutableStateOf(
-            TextFieldValue(
-                if (warmUpPercentage?.minus(warmUpPercentage!!.roundToInt())?.times(100.0) == 0.0) {
-                    warmUpPercentage?.roundToInt()?.times(100).toString().plus("%")
-                } else {
-                    warmUpPercentage?.times(100.0).toString().plus("%")
-                }
-            )
+            if (warmUpPercentage?.minus(warmUpPercentage!!.roundToInt())?.times(100.0) == 0.0) {
+                warmUpPercentage?.roundToInt()?.times(100).toString().plus("%")
+            } else {
+                warmUpPercentage?.times(100.0).toString().plus("%")
+            }
         )
     }
 
-    var repetitionsText by remember {
-        mutableStateOf(
-            TextFieldValue(
-                if (warmUpSet.repetitions == null) {
-                    ""
-                } else {
-                    warmUpSet.repetitions.toString()
-                }
-            )
-        )
-    }
+    var repetitionsText by remember { mutableStateOf(warmUpSet.repetitions?.toString() ?: "") }
 
     newWeight(workingWeight.times(warmUpPercentage!!))
 
@@ -108,14 +97,11 @@ fun WarmUpSetLayout(
                     imeAction = ImeAction.Next
                 ),
                 value = percentageText,
-                onValueChange = {
-                    percentageText = it
-                    warmUpPercentage =
-                        if (it.text.replace("%", "").isNotEmpty()) {
-                            0.0.plus(it.text.replace("%", "").toDouble()).div(100.0)
-                        } else {
-                            0.0
-                        }
+                onValueChange = { percentage ->
+                    val formattedPercentage = percentage.replace("%", "")
+                    percentageText = formattedPercentage.takeIf { formattedPercentage.isNotBlank() }
+                        ?.let { checkDoubleInput(formattedPercentage) ?: percentageText } ?: ""
+                    warmUpPercentage = formattedPercentage.toDoubleOrNull()?.div(100.0) ?: 0.0
                 }
             )
         }
@@ -147,9 +133,9 @@ fun WarmUpSetLayout(
                 ),
                 value = repetitionsText,
                 onValueChange = {
-                    repetitionsText = it
-                    warmUpSet.repetitions = if (it.text.isNotBlank()) it.text.toInt() else null
-                    newReps(if (it.text.isNotBlank()) it.text.toInt() else 0)
+                    repetitionsText = checkIntInput(it)
+                    warmUpSet.repetitions = repetitionsText.toIntOrNull()
+                    newReps(if (repetitionsText.isNotBlank()) repetitionsText.toInt() else 0)
                 }
             )
         }
@@ -174,20 +160,20 @@ fun WarmUpSetLayout(
                     String.format(
                         "%d x %s",
                         workingWeight.times(warmUpPercentage!!).roundToInt(),
-                        repetitionsText.text
+                        repetitionsText
                     )
                 } else {
-                    val formattedworkingWeight =
+                    val formattedWorkingWeight =
                         String.format("%.2f", workingWeight.times(warmUpPercentage!!)).toDouble()
 
-                    if (formattedworkingWeight.minus(formattedworkingWeight.roundToInt()) == 0.0) {
+                    if (formattedWorkingWeight.minus(formattedWorkingWeight.roundToInt()) == 0.0) {
                         String.format(
                             "%d x %s",
-                            formattedworkingWeight.roundToInt(),
-                            repetitionsText.text
+                            formattedWorkingWeight.roundToInt(),
+                            repetitionsText
                         )
                     } else {
-                        String.format("%.2f x %s", formattedworkingWeight, repetitionsText.text)
+                        String.format("%.2f x %s", formattedWorkingWeight, repetitionsText)
                     }
                 }
             )

@@ -1,13 +1,14 @@
 package com.example.myapplication.components
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -25,24 +25,22 @@ import com.example.myapplication.components.warmUpSets.WarmUpViewModel
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
-import kotlin.math.roundToInt
+import com.example.myapplication.utils.checkDoubleInput
+import com.example.myapplication.utils.doubleFormatted
 
 // @Preview
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddWarmUpSetsScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
     warmUpViewModel: WarmUpViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    exerciseSets: ExerciseSetModel
+    exerciseSets: ExerciseSetModel,
 ) {
     AddWarmUpSetsDialog(
         openDialog = { close -> openDialog(close) },
         _workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets),
-        changeWorkingSetWeight = { newWorkingWeight ->
-            warmUpViewModel.changeWorkingSetWeight(
-                newWorkingWeight
-            )
+        onWorkingSetWeightChange = { newWorkingWeight ->
+            warmUpViewModel.changeWorkingSetWeight(newWorkingWeight)
         },
         warmUpSets = warmUpViewModel.warmUpSets,
         addSet = { warmUpViewModel.addSet() },
@@ -72,37 +70,19 @@ fun AddWarmUpSetsScreen(
 fun AddWarmUpSetsDialog(
     openDialog: (Boolean) -> Unit,
     _workingSetWeight: Double?,
-    changeWorkingSetWeight: (Double) -> Unit,
+    onWorkingSetWeightChange: (Double) -> Unit,
     warmUpSets: List<SetModel>,
     addSet: () -> Unit,
     removeSet: (id: Long) -> Unit,
     updateWarmUpSetWeight: (id: Long, newWeight: Double) -> Unit,
     updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit,
-    insertWarmUpSets: (warmUpSets: List<SetModel>) -> Unit
+    insertWarmUpSets: (warmUpSets: List<SetModel>) -> Unit,
 ) {
     var workingSetWeight: Double by remember {
-        if (_workingSetWeight != null) {
-            mutableStateOf(_workingSetWeight)
-        } else {
-            mutableStateOf(0.0)
-        }
+        _workingSetWeight?.let { mutableStateOf(it) } ?: mutableStateOf(0.0)
     }
 
-    var workingSetWeightText by remember {
-        mutableStateOf(
-            TextFieldValue(
-                if (workingSetWeight == 0.0) {
-                    ""
-                } else {
-                    if (workingSetWeight.minus(workingSetWeight.roundToInt()) == 0.0) {
-                        workingSetWeight.roundToInt().toString()
-                    } else {
-                        workingSetWeight.toString()
-                    }
-                }
-            )
-        )
-    }
+    var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
 
     AlertDialog(
         onDismissRequest = {
@@ -116,7 +96,7 @@ fun AddWarmUpSetsDialog(
         },
         text = {
             Column {
-                Text(text = "Work set (***USER DEFAULT***)") // TODO USE USER SELECTED WEIGHT
+                Text(text = "Working Set Weight (***USER DEFAULT***)") // TODO USE USER SELECTED WEIGHT
                 Box(
                     modifier = Modifier
 //                        .padding(4.dp)
@@ -127,72 +107,18 @@ fun AddWarmUpSetsDialog(
                     contentAlignment = Alignment.Center
 
                 ) {
-                    BasicTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(PaddingValues(4.dp)),
-                        textStyle = TextStyle(
-                            fontSize = 5.em,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onBackground
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
-                        value = workingSetWeightText,
-                        onValueChange = {
-                            workingSetWeightText = it
-                            workingSetWeight = if (it.text.isNotBlank()) {
-                                it.text.toDouble()
-                            } else {
-                                0.0
+                    WorkingWeightTextField(
+                        workingSetWeightText = workingSetWeightText,
+                        onWorkingSetWeightChange = {
+                            workingSetWeightText = when {
+                                it.isBlank() -> ""
+                                else -> checkDoubleInput(it) ?: workingSetWeightText
                             }
-                            changeWorkingSetWeight(
-                                if (it.text.isNotBlank()) {
-                                    it.text.toDouble()
-                                } else {
-                                    0.0
-                                }
-                            )
+                            onWorkingSetWeightChange(checkDoubleInput(it)?.toDoubleOrNull() ?: 0.0)
                         }
                     )
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(0.dp)
-                            .width(48.dp),
-                        contentAlignment = Alignment.Center
-
-                    ) {
-                        Text("Set")
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(PaddingValues(horizontal = 4.dp)),
-                        contentAlignment = Alignment.Center
-                    ) { Text("Percent") }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(PaddingValues(horizontal = 4.dp))
-                            .width(50.dp),
-                        contentAlignment = Alignment.Center
-                    ) { Text("Reps") }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(PaddingValues(horizontal = 4.dp))
-                            .width(60.dp),
-                        contentAlignment = Alignment.Center
-                    ) { /* TODO Put appropriate text here */ }
-                }
+                WarmUpSetsHeaderRow()
 
                 WarmUpSetLazyColumn(
                     warmUpSets,
@@ -235,5 +161,69 @@ fun AddWarmUpSetsDialog(
             }
         }
 
+    )
+}
+
+@Composable
+private fun WarmUpSetsHeaderRow() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(0.dp)
+                .width(48.dp),
+            contentAlignment = Alignment.Center
+
+        ) {
+            Text("Set")
+        }
+
+        Box(
+            modifier = Modifier
+                .padding(PaddingValues(horizontal = 4.dp)),
+            contentAlignment = Alignment.Center
+        ) { Text("Percent") }
+
+        Box(
+            modifier = Modifier
+                .padding(PaddingValues(horizontal = 4.dp))
+                .width(50.dp),
+            contentAlignment = Alignment.Center
+        ) { Text("Reps") }
+
+        Box(
+            modifier = Modifier
+                .padding(PaddingValues(horizontal = 4.dp))
+                .width(60.dp),
+            contentAlignment = Alignment.Center
+        ) { /* TODO Put appropriate text here */ }
+    }
+}
+
+@Composable
+private fun WorkingWeightTextField(
+    workingSetWeightText: String,
+    onWorkingSetWeightChange: (newWeight: String) -> Unit,
+) {
+    BasicTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(PaddingValues(4.dp)),
+        textStyle = TextStyle(
+            fontSize = 5.em,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground
+        ),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next
+        ),
+        value = workingSetWeightText,
+        onValueChange = {
+            onWorkingSetWeightChange(it.take(7))
+        }
     )
 }

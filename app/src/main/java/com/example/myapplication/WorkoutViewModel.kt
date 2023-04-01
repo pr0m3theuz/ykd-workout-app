@@ -442,11 +442,14 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
     fun getWorkingSetWeight(exerciseSets: ExerciseSetModel): Double? {
         // TODO Get Previous Working Set if Sets is empty
-        var weight: Double? = null
-        if (exerciseSets.sets.isNotEmpty()) {
-            weight = exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.exerciseWeight
-        }
-        return weight
+//        var weight: Double? = null
+
+//        if (exerciseSets.sets.isNotEmpty()) {
+//            weight = exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.exerciseWeight
+//        }
+//        return weight
+
+        return exerciseSets.sets.firstOrNull { it.setType.name != WARM_UP_SET }?.exerciseWeight
     }
 
     fun getWorkingSetRepetitions(exerciseSets: ExerciseSetModel): Int? {
