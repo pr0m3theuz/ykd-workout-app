@@ -7,14 +7,15 @@ import com.example.myapplication.data.setVolume
 import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.math.RoundingMode
 import kotlin.math.roundToInt
 
-class EquateVolumeViewModel() : ViewModel() {
+class EquateVolumeViewModel constructor(initSets: List<SetModel>) : ViewModel() {
     private var _oneRepMax: Double = 100.0
     val oneRepMax: Double
         get() = _oneRepMax
 
-    private var _sets = MutableStateFlow(initSets())
+    private var _sets = MutableStateFlow(initSets)
     val sets: StateFlow<List<SetModel>>
         get() = _sets
 
@@ -56,9 +57,6 @@ class EquateVolumeViewModel() : ViewModel() {
         }
         _sets.value = temporarySets.toList()
         calculateNewTotalVolume()
-
-        Log.i("EquateVolumeViewModel.addSet(): ", "temporarySets: $temporarySets")
-        Log.i("EquateVolumeViewModel.addSet(): ", "New set added: ${_sets.value}")
     }
 
 /*
@@ -111,7 +109,12 @@ Here are some suggestions to improve the addSet() function:
 
     fun updateSetWeight(id: Long, newWeight: Double?) {
         val temporarySets = _sets.value.toMutableList()
-        temporarySets.forEach { if (it.id == id) it.exerciseWeight = newWeight }
+        temporarySets.forEach {
+            if (it.id == id) {
+                it.exerciseWeight =
+                    newWeight?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP)?.toDouble()
+            }
+        }
         _sets.value = temporarySets
         calculateNewTotalVolume()
     }
@@ -182,8 +185,6 @@ Here are some suggestions to improve the addSet() function:
 
         _sets.value.filter { it.setType.name != "Warm Up Set" }.forEach { _ ->
             numberOfWorkingSets++
-//        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
-//        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
         }
 
         return numberOfWorkingSets
@@ -192,12 +193,9 @@ Here are some suggestions to improve the addSet() function:
     private fun calculateNewTotalVolume() {
         val temporarySets = _sets.value
         var totalVolume: Double = 0.0
-        var numberOfWorkingSets: Int = 0
 
         temporarySets.filter { it.setType.name != "Warm Up Set" }.forEach {
-            totalVolume += (it.setVolume()!!)
-//        Log.i("ExerciseSetModel setVolume()", "${it.setVolume()}")
-//        Log.i("ExerciseSetModel.totalWorkingSetVolume()", "$totalVolume")
+            totalVolume += (it.setVolume())
         }
 
         _newTotalVolume.value = totalVolume

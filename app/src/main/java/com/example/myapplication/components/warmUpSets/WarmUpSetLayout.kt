@@ -18,6 +18,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.components.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
 import com.example.myapplication.utils.checkDoubleInput
@@ -26,12 +28,14 @@ import kotlin.math.roundToInt
 
 @Composable
 fun WarmUpSetLayout(
+    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
     setIndex: Int,
     warmUpSet: SetModel,
-    workingWeight: Double,
     newWeight: (newWeight: Double) -> Unit,
     newReps: (newReps: Int) -> Unit,
 ) {
+    val workingWeight by warmUpSetsViewModel.workingSetWeight.collectAsState()
+
     var warmUpPercentage: Double? by remember { mutableStateOf(1.0) }
 
     var percentageText by remember {
@@ -98,7 +102,7 @@ fun WarmUpSetLayout(
                 ),
                 value = percentageText,
                 onValueChange = { percentage ->
-                    val formattedPercentage = percentage.replace("%", "")
+                    val formattedPercentage = percentage.replace("%", "").take(6)
                     percentageText = formattedPercentage.takeIf { formattedPercentage.isNotBlank() }
                         ?.let { checkDoubleInput(formattedPercentage) ?: percentageText } ?: ""
                     warmUpPercentage = formattedPercentage.toDoubleOrNull()?.div(100.0) ?: 0.0
@@ -133,7 +137,7 @@ fun WarmUpSetLayout(
                 ),
                 value = repetitionsText,
                 onValueChange = {
-                    repetitionsText = checkIntInput(it)
+                    repetitionsText = checkIntInput(it.take(4))
                     warmUpSet.repetitions = repetitionsText.toIntOrNull()
                     newReps(if (repetitionsText.isNotBlank()) repetitionsText.toInt() else 0)
                 }

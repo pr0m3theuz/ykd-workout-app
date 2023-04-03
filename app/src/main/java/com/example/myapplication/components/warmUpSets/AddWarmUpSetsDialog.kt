@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.components.warmUpSets.WarmUpViewModel
+import com.example.myapplication.components.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
@@ -32,27 +33,27 @@ import com.example.myapplication.utils.doubleFormatted
 @Composable
 fun AddWarmUpSetsScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
-    warmUpViewModel: WarmUpViewModel = viewModel(),
+    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
     exerciseSets: ExerciseSetModel,
 ) {
+    warmUpSetsViewModel.changeWorkingSetWeight(
+        workoutViewModel.getWorkingSetWeight(exerciseSets) ?: 0.0
+    )
+
     AddWarmUpSetsDialog(
         openDialog = { close -> openDialog(close) },
-        _workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets),
         onWorkingSetWeightChange = { newWorkingWeight ->
-            warmUpViewModel.changeWorkingSetWeight(newWorkingWeight)
+            warmUpSetsViewModel.changeWorkingSetWeight(newWorkingWeight)
         },
-        warmUpSets = warmUpViewModel.warmUpSets,
-        addSet = { warmUpViewModel.addSet() },
-        removeSet = { id: Long -> warmUpViewModel.remove(id) },
         updateWarmUpSetWeight = { id: Long, newWeight: Double ->
-            warmUpViewModel.updateWarmUpSetWeight(
+            warmUpSetsViewModel.updateWarmUpSetWeight(
                 id,
                 newWeight
             )
         },
         updateWarmUpSetReps = { id: Long, newReps: Int ->
-            warmUpViewModel.updateWarmUpSetReps(
+            warmUpSetsViewModel.updateWarmUpSetReps(
                 id,
                 newReps
             )
@@ -68,19 +69,16 @@ fun AddWarmUpSetsScreen(
 
 @Composable
 fun AddWarmUpSetsDialog(
+    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    _workingSetWeight: Double?,
     onWorkingSetWeightChange: (Double) -> Unit,
-    warmUpSets: List<SetModel>,
-    addSet: () -> Unit,
-    removeSet: (id: Long) -> Unit,
     updateWarmUpSetWeight: (id: Long, newWeight: Double) -> Unit,
     updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit,
     insertWarmUpSets: (warmUpSets: List<SetModel>) -> Unit,
 ) {
-    var workingSetWeight: Double by remember {
-        _workingSetWeight?.let { mutableStateOf(it) } ?: mutableStateOf(0.0)
-    }
+    val workingSetWeight by warmUpSetsViewModel.workingSetWeight.collectAsState()
+
+    val warmUpSets by warmUpSetsViewModel.warmUpSets.collectAsState()
 
     var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
 
@@ -114,30 +112,31 @@ fun AddWarmUpSetsDialog(
                                 it.isBlank() -> ""
                                 else -> checkDoubleInput(it) ?: workingSetWeightText
                             }
-                            onWorkingSetWeightChange(checkDoubleInput(it)?.toDoubleOrNull() ?: 0.0)
+                            onWorkingSetWeightChange(
+                                checkDoubleInput(workingSetWeightText)?.toDoubleOrNull() ?: 0.0
+                            )
+                        },
+                        onImeAction = {
                         }
                     )
                 }
                 WarmUpSetsHeaderRow()
 
                 WarmUpSetLazyColumn(
-                    warmUpSets,
-                    workingSetWeight,
-                    { id: Long -> removeSet(id) },
-                    { id: Long, newWeight: Double -> updateWarmUpSetWeight(id, newWeight) },
-                    { id: Long, newReps: Int -> updateWarmUpSetReps(id, newReps) },
-                    { addSet() }
+                    warmUpSets = warmUpSets,
+                    updateWarmUpSetWeight = { id: Long, newWeight: Double ->
+                        updateWarmUpSetWeight(
+                            id,
+                            newWeight
+                        )
+                    },
+                    updateWarmUpSetReps = { id: Long, newReps: Int ->
+                        updateWarmUpSetReps(
+                            id,
+                            newReps
+                        )
+                    },
                 )
-
-/*                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(onClick = { addSet() }) {
-                        Text("Add Set")
-                    }
-                }*/
             }
         },
         confirmButton = {
@@ -145,7 +144,6 @@ fun AddWarmUpSetsDialog(
                 onClick = {
                     openDialog(false)
                     run { insertWarmUpSets(warmUpSets) }
-//                    TODO Add warm up sets to the beginning of current exercise sets
                 }
             ) {
                 Text("Insert")
@@ -207,6 +205,7 @@ private fun WarmUpSetsHeaderRow() {
 private fun WorkingWeightTextField(
     workingSetWeightText: String,
     onWorkingSetWeightChange: (newWeight: String) -> Unit,
+    onImeAction: () -> Unit = {},
 ) {
     BasicTextField(
         modifier = Modifier
@@ -219,11 +218,16 @@ private fun WorkingWeightTextField(
         ),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Done
         ),
         value = workingSetWeightText,
         onValueChange = {
             onWorkingSetWeightChange(it.take(7))
-        }
+        },
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onImeAction()
+            },
+        ),
     )
 }

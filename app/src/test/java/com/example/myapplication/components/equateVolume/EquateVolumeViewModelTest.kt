@@ -1,13 +1,25 @@
 package com.example.myapplication.components.equateVolume
 
-import org.junit.Before
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.myapplication.data.SetModel
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
+@Config(sdk = [30])
+@RunWith(AndroidJUnit4::class)
 class EquateVolumeViewModelTest {
-
-    @Before
-    fun setUp() {
+    private lateinit var equateVolumeViewModel: EquateVolumeViewModel
+    private fun initSets(): List<SetModel> {
+        return List(3) { index ->
+            SetModel(
+                setNumber = index,
+                exerciseWeight = 100.00,
+                repetitions = 10,
+                percentage1RM = 1.0f
+            )
+        }
     }
 
     /**
@@ -15,16 +27,17 @@ class EquateVolumeViewModelTest {
      * properties depending on whether _sets was initially empty or not.
      * */
     @Test
-    fun `addSet should add a new SetModel to _sets value`() {
+    fun `addSet should add a new SetModel to _sets`() {
+        equateVolumeViewModel = EquateVolumeViewModel(initSets())
+
         // Arrange
-        val viewModel = EquateVolumeViewModel()
-        val initialSets = viewModel.sets.value
-        val initialSize = initialSets.size ?: 0
+        val initialSets = equateVolumeViewModel.sets.value
+        val initialSize = initialSets.size
         val expectedSize = initialSize + 1
 
         // Act
-        viewModel.addSet()
-        val newSets = viewModel.sets.value
+        equateVolumeViewModel.addSet()
+        val newSets = equateVolumeViewModel.sets.value
 
         // Assert
         assertNotNull(initialSets)
@@ -38,8 +51,39 @@ class EquateVolumeViewModelTest {
             assertFalse(newSet.setCompleted)
         } else {
             assertEquals(1, newSets.size)
-            assertNull(newSets[0].id)
-            assertNull(newSets[0].setNumber)
+            assertNotNull(newSets[0].id)
+            assertEquals(0, newSets[0].setNumber)
+            assertFalse(newSets[0].setCompleted)
+        }
+    }
+
+    @Test
+    fun `addSet should add a new SetModel to _sets when it is empty`() {
+        equateVolumeViewModel = EquateVolumeViewModel(emptyList<SetModel>())
+
+        // Arrange
+        val initialSets = equateVolumeViewModel.sets.value
+        val initialSize = initialSets.size
+        val expectedSize = initialSize + 1
+
+        // Act
+        equateVolumeViewModel.addSet()
+        val newSets = equateVolumeViewModel.sets.value
+
+        // Assert
+        assertNotNull(initialSets)
+        assertNotNull(newSets)
+        assertEquals(expectedSize, newSets.size)
+
+        if (initialSets.isNotEmpty()) {
+            val lastSet = initialSets.last()
+            val newSet = newSets.last()
+            assertEquals(lastSet.setNumber?.plus(1), newSet.setNumber)
+            assertFalse(newSet.setCompleted)
+        } else {
+            assertEquals(1, newSets.size)
+            assertNotNull(newSets[0].id)
+            assertEquals(0, newSets[0].setNumber)
             assertFalse(newSets[0].setCompleted)
         }
     }

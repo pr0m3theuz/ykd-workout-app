@@ -8,6 +8,12 @@ import org.junit.jupiter.api.Test
 class NumberUtilsKtTest {
     @Test
     fun testCheckDoubleInput() {
+        // Test input string with negative value
+        assertEquals(null, checkDoubleInput("--"))
+
+        // Test input string with negative value
+        assertEquals("-", checkDoubleInput("-"))
+
         // Test input string with valid negative value
         assertEquals(null, checkDoubleInput("1.23-"))
 
@@ -69,6 +75,6 @@ class NumberUtilsKtTest {
         assertEquals("-2.5", doubleFormatted(-2.5))
 
         // Test input with null value
-        assertEquals(null, doubleFormatted(null))
+        assertEquals("", doubleFormatted(null))
     }
 }

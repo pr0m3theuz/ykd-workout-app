@@ -11,7 +11,7 @@ private fun isDoubleValid(double: String): Boolean {
     return Pattern.matches(DOUBLE_VALIDATION_REGEX, double)
 }
 
-fun oldcheckDoubleInput(it: String): String? {
+fun brokenCheckDoubleInput(it: String): String? {
     var double: String?
 
     var manipulatedInput = it.replace(",", "")
@@ -59,6 +59,7 @@ private val DOUBLE_PATTERN = Pattern.compile(DOUBLE_VALIDATION_REGEX)
  * @return The double-precision floating-point number represented by the input string,
  *         or null if the input string is not a valid representation of a number.
  */
+// TODO Fix java.text.ParseException: Unparseable number: "-" error, causes app to crash
 fun checkDoubleInput(input: String): String? {
     var manipulatedInput = input.replace(",", "")
     val matcher = DOUBLE_PATTERN.matcher(manipulatedInput)
@@ -71,6 +72,7 @@ fun checkDoubleInput(input: String): String? {
     return if (manipulatedInput.isNotBlank()) {
         when {
             manipulatedInput == "." -> "0." // Add leading zero
+            manipulatedInput == "-" -> manipulatedInput
             manipulatedInput.last() == '.' -> manipulatedInput // Prevent early removal of the decimal place
             else -> {
                 val paddedInput = NumberFormat.getInstance().parse(manipulatedInput)?.toString()

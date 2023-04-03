@@ -7,7 +7,7 @@ import java.util.*
 data class SetModel(
     var id: Long = newID(),
     var uuid: UUID = UUID.randomUUID(),
-    var setNumber: Int? = null,
+    var setNumber: Int? = 0,
     var exerciseWeight: Double? = null,
     var repetitions: Int? = null,
     var ratePerceivedEffort: Double? = null,

@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.components.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
@@ -26,12 +28,10 @@ import kotlinx.coroutines.launch
 // @Preview
 @Composable
 fun WarmUpSetLazyColumn(
+    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
     warmUpSets: List<SetModel>,
-    _workingWeight: Double,
-    deleteSet: (id: Long) -> Unit,
     updateWarmUpSetWeight: (id: Long, newWeight: Double) -> Unit,
     updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit,
-    addSet: () -> Unit
 ) {
     val listState = rememberLazyListState()
     // Remember a CoroutineScope to be able to launch
@@ -62,7 +62,7 @@ fun WarmUpSetLazyColumn(
             }
 
             if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                deleteSet(warmUpSet.id)
+                warmUpSetsViewModel.remove(warmUpSet.id)
             }
 
             SwipeToDismiss(
@@ -115,11 +115,10 @@ fun WarmUpSetLazyColumn(
                     shape = RoundedCornerShape(CornerSize(0f))
                 ) {
                     WarmUpSetLayout(
-                        index,
-                        warmUpSet,
-                        _workingWeight,
-                        { newWeight -> newWeight(newWeight) },
-                        { newReps -> newReps(newReps) }
+                        setIndex = index,
+                        warmUpSet = warmUpSet,
+                        newWeight = { newWeight -> newWeight(newWeight) },
+                        newReps = { newReps -> newReps(newReps) }
                     )
                 }
             }
@@ -133,7 +132,7 @@ fun WarmUpSetLazyColumn(
     ) {
         androidx.compose.material3.TextButton(
             onClick = {
-                addSet()
+                warmUpSetsViewModel.addSet()
                 coroutineScope.launch {
                     // Animate scroll to the last item
                     listState.animateScrollToItem(index = warmUpSets.size.dec())
