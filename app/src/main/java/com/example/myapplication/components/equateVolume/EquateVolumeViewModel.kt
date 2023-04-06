@@ -11,8 +11,9 @@ import java.math.RoundingMode
 import kotlin.math.roundToInt
 
 class EquateVolumeViewModel constructor(initSets: List<SetModel>) : ViewModel() {
-    private var _oneRepMax: Double = 100.0
-    val oneRepMax: Double
+    //    TODO Implement getOneRepMax() Query
+    private var _oneRepMax = MutableStateFlow(100.0)
+    val oneRepMax: StateFlow<Double>
         get() = _oneRepMax
 
     private var _sets = MutableStateFlow(initSets)
@@ -32,7 +33,7 @@ class EquateVolumeViewModel constructor(initSets: List<SetModel>) : ViewModel() 
     }
 
     fun changeWorkingSetWeight(newWorkingWeight: Double) {
-        _oneRepMax = newWorkingWeight
+        _oneRepMax.value = newWorkingWeight
     }
 
     fun changeWorkingSets(sets: List<SetModel>) {
@@ -94,7 +95,7 @@ Here are some suggestions to improve the addSet() function:
         calculateNewTotalVolume()
     }
 
-    fun remove(id: Long) {
+    fun removeSet(id: Long) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.removeIf { it.id == id }
 

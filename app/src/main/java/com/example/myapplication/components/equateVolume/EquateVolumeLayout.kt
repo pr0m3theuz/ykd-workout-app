@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
 import java.math.RoundingMode
@@ -27,12 +28,9 @@ import kotlin.math.roundToInt
 
 @Composable
 fun EquateVolumeLayout(
+    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
     setIndex: Int,
     workingSet: SetModel,
-//    workingWeight: Double,
-    newWeight: (newWeight: Double) -> Unit,
-    newReps: (newReps: Int) -> Unit,
-    newPercentage: (newPercentage: Float) -> Unit
 ) {
     var workingSetPercentage: Float? by remember { mutableStateOf(workingSet.percentage1RM) }
 
@@ -53,20 +51,21 @@ fun EquateVolumeLayout(
         )
     }
 
-    var repetitionsText by remember {
-        mutableStateOf(
-            TextFieldValue(
-                if (workingSet.repetitions == null) {
-                    ""
-                } else {
-                    workingSet.repetitions.toString()
-                }
-            )
-        )
-    }
+    var repetitionsText by remember { mutableStateOf(workingSet.repetitions?.toString() ?: "") }
 
     val workingWeight = workingSet.exerciseWeight
-//    newWeight(workingWeight.times(workingSetPercentage!!))
+
+    fun newWeight(newWeight: Double) {
+        equateVolumeViewModel.updateSetWeight(workingSet.id, newWeight)
+    }
+
+    fun newReps(newReps: Int) {
+        equateVolumeViewModel.updateSetReps(workingSet.id, newReps)
+    }
+
+    fun newPercentage(newPercentage: Float) {
+        equateVolumeViewModel.updateSetPercentage(workingSet.id, newPercentage)
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -158,8 +157,8 @@ fun EquateVolumeLayout(
                 value = repetitionsText,
                 onValueChange = {
                     repetitionsText = it
-                    workingSet.repetitions = if (it.text.isNotBlank()) it.text.toInt() else null
-                    newReps(if (it.text.isNotBlank()) it.text.toInt() else 0)
+                    workingSet.repetitions = if (it.isNotBlank()) it.toInt() else null
+                    newReps(if (it.isNotBlank()) it.toInt() else 0)
                 }
             )
         }
@@ -184,7 +183,7 @@ fun EquateVolumeLayout(
                     String.format(
                         "%d x %s",
                         workingWeight.times(workingSetPercentage!!).roundToInt(),
-                        repetitionsText.text
+                        repetitionsText
                     )
                 } else {
                     val formattedWorkingWeight =
@@ -195,10 +194,10 @@ fun EquateVolumeLayout(
                         String.format(
                             "%d x %s",
                             formattedWorkingWeight.roundToInt(),
-                            repetitionsText.text
+                            repetitionsText
                         )
                     } else {
-                        String.format("%.2f x %s", formattedWorkingWeight, repetitionsText.text)
+                        String.format("%.2f x %s", formattedWorkingWeight, repetitionsText)
                     }
                 }
             )

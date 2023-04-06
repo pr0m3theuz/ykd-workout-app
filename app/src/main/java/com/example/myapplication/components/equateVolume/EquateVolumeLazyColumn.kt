@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
@@ -29,13 +30,9 @@ import kotlinx.coroutines.launch
 // @Preview
 @Composable
 fun EquateVolumeLazyColumn(
+    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
     workingSets: List<SetModel>,
 //    _workingWeight: Double,
-    deleteSet: (id: Long) -> Unit,
-    updateWorkingWeight: (id: Long, newWeight: Double) -> Unit,
-    updateWorkingSetReps: (id: Long, newReps: Int) -> Unit,
-    updateWorkingSetPercentage: (id: Long, newPercentage: Float) -> Unit,
-    addSet: () -> Unit
 ) {
     val listState = rememberLazyListState()
     // Remember a CoroutineScope to be able to launch
@@ -46,46 +43,6 @@ fun EquateVolumeLazyColumn(
         modifier = Modifier.fillMaxWidth().height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        /*
-        stickyHeader {
-            Row(
-                modifier = Modifier.fillMaxWidth().background(Color.White),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .width(48.dp),
-                    contentAlignment = Alignment.Center
-
-                ) {
-                    androidx.compose.material3.Text("Set")
-                }
-
-                Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp)),
-                    contentAlignment = Alignment.Center
-                ) { androidx.compose.material3.Text("Percent") }
-
-                Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp))
-                        .width(50.dp),
-                    contentAlignment = Alignment.Center
-                ) { androidx.compose.material3.Text("Reps") }
-
-                Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp))
-                        .width(60.dp),
-                    contentAlignment = Alignment.Center
-                ) { androidx.compose.material3.Text("Warm-up") }
-            }
-        }
-        */
-
         items(count = workingSets.size, key = { index -> workingSets[index].id }) { index ->
 
             val workingSet = workingSets[index]
@@ -97,20 +54,8 @@ fun EquateVolumeLazyColumn(
                 }
             )
 
-            fun newWeight(newWeight: Double) {
-                updateWorkingWeight(workingSet.id, newWeight)
-            }
-
-            fun newReps(newReps: Int) {
-                updateWorkingSetReps(workingSet.id, newReps)
-            }
-
-            fun newPercentage(newPercentage: Float) {
-                updateWorkingSetPercentage(workingSet.id, newPercentage)
-            }
-
             if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                deleteSet(workingSet.id)
+                equateVolumeViewModel.removeSet(workingSet.id)
             }
 
             SwipeToDismiss(
@@ -163,12 +108,9 @@ fun EquateVolumeLazyColumn(
                     shape = RoundedCornerShape(CornerSize(0f))
                 ) {
                     EquateVolumeLayout(
-                        index,
-                        workingSet,
+                        setIndex = index,
+                        workingSet = workingSet,
 //                        _workingWeight,
-                        { newWeight -> newWeight(newWeight) },
-                        { newReps -> newReps(newReps) },
-                        { newPercentage -> newPercentage(newPercentage) }
                     )
                 }
             }
@@ -182,7 +124,7 @@ fun EquateVolumeLazyColumn(
     ) {
         androidx.compose.material3.TextButton(
             onClick = {
-                addSet()
+                equateVolumeViewModel.addSet()
                 coroutineScope.launch {
                     // Animate scroll to the last item
                     listState.animateScrollToItem(index = workingSets.size.dec())

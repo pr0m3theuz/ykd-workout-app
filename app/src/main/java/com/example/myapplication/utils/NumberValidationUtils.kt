@@ -59,7 +59,6 @@ private val DOUBLE_PATTERN = Pattern.compile(DOUBLE_VALIDATION_REGEX)
  * @return The double-precision floating-point number represented by the input string,
  *         or null if the input string is not a valid representation of a number.
  */
-// TODO Fix java.text.ParseException: Unparseable number: "-" error, causes app to crash
 fun checkDoubleInput(input: String): String? {
     var manipulatedInput = input.replace(",", "")
     val matcher = DOUBLE_PATTERN.matcher(manipulatedInput)

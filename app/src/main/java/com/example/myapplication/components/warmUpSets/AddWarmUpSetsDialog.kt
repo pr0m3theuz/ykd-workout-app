@@ -120,7 +120,7 @@ fun AddWarmUpSetsDialog(
                         }
                     )
                 }
-                WarmUpSetsHeaderRow()
+                SetsHeaderRow()
 
                 WarmUpSetLazyColumn(
                     warmUpSets = warmUpSets,
@@ -163,7 +163,7 @@ fun AddWarmUpSetsDialog(
 }
 
 @Composable
-private fun WarmUpSetsHeaderRow() {
+fun SetsHeaderRow() {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
