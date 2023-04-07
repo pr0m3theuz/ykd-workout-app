@@ -1,6 +1,7 @@
 package com.example.myapplication.components.exercise
 
 import com.example.myapplication.utils.checkDoubleInput
+import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -58,6 +59,60 @@ class NumberUtilsKtTest {
 
         // Test comma input string
         assertEquals(null, checkDoubleInput(","))
+    }
+
+    @Test
+    fun testCheckIntInput() {
+        // Test input string with negative value
+        assertEquals("0", checkIntInput("--"))
+
+        // Test input string with negative value
+        assertEquals("", checkIntInput("-"))
+
+        // Test input string with valid negative value
+        assertEquals("1", checkIntInput("1.23-"))
+
+        // Test input string with valid positive value
+        assertEquals("950", checkIntInput("950....")) // passed
+
+        // Test only decimal point input
+        assertEquals("", checkIntInput("."))
+
+        // Test only decimal point input
+        assertEquals("0", checkIntInput("0."))
+
+        // Test input string with padding
+        assertEquals("100", checkIntInput("00,000,100.01987"))
+
+        // Test input string with valid positive value
+        assertEquals("50", checkIntInput("50")) // passed
+
+        // Test input string with valid positive value
+        assertEquals("50", checkIntInput("50.")) // passed
+
+        // Test input string with valid positive value
+        assertEquals("1", checkIntInput("1.23")) // passed
+
+        // Test input string with valid negative value
+        assertEquals("0", checkIntInput("-1.23"))
+
+        // Test input string with invalid value
+        assertEquals("0", checkIntInput("invalid"))
+
+        // Test empty input string
+        assertEquals("", checkIntInput(""))
+
+        // Test empty input string
+        assertEquals("0", checkIntInput(".1"))
+
+        // Test input string with padding
+        assertEquals("0", checkIntInput("000000000000.01"))
+
+        // Test comma 0 input string
+        assertEquals("0", checkIntInput(",0"))
+
+        // Test comma input string
+        assertEquals("", checkIntInput(","))
     }
 
     @Test

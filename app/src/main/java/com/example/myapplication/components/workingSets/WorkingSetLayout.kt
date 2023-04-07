@@ -32,9 +32,9 @@ fun WorkingSetLayout(
     workingWeight: Double,
     newWeight: (newWeight: Double) -> Unit,
     newReps: (newReps: Int) -> Unit,
-    newPercentage: (newPercentage: Float) -> Unit
+    newPercentage: (newPercentage: Double) -> Unit,
 ) {
-    var workingSetPercentage: Float? by remember { mutableStateOf(workingSet.percentage1RM) }
+    var workingSetPercentage: Double? by remember { mutableStateOf(workingSet.percentage1RM) }
 
     val df = DecimalFormat("#.##")
     df.roundingMode = RoundingMode.HALF_UP
@@ -120,9 +120,9 @@ fun WorkingSetLayout(
                     percentageText = it
                     workingSetPercentage =
                         if (it.text.replace("%", "").isNotEmpty()) {
-                            it.text.replace("%", "").toDouble().div(100.0).toFloat()
+                            it.text.replace("%", "").toDouble().div(100.0)
                         } else {
-                            0.0f
+                            0.0
                         }
                     newPercentage(workingSetPercentage!!)
                 }

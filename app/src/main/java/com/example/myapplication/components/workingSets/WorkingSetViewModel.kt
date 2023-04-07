@@ -53,7 +53,7 @@ class WorkingSetViewModel : ViewModel() {
         _sets.forEach { if (it.id == id) it.repetitions = newReps }
     }
 
-    fun updateSetPercentage(id: Long, newPercentage: Float) {
+    fun updateSetPercentage(id: Long, newPercentage: Double) {
         _sets.forEach { if (it.id == id) it.percentage1RM = newPercentage }
     }
 }
@@ -64,7 +64,7 @@ private fun initSets(): List<SetModel> {
             setNumber = index,
             exerciseWeight = 100.00,
             repetitions = 10,
-            percentage1RM = 1.0f
+            percentage1RM = 1.0
         )
     }
 }

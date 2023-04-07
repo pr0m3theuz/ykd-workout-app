@@ -36,7 +36,7 @@ fun AddWorkingSetsScreen(
     workingSetViewModel: WorkingSetViewModel = viewModel(),
     workoutViewModel: WorkoutViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    exerciseSets: ExerciseSetModel
+    exerciseSets: ExerciseSetModel,
 ) {
     AddWorkingSetsDialog(
         openDialog = { close -> openDialog(close) },
@@ -61,7 +61,7 @@ fun AddWorkingSetsScreen(
                 newReps
             )
         },
-        updateSetPercentage = { id: Long, newPercentage: Float ->
+        updateSetPercentage = { id: Long, newPercentage: Double ->
             workingSetViewModel.updateSetPercentage(
                 id,
                 newPercentage
@@ -82,9 +82,9 @@ fun AddWorkingSetsDialog(
     removeSet: (id: Long) -> Unit,
     updateSetWeight: (id: Long, newWeight: Double) -> Unit,
     updateSetReps: (id: Long, newReps: Int) -> Unit,
-    updateSetPercentage: (id: Long, newPercentage: Float) -> Unit,
+    updateSetPercentage: (id: Long, newPercentage: Double) -> Unit,
     insertSets: (workingSets: List<SetModel>) -> Unit,
-    insertBackOffSets: (backOffSets: List<SetModel>) -> Unit
+    insertBackOffSets: (backOffSets: List<SetModel>) -> Unit,
 ) {
     var workingSetWeight: Double by remember {
         if (_oneRepMax != null) {
@@ -217,7 +217,7 @@ fun AddWorkingSetsDialog(
                     { id: Long -> removeSet(id) },
                     { id: Long, newWeight: Double -> updateSetWeight(id, newWeight) },
                     { id: Long, newReps: Int -> updateSetReps(id, newReps) },
-                    { id: Long, newPercentage: Float -> updateSetPercentage(id, newPercentage) },
+                    { id: Long, newPercentage: Double -> updateSetPercentage(id, newPercentage) },
                     { addSet() }
                 )
 

@@ -34,8 +34,8 @@ fun WorkingSetLazyColumn(
     deleteSet: (id: Long) -> Unit,
     updateWorkingWeight: (id: Long, newWeight: Double) -> Unit,
     updateWorkingSetReps: (id: Long, newReps: Int) -> Unit,
-    updateWorkingSetPercentage: (id: Long, newPercentage: Float) -> Unit,
-    addSet: () -> Unit
+    updateWorkingSetPercentage: (id: Long, newPercentage: Double) -> Unit,
+    addSet: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     // Remember a CoroutineScope to be able to launch
@@ -46,46 +46,6 @@ fun WorkingSetLazyColumn(
         modifier = Modifier.fillMaxWidth().height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        /*
-        stickyHeader {
-            Row(
-                modifier = Modifier.fillMaxWidth().background(Color.White),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .width(48.dp),
-                    contentAlignment = Alignment.Center
-
-                ) {
-                    androidx.compose.material3.Text("Set")
-                }
-
-                Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp)),
-                    contentAlignment = Alignment.Center
-                ) { androidx.compose.material3.Text("Percent") }
-
-                Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp))
-                        .width(50.dp),
-                    contentAlignment = Alignment.Center
-                ) { androidx.compose.material3.Text("Reps") }
-
-                Box(
-                    modifier = Modifier
-                        .padding(PaddingValues(horizontal = 4.dp))
-                        .width(60.dp),
-                    contentAlignment = Alignment.Center
-                ) { androidx.compose.material3.Text("Warm-up") }
-            }
-        }
-        */
-
         items(count = workingSets.size, key = { index -> workingSets[index].id }) { index ->
 
             val workingSet = workingSets[index]
@@ -105,7 +65,7 @@ fun WorkingSetLazyColumn(
                 updateWorkingSetReps(workingSet.id, newReps)
             }
 
-            fun newPercentage(newPercentage: Float) {
+            fun newPercentage(newPercentage: Double) {
                 updateWorkingSetPercentage(workingSet.id, newPercentage)
             }
 
@@ -189,7 +149,7 @@ fun WorkingSetLazyColumn(
                 }
             }
         ) {
-            androidx.compose.material3.Text("Add Set")
+            Text("Add Set")
         }
     }
 }
