@@ -127,7 +127,7 @@ Here are some suggestions to improve the addSet() function:
         calculateNewTotalVolume()
     }
 
-    fun updateSetPercentage(id: Long, newPercentage: Float) {
+    fun updateSetPercentage(id: Long, newPercentage: Double) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.forEach { if (it.id == id) it.percentage1RM = newPercentage }
         _sets.value = temporarySets
@@ -209,7 +209,7 @@ private fun initSets(): List<SetModel> {
             setNumber = index,
             exerciseWeight = 100.00,
             repetitions = 10,
-            percentage1RM = 1.0f
+            percentage1RM = 1.0
         )
     }
 }

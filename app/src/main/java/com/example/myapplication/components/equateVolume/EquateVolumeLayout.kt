@@ -15,13 +15,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
+import com.example.myapplication.utils.checkDoubleInput
+import com.example.myapplication.utils.checkIntInput
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
@@ -32,7 +33,7 @@ fun EquateVolumeLayout(
     setIndex: Int,
     workingSet: SetModel,
 ) {
-    var workingSetPercentage: Float? by remember { mutableStateOf(workingSet.percentage1RM) }
+    var workingSetPercentage: Double? by remember { mutableStateOf(workingSet.percentage1RM) }
 
     val df = DecimalFormat("#.##")
     df.roundingMode = RoundingMode.HALF_UP
@@ -41,13 +42,11 @@ fun EquateVolumeLayout(
 
     var percentageText by remember {
         mutableStateOf(
-            TextFieldValue(
-                if (reformattedPercentage.minus(reformattedPercentage.roundToInt()) == 0.0) {
-                    reformattedPercentage.roundToInt().toString().plus("%")
-                } else {
-                    reformattedPercentage.toString().plus("%")
-                }
-            )
+            if (reformattedPercentage.minus(reformattedPercentage.roundToInt()) == 0.0) {
+                reformattedPercentage.roundToInt().toString().plus("%")
+            } else {
+                reformattedPercentage.toString().plus("%")
+            }
         )
     }
 
@@ -63,7 +62,7 @@ fun EquateVolumeLayout(
         equateVolumeViewModel.updateSetReps(workingSet.id, newReps)
     }
 
-    fun newPercentage(newPercentage: Float) {
+    fun newPercentage(newPercentage: Double) {
         equateVolumeViewModel.updateSetPercentage(workingSet.id, newPercentage)
     }
 
@@ -116,14 +115,11 @@ fun EquateVolumeLayout(
                     imeAction = ImeAction.Next
                 ),
                 value = percentageText,
-                onValueChange = {
-                    percentageText = it
-                    workingSetPercentage =
-                        if (it.text.replace("%", "").isNotEmpty()) {
-                            it.text.replace("%", "").toDouble().div(100.0).toFloat()
-                        } else {
-                            0.0f
-                        }
+                onValueChange = { percentage ->
+                    val formattedPercentage = percentage.replace("%", "").take(6)
+                    percentageText = formattedPercentage.takeIf { formattedPercentage.isNotBlank() }
+                        ?.let { checkDoubleInput(formattedPercentage) ?: percentageText } ?: ""
+                    workingSetPercentage = formattedPercentage.toDoubleOrNull()?.div(100.0) ?: 0.0
                     newPercentage(workingSetPercentage!!)
                 }
             )
@@ -156,9 +152,8 @@ fun EquateVolumeLayout(
                 ),
                 value = repetitionsText,
                 onValueChange = {
-                    repetitionsText = it
-                    workingSet.repetitions = if (it.isNotBlank()) it.toInt() else null
-                    newReps(if (it.isNotBlank()) it.toInt() else 0)
+                    repetitionsText = checkIntInput(it.take(4))
+                    newReps(repetitionsText.toIntOrNull() ?: 0)
                 }
             )
         }
@@ -172,35 +167,36 @@ fun EquateVolumeLayout(
             contentAlignment = Alignment.Center
 
         ) {
-            Text(
-                fontSize = 4.em,
-                text =
-                if (workingWeight?.times(workingSetPercentage!!)?.minus(
-                        workingWeight.times(workingSetPercentage!!).roundToInt()
-                    ) == 0.0
-                ) {
-//                    String.format("%", workingWeight?.times(warmUpPercentage!!)!!.roundToInt())
-                    String.format(
-                        "%d x %s",
-                        workingWeight.times(workingSetPercentage!!).roundToInt(),
-                        repetitionsText
-                    )
-                } else {
-                    val formattedWorkingWeight =
-                        String.format("%.2f", workingWeight?.times(workingSetPercentage!!))
-                            .toDouble()
-
-                    if (formattedWorkingWeight.minus(formattedWorkingWeight.roundToInt()) == 0.0) {
-                        String.format(
-                            "%d x %s",
-                            formattedWorkingWeight.roundToInt(),
-                            repetitionsText
-                        )
-                    } else {
-                        String.format("%.2f x %s", formattedWorkingWeight, repetitionsText)
-                    }
-                }
-            )
+            NewSetResultsText(workingWeight, workingSetPercentage, repetitionsText)
         }
     }
+}
+
+@Composable
+fun NewSetResultsText(
+    workingWeight: Double?,
+    percentage: Double?,
+    repetitionsText: String,
+) {
+    val workingWeightXRepetitions = "%d x %s"
+    val newWorkingWeight = workingWeight?.times(percentage!!)
+    val roundedNewWorkingWeight = workingWeight?.roundToInt()
+    val formattedNewWorkingWeight = "%.2f".format(newWorkingWeight).toDouble()
+    val roundedFormattedNewWorkingWeight = formattedNewWorkingWeight.roundToInt()
+
+    Text(
+        fontSize = 4.em,
+        text =
+        when {
+            newWorkingWeight?.minus(roundedNewWorkingWeight!!) == 0.0 -> {
+                workingWeightXRepetitions.format(roundedNewWorkingWeight, repetitionsText)
+            }
+            formattedNewWorkingWeight.minus(roundedFormattedNewWorkingWeight) == 0.0 -> {
+                workingWeightXRepetitions.format(roundedFormattedNewWorkingWeight, repetitionsText)
+            }
+            else -> {
+                workingWeightXRepetitions.format(formattedNewWorkingWeight, repetitionsText)
+            }
+        }
+    )
 }

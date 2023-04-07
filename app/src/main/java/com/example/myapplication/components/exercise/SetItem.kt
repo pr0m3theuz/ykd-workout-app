@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
-import com.example.myapplication.components.SetContent
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.White

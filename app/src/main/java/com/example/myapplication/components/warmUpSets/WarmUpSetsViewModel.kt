@@ -71,7 +71,7 @@ private fun initWarmUpSets(): MutableList<SetModel> {
             ),
             exerciseWeight = 100.00,
             repetitions = 10,
-            percentage1RM = 1.0f
+            percentage1RM = 1.0
         )
     }
 }

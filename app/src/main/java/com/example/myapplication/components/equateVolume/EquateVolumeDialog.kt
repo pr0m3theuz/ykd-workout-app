@@ -174,7 +174,6 @@ fun EquateVolumeDialog(
                             setWorkingSetWeightOrWorkingSetRepetitionsText(it)
                             setWorkingSetWeightOrWorkingSetRepetitionsNumber()
                             calculateNewValues()
-                            /* TODO */
                         },
                     )
                 }

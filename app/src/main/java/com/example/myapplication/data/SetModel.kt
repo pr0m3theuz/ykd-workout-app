@@ -12,7 +12,7 @@ data class SetModel(
     var repetitions: Int? = null,
     var ratePerceivedEffort: Double? = null,
     var repetitionsInReserve: Double? = null,
-    var percentage1RM: Float? = 1.0f,
+    var percentage1RM: Double? = 1.0,
     var setCompleted: Boolean = false,
     var setType: SetTypeModel = SetTypeModel(
         newID(),

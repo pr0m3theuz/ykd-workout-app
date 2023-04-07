@@ -1,4 +1,4 @@
-package com.example.myapplication.components
+package com.example.myapplication.components.exercise
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,9 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.components.exercise.ExerciseWeightState
-import com.example.myapplication.components.exercise.ExerciseWeightStateSaver
-import com.example.myapplication.components.exercise.TextFieldState
+import com.example.myapplication.components.SetTypeOptionsMenu
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
@@ -37,7 +35,7 @@ import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
 
 // TODO Add ability to rearrange sets
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SetContent(
     exerciseSets: ExerciseSetModel,
@@ -97,7 +95,6 @@ fun SetContent(
     var iconText by remember { mutableStateOf("") }
 
     fun updateReps(reps: String) {
-//        repetitionsText = checkIntInput(reps).toString()
         workoutViewModel.updateSetReps(
             exerciseSets = exerciseSets,
             setUUID = setUUID,
@@ -106,7 +103,6 @@ fun SetContent(
     }
 
     fun updateRIR(rir: String) {
-//        ?repetitionsInReserveText = parseTextFieldInputDouble(checkDoubleInput(rir).toString())
         workoutViewModel.updateSetRIR(
             exerciseSets = exerciseSets,
             setUUID = setUUID,
@@ -115,7 +111,6 @@ fun SetContent(
     }
 
     fun updateWeight(weight: String) {
-//        weightState.text = parse-TextFieldInputDouble(checkDoubleInput(weight).toString())
         workoutViewModel.updateSetWeight(
             exerciseSets = exerciseSets,
             setUUID = setUUID,
@@ -215,8 +210,8 @@ fun SetContent(
 
         ) {
             ExerciseWeightTextField(
-                weightState,
                 modifier = Modifier.focusRequester(focusRequester),
+                weightState = weightState,
                 onWeightChange = {
                     weightState.text =
                         when {
@@ -244,8 +239,8 @@ fun SetContent(
 
         ) {
             ExerciseRepsTextField(
-                repetitionsText = repetitionsText,
                 modifier = Modifier.focusRequester(repsFocusRequester),
+                repetitionsText = repetitionsText,
                 onRepsChange = { reps -> repetitionsText = checkIntInput(reps) },
                 onImeAction = {
                     updateSetData()
@@ -267,10 +262,9 @@ fun SetContent(
 
         ) {
             RirTextField(
-                repetitionsInReserveText,
                 modifier = Modifier.focusRequester(rirFocusRequester),
+                repetitionsInReserveText = repetitionsInReserveText,
                 onRIRChange = { rir ->
-//                    val rirDouble = checkDoubleInput(rir)
                     repetitionsInReserveText =
                         when {
                             rir.isBlank() -> ""
@@ -278,12 +272,6 @@ fun SetContent(
                                 ?.toString()
                                 ?: repetitionsInReserveText
                         }
-
-//                        if (rirDouble != null && rirDouble.toDouble() in 0.0..10.0) {
-//                            checkDoubleInput(rir) ?: repetitionsInReserveText
-//                        } else {
-//                            repetitionsInReserveText
-//                        }
                 },
                 onImeAction = { updateRIR(repetitionsInReserveText) }
             )
@@ -312,8 +300,8 @@ fun SetContent(
 
 @Composable
 private fun RirTextField(
-    repetitionsInReserveText: String,
     modifier: Modifier = Modifier,
+    repetitionsInReserveText: String,
     onRIRChange: (newRIR: String) -> Unit,
     onImeAction: () -> Unit = {},
 ) {
@@ -356,8 +344,8 @@ private fun RirTextField(
 
 @Composable
 private fun ExerciseRepsTextField(
-    repetitionsText: String,
     modifier: Modifier = Modifier,
+    repetitionsText: String,
     onRepsChange: (newReps: String) -> Unit,
     onImeAction: () -> Unit = {},
 ) {
@@ -385,11 +373,10 @@ private fun ExerciseRepsTextField(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ExerciseWeightTextField(
-    weightState: TextFieldState = remember { ExerciseWeightState() },
     modifier: Modifier = Modifier,
+    weightState: TextFieldState = remember { ExerciseWeightState() },
     onWeightChange: (newWeight: String) -> Unit,
     onImeAction: () -> Unit = {},
 ) {

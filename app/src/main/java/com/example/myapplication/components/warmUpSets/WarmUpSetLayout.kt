@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.components.equateVolume.NewSetResultsText
 import com.example.myapplication.components.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.ui.theme.PurpleGrey80
@@ -138,8 +139,7 @@ fun WarmUpSetLayout(
                 value = repetitionsText,
                 onValueChange = {
                     repetitionsText = checkIntInput(it.take(4))
-                    warmUpSet.repetitions = repetitionsText.toIntOrNull()
-                    newReps(if (repetitionsText.isNotBlank()) repetitionsText.toInt() else 0)
+                    newReps(repetitionsText.toIntOrNull() ?: 0)
                 }
             )
         }
@@ -153,34 +153,7 @@ fun WarmUpSetLayout(
             contentAlignment = Alignment.Center
 
         ) {
-            Text(
-                fontSize = 4.em,
-                text =
-                if (workingWeight.times(warmUpPercentage!!).minus(
-                        workingWeight.times(warmUpPercentage!!).roundToInt()
-                    ) == 0.0
-                ) {
-//                    String.format("%", workingWeight?.times(warmUpPercentage!!)!!.roundToInt())
-                    String.format(
-                        "%d x %s",
-                        workingWeight.times(warmUpPercentage!!).roundToInt(),
-                        repetitionsText
-                    )
-                } else {
-                    val formattedWorkingWeight =
-                        String.format("%.2f", workingWeight.times(warmUpPercentage!!)).toDouble()
-
-                    if (formattedWorkingWeight.minus(formattedWorkingWeight.roundToInt()) == 0.0) {
-                        String.format(
-                            "%d x %s",
-                            formattedWorkingWeight.roundToInt(),
-                            repetitionsText
-                        )
-                    } else {
-                        String.format("%.2f x %s", formattedWorkingWeight, repetitionsText)
-                    }
-                }
-            )
+            NewSetResultsText(workingWeight, warmUpPercentage, repetitionsText)
         }
     }
 }
