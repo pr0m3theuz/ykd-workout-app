@@ -1,7 +1,8 @@
-package com.example.myapplication.components
+package com.example.myapplication.components.workoutDialogs.equateVolume
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,39 +13,40 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.components.warmUpSets.WarmUpSetsViewModel
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.components.workoutDialogs.AddSetText
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 // @Preview
 @Composable
-fun WarmUpSetLazyColumn(
-    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
-    warmUpSets: List<SetModel>,
-    updateWarmUpSetWeight: (id: Long, newWeight: Double) -> Unit,
-    updateWarmUpSetReps: (id: Long, newReps: Int) -> Unit,
+fun EquateVolumeLazyColumn(
+    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
 ) {
     val listState = rememberLazyListState()
     // Remember a CoroutineScope to be able to launch
     val coroutineScope = rememberCoroutineScope()
+
+    val workingSets by equateVolumeViewModel.sets.collectAsState()
 
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxWidth().height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(count = warmUpSets.size, key = { index -> warmUpSets[index].id }) { index ->
+        items(count = workingSets.size, key = { index -> workingSets[index].id }) { index ->
 
-            val warmUpSet = warmUpSets[index]
+            val workingSet = workingSets[index]
 
 //            var deletedState by remember { mutableStateOf(false) }
             val dismissState = rememberDismissState(
@@ -53,16 +55,8 @@ fun WarmUpSetLazyColumn(
                 }
             )
 
-            fun newWeight(newWeight: Double) {
-                updateWarmUpSetWeight(warmUpSet.id, newWeight)
-            }
-
-            fun newReps(newReps: Int) {
-                updateWarmUpSetReps(warmUpSet.id, newReps)
-            }
-
             if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                warmUpSetsViewModel.remove(warmUpSet.id)
+                equateVolumeViewModel.removeSet(workingSet.id)
             }
 
             SwipeToDismiss(
@@ -114,11 +108,9 @@ fun WarmUpSetLazyColumn(
                     backgroundColor = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(CornerSize(0f))
                 ) {
-                    WarmUpSetLayout(
+                    EquateVolumeLayout(
                         setIndex = index,
-                        warmUpSet = warmUpSet,
-                        newWeight = { newWeight -> newWeight(newWeight) },
-                        newReps = { newReps -> newReps(newReps) }
+                        workingSet = workingSet,
                     )
                 }
             }
@@ -130,16 +122,16 @@ fun WarmUpSetLazyColumn(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.material3.TextButton(
+        TextButton(
             onClick = {
-                warmUpSetsViewModel.addSet()
+                equateVolumeViewModel.addSet()
                 coroutineScope.launch {
                     // Animate scroll to the last item
-                    listState.animateScrollToItem(index = warmUpSets.size.dec())
+                    listState.animateScrollToItem(index = workingSets.size.dec())
                 }
             }
         ) {
-            androidx.compose.material3.Text("Add Set")
+            AddSetText()
         }
     }
 }

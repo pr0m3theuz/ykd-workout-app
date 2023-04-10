@@ -1,4 +1,4 @@
-package com.example.myapplication.components.warmUpSets
+package com.example.myapplication.components.workoutDialogs.warmUpSets
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -8,6 +8,7 @@ import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.math.RoundingMode
+import java.util.*
 
 class WarmUpSetsViewModel : ViewModel() {
     private var _workingSetWeight = MutableStateFlow(100.0)
@@ -26,7 +27,8 @@ class WarmUpSetsViewModel : ViewModel() {
         if (_warmUpSets.value.isNotEmpty()) {
             _warmUpSets.value.add(
                 _warmUpSets.value.last().copy(
-                    id = newID()
+                    id = newID(),
+                    uuid = UUID.randomUUID()
                 )
             )
         } else {
@@ -36,26 +38,26 @@ class WarmUpSetsViewModel : ViewModel() {
         }
     }
 
-    fun remove(id: Long) {
+    fun remove(uuid: UUID) {
         for (index in _warmUpSets.value.indices) {
-            if (_warmUpSets.value[index].id == id) {
+            if (_warmUpSets.value[index].uuid == uuid) {
                 _warmUpSets.value.removeAt(index)
                 break
             }
         }
     }
 
-    fun updateWarmUpSetWeight(id: Long, newWeight: Double) {
+    fun updateWarmUpSetWeight(uuid: UUID, newWeight: Double) {
         _warmUpSets.value.forEach {
-            if (it.id == id) {
+            if (it.uuid == uuid) {
                 it.exerciseWeight =
                     newWeight.toBigDecimal().setScale(2, RoundingMode.HALF_UP).toDouble()
             }
         }
     }
 
-    fun updateWarmUpSetReps(id: Long, newReps: Int) {
-        _warmUpSets.value.forEach { if (it.id == id) it.repetitions = newReps }
+    fun updateWarmUpSetReps(uuid: UUID, newReps: Int) {
+        _warmUpSets.value.forEach { if (it.uuid == uuid) it.repetitions = newReps }
     }
 }
 

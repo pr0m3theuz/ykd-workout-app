@@ -1,6 +1,7 @@
 package com.example.myapplication.components.equateVolume
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
 import com.example.myapplication.data.SetModel
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

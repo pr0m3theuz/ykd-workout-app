@@ -1,31 +1,21 @@
 package com.example.myapplication.components.exercise
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.components.SetsHeaderRow
-import com.example.myapplication.components.equateVolume.EquateVolumeLazyColumn
-import com.example.myapplication.components.equateVolume.EquateVolumeViewModel
+import com.example.myapplication.components.workoutDialogs.DialogInput
+import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
+import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeLazyColumn
+import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
 import com.example.myapplication.data.ExerciseSetModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.totalWorkingSetVolume
-import com.example.myapplication.ui.theme.PurpleGrey80
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
@@ -146,37 +136,14 @@ fun EquateVolumeDialog(
                     Text("New Total Volume: $newTotalWorkingSetVolume")
                 }
 
-                Box(
-                    modifier = Modifier
-//                        .padding(4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(PurpleGrey80)
-                        .fillMaxWidth()
-                        .wrapContentSize(Alignment.Center),
-                    contentAlignment = Alignment.Center,
-
-                ) {
-                    BasicTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(PaddingValues(4.dp)),
-                        textStyle = TextStyle(
-                            fontSize = 5.em,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next,
-                        ),
-                        value = getWorkingSetWeightOrWorkingSetRepetitions(),
-                        onValueChange = {
-                            setWorkingSetWeightOrWorkingSetRepetitionsText(it)
-                            setWorkingSetWeightOrWorkingSetRepetitionsNumber()
-                            calculateNewValues()
-                        },
-                    )
-                }
+                DialogInput(
+                    text = getWorkingSetWeightOrWorkingSetRepetitions(),
+                    onValueChange = {
+                        setWorkingSetWeightOrWorkingSetRepetitionsText(it.take(7))
+                        setWorkingSetWeightOrWorkingSetRepetitionsNumber()
+                        calculateNewValues()
+                    },
+                )
 
                 Row() {
                     RadioButton(
@@ -196,10 +163,7 @@ fun EquateVolumeDialog(
 
                 SetsHeaderRow()
 
-                EquateVolumeLazyColumn(
-                    workingSets = sets,
-//                    workingSetWeight,
-                )
+                EquateVolumeLazyColumn()
             }
         },
         confirmButton = {
@@ -221,36 +185,5 @@ fun EquateVolumeDialog(
                 Text("Cancel")
             }
         },
-    )
-}
-
-@Composable
-private fun WorkingWeightTextField(
-    workingSetWeightText: String,
-    onWorkingSetWeightChange: (newWeight: String) -> Unit,
-    onImeAction: () -> Unit = {},
-) {
-    BasicTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(PaddingValues(4.dp)),
-        textStyle = TextStyle(
-            fontSize = 5.em,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground
-        ),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
-        value = workingSetWeightText,
-        onValueChange = {
-            onWorkingSetWeightChange(it.take(7))
-        },
-        keyboardActions = KeyboardActions(
-            onDone = {
-                onImeAction()
-            },
-        ),
     )
 }

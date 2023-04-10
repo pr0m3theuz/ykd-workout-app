@@ -1,4 +1,4 @@
-package com.example.myapplication.components.equateVolume
+package com.example.myapplication.components.workoutDialogs.workingSets
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -22,21 +23,21 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.components.workoutDialogs.AddSetText
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 // @Preview
 @Composable
-fun EquateVolumeLazyColumn(
-    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
-    workingSets: List<SetModel>,
-//    _workingWeight: Double,
+fun WorkingSetLazyColumn(
+    workingSetViewModel: WorkingSetViewModel = viewModel(),
 ) {
     val listState = rememberLazyListState()
     // Remember a CoroutineScope to be able to launch
     val coroutineScope = rememberCoroutineScope()
+
+    val workingSets by workingSetViewModel.sets.collectAsState()
 
     LazyColumn(
         state = listState,
@@ -55,7 +56,7 @@ fun EquateVolumeLazyColumn(
             )
 
             if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                equateVolumeViewModel.removeSet(workingSet.id)
+                workingSetViewModel.remove(workingSet.uuid)
             }
 
             SwipeToDismiss(
@@ -107,10 +108,9 @@ fun EquateVolumeLazyColumn(
                     backgroundColor = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(CornerSize(0f))
                 ) {
-                    EquateVolumeLayout(
+                    WorkingSetLayout(
                         setIndex = index,
                         workingSet = workingSet,
-//                        _workingWeight,
                     )
                 }
             }
@@ -124,14 +124,14 @@ fun EquateVolumeLazyColumn(
     ) {
         androidx.compose.material3.TextButton(
             onClick = {
-                equateVolumeViewModel.addSet()
+                workingSetViewModel.addSet()
                 coroutineScope.launch {
                     // Animate scroll to the last item
                     listState.animateScrollToItem(index = workingSets.size.dec())
                 }
             }
         ) {
-            androidx.compose.material3.Text("Add Set")
+            AddSetText()
         }
     }
 }

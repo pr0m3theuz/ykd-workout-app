@@ -62,7 +62,8 @@ fun SetContent(
     val repsFocusRequester = remember { FocusRequester() }
     val rirFocusRequester = remember { FocusRequester() }
 
-    val textFieldColor = MaterialTheme.colorScheme.secondaryContainer
+    val textFieldBackgroundColor = MaterialTheme.colorScheme.secondaryContainer
+    val textColor = MaterialTheme.colorScheme.onSecondaryContainer
 
     var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
 
@@ -201,7 +202,7 @@ fun SetContent(
             modifier = Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(textFieldColor)
+                .background(textFieldBackgroundColor)
                 .align(Alignment.CenterVertically)
                 .width(72.dp)
                 .wrapContentSize(Alignment.Center),
@@ -230,7 +231,7 @@ fun SetContent(
             modifier = Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(textFieldColor)
+                .background(textFieldBackgroundColor)
                 .align(Alignment.CenterVertically)
                 .width(60.dp)
                 .wrapContentSize(Alignment.Center),
@@ -253,7 +254,7 @@ fun SetContent(
             modifier = Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(textFieldColor)
+                .background(textFieldBackgroundColor)
                 .align(Alignment.CenterVertically)
                 .width(40.dp)
                 .wrapContentSize(Alignment.Center),

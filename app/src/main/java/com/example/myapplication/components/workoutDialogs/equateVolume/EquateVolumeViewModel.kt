@@ -1,6 +1,5 @@
-package com.example.myapplication.components.equateVolume
+package com.example.myapplication.components.workoutDialogs.equateVolume
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.setVolume
@@ -8,17 +7,24 @@ import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.RoundingMode
+import java.util.*
 import kotlin.math.roundToInt
 
-class EquateVolumeViewModel constructor(initSets: List<SetModel>) : ViewModel() {
+private const val WARM_UP_SET = "Warm Up Set"
+
+class EquateVolumeViewModel constructor() : ViewModel() {
     //    TODO Implement getOneRepMax() Query
     private var _oneRepMax = MutableStateFlow(100.0)
     val oneRepMax: StateFlow<Double>
         get() = _oneRepMax
 
-    private var _sets = MutableStateFlow(initSets)
+    private var _sets = MutableStateFlow(initSets())
     val sets: StateFlow<List<SetModel>>
         get() = _sets
+
+    private var _setsPercentage = MutableStateFlow(_sets.value.associate { it.uuid to 1.0 })
+    val setsPercentage: StateFlow<Map<UUID, Double>>
+        get() = _setsPercentage
 
     private var _totalVolume: Double = 0.0
     private val totalVolume: Double
@@ -37,12 +43,11 @@ class EquateVolumeViewModel constructor(initSets: List<SetModel>) : ViewModel() 
     }
 
     fun changeWorkingSets(sets: List<SetModel>) {
-        _sets.value = sets.filter { it.setType.name != "Warm Up Set" }
+        _sets.value = sets.filter { it.setType.name != WARM_UP_SET }
         calculateNewTotalVolume()
     }
 
     fun addSet() {
-//        Log.i("workingSetViewModel.addSet(): ", "workingSets List: ${_Sets.toList()}")
         val temporarySets: MutableList<SetModel> = _sets.value.toMutableList()
 
         if (_sets.value.isNotEmpty()) {
@@ -103,15 +108,12 @@ Here are some suggestions to improve the addSet() function:
 
         _sets.value = temporarySets.toList()
         calculateNewTotalVolume()
-
-        Log.i("EquateVolumeViewModel.remove(): ", "temporarySets: $temporarySets")
-        Log.i("EquateVolumeViewModel.remove(): ", "New set added: ${_sets.value}")
     }
 
-    fun updateSetWeight(id: Long, newWeight: Double?) {
+    fun updateSetWeight(uuid: UUID, newWeight: Double?) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.forEach {
-            if (it.id == id) {
+            if (it.uuid == uuid) {
                 it.exerciseWeight =
                     newWeight?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP)?.toDouble()
             }
@@ -120,25 +122,27 @@ Here are some suggestions to improve the addSet() function:
         calculateNewTotalVolume()
     }
 
-    fun updateSetReps(id: Long, newReps: Int) {
+    fun updateSetReps(uuid: UUID, newReps: Int) {
         val temporarySets = _sets.value.toMutableList()
-        temporarySets.forEach { if (it.id == id) it.repetitions = newReps }
+        temporarySets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
         _sets.value = temporarySets
         calculateNewTotalVolume()
     }
 
-    fun updateSetPercentage(id: Long, newPercentage: Double) {
+    fun updateSetPercentage(uuid: UUID, newPercentage: Double) {
+        val temporaryMap = _setsPercentage.value.toMutableMap()
+        temporaryMap[uuid] = newPercentage
+        _setsPercentage.value = temporaryMap
+
         val temporarySets = _sets.value.toMutableList()
-        temporarySets.forEach { if (it.id == id) it.percentage1RM = newPercentage }
+        temporarySets.forEach { if (it.uuid == uuid) it.percentage1RM = newPercentage }
         _sets.value = temporarySets
         calculateNewTotalVolume()
     }
 
     fun equateVolumeByWeight(newWeight: Double?) {
         val numberOfWorkingSets: Int = numberOfWorkingSets()
-        var newRepetitions: Int = 0
-
-        newRepetitions = if (numberOfWorkingSets > 0 && newWeight != null && newWeight > 0.0) {
+        val newRepetitions = if (numberOfWorkingSets > 0 && newWeight != null && newWeight > 0.0) {
             totalVolume.div(newWeight).div(numberOfWorkingSets).roundToInt()
         } else {
             0
@@ -151,17 +155,11 @@ Here are some suggestions to improve the addSet() function:
 
         _sets.value = newSets.toList()
         calculateNewTotalVolume()
-
-        Log.i("equateVolumeByWeight()", "$newRepetitions")
-        Log.i("equateVolumeByWeight()", "$newSets")
-        Log.i("equateVolumeByWeight()", "${_sets.value}")
     }
 
     fun equateVolumeByRepetitions(newRepetitions: Int?) {
         val numberOfWorkingSets: Int = numberOfWorkingSets()
-        var newWeight: Double = 0.0
-
-        newWeight =
+        val newWeight =
             if (numberOfWorkingSets > 0 && newRepetitions != null && newRepetitions > 0) {
                 totalVolume.div(numberOfWorkingSets).div(newRepetitions)
             } else {
@@ -175,16 +173,12 @@ Here are some suggestions to improve the addSet() function:
 
         _sets.value = newSets.toList()
         calculateNewTotalVolume()
-
-        Log.i("equateVolumeByRepetitions()", "$newWeight")
-        Log.i("equateVolumeByRepetitions()", "$newSets")
-        Log.i("equateVolumeByRepetitions()", "${_sets.value}")
     }
 
     private fun numberOfWorkingSets(): Int {
         var numberOfWorkingSets: Int = 0
 
-        _sets.value.filter { it.setType.name != "Warm Up Set" }.forEach { _ ->
+        _sets.value.filter { it.setType.name != WARM_UP_SET }.forEach { _ ->
             numberOfWorkingSets++
         }
 
@@ -195,7 +189,7 @@ Here are some suggestions to improve the addSet() function:
         val temporarySets = _sets.value
         var totalVolume: Double = 0.0
 
-        temporarySets.filter { it.setType.name != "Warm Up Set" }.forEach {
+        temporarySets.filter { it.setType.name != WARM_UP_SET }.forEach {
             totalVolume += (it.setVolume())
         }
 
