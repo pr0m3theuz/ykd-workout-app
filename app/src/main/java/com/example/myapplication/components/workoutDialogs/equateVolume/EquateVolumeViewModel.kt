@@ -7,7 +7,7 @@ import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.RoundingMode
-import java.util.*
+import java.util.UUID
 import kotlin.math.roundToInt
 
 private const val WARM_UP_SET = "Warm Up Set"
@@ -27,15 +27,24 @@ class EquateVolumeViewModel constructor() : ViewModel() {
         get() = _setsPercentage
 
     private var _totalVolume: Double = 0.0
-    private val totalVolume: Double
+    public val totalVolume: Double
         get() = _totalVolume
 
     private var _newTotalVolume = MutableStateFlow(0.0)
     val newTotalVolume: StateFlow<Double>
         get() = _newTotalVolume
 
+    fun initialize(sets: List<SetModel>) {
+        changeWorkingSets(sets)
+        setTotalVolume(calculateTotalVolume(sets))
+    }
+
     fun setTotalVolume(totalVolume: Double) {
         _totalVolume = totalVolume
+    }
+
+    private fun setNewTotalVolume(totalVolume: Double) {
+        _newTotalVolume.value = totalVolume
     }
 
     fun changeWorkingSetWeight(newWorkingWeight: Double) {
@@ -44,7 +53,7 @@ class EquateVolumeViewModel constructor() : ViewModel() {
 
     fun changeWorkingSets(sets: List<SetModel>) {
         _sets.value = sets.filter { it.setType.name != WARM_UP_SET }
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     fun addSet() {
@@ -54,6 +63,7 @@ class EquateVolumeViewModel constructor() : ViewModel() {
             temporarySets.add(
                 temporarySets.last().copy(
                     id = newID(),
+                    uuid = UUID.randomUUID(),
                     setNumber = sets.value.last().setNumber?.plus(1),
                     setCompleted = false
                 )
@@ -62,19 +72,19 @@ class EquateVolumeViewModel constructor() : ViewModel() {
             temporarySets.add(SetModel())
         }
         _sets.value = temporarySets.toList()
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
-/*
-how would you improve this function?
-Here are some suggestions to improve the addSet() function:
-1. The function creates a new mutable list by converting the current list to mutable.
-    Instead, it's better to directly create a new mutable list and copy all the elements from the current list.
-2. The function accesses _sets.value multiple times, which is not optimal.
-    It's better to assign it to a local variable for better readability and performance.
-3. Instead of using an if-else statement to check if the _sets.value list is empty or not, we can use the lastOrNull() function to get the last item in the list if it exists, otherwise return null.
-4. The copy() function can be simplified by using named arguments instead of positional arguments.
- */
+    /*
+    how would you improve this function?
+    Here are some suggestions to improve the addSet() function:
+    1. The function creates a new mutable list by converting the current list to mutable.
+        Instead, it's better to directly create a new mutable list and copy all the elements from the current list.
+    2. The function accesses _sets.value multiple times, which is not optimal.
+        It's better to assign it to a local variable for better readability and performance.
+    3. Instead of using an if-else statement to check if the _sets.value list is empty or not, we can use the lastOrNull() function to get the last item in the list if it exists, otherwise return null.
+    4. The copy() function can be simplified by using named arguments instead of positional arguments.
+     */
 
     /**
      * Adds a new set to the list of sets and updates the total volume.
@@ -89,6 +99,7 @@ Here are some suggestions to improve the addSet() function:
 
         val newSet = lastSet?.copy(
             id = newID(),
+            uuid = UUID.randomUUID(),
             setNumber = lastSet.setNumber?.plus(1),
             setCompleted = false
         )
@@ -97,7 +108,7 @@ Here are some suggestions to improve the addSet() function:
         currentSets.add(newSet)
         _sets.value = currentSets.toList()
 
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     fun removeSet(id: Long) {
@@ -107,7 +118,7 @@ Here are some suggestions to improve the addSet() function:
         temporarySets.forEach { it.id = newID() }
 
         _sets.value = temporarySets.toList()
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     fun updateSetWeight(uuid: UUID, newWeight: Double?) {
@@ -119,14 +130,14 @@ Here are some suggestions to improve the addSet() function:
             }
         }
         _sets.value = temporarySets
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     fun updateSetReps(uuid: UUID, newReps: Int) {
         val temporarySets = _sets.value.toMutableList()
         temporarySets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
         _sets.value = temporarySets
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     fun updateSetPercentage(uuid: UUID, newPercentage: Double) {
@@ -137,7 +148,7 @@ Here are some suggestions to improve the addSet() function:
         val temporarySets = _sets.value.toMutableList()
         temporarySets.forEach { if (it.uuid == uuid) it.percentage1RM = newPercentage }
         _sets.value = temporarySets
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     fun equateVolumeByWeight(newWeight: Double?) {
@@ -154,7 +165,7 @@ Here are some suggestions to improve the addSet() function:
         }
 
         _sets.value = newSets.toList()
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     fun equateVolumeByRepetitions(newRepetitions: Int?) {
@@ -172,7 +183,7 @@ Here are some suggestions to improve the addSet() function:
         }
 
         _sets.value = newSets.toList()
-        calculateNewTotalVolume()
+        setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
     private fun numberOfWorkingSets(): Int {
@@ -185,15 +196,14 @@ Here are some suggestions to improve the addSet() function:
         return numberOfWorkingSets
     }
 
-    private fun calculateNewTotalVolume() {
-        val temporarySets = _sets.value
+    private fun calculateTotalVolume(temporarySets: List<SetModel>): Double {
         var totalVolume: Double = 0.0
 
         temporarySets.filter { it.setType.name != WARM_UP_SET }.forEach {
             totalVolume += (it.setVolume())
         }
 
-        _newTotalVolume.value = totalVolume
+        return totalVolume
     }
 }
 

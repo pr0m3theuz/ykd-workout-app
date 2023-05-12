@@ -6,7 +6,12 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
@@ -31,8 +36,7 @@ fun EquateVolumeScreen(
     val workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets)
     val workingSetRepetitions = workoutViewModel.getWorkingSetRepetitions(exerciseSets)
 
-    equateVolumeViewModel.changeWorkingSets(exerciseSets.sets)
-    equateVolumeViewModel.setTotalVolume(totalWorkingSetVolume)
+    equateVolumeViewModel.initialize(exerciseSets.sets)
 
     EquateVolumeDialog(
         openDialog = { close -> openDialog(close) },
