@@ -315,7 +315,7 @@ class EquateVolumeViewModelTest {
 
         // Then
         assertEquals(0.0, equateVolumeViewModel.newTotalVolume.value, 0.0)
-        assertEquals(0, equateVolumeViewModel.sets.value[1].repetitions)
+        assertEquals(null, equateVolumeViewModel.sets.value[1].repetitions)
     }
 
     @Test
@@ -349,7 +349,7 @@ class EquateVolumeViewModelTest {
         assertEquals(oldTotalVolume, newTotalVolume, 0.0)
 
         val numberOfWorkingSets = oldSets.filter { it.setType.name != "WARM_UP_SET" }.size
-        val expectedWeight = (oldTotalVolume / 50 / numberOfWorkingSets).toInt()
+        val expectedWeight = (oldTotalVolume / 50 / numberOfWorkingSets)
 
         newSets.forEach {
             it.repetitions?.let { it1 -> assertEquals(it1, 50) }

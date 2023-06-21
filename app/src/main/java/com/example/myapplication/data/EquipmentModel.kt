@@ -6,10 +6,32 @@ enum class Equipment(val printableName: String) {
     PLATE_LOADED_MACHINE("Plate Loaded"),
     MACHINE("Machine"),
     KETTLEBELL("Kettlebell"),
+    MEDICINEBALL("Medicine Ball"),
     BODY_WEIGHT("Body Weight"),
     CARDIO("Cardio"),
     OTHER("Other"),
-    NO_EQUIPMENT("No Equipment")
+    NO_EQUIPMENT("No Equipment"),
+}
+
+enum class ExerciseEquipment(val printableName: String) {
+    LEVER("Lever"),
+    CABLE("Cable"),
+    BODY_WEIGHT("Body Weight"),
+    DUMBBELL("Dumbbell"),
+    BARBELL("Barbell"),
+    WEIGHTED("Weighted"),
+    SLED("Sled"),
+    SUSPENSION("Suspension"),
+    SMITH("Smith"),
+    BAND_ASSISTED("Band-Assisted"),
+    ASSISTED("Assisted"),
+    TRAP_BAR("Trap Bar"),
+    SAFETY("Safety"),
+    KETTLEBELL("Kettlebell"),
+    SLED_SINGLE("Sled Single"),
+    MEDICINE_BALL("Medicine Ball"),
+    BAND_RESISTIVE("Band Resistive"),
+    STRETCH("Stretch"),
 }
 
 enum class ExerciseProgression {
@@ -19,7 +41,7 @@ enum class ExerciseProgression {
     TIME_WEIGHT,
     DISTANCE,
     WEIGHT_DISTANCE,
-    WEIGHT_DISTANCE_TIME
+    WEIGHT_DISTANCE_TIME,
 }
 
 enum class MuscleGroup(val printableName: String) {
@@ -32,10 +54,11 @@ enum class MuscleGroup(val printableName: String) {
     GLUTES("Glutes"),
     HAMSTRINGS("Hamstring"),
     LEGS("Legs"),
+    NECK("Neck"),
     QUADS("Quad"),
     SHOULDERS("Shoulders"),
     TRICEPS("Triceps"),
-    FULL_BODY("Full Body")
+    FULL_BODY("Full Body"),
 }
 
 enum class MovementType(val printableName: String) {
@@ -45,5 +68,12 @@ enum class MovementType(val printableName: String) {
     CARDIO("Cardio"),
     STRETCH("Stretch"),
     UNILATERAL("Unilateral"),
-    BILATERAL("Bilateral")
+    BILATERAL("Bilateral"),
+    PLYOMETRIC("Plyometric"),
+    OLYMPIC("Olympic"),
+}
+
+enum class ExerciseForce(val printableName: String) {
+    PUSH("Push"),
+    PULL("Pull"),
 }

@@ -10,7 +10,6 @@ import com.example.myapplication.data.Repository
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import javax.inject.Inject
 
 const val NOTIFICATION_CHANNEL_ID = "rest_timer"
 
@@ -18,10 +17,13 @@ const val NOTIFICATION_CHANNEL_ID = "rest_timer"
 class NameHereApplication : Application() {
     val applicationScope = CoroutineScope(SupervisorJob())
 
-    @Inject
-    lateinit var database: AppRoomDatabase
+//    @Inject
+//    lateinit var database: AppRoomDatabase
+//
+//    @Inject
+//    lateinit var repository: Repository
 
-    //    val database by lazy { AppRoomDatabase.getDatabase(this, applicationScope) }
+    private val database by lazy { AppRoomDatabase.getDatabase(this, applicationScope) }
     val repository by lazy { Repository(database.Dao()) }
 
     override fun onCreate() {

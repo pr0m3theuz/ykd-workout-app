@@ -26,7 +26,8 @@ object DatabaseModule {
             appContext,
             AppRoomDatabase::class.java,
             "app_database"
-        ).addCallback(AppRoomDatabase.DatabaseCallback(CoroutineScope(SupervisorJob())))
+        ).createFromAsset("database/app_database.db")
+            .addCallback(AppRoomDatabase.DatabaseCallback(CoroutineScope(SupervisorJob())))
             .build()
     }
 }

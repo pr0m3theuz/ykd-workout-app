@@ -4,7 +4,11 @@ import android.util.Log
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.*
+import com.example.myapplication.data.Equipment
+import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.MovementType
+import com.example.myapplication.data.MuscleGroup
+import com.example.myapplication.data.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-public class ExercisesViewModel @Inject constructor(private var repository: Repository) :
+class ExercisesViewModel @Inject constructor(private var repository: Repository) :
     ViewModel() {
 
     private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
@@ -25,6 +29,7 @@ public class ExercisesViewModel @Inject constructor(private var repository: Repo
             repository.getExercises().collect {
                 _exercises.value = it
             }
+            Log.i("ExercisesViewModel: ", "collected exercises!")
         }
     }
 

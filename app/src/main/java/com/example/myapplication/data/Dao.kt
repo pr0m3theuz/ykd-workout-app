@@ -16,7 +16,7 @@ interface Dao {
 //    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise AND bodyPart IN(:bodyParts) AND equipment IN(:equipments) ORDER BY name ASC")
     @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise ORDER BY name ASC")
     fun filterExercises(
-        exercise: String
+        exercise: String,
 //        bodyParts: List<String> = listOf("%%"),
 //        equipments: List<String> = listOf("%%")
 //        movementTypes: List<String> = listOf("%%")
@@ -27,4 +27,7 @@ interface Dao {
 
     @Update
     fun updateExercise(exercise: ExerciseModel)
+
+    @Delete
+    fun deleteExercise(exercise: ExerciseModel)
 }

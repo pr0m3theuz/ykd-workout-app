@@ -2,22 +2,25 @@ package com.example.myapplication.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.myapplication.fakeULID
 import com.example.myapplication.newID
-import java.util.*
+import java.util.UUID
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 @Entity(tableName = "exercises_table")
 data class ExerciseModel(
-    @PrimaryKey(autoGenerate = true) val pId: Int = 0,
-    val id: Long = newID(),
+    @PrimaryKey(autoGenerate = true) val primaryKey: Long = fakeULID(),
+    val lazyListItemID: Long = newID(),
     val uuid: UUID = UUID.randomUUID(),
+//    val exrxID: String? = null,
     var name: String = "Exercise Name", // TODO Remove Assignment
-    val exerciseCategory: String = "Exercise Category", // TODO Remove Assignment
+    val exerciseCategory: String? = null, // TODO Remove Assignment // TODO This is too vague, make more specific or remove
+//    val exerciseForce: ExerciseForce, // TODO determine if it should be included
     // TODO Make into a List<String> for Multiple Body Parts
-    val bodyPart: String = "Exercise Body Part", // TODO Remove Assignment
-    var exerciseProgression: String? = null,
-    val equipment: String? = null,
+    val muscleGroup: String = "Muscle Group", // TODO MuscleGroup
+    var exerciseProgression: String? = null, // ExerciseProgression
+    val equipment: String? = null, // Equipment
     var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,
