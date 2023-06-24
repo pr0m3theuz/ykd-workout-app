@@ -14,3 +14,7 @@
 .cxx
 local.properties
 @eaDir
+/.idea/sonarlint/
+/.scannerwork/
+*.kate-swp
+*.csv#

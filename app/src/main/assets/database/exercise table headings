@@ -1,0 +1,5 @@
+id,equipment_id,name,utility,mechanics,force,preparation,execution,comments,muscle_group_id,media_url,page_url
+comments,equipment,execution,force,id,mechanics,media_url,muscle_group_id,name,page_url,preparation,utility
+comments,equipment,execution,force,id,mechanics,media_url,muscle_group_id,name,page_url,preparation,utility
+comments,equipment,execution,force,id,mechanics,media_url,muscle_group_id,name,page_url,preparation,utility
+comments,equipment,execution,force,function,id,intensity,mechanics,media_url,muscle_group_id,name,page_url,preparation,utility

@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "8a56d0478eb698d372bee1ea9ce93d7a",
+    "entities": [
+      {
+        "tableName": "exercises_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `exerciseCategory` TEXT, `muscleGroup` TEXT NOT NULL, `exerciseProgression` TEXT, `equipment` TEXT, `notes` TEXT, `pinnedNotes` TEXT, `notesPinned` INTEGER NOT NULL, `barType` TEXT, `weightUnit` TEXT, `workingSetRestInWholeMilliseconds` INTEGER NOT NULL, `warmUpSetRestInWholeMilliseconds` INTEGER NOT NULL, `workingSetRestTimerEnabled` INTEGER NOT NULL, `warmUpSetRestTimerEnabled` INTEGER NOT NULL, `videoUri` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "primaryKey",
+            "columnName": "primaryKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lazyListItemID",
+            "columnName": "lazyListItemID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exerciseCategory",
+            "columnName": "exerciseCategory",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "muscleGroup",
+            "columnName": "muscleGroup",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exerciseProgression",
+            "columnName": "exerciseProgression",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "equipment",
+            "columnName": "equipment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinnedNotes",
+            "columnName": "pinnedNotes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notesPinned",
+            "columnName": "notesPinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "barType",
+            "columnName": "barType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "weightUnit",
+            "columnName": "weightUnit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "workingSetRestInWholeMilliseconds",
+            "columnName": "workingSetRestInWholeMilliseconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "warmUpSetRestInWholeMilliseconds",
+            "columnName": "warmUpSetRestInWholeMilliseconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workingSetRestTimerEnabled",
+            "columnName": "workingSetRestTimerEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "warmUpSetRestTimerEnabled",
+            "columnName": "warmUpSetRestTimerEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "videoUri",
+            "columnName": "videoUri",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "primaryKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a56d0478eb698d372bee1ea9ce93d7a')"
+    ]
+  }
+}

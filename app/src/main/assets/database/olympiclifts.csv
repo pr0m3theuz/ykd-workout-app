@@ -1,0 +1,49 @@
+comments,equipment,execution,force,id,mechanics,media_url,muscle_group_id,name,page_url,preparation,utility
+,BB,,Pull,Clean,Compound,https://exrx.glorb.com/api/video/edfddfa5fe57a9aa7867421bfce2cf34/10836,FullBody,Clean,https://exrx.net/WeightExercises/OlympicLifts/Clean,,Power
+,BB,,Pull_Push,CleanAndJerk,Compound,https://exrx.glorb.com/api/video/a49b5257d4e3a4d6271e38932129b19f/10837,FullBody,Clean and Jerk,https://exrx.net/WeightExercises/OlympicLifts/CleanAndJerk,,Power
+,BB,,Pull_Push,PowerCleanJerk,Compound,https://exrx.glorb.com/api/video/0778088dbb5396315ffafd721608d5a7/10863,FullBody,Power Clean and Jerk,https://exrx.net/WeightExercises/OlympicLifts/PowerCleanJerk,,Power
+,BB,,Pull,PowerClean,Compound,https://exrx.glorb.com/api/video/24fac1d6584fda089f4da78ff8e7989e/10862,FullBody,Power Clean,https://exrx.net/WeightExercises/OlympicLifts/PowerClean,,Power
+,BB,,Pull,DeficitClean,Compound,https://exrx.glorb.com/api/video/d49935c3bfe242f0b9d7a818be9876a1/10972,FullBody,Deficit Clean,https://exrx.net/WeightExercises/OlympicLifts/DeficitClean,,Power
+,BB,,Pull_Push,HangCleanJerk,Compound,https://exrx.glorb.com/api/video/8d94858e28c30d1f952474ac1aa8299d/10982,FullBody,Hang Clean and Jerk (from floor),https://exrx.net/WeightExercises/OlympicLifts/HangCleanJerk,,Power
+,BB,,Pull_Push,HangPowerCleanJerk,Compound,https://exrx.glorb.com/api/video/8862cd34ffaf3df72bba1c286e73b9e5/10984,FullBody,Hang Power Clean and Jerk,https://exrx.net/WeightExercises/OlympicLifts/HangPowerCleanJerk,,Power
+,BB,,Pull_Push,HangPowerCleanJerkFloor,Compound,https://exrx.glorb.com/api/video/6c5607b2faacf88554ac58f96556a25e/10985,FullBody,Hang Power Clean and Jerk (from floor),https://exrx.net/WeightExercises/OlympicLifts/HangPowerCleanJerkFloor,,Power
+,BB,,Pull,BlockClean,Compound,https://exrx.glorb.com/api/video/0b274dda0cebf4d4f2954e7ecc51db49/10971,FullBody,Block Clean,https://exrx.net/WeightExercises/OlympicLifts/BlockClean,,Power
+,BB,,Pull,BlockPowerClean,Compound,https://exrx.glorb.com/api/video/63e817381d98a23cfe55ae9400f4f7b2/10970,FullBody,Block Power Clean,https://exrx.net/WeightExercises/OlympicLifts/BlockPowerClean,,Power
+,BB,,Pull,BlockPull,Compound,https://exrx.glorb.com/api/video/a98798c0499725a5549b7e366fc33e82/10983,FullBody,Block Pull,https://exrx.net/WeightExercises/OlympicLifts/BlockPull,,Power
+,BB,,Pull,HangClean,Compound,https://exrx.glorb.com/api/video/e7fe9c9ed1ee50b5100309e1fa154f6c/10853,FullBody,Hang Clean,https://exrx.net/WeightExercises/OlympicLifts/HangClean,,Power
+,BB,,Pull,HangPowerClean,Compound,https://exrx.glorb.com/api/video/d54cc917ebd9280e312612b7f043c992/10855,FullBody,Hang Power Clean,https://exrx.net/WeightExercises/OlympicLifts/HangPowerClean,,Power
+,BB,,Pull,HighPull,Compound,https://exrx.glorb.com/api/video/ea181777f399ad256f2388ddf3c56a8a/10859,FullBody,High Pull,https://exrx.net/WeightExercises/OlympicLifts/HighPull,,Power
+,BB,,Pull,HangPull,Compound,https://exrx.glorb.com/api/video/13dc9e833f2341ab830891d2a245cb0a/10987,FullBody,Hang High Pull,https://exrx.net/WeightExercises/OlympicLifts/HangPull,,Power
+,BB,,Pull,BelowKneeHighPull,Compound,https://exrx.glorb.com/api/video/83a3a5548c49fb6cae11ba0334295f5c/10979,FullBody,Below Knee High Pull,https://exrx.net/WeightExercises/OlympicLifts/BelowKneeHighPull,,Power
+,BB,,Pull,JumpShrug,Compound,https://exrx.glorb.com/api/video/c0ab865176c21f3da56f3ab9c05c8f3e/10860,FullBody,Jump Shrug,https://exrx.net/WeightExercises/OlympicLifts/JumpShrug,,Power
+,BB,,Push,PushPress,Compound,https://exrx.glorb.com/api/video/63520ab7651b3842426a5a70fd62125f/10866,FullBody,Push Press,https://exrx.net/WeightExercises/OlympicLifts/PushPress,,Power
+,BB,,Pull,HangJumpShrug,Compound,https://exrx.glorb.com/api/video/184fb774a9bc22dce71c6449a5de5e56/10854,FullBody,Hang Jump Shrug,https://exrx.net/WeightExercises/OlympicLifts/HangJumpShrug,,Power
+,BB,,Push,PushPressBehindNeck,Compound,https://exrx.glorb.com/api/video/2e8780158df62189edd0a497ffbe4db1/10867,FullBody,Push Press (behind neck),https://exrx.net/WeightExercises/OlympicLifts/PushPressBehindNeck,,Power
+,BB,,Push,SplitJerk,Compound,https://exrx.glorb.com/api/video/03457b9b4bfdc7bc0231250fb66d4906/10873,FullBody,Split Jerk,https://exrx.net/WeightExercises/OlympicLifts/SplitJerk,,Power
+,BB,,Push,SplitJerkBehindNeck,Compound,https://exrx.glorb.com/api/video/d6a93ec3e0f9cf9afe2d489f8479eb46/10874,FullBody,Split Jerk (behind neck),https://exrx.net/WeightExercises/OlympicLifts/SplitJerkBehindNeck,,Power
+,BB,,Pull,RomanianDeadlift,Compound,https://exrx.glorb.com/api/video/2f9fa2adc273ba3ca822c413e986a9b4/10871,FullBody,Romanian Deadlift,https://exrx.net/WeightExercises/OlympicLifts/RomanianDeadlift,,Power
+,BB,,Push,BulgarianSquat,Compound,https://exrx.glorb.com/api/video/a641ce176497ad1b2b55c38cf76b83b5/11401,FullBody,Barbell Bulgarian Squat,https://exrx.net/WeightExercises/OlympicLifts/BulgarianSquat,,Power
+,BB,,Push,FrontSquat,Compound,https://exrx.glorb.com/api/video/95a3b6e3c20f438c9b6731f8efeb1fc2/10852,FullBody,Front Squat (weightlifting style),https://exrx.net/WeightExercises/OlympicLifts/FrontSquat,,Power
+,DB,,Pull_Push,DBHangCleanJerk,Compound,https://exrx.glorb.com/api/video/d8583247b5467df616a9a5a487b91c12/10980,FullBody,Dumbbell Hang Clean and Jerk,https://exrx.net/WeightExercises/OlympicLifts/DBHangCleanJerk,,Power
+,DB,,Pull_Push,DBHangPowerCleanJerk,Compound,https://exrx.glorb.com/api/video/fa181260dda179b1818d85f06370efbf/10981,FullBody,Dumbbell Hang Power Clean and Jerk,https://exrx.net/WeightExercises/OlympicLifts/DBHangPowerCleanJerk,,Power
+,DB,,Pull,DBHangClean,Compound,https://exrx.glorb.com/api/video/99d3ed384d4c08df62c92a9bdc5d6bad/10845,FullBody,Dumbbell Hang Power Clean,https://exrx.net/WeightExercises/OlympicLifts/DBHangClean,,Power
+,DB,,Pull,DBClean,Compound,https://exrx.glorb.com/api/video/5e75af9b03d8adae8284f630ff55d4e2/10842,FullBody,Dumbbell Clean,https://exrx.net/WeightExercises/OlympicLifts/DBClean,,Power
+,KB,,Pull_Push,KBCleanAndJerk,Compound,https://exrx.glorb.com/api/video/dc95b92576031701c1dbb8b0d75d65dc/10040,FullBody,Kettlebell Clean and Press,https://exrx.net/WeightExercises/Kettlebell/KBCleanAndJerk,,Power
+,KB,,Pull,KBClean,Compound,https://exrx.glorb.com/api/video/29bd747a3938f5ccee238650f20aa5ae/10039,FullBody,Kettlebell Clean,https://exrx.net/WeightExercises/Kettlebell/KBClean,,Power
+,BB,,Pull,Snatch,Compound,https://exrx.glorb.com/api/video/68c856967d699786fac00c5002d797ec/11032,FullBody,Snatch,https://exrx.net/WeightExercises/OlympicLifts/Snatch,,Power
+,BB,,Pull,PowerSnatch,Compound,https://exrx.glorb.com/api/video/200d63ba18abce8c62963a91b224c745/10864,FullBody,Power Snatch,https://exrx.net/WeightExercises/OlympicLifts/PowerSnatch,,Power
+,BB,,Pull,DeficitSnatch,Compound,https://exrx.glorb.com/api/video/7d023955ce58ed8377fee3941d9221c1/10973,FullBody,Deficit Snatch,https://exrx.net/WeightExercises/OlympicLifts/DeficitSnatch,,Power
+,BB,,Pull,BlockSnatchPull,Compound,https://exrx.glorb.com/api/video/851a885c39dac30485419e7b94ca96a4/10977,FullBody,Block Snatch Pull,https://exrx.net/WeightExercises/OlympicLifts/BlockSnatchPull,,Power
+,BB,,Pull,BlockSnatch,Compound,https://exrx.glorb.com/api/video/2083201641b739769941f3855b59360e/10969,FullBody,Block Snatch,https://exrx.net/WeightExercises/OlympicLifts/BlockSnatch,,Power
+,BB,,Pull,BlockPowerSnatch,Compound,https://exrx.glorb.com/api/video/23290b92c7a3d0cbcb3bde411df1a272/10975,FullBody,Block Power Snatch,https://exrx.net/WeightExercises/OlympicLifts/BlockPowerSnatch,,Power
+,BB,,Pull,HighBlockSnatch,Compound,https://exrx.glorb.com/api/video/ad4419b3b145d7a3d2f1e26783c29a98/10978,FullBody,High Block Snatch,https://exrx.net/WeightExercises/OlympicLifts/HighBlockSnatch,,Power
+,BB,,Pull,HighBlockPowerSnatch,Compound,https://exrx.glorb.com/api/video/3bba37dcb456a39ec9ef46d796566058/10976,FullBody,High Block Power Snatch,https://exrx.net/WeightExercises/OlympicLifts/HighBlockPowerSnatch,,Power
+,BB,,Pull,HangSnatch,Compound,https://exrx.glorb.com/api/video/c0bcea4fb278bdaf4bb92930b9df965f/10858,FullBody,Hang Snatch,https://exrx.net/WeightExercises/OlympicLifts/HangSnatch,,Power
+,BB,,Pull,HangPowerSnatch,Compound,https://exrx.glorb.com/api/video/4089497666844db16e032e3d87f8e3cb/10856,FullBody,Hang Power Snatch,https://exrx.net/WeightExercises/OlympicLifts/HangPowerSnatch,,Power
+,BB,,Push,OverheadLunge,Compound,https://exrx.glorb.com/api/video/3feee2a03ebabd042373d44d9d2a4d58/10974,FullBody,Overhead Lunge,https://exrx.net/WeightExercises/OlympicLifts/OverheadLunge,,Power
+,BB,,Push,OverheadSquat,Compound,https://exrx.glorb.com/api/video/a028d7d9d27f900de1a1ac8d4a97db05/10861,FullBody,Overhead Squat,https://exrx.net/WeightExercises/OlympicLifts/OverheadSquat,,Power
+,BB,,Push,PressUnder,Compound,https://exrx.glorb.com/api/video/4ce22de1bf50624dd8ce7549550333a3/10865,FullBody,Press Under,https://exrx.net/WeightExercises/OlympicLifts/PressUnder,,Power
+,BB,,Push,QuickDrop,Compound,https://exrx.glorb.com/api/video/33bbcc34c72b23e34d0a6951e071936b/10870,FullBody,Quick Drop,https://exrx.net/WeightExercises/OlympicLifts/QuickDrop,,Power
+,BB,,Push,SotsPress,Compound,https://exrx.glorb.com/api/video/dd9fe19704e5bbff78d84ea61a59391c/10986,FullBody,Sots Press,https://exrx.net/WeightExercises/OlympicLifts/SotsPress,,Power
+,DB,,Pull,DBSnatch,Compound,https://exrx.glorb.com/api/video/0db6b78c30f941c7fff672283235dc4f/10849,FullBody,Dumbbell Power Snatch,https://exrx.net/WeightExercises/OlympicLifts/DBSnatch,,Power
+,KB,,Pull,KBSnatch,Compound,https://exrx.glorb.com/api/video/8def166b727fb91619008cf1f5fff550/10047,FullBody,Kettlebell Snatch,https://exrx.net/WeightExercises/Kettlebell/KBSnatch,,Power
