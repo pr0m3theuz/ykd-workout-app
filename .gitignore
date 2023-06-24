@@ -18,3 +18,5 @@ local.properties
 /.scannerwork/
 *.kate-swp
 *.csv#
+app/src/main/assets/database/exercise.ods
+app/src/main/assets/database/Text File.txt
