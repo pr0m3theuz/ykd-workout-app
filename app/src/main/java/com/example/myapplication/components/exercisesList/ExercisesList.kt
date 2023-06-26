@@ -1,5 +1,6 @@
 package com.example.myapplication.components.exercisesList
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -46,19 +48,53 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.myapplication.components.BottomNavigationBar
+import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
 import com.example.myapplication.data.ExerciseModel
 
 // @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ExercisesScreen(
-    exercisesViewModel: ExercisesViewModel,
+//    exercisesViewModel: ExercisesViewModel,
+    navController: NavHostController = rememberNavController(),
 ) {
-    val exercises by exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
+//    val exercises by exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
 //    Surface {
-    ExercisesLazyColumn(exercises = exercises)
+//    ExercisesLazyColumn(exercises = exercises)
 //    }
+
+    NavHost(navController = navController, startDestination = "exercisesList") {
+        composable("exercisesList") {
+            val viewModel = hiltViewModel<ExercisesViewModel>()
+            ExercisesLazyColumn(
+                navController = navController,
+                exercisesViewModel = viewModel,
+                /*exercises = exercises*/
+            )
+        }
+        composable(
+            "exerciseDetails/{exerciseID}",
+            arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val viewModel = hiltViewModel<ExercisesViewModel>()
+            navBackStackEntry.arguments?.getString("exerciseID")?.let {
+                ExerciseDetailsScreen(
+                    navController,
+                    exercisePK = it,
+                    exercisesViewModel = viewModel,
+                )
+            }
+        }
+    }
 }
 
 @OptIn(
@@ -68,12 +104,15 @@ fun ExercisesScreen(
 )
 @Composable
 fun ExercisesLazyColumn(
-    exercisesViewModel: ExercisesViewModel = viewModel(),
-    exercises: List<ExerciseModel>,
+    navController: NavController,
+    exercisesViewModel: ExercisesViewModel,
+    /*exercises: List<ExerciseModel>,*/
 ) {
 //    val selectedCategoriesMap by exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
 //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
 
+    val exercises by exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
+    Log.i("ExercisesLazyColumn.exercises", exercises.toString())
     fun filterExercises(search: String) {
         exercisesViewModel.filterExercises(search)
     }
@@ -101,6 +140,7 @@ fun ExercisesLazyColumn(
                     IconButton(
                         onClick = {
                             /*TODO Navigate to Previous Screen */
+                            navController.navigateUp()
                             Toast.makeText(
                                 context,
                                 "TODO: Navigate to Previous Screen",
@@ -117,7 +157,22 @@ fun ExercisesLazyColumn(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    val iconColors =
+                        IconButtonDefaults.iconButtonColors()
+                    IconButton(
+                        onClick = {
+                            /*TODO*/
+                            Toast
+                                .makeText(
+                                    context,
+                                    "TODO: On Click, Replace Title with Search Bar",
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                        },
+                        enabled = true,
+                        colors = iconColors
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Search,
                             tint = MaterialTheme.colorScheme.onSurface,
@@ -129,7 +184,8 @@ fun ExercisesLazyColumn(
                 },
             )
         },
-        content = { it ->
+        bottomBar = { BottomNavigationBar() },
+        content = { _ ->
             Column() {
                 Box(modifier = Modifier.fillMaxHeight(0.075f).fillMaxWidth())
                 SearchBar(
@@ -151,31 +207,6 @@ fun ExercisesLazyColumn(
                     horizontalArrangement = Arrangement.spacedBy(4.dp).also { Arrangement.Start },
                     contentPadding = PaddingValues(0.dp)
                 ) {
-/*            items(items = exercisesViewModel.selected.keys.toList()) { category ->
-
-                val checked = exercisesViewModel.selected[category]!!
-                fun updateState() {
-                    exercisesViewModel.onCategoryChange(category = category)
-                }
-                if (checked) {
-                    FilterChip(
-                        selected = checked,
-                        onClick = { updateState() },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = "Localized Description",
-                                modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                            )
-                        },
-                        colors = ChipDefaults.filterChipColors(
-                            backgroundColor = colors.primary,
-                            contentColor = colors.onPrimary
-                        )
-                    ) {
-                        Text(text = exercisesViewModel.getPrintableName(category = category))
-                    }
-                }*/
                     items(items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }) { muscleGroup ->
                         val checked = exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
                         fun updateState() {
@@ -260,239 +291,24 @@ fun ExercisesLazyColumn(
 
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-//            verticalArrangement = Arrangement.spacedBy(8.dp),
-//        contentPadding = PaddingValues(0.dp)
+//                    verticalArrangement = Arrangement.spacedBy(8.dp),
+//                    contentPadding = PaddingValues(0.dp)
                 ) {
-                    stickyHeader { /* TODO Search Function */ }
                     items(
                         count = exercises.size,
                         key = { index: Int -> exercises[index].lazyListItemID }
                     ) { index ->
                         val exercise: ExerciseModel = exercises[index]
 
-                        ExerciseItem(exercise = exercise)
+                        ExerciseItem(
+                            exercise = exercise,
+                            navController = navController
+                        )
                     }
                 }
             }
         }
     )
-    /*    Column(
-            modifier = Modifier*//*.padding(horizontal = 8.dp)*//*
-//            .fillMaxWidth()
-            .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.surface)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            IconButton(
-                onClick = {
-                    *//*TODO Navigate to Previous Screen *//*
-                    Toast.makeText(
-                        context,
-                        "TODO: Navigate to Previous Screen",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ArrowBack,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    contentDescription = "Go to the previous screen"
-                )
-            }
-
-            Text(
-                text = "Exercises",
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-
-            ExercisesFilterMenu(modifier = Modifier.align(Alignment.CenterVertically))
-            ExerciseOptionsDropdownMenu()
-        }
-
-        *//*Row(
-            Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            SearchBar(filterExercises = { search -> filterExercises(search) })
-        }*//*
-
-        var text by rememberSaveable { mutableStateOf("") }
-        var active by rememberSaveable { mutableStateOf(false) }
-
-        SearchBar(
-            query = text,
-            onQueryChange = {
-                text = it
-                filterExercises("%$it%")
-            },
-            onSearch = { active = false },
-            active = active,
-            onActiveChange = { active = false },
-            placeholder = { Text("Search Exercises") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally)
-                .padding(horizontal = 8.dp)
-
-        ) {
-        }
-
-        LazyRow(
-            modifier = Modifier.align(Alignment.Start).padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp).also { Arrangement.Start },
-            contentPadding = PaddingValues(0.dp)
-        ) {
-*//*            items(items = exercisesViewModel.selected.keys.toList()) { category ->
-
-                val checked = exercisesViewModel.selected[category]!!
-                fun updateState() {
-                    exercisesViewModel.onCategoryChange(category = category)
-                }
-                if (checked) {
-                    FilterChip(
-                        selected = checked,
-                        onClick = { updateState() },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = "Localized Description",
-                                modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                            )
-                        },
-                        colors = ChipDefaults.filterChipColors(
-                            backgroundColor = colors.primary,
-                            contentColor = colors.onPrimary
-                        )
-                    ) {
-                        Text(text = exercisesViewModel.getPrintableName(category = category))
-                    }
-                }*//*
-            items(items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }) { muscleGroup ->
-                val checked = exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
-                fun updateState() {
-                    exercisesViewModel.muscleGroupsChecked[muscleGroup] =
-                        !exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
-                }
-                if (checked) {
-                    FilterChip(
-                        selected = checked,
-                        onClick = { updateState() },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = "Localized Description",
-                                modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                            )
-                        },
-                        colors = ChipDefaults.filterChipColors(
-                            backgroundColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Text(text = muscleGroup.printableName)
-                    }
-                }
-            }
-            items(items = exercisesViewModel.equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }) { equipment ->
-                val checked = exercisesViewModel.equipmentsChecked[equipment]!!
-                fun updateState() {
-                    exercisesViewModel.equipmentsChecked[equipment] =
-                        !exercisesViewModel.equipmentsChecked[equipment]!!
-                }
-                if (checked) {
-                    FilterChip(
-                        selected = checked,
-                        onClick = { updateState() },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = "Localized Description",
-                                modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                            )
-                        },
-                        colors = ChipDefaults.filterChipColors(
-                            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    ) {
-                        Text(text = equipment.printableName)
-                    }
-                }
-            }
-            items(items = exercisesViewModel.movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }) {
-                    movementType,
-                ->
-                val checked = exercisesViewModel.movementTypesChecked[movementType]!!
-                fun updateState() {
-                    exercisesViewModel.movementTypesChecked[movementType] =
-                        !exercisesViewModel.movementTypesChecked[movementType]!!
-                }
-                if (checked) {
-                    FilterChip(
-                        selected = checked,
-                        onClick = { updateState() },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = "Localized Description",
-                                modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                            )
-                        },
-                        colors = ChipDefaults.filterChipColors(
-                            backgroundColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Text(text = movementType.printableName)
-                    }
-                }
-            }
-        }
-
-//        Row(modifier = Modifier.scrollable(state = filterChipRowScrollState, orientation = Orientation.Horizontal)) {
-//            exercisesViewModel.muscleGroupsChecked.forEach { (muscleGroup, checked) ->
-//                fun updateState() {
-//                    exercisesViewModel.muscleGroupsChecked[muscleGroup] =
-//                        !exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
-//                }
-//                if (checked) {
-//                    FilterChip(
-//                        selected = checked,
-//                        onClick = { updateState() }
-// //                        colors =
-//                    ) {
-//                        Text(text = muscleGroup.printableName)
-//                    }
-//                }
-//            }
-//        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-//            verticalArrangement = Arrangement.spacedBy(8.dp),
-//        contentPadding = PaddingValues(0.dp)
-        ) {
-            stickyHeader { *//* TODO Search Function *//* }
-            items(
-                count = exercises.size,
-                key = { index: Int -> exercises[index].lazyListItemID }
-            ) { index ->
-                val exercise: ExerciseModel = exercises[index]
-
-                ExerciseItem(exercise = exercise)
-            }
-        }
-    }*/
 }
 
 @Preview

@@ -13,7 +13,7 @@ interface Dao {
     @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise ORDER BY name ASC")
     fun searchExercises(exercise: String): Flow<List<ExerciseModel>>
 
-//    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise AND bodyPart IN(:bodyParts) AND equipment IN(:equipments) ORDER BY name ASC")
+    //    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise AND bodyPart IN(:bodyParts) AND equipment IN(:equipments) ORDER BY name ASC")
     @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise ORDER BY name ASC")
     fun filterExercises(
         exercise: String,
@@ -22,7 +22,12 @@ interface Dao {
 //        movementTypes: List<String> = listOf("%%")
     ): Flow<List<ExerciseModel>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE, entity = ExerciseModel::class)
+    @Query("SELECT * FROM exercises_table WHERE primaryKey=:exercisePK")
+    fun getExerciseDetails(
+        exercisePK: Long,
+    ): Flow<List<ExerciseModel>>
+
+    @Insert(onConflict = OnConflictStrategy.ABORT, entity = ExerciseModel::class)
     suspend fun insertExercise(exercise: ExerciseModel)
 
     @Update

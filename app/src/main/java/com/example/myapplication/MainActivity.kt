@@ -8,24 +8,27 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.components.*
 import com.example.myapplication.components.exercisesList.ExercisesScreen
-import com.example.myapplication.components.exercisesList.ExercisesViewModel
-import com.example.myapplication.data.ExercisesViewModelFactory
+import com.example.myapplication.components.homeScreen.HomeScreen
+import com.example.myapplication.components.workout.WorkoutScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val exercisesViewModel: ExercisesViewModel by viewModels {
-        ExercisesViewModelFactory((application as NameHereApplication).repository)
-    }
+    /*    private val exercisesViewModel: ExercisesViewModel by viewModels {
+            ExercisesViewModelFactory((application as NameHereApplication).repository)
+        }*/
 
 //    private val exercisesViewModel: ExercisesViewModel by viewModels()
 
@@ -33,10 +36,39 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                Surface {
-//                    WorkoutScreen()
-                    ExercisesScreen(exercisesViewModel = exercisesViewModel)
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "exercises") {
+                    navigation(
+                        "exercisesScreen",
+                        route = "exercises"
+                    ) {
+                        composable("exercisesScreen") {
+//                            val viewModel = hiltViewModel<ExercisesViewModel>()
+//                            ExercisesScreen(exercisesViewModel = viewModel)
+                            ExercisesScreen(/*exercisesViewModel = exercisesViewModel*/)
+                        }
+                    }
+                    navigation(
+                        "workoutScreen",
+                        route = "workout"
+                    ) {
+                        composable("workoutScreen") {
+                            WorkoutScreen()
+                        }
+                    }
+                    navigation(
+                        "homeScreen",
+                        route = "home"
+                    ) {
+                        composable("homeScreen") {
+                            HomeScreen()
+                        }
+                    }
                 }
+//                Surface {
+//                    WorkoutScreen()
+//                    ExercisesScreen(exercisesViewModel = exercisesViewModel)
+//                }
             }
         }
     }

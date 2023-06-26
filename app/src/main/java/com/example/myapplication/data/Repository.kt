@@ -23,13 +23,17 @@ class Repository @Inject constructor(private val dao: Dao) {
         dao.insertExercise(exercise)
     }
 
+    fun getExerciseDetails(exercisePK: Long): Flow<List<ExerciseModel>> {
+        return dao.getExerciseDetails(exercisePK)
+    }
+
     @WorkerThread
     suspend fun updateExercise(exercise: ExerciseModel) {
         dao.updateExercise(exercise)
     }
 
     fun filterExercises(
-        exercise: String
+        exercise: String,
 //        bodyParts: List<String>,
 //        equipments: List<String>
 //        movementTypes: List<String>

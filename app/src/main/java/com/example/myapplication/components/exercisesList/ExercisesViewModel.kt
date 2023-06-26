@@ -17,8 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ExercisesViewModel @Inject constructor(private var repository: Repository) :
-    ViewModel() {
+class ExercisesViewModel @Inject constructor(private var repository: Repository) : ViewModel() {
 
     private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
     val exercises: StateFlow<List<ExerciseModel>>
@@ -26,10 +25,10 @@ class ExercisesViewModel @Inject constructor(private var repository: Repository)
 
     init {
         viewModelScope.launch {
+            println("ExercisesViewModel: collected exercises!")
             repository.getExercises().collect {
                 _exercises.value = it
             }
-            Log.i("ExercisesViewModel: ", "collected exercises!")
         }
     }
 
@@ -123,4 +122,54 @@ class ExercisesViewModel @Inject constructor(private var repository: Repository)
             }
         }
     }
+
+    // TODO Get Exercise Details
+    private val _exercise: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
+
+    val selectedExerciseDetails: StateFlow<List<ExerciseModel>>
+        get() = _exercise.asStateFlow()
+
+    /**
+     * Retrieves the detailed information of an exercise from the repository.
+     *
+     * @param exercisePK The exercise for which to fetch the details.
+     * @return The exercise model with detailed information.
+     **/
+    fun getExerciseDetails(exercisePK: String?) {
+        if (exercisePK != null) {
+            println("getExerciseDetails() called")
+            viewModelScope.launch {
+                println("getExerciseDetails() viewModelScope launched")
+                repository.getExerciseDetails(exercisePK = exercisePK.toLong()).collect() {
+                    _exercise.value = it
+                    println("getExerciseDetails() query results it: $it")
+                    println("getExerciseDetails() query results exercise: ${_exercise.value}")
+                }
+            }
+        }
+        println("getExerciseDetails() exercise.first(): ${_exercise.value}")
+//        }
+//        return exercise.first()
+    }
+
+    /**
+     *  Retrieves the detailed information of an exercise from the repository.
+     *
+     * @param exercise The exercise for which to fetch the details.
+     * @return The exercise model with detailed information.
+     *
+     * From ChatGPT
+     * In this updated version:
+     *
+     * The function is marked with the suspend modifier, indicating that it is a coroutine function and can be suspended.
+     * The viewModelScope.launch block is replaced with withContext(Dispatchers.IO). This ensures that the function executes in the IO context to perform the network/database operation.
+     * The collect method is replaced with first to collect the first emitted value from the flow. This assumes that the flow will emit a single value, and the function will return that value.
+     */
+    /*    suspend fun getExerciseDetails(exercisePK: Long?) {
+            return withContext(Dispatchers.IO) {
+                if (exercisePK != null) {
+                    repository.getExerciseDetails(exercisePK = exercisePK).first()
+                }
+            }
+        }*/
 }

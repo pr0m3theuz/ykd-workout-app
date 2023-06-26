@@ -7,20 +7,10 @@ Mapp/src/androidTest/java/com/example/myapplication/ExampleInstrumentedTest.kt,
 gradlew,5/b/5bbfa66edb4db3c7c33c5181f43510990d3307f9
 n
 >app/src/test/java/com/example/myapplication/ExampleUnitTest.kt,e/1/e110aede2d9b606b5e7c8b653b7e7a4905cf45b6
-n
->app/src/main/java/com/example/myapplication/data/Repository.kt,3/3/33ad01bb6036777ccfdc174c5b86aba29bd3e8ef
 r
 Bapp/src/main/java/com/example/myapplication/data/EquipmentModel.kt,f/b/fb506da3ad98556381dbdf1b4a6fb8a50218e8bf
-k
-;app/src/main/java/com/example/myapplication/MainActivity.kt,0/0/00ed33bb9fa3f2577abe71150520b83c93b6af18
-Š
-Zapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesViewModel.kt,0/9/090e8e9f514d9413e3dd3b6a9748c09f20d8690f
 d
 4app/src/main/java/com/example/myapplication/NewID.kt,8/8/881394c61d1a2cd526f4990c05834500048c0246
-j
-:app/src/main/java/com/example/myapplication/Application.kt,d/1/d14001a80843e603f9ff0d82ec6097000c60b9a1
-@
-app/build.gradle,f/4/f4a01d6a4fcb971362ec00a83903fd3902f52164
 ‰
 Yapp/src/main/java/com/example/myapplication/components/workoutDialogs/CommonComponents.kt,4/8/4843a9da935f495a52c3935e50f514f7c52e1c22
 r
@@ -33,15 +23,7 @@ l
 `app/src/test/java/com/example/myapplication/components/equateVolume/EquateVolumeViewModelTest.kt,b/b/bb5670da638919c6e67973d8e215f00b768b5312
 <
 build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
-…
-Uapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesList.kt,2/a/2a7dd877d030e002a109fdde0cebf0d30c6ac83b
-g
-7app/src/main/java/com/example/myapplication/data/Dao.kt,6/a/6a2cfe3ab8207b7b2b0f8f9bc572472ef4cc590a
-s
-Capp/src/main/java/com/example/myapplication/components/SearchBar.kt,8/3/833d739c507f2f903fdf1e3820218a7a2bb6ed99
 ‹
 [app/src/main/java/com/example/myapplication/components/exercisesList/ExercisesFilterMenu.kt,2/d/2ded629d6a2f0aa56506fe65c2900ee1dcc34244
 q
 Aapp/src/main/java/com/example/myapplication/data/ExerciseModel.kt,4/2/4265700d78596b78e4368fe09f84ce7b25a73928
-„
-Tapp/src/main/java/com/example/myapplication/components/exercisesList/ExerciseItem.kt,2/1/214944efb3abe9e07e31d6bff139de98b02b501f

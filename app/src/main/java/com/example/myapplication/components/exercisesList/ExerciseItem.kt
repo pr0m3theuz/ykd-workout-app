@@ -24,26 +24,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.myapplication.data.ExerciseModel
 
 @Composable
-fun ExerciseItem(exercise: ExerciseModel) {
+fun ExerciseItem(exercise: ExerciseModel, navController: NavController) {
     val context = LocalContext.current
 
     val padding = 8.dp
 
     Row(
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier
+            .padding(vertical = 8.dp)
             .fillMaxWidth()
             .clickable(
                 enabled = true,
                 onClickLabel = null,
                 onClick = {
-                    Toast.makeText(
-                        context,
-                        "TODO: Navigate to Exercise Details Screen",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    navController.navigate("exerciseDetails/${exercise.primaryKey}")
+                    Toast
+                        .makeText(
+                            context,
+                            "TODO: Navigate to Exercise Details Screen",
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
                 }
             ), // TODO Create Exercise Details Screen
 //        horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -51,12 +56,15 @@ fun ExerciseItem(exercise: ExerciseModel) {
     ) {
         Spacer(modifier = Modifier.width(padding))
         Box(
-            modifier = Modifier.size(width = 50.dp, height = 50.dp)
+            modifier = Modifier
+                .size(width = 50.dp, height = 50.dp)
                 .background(MaterialTheme.colorScheme.errorContainer)
         ) {
 //            TODO Get Image from YouTube Thumbnail
             Icon(
-                modifier = Modifier.align(Alignment.Center).size(40.dp),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(40.dp),
                 imageVector = Icons.Outlined.Error,
                 tint = MaterialTheme.colorScheme.error,
                 contentDescription = "No exercise image available."
