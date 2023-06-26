@@ -32,18 +32,11 @@ fun SetItem(
     index: Int,
     set: SetModel,
     removeSet: () -> Unit,
-//    updateSetWeight: (id: Long, newWeight: Double?) -> Unit,
-//    updateSetReps: (id: Long, newReps: Int?) -> Unit,
-//    updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
-//    updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
-//    updateSetType: (id: Long, setType: SetTypeModel) -> Unit,
-//    setComplete: (setComplete: Boolean) -> Unit, // ,
-//    startRestTimer: () -> Unit
 ) {
 //    Log.i("SetColumn()", "$set")
 
     val coroutineScope = rememberCoroutineScope()
-    var setCompletedState by remember { mutableStateOf(set.setCompleted) }
+    val setCompletedState by remember { mutableStateOf(set.setCompleted) }
     val openDialog = remember { mutableStateOf(true) }
 
     val dismissState = rememberDismissState(
@@ -51,26 +44,6 @@ fun SetItem(
             true
         }
     )
-
-//    fun newWeight(newWeight: Double?) {
-//        updateSetWeight(set.id, newWeight)
-//    }
-//
-//    fun newReps(newReps: Int?) {
-//        updateSetReps(set.id, newReps)
-//    }
-//
-//    fun newRIR(newRIR: Double?) {
-//        updateSetRIR(set.id, newRIR)
-//    }
-//
-//    fun newRPE(newRPE: Double?) {
-//        updateSetRPE(set.id, newRPE)
-//    }
-//
-//    fun newSetType(setType: SetTypeModel) {
-//        updateSetType(set.id, setType)
-//    }
 
     fun deleteCompletedSet(delete: Boolean) {
         if (delete) {
@@ -84,11 +57,6 @@ fun SetItem(
             }
         }
     }
-
-//    fun changesetCompletedState(status: Boolean) {
-//        setCompletedState = status
-//        setComplete(status)
-//    }
 
     fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
         openDialog.value = open
@@ -105,17 +73,13 @@ fun SetItem(
 
     SwipeToDismiss(
         state = dismissState,
-        // modifier = Modifier.padding(vertical = 4.dp),
-        directions = setOf(DismissDirection.EndToStart)
-        /*    (if (!exerciseSet.setCompleted) DismissDirection.EndToStart else null)
-        ) as Set<DismissDirection>*/,
+        directions = setOf(DismissDirection.EndToStart),
         dismissThresholds = { dismissDirection ->
             FractionalThreshold(
                 if (dismissDirection == DismissDirection.EndToStart) 0.5f else 1f
             )
         },
         background = {
-            // val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
             val color by animateColorAsState(
                 when (dismissState.targetValue) {
                     DismissValue.Default -> MaterialTheme.colorScheme.primary
@@ -150,12 +114,6 @@ fun SetItem(
                 exerciseSets = exerciseSets,
                 index,
                 set
-//                { completed -> changesetCompletedState(completed) },
-//                { newWeight -> newWeight(newWeight) },
-//                { newReps -> newReps(newReps) },
-//                { newRIR -> newRIR(newRIR) },
-//                { newRPE -> newRPE(newRPE) },
-//                { setType -> newSetType(setType) }
             )
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.exercise.AddSet
 import com.example.myapplication.components.exercise.ExerciseScreen
@@ -17,30 +18,20 @@ import com.example.myapplication.data.SetModel
 
 @Composable
 fun ExercisesSetsScreen(
+    navController: NavController,
     workoutViewModel: WorkoutViewModel = viewModel(),
-//    exercises: List<ExerciseSetModel>,
-    /*addSet: (exerciseSet: ExerciseSetModel) -> Unit,
-    startRestTimer: (exerciseSet: ExerciseSetModel, setID: Long) -> Unit*/
 ) {
     val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
 
-//    val exercises = remember { mutableStateOf(exercises) }
-
     ExerciseSetLazyColumn(
+        navController = navController,
         exercises = exercisesSets
-/*        addSet = { exerciseSet: ExerciseSetModel -> addSet(exerciseSet) },
-        startRestTimer = { exerciseSet: ExerciseSetModel, setID: Long ->
-            workoutViewModel.startSetCompletedTimer(
-                exerciseSet,
-                setID
-            )
-        }*/
-
     )
 }
 
 @Composable
 fun ExerciseSetLazyColumn(
+    navController: NavController,
     workoutViewModel: WorkoutViewModel = viewModel(),
     exercises: List<ExerciseSetModel>,
 ) {
@@ -53,6 +44,7 @@ fun ExerciseSetLazyColumn(
             key = { item -> item.id }
         ) { exerciseSets ->
             ExerciseScreen(
+                navController = navController,
                 _exerciseSets = exerciseSets
             )
 
@@ -62,54 +54,6 @@ fun ExerciseSetLazyColumn(
                     index = index,
                     set = set,
                     removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
-//                    updateSetWeight = { setID: Long, newWeight: Double? ->
-//                        workoutViewModel.updateSetWeight(
-//                            exerciseSets = exerciseSets,
-//                            setID = setID,
-//                            newWeight = newWeight
-//                        )
-//                    },
-//                    updateSetReps = { setID: Long, newReps: Int? ->
-//                        workoutViewModel.updateSetReps(
-//                            exerciseSets = exerciseSets,
-//                            setID,
-//                            newReps
-//                        )
-//                    },
-//                    updateSetRIR = { setID: Long, newRIR: Double? ->
-//                        workoutViewModel.updateSetRIR(
-//                            exerciseSets = exerciseSets,
-//                            setID,
-//                            newRIR
-//                        )
-//                    },
-//                    updateSetRPE = { setID: Long, newRPE: Double? ->
-//                        workoutViewModel.updateSetRPE(
-//                            exerciseSets = exerciseSets,
-//                            setID,
-//                            newRPE
-//                        )
-//                    },
-//                    updateSetType = { setID: Long, setType: SetTypeModel ->
-//                        workoutViewModel.updateSetType(
-//                            exerciseSets = exerciseSets,
-//                            setID,
-//                            setType
-//                        )
-//                    },
-//                    setComplete = { setComplete: Boolean ->
-//                        workoutViewModel.setComplete(
-//                            exerciseSets,
-//                            set.id,
-//                            setComplete
-//                        )
-//                    }
-//                    startRestTimer = {
-//                        workoutViewModel.startSetCompletedTimer(
-//                            exerciseSets,
-//                            set.id
-//                        )
-//                    }
                 )
             }
 
@@ -117,7 +61,7 @@ fun ExerciseSetLazyColumn(
         }
 
         item {
-            AddExercise()
+            AddExercise(navController = navController)
         }
         item {
             CancelWorkout()

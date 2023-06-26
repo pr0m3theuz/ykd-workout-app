@@ -25,27 +25,18 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    /*    private val exercisesViewModel: ExercisesViewModel by viewModels {
-            ExercisesViewModelFactory((application as NameHereApplication).repository)
-        }*/
-
-//    private val exercisesViewModel: ExercisesViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "exercises") {
+                NavHost(navController = navController, startDestination = "workout") {
                     navigation(
                         "exercisesScreen",
                         route = "exercises"
                     ) {
                         composable("exercisesScreen") {
-//                            val viewModel = hiltViewModel<ExercisesViewModel>()
-//                            ExercisesScreen(exercisesViewModel = viewModel)
-                            ExercisesScreen(/*exercisesViewModel = exercisesViewModel*/)
+                            ExercisesScreen()
                         }
                     }
                     navigation(

@@ -8,15 +8,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 
 @Composable
-fun AddExercise() {
+fun AddExercise(navController: NavController) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = { /*TODO Do something!*/ }) {
+        TextButton(onClick = {
+            /*TODO Do something!*/
+            navController.navigate("exercisesList")
+        }) {
             Text("Add Exercise")
         }
     }

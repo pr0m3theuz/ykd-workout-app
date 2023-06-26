@@ -64,21 +64,14 @@ import com.example.myapplication.data.ExerciseModel
 // @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ExercisesScreen(
-//    exercisesViewModel: ExercisesViewModel,
     navController: NavHostController = rememberNavController(),
 ) {
-//    val exercises by exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
-//    Surface {
-//    ExercisesLazyColumn(exercises = exercises)
-//    }
-
     NavHost(navController = navController, startDestination = "exercisesList") {
         composable("exercisesList") {
             val viewModel = hiltViewModel<ExercisesViewModel>()
             ExercisesLazyColumn(
                 navController = navController,
                 exercisesViewModel = viewModel,
-                /*exercises = exercises*/
             )
         }
         composable(
@@ -106,7 +99,6 @@ fun ExercisesScreen(
 fun ExercisesLazyColumn(
     navController: NavController,
     exercisesViewModel: ExercisesViewModel,
-    /*exercises: List<ExerciseModel>,*/
 ) {
 //    val selectedCategoriesMap by exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
 //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
