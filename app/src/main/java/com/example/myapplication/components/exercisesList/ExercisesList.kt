@@ -48,17 +48,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.myapplication.components.BottomNavigationBar
-import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
 import com.example.myapplication.data.ExerciseModel
 
 // @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -66,7 +60,7 @@ import com.example.myapplication.data.ExerciseModel
 fun ExercisesScreen(
     navController: NavHostController = rememberNavController(),
 ) {
-    NavHost(navController = navController, startDestination = "exercisesList") {
+    /*NavHost(navController = navController, startDestination = "exercisesList") {
         composable("exercisesList") {
             val viewModel = hiltViewModel<ExercisesViewModel>()
             ExercisesLazyColumn(
@@ -87,7 +81,7 @@ fun ExercisesScreen(
                 )
             }
         }
-    }
+    }*/
 }
 
 @OptIn(
@@ -176,7 +170,7 @@ fun ExercisesLazyColumn(
                 },
             )
         },
-        bottomBar = { BottomNavigationBar() },
+        bottomBar = { BottomNavigationBar(navController = navController) },
         content = { _ ->
             Column() {
                 Box(modifier = Modifier.fillMaxHeight(0.075f).fillMaxWidth())

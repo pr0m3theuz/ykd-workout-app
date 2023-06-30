@@ -31,7 +31,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
             )
         },
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(navController = navController)
         },
         content = { _ ->
             Column(

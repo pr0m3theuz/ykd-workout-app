@@ -5,4 +5,10 @@
     <string name="new_timer_title">Rest Timer</string>
     <string name="rest_timer_running_text">Remaining Time: </string>
     <string name="rest_timer_ended_text">Rest Timer Finished! Start Next Set!</string>
+    <string name="profile">Profile</string>
+    <string name="history">History</string>
+    <string name="workout">Workout</string>
+    <string name="programs">Programs</string>
+    <string name="exercises">Exercises</string>
+    <string name="settings">Settings</string>
 </resources>
