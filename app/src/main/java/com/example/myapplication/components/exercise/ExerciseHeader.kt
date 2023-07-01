@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -68,9 +69,11 @@ fun ExerciseHeader(
             ) {
                 // TODO Change to a button that takes the user to a new screen with more info about the exercise
                 Text(
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier
+                        .padding(8.dp)
                         .clickable { navController.navigate("exerciseDetails/${exerciseSets.exercise.primaryKey}") },
-                    text = "Exercise Name"
+                    text = "Exercise Name",
+                    style = MaterialTheme.typography.titleMedium
                 )
 
                 ExerciseOptionsDropdownMenu(
@@ -103,6 +106,8 @@ private fun SetContentHeader() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val textStyle = MaterialTheme.typography.titleSmall
+
         Box(
             modifier = Modifier
                 .padding(0.dp)
@@ -110,7 +115,7 @@ private fun SetContentHeader() {
             contentAlignment = Alignment.Center
 
         ) {
-            Text("SET")
+            Text("SET", style = textStyle)
         }
 
         Box(
@@ -118,28 +123,28 @@ private fun SetContentHeader() {
 //                        .padding(4.dp)
                 .width(128.dp),
             contentAlignment = Alignment.Center
-        ) { Text("PREVIOUS") }
+        ) { Text("PREVIOUS", style = textStyle) }
 
         Box(
             modifier = Modifier
                 .padding(PaddingValues(horizontal = 4.dp))
                 .width(72.dp),
             contentAlignment = Alignment.Center
-        ) { Text("WEIGHT") }
+        ) { Text("WEIGHT", style = textStyle) }
 
         Box(
             modifier = Modifier
                 .padding(PaddingValues(horizontal = 4.dp))
                 .width(60.dp),
             contentAlignment = Alignment.Center
-        ) { Text("REPS") }
+        ) { Text("REPS", style = textStyle) }
 
         Box(
             modifier = Modifier
                 .padding(4.dp)
                 .width(40.dp),
             contentAlignment = Alignment.Center
-        ) { Text("RIR") }
+        ) { Text("RIR", style = textStyle) }
 
         Spacer(
             Modifier
@@ -156,6 +161,7 @@ private fun ExerciseSetsWorkoutSummary(
 ) {
 // TODO Give option to show either Total Volume or Total Working Volume
 // TODO Update Values on user input, cause keyboard to
+    val textStyle = MaterialTheme.typography.titleSmall
 
     val exercisesSets by workoutViewModel.exercisesSets.collectAsStateWithLifecycle()
     val exerciseSets = exercisesSets.first { it.uuid == _exerciseSets.uuid }
@@ -175,8 +181,11 @@ private fun ExerciseSetsWorkoutSummary(
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise.weightUnit}")
-        Text(text = "Reps: $totalRepetitions")
-        Text(text = "Avg Weight: ${df.format(averageWeight)}")
+        Text(
+            text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise.weightUnit}",
+            style = textStyle
+        )
+        Text(text = "Reps: $totalRepetitions", style = textStyle)
+        Text(text = "Avg Weight: ${df.format(averageWeight)}", style = textStyle)
     }
 }

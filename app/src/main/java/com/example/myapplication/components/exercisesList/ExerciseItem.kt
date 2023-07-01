@@ -19,11 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.data.ExerciseModel
 
@@ -74,8 +71,16 @@ fun ExerciseItem(exercise: ExerciseModel, navController: NavController) {
         Spacer(modifier = Modifier.width(8.dp))
 
         Column {
-            Text(text = exercise.name, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-            Text(text = exercise.muscleGroup, color = Color.Gray, fontSize = 14.sp)
+            Text(
+                text = exercise.name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = exercise.muscleGroup,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         Box(modifier = Modifier.width(padding))

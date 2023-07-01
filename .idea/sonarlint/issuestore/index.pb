@@ -21,8 +21,6 @@ r
 Bapp/src/main/java/com/example/myapplication/data/EquipmentModel.kt,f/b/fb506da3ad98556381dbdf1b4a6fb8a50218e8bf
 q
 Aapp/src/main/java/com/example/myapplication/data/ExerciseModel.kt,4/2/4265700d78596b78e4368fe09f84ce7b25a73928
-‹
-[app/src/main/java/com/example/myapplication/components/exercisesList/ExercisesFilterMenu.kt,2/d/2ded629d6a2f0aa56506fe65c2900ee1dcc34244
 d
 4app/src/main/java/com/example/myapplication/NewID.kt,8/8/881394c61d1a2cd526f4990c05834500048c0246
 Œ

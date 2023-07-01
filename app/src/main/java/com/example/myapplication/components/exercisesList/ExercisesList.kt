@@ -33,6 +33,8 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,12 +44,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -114,8 +114,7 @@ fun ExercisesLazyColumn(
                     Text(
                         text = "Exercises",
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                         //                    modifier = Modifier.align(Alignment.CenterVertically),
                         maxLines = 1,
@@ -174,6 +173,15 @@ fun ExercisesLazyColumn(
         content = { _ ->
             Column() {
                 Box(modifier = Modifier.fillMaxHeight(0.075f).fillMaxWidth())
+
+                val color = SearchBarDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    inputFieldColors = TextFieldDefaults.colors(
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                )
+
                 SearchBar(
                     query = text,
                     onQueryChange = {
@@ -182,9 +190,21 @@ fun ExercisesLazyColumn(
                     },
                     onSearch = { active = false },
                     active = active,
+                    colors = color,
                     onActiveChange = { active = false },
-                    placeholder = { Text("Search Exercises") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    placeholder = {
+                        Text(
+                            "Search Exercises",
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 8.dp)
                 ) {}
@@ -307,7 +327,7 @@ fun ExerciseOptionsDropdownMenu() {
             Icon(
                 Icons.Outlined.MoreVert,
                 contentDescription = "Exercise Options and Settings",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
         DropdownMenu(

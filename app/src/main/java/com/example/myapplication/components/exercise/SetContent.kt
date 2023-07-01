@@ -195,7 +195,8 @@ fun SetContent(
         // TODO If Previous RIR is null, text = "110 x 10" or "110 x 10 @ 1RM%"
         Text(
             "110 x 10 @ RIR 0",
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall
         )
 
         Box(

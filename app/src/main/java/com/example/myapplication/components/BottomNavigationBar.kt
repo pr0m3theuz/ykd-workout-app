@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
@@ -44,7 +45,13 @@ fun BottomNavigationBar(navController: NavController) {
         items.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = stringResource(item.resourceId)) },
-                label = { Text(stringResource(item.resourceId)) },
+                label = {
+                    Text(
+                        stringResource(item.resourceId),
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
                 selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                 onClick = {
                     navController.navigate(item.route) {

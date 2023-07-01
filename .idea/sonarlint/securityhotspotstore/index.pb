@@ -23,7 +23,5 @@ l
 `app/src/test/java/com/example/myapplication/components/equateVolume/EquateVolumeViewModelTest.kt,b/b/bb5670da638919c6e67973d8e215f00b768b5312
 <
 build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
-‹
-[app/src/main/java/com/example/myapplication/components/exercisesList/ExercisesFilterMenu.kt,2/d/2ded629d6a2f0aa56506fe65c2900ee1dcc34244
 q
 Aapp/src/main/java/com/example/myapplication/data/ExerciseModel.kt,4/2/4265700d78596b78e4368fe09f84ce7b25a73928

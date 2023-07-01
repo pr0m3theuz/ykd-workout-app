@@ -38,12 +38,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -58,7 +56,7 @@ fun ExerciseDetailsScreen(
     exercisesViewModel: ExercisesViewModel,
 ) {
     exercisesViewModel.getExerciseDetails(exercisePK)
-//    val exercise: ExerciseModel = exercisesViewModel.getExerciseDetails(exercisePK)
+
     val exercise by exercisesViewModel.selectedExerciseDetails.collectAsStateWithLifecycle()
 
     ExerciseDetailsLayout(navController, exercise)
@@ -72,6 +70,7 @@ private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<
     val context = LocalContext.current
     var state by remember { mutableIntStateOf(0) }
     val titles = listOf("About", "History", "Charts", "Records")
+    val onSurface = MaterialTheme.colorScheme.onSurface
 
     Scaffold() { _ ->
         Column {
@@ -82,8 +81,8 @@ private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<
                             text = exercise?.name ?: "Loading...",
                             maxLines = 2,
                             overflow = TextOverflow.Visible,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
+                            color = onSurface,
+                            style = MaterialTheme.typography.titleMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
@@ -150,12 +149,14 @@ private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<
 fun ExerciseDetailsOptionsDropdownMenu() {
     var expanded by remember { mutableStateOf(false) }
 
+    val onSurface = MaterialTheme.colorScheme.onSurface
+
     Box {
         IconButton(onClick = { expanded = true }) {
             Icon(
                 Icons.Outlined.MoreVert,
                 contentDescription = "Exercise Options and Settings",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
         DropdownMenu(
@@ -163,7 +164,7 @@ fun ExerciseDetailsOptionsDropdownMenu() {
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { androidx.compose.material3.Text("Edit Exercise") },
+                text = { Text("Edit Exercise", color = onSurface) },
                 onClick = { /* TODO Navigate to Create Exercise Screen*/ }
             )
         }
@@ -177,9 +178,10 @@ fun AboutTab(_exerciseName: String) {
     val youtubeSearchQuery = "https://www.youtube.com/results?search_query=$exerciseName"
 
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(youtubeSearchQuery))
-//    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     val context = LocalContext.current
+
+    val onSurface = MaterialTheme.colorScheme.onSecondaryContainer
 
     val buttonColors = ButtonDefaults.buttonColors(
         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -188,13 +190,17 @@ fun AboutTab(_exerciseName: String) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         Row() {
-            Icon(imageVector = Icons.Outlined.BrokenImage, contentDescription = "Missing Image")
+            Icon(
+                imageVector = Icons.Outlined.BrokenImage,
+                contentDescription = "Missing Image",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
         Button(
             onClick = { startActivity(context, intent, null) },
             colors = buttonColors,
         ) {
-            Text(text = "Search Exercise on Youtube")
+            Text(text = "Search Exercise on Youtube", color = onSurface)
         }
     }
 }
@@ -210,6 +216,8 @@ fun HistoryTab() {
                 .primaryContainer.copy(alpha = 0.2f),
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
+    val subtitle = MaterialTheme.colorScheme.onSurfaceVariant
+    val onSurface = MaterialTheme.colorScheme.onSurface
 
     Card(
         colors = cardColors,
@@ -218,16 +226,42 @@ fun HistoryTab() {
 //            .padding(8.dp)
         border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outlineVariant)
     ) {
-        Column(Modifier.padding(8.dp)) {
-            Text(text = "Workout Name")
-            Text(text = "Program Name")
-            Text(text = "Mesocycle/Microcycle")
-            Text(text = "Workout Date & Time")
-            Text(text = "Total Volume: 9000 kg")
-            Row {
-                Text(text = "Sets performed")
+        Column(Modifier.padding(16.dp)) {
+            Text(
+                text = "Workout Name",
+                style = MaterialTheme.typography.titleMedium,
+                color = onSurface
+            )
+            Text(
+                text = "Program Name",
+                style = MaterialTheme.typography.bodyMedium,
+                color = subtitle
+            )
+            Text(
+                text = "Mesocycle/Microcycle",
+                style = MaterialTheme.typography.bodyMedium,
+                color = subtitle
+            )
+            Text(
+                text = "Workout Date & Time",
+                style = MaterialTheme.typography.bodyMedium,
+                color = subtitle
+            )
+            Text(text = "Total Volume: 9000 kg", color = onSurface)
+            Row(Modifier.padding(vertical = 8.dp)) {
+                Text(
+                    text = "Sets performed",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = onSurface
+                )
             }
-            Text(text = "List of Sets")
+            Row() {
+                Text(
+                    text = "List of Sets",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = subtitle
+                )
+            }
         }
     }
 }
@@ -237,7 +271,11 @@ fun HistoryTab() {
 fun ChartTab() {
     Column() {
         Row() {
-            Icon(imageVector = Icons.Outlined.BrokenImage, contentDescription = "Missing Image")
+            Icon(
+                imageVector = Icons.Outlined.BrokenImage,
+                contentDescription = "Missing Image",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
@@ -247,6 +285,9 @@ fun ChartTab() {
 fun RecordsTab() {
     val rowPadding = 4.dp
 
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val subtitle = MaterialTheme.colorScheme.onSurfaceVariant
+
     val buttonColors = ButtonDefaults.buttonColors(
         containerColor = MaterialTheme.colorScheme.secondaryContainer,
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -254,11 +295,15 @@ fun RecordsTab() {
 
     Column(
         Modifier
-//            .padding(8.dp)
+            .padding(4.dp)
             .fillMaxWidth()
     ) {
         Row(Modifier.padding(rowPadding)) {
-            Text("Personal Records")
+            Text(
+                "Personal Records",
+                color = onSurface,
+                style = MaterialTheme.typography.titleMedium
+            )
         }
         Row(
             Modifier
@@ -266,8 +311,8 @@ fun RecordsTab() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Estimated 1RM")
-            Text("13 lbs")
+            Text("Estimated 1RM", color = onSurface)
+            Text("13 lbs", color = onSurface)
         }
         Row(
             Modifier
@@ -275,8 +320,8 @@ fun RecordsTab() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Max Volume")
-            Text("1,300 lbs")
+            Text("Max Volume", color = onSurface)
+            Text("1,300 lbs", color = onSurface)
         }
         Row(
             Modifier
@@ -284,8 +329,8 @@ fun RecordsTab() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Max weight")
-            Text("13 lbs")
+            Text("Max Weight", color = onSurface)
+            Text("13 lbs", color = onSurface)
         }
         Row(
             Modifier
@@ -297,7 +342,7 @@ fun RecordsTab() {
                 onClick = { /* TODO Navigate Records History */ },
                 colors = buttonColors
             ) {
-                Text(text = "View Records History")
+                Text(text = "View Records History", color = onSurface)
             }
         }
         Row(
@@ -306,9 +351,9 @@ fun RecordsTab() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Reps")
-            Text("Best Performance")
-            Text("Estimated 1RM")
+            Text("Reps", color = onSurface)
+            Text("Best Performance", color = onSurface)
+            Text("Estimated 1RM", color = onSurface)
         }
 
         // TODO Refoctor to List
@@ -320,22 +365,30 @@ fun RecordsTab() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box() {
-                Text(text = "1")
+                Text(text = "1", color = onSurface)
             }
             Box() {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "85 lbs (# of Reps)")
-                    Text(text = "Date")
+                    Text(text = "85 lbs (# of Reps)", color = onSurface)
+                    Text(
+                        text = "Date",
+                        color = subtitle,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
-            Box() { Text(text = "1RM") }
+            Box() { Text(text = "1RM", color = onSurface) }
         }
 
         Row(Modifier.padding(rowPadding)) {
-            Text(text = "Estimate RMs are generated using ...")
+            Text(
+                text = "Estimate RMs are generated using ...",
+                color = subtitle,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
         Row(Modifier.padding(rowPadding)) {
-            Text("Lifetime Stats")
+            Text("Lifetime Stats", color = onSurface, style = MaterialTheme.typography.titleMedium)
         }
         Row(
             Modifier
@@ -343,8 +396,8 @@ fun RecordsTab() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Total Reps")
-            Text(text = "1,305")
+            Text("Total Reps", color = onSurface)
+            Text(text = "1,305", color = onSurface)
         }
         Row(
             Modifier
@@ -352,8 +405,8 @@ fun RecordsTab() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Total Volume")
-            Text("13,405 lbs")
+            Text("Total Volume", color = onSurface)
+            Text("13,405 lbs", color = onSurface)
         }
     }
 }
