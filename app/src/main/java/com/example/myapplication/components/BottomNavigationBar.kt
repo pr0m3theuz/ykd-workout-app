@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
-import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Person
@@ -21,6 +20,8 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.myapplication.R
+import com.example.myapplication.myiconpack.ExerciseFilled
+import com.example.myapplication.myiconpack.MyIconPack
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -70,7 +71,7 @@ sealed class Screens(val route: String, @StringRes val resourceId: Int, val icon
     object History : Screens("history", R.string.history, Icons.Filled.History)
     object Workout : Screens("workout", R.string.workout, Icons.Filled.Assignment)
     object Programs : Screens("programs", R.string.programs, Icons.Filled.LibraryBooks)
-    object Exercise : Screens("exercises", R.string.exercises, Icons.Filled.FitnessCenter)
+    object Exercise : Screens("exercises", R.string.exercises, MyIconPack.ExerciseFilled)
 
     object Settings : Screens("settings", R.string.settings, Icons.Filled.Settings)
 }
