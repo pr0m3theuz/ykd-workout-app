@@ -72,47 +72,46 @@ private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<
     val titles = listOf("About", "History", "Charts", "Records")
     val onSurface = MaterialTheme.colorScheme.onSurface
 
-    Scaffold() { _ ->
-        Column {
-            Row() {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = exercise?.name ?: "Loading...",
-                            maxLines = 2,
-                            overflow = TextOverflow.Visible,
-                            color = onSurface,
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                navController.navigateUp()
-                                /*TODO Navigate to Previous Screen */
-                                Toast.makeText(
-                                    context,
-                                    "TODO: Navigate to Previous Screen",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.ArrowBack,
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                contentDescription = "Go to the previous screen"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = exercise?.name ?: "Loading...",
+                        maxLines = 2,
+                        overflow = TextOverflow.Visible,
+                        color = onSurface,
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.navigateUp()
+                            /*TODO Navigate to Previous Screen */
+                            Toast.makeText(
+                                context,
+                                "TODO: Navigate to Previous Screen",
+                                Toast.LENGTH_SHORT
                             )
-                        }
-                    },
-                    actions = {
-                        ExerciseDetailsOptionsDropdownMenu()
+                                .show()
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowBack,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "Go to the previous screen"
+                        )
                     }
-                )
-            }
-
+                },
+                actions = {
+                    ExerciseDetailsOptionsDropdownMenu()
+                }
+            )
+        }
+    ) { contentPadding ->
+        Column(Modifier.padding(contentPadding)) {
             TabRow(
                 selectedTabIndex = state,
                 backgroundColor = MaterialTheme.colorScheme.primaryContainer,
@@ -351,9 +350,19 @@ fun RecordsTab() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Reps", color = onSurface)
-            Text("Best Performance", color = onSurface)
-            Text("Estimated 1RM", color = onSurface)
+            Text("Reps", color = onSurface, modifier = Modifier.weight(1f))
+            Text(
+                "Best Performance",
+                color = onSurface,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                "Estimated 1RM",
+                color = onSurface,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
         }
 
         // TODO Refoctor to List
@@ -364,20 +373,27 @@ fun RecordsTab() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box() {
-                Text(text = "1", color = onSurface)
+            Text(text = "1", color = onSurface, modifier = Modifier.weight(1f))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "85 lbs (# of Reps)", color = onSurface, textAlign = TextAlign.Center)
+                Text(
+                    text = "Date",
+                    color = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
             }
-            Box() {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "85 lbs (# of Reps)", color = onSurface)
-                    Text(
-                        text = "Date",
-                        color = subtitle,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-            Box() { Text(text = "1RM", color = onSurface) }
+
+            Text(
+                text = "1RM",
+                color = onSurface,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
         }
 
         Row(Modifier.padding(rowPadding)) {

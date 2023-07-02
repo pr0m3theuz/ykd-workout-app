@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -170,11 +169,9 @@ fun ExercisesLazyColumn(
             )
         },
         bottomBar = { BottomNavigationBar(navController = navController) },
-        content = { _ ->
-            Column() {
-                Box(modifier = Modifier.fillMaxHeight(0.075f).fillMaxWidth())
-
-                val color = SearchBarDefaults.colors(
+        content = { contentPadding ->
+            Column(Modifier.padding(contentPadding)) {
+                val searchBarColors = SearchBarDefaults.colors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     inputFieldColors = TextFieldDefaults.colors(
                         unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -190,7 +187,7 @@ fun ExercisesLazyColumn(
                     },
                     onSearch = { active = false },
                     active = active,
-                    colors = color,
+                    colors = searchBarColors,
                     onActiveChange = { active = false },
                     placeholder = {
                         Text(

@@ -27,6 +27,8 @@ import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
 import com.example.myapplication.components.exercisesList.ExercisesScreen
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.homeScreen.HomeScreen
+import com.example.myapplication.components.programs.ProgramDetailsScreen
+import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.WorkoutContent
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "workout") {
                     addExercisesGraph(navController)
                     addWorkoutGraph(navController)
+                    addProgramsGraph(navController)
                     navigation(
                         "homeScreen",
                         route = "home"
@@ -126,5 +129,36 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
                 )
             }
         }
+    }
+}
+
+private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
+    navigation("programsScreen", route = "programs") {
+        composable("programsScreen") {
+            ProgramsScreen(navController)
+        }
+        composable("programDetails") {
+            ProgramDetailsScreen(navController)
+        }
+        /*composable("exercisesList") {
+            val viewModel = hiltViewModel<ExercisesViewModel>()
+            ExercisesLazyColumn(
+                navController = navController,
+                exercisesViewModel = viewModel,
+            )
+        }
+        composable(
+            "exerciseDetails/{exerciseID}",
+            arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val viewModel = hiltViewModel<ExercisesViewModel>()
+            navBackStackEntry.arguments?.getString("exerciseID")?.let {
+                ExerciseDetailsScreen(
+                    navController,
+                    exercisePK = it,
+                    exercisesViewModel = viewModel,
+                )
+            }
+        }*/
     }
 }

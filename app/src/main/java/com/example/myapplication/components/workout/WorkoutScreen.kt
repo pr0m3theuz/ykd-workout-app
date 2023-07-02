@@ -2,11 +2,9 @@ package com.example.myapplication.components.workout
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
@@ -113,10 +111,8 @@ fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewMo
             )
         },
         bottomBar = { BottomNavigationBar(navController = navController) },
-    ) { _ ->
-        Column {
-            Box(modifier = Modifier.fillMaxHeight(0.075f).fillMaxWidth())
-
+    ) { contentPadding ->
+        Column(Modifier.padding(contentPadding)) {
             Row(
                 modifier = Modifier.padding(start = 8.dp)
                     .fillMaxWidth(),
