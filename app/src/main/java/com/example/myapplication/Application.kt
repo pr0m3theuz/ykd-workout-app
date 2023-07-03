@@ -11,17 +11,6 @@ const val NOTIFICATION_CHANNEL_ID = "rest_timer"
 
 @HiltAndroidApp
 class NameHereApplication : Application() {
-//    private val applicationScope = CoroutineScope(SupervisorJob())
-
-//    @Inject
-//    lateinit var database: AppRoomDatabase
-//
-//    @Inject
-//    lateinit var repository: Repository
-
-//    private val database by lazy { AppRoomDatabase.getDatabase(this, applicationScope) }
-//    val repository by lazy { Repository(database.exerciseDao()) }
-
     override fun onCreate() {
         super.onCreate()
 
