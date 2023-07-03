@@ -28,7 +28,7 @@ class WorkingSetViewModel : ViewModel() {
     private var exerciseID: Long? = null
     private var workoutID: Long? = null
     fun getExerciseSets(exerciseSets: ExerciseSets) {
-        exerciseID = exerciseSets.exerciseID
+        exerciseID = exerciseSets.exercise.exerciseID
         workoutID = exerciseSets.workoutID
     }
 
@@ -43,8 +43,8 @@ class WorkingSetViewModel : ViewModel() {
         } else {
             _sets.value.add(
                 SetModel(
-                    exerciseID = exerciseID,
-                    workoutID = workoutID
+                    exerciseID = exerciseID!!,
+                    workoutID = workoutID!!
                 )
             )
         }
@@ -73,8 +73,8 @@ class WorkingSetViewModel : ViewModel() {
                 exerciseWeight = 100.00,
                 repetitions = 10,
                 percentage1RM = 1.0,
-                exerciseID = exerciseID,
-                workoutID = workoutID
+                exerciseID = exerciseID!!,
+                workoutID = workoutID!!
             )
         }
     }

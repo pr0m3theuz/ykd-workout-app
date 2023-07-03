@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "muscle_exercise",
-    primaryKeys = ["exercise_id", "muscle_id", "relation"],
     foreignKeys = [
         ForeignKey(
             entity = ExerciseModel::class,

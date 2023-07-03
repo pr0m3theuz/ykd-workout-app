@@ -164,7 +164,7 @@ private fun ExerciseSetsWorkoutSummary(
     val textStyle = MaterialTheme.typography.titleSmall
 
     val exercisesSets by workoutViewModel.exercisesSets.collectAsStateWithLifecycle()
-    val exerciseSets = exercisesSets.first { it.uuid == _exerciseSets.uuid }
+    val exerciseSets = exercisesSets.first { it.exSetsUUID == _exerciseSets.exSetsUUID }
 
 //    val exerciseSets = _exerciseSets
 

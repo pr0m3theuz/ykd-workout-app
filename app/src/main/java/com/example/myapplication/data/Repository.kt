@@ -8,11 +8,11 @@ import javax.inject.Singleton
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
 @Singleton
-class Repository @Inject constructor(private val dao: Dao) {
+class Repository @Inject constructor(private val exerciseDao: ExerciseDao) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    fun getExercises(): Flow<List<ExerciseModel>> = dao.getAllExercises()
+    fun getExercises(): Flow<List<ExerciseModel>> = exerciseDao.getAllExercises()
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
@@ -20,16 +20,16 @@ class Repository @Inject constructor(private val dao: Dao) {
 
     @WorkerThread
     suspend fun insertExercise(exercise: ExerciseModel) {
-        dao.insertExercise(exercise)
+        exerciseDao.insertExercise(exercise)
     }
 
     fun getExerciseDetails(exercisePK: Long): Flow<List<ExerciseModel>> {
-        return dao.getExerciseDetails(exercisePK)
+        return exerciseDao.getExerciseDetails(exercisePK)
     }
 
     @WorkerThread
     suspend fun updateExercise(exercise: ExerciseModel) {
-        dao.updateExercise(exercise)
+        exerciseDao.updateExercise(exercise)
     }
 
     fun filterExercises(
@@ -38,6 +38,6 @@ class Repository @Inject constructor(private val dao: Dao) {
 //        equipments: List<String>
 //        movementTypes: List<String>
     ): Flow<List<ExerciseModel>> {
-        return dao.filterExercises(exercise/*, bodyParts, equipments, movementTypes*/)
+        return exerciseDao.filterExercises(exercise/*, bodyParts, equipments, movementTypes*/)
     }
 }

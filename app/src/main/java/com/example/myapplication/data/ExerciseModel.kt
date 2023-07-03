@@ -26,7 +26,7 @@ data class ExerciseModel(
     var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,
-
+//
     var barType: String? = null, // TODO Could be :BarType
     var weightUnit: String? = null, // TODO Could be ENUM -> Default, KG, LBS
     var workingSetRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,

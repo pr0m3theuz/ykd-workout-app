@@ -5,17 +5,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
-import com.example.myapplication.data.AppRoomDatabase
-import com.example.myapplication.data.Repository
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 
 const val NOTIFICATION_CHANNEL_ID = "rest_timer"
 
 @HiltAndroidApp
 class NameHereApplication : Application() {
-    val applicationScope = CoroutineScope(SupervisorJob())
+//    private val applicationScope = CoroutineScope(SupervisorJob())
 
 //    @Inject
 //    lateinit var database: AppRoomDatabase
@@ -23,8 +19,8 @@ class NameHereApplication : Application() {
 //    @Inject
 //    lateinit var repository: Repository
 
-    private val database by lazy { AppRoomDatabase.getDatabase(this, applicationScope) }
-    val repository by lazy { Repository(database.Dao()) }
+//    private val database by lazy { AppRoomDatabase.getDatabase(this, applicationScope) }
+//    val repository by lazy { Repository(database.exerciseDao()) }
 
     override fun onCreate() {
         super.onCreate()

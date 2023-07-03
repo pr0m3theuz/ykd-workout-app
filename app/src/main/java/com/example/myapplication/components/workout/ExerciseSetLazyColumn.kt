@@ -44,7 +44,7 @@ fun ExerciseSetLazyColumn(
     ) {
         items(
             exercises,
-            key = { item -> item.id }
+            key = { item -> item.exSetsLazyListItemID }
         ) { exerciseSets ->
             ExerciseScreen(
                 navController = navController,

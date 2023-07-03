@@ -37,10 +37,16 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        val database = Room.databaseBuilder(
+//            applicationContext,
+//            AppRoomDatabase::class.java,
+//            "app_database_v3"
+//        ).build()
+
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "workout") {
+                NavHost(navController = navController, startDestination = "exercises") {
                     addExercisesGraph(navController)
                     addWorkoutGraph(navController)
                     addProgramsGraph(navController)

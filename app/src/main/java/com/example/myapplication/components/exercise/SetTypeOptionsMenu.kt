@@ -24,7 +24,7 @@ fun SetTypeOptionsMenu(
     // selectedSetType: SetTypeModel, TODO Not if this is needed
     expandMenu: () -> Boolean,
     onDismiss: () -> Unit,
-    updateSetType: (setType: SetType) -> Unit,
+    updateSetType: (setTypeID: Int) -> Unit,
     changeIconText: () -> Unit,
     changeIconColor: () -> Unit,
 ) {
@@ -63,7 +63,7 @@ fun SetTypeOptionsMenu(
                 },
                 onClick = {
                     onDismiss()
-                    updateSetType(setType)
+                    updateSetType(setType.setTypeID)
                     changeIconText()
                     changeIconColor()
                 } // TODO Assign Set Type to Set

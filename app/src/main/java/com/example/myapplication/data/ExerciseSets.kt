@@ -1,21 +1,17 @@
 package com.example.myapplication.data
 
-import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.example.myapplication.fakeULID
 import com.example.myapplication.newID
 import java.util.UUID
-import kotlin.math.roundToInt
 
-@Entity(
+/*@Entity(
     tableName = "exerciseSets",
-    primaryKeys = ["workoutID", "exerciseID"],
     foreignKeys = [
         ForeignKey(
             entity = Workout::class,
@@ -30,16 +26,31 @@ import kotlin.math.roundToInt
             onDelete = ForeignKey.CASCADE
         ),
     ]
-)
+)*/
+/*
+ TODO:
+    @Query(SELECT * FROM sets WHERE workoutID:=workoutID) return ExerciseSets
+    @Query(SELECT * FROM sets WHERE exerciseID:=exerciseID) return WorkoutSets
+*/
+
 data class ExerciseSets(
     @PrimaryKey(autoGenerate = true) val exerciseSetsID: Long = fakeULID(),
-    val id: Long = newID(), // Used for LazyColumn
-    val uuid: UUID = UUID.randomUUID(),
+    val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+    val exSetsUUID: UUID = UUID.randomUUID(),
+    @ColumnInfo(name = "workoutID") val workoutID: Long,
     @Embedded val exercise: ExerciseModel,
     @Relation(parentColumn = "exerciseID", entityColumn = "setID", entity = SetModel::class)
     var sets: MutableList<SetModel>,
-    @ColumnInfo(name = "workoutID") val workoutID: Long,
-    @ColumnInfo(name = "exerciseID") val exerciseID: Long,
+)
+
+// TODO to use for exercise history
+data class WorkoutSets(
+    @PrimaryKey(autoGenerate = true) val exerciseSetsID: Long = fakeULID(),
+    val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+    val exSetsUUID: UUID = UUID.randomUUID(),
+    @Embedded val workout: Workout,
+    @Relation(parentColumn = "workoutID", entityColumn = "setID", entity = SetModel::class)
+    var sets: MutableList<SetModel>,
 )
 
 @Entity(primaryKeys = ["exerciseID", "setID"/*, "exerciseNotePrimaryKey"*/])
@@ -59,7 +70,7 @@ data class ExerciseWithSets(
     val sets: List<SetModel>,
 )
 
-fun ExerciseSets.addSet() {
+/*fun ExerciseSets.addSet() {
     if (sets.isNotEmpty()) {
         sets.add(
             sets.last().copy(
@@ -72,7 +83,7 @@ fun ExerciseSets.addSet() {
         sets.add(
             SetModel(
                 exerciseID = exercise.exerciseID,
-                workoutID = fakeULID() /* TODO change in workout.primaryKey*/
+                workoutID = fakeULID() *//* TODO change in workout.primaryKey*//*
             )
         )
     }
@@ -82,7 +93,7 @@ fun ExerciseSets.addSet() {
 
 fun ExerciseSets.removeSet(uuid: UUID) {
     sets.removeIf { it.uuid == uuid }
-}
+}*/
 
 fun ExerciseSets.updateSetWeight(uuid: UUID, newWeight: Double?) {
     sets.forEach { if (it.uuid == uuid) it.exerciseWeight = newWeight }
@@ -110,83 +121,27 @@ fun ExerciseSets.updateSetType(uuid: UUID, setTypeID: Int) {
 
 fun ExerciseSets.addWarmUpSets(warmUpSets: List<SetModel>) {
     for (index in warmUpSets.indices) {
-        sets.add(index, warmUpSets[index].copy(lazyListItemID = newID(), uuid = UUID.randomUUID()))
+        sets.add(
+            index,
+            warmUpSets[index].copy(
+                lazyListItemID = newID(),
+                uuid = UUID.randomUUID(),
+                exerciseID = exercise.exerciseID
+            )
+        )
     }
 }
 
-fun ExerciseSets.getWorkingSetWeight(): Double? {
-    return sets.firstOrNull { it.setTypeID != 2 }?.exerciseWeight
-}
-
-fun ExerciseSets.addWorkingSets(workingSets: List<SetModel>) {
-    workingSets.forEach { it.lazyListItemID = newID() }
-
-    sets.removeAll { it.setTypeID != 2 }
-
-    sets.addAll(workingSets)
-}
-
-fun ExerciseSets.addBackOffSets(backOffSets: List<SetModel>) {
-    for (index in backOffSets.indices) {
-        sets.add(backOffSets[index].copy(lazyListItemID = newID(), uuid = UUID.randomUUID()))
-    }
-}
+private const val WARM_UP_SET = 2
 
 fun ExerciseSets.totalWorkingSetVolume(): Double {
-    var totalVolume: Double = 0.0
+    var totalVolume = 0.0
 
-    sets.filter { it.setTypeID != 2 }.forEach {
+    sets.filter { it.setTypeID != WARM_UP_SET }.forEach {
         totalVolume += (it.setVolume())
     }
 
     return totalVolume
-}
-
-fun ExerciseSets.numberOfWorkingSets(): Int {
-    var numberOfWorkingSets: Int = 0
-
-    sets.filter { it.setTypeID != 2 }.forEach { _ ->
-        numberOfWorkingSets++
-    }
-
-    return numberOfWorkingSets
-}
-
-//    Returns the number of reps to be performed based on the new weight
-fun ExerciseSets.equateWorkingSetVolumeByWeight(weight: Double?): Int {
-    var totalVolume: Double = 0.0
-    var numberOfWorkingSets: Int = 0
-
-    sets.filter { it.setTypeID != 2 }.forEach {
-        totalVolume += (it.setVolume())
-        numberOfWorkingSets++
-    }
-
-    val newRepetitions: Int = if (numberOfWorkingSets > 0 && weight != null && weight > 0.0) {
-        totalVolume.div(weight).div(numberOfWorkingSets).roundToInt()
-    } else {
-        0
-    }
-
-    return newRepetitions
-}
-
-//    Returns the weight to be used based on the new repetitions
-fun ExerciseSets.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double {
-    var totalVolume: Double = 0.0
-    var numberOfWorkingSets: Int = 0
-
-    sets.filter { it.setTypeID != 2 }.forEach {
-        totalVolume += (it.setVolume())
-        numberOfWorkingSets++
-    }
-
-    val newWeight: Double = if (numberOfWorkingSets > 0 && repetitions != null && repetitions > 0) {
-        totalVolume.div(repetitions).div(numberOfWorkingSets)
-    } else {
-        0.0
-    }
-    return newWeight
 }
 
 fun ExerciseSets.totalVolume(): Double {
@@ -218,3 +173,69 @@ fun ExerciseSets.averageWeight(): Double {
         averageWeight
     }
 }
+
+/*
+fun ExerciseSets.getWorkingSetWeight(): Double? {
+    return sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.exerciseWeight
+}
+
+fun ExerciseSets.addWorkingSets(workingSets: List<SetModel>) {
+    workingSets.forEach { it.lazyListItemID = newID() }
+
+    sets.removeAll { it.setTypeID != WARM_UP_SET }
+
+    sets.addAll(workingSets)
+}
+
+fun ExerciseSets.addBackOffSets(backOffSets: List<SetModel>) {
+    for (index in backOffSets.indices) {
+        sets.add(backOffSets[index].copy(lazyListItemID = newID(), uuid = UUID.randomUUID()))
+    }
+}*/
+
+/*fun ExerciseSets.numberOfWorkingSets(): Int {
+    var numberOfWorkingSets: Int = 0
+
+    sets.filter { it.setTypeID != WARM_UP_SET }.forEach { _ ->
+        numberOfWorkingSets++
+    }
+
+    return numberOfWorkingSets
+}
+
+//    Returns the number of reps to be performed based on the new weight
+fun ExerciseSets.equateWorkingSetVolumeByWeight(weight: Double?): Int {
+    var totalVolume: Double = 0.0
+    var numberOfWorkingSets: Int = 0
+
+    sets.filter { it.setTypeID != WARM_UP_SET }.forEach {
+        totalVolume += (it.setVolume())
+        numberOfWorkingSets++
+    }
+
+    val newRepetitions: Int = if (numberOfWorkingSets > 0 && weight != null && weight > 0.0) {
+        totalVolume.div(weight).div(numberOfWorkingSets).roundToInt()
+    } else {
+        0
+    }
+
+    return newRepetitions
+}
+
+//    Returns the weight to be used based on the new repetitions
+fun ExerciseSets.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double {
+    var totalVolume: Double = 0.0
+    var numberOfWorkingSets: Int = 0
+
+    sets.filter { it.setTypeID != WARM_UP_SET }.forEach {
+        totalVolume += (it.setVolume())
+        numberOfWorkingSets++
+    }
+
+    val newWeight: Double = if (numberOfWorkingSets > 0 && repetitions != null && repetitions > 0) {
+        totalVolume.div(repetitions).div(numberOfWorkingSets)
+    } else {
+        0.0
+    }
+    return newWeight
+}*/

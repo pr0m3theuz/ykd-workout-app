@@ -132,15 +132,15 @@ class ExercisesViewModel @Inject constructor(private var repository: Repository)
     /**
      * Retrieves the detailed information of an exercise from the repository.
      *
-     * @param exercisePK The exercise for which to fetch the details.
+     * @param exerciseID The exercise for which to fetch the details.
      * @return The exercise model with detailed information.
      **/
-    fun getExerciseDetails(exercisePK: String?) {
-        if (exercisePK != null) {
+    fun getExerciseDetails(exerciseID: String?) {
+        if (exerciseID != null) {
             println("getExerciseDetails() called")
             viewModelScope.launch {
                 println("getExerciseDetails() viewModelScope launched")
-                repository.getExerciseDetails(exercisePK = exercisePK.toLong()).collect() {
+                repository.getExerciseDetails(exercisePK = exerciseID.toLong()).collect() {
                     _exercise.value = it
                     println("getExerciseDetails() query results it: $it")
                     println("getExerciseDetails() query results exercise: ${_exercise.value}")

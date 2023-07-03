@@ -10,7 +10,6 @@ import java.util.UUID
 
 @Entity(
     tableName = "exerciseNotes",
-    primaryKeys = ["workoutID", "exerciseID", "programID", "mesocycleID", "microcycleID"],
     foreignKeys = [
         ForeignKey(
             entity = Workout::class,
@@ -60,18 +59,11 @@ data class ExerciseNote(
 // TODO Are the below necessary? TBD
 @Entity(
     tableName = "workoutNotes",
-    primaryKeys = ["workoutID", "programID", "mesocycleID", "microcycleID"],
     foreignKeys = [
         ForeignKey(
             entity = Workout::class,
             parentColumns = ["workoutID"],
             childColumns = ["workoutID"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = ExerciseModel::class,
-            parentColumns = ["exerciseID"],
-            childColumns = ["exerciseID"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
@@ -108,13 +100,12 @@ data class WorkoutNote(
 
 @Entity(
     tableName = "programNotes",
-    primaryKeys = ["programID"],
     foreignKeys = [
         ForeignKey(
             entity = Program::class,
             parentColumns = ["programID"],
             childColumns = ["programID"],
-            onDelete = ForeignKey.SET_NULL
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -129,7 +120,6 @@ data class ProgramNote(
 
 @Entity(
     tableName = "mesocycleNotes",
-    primaryKeys = ["workoutID", "programID", "mesocycleID", "microcycleID"],
     foreignKeys = [
         ForeignKey(
             entity = Program::class,
@@ -141,7 +131,7 @@ data class ProgramNote(
             entity = Mesocycle::class,
             parentColumns = ["mesocycleID"],
             childColumns = ["mesocycleID"],
-            onDelete = ForeignKey.SET_NULL
+            onDelete = ForeignKey.CASCADE
         ),
     ]
 )
@@ -157,7 +147,6 @@ data class MesocycleNote(
 
 @Entity(
     tableName = "microcycleNotes",
-    primaryKeys = ["workoutID", "programID", "mesocycleID", "microcycleID"],
     foreignKeys = [
         ForeignKey(
             entity = Program::class,
@@ -175,7 +164,7 @@ data class MesocycleNote(
             entity = Microcycle::class,
             parentColumns = ["microcycleID"],
             childColumns = ["microcycleID"],
-            onDelete = ForeignKey.SET_NULL
+            onDelete = ForeignKey.CASCADE
         ),
     ]
 )

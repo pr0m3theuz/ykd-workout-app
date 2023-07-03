@@ -366,7 +366,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
                 SetModel(
                     lazyListItemID = newID(),
                     setNumber = 0,
-                    exerciseID = exerciseSets.exerciseID,
+                    exerciseID = exerciseSets.exercise.exerciseID,
                     workoutID = fakeULID() // TODO Replace with workout.workoutID
                 )
             )
@@ -390,17 +390,17 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         exerciseSets: ExerciseSets,
         temporarySets: MutableList<SetModel>,
     ) {
-        val index = _exercisesSetsData.indexOfFirst { it.uuid == exerciseSets.uuid }
+        val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
         _exercisesSetsData[index] =
-            exerciseSets.copy(id = newID(), sets = temporarySets)
+            exerciseSets.copy(exSetsLazyListItemID = newID(), sets = temporarySets)
         _exercisesSets.value = _exercisesSetsData.toMutableList()
     }
 
     private fun updateSetData(
         exerciseSets: ExerciseSets,
     ) {
-        val index = _exercisesSetsData.indexOfFirst { it.uuid == exerciseSets.uuid }
-        _exercisesSetsData[index] = exerciseSets.copy(id = newID())
+        val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
+        _exercisesSetsData[index] = exerciseSets.copy(exSetsLazyListItemID = newID())
         _exercisesSets.value = _exercisesSetsData.toMutableList()
         _allSets.value = allSets().toList()
     }
@@ -531,13 +531,15 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 }
 
 private fun initWorkout(): Workout {
-    return Workout(name = "Workout Name")
+    return Workout(name = "Test Workout Name")
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSets> {
     val exercise = ExerciseModel()
+    val workoutID = fakeULID()
     return MutableList(6) {
         ExerciseSets(
+            workoutID = workoutID,
             exercise = exercise,
             sets = MutableList(3) { indices ->
                 SetModel(
@@ -545,11 +547,9 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
                     exerciseWeight = 100.00.times(it),
                     repetitions = 10.times(it),
                     exerciseID = exercise.exerciseID,
-                    workoutID = fakeULID(),
+                    workoutID = workoutID,
                 )
-            },
-            exerciseID = exercise.exerciseID,
-            workoutID = fakeULID()
+            }
         )
     }
 }

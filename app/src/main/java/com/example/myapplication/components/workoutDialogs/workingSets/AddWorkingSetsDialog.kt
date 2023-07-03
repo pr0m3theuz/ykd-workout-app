@@ -35,7 +35,9 @@ fun AddWorkingSetsScreen(
     openDialog: (Boolean) -> Unit,
     exerciseSets: ExerciseSets,
 ) {
-/* TODO Get User's One Rep Max or Estimated One Rep Max*/
+    workingSetViewModel.getExerciseSets(exerciseSets)
+
+    /* TODO Get User's One Rep Max or Estimated One Rep Max*/
     workingSetViewModel.changeWorkingSetWeight(
         workoutViewModel.getWorkingSetWeight(exerciseSets) ?: 0.0
     )

@@ -22,10 +22,10 @@ class WarmUpSetsViewModel : ViewModel() {
         _workingSetWeight.value = newWorkingWeight
     }
 
-    private var exerciseID: Long? = null
-    private var workoutID: Long? = null
+    private var exerciseID: Long = 0
+    private var workoutID: Long = 0
     fun getExerciseSets(exerciseSets: ExerciseSets) {
-        exerciseID = exerciseSets.exerciseID
+        exerciseID = exerciseSets.exercise.exerciseID
         workoutID = exerciseSets.workoutID
     }
 

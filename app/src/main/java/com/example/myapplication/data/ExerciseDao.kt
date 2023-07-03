@@ -1,12 +1,10 @@
 package com.example.myapplication.data
 
 import androidx.room.*
-import androidx.room.Dao
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface Dao {
-
+interface ExerciseDao {
     @Query("SELECT * FROM exercises ORDER BY name ASC")
     fun getAllExercises(): Flow<List<ExerciseModel>>
 

@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 
 private const val WARM_UP_SET = 2
 
-class EquateVolumeViewModel constructor() : ViewModel() {
+class EquateVolumeViewModel : ViewModel() {
     //    TODO Implement getOneRepMax() Query
     private var _oneRepMax = MutableStateFlow(100.0)
     val oneRepMax: StateFlow<Double>
@@ -37,11 +37,12 @@ class EquateVolumeViewModel constructor() : ViewModel() {
 
     private var _exerciseSets: ExerciseSets? = null
 
-    private var exerciseID: Long? = _exerciseSets?.exerciseID
+    private var exerciseID: Long? = _exerciseSets?.exercise?.exerciseID
     private var workoutID: Long? = _exerciseSets?.workoutID
+
     private fun getExerciseSets(exerciseSets: ExerciseSets) {
         _exerciseSets = exerciseSets
-        exerciseID = _exerciseSets?.exerciseID
+        exerciseID = _exerciseSets?.exercise?.exerciseID
         workoutID = _exerciseSets?.workoutID
     }
 
@@ -78,15 +79,15 @@ class EquateVolumeViewModel constructor() : ViewModel() {
                     uuid = UUID.randomUUID(),
                     setNumber = sets.value.last().setNumber?.plus(1),
                     setCompleted = false,
-                    exerciseID = exerciseID,
-                    workoutID = workoutID
+                    exerciseID = exerciseID!!,
+                    workoutID = workoutID!!
                 )
             )
         } else {
             temporarySets.add(
                 SetModel(
-                    exerciseID = exerciseID,
-                    workoutID = workoutID
+                    exerciseID = exerciseID!!,
+                    workoutID = workoutID!!
                 )
             )
         }
@@ -121,12 +122,12 @@ class EquateVolumeViewModel constructor() : ViewModel() {
             uuid = UUID.randomUUID(),
             setNumber = lastSet.setNumber?.plus(1),
             setCompleted = false,
-            exerciseID = exerciseID,
-            workoutID = workoutID
+            exerciseID = exerciseID!!,
+            workoutID = workoutID!!
         )
             ?: SetModel(
-                exerciseID = exerciseID,
-                workoutID = workoutID
+                exerciseID = exerciseID!!,
+                workoutID = workoutID!!
             )
 
         currentSets.add(newSet)
@@ -241,8 +242,8 @@ class EquateVolumeViewModel constructor() : ViewModel() {
                 exerciseWeight = 100.00,
                 repetitions = 10,
                 percentage1RM = 1.0,
-                exerciseID = exerciseID,
-                workoutID = workoutID
+                exerciseID = exerciseID!!,
+                workoutID = workoutID!!
             )
         }
     }

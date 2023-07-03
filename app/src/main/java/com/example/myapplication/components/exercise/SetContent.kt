@@ -133,8 +133,7 @@ fun SetContent(
         iconText = getSetIconText(set, setIndex)
     }
 
-    fun getSetTypeColor(setTypeID: Int) {
-    }
+    fun getSetTypeColor(setTypeID: Int) {}
 
     var iconColor: Color = Color.White
 
@@ -182,11 +181,11 @@ fun SetContent(
                 // selectedSetType = exerciseSet.setType, TODO Not if this is needed
                 expandMenu = { expandedSetTypeOptionsDropdownMenu },
                 onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
-                updateSetType = { setType ->
+                updateSetType = { setTypeID ->
                     workoutViewModel.updateSetType(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
-                        setTypeID = setType.id
+                        setTypeID = setTypeID
                     )
                 },
                 changeIconText = { changeIconText() },

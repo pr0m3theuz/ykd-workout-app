@@ -16,7 +16,6 @@ import kotlin.time.Duration
 
 @Entity(
     tableName = "workouts",
-    primaryKeys = ["programID", "mesocycleID", "microcycleID"],
     foreignKeys = [
         ForeignKey(
             entity = Program::class,
@@ -43,11 +42,15 @@ data class Workout(
     val lazyListItemID: Long = newID(),
     val uuid: UUID = UUID.randomUUID(),
     var name: String,
+    var workoutAuthor: String? = null,
+//    TODO Remove
     var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,
+//
     var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds,
     var workoutType: String? = null,
+    var dateCreated: LocalDateTime = LocalDateTime.now(),
     val workoutStarted: LocalDateTime = LocalDateTime.now(),
     var workoutEnded: LocalDateTime? = null,
     var day: Int? = null,

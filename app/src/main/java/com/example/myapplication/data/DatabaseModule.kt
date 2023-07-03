@@ -7,16 +7,14 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 object DatabaseModule {
     @Provides
-    fun provideDao(database: AppRoomDatabase): Dao {
-        return database.Dao()
+    fun provideDao(database: AppRoomDatabase): ExerciseDao {
+        return database.exerciseDao()
     }
 
     @Provides
@@ -25,9 +23,10 @@ object DatabaseModule {
         return Room.databaseBuilder(
             appContext,
             AppRoomDatabase::class.java,
-            "app_database"
-        ).createFromAsset("database/app_database.db")
-            .addCallback(AppRoomDatabase.DatabaseCallback(CoroutineScope(SupervisorJob())))
+            "app_database.db"
+        )
+//            .createFromAsset("database/app_database.db")
+//            .addCallback(AppRoomDatabase.DatabaseCallback(CoroutineScope(SupervisorJob())))
             .build()
     }
 }

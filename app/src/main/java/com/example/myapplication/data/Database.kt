@@ -1,23 +1,28 @@
 package com.example.myapplication.data
 
-import android.content.Context
-import android.util.Log
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import androidx.room.TypeConverters
 
 @Database(
-    entities = [ExerciseModel::class],
-    version = 1/*, autoMigrations = [AutoMigration(from = 1, to = 2)]*/
+    entities = [
+        ExerciseModel::class, SetModel::class, Workout::class, Program::class,
+        Mesocycle::class, Microcycle::class, ExerciseNote::class, WorkoutNote::class,
+        ProgramNote::class, MesocycleNote::class, MicrocycleNote::class,
+    ],
+    exportSchema = false,
+    version = 1,
+    /*autoMigrations = [AutoMigration(from = 1, to = 2, spec = AppRoomDatabase.Migration1to2::class)]*/
 )
+@TypeConverters(Converters::class)
 abstract class AppRoomDatabase : RoomDatabase() {
-    abstract fun Dao(): Dao
+    abstract fun exerciseDao(): ExerciseDao
 
-    class DatabaseCallback(
+    /*    @RenameTable(fromTableName = "exercises_table", toTableName = "exercises")
+        @RenameColumn(tableName = "exercises", fromColumnName = "primaryKey", toColumnName = "exerciseID")
+        class Migration1to2 : AutoMigrationSpec*/
+
+    /*class DatabaseCallback(
         private val scope: CoroutineScope,
     ) : RoomDatabase.Callback() {
 
@@ -25,9 +30,9 @@ abstract class AppRoomDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    val dao = database.Dao()
-                    dao.getAllExercises()
-                    Log.i("database onCreate(): ", "database created!")
+//                    val exerciseDao = database.exerciseDao()
+//                    exerciseDao.getAllExercises()
+//                    Log.i("database onCreate(): ", "database created!")
 //                     Delete all content here.
 //                     dao.deleteAll()
 //
@@ -47,9 +52,9 @@ abstract class AppRoomDatabase : RoomDatabase() {
                 }
             }
         }
-    }
+    }*/
 
-    companion object {
+    /*companion object {
         // Singleton prevents multiple instances of database opening at the
         // same time.
         @Volatile
@@ -62,11 +67,11 @@ abstract class AppRoomDatabase : RoomDatabase() {
             val instance = Room.databaseBuilder(
                 context.applicationContext,
                 AppRoomDatabase::class.java,
-                "app_database"
+                "app_database_v3.db"
             )
 //                .fallbackToDestructiveMigration()
-                .createFromAsset("database/test.db")
-                .addCallback(DatabaseCallback(scope))
+//                .createFromAsset("database/test.db")
+//                .addCallback(DatabaseCallback(scope))
                 .build()
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
@@ -76,7 +81,7 @@ abstract class AppRoomDatabase : RoomDatabase() {
                 instance
             }
         }
-    }
+    }*/
 }
 
 /*
