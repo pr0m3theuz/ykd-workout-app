@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.Equipment
 import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.ExercisesRepository
 import com.example.myapplication.data.MovementType
 import com.example.myapplication.data.MuscleGroup
-import com.example.myapplication.data.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ExercisesViewModel @Inject constructor(private var repository: Repository) : ViewModel() {
+class ExercisesViewModel @Inject constructor(private var exercisesRepository: ExercisesRepository) :
+    ViewModel() {
 
     private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
     val exercises: StateFlow<List<ExerciseModel>>
@@ -26,7 +27,7 @@ class ExercisesViewModel @Inject constructor(private var repository: Repository)
     init {
         viewModelScope.launch {
             println("ExercisesViewModel: collected exercises!")
-            repository.getExercises().collect {
+            exercisesRepository.getExercises().collect {
                 _exercises.value = it
             }
         }
@@ -111,7 +112,7 @@ class ExercisesViewModel @Inject constructor(private var repository: Repository)
 
 //        TODO If _exercises is empty, display "No results" Message
         viewModelScope.launch {
-            repository.filterExercises(
+            exercisesRepository.filterExercises(
                 searchExerciseName
 //                selectedMuscleGroups.toList(),
 //                selectedEquipments.toList()
@@ -140,7 +141,7 @@ class ExercisesViewModel @Inject constructor(private var repository: Repository)
             println("getExerciseDetails() called")
             viewModelScope.launch {
                 println("getExerciseDetails() viewModelScope launched")
-                repository.getExerciseDetails(exercisePK = exerciseID.toLong()).collect() {
+                exercisesRepository.getExerciseDetails(exercisePK = exerciseID.toLong()).collect() {
                     _exercise.value = it
                     println("getExerciseDetails() query results it: $it")
                     println("getExerciseDetails() query results exercise: ${_exercise.value}")

@@ -8,7 +8,7 @@ import javax.inject.Singleton
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
 @Singleton
-class Repository @Inject constructor(private val exerciseDao: ExerciseDao) {
+class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseDao) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
