@@ -1,14 +1,13 @@
 package com.example.myapplication.components.workoutDialogs.warmUpSets
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
-import com.example.myapplication.data.SetTypeModel
 import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.math.RoundingMode
-import java.util.*
+import java.util.UUID
 
 class WarmUpSetsViewModel : ViewModel() {
     private var _workingSetWeight = MutableStateFlow(100.0)
@@ -23,17 +22,27 @@ class WarmUpSetsViewModel : ViewModel() {
         _workingSetWeight.value = newWorkingWeight
     }
 
+    private var exerciseID: Long? = null
+    private var workoutID: Long? = null
+    fun getExerciseSets(exerciseSets: ExerciseSets) {
+        exerciseID = exerciseSets.exerciseID
+        workoutID = exerciseSets.workoutID
+    }
+
     fun addSet() {
         if (_warmUpSets.value.isNotEmpty()) {
             _warmUpSets.value.add(
                 _warmUpSets.value.last().copy(
-                    id = newID(),
+                    lazyListItemID = newID(),
                     uuid = UUID.randomUUID()
                 )
             )
         } else {
             _warmUpSets.value.add(
-                SetModel()
+                SetModel(
+                    exerciseID = exerciseID,
+                    workoutID = workoutID
+                )
             )
         }
     }
@@ -59,21 +68,18 @@ class WarmUpSetsViewModel : ViewModel() {
     fun updateWarmUpSetReps(uuid: UUID, newReps: Int) {
         _warmUpSets.value.forEach { if (it.uuid == uuid) it.repetitions = newReps }
     }
-}
 
-private fun initWarmUpSets(): MutableList<SetModel> {
-    return MutableList(3) { index ->
-        SetModel(
-            setNumber = index,
-            setType = SetTypeModel(
-                newID(),
-                "Warm Up Set",
-                description = /*TODO*/"",
-                textColor = Color(255, 178, 0) /* Color: Orange */
-            ),
-            exerciseWeight = 100.00,
-            repetitions = 10,
-            percentage1RM = 1.0
-        )
+    private fun initWarmUpSets(): MutableList<SetModel> {
+        return MutableList(3) { index ->
+            SetModel(
+                setNumber = index,
+                exerciseWeight = 100.00,
+                repetitions = 10,
+                percentage1RM = 1.0,
+                setTypeID = 2,
+                exerciseID = exerciseID,
+                workoutID = workoutID
+            )
+        }
     }
 }

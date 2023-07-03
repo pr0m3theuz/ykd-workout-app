@@ -4,14 +4,28 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Icon
+import androidx.compose.material.SwipeToDismiss
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,7 +58,10 @@ fun EquateVolumeLazyColumn(
         modifier = Modifier.fillMaxWidth().height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(count = workingSets.size, key = { index -> workingSets[index].id }) { index ->
+        items(
+            count = workingSets.size,
+            key = { index -> workingSets[index].lazyListItemID }
+        ) { index ->
 
             val workingSet = workingSets[index]
 
@@ -56,7 +73,7 @@ fun EquateVolumeLazyColumn(
             )
 
             if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                equateVolumeViewModel.removeSet(workingSet.id)
+                equateVolumeViewModel.removeSet(workingSet.lazyListItemID)
             }
 
             SwipeToDismiss(

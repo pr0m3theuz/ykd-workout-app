@@ -58,7 +58,10 @@ fun WorkingSetLazyColumn(
         modifier = Modifier.fillMaxWidth().height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(count = workingSets.size, key = { index -> workingSets[index].id }) { index ->
+        items(
+            count = workingSets.size,
+            key = { index -> workingSets[index].lazyListItemID }
+        ) { index ->
 
             val workingSet = workingSets[index]
 

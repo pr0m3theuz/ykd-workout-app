@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,7 +21,7 @@ import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetLazyColumn
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetViewModel
-import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
@@ -28,7 +33,7 @@ fun AddWorkingSetsScreen(
     workingSetViewModel: WorkingSetViewModel = viewModel(),
     workoutViewModel: WorkoutViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    exerciseSets: ExerciseSetModel,
+    exerciseSets: ExerciseSets,
 ) {
 /* TODO Get User's One Rep Max or Estimated One Rep Max*/
     workingSetViewModel.changeWorkingSetWeight(

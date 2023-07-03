@@ -16,7 +16,7 @@ import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.exercise.AddSet
 import com.example.myapplication.components.exercise.ExerciseScreen
 import com.example.myapplication.components.exercise.SetItem
-import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
 
 @Composable
@@ -36,7 +36,7 @@ fun ExercisesSetsScreen(
 fun ExerciseSetLazyColumn(
     navController: NavController,
     workoutViewModel: WorkoutViewModel = viewModel(),
-    exercises: List<ExerciseSetModel>,
+    exercises: List<ExerciseSets>,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()

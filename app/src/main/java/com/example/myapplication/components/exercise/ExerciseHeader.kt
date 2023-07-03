@@ -29,7 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
-import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.averageWeight
 import com.example.myapplication.data.totalRepetitions
 import com.example.myapplication.data.totalVolume
@@ -40,21 +40,21 @@ import java.text.DecimalFormat
 fun ExerciseScreen(
     navController: NavController,
     workoutViewModel: WorkoutViewModel = viewModel(),
-    _exerciseSets: ExerciseSetModel,
+    _exerciseSets: ExerciseSets,
 ) {
     val exerciseSet = remember { mutableStateOf(_exerciseSets) }
 
     ExerciseHeader(
         navController = navController,
         exerciseSet.value
-    ) { exerciseSets: ExerciseSetModel -> workoutViewModel.removeExerciseSets(exerciseSets) }
+    ) { exerciseSets: ExerciseSets -> workoutViewModel.removeExerciseSets(exerciseSets) }
 }
 
 @Composable
 fun ExerciseHeader(
     navController: NavController,
-    exerciseSets: ExerciseSetModel,
-    removeExercise: (exerciseSets: ExerciseSetModel) -> Unit,
+    exerciseSets: ExerciseSets,
+    removeExercise: (exerciseSets: ExerciseSets) -> Unit,
 ) {
     var notesVisible by remember { mutableStateOf(exerciseSets.exercise.notesPinned) }
 
@@ -71,7 +71,7 @@ fun ExerciseHeader(
                 Text(
                     modifier = Modifier
                         .padding(8.dp)
-                        .clickable { navController.navigate("exerciseDetails/${exerciseSets.exercise.primaryKey}") },
+                        .clickable { navController.navigate("exerciseDetails/${exerciseSets.exercise.exerciseID}") },
                     text = "Exercise Name",
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -157,7 +157,7 @@ private fun SetContentHeader() {
 @Composable
 private fun ExerciseSetsWorkoutSummary(
     workoutViewModel: WorkoutViewModel = viewModel(),
-    _exerciseSets: ExerciseSetModel,
+    _exerciseSets: ExerciseSets,
 ) {
 // TODO Give option to show either Total Volume or Total Working Volume
 // TODO Update Values on user input, cause keyboard to

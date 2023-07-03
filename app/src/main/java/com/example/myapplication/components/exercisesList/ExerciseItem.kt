@@ -38,7 +38,7 @@ fun ExerciseItem(exercise: ExerciseModel, navController: NavController) {
                 enabled = true,
                 onClickLabel = null,
                 onClick = {
-                    navController.navigate("exerciseDetails/${exercise.primaryKey}")
+                    navController.navigate("exerciseDetails/${exercise.exerciseID}")
                     Toast
                         .makeText(
                             context,

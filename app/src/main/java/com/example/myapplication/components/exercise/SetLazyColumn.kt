@@ -11,19 +11,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Icon
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.SetModel
-import com.example.myapplication.data.SetTypeModel
+import com.example.myapplication.data.SetType
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
@@ -40,14 +52,17 @@ fun SetLazyColumn(
     updateSetRIR: (id: Long, newRIR: Double?) -> Unit,
     updateSetRPE: (id: Long, newRPE: Double?) -> Unit,
     setComplete: (id: Long, setComplete: Boolean) -> Unit,
-    updateSetType: (id: Long, setType: SetTypeModel) -> Unit,
-    startRestTimer: (id: Long) -> Unit
+    updateSetType: (id: Long, setType: SetType) -> Unit,
+    startRestTimer: (id: Long) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(count = exerciseSets.size, key = { index -> exerciseSets[index].id }) { index ->
+        items(
+            count = exerciseSets.size,
+            key = { index -> exerciseSets[index].lazyListItemID }
+        ) { index ->
             val coroutineScope = rememberCoroutineScope()
             val exerciseSet = exerciseSets[index]
             var setCompletedState by remember { mutableStateOf(false) }
@@ -61,30 +76,30 @@ fun SetLazyColumn(
             )
 
             fun newWeight(newWeight: Double?) {
-                updateSetWeight(exerciseSet.id, newWeight)
+                updateSetWeight(exerciseSet.lazyListItemID, newWeight)
             }
 
             fun newReps(newReps: Int?) {
-                updateSetReps(exerciseSet.id, newReps)
+                updateSetReps(exerciseSet.lazyListItemID, newReps)
             }
 
             fun newRIR(newRIR: Double?) {
-                updateSetRIR(exerciseSet.id, newRIR)
+                updateSetRIR(exerciseSet.lazyListItemID, newRIR)
             }
 
             fun newRPE(newRPE: Double?) {
-                updateSetRPE(exerciseSet.id, newRPE)
+                updateSetRPE(exerciseSet.lazyListItemID, newRPE)
             }
 
-            fun newSetType(setType: SetTypeModel) {
-                updateSetType(exerciseSet.id, setType)
+            fun newSetType(setType: SetType) {
+                updateSetType(exerciseSet.lazyListItemID, setType)
             }
 
             fun deleteCompletedSet(delete: Boolean) {
 //                deletedState = delete
                 if (delete) {
 //                    coroutineScope.launch { dismissState.animateTo(targetValue = DismissValue.DismissedToStart, anim = SnapSpec(0)) }
-                    deleteSet(exerciseSets[index].id)
+                    deleteSet(exerciseSets[index].lazyListItemID)
                 } else {
                     coroutineScope.launch {
                         dismissState.animateTo(
@@ -97,17 +112,17 @@ fun SetLazyColumn(
 
             fun changesetCompletedState(status: Boolean) {
                 setCompletedState = status
-                setComplete(exerciseSet.id, status)
+                setComplete(exerciseSet.lazyListItemID, status)
             }
 
-            if (setCompletedState) startRestTimer(exerciseSet.id)
+            if (setCompletedState) startRestTimer(exerciseSet.lazyListItemID)
 
             fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
                 openDialog.value = open
             }
 
             if (!setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
-                deleteSet(exerciseSets[index].id)
+                deleteSet(exerciseSets[index].lazyListItemID)
             } else if (setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
                 ConfirmCompletedSetDeletionDialog(
                     { open -> openConfirmCompletedSetDeletionDialog(open) },

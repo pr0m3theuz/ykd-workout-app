@@ -2,15 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8a56d0478eb698d372bee1ea9ce93d7a",
+    "identityHash": "0f8735a6995749026b638b90835c4396",
     "entities": [
       {
-        "tableName": "exercises_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `exerciseCategory` TEXT, `muscleGroup` TEXT NOT NULL, `exerciseProgression` TEXT, `equipment` TEXT, `notes` TEXT, `pinnedNotes` TEXT, `notesPinned` INTEGER NOT NULL, `barType` TEXT, `weightUnit` TEXT, `workingSetRestInWholeMilliseconds` INTEGER NOT NULL, `warmUpSetRestInWholeMilliseconds` INTEGER NOT NULL, `workingSetRestTimerEnabled` INTEGER NOT NULL, `warmUpSetRestTimerEnabled` INTEGER NOT NULL, `videoUri` TEXT)",
+        "tableName": "exercises",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `exerciseCategory` TEXT, `muscleGroup` TEXT NOT NULL, `exerciseProgression` TEXT, `equipment` TEXT, `notes` TEXT, `pinnedNotes` TEXT, `notesPinned` INTEGER NOT NULL, `barType` TEXT, `weightUnit` TEXT, `workingSetRestInWholeMilliseconds` INTEGER NOT NULL, `warmUpSetRestInWholeMilliseconds` INTEGER NOT NULL, `workingSetRestTimerEnabled` INTEGER NOT NULL, `warmUpSetRestTimerEnabled` INTEGER NOT NULL, `videoUri` TEXT)",
         "fields": [
           {
-            "fieldPath": "primaryKey",
-            "columnName": "primaryKey",
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -120,7 +120,7 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "primaryKey"
+            "exerciseID"
           ]
         },
         "indices": [],
@@ -130,7 +130,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a56d0478eb698d372bee1ea9ce93d7a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0f8735a6995749026b638b90835c4396')"
     ]
   }
 }

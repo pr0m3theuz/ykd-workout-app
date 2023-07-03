@@ -1,6 +1,12 @@
 package com.example.myapplication.components
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.components.workoutDialogs.SetContent
 import com.example.myapplication.components.workoutDialogs.calculateNewSetResults
@@ -43,7 +49,7 @@ fun WarmUpSetLayout(
 
     SetContent(
         setTypeText = setIndex.inc().toString(),
-        setTypeColor = warmUpSet.setType.textColor,
+        setTypeColor = Color.White /* TODO to get from SetType */,
         resultsText = calculateNewSetResults(workingWeight, warmUpPercentage, repetitionsText),
         percentageText = percentageText,
         repetitionsText = repetitionsText,

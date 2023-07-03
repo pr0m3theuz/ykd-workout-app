@@ -41,7 +41,10 @@ fun WarmUpSetLazyColumn(
         modifier = Modifier.fillMaxWidth().height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(count = warmUpSets.size, key = { index -> warmUpSets[index].id }) { index ->
+        items(
+            count = warmUpSets.size,
+            key = { index -> warmUpSets[index].lazyListItemID }
+        ) { index ->
 
             val warmUpSet = warmUpSets[index]
 

@@ -1,11 +1,12 @@
 package com.example.myapplication.components.workoutDialogs.workingSets
 
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.*
+import java.util.UUID
 
 class WorkingSetViewModel : ViewModel() {
     private var _oneRepMax: Double = 100.0
@@ -24,17 +25,27 @@ class WorkingSetViewModel : ViewModel() {
         _workingSetWeight.value = newWorkingWeight
     }
 
+    private var exerciseID: Long? = null
+    private var workoutID: Long? = null
+    fun getExerciseSets(exerciseSets: ExerciseSets) {
+        exerciseID = exerciseSets.exerciseID
+        workoutID = exerciseSets.workoutID
+    }
+
     fun addSet() {
         if (_sets.value.isNotEmpty()) {
             _sets.value.add(
                 _sets.value.last().copy(
-                    id = newID(),
+                    lazyListItemID = newID(),
                     uuid = UUID.randomUUID()
                 )
             )
         } else {
             _sets.value.add(
-                SetModel()
+                SetModel(
+                    exerciseID = exerciseID,
+                    workoutID = workoutID
+                )
             )
         }
     }
@@ -54,15 +65,17 @@ class WorkingSetViewModel : ViewModel() {
     fun updateSetPercentage(uuid: UUID, newPercentage: Double) {
         _sets.value.forEach { if (it.uuid == uuid) it.percentage1RM = newPercentage }
     }
-}
 
-private fun initSets(): MutableList<SetModel> {
-    return MutableList(3) { index ->
-        SetModel(
-            setNumber = index,
-            exerciseWeight = 100.00,
-            repetitions = 10,
-            percentage1RM = 1.0
-        )
+    private fun initSets(): MutableList<SetModel> {
+        return MutableList(3) { index ->
+            SetModel(
+                setNumber = index,
+                exerciseWeight = 100.00,
+                repetitions = 10,
+                percentage1RM = 1.0,
+                exerciseID = exerciseID,
+                workoutID = workoutID
+            )
+        }
     }
 }

@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface Dao {
 
-    @Query("SELECT * FROM exercises_table ORDER BY name ASC")
+    @Query("SELECT * FROM exercises ORDER BY name ASC")
     fun getAllExercises(): Flow<List<ExerciseModel>>
 
-    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise ORDER BY name ASC")
+    @Query("SELECT * FROM exercises WHERE name LIKE :exercise ORDER BY name ASC")
     fun searchExercises(exercise: String): Flow<List<ExerciseModel>>
 
     //    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise AND bodyPart IN(:bodyParts) AND equipment IN(:equipments) ORDER BY name ASC")
-    @Query("SELECT * FROM exercises_table WHERE name LIKE :exercise ORDER BY name ASC")
+    @Query("SELECT * FROM exercises WHERE name LIKE :exercise ORDER BY name ASC")
     fun filterExercises(
         exercise: String,
 //        bodyParts: List<String> = listOf("%%"),
@@ -22,9 +22,9 @@ interface Dao {
 //        movementTypes: List<String> = listOf("%%")
     ): Flow<List<ExerciseModel>>
 
-    @Query("SELECT * FROM exercises_table WHERE primaryKey=:exercisePK")
+    @Query("SELECT * FROM exercises WHERE exerciseID=:exerciseID")
     fun getExerciseDetails(
-        exercisePK: Long,
+        exerciseID: Long,
     ): Flow<List<ExerciseModel>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT, entity = ExerciseModel::class)

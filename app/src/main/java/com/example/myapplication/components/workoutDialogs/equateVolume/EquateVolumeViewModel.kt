@@ -1,6 +1,7 @@
 package com.example.myapplication.components.workoutDialogs.equateVolume
 
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.setVolume
 import com.example.myapplication.newID
@@ -10,7 +11,7 @@ import java.math.RoundingMode
 import java.util.UUID
 import kotlin.math.roundToInt
 
-private const val WARM_UP_SET = "Warm Up Set"
+private const val WARM_UP_SET = 2
 
 class EquateVolumeViewModel constructor() : ViewModel() {
     //    TODO Implement getOneRepMax() Query
@@ -34,9 +35,20 @@ class EquateVolumeViewModel constructor() : ViewModel() {
     val newTotalVolume: StateFlow<Double>
         get() = _newTotalVolume
 
-    fun initialize(sets: List<SetModel>) {
-        changeWorkingSets(sets)
-        setTotalVolume(calculateTotalVolume(sets))
+    private var _exerciseSets: ExerciseSets? = null
+
+    private var exerciseID: Long? = _exerciseSets?.exerciseID
+    private var workoutID: Long? = _exerciseSets?.workoutID
+    private fun getExerciseSets(exerciseSets: ExerciseSets) {
+        _exerciseSets = exerciseSets
+        exerciseID = _exerciseSets?.exerciseID
+        workoutID = _exerciseSets?.workoutID
+    }
+
+    fun initialize(exerciseSets: ExerciseSets) {
+        getExerciseSets(exerciseSets)
+        changeWorkingSets(exerciseSets.sets)
+        setTotalVolume(calculateTotalVolume(exerciseSets.sets))
     }
 
     fun setTotalVolume(totalVolume: Double) {
@@ -52,7 +64,7 @@ class EquateVolumeViewModel constructor() : ViewModel() {
     }
 
     fun changeWorkingSets(sets: List<SetModel>) {
-        _sets.value = sets.filter { it.setType.name != WARM_UP_SET }
+        _sets.value = sets.filter { it.setTypeID != WARM_UP_SET }
         setNewTotalVolume(calculateTotalVolume(_sets.value))
     }
 
@@ -62,14 +74,21 @@ class EquateVolumeViewModel constructor() : ViewModel() {
         if (_sets.value.isNotEmpty()) {
             temporarySets.add(
                 temporarySets.last().copy(
-                    id = newID(),
+                    lazyListItemID = newID(),
                     uuid = UUID.randomUUID(),
                     setNumber = sets.value.last().setNumber?.plus(1),
-                    setCompleted = false
+                    setCompleted = false,
+                    exerciseID = exerciseID,
+                    workoutID = workoutID
                 )
             )
         } else {
-            temporarySets.add(SetModel())
+            temporarySets.add(
+                SetModel(
+                    exerciseID = exerciseID,
+                    workoutID = workoutID
+                )
+            )
         }
         _sets.value = temporarySets.toList()
         setNewTotalVolume(calculateTotalVolume(_sets.value))
@@ -98,12 +117,17 @@ class EquateVolumeViewModel constructor() : ViewModel() {
         val lastSet = currentSets.lastOrNull()
 
         val newSet = lastSet?.copy(
-            id = newID(),
+            lazyListItemID = newID(),
             uuid = UUID.randomUUID(),
             setNumber = lastSet.setNumber?.plus(1),
-            setCompleted = false
+            setCompleted = false,
+            exerciseID = exerciseID,
+            workoutID = workoutID
         )
-            ?: SetModel()
+            ?: SetModel(
+                exerciseID = exerciseID,
+                workoutID = workoutID
+            )
 
         currentSets.add(newSet)
         _sets.value = currentSets.toList()
@@ -113,9 +137,9 @@ class EquateVolumeViewModel constructor() : ViewModel() {
 
     fun removeSet(id: Long) {
         val temporarySets = _sets.value.toMutableList()
-        temporarySets.removeIf { it.id == id }
+        temporarySets.removeIf { it.lazyListItemID == id }
 
-        temporarySets.forEach { it.id = newID() }
+        temporarySets.forEach { it.lazyListItemID = newID() }
 
         _sets.value = temporarySets.toList()
         setNewTotalVolume(calculateTotalVolume(_sets.value))
@@ -161,7 +185,9 @@ class EquateVolumeViewModel constructor() : ViewModel() {
 
         val newSets = _sets.value
         newSets.forEach {
-            it.id = newID(); it.exerciseWeight = newWeight; it.repetitions = newRepetitions
+            it.lazyListItemID = newID()
+            it.exerciseWeight = newWeight
+            it.repetitions = newRepetitions
         }
 
         _sets.value = newSets.toList()
@@ -179,7 +205,9 @@ class EquateVolumeViewModel constructor() : ViewModel() {
 
         val newSets = sets.value
         newSets.forEach {
-            it.id = newID(); it.exerciseWeight = newWeight; it.repetitions = newRepetitions
+            it.lazyListItemID = newID()
+            it.exerciseWeight = newWeight
+            it.repetitions = newRepetitions
         }
 
         _sets.value = newSets.toList()
@@ -189,7 +217,7 @@ class EquateVolumeViewModel constructor() : ViewModel() {
     private fun numberOfWorkingSets(): Int {
         var numberOfWorkingSets: Int = 0
 
-        _sets.value.filter { it.setType.name != WARM_UP_SET }.forEach { _ ->
+        _sets.value.filter { it.setTypeID != WARM_UP_SET }.forEach { _ ->
             numberOfWorkingSets++
         }
 
@@ -199,21 +227,23 @@ class EquateVolumeViewModel constructor() : ViewModel() {
     private fun calculateTotalVolume(temporarySets: List<SetModel>): Double {
         var totalVolume: Double = 0.0
 
-        temporarySets.filter { it.setType.name != WARM_UP_SET }.forEach {
+        temporarySets.filter { it.setTypeID != WARM_UP_SET }.forEach {
             totalVolume += (it.setVolume())
         }
 
         return totalVolume
     }
-}
 
-private fun initSets(): List<SetModel> {
-    return List(3) { index ->
-        SetModel(
-            setNumber = index,
-            exerciseWeight = 100.00,
-            repetitions = 10,
-            percentage1RM = 1.0
-        )
+    private fun initSets(): List<SetModel> {
+        return List(3) { index ->
+            SetModel(
+                setNumber = index,
+                exerciseWeight = 100.00,
+                repetitions = 10,
+                percentage1RM = 1.0,
+                exerciseID = exerciseID,
+                workoutID = workoutID
+            )
+        }
     }
 }

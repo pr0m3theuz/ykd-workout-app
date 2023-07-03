@@ -28,7 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.SetTypeOptionsMenu
 import com.example.myapplication.components.setRestTimer.TimerScreen
-import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
@@ -38,7 +38,7 @@ import com.example.myapplication.utils.doubleFormatted
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SetContent(
-    exerciseSets: ExerciseSetModel,
+    exerciseSets: ExerciseSets,
     setIndex: Int,
     set: SetModel,
 //    isSetCompleted: (Boolean) -> Unit,
@@ -133,10 +133,13 @@ fun SetContent(
         iconText = getSetIconText(set, setIndex)
     }
 
-    var iconColor: Color = set.setType.textColor
+    fun getSetTypeColor(setTypeID: Int) {
+    }
+
+    var iconColor: Color = Color.White
 
     fun changeIconColor() {
-        iconColor = set.setType.textColor
+        iconColor = Color.White
     }
 
     // Set Completed
@@ -183,7 +186,7 @@ fun SetContent(
                     workoutViewModel.updateSetType(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
-                        setType = setType
+                        setTypeID = setType.id
                     )
                 },
                 changeIconText = { changeIconText() },
@@ -411,10 +414,10 @@ private fun ExerciseWeightTextField(
 }
 
 private fun getSetIconText(set: SetModel, setIndex: Int): String =
-    if (set.setType.name == "Normal") {
+    if (set.setTypeID == 1) {
         setIndex.inc().toString()
     } else {
-        set.setType.name[0].toString()
+        "TODO"
     }
 
 private fun getRatePerceivedEffort(set: SetModel): String =

@@ -4,13 +4,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
-import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
@@ -21,8 +26,10 @@ fun AddWarmUpSetsScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
     warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    exerciseSets: ExerciseSetModel,
+    exerciseSets: ExerciseSets,
 ) {
+    warmUpSetsViewModel.getExerciseSets(exerciseSets)
+
     warmUpSetsViewModel.changeWorkingSetWeight(
         workoutViewModel.getWorkingSetWeight(exerciseSets) ?: 0.0
     )

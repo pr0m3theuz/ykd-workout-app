@@ -10,12 +10,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Icon
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -31,7 +43,7 @@ fun SetsScreen(
     _sets: List<SetModel>,
     removeSet: (setID: Long) -> Unit,
     _setComplete: (id: Long, setComplete: Boolean) -> Unit,
-    startRestTimer: (setID: Long) -> Unit
+    startRestTimer: (setID: Long) -> Unit,
 ) {
 //    val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
     val sets = remember { mutableStateOf(listOf<SetModel>()) }
@@ -73,7 +85,7 @@ fun SetColumn(
 
     updateSetType: (id: Long, setType: SetTypeModel) -> Unit,*/
     setComplete: (id: Long, setComplete: Boolean) -> Unit,
-    startRestTimer: (id: Long) -> Unit
+    startRestTimer: (id: Long) -> Unit,
 ) {
 //    val sets = _sets
     Log.i("SetColumn()", "$sets")
@@ -116,7 +128,7 @@ fun SetColumn(
 //                deletedState = delete
             if (delete) {
 //                    coroutineScope.launch { dismissState.animateTo(targetValue = DismissValue.DismissedToStart, anim = SnapSpec(0)) }
-                removeSet(set.id)
+                removeSet(set.lazyListItemID)
             } else {
                 coroutineScope.launch {
                     dismissState.animateTo(
@@ -129,17 +141,17 @@ fun SetColumn(
 
         fun changesetCompletedState(status: Boolean) {
             setCompletedState = status
-            setComplete(set.id, status)
+            setComplete(set.lazyListItemID, status)
         }
 
-        if (setCompletedState) startRestTimer(set.id)
+        if (setCompletedState) startRestTimer(set.lazyListItemID)
 
         fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
             openDialog.value = open
         }
 
         if (!setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
-            removeSet(set.id)
+            removeSet(set.lazyListItemID)
         } else if (setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
             ConfirmCompletedSetDeletionDialog(
                 { open -> openConfirmCompletedSetDeletionDialog(open) },

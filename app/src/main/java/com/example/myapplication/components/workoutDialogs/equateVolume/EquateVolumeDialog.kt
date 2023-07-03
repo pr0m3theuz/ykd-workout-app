@@ -18,7 +18,7 @@ import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeLazyColumn
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
-import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.totalWorkingSetVolume
 import com.example.myapplication.utils.checkDoubleInput
@@ -29,14 +29,14 @@ import com.example.myapplication.utils.doubleFormatted
 fun EquateVolumeScreen(
     openDialog: (Boolean) -> Unit,
     workoutViewModel: WorkoutViewModel = viewModel(),
-    exerciseSets: ExerciseSetModel,
+    exerciseSets: ExerciseSets,
     equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
 ) {
     val totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume()
     val workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets)
     val workingSetRepetitions = workoutViewModel.getWorkingSetRepetitions(exerciseSets)
 
-    equateVolumeViewModel.initialize(exerciseSets.sets)
+    equateVolumeViewModel.initialize(exerciseSets)
 
     EquateVolumeDialog(
         openDialog = { close -> openDialog(close) },

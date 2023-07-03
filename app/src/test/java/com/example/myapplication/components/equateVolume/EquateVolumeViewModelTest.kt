@@ -59,7 +59,7 @@ class EquateVolumeViewModelTest {
             assertFalse(newSet.setCompleted)
         } else {
             assertEquals(1, newSets.size)
-            assertNotNull(newSets[0].id)
+            assertNotNull(newSets[0].lazyListItemID)
             assertEquals(0, newSets[0].setNumber)
             assertFalse(newSets[0].setCompleted)
             assertEquals(expectedTotalVolume, equateVolumeViewModel.newTotalVolume.value)
@@ -93,7 +93,7 @@ class EquateVolumeViewModelTest {
             assertFalse(newSet.setCompleted)
         } else {
             assertEquals(1, newSets.size)
-            assertNotNull(newSets[0].id)
+            assertNotNull(newSets[0].lazyListItemID)
             assertNotNull(newSets[0].uuid)
             assertEquals(0, newSets[0].setNumber)
             assertFalse(newSets[0].setCompleted)
@@ -110,14 +110,14 @@ class EquateVolumeViewModelTest {
         val initialSets = equateVolumeViewModel.sets.value
         val initialSize = initialSets.size
         val expectedSize = initialSize - 1
-        val id = initialSets[1].id
+        val id = initialSets[1].lazyListItemID
 
         // Act
         equateVolumeViewModel.removeSet(id)
 
         // Assert
         assertEquals(expectedSize, equateVolumeViewModel.sets.value.size)
-        assertNull(equateVolumeViewModel.sets.value.firstOrNull { it.id == id })
+        assertNull(equateVolumeViewModel.sets.value.firstOrNull { it.lazyListItemID == id })
     }
 
     @Test

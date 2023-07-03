@@ -10,8 +10,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -20,11 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.myapplication.data.ExerciseModel
 
+private const val infoTag = "ExerciseLayout().pinNote()"
+
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseNotes(
     exercise: ExerciseModel,
-    placeholder: String = "Write a note"
+    placeholder: String = "Write a note",
 ) {
     var exerciseNotes by remember {
         mutableStateOf(
@@ -48,8 +60,8 @@ fun ExerciseNotes(
     fun pinNote() {
         exercise.notesPinned = !exercise.notesPinned
         notesPinned = exercise.notesPinned
-        Log.i("ExerciseLayout().pinNote()", exercise.notesPinned.toString())
-        Log.i("ExerciseLayout().pinNote()", notesPinned.toString())
+        Log.i(infoTag, exercise.notesPinned.toString())
+        Log.i(infoTag, notesPinned.toString())
     }
 
     val noteButtonContainerColor =
@@ -57,7 +69,7 @@ fun ExerciseNotes(
             Log.i("ExerciseLayout(). noteButtonContainerColor", notesPinned.toString())
             MaterialTheme.colorScheme.primary.copy(1f)
         } else {
-            Log.i("ExerciseLayout().pinNote()", notesPinned.toString())
+            Log.i(infoTag, notesPinned.toString())
             MaterialTheme.colorScheme.primary.copy(0.25f)
         }
 
@@ -69,7 +81,7 @@ fun ExerciseNotes(
         }
 
     val animateNoteButtonContainerColor = animateColorAsState(noteButtonContainerColor)
-    var animateNoteButtonContentColor = animateColorAsState(noteButtonContentColor)
+    val animateNoteButtonContentColor = animateColorAsState(noteButtonContentColor)
 
     if (exerciseNotes.text == "" && notesPinned) {
         placeholderText = "Pin a note for next time"
@@ -80,7 +92,7 @@ fun ExerciseNotes(
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
     TextField(
-        placeholder = { Text("$placeholderText", color = Color.DarkGray) },
+        placeholder = { Text(placeholderText, color = Color.DarkGray) },
         modifier = Modifier
             .padding(horizontal = 8.dp)
             .fillMaxWidth(),
@@ -95,7 +107,7 @@ fun ExerciseNotes(
                 onClick = { pinNote() },
                 shape = RoundedCornerShape(15),
                 contentPadding = PaddingValues(0.dp),
-                modifier = androidx.compose.ui.Modifier.padding(8.dp).size(36.dp),
+                modifier = Modifier.padding(8.dp).size(36.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = animateNoteButtonContainerColor.value,
                     contentColor = animateNoteButtonContentColor.value
@@ -104,7 +116,7 @@ fun ExerciseNotes(
                 Icon(
                     Icons.Default.PushPin,
                     contentDescription = "Localized description",
-                    modifier = androidx.compose.ui.Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }

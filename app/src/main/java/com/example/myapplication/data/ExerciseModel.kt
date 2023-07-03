@@ -8,9 +8,9 @@ import java.util.UUID
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-@Entity(tableName = "exercises_table")
+@Entity(tableName = "exercises")
 data class ExerciseModel(
-    @PrimaryKey(autoGenerate = true) val primaryKey: Long = fakeULID(),
+    @PrimaryKey(autoGenerate = true) val exerciseID: Long = fakeULID(),
     val lazyListItemID: Long = newID(),
     val uuid: UUID = UUID.randomUUID(),
 //    val exrxID: String? = null,
@@ -19,11 +19,14 @@ data class ExerciseModel(
 //    val exerciseForce: ExerciseForce, // TODO determine if it should be included
     // TODO Make into a List<String> for Multiple Body Parts
     val muscleGroup: String = "Muscle Group", // TODO MuscleGroup
-    var exerciseProgression: String? = null, // ExerciseProgression
+    var exerciseProgression: String? = null, // TODO ExerciseProgression Tie to Program
     val equipment: String? = null, // Equipment
+
+//    TODO To remove & refactor
     var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,
+
     var barType: String? = null, // TODO Could be :BarType
     var weightUnit: String? = null, // TODO Could be ENUM -> Default, KG, LBS
     var workingSetRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
@@ -32,24 +35,3 @@ data class ExerciseModel(
     var warmUpSetRestTimerEnabled: Boolean = false,
     var videoUri: String? = null,
 )
-
-// TODO These are unnecessary. Remove
-fun ExerciseModel.pinNotes(pinned: Boolean) {
-    notesPinned = pinned
-}
-
-fun ExerciseModel.updateWorkingSetRestTimer(time: Long) {
-    workingSetRestInWholeMilliseconds = time
-}
-
-fun ExerciseModel.updateWarmUpSetRestTimer(time: Long) {
-    warmUpSetRestInWholeMilliseconds = time
-}
-
-fun ExerciseModel.enableworkingSetRestTimer(enable: Boolean) {
-    workingSetRestTimerEnabled = enable
-}
-
-fun ExerciseModel.enableWarmUpSetRestTimer(enable: Boolean) {
-    warmUpSetRestTimerEnabled = enable
-}

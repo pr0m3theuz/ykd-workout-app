@@ -6,13 +6,28 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
-import com.example.myapplication.data.*
+import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.ExerciseSets
+import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Workout
+import com.example.myapplication.data.addWarmUpSets
+import com.example.myapplication.data.pinNotes
+import com.example.myapplication.data.setComplete
+import com.example.myapplication.data.updateSetRIR
+import com.example.myapplication.data.updateSetRPE
+import com.example.myapplication.data.updateSetReps
+import com.example.myapplication.data.updateSetType
+import com.example.myapplication.data.updateSetWeight
 import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.sendNotification
@@ -22,14 +37,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-private const val WARM_UP_SET = "Warm Up Set"
+private const val WARM_UP_SET = 2
 
+// TODO
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(private val application: Application) :
     ViewModel() {
@@ -41,7 +57,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     private var workoutDuration: Long = 0
 
     private var _workoutDurationFormatted = workoutDuration.toDuration(DurationUnit.MILLISECONDS)
-        .toComponents { minutes, seconds, nanoseconds ->
+        .toComponents { minutes, seconds, _ ->
             "$minutes:${
                 seconds.toString().padStart(2, '0')
             }"
@@ -57,7 +73,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
             _workoutDurationString.value =
                 workoutDuration.toDuration(DurationUnit.MILLISECONDS)
-                    .toComponents { minutes, seconds, nanoseconds ->
+                    .toComponents { minutes, seconds, _ ->
                         "${minutes.toString().padStart(2, '0')}:${
                             seconds.toString().padStart(2, '0')
                         }"
@@ -87,7 +103,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
     private var _timerDuration: Long = 60000L
     private var _timerDurationFormatted = _timerDuration.toDuration(DurationUnit.MILLISECONDS)
-        .toComponents { minutes, seconds, nanoseconds ->
+        .toComponents { minutes, seconds, _ ->
             "$minutes:${
                 seconds.toString().padStart(2, '0')
             }"
@@ -106,7 +122,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     private var _remainingTime: Long = 60000L
 
     private var _remainingTimeFormatted = _remainingTime.toDuration(DurationUnit.MILLISECONDS)
-        .toComponents { minutes, seconds, nanoseconds ->
+        .toComponents { minutes, seconds, _ ->
             "$minutes:${
                 seconds.toString().padStart(2, '0')
             }"
@@ -162,7 +178,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
                     _remainingTime = millisUntilFinished
                     _remainingTimeString.value =
                         _remainingTime.toDuration(DurationUnit.MILLISECONDS)
-                            .toComponents { minutes, seconds, nanoseconds ->
+                            .toComponents { minutes, seconds, _ ->
                                 "$minutes:${
                                     seconds.toString().padStart(2, '0')
                                 }"
@@ -170,7 +186,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
                     _timerDurationString.value =
                         _timerDuration.toDuration(DurationUnit.MILLISECONDS)
-                            .toComponents { minutes, seconds, nanoseconds ->
+                            .toComponents { minutes, seconds, _ ->
                                 "$minutes:${
                                     seconds.toString().padStart(2, '0')
                                 }"
@@ -227,7 +243,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
     private var completedSets = mutableListOf<UUID>()
 
-    fun startSetCompletedTimer(exerciseSet: ExerciseSetModel, setUUID: UUID) {
+    fun startSetCompletedTimer(exerciseSet: ExerciseSets, setUUID: UUID) {
         Log.i("startSetCompletedTimer() ", "called")
 
         val exercise = exerciseSet.exercise
@@ -239,10 +255,10 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
             * Doesn't allow the new completed set to cancel the timer if one is already running
             */
             if (_state != TimerState.RUNNING) {
-                if (exercise.warmUpSetRestTimerEnabled && (set.setType.name == WARM_UP_SET)) {
+                if (exercise.warmUpSetRestTimerEnabled && (set.setTypeID == WARM_UP_SET)) {
                     _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
                     startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
-                } else if (exercise.workingSetRestTimerEnabled && (set.setType.name != WARM_UP_SET)) {
+                } else if (exercise.workingSetRestTimerEnabled && (set.setTypeID != WARM_UP_SET)) {
                     _timerDuration = exercise.workingSetRestInWholeMilliseconds
                     startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
                 }
@@ -337,34 +353,41 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     val allSets
         get() = _allSets.asStateFlow()
 
-    fun addSet(exerciseSets: ExerciseSetModel) {
+    fun addSet(exerciseSets: ExerciseSets) {
         val temporarySets: List<SetModel> = if (exerciseSets.sets.isNotEmpty()) {
             exerciseSets.sets + exerciseSets.sets.last().copy(
-                id = newID(),
+                lazyListItemID = newID(),
                 uuid = UUID.randomUUID(),
                 setNumber = exerciseSets.sets.last().setNumber?.plus(1),
                 setCompleted = false,
             )
         } else {
-            listOf(SetModel(id = newID(), setNumber = 0))
+            listOf(
+                SetModel(
+                    lazyListItemID = newID(),
+                    setNumber = 0,
+                    exerciseID = exerciseSets.exerciseID,
+                    workoutID = fakeULID() // TODO Replace with workout.workoutID
+                )
+            )
         }
 
         updateExercisesSetsData(exerciseSets, temporarySets.toMutableList())
     }
 
-    fun removeExerciseSets(exerciseSets: ExerciseSetModel) {
+    fun removeExerciseSets(exerciseSets: ExerciseSets) {
         _exercisesSetsData = _exercisesSetsData.filter { it != exerciseSets }.toMutableList()
         _exercisesSets.value = _exercisesSetsData
     }
 
-    fun removeSet(exerciseSets: ExerciseSetModel, set: SetModel) {
+    fun removeSet(exerciseSets: ExerciseSets, set: SetModel) {
         val temporarySets = exerciseSets.sets.minusElement(set).toMutableList()
 
         updateExercisesSetsData(exerciseSets, temporarySets)
     }
 
     private fun updateExercisesSetsData(
-        exerciseSets: ExerciseSetModel,
+        exerciseSets: ExerciseSets,
         temporarySets: MutableList<SetModel>,
     ) {
         val index = _exercisesSetsData.indexOfFirst { it.uuid == exerciseSets.uuid }
@@ -374,7 +397,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     }
 
     private fun updateSetData(
-        exerciseSets: ExerciseSetModel,
+        exerciseSets: ExerciseSets,
     ) {
         val index = _exercisesSetsData.indexOfFirst { it.uuid == exerciseSets.uuid }
         _exercisesSetsData[index] = exerciseSets.copy(id = newID())
@@ -395,7 +418,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         return allSets().first { it.uuid == setUUID }
     }
 
-    fun updateSetWeight(exerciseSets: ExerciseSetModel, setUUID: UUID, newWeight: Double?) {
+    fun updateSetWeight(exerciseSets: ExerciseSets, setUUID: UUID, newWeight: Double?) {
         exerciseSets.updateSetWeight(
             uuid = setUUID,
             newWeight = newWeight,
@@ -404,70 +427,58 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         updateSetData(exerciseSets)
     }
 
-    fun updateSetReps(exerciseSets: ExerciseSetModel, setUUID: UUID, newReps: Int?) {
+    fun updateSetReps(exerciseSets: ExerciseSets, setUUID: UUID, newReps: Int?) {
         exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
         updateSetData(exerciseSets)
-//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun updateSetRIR(exerciseSets: ExerciseSetModel, setUUID: UUID, newRIR: Double?) {
+    fun updateSetRIR(exerciseSets: ExerciseSets, setUUID: UUID, newRIR: Double?) {
         exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
         updateSetData(exerciseSets)
-//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun updateSetRPE(exerciseSets: ExerciseSetModel, setUUID: UUID, newRPE: Double?) {
+    fun updateSetRPE(exerciseSets: ExerciseSets, setUUID: UUID, newRPE: Double?) {
         exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
         updateSetData(exerciseSets)
-//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun setComplete(exerciseSets: ExerciseSetModel, setUUID: UUID, setComplete: Boolean) {
+    fun setComplete(exerciseSets: ExerciseSets, setUUID: UUID, setComplete: Boolean) {
         exerciseSets.setComplete(setUUID, setComplete)
         updateSetData(exerciseSets)
-//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun updateSetType(exerciseSets: ExerciseSetModel, setUUID: UUID, setType: SetTypeModel) {
-        exerciseSets.updateSetType(uuid = setUUID, setType = setType)
+    fun updateSetType(exerciseSets: ExerciseSets, setUUID: UUID, setTypeID: Int) {
+        exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
         updateSetData(exerciseSets)
-//        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun addWarmUpSets(exerciseSets: ExerciseSetModel, warmUpSets: List<SetModel>) {
+    fun addWarmUpSets(exerciseSets: ExerciseSets, warmUpSets: List<SetModel>) {
         exerciseSets.addWarmUpSets(warmUpSets)
 
         updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
 
-    fun getWorkingSetWeight(exerciseSets: ExerciseSetModel): Double? {
+    fun getWorkingSetWeight(exerciseSets: ExerciseSets): Double? {
         // TODO Get Previous Working Set if Sets is empty
-//        var weight: Double? = null
 
-//        if (exerciseSets.sets.isNotEmpty()) {
-//            weight = exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.exerciseWeight
-//        }
-//        return weight
-
-        return exerciseSets.sets.firstOrNull { it.setType.name != WARM_UP_SET }?.exerciseWeight
+        return exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.exerciseWeight
     }
 
-    fun getWorkingSetRepetitions(exerciseSets: ExerciseSetModel): Int? {
+    fun getWorkingSetRepetitions(exerciseSets: ExerciseSets): Int? {
         // TODO Get Previous Working Set if Sets is empty
         var repetitions: Int? = null
         if (exerciseSets.sets.isNotEmpty()) {
-            repetitions = exerciseSets.sets.first { it.setType.name != WARM_UP_SET }.repetitions
+            repetitions = exerciseSets.sets.first { it.setTypeID != WARM_UP_SET }.repetitions
         }
         return repetitions
     }
 
-    fun addWorkingSets(exerciseSets: ExerciseSetModel, workingSets: List<SetModel>) {
-        workingSets.forEach { it.id = newID() }
-//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Before: ${_exerciseSets.toList()}")
-        exerciseSets.sets.removeAll { it.setType.name != WARM_UP_SET }
-//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Removed Old Sets: ${_exerciseSets.toList()}")
+    fun addWorkingSets(exerciseSets: ExerciseSets, workingSets: List<SetModel>) {
+        workingSets.forEach { it.lazyListItemID = newID() }
+
+        exerciseSets.sets.removeAll { it.setTypeID != WARM_UP_SET }
+
         exerciseSets.sets.addAll(workingSets)
-//        Log.i("ExerciseSetViewModel.addWorkingSets(): ", "exerciseSets Added New Sets: ${_exerciseSets.toList()}")
 
         updateExercisesSetsData(
             exerciseSets = exerciseSets,
@@ -475,11 +486,9 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         )
     }
 
-    fun addBackOffSets(exerciseSets: ExerciseSetModel, backOffSets: List<SetModel>) {
-//        backOffSets.indices.forEach { index -> exerciseSets.sets.add(backOffSets[index].copy(id = newID())) }
-
+    fun addBackOffSets(exerciseSets: ExerciseSets, backOffSets: List<SetModel>) {
         for (index in backOffSets.indices) {
-            exerciseSets.sets.add(backOffSets[index].copy(id = newID()))
+            exerciseSets.sets.add(backOffSets[index].copy(lazyListItemID = newID()))
         }
 
         updateExercisesSetsData(
@@ -521,21 +530,26 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     }
 }
 
-private fun initWorkout(): WorkoutModel {
-    return WorkoutModel(name = "Workout Name")
+private fun initWorkout(): Workout {
+    return Workout(name = "Workout Name")
 }
 
-private fun initExercisesSets(): MutableList<ExerciseSetModel> {
+private fun initExercisesSets(): MutableList<ExerciseSets> {
+    val exercise = ExerciseModel()
     return MutableList(6) {
-        ExerciseSetModel(
-            exercise = ExerciseModel(),
+        ExerciseSets(
+            exercise = exercise,
             sets = MutableList(3) { indices ->
                 SetModel(
                     setNumber = indices,
                     exerciseWeight = 100.00.times(it),
                     repetitions = 10.times(it),
+                    exerciseID = exercise.exerciseID,
+                    workoutID = fakeULID(),
                 )
             },
+            exerciseID = exercise.exerciseID,
+            workoutID = fakeULID()
         )
     }
 }

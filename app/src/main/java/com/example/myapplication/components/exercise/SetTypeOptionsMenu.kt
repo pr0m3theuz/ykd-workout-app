@@ -9,8 +9,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.example.myapplication.data.SetTypeModel
-import com.example.myapplication.newID
+import com.example.myapplication.data.SetType
 import com.example.myapplication.ui.theme.White
 
 private val questionMarkColor = White
@@ -21,11 +20,11 @@ private val setTypes = create()
 // @Preview
 @Composable
 fun SetTypeOptionsMenu(
-    menuItems: List<SetTypeModel> = setTypes.toList(),
+    menuItems: List<SetType> = setTypes.toList(),
     // selectedSetType: SetTypeModel, TODO Not if this is needed
     expandMenu: () -> Boolean,
     onDismiss: () -> Unit,
-    updateSetType: (setType: SetTypeModel) -> Unit,
+    updateSetType: (setType: SetType) -> Unit,
     changeIconText: () -> Unit,
     changeIconColor: () -> Unit,
 ) {
@@ -41,12 +40,12 @@ fun SetTypeOptionsMenu(
                  onClick = { *//* onDismiss(); onClickArrowBack() *//* }
         )*/
 
-        menuItems.forEachIndexed { index, setType ->
+        menuItems.forEachIndexed { _, setType ->
             DropdownMenuItem(
                 text = { Text(setType.name) },
                 leadingIcon = {
                     Text(
-                        setType.name.get(0).toString(),
+                        setType.name[0].toString(),
                         color = if (setType.name == "Normal") {
                             Color.Black
                         } else {
@@ -73,12 +72,12 @@ fun SetTypeOptionsMenu(
     }
 }
 
-private fun create(): ArrayList<SetTypeModel> {
-    val menu = ArrayList<SetTypeModel>()
+private fun create(): ArrayList<SetType> {
+    val menu = ArrayList<SetType>()
 
     menu.add(
-        SetTypeModel(
-            newID(),
+        SetType(
+            1,
             "Normal",
             description = "Normal",
             textColor = Color.White
@@ -86,8 +85,8 @@ private fun create(): ArrayList<SetTypeModel> {
     )
 
     menu.add(
-        SetTypeModel(
-            newID(),
+        SetType(
+            2,
             "Warm Up Set",
             description = /*TODO*/"",
             textColor = Color(255, 178, 0) /* Color: Orange */
@@ -95,8 +94,8 @@ private fun create(): ArrayList<SetTypeModel> {
     )
 
     menu.add(
-        SetTypeModel(
-            newID(),
+        SetType(
+            3,
             "Drop Set",
             description = /*TODO*/"",
             textColor = Color.LightGray /* Color: Purple */
@@ -104,17 +103,26 @@ private fun create(): ArrayList<SetTypeModel> {
     )
 
     menu.add(
-        SetTypeModel(
-            newID(),
-            "Myo Rep Set",
+        SetType(
+            4,
+            "Myo Rep",
             description = /*TODO*/"",
             textColor = Color.Cyan
         )
     )
 
     menu.add(
-        SetTypeModel(
-            newID(),
+        SetType(
+            4,
+            "Myo Rep Match",
+            description = /*TODO*/"",
+            textColor = Color.Cyan
+        )
+    )
+
+    menu.add(
+        SetType(
+            6,
             "Giant Set",
             description = /*TODO*/"",
             textColor = Color.Blue
@@ -122,17 +130,17 @@ private fun create(): ArrayList<SetTypeModel> {
     )
 
     menu.add(
-        SetTypeModel(
-            newID(),
-            "AMRAP Set",
+        SetType(
+            7,
+            "AMRAP",
             description = /*TODO*/"",
             textColor = Color.Magenta
         )
     )
 
     menu.add(
-        SetTypeModel(
-            newID(),
+        SetType(
+            8,
             "Failure Set",
             description = /*TODO*/"",
             textColor = Color.Red

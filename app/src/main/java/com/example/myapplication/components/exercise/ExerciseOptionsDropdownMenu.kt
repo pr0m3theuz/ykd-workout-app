@@ -4,11 +4,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.myapplication.components.exercise.EquateVolumeScreen
 import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
-import com.example.myapplication.data.ExerciseSetModel
+import com.example.myapplication.data.ExerciseSets
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -16,25 +25,25 @@ import kotlin.time.toDuration
 
 @Composable
 fun ExerciseOptionsDropdownMenu(
-    exerciseSets: ExerciseSetModel,
+    exerciseSets: ExerciseSets,
     addNotes: () -> Unit,
     removeExercise: () -> Unit,
 ) {
     var expandedExerciseOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedBarTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
-    val openAddWarmUpSetsDialog = remember { mutableStateOf(false) }
-    val openAddWorkingSetsDialog = remember { mutableStateOf(false) }
+    var openAddWarmUpSetsDialog by remember { mutableStateOf(false) }
+    var openAddWorkingSetsDialog by remember { mutableStateOf(false) }
     var openRestTimePicker by remember { mutableStateOf(false) }
     var openReplaceExerciseDialog by remember { mutableStateOf(false) }
     var openEquateVolumeDialog by remember { mutableStateOf(false) }
 
     fun closeAddWarmUpSetsDialog(close: Boolean) {
-        openAddWarmUpSetsDialog.value = close
+        openAddWarmUpSetsDialog = close
     }
 
     fun closeWorkingSetsDialog(close: Boolean) {
-        openAddWorkingSetsDialog.value = close
+        openAddWorkingSetsDialog = close
     }
 
     fun closeRestTimerDialog(close: Boolean) {
@@ -70,11 +79,11 @@ fun ExerciseOptionsDropdownMenu(
             )
             DropdownMenuItem(
                 text = { Text("Add Warm-up Sets") },
-                onClick = { openAddWarmUpSetsDialog.value = true }
+                onClick = { openAddWarmUpSetsDialog = true }
             )
             DropdownMenuItem(
                 text = { Text("Add Working Sets") },
-                onClick = { openAddWorkingSetsDialog.value = true }
+                onClick = { openAddWorkingSetsDialog = true }
             )
             DropdownMenuItem(
                 text = { Text("Equate Volume") },
@@ -149,13 +158,13 @@ fun ExerciseOptionsDropdownMenu(
         )
 
         // TODO Add exerciseSets to each of the below functions
-        if (openAddWarmUpSetsDialog.value) {
+        if (openAddWarmUpSetsDialog) {
             AddWarmUpSetsScreen(
                 openDialog = { close -> closeAddWarmUpSetsDialog(close) },
                 exerciseSets = exerciseSets
             )
         }
-        if (openAddWorkingSetsDialog.value) {
+        if (openAddWorkingSetsDialog) {
             AddWorkingSetsScreen(
                 openDialog = { close -> closeWorkingSetsDialog(close) },
                 exerciseSets = exerciseSets
