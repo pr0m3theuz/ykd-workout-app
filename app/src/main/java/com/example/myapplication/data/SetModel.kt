@@ -1,3 +1,4 @@
+
 package com.example.myapplication.data
 
 import androidx.room.ColumnInfo
@@ -23,6 +24,12 @@ import java.util.UUID
             childColumns = ["workoutID"],
             onDelete = ForeignKey.CASCADE
         ),
+        ForeignKey(
+            entity = ProgressionScheme::class,
+            parentColumns = ["progressionSchemeID"],
+            childColumns = ["progressionSchemeID"],
+            onDelete = ForeignKey.CASCADE
+        ),
     ]
 )
 data class SetModel(
@@ -43,14 +50,14 @@ data class SetModel(
     @ColumnInfo(name = "setTypeID", defaultValue = "1") var setTypeID: Int = 1,
     @ColumnInfo(name = "exerciseID") var exerciseID: Long,
     @ColumnInfo(name = "workoutID") var workoutID: Long,
+    @ColumnInfo(name = "progressionSchemeID") var progressionSchemeID: Int,
     var programID: Long? = null,
     var mesocycleID: Long? = null,
     var microcycleID: Long? = null,
+
 )
 
 fun SetModel.setVolume(): Double {
-//    Log.i("SetModel.setVolume()", "${exerciseWeight?.times(repetitions!!)}")
-
     return if (exerciseWeight != null && repetitions != null) {
         exerciseWeight!!.times(repetitions!!)
     } else {

@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.Equipment
 import com.example.myapplication.data.ExerciseModel
 import com.example.myapplication.data.ExercisesRepository
+import com.example.myapplication.data.Force
+import com.example.myapplication.data.Mechanic
 import com.example.myapplication.data.MovementType
 import com.example.myapplication.data.MuscleGroup
+import com.example.myapplication.data.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,12 +20,32 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ExercisesViewModel @Inject constructor(private var exercisesRepository: ExercisesRepository) :
-    ViewModel() {
-
+class ExercisesViewModel @Inject constructor(
+    private var exercisesRepository: ExercisesRepository,
+) : ViewModel() {
     private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
     val exercises: StateFlow<List<ExerciseModel>>
         get() = _exercises.asStateFlow()
+
+    private val _equipment: MutableStateFlow<List<Equipment>> = MutableStateFlow(emptyList())
+    val equipment: StateFlow<List<Equipment>>
+        get() = _equipment.asStateFlow()
+
+    private val _muscleGroup: MutableStateFlow<List<MuscleGroup>> = MutableStateFlow(emptyList())
+    val muscleGroup: StateFlow<List<MuscleGroup>>
+        get() = _muscleGroup.asStateFlow()
+
+    private val _utility: MutableStateFlow<List<Utility>> = MutableStateFlow(emptyList())
+    val utility: StateFlow<List<Utility>>
+        get() = _utility.asStateFlow()
+
+    private val _force: MutableStateFlow<List<Force>> = MutableStateFlow(emptyList())
+    val force: StateFlow<List<Force>>
+        get() = _force.asStateFlow()
+
+    private val _mechanic: MutableStateFlow<List<Mechanic>> = MutableStateFlow(emptyList())
+    val mechanic: StateFlow<List<Mechanic>>
+        get() = _mechanic.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -30,13 +53,27 @@ class ExercisesViewModel @Inject constructor(private var exercisesRepository: Ex
             exercisesRepository.getExercises().collect {
                 _exercises.value = it
             }
+
+            exercisesRepository.getAllEquipment().collect {
+                _equipment.value = it
+            }
+            exercisesRepository.getAllMuscleGroups().collect {
+                _muscleGroup.value = it
+            }
+            exercisesRepository.getAllUtilities().collect {
+                _utility.value = it
+            }
+            exercisesRepository.getAllForces().collect {
+                _force.value = it
+            }
+            exercisesRepository.getAllMechanics().collect {
+                _mechanic.value = it
+            }
         }
     }
 
-    val muscleGroups = MuscleGroup.values().sortedBy { it.name }
-
-    val equipments = Equipment.values().sortedBy { it.name }
-
+    val muscleGroups = _muscleGroup.value
+    val equipments = _equipment.value
     val movementTypes = MovementType.values().sortedBy { it.name }
 
     val muscleGroupsChecked = muscleGroups.map { it to false }.toMutableStateMap()
@@ -46,21 +83,24 @@ class ExercisesViewModel @Inject constructor(private var exercisesRepository: Ex
     private val all = muscleGroupsChecked + movementTypesChecked + equipmentsChecked
     val selected = all.filterValues { it }
 
+//    TODO Implement
 //    private val _selectedCategories = MutableStateFlow(_selected)
 //    val selectedCategories: StateFlow<Map<Enum<*>, Boolean>>
 //        get() = _selectedCategories
 
-    fun onCategoryChange(category: Enum<*>) {
-        if (muscleGroupsChecked.containsKey(category)) {
-            muscleGroupsChecked[category as MuscleGroup] = false
-        } else if (equipmentsChecked.containsKey(category)) {
-            equipmentsChecked[category as Equipment] = false
-        } else if (movementTypesChecked.containsKey(category)) {
-            movementTypesChecked[category as MovementType] = false
-        }
-    }
+    //    TODO Implement
+    /*    fun onCategoryChange(category: Enum<*>) {
+            if (muscleGroupsChecked.containsKey(category)) {
+                muscleGroupsChecked[category as MuscleGroup] = false
+            } else if (equipmentsChecked.containsKey(category)) {
+                equipmentsChecked[category as Equipment] = false
+            } else if (movementTypesChecked.containsKey(category)) {
+                movementTypesChecked[category as MovementType] = false
+            }
+        }*/
 
-    fun getPrintableName(category: Enum<*>): String {
+    //    TODO Implement
+    /*fun getPrintableName(category: Enum<*>): String {
         var printableName: String = ""
 
         if (muscleGroups.contains(category)) {
@@ -83,7 +123,7 @@ class ExercisesViewModel @Inject constructor(private var exercisesRepository: Ex
             }
         }
         return printableName
-    }
+    }*/
 
     fun filterExercises(search: String) {
         var searchExerciseName = search
@@ -92,7 +132,8 @@ class ExercisesViewModel @Inject constructor(private var exercisesRepository: Ex
             searchExerciseName = "%%"
         }
 
-        val selectedMuscleGroups = mutableListOf<String>()
+//        TODO Implement Filter
+        /*val selectedMuscleGroups = mutableListOf<String>()
         muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.printableName }
             .forEach { selectedMuscleGroups.add(it.printableName) }
         val selectedEquipments = mutableListOf<String>()
@@ -108,7 +149,7 @@ class ExercisesViewModel @Inject constructor(private var exercisesRepository: Ex
             selectedMovementTypes.add("%%")
         } else if (selectedMuscleGroups.isEmpty()) {
             selectedMuscleGroups.add("%%")
-        }
+        }*/
 
 //        TODO If _exercises is empty, display "No results" Message
         viewModelScope.launch {

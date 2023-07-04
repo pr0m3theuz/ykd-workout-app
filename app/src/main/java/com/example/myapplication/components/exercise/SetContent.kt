@@ -35,6 +35,7 @@ import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
 
 // TODO Add ability to rearrange sets
+// TODO Add placeholder text for target weight, reps, & rpe/rir
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SetContent(

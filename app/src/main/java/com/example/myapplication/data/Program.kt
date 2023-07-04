@@ -48,6 +48,7 @@ data class Mesocycle(
     var dateCreated: LocalDateTime = LocalDateTime.now(),
     var startDate: LocalDateTime? = null,
     var endDate: LocalDateTime? = null,
+    var order: Int,
 //    var tags: String, // TODO Should be a List<String>
     @ColumnInfo(name = "programID") val programID: Long? = null,
 )
@@ -78,6 +79,7 @@ data class Microcycle(
     var dateCreated: LocalDateTime = LocalDateTime.now(),
     var startDate: LocalDateTime? = null,
     var endDate: LocalDateTime? = null,
+    var order: Int,
 //    var tags: String, // TODO Should be a List<String>
     @ColumnInfo(name = "programID") val programID: Long? = null,
     @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,

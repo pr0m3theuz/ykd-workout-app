@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.util.Random
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -367,6 +368,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
                     lazyListItemID = newID(),
                     setNumber = 0,
                     exerciseID = exerciseSets.exercise.exerciseID,
+                    progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                     workoutID = fakeULID() // TODO Replace with workout.workoutID
                 )
             )
@@ -535,7 +537,12 @@ private fun initWorkout(): Workout {
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSets> {
-    val exercise = ExerciseModel()
+    val exercise = ExerciseModel(
+        equipmentID = "null",
+        force = "null",
+        mechanicsID = "null",
+        muscleGroupID = "null"
+    )
     val workoutID = fakeULID()
     return MutableList(6) {
         ExerciseSets(
@@ -547,7 +554,8 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
                     exerciseWeight = 100.00.times(it),
                     repetitions = 10.times(it),
                     exerciseID = exercise.exerciseID,
-                    workoutID = workoutID,
+                    workoutID = fakeULID(), // TODO Replace with workout.workoutID
+                    progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                 )
             }
         )

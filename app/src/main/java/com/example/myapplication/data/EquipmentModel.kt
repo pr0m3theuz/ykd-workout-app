@@ -1,5 +1,10 @@
 package com.example.myapplication.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+/*
+TODO Remove
 enum class Equipment(val printableName: String) {
     DUMBBELL("Dumbbell"),
     BARBELL("Barbell"),
@@ -12,6 +17,7 @@ enum class Equipment(val printableName: String) {
     OTHER("Other"),
     NO_EQUIPMENT("No Equipment"),
 }
+*/
 
 enum class ExerciseEquipment(val printableName: String) {
     LEVER("Lever"),
@@ -34,16 +40,27 @@ enum class ExerciseEquipment(val printableName: String) {
     STRETCH("Stretch"),
 }
 
-enum class ExerciseProgression {
+enum class ProgressionSchemeEnum {
     WEIGHT_REPS,
     TIME,
     REPS,
+    REP_RANGE,
+    AMRAP,
     TIME_WEIGHT,
     DISTANCE,
     WEIGHT_DISTANCE,
     WEIGHT_DISTANCE_TIME,
 }
 
+@Entity(tableName = "progressionSchemes")
+data class ProgressionScheme(
+    @PrimaryKey val progressionSchemeID: Int,
+    val name: String,
+    val description: String? = null,
+)
+
+/*
+TODO Remove
 enum class MuscleGroup(val printableName: String) {
     CORE("Core"),
     CALVES("Calves"),
@@ -59,7 +76,7 @@ enum class MuscleGroup(val printableName: String) {
     SHOULDERS("Shoulders"),
     TRICEPS("Triceps"),
     FULL_BODY("Full Body"),
-}
+}*/
 
 enum class MovementType(val printableName: String) {
     COMPOUND("Compound"),
@@ -73,7 +90,10 @@ enum class MovementType(val printableName: String) {
     OLYMPIC("Olympic"),
 }
 
+/*
+TODO Remove
 enum class ExerciseForce(val printableName: String) {
     PUSH("Push"),
     PULL("Pull"),
 }
+*/

@@ -77,7 +77,8 @@ fun ExerciseItem(exercise: ExerciseModel, navController: NavController) {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = exercise.muscleGroup,
+                // TODO Create data class that only take exerciseID, exercise name and MuscleGroup Name
+                text = exercise.muscleGroupID,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

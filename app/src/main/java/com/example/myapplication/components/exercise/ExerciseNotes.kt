@@ -38,6 +38,7 @@ fun ExerciseNotes(
     exercise: ExerciseModel,
     placeholder: String = "Write a note",
 ) {
+//    TODO Refactor
     var exerciseNotes by remember {
         mutableStateOf(
             TextFieldValue(

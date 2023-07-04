@@ -8,6 +8,24 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercises ORDER BY name ASC")
     fun getAllExercises(): Flow<List<ExerciseModel>>
 
+    @Query("SELECT * FROM equipment ORDER BY name ASC")
+    fun getAllEquipment(): Flow<List<Equipment>>
+
+    @Query("SELECT * FROM mechanics ORDER BY name ASC")
+    fun getAllMuscleGroups(): Flow<List<MuscleGroup>>
+
+    @Query("SELECT * FROM utility ORDER BY name ASC")
+    fun getAllUtilities(): Flow<List<Utility>>
+
+    @Query("SELECT * FROM forces ORDER BY name ASC")
+    fun getAllForces(): Flow<List<Force>>
+
+    @Query("SELECT * FROM mechanics ORDER BY name ASC")
+    fun getAllMechanics(): Flow<List<Mechanic>>
+
+    @Query("SELECT * FROM muscleRolesFunctions ORDER BY roleFunction ASC")
+    fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>>
+
     @Query("SELECT * FROM exercises WHERE name LIKE :exercise ORDER BY name ASC")
     fun searchExercises(exercise: String): Flow<List<ExerciseModel>>
 

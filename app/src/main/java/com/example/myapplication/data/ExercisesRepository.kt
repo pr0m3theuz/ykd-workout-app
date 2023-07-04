@@ -14,6 +14,19 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
     // Observed Flow will notify the observer when the data has changed.
     fun getExercises(): Flow<List<ExerciseModel>> = exerciseDao.getAllExercises()
 
+    fun getAllEquipment(): Flow<List<Equipment>> = exerciseDao.getAllEquipment()
+
+    fun getAllMuscleGroups(): Flow<List<MuscleGroup>> = exerciseDao.getAllMuscleGroups()
+
+    fun getAllUtilities(): Flow<List<Utility>> = exerciseDao.getAllUtilities()
+
+    fun getAllForces(): Flow<List<Force>> = exerciseDao.getAllForces()
+
+    fun getAllMechanics(): Flow<List<Mechanic>> = exerciseDao.getAllMechanics()
+
+    fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> =
+        exerciseDao.getAllMuscleRolesFunctions()
+
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.

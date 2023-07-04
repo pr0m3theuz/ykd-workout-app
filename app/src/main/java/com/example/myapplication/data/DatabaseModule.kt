@@ -1,11 +1,10 @@
 package com.example.myapplication.data
 
-import android.content.Context
+import android.app.Application
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -19,14 +18,13 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext appContext: Context): AppRoomDatabase {
+    fun provideDatabase(app: Application): AppRoomDatabase {
         return Room.databaseBuilder(
-            appContext,
+            app,
             AppRoomDatabase::class.java,
             "app_database.db"
         )
-//            .createFromAsset("database/app_database.db")
-//            .addCallback(AppRoomDatabase.DatabaseCallback(CoroutineScope(SupervisorJob())))
+//            .createFromAsset("database/test.db")
             .build()
     }
 }

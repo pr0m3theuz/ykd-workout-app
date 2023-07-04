@@ -44,6 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
 
+// TODO Add a placeholder card if there is no active program
+// TODO Add FAB
+// TODO Add a card to add new program
+// TODO Add a card/button to add new mesocycle/block
+// TODO Add animatedVisibility Function to expand more/less buttons
+
 @OptIn(ExperimentalMaterial3Api::class)
 // @Preview
 @Composable

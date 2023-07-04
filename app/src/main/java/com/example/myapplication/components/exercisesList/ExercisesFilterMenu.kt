@@ -151,7 +151,7 @@ fun ExercisesFilterMenu(exercisesViewModel: ExercisesViewModel = viewModel() /*m
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text(text = muscleGroup.printableName)
+                                        Text(text = muscleGroup.name)
                                         Checkbox(
                                             checked = exercisesViewModel.muscleGroupsChecked[muscleGroup] == true,
                                             onCheckedChange = {
@@ -219,7 +219,7 @@ fun ExercisesFilterMenu(exercisesViewModel: ExercisesViewModel = viewModel() /*m
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text(text = equipment.printableName)
+                                        Text(text = equipment.name)
                                         Checkbox(
                                             checked = exercisesViewModel.equipmentsChecked[equipment] == true,
                                             onCheckedChange = {

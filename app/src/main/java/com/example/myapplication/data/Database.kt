@@ -9,8 +9,11 @@ import androidx.room.TypeConverters
         ExerciseModel::class, SetModel::class, Workout::class, Program::class,
         Mesocycle::class, Microcycle::class, ExerciseNote::class, WorkoutNote::class,
         ProgramNote::class, MesocycleNote::class, MicrocycleNote::class,
+        MuscleExercise::class, MuscleRoleFunction::class, Muscle::class,
+        MuscleGroup::class, Equipment::class, Utility::class, Force::class, Mechanic::class,
+        ProgressionScheme::class
     ],
-    exportSchema = false,
+    exportSchema = true,
     version = 1,
     /*autoMigrations = [AutoMigration(from = 1, to = 2, spec = AppRoomDatabase.Migration1to2::class)]*/
 )

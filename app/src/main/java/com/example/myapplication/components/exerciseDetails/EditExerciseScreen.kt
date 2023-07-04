@@ -31,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.ExerciseModel
 
@@ -39,11 +38,12 @@ import com.example.myapplication.data.ExerciseModel
 @Composable
 fun EditExerciseScreen(exercise: ExerciseModel, onSaveClicked: (ExerciseModel) -> Unit) {
     var name by remember { mutableStateOf(exercise.name) }
-    var exerciseCategory by remember { mutableStateOf(exercise.exerciseCategory) }
-    var muscleGroup by remember { mutableStateOf(exercise.muscleGroup) }
-    var equipment by remember { mutableStateOf(exercise.equipment) }
-    var exerciseProgression by remember { mutableStateOf(exercise.exerciseProgression) }
-    var barType by remember { mutableStateOf(exercise.barType) }
+    var mechanic by remember { mutableStateOf(exercise.mechanicsID) }
+    var muscleGroup by remember { mutableStateOf(exercise.muscleGroupID) }
+    var equipment by remember { mutableStateOf(exercise.equipmentID) }
+    var force by remember { mutableStateOf(exercise.force) }
+    var function by remember { mutableStateOf(exercise.functionID) }
+    var intensity by remember { mutableStateOf(exercise.intensityID) }
     var weightUnit by remember { mutableStateOf(exercise.weightUnit) }
     var videoUri by remember { mutableStateOf(exercise.videoUri) }
 
@@ -329,6 +329,7 @@ fun CheckboxWithLabel(
     }
 }
 
+/*
 @Preview
 @Composable
 fun EditExerciseScreenPreview() {
@@ -337,3 +338,4 @@ fun EditExerciseScreenPreview() {
     )
     EditExerciseScreen(exercise = exercise, onSaveClicked = {})
 }
+*/

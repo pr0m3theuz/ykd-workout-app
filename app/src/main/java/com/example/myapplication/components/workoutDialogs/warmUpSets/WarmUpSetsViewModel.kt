@@ -7,6 +7,7 @@ import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.math.RoundingMode
+import java.util.Random
 import java.util.UUID
 
 class WarmUpSetsViewModel : ViewModel() {
@@ -41,7 +42,8 @@ class WarmUpSetsViewModel : ViewModel() {
             _warmUpSets.value.add(
                 SetModel(
                     exerciseID = exerciseID,
-                    workoutID = workoutID
+                    workoutID = workoutID,
+                    progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                 )
             )
         }
@@ -78,7 +80,8 @@ class WarmUpSetsViewModel : ViewModel() {
                 percentage1RM = 1.0,
                 setTypeID = 2,
                 exerciseID = exerciseID,
-                workoutID = workoutID
+                workoutID = workoutID,
+                progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
             )
         }
     }

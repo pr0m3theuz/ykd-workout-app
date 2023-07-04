@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
 
+// TODO Add animatedVisibility Function to expand more/less buttons
 @OptIn(ExperimentalMaterial3Api::class)
 // @Preview
 @Composable

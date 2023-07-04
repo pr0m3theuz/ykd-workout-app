@@ -232,7 +232,7 @@ fun ExercisesLazyColumn(
                                     contentColor = MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
-                                Text(text = muscleGroup.printableName)
+                                Text(text = muscleGroup.name)
                             }
                         }
                     }
@@ -258,7 +258,7 @@ fun ExercisesLazyColumn(
                                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             ) {
-                                Text(text = equipment.printableName)
+                                Text(text = equipment.name)
                             }
                         }
                     }

@@ -1,0 +1,311 @@
+> Task :app:kaptDebugKotlin
+error: You must annotate primary keys with @NonNull. "exerciseID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - exerciseID in com.example.myapplication.data.SetModel
+error: You must annotate primary keys with @NonNull. "workoutID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - workoutID in com.example.myapplication.data.SetModel
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[exerciseID, workoutID, setTypeID], PrimaryKey[setID] - com.example.myapplication.data.SetModel
+You must annotate primary keys with @NonNull. "exerciseID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - exerciseID in com.example.myapplication.data.SetModel
+
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - workoutStarted in com.example.myapplication.data.Workout
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - workoutEnded in com.example.myapplication.data.Workout
+error: You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.Workout
+You must annotate primary keys with @NonNull. "workoutID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - workoutID in com.example.myapplication.data.SetModel
+
+error: You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.Workout
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[exerciseID, workoutID, setTypeID], PrimaryKey[setID] - com.example.myapplication.data.SetModel
+
+error: You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.Workout
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - workoutStarted in com.example.myapplication.data.Workout
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID, microcycleID], PrimaryKey[workoutID] - com.example.myapplication.data.Workout
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - workoutEnded in com.example.myapplication.data.Workout
+
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.Workout
+You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.Workout
+
+error: Multiple fields have the same columnName: uuid. Field names: uuid, exercise > uuid. - com.example.myapplication.data.ExerciseSets
+You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.Workout
+
+You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.Workout
+
+error: Field has non-unique column name. - uuid in com.example.myapplication.data.ExerciseSets
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID, microcycleID], PrimaryKey[workoutID] - com.example.myapplication.data.Workout
+
+error: Field has non-unique column name. - uuid in com.example.myapplication.data.ExerciseModel
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.Workout
+
+Multiple fields have the same columnName: uuid. Field names: uuid, exercise > uuid. - com.example.myapplication.data.ExerciseSets
+
+error: Multiple fields have the same columnName: exerciseID. Field names: exerciseID, exercise > exerciseID. - com.example.myapplication.data.ExerciseSets
+Field has non-unique column name. - uuid in com.example.myapplication.data.ExerciseSets
+
+error: Field has non-unique column name. - exerciseID in com.example.myapplication.data.ExerciseSets
+Field has non-unique column name. - uuid in com.example.myapplication.data.ExerciseModel
+
+Multiple fields have the same columnName: exerciseID. Field names: exerciseID, exercise > exerciseID. - com.example.myapplication.data.ExerciseSets
+
+error: Field has non-unique column name. - exerciseID in com.example.myapplication.data.ExerciseModel
+Field has non-unique column name. - exerciseID in com.example.myapplication.data.ExerciseSets
+
+error: Entities cannot have relations. - com.example.myapplication.data.ExerciseSets
+Field has non-unique column name. - exerciseID in com.example.myapplication.data.ExerciseModel
+
+Entities cannot have relations. - com.example.myapplication.data.ExerciseSets
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[workoutID, exerciseID], PrimaryKey[exerciseSetsID] - com.example.myapplication.data.ExerciseSets
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[workoutID, exerciseID], PrimaryKey[exerciseSetsID] - com.example.myapplication.data.ExerciseSets
+
+error: Entity class must be annotated with @Entity - com.example.myapplication.data.Program
+Entity class must be annotated with @Entity - com.example.myapplication.data.Program
+
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - startDate in com.example.myapplication.data.Program
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - startDate in com.example.myapplication.data.Program
+
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - endDate in com.example.myapplication.data.Program
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - endDate in com.example.myapplication.data.Program
+
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - startDate in com.example.myapplication.data.Mesocycle
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - startDate in com.example.myapplication.data.Mesocycle
+
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - endDate in com.example.myapplication.data.Mesocycle
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - endDate in com.example.myapplication.data.Mesocycle
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID], PrimaryKey[mesocycleID] - com.example.myapplication.data.Mesocycle
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID], PrimaryKey[mesocycleID] - com.example.myapplication.data.Mesocycle
+
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.Mesocycle
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.Mesocycle
+
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - startDate in com.example.myapplication.data.Microcycle
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - startDate in com.example.myapplication.data.Microcycle
+
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - endDate in com.example.myapplication.data.Microcycle
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - endDate in com.example.myapplication.data.Microcycle
+
+error: You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.Microcycle
+You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.Microcycle
+
+error: You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.Microcycle
+You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.Microcycle
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID], PrimaryKey[microcyleID] - com.example.myapplication.data.Microcycle
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID], PrimaryKey[microcyleID] - com.example.myapplication.data.Microcycle
+
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.Microcycle
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.Microcycle
+
+error: You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.ExerciseNote
+You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.ExerciseNote
+
+error: You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.ExerciseNote
+You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.ExerciseNote
+
+error: You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.ExerciseNote
+You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.ExerciseNote
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[workoutID, exerciseID, programID, mesocycleID, microcycleID], PrimaryKey[exerciseNotePrimaryKey] - com.example.myapplication.data.ExerciseNote
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[workoutID, exerciseID, programID, mesocycleID, microcycleID], PrimaryKey[exerciseNotePrimaryKey] - com.example.myapplication.data.ExerciseNote
+
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.ExerciseNote
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.ExerciseNote
+
+error: You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.WorkoutNote
+You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.WorkoutNote
+
+error: You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.WorkoutNote
+You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.WorkoutNote
+
+error: You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.WorkoutNote
+You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.WorkoutNote
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[workoutID, programID, mesocycleID, microcycleID], PrimaryKey[primaryKey] - com.example.myapplication.data.WorkoutNote
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[workoutID, programID, mesocycleID, microcycleID], PrimaryKey[primaryKey] - com.example.myapplication.data.WorkoutNote
+
+error: (exerciseID) referenced in the foreign key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, workoutID, programID, mesocycleID, microcycleID - com.example.myapplication.data.WorkoutNote
+(exerciseID) referenced in the foreign key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, workoutID, programID, mesocycleID, microcycleID - com.example.myapplication.data.WorkoutNote
+
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.WorkoutNote
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.WorkoutNote
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID], PrimaryKey[primaryKey] - com.example.myapplication.data.ProgramNote
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID], PrimaryKey[primaryKey] - com.example.myapplication.data.ProgramNote
+
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.ProgramNote
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.ProgramNote
+
+error: workoutID referenced in the primary key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, programID, mesocycleID - com.example.myapplication.data.MesocycleNote
+workoutID referenced in the primary key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, programID, mesocycleID - com.example.myapplication.data.MesocycleNote
+
+error: microcycleID referenced in the primary key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, programID, mesocycleID - com.example.myapplication.data.MesocycleNote
+microcycleID referenced in the primary key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, programID, mesocycleID - com.example.myapplication.data.MesocycleNote
+
+error: You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.MesocycleNote
+You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.MesocycleNote
+
+error: You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.MesocycleNote
+You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.MesocycleNote
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID], PrimaryKey[primaryKey] - com.example.myapplication.data.MesocycleNote
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.MesocycleNote
+error: workoutID referenced in the primary key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, programID, mesocycleID, microcycleID - com.example.myapplication.data.MicrocycleNote
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID], PrimaryKey[primaryKey] - com.example.myapplication.data.MesocycleNote
+
+error: You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.MicrocycleNote
+error: You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.MicrocycleNote
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.MesocycleNote
+
+error: You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.MicrocycleNote
+workoutID referenced in the primary key does not exists in the Entity. Available column names:primaryKey, id, uuid, note, pinned, programID, mesocycleID, microcycleID - com.example.myapplication.data.MicrocycleNote
+
+error: You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID, microcycleID], PrimaryKey[primaryKey] - com.example.myapplication.data.MicrocycleNote
+You must annotate primary keys with @NonNull. "programID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - programID in com.example.myapplication.data.MicrocycleNote
+
+error: Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.MicrocycleNote
+error: Cannot figure out how to save this field into database. You can consider adding a type converter for it. - uri in com.example.myapplication.data.SetType
+You must annotate primary keys with @NonNull. "mesocycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - mesocycleID in com.example.myapplication.data.MicrocycleNote
+
+error: Entities and POJOs must have a usable public constructor. You can have an empty constructor or a constructor whose parameters match the fields (by name and type). - com.example.myapplication.data.SetType
+error: Cannot find getter for field. - textColor in com.example.myapplication.data.SetType
+You must annotate primary keys with @NonNull. "microcycleID" is nullable. SQLite considers this a bug and Room does not allow it. See SQLite docs for details: https://www.sqlite.org/lang_createtable.html - microcycleID in com.example.myapplication.data.MicrocycleNote
+
+error: Cannot find setter for field. - id in com.example.myapplication.data.SetType
+error: Cannot find setter for field. - name in com.example.myapplication.data.SetType
+You cannot have multiple primary keys defined in an Entity. If you want to declare a composite primary key, you should use @Entity#primaryKeys and not use @PrimaryKey. Defined Primary Keys: PrimaryKey[programID, mesocycleID, microcycleID], PrimaryKey[primaryKey] - com.example.myapplication.data.MicrocycleNote
+
+error: Cannot find setter for field. - description in com.example.myapplication.data.SetType
+Classes referenced in Foreign Key annotations must be @Entity classes. com.example.myapplication.data.Program is not an entity - com.example.myapplication.data.MicrocycleNote
+
+error: Cannot find setter for field. - textColor in com.example.myapplication.data.SetType
+Cannot figure out how to save this field into database. You can consider adding a type converter for it. - uri in com.example.myapplication.data.SetType
+
+error: com.example.myapplication.data.SetModel has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+Entities and POJOs must have a usable public constructor. You can have an empty constructor or a constructor whose parameters match the fields (by name and type). - com.example.myapplication.data.SetType
+
+error: (setTypeID) does not exist in com.example.myapplication.data.SetType. Available columns are id,name,description,uri,textColor - com.example.myapplication.data.SetModel
+error: com.example.myapplication.data.Workout has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+Cannot find getter for field. - textColor in com.example.myapplication.data.SetType
+
+Cannot find setter for field. - id in com.example.myapplication.data.SetType
+
+error: (microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.Workout
+Cannot find setter for field. - name in com.example.myapplication.data.SetType
+
+error: com.example.myapplication.data.ExerciseSets has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+Cannot find setter for field. - description in com.example.myapplication.data.SetType
+
+Cannot find setter for field. - textColor in com.example.myapplication.data.SetType
+
+error: com.example.myapplication.data.Microcycle has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+com.example.myapplication.data.SetModel has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+
+(setTypeID) does not exist in com.example.myapplication.data.SetType. Available columns are id,name,description,uri,textColor - com.example.myapplication.data.SetModel
+
+error: com.example.myapplication.data.ExerciseNote has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+com.example.myapplication.data.Workout has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+
+(microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.Workout
+
+com.example.myapplication.data.ExerciseSets has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+
+com.example.myapplication.data.Microcycle has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+
+com.example.myapplication.data.ExerciseNote has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+
+error: com.example.myapplication.data.ExerciseNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+com.example.myapplication.data.ExerciseNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+
+error: (microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.ExerciseNote
+(microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.ExerciseNote
+
+error: com.example.myapplication.data.ExerciseNote has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+com.example.myapplication.data.ExerciseNote has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+
+error: com.example.myapplication.data.ExerciseNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+com.example.myapplication.data.ExerciseNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+
+error: (microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.ExerciseNote
+(microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.ExerciseNote
+
+error: com.example.myapplication.data.WorkoutNote has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+com.example.myapplication.data.WorkoutNote has a foreign key (workoutID) that references com.example.myapplication.data.Workout (workoutID) but com.example.myapplication.data.Workout does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Workout that has (workoutID) column(s). - com.example.myapplication.data.Workout
+
+error: com.example.myapplication.data.WorkoutNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+com.example.myapplication.data.WorkoutNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+
+error: (microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.WorkoutNote
+(microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.WorkoutNote
+
+error: com.example.myapplication.data.MesocycleNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+com.example.myapplication.data.MesocycleNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+
+error: com.example.myapplication.data.MicrocycleNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+com.example.myapplication.data.MicrocycleNote has a foreign key (mesocycleID) that references com.example.myapplication.data.Mesocycle (mesocycleID) but com.example.myapplication.data.Mesocycle does not have a unique index on those columns nor the columns are its primary key. SQLite requires having a unique constraint on referenced parent columns so you must add a unique index to com.example.myapplication.data.Mesocycle that has (mesocycleID) column(s). - com.example.myapplication.data.Mesocycle
+
+error: (microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.MicrocycleNote
+(microcycleID) does not exist in com.example.myapplication.data.Microcycle. Available columns are microcyleID,lazyListItemID,uuid,name,notes,startDate,endDate,tags,programID,mesocycleID - com.example.myapplication.data.MicrocycleNote
+
+error: [SQLITE_ERROR] SQL error or missing database (duplicate column name: exerciseID) - com.example.myapplication.data.ExerciseSets
+[SQLITE_ERROR] SQL error or missing database (duplicate column name: exerciseID) - com.example.myapplication.data.ExerciseSets
+
+error: The name "exercisenotes" is used by multiple entities or views: com.example.myapplication.data.ExerciseNote, com.example.myapplication.data.ExerciseNote - com.example.myapplication.data.ExerciseNote
+The name "exercisenotes" is used by multiple entities or views: com.example.myapplication.data.ExerciseNote, com.example.myapplication.data.ExerciseNote - com.example.myapplication.data.ExerciseNote
+
+error: The name "exercisenotes" is used by multiple entities or views: com.example.myapplication.data.ExerciseNote, com.example.myapplication.data.ExerciseNote - com.example.myapplication.data.ExerciseNote
+/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/build/tmp/kapt3/stubs/debug/com/example/myapplication/data/AppRoomDatabase.java:13: error: The name "exercisenotes" is used by multiple entities or views: com.example.myapplication.data.ExerciseNote, com.example.myapplication.data.ExerciseNote
+public abstract class AppRoomDatabase extends androidx.room.RoomDatabase {
+                ^
+warning: exerciseID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.SetModel
+warning: workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.SetModel
+warning: setTypeID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.SetModel
+warning: mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.Workout
+warning: microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.Workout
+warning: Primary key constraint on exerciseID is ignored when being merged into com.example.myapplication.data.ExerciseSets - exercise in com.example.myapplication.data.ExerciseSets
+warning: workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseSets
+warning: exerciseID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseSets
+warning: mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.Microcycle
+warning: workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+warning: exerciseID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+warning: mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+warning: microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+exerciseID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.SetModel
+
+workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.SetModel
+
+warning: workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.WorkoutNote
+setTypeID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.SetModel
+
+mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.Workout
+
+microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.Workout
+
+warning: mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.WorkoutNote
+Primary key constraint on exerciseID is ignored when being merged into com.example.myapplication.data.ExerciseSets - exercise in com.example.myapplication.data.ExerciseSets
+
+workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseSets
+
+exerciseID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseSets
+
+warning: microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.WorkoutNote
+mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.Microcycle
+
+workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+
+exerciseID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+
+warning: mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.MesocycleNote
+mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+
+microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.ExerciseNote
+
+workoutID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.WorkoutNote
+
+warning: mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.MicrocycleNote
+mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.WorkoutNote
+
+microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.WorkoutNote
+
+mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.MesocycleNote
+
+warning: microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.MicrocycleNote
+mesocycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.MicrocycleNote
+
+microcycleID column references a foreign key but it is not part of an index. This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column. - com.example.myapplication.data.MicrocycleNote
+

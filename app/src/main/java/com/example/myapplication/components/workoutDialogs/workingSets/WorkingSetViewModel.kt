@@ -6,6 +6,7 @@ import com.example.myapplication.data.SetModel
 import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.Random
 import java.util.UUID
 
 class WorkingSetViewModel : ViewModel() {
@@ -44,7 +45,8 @@ class WorkingSetViewModel : ViewModel() {
             _sets.value.add(
                 SetModel(
                     exerciseID = exerciseID!!,
-                    workoutID = workoutID!!
+                    workoutID = workoutID!!,
+                    progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                 )
             )
         }
@@ -74,7 +76,8 @@ class WorkingSetViewModel : ViewModel() {
                 repetitions = 10,
                 percentage1RM = 1.0,
                 exerciseID = exerciseID!!,
-                workoutID = workoutID!!
+                workoutID = workoutID!!,
+                progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
             )
         }
     }

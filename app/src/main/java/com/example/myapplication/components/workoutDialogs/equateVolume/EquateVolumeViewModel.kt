@@ -8,6 +8,7 @@ import com.example.myapplication.newID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.RoundingMode
+import java.util.Random
 import java.util.UUID
 import kotlin.math.roundToInt
 
@@ -79,15 +80,14 @@ class EquateVolumeViewModel : ViewModel() {
                     uuid = UUID.randomUUID(),
                     setNumber = sets.value.last().setNumber?.plus(1),
                     setCompleted = false,
-                    exerciseID = exerciseID!!,
-                    workoutID = workoutID!!
                 )
             )
         } else {
             temporarySets.add(
                 SetModel(
                     exerciseID = exerciseID!!,
-                    workoutID = workoutID!!
+                    workoutID = workoutID!!,
+                    progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                 )
             )
         }
@@ -121,13 +121,13 @@ class EquateVolumeViewModel : ViewModel() {
             lazyListItemID = newID(),
             uuid = UUID.randomUUID(),
             setNumber = lastSet.setNumber?.plus(1),
-            setCompleted = false,
             exerciseID = exerciseID!!,
             workoutID = workoutID!!
         )
             ?: SetModel(
                 exerciseID = exerciseID!!,
-                workoutID = workoutID!!
+                workoutID = workoutID!!,
+                progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
             )
 
         currentSets.add(newSet)
@@ -243,7 +243,8 @@ class EquateVolumeViewModel : ViewModel() {
                 repetitions = 10,
                 percentage1RM = 1.0,
                 exerciseID = exerciseID!!,
-                workoutID = workoutID!!
+                workoutID = workoutID!!,
+                progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
             )
         }
     }
