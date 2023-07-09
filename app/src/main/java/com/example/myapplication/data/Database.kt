@@ -11,7 +11,7 @@ import androidx.room.TypeConverters
         ProgramNote::class, MesocycleNote::class, MicrocycleNote::class,
         MuscleExercise::class, MuscleRoleFunction::class, Muscle::class,
         MuscleGroup::class, Equipment::class, Utility::class, Force::class, Mechanic::class,
-        ProgressionScheme::class
+        ProgressionScheme::class, ExerciseSetCrossRef::class, WorkoutSetCrossRef::class
     ],
     exportSchema = true,
     version = 1,
@@ -28,5 +28,6 @@ abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun programNotesDao(): ProgramNotesDao
     abstract fun workoutDao(): WorkoutDao
     abstract fun setsDao(): SetsDao
+    abstract fun exerciseSetsDao(): ExerciseSetsDao
 
 }

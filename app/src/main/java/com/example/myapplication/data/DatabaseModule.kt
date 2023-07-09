@@ -52,6 +52,11 @@ object DatabaseModule {
     }
 
     @Provides
+    fun provideExerciseSetsDao(database: AppRoomDatabase): ExerciseSetsDao {
+        return database.exerciseSetsDao()
+    }
+
+    @Provides
     @Singleton
     fun provideDatabase(app: Application): AppRoomDatabase {
         return Room.databaseBuilder(

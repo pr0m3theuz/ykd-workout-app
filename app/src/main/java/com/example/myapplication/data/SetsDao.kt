@@ -1,7 +1,6 @@
 package com.example.myapplication.data
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SetsDao {
@@ -17,7 +16,7 @@ interface SetsDao {
     @Query("SELECT * FROM sets WHERE setID = :setID")
     suspend fun getSetModelById(setID: Long): SetModel?
 
-    @Query("SELECT * FROM sets WHERE workoutID = :workoutID ORDER BY setNumber ASC")
+/*    @Query("SELECT * FROM sets WHERE workoutID = :workoutID ORDER BY setNumber ASC")
     fun getSetModelsForWorkout(workoutID: Long): Flow<List<ExerciseSets>>
 
     @Query("SELECT * FROM sets WHERE exerciseID = :exerciseID ORDER BY setNumber ASC")
@@ -31,6 +30,6 @@ interface SetsDao {
     fun getSetModelsForWorkoutAndExercise(
         workoutID: Long,
         exerciseID: Long
-    ): Flow<List<ExerciseSets>>
+    ): Flow<List<ExerciseSets>>*/
 
 }

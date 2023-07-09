@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "exercises") {
+                NavHost(navController = navController, startDestination = "workout") {
                     addExercisesGraph(navController)
                     addWorkoutGraph(navController)
                     addProgramsGraph(navController)
@@ -76,34 +76,37 @@ class MainActivity : ComponentActivity() {
 }
 
 private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
-    navigation("workoutContent", route = "workout") {
-/*        composable("workoutScreen") {
+    navigation("addExercisesList", route = "workout") {
+        /* composable("workoutScreen") {
             WorkoutScreen()
         }*/
+
         composable("workoutContent") {
-            val viewModel = hiltViewModel<WorkoutViewModel>()
+            val workoutViewModel = hiltViewModel<WorkoutViewModel>()
             WorkoutContent(
                 navController = navController,
-                workoutViewModel = viewModel,
+                workoutViewModel = workoutViewModel,
             )
         }
         composable("addExercisesList") {
-            val viewModel = hiltViewModel<ExercisesViewModel>()
+            val exercisesViewModel = hiltViewModel<ExercisesViewModel>()
+            val workoutViewModel = hiltViewModel<WorkoutViewModel>()
             AddExercisesLazyColumn(
                 navController = navController,
-                exercisesViewModel = viewModel,
+                exercisesViewModel = exercisesViewModel,
+                workoutViewModel = workoutViewModel
             )
         }
         composable(
             "exerciseDetails/{exerciseID}",
             arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
         ) { navBackStackEntry ->
-            val viewModel = hiltViewModel<ExercisesViewModel>()
+            val exercisesViewModel = hiltViewModel<ExercisesViewModel>()
             navBackStackEntry.arguments?.getString("exerciseID")?.let {
                 ExerciseDetailsScreen(
                     navController,
                     exercisePK = it,
-                    exercisesViewModel = viewModel,
+                    exercisesViewModel = exercisesViewModel,
                 )
             }
         }

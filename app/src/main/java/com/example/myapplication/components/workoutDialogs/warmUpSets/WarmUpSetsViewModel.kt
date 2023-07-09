@@ -24,10 +24,14 @@ class WarmUpSetsViewModel : ViewModel() {
     }
 
     private var exerciseID: Long = 0
+    private var exerciseUUID: UUID = UUID.randomUUID()
     private var workoutID: Long = 0
+    private var workoutUUID: UUID = UUID.randomUUID()
     fun getExerciseSets(exerciseSets: ExerciseSets) {
         exerciseID = exerciseSets.exercise.exerciseID
+        exerciseUUID = exerciseSets.exercise.uuid
         workoutID = exerciseSets.workoutID
+        workoutUUID = exerciseSets.workoutUUID
     }
 
     fun addSet() {
@@ -42,7 +46,9 @@ class WarmUpSetsViewModel : ViewModel() {
             _warmUpSets.value.add(
                 SetModel(
                     exerciseID = exerciseID,
+                    exerciseUUID = exerciseUUID,
                     workoutID = workoutID,
+                    workoutUUID = workoutUUID,
                     progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                 )
             )
@@ -80,7 +86,9 @@ class WarmUpSetsViewModel : ViewModel() {
                 percentage1RM = 1.0,
                 setTypeID = 2,
                 exerciseID = exerciseID,
+                exerciseUUID = exerciseUUID,
                 workoutID = workoutID,
+                workoutUUID = workoutUUID,
                 progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
             )
         }

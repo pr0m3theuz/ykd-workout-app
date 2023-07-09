@@ -39,12 +39,16 @@ class EquateVolumeViewModel : ViewModel() {
     private var _exerciseSets: ExerciseSets? = null
 
     private var exerciseID: Long? = _exerciseSets?.exercise?.exerciseID
+    private var exerciseUUID: UUID? = _exerciseSets?.exercise?.uuid
     private var workoutID: Long? = _exerciseSets?.workoutID
+    private var workoutUUID: UUID? = _exerciseSets?.workoutUUID
 
     private fun getExerciseSets(exerciseSets: ExerciseSets) {
         _exerciseSets = exerciseSets
         exerciseID = _exerciseSets?.exercise?.exerciseID
+        exerciseUUID = _exerciseSets?.exercise?.uuid
         workoutID = _exerciseSets?.workoutID
+        workoutUUID = _exerciseSets?.workoutUUID
     }
 
     fun initialize(exerciseSets: ExerciseSets) {
@@ -86,7 +90,9 @@ class EquateVolumeViewModel : ViewModel() {
             temporarySets.add(
                 SetModel(
                     exerciseID = exerciseID!!,
+                    exerciseUUID = exerciseUUID!!,
                     workoutID = workoutID!!,
+                    workoutUUID = workoutUUID!!,
                     progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                 )
             )
@@ -126,7 +132,9 @@ class EquateVolumeViewModel : ViewModel() {
         )
             ?: SetModel(
                 exerciseID = exerciseID!!,
+                exerciseUUID = exerciseUUID!!,
                 workoutID = workoutID!!,
+                workoutUUID = workoutUUID!!,
                 progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
             )
 
@@ -243,7 +251,9 @@ class EquateVolumeViewModel : ViewModel() {
                 repetitions = 10,
                 percentage1RM = 1.0,
                 exerciseID = exerciseID!!,
+                exerciseUUID = exerciseUUID!!,
                 workoutID = workoutID!!,
+                workoutUUID = workoutUUID!!,
                 progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
             )
         }

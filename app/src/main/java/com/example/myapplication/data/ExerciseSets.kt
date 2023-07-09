@@ -45,10 +45,14 @@ data class ExerciseSets(
 )
 
 // TODO to use for exercise history
+data class TestExerciseSets(
+    @Embedded val exercise: ExerciseModel,
+    @Relation(parentColumn = "exerciseID", entityColumn = "exerciseID", entity = SetModel::class)
+//    @Relation(parentColumn = "exerciseID", entityColumn = "setID", entity = SetModel::class)
+    val sets: MutableList<SetModel>,
+)
+
 data class WorkoutSets(
-    @PrimaryKey(autoGenerate = true) val exerciseSetsID: Long = fakeULID(),
-    val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
-    val exSetsUUID: UUID = UUID.randomUUID(),
     @Embedded val workout: Workout,
     @Relation(parentColumn = "workoutID", entityColumn = "setID", entity = SetModel::class)
     var sets: MutableList<SetModel>,
@@ -58,8 +62,7 @@ data class WorkoutSets(
 data class ExerciseSetCrossRef(
     val exerciseID: Long,
     val setID: Long,
-
-    )
+)
 
 data class ExerciseWithSets(
     @Embedded val exercise: ExerciseModel,
@@ -69,6 +72,64 @@ data class ExerciseWithSets(
         associateBy = Junction(ExerciseSetCrossRef::class)
     )
     val sets: List<SetModel>,
+)
+
+data class SetsWithExercise(
+    @Embedded val set: SetModel,
+    @Relation(
+        parentColumn = "setID",
+        entityColumn = "exerciseID",
+        associateBy = Junction(ExerciseSetCrossRef::class)
+    )
+    val exercise: ExerciseModel,
+)
+
+data class WorkoutWithSetsAndExercise(
+    @Embedded val workout: Workout,
+    @Relation(
+        entity = SetModel::class,
+        parentColumn = "workoutID",
+        entityColumn = "workoutID",
+    )
+    val sets: List<SetsWithExercise>,
+)
+
+@Entity(primaryKeys = ["workoutID", "setID"/*, "exerciseNotePrimaryKey"*/])
+data class WorkoutSetCrossRef(
+    val workoutID: Long,
+    val setID: Long,
+
+    )
+
+data class WorkoutWithSets(
+    @Embedded val workout: Workout,
+    @Relation(
+        parentColumn = "workoutID",
+        entityColumn = "setId",
+        associateBy = Junction(WorkoutSetCrossRef::class)
+    )
+    val sets: List<SetModel>,
+)
+
+
+data class SetsWithWorkout(
+    @Embedded val set: SetModel,
+    @Relation(
+        parentColumn = "setID",
+        entityColumn = "workoutID",
+        associateBy = Junction(WorkoutSetCrossRef::class)
+    )
+    val workout: List<Workout>,
+)
+
+data class ExercisesWithSetsAndWorkout(
+    @Embedded val exercise: ExerciseModel,
+    @Relation(
+        entity = SetModel::class,
+        parentColumn = "exerciseID",
+        entityColumn = "exerciseID",
+    )
+    val sets: MutableList<SetsWithWorkout>,
 )
 
 /*fun ExerciseSets.addSet() {

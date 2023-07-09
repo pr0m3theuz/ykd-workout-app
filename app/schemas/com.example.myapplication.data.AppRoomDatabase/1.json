@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1164068b2efc52253e3337ee3e7e44ef",
+    "identityHash": "234d574a7c70f60e4e7e7d24b7667e2b",
     "entities": [
       {
         "tableName": "exercises",
@@ -134,7 +134,7 @@
       },
       {
         "tableName": "sets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`setID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `setNumber` INTEGER, `exerciseWeight` REAL, `repetitions` INTEGER, `ratePerceivedEffort` REAL, `repetitionsInReserve` REAL, `targetWeight` REAL, `targetRepetitions` INTEGER, `targetRatePerceivedEffort` REAL, `targetRepetitionsInReserve` REAL, `percentage1RM` REAL, `setCompleted` INTEGER NOT NULL, `setTypeID` INTEGER NOT NULL DEFAULT 1, `exerciseID` INTEGER NOT NULL, `workoutID` INTEGER NOT NULL, `progressionSchemeID` INTEGER NOT NULL, `programID` INTEGER, `mesocycleID` INTEGER, `microcycleID` INTEGER, FOREIGN KEY(`exerciseID`) REFERENCES `exercises`(`exerciseID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`workoutID`) REFERENCES `workouts`(`workoutID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`progressionSchemeID`) REFERENCES `progressionSchemes`(`progressionSchemeID`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`setID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `setNumber` INTEGER, `exerciseWeight` REAL, `repetitions` INTEGER, `ratePerceivedEffort` REAL, `repetitionsInReserve` REAL, `targetWeight` REAL, `targetRepetitions` INTEGER, `targetRatePerceivedEffort` REAL, `targetRepetitionsInReserve` REAL, `percentage1RM` REAL, `setCompleted` INTEGER NOT NULL, `setTypeID` INTEGER NOT NULL DEFAULT 1, `exerciseID` INTEGER NOT NULL, `exerciseUUID` BLOB NOT NULL, `workoutID` INTEGER NOT NULL, `workoutUUID` BLOB NOT NULL, `progressionSchemeID` INTEGER NOT NULL, `programUUID` BLOB, `mesocycleUUID` BLOB, `microcycleUUID` BLOB, FOREIGN KEY(`exerciseID`) REFERENCES `exercises`(`exerciseID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`workoutID`) REFERENCES `workouts`(`workoutID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`progressionSchemeID`) REFERENCES `progressionSchemes`(`progressionSchemeID`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "setID",
@@ -234,9 +234,21 @@
             "notNull": true
           },
           {
+            "fieldPath": "exerciseUUID",
+            "columnName": "exerciseUUID",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
             "fieldPath": "workoutID",
             "columnName": "workoutID",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutUUID",
+            "columnName": "workoutUUID",
+            "affinity": "BLOB",
             "notNull": true
           },
           {
@@ -246,21 +258,21 @@
             "notNull": true
           },
           {
-            "fieldPath": "programID",
-            "columnName": "programID",
-            "affinity": "INTEGER",
+            "fieldPath": "programUUID",
+            "columnName": "programUUID",
+            "affinity": "BLOB",
             "notNull": false
           },
           {
-            "fieldPath": "mesocycleID",
-            "columnName": "mesocycleID",
-            "affinity": "INTEGER",
+            "fieldPath": "mesocycleUUID",
+            "columnName": "mesocycleUUID",
+            "affinity": "BLOB",
             "notNull": false
           },
           {
-            "fieldPath": "microcycleID",
-            "columnName": "microcycleID",
-            "affinity": "INTEGER",
+            "fieldPath": "microcycleUUID",
+            "columnName": "microcycleUUID",
+            "affinity": "BLOB",
             "notNull": false
           }
         ],
@@ -1628,12 +1640,66 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "ExerciseSetCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseID` INTEGER NOT NULL, `setID` INTEGER NOT NULL, PRIMARY KEY(`exerciseID`, `setID`))",
+        "fields": [
+          {
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "setID",
+            "columnName": "setID",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "exerciseID",
+            "setID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "WorkoutSetCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`workoutID` INTEGER NOT NULL, `setID` INTEGER NOT NULL, PRIMARY KEY(`workoutID`, `setID`))",
+        "fields": [
+          {
+            "fieldPath": "workoutID",
+            "columnName": "workoutID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "setID",
+            "columnName": "setID",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "workoutID",
+            "setID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1164068b2efc52253e3337ee3e7e44ef')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '234d574a7c70f60e4e7e7d24b7667e2b')"
     ]
   }
 }

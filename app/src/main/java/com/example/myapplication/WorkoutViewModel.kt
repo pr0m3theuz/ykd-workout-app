@@ -20,11 +20,14 @@ import com.example.myapplication.data.ExerciseModel
 import com.example.myapplication.data.ExerciseNote
 import com.example.myapplication.data.ExerciseNotesRepository
 import com.example.myapplication.data.ExerciseSets
+import com.example.myapplication.data.ExerciseSetsRepository
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetsRepository
+import com.example.myapplication.data.SetsWithExercise
 import com.example.myapplication.data.Workout
 import com.example.myapplication.data.WorkoutNotesRepository
 import com.example.myapplication.data.WorkoutRepository
+import com.example.myapplication.data.WorkoutWithSetsAndExercise
 import com.example.myapplication.data.addWarmUpSets
 import com.example.myapplication.data.pinNotes
 import com.example.myapplication.data.resetSets
@@ -60,6 +63,7 @@ class WorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
     private val workoutNotesRepository: WorkoutNotesRepository,
     private val setsRepository: SetsRepository,
+    private val exerciseSetsRepository: ExerciseSetsRepository,
 ) :
     ViewModel() {
     //    fun currentTimeMillis(): Long = System.currentTimeMillis()
@@ -322,6 +326,7 @@ class WorkoutViewModel @Inject constructor(
         }
     }
 
+    //    Workout
     private var _workoutData = initWorkout()
     private var _workout = MutableStateFlow(_workoutData)
     val workout
@@ -355,6 +360,8 @@ class WorkoutViewModel @Inject constructor(
 //        TODO Navigate to Workout Complete Screen & Summary
     }
 
+
+    //    ExerciseSets
     private var _exercisesSetsData = initExercisesSets()
 
     private var _exercisesSets = MutableStateFlow(_exercisesSetsData.toList())
@@ -597,15 +604,39 @@ class WorkoutViewModel @Inject constructor(
             microcycleID = workout.microcycleID
         )
 
-        var newExerciseSets: List<ExerciseSets> = emptyList()
+        var newExerciseSets: List<WorkoutWithSetsAndExercise> = emptyList()
+        var exercisesSetsMap: Map<ExerciseModel, List<SetsWithExercise>> = emptyMap()
+
+        val exercisesSets: MutableList<ExerciseSets> = mutableListOf()
 
         viewModelScope.launch {
-            setsRepository.getSetModelsForWorkout(workout.workoutID).collect() {
-                newExerciseSets = it
-            }
+            newExerciseSets = exerciseSetsRepository.getSetsAndExerciseByWorkout(workout.workoutID)
         }
 
-        newExerciseSets.forEach { exerciseSets -> exerciseSets.resetSets(newWorkout) }
+        newExerciseSets.groupBy { it.sets.forEach { setsWithExercise -> setsWithExercise.exercise.exerciseID } }
+
+        newExerciseSets.forEach() { workoutWithSetsAndExercise ->
+            exercisesSetsMap = workoutWithSetsAndExercise.sets.groupBy { it.exercise }
+        }
+
+        exercisesSetsMap.forEach() {
+            exercisesSets.add(
+                ExerciseSets(
+                    workoutID = newWorkout.workoutID,
+                    workoutUUID = newWorkout.uuid,
+                    exercise = it.key,
+                    sets = MutableList(it.value.size) { i -> it.value[i].set },
+                )
+
+            )
+        }
+
+        exercisesSets.forEach { exerciseSets ->
+            exerciseSets.resetSets(newWorkout)
+        }
+        _workoutData = newWorkout
+        _exercisesSetsData = exercisesSets
+
     }
 
     private val exercisesSelectedToBeAddedToWorkout: MutableSet<ExerciseModel> = mutableSetOf()

@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
@@ -22,7 +23,7 @@ import com.example.myapplication.data.SetModel
 @Composable
 fun ExercisesSetsScreen(
     navController: NavController,
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = hiltViewModel(),
 ) {
     val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
 
@@ -69,6 +70,8 @@ fun ExerciseSetLazyColumn(
         item {
             CancelWorkout()
         }
-        item { Box(modifier = Modifier.height(128.dp).fillMaxWidth()) }
+        item { Box(modifier = Modifier
+            .height(128.dp)
+            .fillMaxWidth()) }
     }
 }

@@ -258,9 +258,6 @@ interface ProgramNotesDao {
     fun getPinnedProgramNotes(
         programID: Long,
         pinned: Boolean = true,
-        programPinned: Boolean = false,
-        mesocyclePinned: Boolean = false,
-        microcyclePinned: Boolean = false,
     ): Flow<List<ProgramNote>>
 
 

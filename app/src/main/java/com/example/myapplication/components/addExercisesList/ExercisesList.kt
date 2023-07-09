@@ -5,12 +5,13 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlaylistAddCheck
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Search
@@ -35,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.BottomNavigationBar
@@ -55,7 +55,7 @@ import com.example.myapplication.data.ExerciseModel
 fun AddExercisesLazyColumn(
     navController: NavController,
     exercisesViewModel: ExercisesViewModel,
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel,
 ) {
     val exercises by exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
     Log.i("ExercisesLazyColumn.exercises", exercises.toString())
@@ -125,10 +125,17 @@ fun AddExercisesLazyColumn(
         },
         bottomBar = { BottomNavigationBar(navController = navController) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { workoutViewModel.addEmptyExerciseSets() }) {
+            FloatingActionButton(onClick = {
+                workoutViewModel.addEmptyExerciseSets()
+                navController.navigateUp()
+            }
+            ) {
 //                TODO Figure out right icon for this
                 Icon(
-                    imageVector = Icons.Filled.PlaylistAddCheck,
+                    modifier = Modifier
+                        .size(30.dp),
+                    imageVector = Icons.Filled.Check,
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = "Add Selected Exercises"
                 )
             }
