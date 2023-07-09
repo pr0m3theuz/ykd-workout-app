@@ -37,10 +37,11 @@ data class ExerciseSets(
     @PrimaryKey(autoGenerate = true) val exerciseSetsID: Long = fakeULID(),
     val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
     val exSetsUUID: UUID = UUID.randomUUID(),
-    @ColumnInfo(name = "workoutID") val workoutID: Long,
+    @ColumnInfo(name = "workoutID") val workoutID: Long, // TODO May be useless
+    @ColumnInfo(name = "workoutUUID") val workoutUUID: UUID, // TODO May be useless
     @Embedded val exercise: ExerciseModel,
     @Relation(parentColumn = "exerciseID", entityColumn = "setID", entity = SetModel::class)
-    var sets: MutableList<SetModel>,
+    val sets: MutableList<SetModel>,
 )
 
 // TODO to use for exercise history
@@ -58,7 +59,7 @@ data class ExerciseSetCrossRef(
     val exerciseID: Long,
     val setID: Long,
 
-)
+    )
 
 data class ExerciseWithSets(
     @Embedded val exercise: ExerciseModel,
@@ -171,6 +172,22 @@ fun ExerciseSets.averageWeight(): Double {
         0.0
     } else {
         averageWeight
+    }
+}
+
+/**
+ * Resets the sets of an exerciseSet by updating their IDs, lazyListItemIDs, UUIDs, workoutIDs, and setCompleted status.
+ * Useful for when creating a new workout from a template or previous workout.
+ * @param workout The workout to associate the sets with.
+ */
+fun ExerciseSets.resetSets(workout: Workout) {
+    sets.forEach { set ->
+        set.setID = newID();
+        set.lazyListItemID = newID();
+        set.uuid = UUID.randomUUID();
+        set.workoutID = workout.workoutID;
+        set.workoutUUID = workout.uuid
+        set.setCompleted = false
     }
 }
 

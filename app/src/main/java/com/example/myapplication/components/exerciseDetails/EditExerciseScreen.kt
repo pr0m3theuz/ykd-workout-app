@@ -45,7 +45,7 @@ fun EditExerciseScreen(exercise: ExerciseModel, onSaveClicked: (ExerciseModel) -
     var function by remember { mutableStateOf(exercise.functionID) }
     var intensity by remember { mutableStateOf(exercise.intensityID) }
     var weightUnit by remember { mutableStateOf(exercise.weightUnit) }
-    var videoUri by remember { mutableStateOf(exercise.videoUri) }
+    var mediaUri by remember { mutableStateOf(exercise.mediaUri) }
 
     fun getUpdatedExercise(): ExerciseModel {
         return exercise
@@ -70,7 +70,9 @@ fun EditExerciseScreen(exercise: ExerciseModel, onSaveClicked: (ExerciseModel) -
         content = { contentPadding ->
             Column(modifier = Modifier.padding(contentPadding)) {
                 Column(
-                    modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OutlinedTextField(
@@ -95,8 +97,8 @@ fun EditExerciseScreen(exercise: ExerciseModel, onSaveClicked: (ExerciseModel) -
                     WeightUnitMenu()
 
                     OutlinedTextField(
-                        value = videoUri ?: "",
-                        onValueChange = { videoUri = it },
+                        value = mediaUri ?: "",
+                        onValueChange = { mediaUri = it },
                         label = { Text("Video Link") }
                     )
                 }

@@ -11,7 +11,7 @@ interface ExerciseDao {
     @Query("SELECT * FROM equipment ORDER BY name ASC")
     fun getAllEquipment(): Flow<List<Equipment>>
 
-    @Query("SELECT * FROM mechanics ORDER BY name ASC")
+    @Query("SELECT * FROM muscleGroups ORDER BY name ASC")
     fun getAllMuscleGroups(): Flow<List<MuscleGroup>>
 
     @Query("SELECT * FROM utility ORDER BY name ASC")

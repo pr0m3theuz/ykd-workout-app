@@ -12,8 +12,43 @@ import javax.inject.Singleton
 @Module
 object DatabaseModule {
     @Provides
-    fun provideDao(database: AppRoomDatabase): ExerciseDao {
+    fun provideExerciseDao(database: AppRoomDatabase): ExerciseDao {
         return database.exerciseDao()
+    }
+
+    @Provides
+    fun provideExerciseNotesDao(database: AppRoomDatabase): ExerciseNotesDao {
+        return database.exerciseNotesDao()
+    }
+
+    @Provides
+    fun provideWorkoutNotesDao(database: AppRoomDatabase): WorkoutNotesDao {
+        return database.workoutNotesDao()
+    }
+
+    @Provides
+    fun provideMicrocycleNotesDao(database: AppRoomDatabase): MicrocycleNotesDao {
+        return database.microcycleNotesDao()
+    }
+
+    @Provides
+    fun provideMesocycleNotesDao(database: AppRoomDatabase): MesocycleNotesDao {
+        return database.mesocycleNotesDao()
+    }
+
+    @Provides
+    fun provideProgramNotesDao(database: AppRoomDatabase): ProgramNotesDao {
+        return database.programNotesDao()
+    }
+
+    @Provides
+    fun provideWorkoutDao(database: AppRoomDatabase): WorkoutDao {
+        return database.workoutDao()
+    }
+
+    @Provides
+    fun provideSetsDao(database: AppRoomDatabase): SetsDao {
+        return database.setsDao()
     }
 
     @Provides

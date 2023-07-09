@@ -12,6 +12,8 @@ import com.example.myapplication.newID
 import java.time.LocalDateTime
 import java.util.UUID
 
+
+// TODO Add a woy to differentiate between templates and completed/current/active
 @Entity(tableName = "programs")
 data class Program(
     @PrimaryKey(autoGenerate = true) val programID: Long = fakeULID(),
@@ -132,3 +134,6 @@ data class MicrocycleWithWorkouts(
     )
     val workouts: List<Workout>,
 )
+
+// TODO Create a data class to track progress in a program
+//  i.e. the workouts, microcycles, and mesocycles/blocks completed

@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExercisesViewModel @Inject constructor(
-    private var exercisesRepository: ExercisesRepository,
+    private val exercisesRepository: ExercisesRepository,
 ) : ViewModel() {
     private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
     val exercises: StateFlow<List<ExerciseModel>>

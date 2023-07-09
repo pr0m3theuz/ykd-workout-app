@@ -17,15 +17,5 @@ Yapp/src/main/java/com/example/myapplication/components/workoutDialogs/CommonCom
 iapp/src/main/java/com/example/myapplication/components/workoutDialogs/workingSets/AddWorkingSetsDialog.kt,5/9/594476ba244bf01ee7d075f7609560fbb0c839d2
 P
  app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
-p
-@app/src/main/java/com/example/myapplication/data/ExerciseSets.kt,0/f/0f99347f4a7c9fb97ed3296f7763217609e17397
-k
-;app/src/main/java/com/example/myapplication/data/SetType.kt,5/1/512f8200f44806800427d5974f2d38aeb484d037
-Å
-Qapp/src/main/java/com/example/myapplication/components/exercise/ExerciseHeader.kt,5/f/5f648ea010abf7f514e12f760983c8cd77bf964c
 Ö
 Uapp/src/main/java/com/example/myapplication/components/exercise/SetTypeOptionsMenu.kt,5/f/5fec9b3be50a23264b1093d61b54257a809ccc2e
-á
-Wapp/src/main/java/com/example/myapplication/components/workout/ExerciseSetLazyColumn.kt,8/e/8e2b1fb3c5c9c9920375d14d3cec871a4467a731
-k
-;app/src/main/java/com/example/myapplication/data/Workout.kt,6/3/63b9ff55f6c071011df655707341bdddbdad0a70

@@ -6,8 +6,10 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.myapplication.fakeULID
 import com.example.myapplication.newID
+import java.time.LocalDateTime
 import java.util.UUID
 
+// TODO Switch to use UUIDs instead of IDs
 @Entity(
     tableName = "exerciseNotes",
     foreignKeys = [
@@ -49,11 +51,15 @@ data class ExerciseNote(
     val uuid: UUID = UUID.randomUUID(),
     var note: String? = null,
     var pinned: Boolean = false,
+    var dateCreated: LocalDateTime = LocalDateTime.now(),
     @ColumnInfo(name = "exerciseID") val exerciseID: Long,
-    @ColumnInfo(name = "workoutID") val workoutID: Long,
+    @ColumnInfo(name = "workoutID") val workoutID: Long? = null,
     @ColumnInfo(name = "programID") val programID: Long? = null,
+    var programPinned: Boolean = false,
     @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
+    var mesocyclePinned: Boolean = false,
     @ColumnInfo(name = "microcycleID") val microcycleID: Long? = null,
+    var microcyclePinned: Boolean = false,
 )
 
 // TODO Are the below necessary? TBD
@@ -94,8 +100,11 @@ data class WorkoutNote(
     var pinned: Boolean = false,
     @ColumnInfo(name = "workoutID") val workoutID: Long,
     @ColumnInfo(name = "programID") val programID: Long? = null,
+    var programPinned: Boolean = false,
     @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
+    var mesocyclePinned: Boolean = false,
     @ColumnInfo(name = "microcycleID") val microcycleID: Long? = null,
+    var microcyclePinned: Boolean = false,
 )
 
 @Entity(
@@ -142,6 +151,7 @@ data class MesocycleNote(
     var note: String? = null,
     var pinned: Boolean = false,
     @ColumnInfo(name = "programID") val programID: Long? = null,
+    var programPinned: Boolean = false,
     @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
 )
 
@@ -174,7 +184,9 @@ data class MicrocycleNote(
     val uuid: UUID = UUID.randomUUID(),
     var note: String? = null,
     var pinned: Boolean = false,
-    @ColumnInfo(name = "programID") val programID: Long? = null,
-    @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
     @ColumnInfo(name = "microcycleID") val microcycleID: Long? = null,
+    @ColumnInfo(name = "programID") val programID: Long? = null,
+    var programPinned: Boolean = false,
+    @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
+    var mesocyclePinned: Boolean = false,
 )

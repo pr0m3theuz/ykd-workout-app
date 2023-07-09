@@ -29,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
+import com.example.myapplication.data.ExerciseNote
 import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.averageWeight
 import com.example.myapplication.data.totalRepetitions
@@ -44,9 +45,13 @@ fun ExerciseScreen(
 ) {
     val exerciseSet = remember { mutableStateOf(_exerciseSets) }
 
+    val exerciseNotes by workoutViewModel.getExerciseNoteByExercise(_exerciseSets.exercise.exerciseID)
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
     ExerciseHeader(
         navController = navController,
-        exerciseSet.value
+        exerciseSet.value,
+        exerciseNotes = exerciseNotes
     ) { exerciseSets: ExerciseSets -> workoutViewModel.removeExerciseSets(exerciseSets) }
 }
 
@@ -54,9 +59,11 @@ fun ExerciseScreen(
 fun ExerciseHeader(
     navController: NavController,
     exerciseSets: ExerciseSets,
+    exerciseNotes: List<ExerciseNote>,
     removeExercise: (exerciseSets: ExerciseSets) -> Unit,
 ) {
-    var notesVisible by remember { mutableStateOf(exerciseSets.exercise.notesPinned) }
+//    TODO: Create a button that toggle the notes
+    var notesVisible by remember { mutableStateOf(true) }
 
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
@@ -91,7 +98,18 @@ fun ExerciseHeader(
                 exit = slideOutHorizontally(animationSpec = tween(250))
             ) {
 // TODO Add swipe to dismiss functionality and maybe wrap in a LazyColumn
-                ExerciseNotes(exercise = exerciseSets.exercise)
+                if (exerciseNotes.isEmpty()) {
+                    ExerciseNotes(
+                        exerciseNote = ExerciseNote(
+                            exerciseID = exerciseSets.exercise.exerciseID,
+                            workoutID = exerciseSets.workoutID
+                        )
+                    )
+                } else {
+                    exerciseNotes.forEach { note ->
+                        ExerciseNotes(exerciseNote = note)
+                    }
+                }
             }
 
             SetContentHeader()

@@ -54,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.data.ExerciseModel
 
+// TODO Create Advanced Search Options & Exercise Creation & Editing Screens
 // @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ExercisesScreen(
@@ -202,116 +203,131 @@ fun ExercisesLazyColumn(
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 8.dp)
                 ) {}
-                LazyRow(
-                    modifier = Modifier/*.align(Alignment.Start)*/.padding(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp).also { Arrangement.Start },
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    items(items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }) { muscleGroup ->
-                        val checked = exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
-                        fun updateState() {
-                            exercisesViewModel.muscleGroupsChecked[muscleGroup] =
-                                !exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
-                        }
-                        if (checked) {
-                            FilterChip(
-                                selected = checked,
-                                onClick = { updateState() },
-                                selectedIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Done,
-                                        contentDescription = "Localized Description",
-                                        modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                                    )
-                                },
-                                colors = ChipDefaults.filterChipColors(
-                                    backgroundColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                )
-                            ) {
-                                Text(text = muscleGroup.name)
-                            }
-                        }
-                    }
-                    items(items = exercisesViewModel.equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }) { equipment ->
-                        val checked = exercisesViewModel.equipmentsChecked[equipment]!!
-                        fun updateState() {
-                            exercisesViewModel.equipmentsChecked[equipment] =
-                                !exercisesViewModel.equipmentsChecked[equipment]!!
-                        }
-                        if (checked) {
-                            FilterChip(
-                                selected = checked,
-                                onClick = { updateState() },
-                                selectedIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Done,
-                                        contentDescription = "Localized Description",
-                                        modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                                    )
-                                },
-                                colors = ChipDefaults.filterChipColors(
-                                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            ) {
-                                Text(text = equipment.name)
-                            }
-                        }
-                    }
-                    items(items = exercisesViewModel.movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }) {
-                            movementType,
-                        ->
-                        val checked = exercisesViewModel.movementTypesChecked[movementType]!!
-                        fun updateState() {
-                            exercisesViewModel.movementTypesChecked[movementType] =
-                                !exercisesViewModel.movementTypesChecked[movementType]!!
-                        }
-                        if (checked) {
-                            FilterChip(
-                                selected = checked,
-                                onClick = { updateState() },
-                                selectedIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Done,
-                                        contentDescription = "Localized Description",
-                                        modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-                                    )
-                                },
-                                colors = ChipDefaults.filterChipColors(
-                                    backgroundColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                )
-                            ) {
-                                Text(text = movementType.printableName)
-                            }
-                        }
-                    }
-                }
+                SelectedFiltersLazyRow(exercisesViewModel)
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-//                    verticalArrangement = Arrangement.spacedBy(8.dp),
-//                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    items(
-                        count = exercises.size,
-                        key = { index: Int -> exercises[index].lazyListItemID }
-                    ) { index ->
-                        val exercise: ExerciseModel = exercises[index]
-
-                        ExerciseItem(
-                            exercise = exercise,
-                            navController = navController
-                        )
-                    }
-                }
+                ExercisesLazyList(exercises, navController)
             }
         }
     )
+}
+
+@Composable
+private fun ExercisesLazyList(
+    exercises: List<ExerciseModel>,
+    navController: NavController
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+//                    verticalArrangement = Arrangement.spacedBy(8.dp),
+//                    contentPadding = PaddingValues(0.dp)
+    ) {
+        items(
+            count = exercises.size,
+            key = { index: Int -> exercises[index].lazyListItemID }
+        ) { index ->
+            val exercise: ExerciseModel = exercises[index]
+
+            ExerciseItem(
+                exercise = exercise,
+                navController = navController
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterialApi::class)
+fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
+    LazyRow(
+        modifier = Modifier/*.align(Alignment.Start)*/.padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp).also { Arrangement.Start },
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        items(items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }) { muscleGroup ->
+            val checked = exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
+            fun updateState() {
+                exercisesViewModel.muscleGroupsChecked[muscleGroup] =
+                    !exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
+            }
+            if (checked) {
+                FilterChip(
+                    selected = checked,
+                    onClick = { updateState() },
+                    selectedIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Localized Description",
+                            modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+                        )
+                    },
+                    colors = ChipDefaults.filterChipColors(
+                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(text = muscleGroup.name)
+                }
+            }
+        }
+        items(items = exercisesViewModel.equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }) { equipment ->
+            val checked = exercisesViewModel.equipmentsChecked[equipment]!!
+            fun updateState() {
+                exercisesViewModel.equipmentsChecked[equipment] =
+                    !exercisesViewModel.equipmentsChecked[equipment]!!
+            }
+            if (checked) {
+                FilterChip(
+                    selected = checked,
+                    onClick = { updateState() },
+                    selectedIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Localized Description",
+                            modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+                        )
+                    },
+                    colors = ChipDefaults.filterChipColors(
+                        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Text(text = equipment.name)
+                }
+            }
+        }
+        items(items = exercisesViewModel.movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }) {
+                movementType,
+            ->
+            val checked = exercisesViewModel.movementTypesChecked[movementType]!!
+            fun updateState() {
+                exercisesViewModel.movementTypesChecked[movementType] =
+                    !exercisesViewModel.movementTypesChecked[movementType]!!
+            }
+            if (checked) {
+                FilterChip(
+                    selected = checked,
+                    onClick = { updateState() },
+                    selectedIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Localized Description",
+                            modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+                        )
+                    },
+                    colors = ChipDefaults.filterChipColors(
+                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(text = movementType.printableName)
+                }
+            }
+        }
+    }
 }
 
 @Preview

@@ -1,7 +1,6 @@
 package com.example.myapplication.components.exercise
 
 import android.util.Log
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,40 +26,34 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.ExerciseNote
 
 private const val infoTag = "ExerciseLayout().pinNote()"
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseNotes(
-    exercise: ExerciseModel,
+    exerciseNote: ExerciseNote,
     placeholder: String = "Write a note",
 ) {
-//    TODO Refactor
-    var exerciseNotes by remember {
+    var note by remember {
         mutableStateOf(
-            TextFieldValue(
-                if (exercise.notesPinned && (exercise.pinnedNotes?.isNotEmpty() == true)) {
-                    exercise.pinnedNotes.orEmpty()
-                } else {
-                    exercise.notes.orEmpty()
-                }
-            )
+            exerciseNote.note?.let {
+                TextFieldValue(
+                    it
+                )
+            }
         )
     }
 
     var placeholderText by remember { mutableStateOf(placeholder) }
 
-//    var notesVisible by remember { mutableStateOf(exercise.notesPinned) }
-    var notesPinned by remember { mutableStateOf(false) }
-
-    notesPinned = exercise.notesPinned
+//    var notesVisible by remember { mutableStateOf(exercise.pinned) }
+    var notesPinned by remember { mutableStateOf(exerciseNote.pinned) }
 
     fun pinNote() {
-        exercise.notesPinned = !exercise.notesPinned
-        notesPinned = exercise.notesPinned
-        Log.i(infoTag, exercise.notesPinned.toString())
+        exerciseNote.pinned = !exerciseNote.pinned // TODO Add callback function
+        notesPinned = exerciseNote.pinned
+        Log.i(infoTag, exerciseNote.pinned.toString())
         Log.i(infoTag, notesPinned.toString())
     }
 
@@ -84,14 +76,13 @@ fun ExerciseNotes(
     val animateNoteButtonContainerColor = animateColorAsState(noteButtonContainerColor)
     val animateNoteButtonContentColor = animateColorAsState(noteButtonContentColor)
 
-    if (exerciseNotes.text == "" && notesPinned) {
+    if (exerciseNote.note == "" && notesPinned) {
         placeholderText = "Pin a note for next time"
-    } else if (exerciseNotes.text == "") {
+    } else if (exerciseNote.note == "") {
         placeholderText = placeholder
     }
 
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
-
     TextField(
         placeholder = { Text(placeholderText, color = Color.DarkGray) },
         modifier = Modifier
@@ -101,14 +92,16 @@ fun ExerciseNotes(
             fontSize = 5.em,
             color = MaterialTheme.colorScheme.onBackground
         ),
-        value = exerciseNotes,
-        onValueChange = { exerciseNotes = it },
+        value = note ?: TextFieldValue(""),
+        onValueChange = { note = it },
         trailingIcon = {
             Button(
                 onClick = { pinNote() },
                 shape = RoundedCornerShape(15),
                 contentPadding = PaddingValues(0.dp),
-                modifier = Modifier.padding(8.dp).size(36.dp),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(36.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = animateNoteButtonContainerColor.value,
                     contentColor = animateNoteButtonContentColor.value

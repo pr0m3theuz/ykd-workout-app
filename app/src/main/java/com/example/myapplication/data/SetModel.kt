@@ -33,7 +33,7 @@ import java.util.UUID
     ]
 )
 data class SetModel(
-    @PrimaryKey(autoGenerate = true) val setID: Long = fakeULID(),
+    @PrimaryKey(autoGenerate = true) var setID: Long = fakeULID(),
     var lazyListItemID: Long = newID(),
     var uuid: UUID = UUID.randomUUID(),
     var setNumber: Int? = 0,
@@ -49,12 +49,13 @@ data class SetModel(
     var setCompleted: Boolean = false,
     @ColumnInfo(name = "setTypeID", defaultValue = "1") var setTypeID: Int = 1,
     @ColumnInfo(name = "exerciseID") var exerciseID: Long,
+    @ColumnInfo(name = "exerciseUUID") var exerciseUUID: UUID,
     @ColumnInfo(name = "workoutID") var workoutID: Long,
+    @ColumnInfo(name = "workoutUUID") var workoutUUID: UUID,
     @ColumnInfo(name = "progressionSchemeID") var progressionSchemeID: Int,
-    var programID: Long? = null,
-    var mesocycleID: Long? = null,
-    var microcycleID: Long? = null,
-
+    var programUUID: UUID? = null,
+    var mesocycleUUID: UUID? = null,
+    var microcycleUUID: UUID? = null,
 )
 
 fun SetModel.setVolume(): Double {

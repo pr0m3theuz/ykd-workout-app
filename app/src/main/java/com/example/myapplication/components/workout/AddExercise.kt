@@ -19,7 +19,7 @@ fun AddExercise(navController: NavController) {
     ) {
         TextButton(onClick = {
             /*TODO Do something!*/
-            navController.navigate("exercisesList")
+            navController.navigate("addExercisesList")
         }) {
             Text("Add Exercise")
         }

@@ -27,25 +27,27 @@ data class ExerciseModel(
     val exrxExerciseID: String? = null,
     val equipmentID: String, // Equipment
     val muscleGroupID: String,
-    val force: String?,
+    val utility: Int? = null, // May be useless
     val mechanicsID: String?,
+    val force: String?,
     val functionID: Int? = null,
     val intensityID: Int? = null,
 
 //    TODO To remove & refactor
-    var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
-    var pinnedNotes: String? = null,
-    var notesPinned: Boolean = false,
+//    var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
+//    var pinnedNotes: String? = null,
+//    var notesPinned: Boolean = false,
 //
     // TODO deprecated, replaced by equipmentID. TODO Could be :BarType
 //    var barType: String? = null,
 
     var weightUnit: String? = null, // TODO Could be ENUM -> Default, KG, LBS
 
-    var workingSetRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
-    var warmUpSetRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+    var workingSetRestInWholeMilliseconds: Long = 2.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+    var warmUpSetRestInWholeMilliseconds: Long = 2.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
     var workingSetRestTimerEnabled: Boolean = true,
     var warmUpSetRestTimerEnabled: Boolean = false,
 
-    var videoUri: String? = null,
+    var mediaUri: String? = null,
+    var pageUri: String? = null,
 )

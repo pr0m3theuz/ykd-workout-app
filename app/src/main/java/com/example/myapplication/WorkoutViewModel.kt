@@ -17,11 +17,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.ExerciseNote
+import com.example.myapplication.data.ExerciseNotesRepository
 import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.SetsRepository
 import com.example.myapplication.data.Workout
+import com.example.myapplication.data.WorkoutNotesRepository
+import com.example.myapplication.data.WorkoutRepository
 import com.example.myapplication.data.addWarmUpSets
 import com.example.myapplication.data.pinNotes
+import com.example.myapplication.data.resetSets
 import com.example.myapplication.data.setComplete
 import com.example.myapplication.data.updateSetRIR
 import com.example.myapplication.data.updateSetRPE
@@ -48,7 +54,13 @@ private const val WARM_UP_SET = 2
 
 // TODO
 @HiltViewModel
-class WorkoutViewModel @Inject constructor(private val application: Application) :
+class WorkoutViewModel @Inject constructor(
+    private val application: Application,
+    private val exerciseNotesRepository: ExerciseNotesRepository,
+    private val workoutRepository: WorkoutRepository,
+    private val workoutNotesRepository: WorkoutNotesRepository,
+    private val setsRepository: SetsRepository,
+) :
     ViewModel() {
     //    fun currentTimeMillis(): Long = System.currentTimeMillis()
 //    fun elapsedTimeMillis(): Long = System.
@@ -354,6 +366,21 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     val allSets
         get() = _allSets.asStateFlow()
 
+    fun addEmptyExerciseSets() {
+        exercisesSelectedToBeAddedToWorkout.forEach {
+            _exercisesSetsData.add(
+                ExerciseSets(
+                    workoutID = _workout.value.workoutID,
+                    workoutUUID = _workout.value.uuid,
+                    exercise = it,
+                    sets = mutableListOf<SetModel>()
+                )
+            )
+        }
+
+        clearExercisesSelectedToBeAddedToWorkout()
+    }
+
     fun addSet(exerciseSets: ExerciseSets) {
         val temporarySets: List<SetModel> = if (exerciseSets.sets.isNotEmpty()) {
             exerciseSets.sets + exerciseSets.sets.last().copy(
@@ -365,11 +392,12 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
         } else {
             listOf(
                 SetModel(
-                    lazyListItemID = newID(),
                     setNumber = 0,
                     exerciseID = exerciseSets.exercise.exerciseID,
+                    exerciseUUID = exerciseSets.exercise.uuid,
                     progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
-                    workoutID = fakeULID() // TODO Replace with workout.workoutID
+                    workoutID = workout.value.workoutID, // TODO Replace with workout.workoutID
+                    workoutUUID = workout.value.uuid,
                 )
             )
         }
@@ -378,7 +406,7 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
     }
 
     fun removeExerciseSets(exerciseSets: ExerciseSets) {
-        _exercisesSetsData = _exercisesSetsData.filter { it != exerciseSets }.toMutableList()
+        _exercisesSetsData = _exercisesSets.value.filter { it != exerciseSets }.toMutableList()
         _exercisesSets.value = _exercisesSetsData
     }
 
@@ -530,6 +558,73 @@ class WorkoutViewModel @Inject constructor(private val application: Application)
 
         return countSetsCompleted == countSets
     }
+
+    fun addExerciseNote(note: ExerciseNote) {
+//        TODO Save Exercise Note to Database when Workout is saved
+    }
+
+    fun getExerciseNoteByExercise(exerciseID: Long): StateFlow<List<ExerciseNote>> {
+        val exerciseNotes: MutableStateFlow<List<ExerciseNote>> = MutableStateFlow(emptyList())
+
+        viewModelScope.launch {
+            exerciseNotesRepository.getExerciseNotes(exerciseID).collect() {
+                exerciseNotes.value = it
+            }
+        }
+
+        return exerciseNotes.asStateFlow()
+    }
+
+    fun getWorkoutNotes(): StateFlow<List<ExerciseNote>> {
+        val workoutNotes: MutableStateFlow<List<ExerciseNote>> = MutableStateFlow(emptyList())
+
+        viewModelScope.launch {
+            // TODO get Workout Notes
+        }
+
+        return workoutNotes.asStateFlow()
+    }
+
+    fun createWorkoutFromHistoryOrTemplate(workout: Workout) {
+
+        val newWorkout = Workout(
+            uuid = workout.uuid,
+            name = workout.name,
+            workoutAuthor = workout.workoutAuthor,
+            day = workout.day,
+            programID = workout.programID,
+            mesocycleID = workout.mesocycleID,
+            microcycleID = workout.microcycleID
+        )
+
+        var newExerciseSets: List<ExerciseSets> = emptyList()
+
+        viewModelScope.launch {
+            setsRepository.getSetModelsForWorkout(workout.workoutID).collect() {
+                newExerciseSets = it
+            }
+        }
+
+        newExerciseSets.forEach { exerciseSets -> exerciseSets.resetSets(newWorkout) }
+    }
+
+    private val exercisesSelectedToBeAddedToWorkout: MutableSet<ExerciseModel> = mutableSetOf()
+
+    fun selectExercise(exercise: ExerciseModel, isSelected: Boolean) {
+        if (isSelected) {
+            exercisesSelectedToBeAddedToWorkout.add(exercise)
+        } else {
+            exercisesSelectedToBeAddedToWorkout.remove(exercise)
+        }
+    }
+
+    fun cancelExerciseSelection() {
+        clearExercisesSelectedToBeAddedToWorkout()
+    }
+
+    private fun clearExercisesSelectedToBeAddedToWorkout() {
+        exercisesSelectedToBeAddedToWorkout.clear()
+    }
 }
 
 private fun initWorkout(): Workout {
@@ -543,10 +638,14 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
         mechanicsID = "null",
         muscleGroupID = "null"
     )
+
+    val workoutUUID = UUID.randomUUID()
     val workoutID = fakeULID()
+
     return MutableList(6) {
         ExerciseSets(
             workoutID = workoutID,
+            workoutUUID = workoutUUID,
             exercise = exercise,
             sets = MutableList(3) { indices ->
                 SetModel(
@@ -554,7 +653,9 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
                     exerciseWeight = 100.00.times(it),
                     repetitions = 10.times(it),
                     exerciseID = exercise.exerciseID,
-                    workoutID = fakeULID(), // TODO Replace with workout.workoutID
+                    exerciseUUID = exercise.uuid,
+                    workoutID = workoutID, // TODO Replace with workout.workoutID
+                    workoutUUID = workoutUUID,
                     progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
                 )
             }

@@ -11,3 +11,5 @@ data class SetType(
     var uri: String? = null,
     var textColor: Color,
 )
+
+// TODO Create screen to edit/create set type

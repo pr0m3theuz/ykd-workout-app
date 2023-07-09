@@ -87,18 +87,23 @@ data class Muscle(
 data class MuscleGroup(
     @PrimaryKey val id: String,
     val name: String,
+    val exrxName: String,
 )
 
 @Entity(tableName = "equipment")
 data class Equipment(
     @PrimaryKey val id: String,
+    val exrxID: String,
     val name: String,
+    val exrxName: String,
+    val description: String? = null,
 )
 
 @Entity(tableName = "utility")
 data class Utility(
     @PrimaryKey val id: String,
     val name: String,
+    val description: String? = null,
 )
 
 @Entity(tableName = "forces")

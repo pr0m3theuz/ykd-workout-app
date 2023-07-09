@@ -47,8 +47,10 @@ import com.example.myapplication.components.BottomNavigationBar
 // TODO Add a placeholder card if there is no active program
 // TODO Add FAB
 // TODO Add a card to add new program
+// TODO Add a placeholder card to when there are no programs, mesocycles or workouts
 // TODO Add a card/button to add new mesocycle/block
 // TODO Add animatedVisibility Function to expand more/less buttons
+// TODO Create screens to show all programs and all workouts respectively
 
 @OptIn(ExperimentalMaterial3Api::class)
 // @Preview
@@ -91,7 +93,9 @@ fun ProgramsScreen(navController: NavController) {
                 .padding(contentPadding)
         ) {
             WorkoutSearchBar()
-            Column(modifier = Modifier.padding(12.dp).verticalScroll(scrollState)) {
+            Column(modifier = Modifier
+                .padding(12.dp)
+                .verticalScroll(scrollState)) {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -257,7 +261,8 @@ fun WorkoutSearchBar() {
                 tint = MaterialTheme.colorScheme.onSecondaryContainer
             )
         },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(horizontal = 8.dp)
     ) {}
 }
@@ -270,7 +275,9 @@ fun WorkoutCard() {
 
     Card(modifier = Modifier.clickable { /* TODO Navigate to Workout Details Screen */ }) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(padding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(padding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -289,7 +296,9 @@ fun WorkoutCard() {
                 }
             }
         }
-        Row(modifier = Modifier.fillMaxWidth().padding(padding)) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)) {
             Column() {
 //                TODO List Exercises
                 Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
@@ -311,7 +320,9 @@ fun ProgramCard(navController: NavController) {
         }
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(padding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(padding),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -322,7 +333,9 @@ fun ProgramCard(navController: NavController) {
             )
         }
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = padding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = padding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -350,7 +363,9 @@ fun CurrentProgramCard(navController: NavController) {
 
     Card() {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = padding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = padding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -375,7 +390,9 @@ fun CurrentProgramCard(navController: NavController) {
             style = MaterialTheme.typography.bodySmall
         )
         Row(
-            modifier = Modifier.fillMaxWidth().padding(padding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(padding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -392,7 +409,9 @@ fun CurrentProgramCard(navController: NavController) {
             }
         }
 
-        Row(modifier = Modifier.fillMaxWidth().padding(padding)) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)) {
             Column() {
 //                TODO List Exercises
                 Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
@@ -400,7 +419,9 @@ fun CurrentProgramCard(navController: NavController) {
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(padding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(padding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
