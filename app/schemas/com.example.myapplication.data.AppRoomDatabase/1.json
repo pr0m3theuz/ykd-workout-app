@@ -1,0 +1,1717 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "2cb6cf8ca5882f9cc698c200f2d5eff2",
+    "entities": [
+      {
+        "tableName": "exercises",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `exrxExerciseID` TEXT, `equipmentID` TEXT NOT NULL, `muscleGroupID` TEXT NOT NULL, `utilityID` TEXT, `mechanicsID` TEXT, `force` TEXT, `functionID` TEXT, `intensityID` TEXT, `weightUnit` TEXT, `workingSetRestInWholeMilliseconds` INTEGER NOT NULL, `warmUpSetRestInWholeMilliseconds` INTEGER NOT NULL, `workingSetRestTimerEnabled` INTEGER NOT NULL, `warmUpSetRestTimerEnabled` INTEGER NOT NULL, `mediaURI` TEXT, `pageURI` TEXT, `primaryMuscleID` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lazyListItemID",
+            "columnName": "lazyListItemID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exrxExerciseID",
+            "columnName": "exrxExerciseID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "equipmentID",
+            "columnName": "equipmentID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "muscleGroupID",
+            "columnName": "muscleGroupID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "utilityID",
+            "columnName": "utilityID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mechanicsID",
+            "columnName": "mechanicsID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "force",
+            "columnName": "force",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "functionID",
+            "columnName": "functionID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "intensityID",
+            "columnName": "intensityID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "weightUnit",
+            "columnName": "weightUnit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "workingSetRestInWholeMilliseconds",
+            "columnName": "workingSetRestInWholeMilliseconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "warmUpSetRestInWholeMilliseconds",
+            "columnName": "warmUpSetRestInWholeMilliseconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workingSetRestTimerEnabled",
+            "columnName": "workingSetRestTimerEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "warmUpSetRestTimerEnabled",
+            "columnName": "warmUpSetRestTimerEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mediaURI",
+            "columnName": "mediaURI",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pageURI",
+            "columnName": "pageURI",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "primaryMuscleID",
+            "columnName": "primaryMuscleID",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "exerciseID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "sets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`setID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `setNumber` INTEGER, `exerciseWeight` REAL, `repetitions` INTEGER, `ratePerceivedEffort` REAL, `repetitionsInReserve` REAL, `targetWeight` REAL, `targetRepetitions` INTEGER, `targetRatePerceivedEffort` REAL, `targetRepetitionsInReserve` REAL, `percentage1RM` REAL, `setCompleted` INTEGER NOT NULL, `setTypeID` INTEGER NOT NULL DEFAULT 1, `exerciseID` INTEGER NOT NULL, `exerciseUUID` BLOB NOT NULL, `workoutID` INTEGER NOT NULL, `workoutUUID` BLOB NOT NULL, `progressionSchemeID` INTEGER NOT NULL, `programUUID` BLOB, `mesocycleUUID` BLOB, `microcycleUUID` BLOB, FOREIGN KEY(`exerciseID`) REFERENCES `exercises`(`exerciseID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`workoutID`) REFERENCES `workouts`(`workoutID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`progressionSchemeID`) REFERENCES `progressionSchemes`(`progressionSchemeID`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "setID",
+            "columnName": "setID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lazyListItemID",
+            "columnName": "lazyListItemID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "setNumber",
+            "columnName": "setNumber",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "exerciseWeight",
+            "columnName": "exerciseWeight",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "repetitions",
+            "columnName": "repetitions",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ratePerceivedEffort",
+            "columnName": "ratePerceivedEffort",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "repetitionsInReserve",
+            "columnName": "repetitionsInReserve",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "targetWeight",
+            "columnName": "targetWeight",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "targetRepetitions",
+            "columnName": "targetRepetitions",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "targetRatePerceivedEffort",
+            "columnName": "targetRatePerceivedEffort",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "targetRepetitionsInReserve",
+            "columnName": "targetRepetitionsInReserve",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "percentage1RM",
+            "columnName": "percentage1RM",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "setCompleted",
+            "columnName": "setCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "setTypeID",
+            "columnName": "setTypeID",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exerciseUUID",
+            "columnName": "exerciseUUID",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutID",
+            "columnName": "workoutID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutUUID",
+            "columnName": "workoutUUID",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "progressionSchemeID",
+            "columnName": "progressionSchemeID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "programUUID",
+            "columnName": "programUUID",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mesocycleUUID",
+            "columnName": "mesocycleUUID",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "microcycleUUID",
+            "columnName": "microcycleUUID",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "setID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "exercises",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "exerciseID"
+            ],
+            "referencedColumns": [
+              "exerciseID"
+            ]
+          },
+          {
+            "table": "workouts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "workoutID"
+            ],
+            "referencedColumns": [
+              "workoutID"
+            ]
+          },
+          {
+            "table": "progressionSchemes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "progressionSchemeID"
+            ],
+            "referencedColumns": [
+              "progressionSchemeID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "workouts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`workoutID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `workoutAuthor` TEXT, `notes` TEXT, `pinnedNotes` TEXT, `notesPinned` INTEGER NOT NULL, `workoutDuration` INTEGER NOT NULL, `workoutType` TEXT, `dateCreated` TEXT NOT NULL, `workoutStarted` TEXT NOT NULL, `workoutEnded` TEXT, `day` INTEGER, `programID` INTEGER, `mesocycleID` INTEGER, `microcycleID` INTEGER, FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`mesocycleID`) REFERENCES `mesocycles`(`mesocycleID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`microcycleID`) REFERENCES `microcycles`(`microcycleID`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "workoutID",
+            "columnName": "workoutID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lazyListItemID",
+            "columnName": "lazyListItemID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutAuthor",
+            "columnName": "workoutAuthor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinnedNotes",
+            "columnName": "pinnedNotes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notesPinned",
+            "columnName": "notesPinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutDuration",
+            "columnName": "workoutDuration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutType",
+            "columnName": "workoutType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "dateCreated",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutStarted",
+            "columnName": "workoutStarted",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutEnded",
+            "columnName": "workoutEnded",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "day",
+            "columnName": "day",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mesocycleID",
+            "columnName": "mesocycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "microcycleID",
+            "columnName": "microcycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "workoutID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "programs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          },
+          {
+            "table": "mesocycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mesocycleID"
+            ],
+            "referencedColumns": [
+              "mesocycleID"
+            ]
+          },
+          {
+            "table": "microcycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "microcycleID"
+            ],
+            "referencedColumns": [
+              "microcycleID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "programs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`programID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `author` TEXT, `dateCreated` TEXT NOT NULL, `startDate` TEXT, `endDate` TEXT, `description` TEXT, `uri` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lazyListItemID",
+            "columnName": "lazyListItemID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "author",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "dateCreated",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startDate",
+            "columnName": "startDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "endDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "uri",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "programID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "mesocycles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mesocycleID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `dateCreated` TEXT NOT NULL, `startDate` TEXT, `endDate` TEXT, `order` INTEGER NOT NULL, `programID` INTEGER, FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mesocycleID",
+            "columnName": "mesocycleID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lazyListItemID",
+            "columnName": "lazyListItemID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "dateCreated",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startDate",
+            "columnName": "startDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "endDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "mesocycleID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "programs",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "microcycles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`microcycleID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lazyListItemID` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `dateCreated` TEXT NOT NULL, `startDate` TEXT, `endDate` TEXT, `order` INTEGER NOT NULL, `programID` INTEGER, `mesocycleID` INTEGER, FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`mesocycleID`) REFERENCES `mesocycles`(`mesocycleID`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "microcycleID",
+            "columnName": "microcycleID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lazyListItemID",
+            "columnName": "lazyListItemID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "dateCreated",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startDate",
+            "columnName": "startDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "endDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mesocycleID",
+            "columnName": "mesocycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "microcycleID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "programs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          },
+          {
+            "table": "mesocycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mesocycleID"
+            ],
+            "referencedColumns": [
+              "mesocycleID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "exerciseNotes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseNotePrimaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `note` TEXT, `pinned` INTEGER NOT NULL, `dateCreated` TEXT NOT NULL, `exerciseID` INTEGER NOT NULL, `workoutID` INTEGER, `programID` INTEGER, `programPinned` INTEGER NOT NULL, `mesocycleID` INTEGER, `mesocyclePinned` INTEGER NOT NULL, `microcycleID` INTEGER, `microcyclePinned` INTEGER NOT NULL, FOREIGN KEY(`workoutID`) REFERENCES `workouts`(`workoutID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`exerciseID`) REFERENCES `exercises`(`exerciseID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`mesocycleID`) REFERENCES `mesocycles`(`mesocycleID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`microcycleID`) REFERENCES `microcycles`(`microcycleID`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "exerciseNotePrimaryKey",
+            "columnName": "exerciseNotePrimaryKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinned",
+            "columnName": "pinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "dateCreated",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutID",
+            "columnName": "workoutID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programPinned",
+            "columnName": "programPinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mesocycleID",
+            "columnName": "mesocycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mesocyclePinned",
+            "columnName": "mesocyclePinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "microcycleID",
+            "columnName": "microcycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "microcyclePinned",
+            "columnName": "microcyclePinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "exerciseNotePrimaryKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "workouts",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "workoutID"
+            ],
+            "referencedColumns": [
+              "workoutID"
+            ]
+          },
+          {
+            "table": "exercises",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "exerciseID"
+            ],
+            "referencedColumns": [
+              "exerciseID"
+            ]
+          },
+          {
+            "table": "programs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          },
+          {
+            "table": "mesocycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mesocycleID"
+            ],
+            "referencedColumns": [
+              "mesocycleID"
+            ]
+          },
+          {
+            "table": "microcycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "microcycleID"
+            ],
+            "referencedColumns": [
+              "microcycleID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "workoutNotes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `note` TEXT, `pinned` INTEGER NOT NULL, `workoutID` INTEGER NOT NULL, `programID` INTEGER, `programPinned` INTEGER NOT NULL, `mesocycleID` INTEGER, `mesocyclePinned` INTEGER NOT NULL, `microcycleID` INTEGER, `microcyclePinned` INTEGER NOT NULL, FOREIGN KEY(`workoutID`) REFERENCES `workouts`(`workoutID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`mesocycleID`) REFERENCES `mesocycles`(`mesocycleID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`microcycleID`) REFERENCES `microcycles`(`microcycleID`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "primaryKey",
+            "columnName": "primaryKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinned",
+            "columnName": "pinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workoutID",
+            "columnName": "workoutID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programPinned",
+            "columnName": "programPinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mesocycleID",
+            "columnName": "mesocycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mesocyclePinned",
+            "columnName": "mesocyclePinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "microcycleID",
+            "columnName": "microcycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "microcyclePinned",
+            "columnName": "microcyclePinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "primaryKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "workouts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "workoutID"
+            ],
+            "referencedColumns": [
+              "workoutID"
+            ]
+          },
+          {
+            "table": "programs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          },
+          {
+            "table": "mesocycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mesocycleID"
+            ],
+            "referencedColumns": [
+              "mesocycleID"
+            ]
+          },
+          {
+            "table": "microcycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "microcycleID"
+            ],
+            "referencedColumns": [
+              "microcycleID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "programNotes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `note` TEXT, `pinned` INTEGER NOT NULL, `programID` INTEGER, FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "primaryKey",
+            "columnName": "primaryKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinned",
+            "columnName": "pinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "primaryKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "programs",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "mesocycleNotes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `note` TEXT, `pinned` INTEGER NOT NULL, `programID` INTEGER, `programPinned` INTEGER NOT NULL, `mesocycleID` INTEGER, FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`mesocycleID`) REFERENCES `mesocycles`(`mesocycleID`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "primaryKey",
+            "columnName": "primaryKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinned",
+            "columnName": "pinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programPinned",
+            "columnName": "programPinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mesocycleID",
+            "columnName": "mesocycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "primaryKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "programs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          },
+          {
+            "table": "mesocycles",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mesocycleID"
+            ],
+            "referencedColumns": [
+              "mesocycleID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "microcycleNotes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `uuid` BLOB NOT NULL, `note` TEXT, `pinned` INTEGER NOT NULL, `microcycleID` INTEGER, `programID` INTEGER, `programPinned` INTEGER NOT NULL, `mesocycleID` INTEGER, `mesocyclePinned` INTEGER NOT NULL, FOREIGN KEY(`programID`) REFERENCES `programs`(`programID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`mesocycleID`) REFERENCES `mesocycles`(`mesocycleID`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`microcycleID`) REFERENCES `microcycles`(`microcycleID`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "primaryKey",
+            "columnName": "primaryKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinned",
+            "columnName": "pinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "microcycleID",
+            "columnName": "microcycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programID",
+            "columnName": "programID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programPinned",
+            "columnName": "programPinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mesocycleID",
+            "columnName": "mesocycleID",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mesocyclePinned",
+            "columnName": "mesocyclePinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "primaryKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "programs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "programID"
+            ],
+            "referencedColumns": [
+              "programID"
+            ]
+          },
+          {
+            "table": "mesocycles",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mesocycleID"
+            ],
+            "referencedColumns": [
+              "mesocycleID"
+            ]
+          },
+          {
+            "table": "microcycles",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "microcycleID"
+            ],
+            "referencedColumns": [
+              "microcycleID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "muscleExercises",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`muscleExerciseID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exerciseID` TEXT NOT NULL, `exrxExerciseID` TEXT NOT NULL, `muscleID` TEXT NOT NULL, `muscleGroupID` TEXT NOT NULL, `roleFunction` TEXT NOT NULL, FOREIGN KEY(`exerciseID`) REFERENCES `exercises`(`exerciseID`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`muscleID`) REFERENCES `muscles`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`muscleGroupID`) REFERENCES `muscleGroups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`roleFunction`) REFERENCES `muscleRolesFunctions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "muscleExerciseID",
+            "columnName": "muscleExerciseID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exrxExerciseID",
+            "columnName": "exrxExerciseID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "muscleID",
+            "columnName": "muscleID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "muscleGroupID",
+            "columnName": "muscleGroupID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "roleFunction",
+            "columnName": "roleFunction",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "muscleExerciseID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "exercises",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "exerciseID"
+            ],
+            "referencedColumns": [
+              "exerciseID"
+            ]
+          },
+          {
+            "table": "muscles",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "muscleID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "muscleGroups",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "muscleGroupID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "muscleRolesFunctions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "roleFunction"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "muscleRolesFunctions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `roleFunction` TEXT NOT NULL, `description` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "roleFunction",
+            "columnName": "roleFunction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "muscles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `muscleGroupID` TEXT NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`muscleGroupID`) REFERENCES `muscleGroups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "muscleGroupID",
+            "columnName": "muscleGroupID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "muscleGroups",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "muscleGroupID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "muscleGroups",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `exrxName` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exrxName",
+            "columnName": "exrxName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "equipment",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `exrxID` TEXT NOT NULL, `name` TEXT NOT NULL, `exrxName` TEXT NOT NULL, `description` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exrxID",
+            "columnName": "exrxID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exrxName",
+            "columnName": "exrxName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "utility",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "forces",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "mechanics",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "progressionSchemes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`progressionSchemeID` INTEGER NOT NULL, `name` TEXT NOT NULL, `description` TEXT, PRIMARY KEY(`progressionSchemeID`))",
+        "fields": [
+          {
+            "fieldPath": "progressionSchemeID",
+            "columnName": "progressionSchemeID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "progressionSchemeID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ExerciseSetCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseID` INTEGER NOT NULL, `setID` INTEGER NOT NULL, PRIMARY KEY(`exerciseID`, `setID`))",
+        "fields": [
+          {
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "setID",
+            "columnName": "setID",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "exerciseID",
+            "setID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "WorkoutSetCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`workoutID` INTEGER NOT NULL, `setID` INTEGER NOT NULL, PRIMARY KEY(`workoutID`, `setID`))",
+        "fields": [
+          {
+            "fieldPath": "workoutID",
+            "columnName": "workoutID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "setID",
+            "columnName": "setID",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "workoutID",
+            "setID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2cb6cf8ca5882f9cc698c200f2d5eff2')"
+    ]
+  }
+}
