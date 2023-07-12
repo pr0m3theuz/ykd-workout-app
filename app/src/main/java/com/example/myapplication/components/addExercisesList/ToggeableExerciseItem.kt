@@ -30,6 +30,7 @@ import com.example.myapplication.data.ExerciseModel
 @Composable
 fun ToggleableExerciseItem(
     exercise: ExerciseModel,
+    selectExercise: (_exercise: ExerciseModel, selected: Boolean) -> Unit,
     workoutViewModel: WorkoutViewModel = hiltViewModel()
 ) {
 
@@ -46,7 +47,7 @@ fun ToggleableExerciseItem(
                 value = selected,
                 onValueChange = {
                     onSelected(it)
-                    workoutViewModel.selectExercise(exercise, selected)
+                    selectExercise(exercise, it)
                 }
             ),
 //        horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -56,7 +57,13 @@ fun ToggleableExerciseItem(
         Box(
             modifier = Modifier
                 .size(width = 50.dp, height = 50.dp)
-                .background(MaterialTheme.colorScheme.errorContainer)
+                .background(
+                    if (selected) {
+                        MaterialTheme.colorScheme.surface
+                    } else {
+                        MaterialTheme.colorScheme.errorContainer
+                    }
+                )
         ) {
 //            TODO Get Image from YouTube Thumbnail
             if (selected) {

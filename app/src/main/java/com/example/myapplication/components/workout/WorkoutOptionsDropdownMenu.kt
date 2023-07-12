@@ -4,8 +4,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 
 @Preview
@@ -28,6 +36,10 @@ fun WorkoutOptionsDropdownMenu() {
             DropdownMenuItem(
                 text = { Text("Rename Workout") },
                 onClick = { /* TODO */ }
+            )
+            DropdownMenuItem(
+                text = { Text("Add Workout Notes") },
+                onClick = { /* TODO Show Workout Notes */ }
             )
             DropdownMenuItem(
                 text = { Text("Adjust Start/End Time") },

@@ -35,7 +35,7 @@ import java.util.UUID
 
 data class ExerciseSets(
     @PrimaryKey(autoGenerate = true) val exerciseSetsID: Long = fakeULID(),
-    val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+    var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
     val exSetsUUID: UUID = UUID.randomUUID(),
     @ColumnInfo(name = "workoutID") val workoutID: Long, // TODO May be useless
     @ColumnInfo(name = "workoutUUID") val workoutUUID: UUID, // TODO May be useless

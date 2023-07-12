@@ -1,6 +1,5 @@
 package com.example.myapplication.components.exercisesList
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,65 +24,59 @@ import androidx.navigation.NavController
 import com.example.myapplication.data.ExerciseModel
 
 @Composable
-fun ExerciseItem(exercise: ExerciseModel, navController: NavController) {
-    val context = LocalContext.current
+fun ExerciseItem(exercise: ExerciseModel, muscleGroupName: String?, navController: NavController) {
+  val context = LocalContext.current
 
-    val padding = 8.dp
+  val padding = 8.dp
 
-    Row(
-        modifier = Modifier
-            .padding(vertical = 8.dp)
-            .fillMaxWidth()
-            .clickable(
-                enabled = true,
-                onClickLabel = null,
-                onClick = {
-                    navController.navigate("exerciseDetails/${exercise.exerciseID}")
-                    Toast
-                        .makeText(
-                            context,
-                            "TODO: Navigate to Exercise Details Screen",
-                            Toast.LENGTH_SHORT
-                        )
-                        .show()
-                }
-            ), // TODO Create Exercise Details Screen
-//        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+  Row(
+    modifier =
+    Modifier
+      .padding(vertical = 8.dp)
+      .fillMaxWidth()
+      .clickable(
+        enabled = true,
+        onClickLabel = null,
+        onClick = { navController.navigate("exerciseDetails/${exercise.exerciseID}") }
+      ), // TODO Create Exercise Details Screen
+    //        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    Spacer(modifier = Modifier.width(padding))
+    Box(
+      modifier =
+      Modifier
+        .size(width = 50.dp, height = 50.dp)
+        .background(MaterialTheme.colorScheme.errorContainer)
     ) {
-        Spacer(modifier = Modifier.width(padding))
-        Box(
-            modifier = Modifier
-                .size(width = 50.dp, height = 50.dp)
-                .background(MaterialTheme.colorScheme.errorContainer)
-        ) {
-//            TODO Get Image from YouTube Thumbnail
-            Icon(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(40.dp),
-                imageVector = Icons.Outlined.Error,
-                tint = MaterialTheme.colorScheme.error,
-                contentDescription = "No exercise image available."
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Column {
-            Text(
-                text = exercise.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                // TODO Create data class that only take exerciseID, exercise name and MuscleGroup Name
-                text = exercise.muscleGroupID,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        Box(modifier = Modifier.width(padding))
+      //            TODO Get Image from YouTube Thumbnail
+      Icon(
+        modifier = Modifier
+          .align(Alignment.Center)
+          .size(40.dp),
+        imageVector = Icons.Outlined.Error,
+        tint = MaterialTheme.colorScheme.error,
+        contentDescription = "No exercise image available."
+      )
     }
+
+    Spacer(modifier = Modifier.width(8.dp))
+
+    Column {
+      Text(
+        text = exercise.name,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      Text(
+        // TODO Create data class that only take exerciseID, exercise name and MuscleGroup
+        // Name
+        text = muscleGroupName ?: "-",
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+      )
+    }
+
+    Box(modifier = Modifier.width(padding))
+  }
 }

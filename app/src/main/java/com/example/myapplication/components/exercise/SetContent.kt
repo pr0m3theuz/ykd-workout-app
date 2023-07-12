@@ -36,25 +36,26 @@ import com.example.myapplication.utils.doubleFormatted
 
 // TODO Add ability to rearrange sets
 // TODO Add placeholder text for target weight, reps, & rpe/rir
+// TODO FocusRequester.requestFocus() to tab to next field doesn't work
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SetContent(
     exerciseSets: ExerciseSets,
     setIndex: Int,
     set: SetModel,
-//    isSetCompleted: (Boolean) -> Unit,
-//    newWeight: (newWeight: Double?) -> Unit,
-//    newReps: (newReps: Int?) -> Unit,
-//    newRIR: (newRIR: Double?) -> Unit,
-//    newRPE: (newRPE: Double?) -> Unit,
-//    updateSetType: (setType: SetTypeModel) -> Unit,
+    //    isSetCompleted: (Boolean) -> Unit,
+    //    newWeight: (newWeight: Double?) -> Unit,
+    //    newReps: (newReps: Int?) -> Unit,
+    //    newRIR: (newRIR: Double?) -> Unit,
+    //    newRPE: (newRPE: Double?) -> Unit,
+    //    updateSetType: (setType: SetTypeModel) -> Unit,
     workoutViewModel: WorkoutViewModel = viewModel(),
 ) {
     val setUUID = set.uuid
 
-//    val sets = workoutViewModel.allSets.collectAsState()
-//
-//    val set = sets.value.first { it.uuid == setUUID }
+    //    val sets = workoutViewModel.allSets.collectAsState()
+    //
+    //    val set = sets.value.first { it.uuid == setUUID }
 
     val showKeyboard = remember { mutableStateOf(true) }
     val focusRequester = remember { FocusRequester() }
@@ -70,7 +71,8 @@ fun SetContent(
 
     val exerciseWeight = getExerciseWeight(set)
 
-    val weightState by rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
+    val weightState by
+    rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
         mutableStateOf(ExerciseWeightState(exerciseWeight))
     }
 
@@ -160,20 +162,14 @@ fun SetContent(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .wrapContentSize(Alignment.Center),
-            propagateMinConstraints = true
-        ) {
+        Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
             Button(
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .size(32.dp),
                 shape = RoundedCornerShape(size = 8.dp),
                 contentPadding = PaddingValues(0.dp),
-                onClick = {
-                    expandedSetTypeOptionsDropdownMenu = true
-                }
+                onClick = { expandedSetTypeOptionsDropdownMenu = true }
             ) {
                 Text(text = iconText, color = MaterialTheme.colorScheme.onPrimary)
             }
@@ -203,7 +199,8 @@ fun SetContent(
         )
 
         Box(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(textFieldBackgroundColor)
@@ -212,7 +209,6 @@ fun SetContent(
                 .wrapContentSize(Alignment.Center),
             propagateMinConstraints = true,
             contentAlignment = Alignment.Center
-
         ) {
             ExerciseWeightTextField(
                 modifier = Modifier.focusRequester(focusRequester),
@@ -232,7 +228,8 @@ fun SetContent(
         }
 
         Box(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(textFieldBackgroundColor)
@@ -241,7 +238,6 @@ fun SetContent(
                 .wrapContentSize(Alignment.Center),
             propagateMinConstraints = true,
             contentAlignment = Alignment.Center
-
         ) {
             ExerciseRepsTextField(
                 modifier = Modifier.focusRequester(repsFocusRequester),
@@ -255,7 +251,8 @@ fun SetContent(
         }
 
         Box(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(textFieldBackgroundColor)
@@ -264,7 +261,6 @@ fun SetContent(
                 .wrapContentSize(Alignment.Center),
             propagateMinConstraints = true,
             contentAlignment = Alignment.Center
-
         ) {
             RirTextField(
                 modifier = Modifier.focusRequester(rirFocusRequester),
@@ -273,9 +269,11 @@ fun SetContent(
                     repetitionsInReserveText =
                         when {
                             rir.isBlank() -> ""
-                            else -> checkDoubleInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }
-                                ?.toString()
-                                ?: repetitionsInReserveText
+                            else ->
+                                checkDoubleInput(rir)
+                                    ?.takeIf { it.toDouble() in 0.0..10.0 }
+                                    ?.toString()
+                                    ?: repetitionsInReserveText
                         }
                 },
                 onImeAction = { updateRIR(repetitionsInReserveText) }
@@ -324,26 +322,16 @@ private fun RirTextField(
     }
 
     BasicTextField(
-        modifier = modifier
-            .padding(PaddingValues(4.dp)),
-        textStyle = TextStyle(
-            fontSize = 5.em,
-            textAlign = TextAlign.Center,
-            color = textColor
-        ),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                onImeAction()
-            },
+        modifier = modifier.padding(PaddingValues(4.dp)),
+        textStyle = TextStyle(fontSize = 5.em, textAlign = TextAlign.Center, color = textColor),
+        keyboardOptions =
+        KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+        keyboardActions =
+        KeyboardActions(
+            onDone = { onImeAction() },
         ),
         value = repetitionsInReserveText,
-        onValueChange = {
-            onRIRChange(it.take(4))
-        }
+        onValueChange = { onRIRChange(it.take(4)) }
     )
 }
 
@@ -355,26 +343,22 @@ private fun ExerciseRepsTextField(
     onImeAction: () -> Unit = {},
 ) {
     BasicTextField(
-        modifier = modifier
-            .padding(PaddingValues(4.dp)),
-        textStyle = TextStyle(
+        modifier =
+        modifier.padding(PaddingValues(4.dp)),
+        textStyle =
+        TextStyle(
             fontSize = 5.em,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground
         ),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                onImeAction()
-            },
+        keyboardOptions =
+        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        keyboardActions =
+        KeyboardActions(
+            onDone = { onImeAction() },
         ),
         value = repetitionsText,
-        onValueChange = {
-            onRepsChange(it.take(4))
-        },
+        onValueChange = { onRepsChange(it.take(4)) },
     )
 }
 
@@ -387,28 +371,25 @@ private fun ExerciseWeightTextField(
 ) {
     BasicTextField(
         value = weightState.text,
-        onValueChange = {
-            onWeightChange(it.take(7))
-        },
-        modifier = modifier
+        onValueChange = { onWeightChange(it.take(7)) },
+        modifier =
+        modifier
             .padding(PaddingValues(4.dp))
             .onFocusChanged {
                 weightState.onFocusChange(it.isFocused)
             },
-        textStyle = TextStyle(
+        textStyle =
+        TextStyle(
             fontSize = 5.em,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground
         ),
-//                placeholder = { Text(exerciseSet.exerciseWeight.toString())},
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = {
-                onImeAction()
-            },
+        //                placeholder = { Text(exerciseSet.exerciseWeight.toString())},
+        keyboardOptions =
+        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+        keyboardActions =
+        KeyboardActions(
+            onNext = { onImeAction() },
         ),
     )
 }
@@ -420,8 +401,7 @@ private fun getSetIconText(set: SetModel, setIndex: Int): String =
         "TODO"
     }
 
-private fun getRatePerceivedEffort(set: SetModel): String =
-    doubleFormatted(set.ratePerceivedEffort)
+private fun getRatePerceivedEffort(set: SetModel): String = doubleFormatted(set.ratePerceivedEffort)
 
 private fun getRepetitionsInReserve(set: SetModel): String =
     doubleFormatted(set.repetitionsInReserve)
@@ -432,5 +412,4 @@ private fun getRepetitions(set: SetModel): String =
         else -> set.repetitions.toString()
     }
 
-private fun getExerciseWeight(set: SetModel): String =
-    doubleFormatted(set.exerciseWeight)
+private fun getExerciseWeight(set: SetModel): String = doubleFormatted(set.exerciseWeight)

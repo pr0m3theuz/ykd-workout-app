@@ -75,7 +75,7 @@ fun calculateNewSetResults(
     val roundedNewWorkingWeight = weight?.roundToInt()
 
     // Format new working weight as double with 2 decimal places and round to nearest integer
-    val formattedNewWorkingWeight = "%.2f".format(newWorkingWeight).toDouble()
+    val formattedNewWorkingWeight = "%.2f".format(newWorkingWeight).toDoubleOrNull() ?: 0.0
     val roundedFormattedNewWorkingWeight = formattedNewWorkingWeight.roundToInt()
 
     // Choose appropriate values for formatting the string based on calculated results

@@ -24,13 +24,10 @@ import com.example.myapplication.data.SetModel
 fun ExercisesSetsScreen(
     navController: NavController,
     workoutViewModel: WorkoutViewModel = hiltViewModel(),
+    /*exercisesSets: List<ExerciseSets>,*/
 ) {
-    val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
-
-    ExerciseSetLazyColumn(
-        navController = navController,
-        exercises = exercisesSets
-    )
+    val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
+    ExerciseSetLazyColumn(navController = navController, exercises = exercisesSets)
 }
 
 @Composable
@@ -43,14 +40,8 @@ fun ExerciseSetLazyColumn(
         modifier = Modifier.fillMaxWidth()
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(
-            exercises,
-            key = { item -> item.exSetsLazyListItemID }
-        ) { exerciseSets ->
-            ExerciseScreen(
-                navController = navController,
-                _exerciseSets = exerciseSets
-            )
+        items(exercises, key = { item -> item.exSetsLazyListItemID }) { exerciseSets ->
+            ExerciseScreen(navController = navController, _exerciseSets = exerciseSets)
 
             exerciseSets.sets.forEachIndexed { index: Int, set: SetModel ->
                 SetItem(
@@ -64,12 +55,8 @@ fun ExerciseSetLazyColumn(
             AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
         }
 
-        item {
-            AddExercise(navController = navController)
-        }
-        item {
-            CancelWorkout()
-        }
+        item { AddExercise() }
+        item { CancelWorkout() }
         item { Box(modifier = Modifier
             .height(128.dp)
             .fillMaxWidth()) }

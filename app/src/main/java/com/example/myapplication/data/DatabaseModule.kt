@@ -64,7 +64,7 @@ object DatabaseModule {
             AppRoomDatabase::class.java,
             "app_database.db"
         )
-//            .createFromAsset("database/test.db")
+            .createFromAsset("database/test_v3.db")
             .build()
     }
 }

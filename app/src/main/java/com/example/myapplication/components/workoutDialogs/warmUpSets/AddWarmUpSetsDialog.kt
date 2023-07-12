@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
@@ -24,7 +25,7 @@ import com.example.myapplication.utils.doubleFormatted
 @Composable
 fun AddWarmUpSetsScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
-    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
+    warmUpSetsViewModel: WarmUpSetsViewModel = hiltViewModel(),
     openDialog: (Boolean) -> Unit,
     exerciseSets: ExerciseSets,
 ) {

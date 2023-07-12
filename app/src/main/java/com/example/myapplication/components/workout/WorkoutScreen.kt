@@ -30,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.BottomNavigationBar
@@ -50,109 +51,115 @@ fun WorkoutScreen(navController: NavHostController = rememberNavController()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewModel) {
-    val workout by workoutViewModel.workout.collectAsState()
+  val workout by workoutViewModel.workout.collectAsState()
 
-    val openFinishWorkoutDialog = remember { mutableStateOf(false) }
+  val openFinishWorkoutDialog = remember { mutableStateOf(false) }
 
-    if (openFinishWorkoutDialog.value) {
-        FinishWorkoutButton()
-        openFinishWorkoutDialog.value = false
-    }
+  if (openFinishWorkoutDialog.value) {
+    FinishWorkoutButton()
+    openFinishWorkoutDialog.value = false
+  }
 
-    val workoutName by workoutViewModel.workoutName.collectAsState()
+  val workoutName by workoutViewModel.workoutName.collectAsState()
+//  val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
 
-    val workoutDuration by workoutViewModel.workoutDurationString.collectAsState()
-//    val exercisesSets by workoutViewModel.exercisesSets.collectAsState()
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    WorkoutNameTextField(
-                        workoutName,
-                        setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) }
-                    )
-                    /*                    Text(
-                                            text = "Exercises",
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            fontSize = 20.sp,
-                                            fontWeight = FontWeight.Medium,
-                                            textAlign = TextAlign.Center,
-                                            //                    modifier = Modifier.align(Alignment.CenterVertically),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )*/
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            /*TODO Navigate to Previous Screen */
-                            navController.navigateUp()
-                            Toast.makeText(
-                                context,
-                                "TODO: Navigate to Previous Screen",
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            contentDescription = "Go to the previous screen"
-                        )
-                    }
-                },
-                actions = {
-                    RestTimerButton()
-                    WorkoutOptionsDropdownMenu()
-                },
-            )
+  Scaffold(
+    topBar = {
+      TopAppBar(
+        title = {
+          WorkoutNameTextField(
+            workoutName,
+            setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) }
+          )
+          /*                    Text(
+              text = "Exercises",
+              color = MaterialTheme.colorScheme.onSurface,
+              fontSize = 20.sp,
+              fontWeight = FontWeight.Medium,
+              textAlign = TextAlign.Center,
+              //                    modifier = Modifier.align(Alignment.CenterVertically),
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis
+          )*/
         },
-        bottomBar = { BottomNavigationBar(navController = navController) },
-    ) { contentPadding ->
-        Column(Modifier.padding(contentPadding)) {
-            Row(
-                modifier = Modifier.padding(start = 8.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(modifier = Modifier.padding(8.dp), text = workoutDuration)
-                FinishWorkoutButton()
-            }
-            WorkoutNotes(
-                placeholder = "Workout Note",
-                pinNote = { pin -> workoutViewModel.pinWorkoutNote(pin) },
-                notesPinned = workout.notesPinned
+        navigationIcon = {
+          IconButton(
+            onClick = {
+              /*TODO Navigate to Previous Screen */
+              navController.navigateUp()
+              Toast.makeText(context, "TODO: Navigate to Previous Screen", Toast.LENGTH_SHORT)
+                .show()
+            },
+          ) {
+            Icon(
+              imageVector = Icons.Outlined.ArrowBack,
+              tint = MaterialTheme.colorScheme.onSurface,
+              contentDescription = "Go to the previous screen"
             )
+          }
+        },
+        actions = {
+          RestTimerButton()
+          WorkoutOptionsDropdownMenu()
+        },
+      )
+    },
+    bottomBar = { BottomNavigationBar(navController = navController) },
+  ) { contentPadding ->
+    Column(Modifier.padding(contentPadding)) {
+      Row(
+        modifier = Modifier
+          .padding(start = 8.dp)
+          .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        WorkoutDuration()
+        FinishWorkoutButton()
+      }
+      WorkoutNotes(
+        placeholder = "Workout Note",
+        pinNote = { pin -> workoutViewModel.pinWorkoutNote(pin) },
+        notesPinned = workout.notesPinned
+      )
 
-            ExercisesSetsScreen(navController = navController)
-        }
+      ExercisesSetsScreen(navController = navController /*exercisesSets = exercisesSets*/)
     }
+  }
+}
+
+@Composable
+private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = viewModel()) {
+  val workoutDuration by workoutViewModel.workoutDurationString.collectAsState()
+  Text(
+    modifier = Modifier.padding(8.dp),
+    text = workoutDuration,
+    style = MaterialTheme.typography.bodyLarge
+  )
 }
 
 @Composable
 private fun WorkoutNameTextField(
-    workoutName: String,
-    setWorkoutName: (String) -> Unit,
+  workoutName: String,
+  setWorkoutName: (String) -> Unit,
 ) {
-    var name by remember { mutableStateOf(workoutName) }
+  var name by remember { mutableStateOf(workoutName) }
 
-    BasicTextField(
-        enabled = false,
-        modifier = Modifier
-            .padding(PaddingValues(4.dp)),
-        textStyle = TextStyle(
-            fontSize = 5.em,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground
-        ),
-        value = name,
-        onValueChange = {
-            name = it
-            setWorkoutName(it)
-        }
-    )
+  BasicTextField(
+    enabled = false,
+    modifier = Modifier.padding(PaddingValues(4.dp)),
+    textStyle =
+    TextStyle(
+      fontSize = 5.em,
+      textAlign = TextAlign.Center,
+      color = MaterialTheme.colorScheme.onBackground
+    ),
+    value = name,
+    onValueChange = {
+      name = it
+      setWorkoutName(it)
+    }
+  )
 }

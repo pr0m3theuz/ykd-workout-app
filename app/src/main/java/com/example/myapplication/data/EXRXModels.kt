@@ -110,6 +110,7 @@ data class Utility(
 data class Force(
     @PrimaryKey val id: String,
     val name: String,
+    var description: String? = null,
 )
 
 /**

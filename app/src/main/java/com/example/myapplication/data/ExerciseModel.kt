@@ -27,11 +27,11 @@ data class ExerciseModel(
     val exrxExerciseID: String? = null,
     val equipmentID: String, // Equipment
     val muscleGroupID: String,
-    val utility: Int? = null, // May be useless
+    val utilityID: String? = null, // May be useless
     val mechanicsID: String?,
     val force: String?,
-    val functionID: Int? = null,
-    val intensityID: Int? = null,
+    val functionID: String? = null,
+    val intensityID: String? = null,
 
 //    TODO To remove & refactor
 //    var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
@@ -48,6 +48,7 @@ data class ExerciseModel(
     var workingSetRestTimerEnabled: Boolean = true,
     var warmUpSetRestTimerEnabled: Boolean = false,
 
-    var mediaUri: String? = null,
-    var pageUri: String? = null,
+    var mediaURI: String? = null,
+    var pageURI: String? = null,
+    var primaryMuscleID: String? = null,
 )

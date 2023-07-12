@@ -18,9 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -63,7 +64,7 @@ fun ExerciseHeader(
     removeExercise: (exerciseSets: ExerciseSets) -> Unit,
 ) {
 //    TODO: Create a button that toggle the notes
-    var notesVisible by remember { mutableStateOf(true) }
+    val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
 
 //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
@@ -79,13 +80,13 @@ fun ExerciseHeader(
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable { navController.navigate("exerciseDetails/${exerciseSets.exercise.exerciseID}") },
-                    text = "Exercise Name",
+                    text = exerciseSets.exercise.name,
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 ExerciseOptionsDropdownMenu(
                     exerciseSets = exerciseSets,
-                    addNotes = { notesVisible = true },
+                    addNotes = { setNotesVisible(true) },
                     removeExercise = { removeExercise(exerciseSets) }
                 )
             }
@@ -133,40 +134,40 @@ private fun SetContentHeader() {
             contentAlignment = Alignment.Center
 
         ) {
-            Text("SET", style = textStyle)
+            Text("Set", style = textStyle)
         }
 
         Box(
             modifier = Modifier
 //                        .padding(4.dp)
-                .width(128.dp),
+                .width(110.dp),
             contentAlignment = Alignment.Center
-        ) { Text("PREVIOUS", style = textStyle) }
+        ) { Text("Previous", style = textStyle) }
 
         Box(
             modifier = Modifier
                 .padding(PaddingValues(horizontal = 4.dp))
-                .width(72.dp),
+                .width(64.dp),
             contentAlignment = Alignment.Center
-        ) { Text("WEIGHT", style = textStyle) }
+        ) { Text("Weight", style = textStyle) }
 
         Box(
             modifier = Modifier
                 .padding(PaddingValues(horizontal = 4.dp))
-                .width(60.dp),
+                .width(76.dp),
             contentAlignment = Alignment.Center
-        ) { Text("REPS", style = textStyle) }
+        ) { Text("Reps", style = textStyle) }
 
         Box(
             modifier = Modifier
-                .padding(4.dp)
+                .padding(0.dp)
                 .width(40.dp),
             contentAlignment = Alignment.Center
         ) { Text("RIR", style = textStyle) }
 
         Spacer(
             Modifier
-                .width(40.dp)
+                .width(100.dp)
                 .padding(PaddingValues(horizontal = 4.dp))
         )
     }
@@ -186,9 +187,9 @@ private fun ExerciseSetsWorkoutSummary(
 
 //    val exerciseSets = _exerciseSets
 
-    val totalVolume by remember { mutableStateOf(exerciseSets.totalVolume()) }
-    val totalRepetitions by remember { mutableStateOf(exerciseSets.totalRepetitions()) }
-    val averageWeight by remember { mutableStateOf(exerciseSets.averageWeight()) }
+    val totalVolume by remember { mutableDoubleStateOf(exerciseSets.totalVolume()) }
+    val totalRepetitions by remember { mutableIntStateOf(exerciseSets.totalRepetitions()) }
+    val averageWeight by remember { mutableDoubleStateOf(exerciseSets.averageWeight()) }
 
     val df = DecimalFormat("#,###.##")
     df.roundingMode = RoundingMode.HALF_UP
@@ -200,6 +201,7 @@ private fun ExerciseSetsWorkoutSummary(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
+
             text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise.weightUnit}",
             style = textStyle
         )

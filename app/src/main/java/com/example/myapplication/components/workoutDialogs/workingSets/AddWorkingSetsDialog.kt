@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
@@ -30,7 +31,7 @@ import com.example.myapplication.utils.doubleFormatted
 
 @Composable
 fun AddWorkingSetsScreen(
-    workingSetViewModel: WorkingSetViewModel = viewModel(),
+    workingSetViewModel: WorkingSetViewModel = hiltViewModel(),
     workoutViewModel: WorkoutViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
     exerciseSets: ExerciseSets,

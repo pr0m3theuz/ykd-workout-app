@@ -55,53 +55,72 @@ import kotlin.time.toDuration
 
 private const val WARM_UP_SET = 2
 
-// TODO
+// TODO Croate queries to save workouts and sets
 @HiltViewModel
-class WorkoutViewModel @Inject constructor(
+class WorkoutViewModel
+@Inject
+constructor(
     private val application: Application,
     private val exerciseNotesRepository: ExerciseNotesRepository,
     private val workoutRepository: WorkoutRepository,
     private val workoutNotesRepository: WorkoutNotesRepository,
     private val setsRepository: SetsRepository,
     private val exerciseSetsRepository: ExerciseSetsRepository,
-) :
-    ViewModel() {
+) : ViewModel() {
     //    fun currentTimeMillis(): Long = System.currentTimeMillis()
-//    fun elapsedTimeMillis(): Long = System.
+    //    fun elapsedTimeMillis(): Long = System.
     private val REQUEST_CODE = 0
     private val notifyPendingIntent: PendingIntent
 
     private var workoutDuration: Long = 0
 
-    private var _workoutDurationFormatted = workoutDuration.toDuration(DurationUnit.MILLISECONDS)
-        .toComponents { minutes, seconds, _ ->
-            "$minutes:${
-                seconds.toString().padStart(2, '0')
-            }"
+    private var _workoutDurationFormatted =
+        workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                             minutes,
+                                                                             seconds,
+                                                                             _ ->
+            if (hours > 0) {
+                "$hours:" +
+                        minutes.toString().padStart(2, '0') +
+                        ":" +
+                        seconds.toString().padStart(2, '0')
+            } else {
+                "$minutes:${seconds.toString().padStart(2, '0')}"
+            }
         }
 
     private val _workoutDurationString = MutableStateFlow(_workoutDurationFormatted)
     val workoutDurationString: StateFlow<String>
         get() = _workoutDurationString.asStateFlow()
 
-    private val workoutCountUpTimer = object : CountUpTimer(1000) {
-        override fun onTick(elapsedTime: Long) {
-            workoutDuration = elapsedTime
+    private val workoutCountUpTimer =
+        object : CountUpTimer(1000) {
+            override fun onTick(elapsedTime: Long) {
+                workoutDuration = elapsedTime
 
-            _workoutDurationString.value =
-                workoutDuration.toDuration(DurationUnit.MILLISECONDS)
-                    .toComponents { minutes, seconds, _ ->
-                        "${minutes.toString().padStart(2, '0')}:${
-                            seconds.toString().padStart(2, '0')
-                        }"
+                _workoutDurationString.value =
+                    workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                                         minutes,
+                                                                                         seconds,
+                                                                                         _ ->
+                        if (hours > 0) {
+                            "$hours:" +
+                                    minutes.toString().padStart(2, '0') +
+                                    ":" +
+                                    seconds.toString().padStart(2, '0')
+                        } else {
+                            "$minutes:${seconds.toString().padStart(2, '0')}"
+                        }
                     }
+            }
         }
-    }
 
-    private val notificationManager = ContextCompat.getSystemService(
-        application,
-        NotificationManager::class.java,
-    ) as NotificationManager
+    //  Rest Timer
+    private val notificationManager =
+        ContextCompat.getSystemService(
+            application,
+            NotificationManager::class.java,
+        ) as NotificationManager
 
     private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -110,17 +129,18 @@ class WorkoutViewModel @Inject constructor(
     init {
         workoutCountUpTimer.start()
 
-        notifyPendingIntent = PendingIntent.getBroadcast(
-            application,
-            REQUEST_CODE,
-            notifyIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        notifyPendingIntent =
+            PendingIntent.getBroadcast(
+                application,
+                REQUEST_CODE,
+                notifyIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
     }
 
     private var _timerDuration: Long = 60000L
-    private var _timerDurationFormatted = _timerDuration.toDuration(DurationUnit.MILLISECONDS)
-        .toComponents { minutes, seconds, _ ->
+    private var _timerDurationFormatted =
+        _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
             "$minutes:${
                 seconds.toString().padStart(2, '0')
             }"
@@ -131,15 +151,14 @@ class WorkoutViewModel @Inject constructor(
         get() = _timerDurationString.asStateFlow()
 
     //        TODO Store User Settings for Rest Timer Adjustments
-    private val _restTimerAdjustment: Long =
-        30.toDuration(DurationUnit.SECONDS).inWholeMilliseconds
+    private val _restTimerAdjustment: Long = 30.toDuration(DurationUnit.SECONDS).inWholeMilliseconds
     val restTimerAdjustmentString =
         _restTimerAdjustment.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString()
 
     private var _remainingTime: Long = 60000L
 
-    private var _remainingTimeFormatted = _remainingTime.toDuration(DurationUnit.MILLISECONDS)
-        .toComponents { minutes, seconds, _ ->
+    private var _remainingTimeFormatted =
+        _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
             "$minutes:${
                 seconds.toString().padStart(2, '0')
             }"
@@ -187,51 +206,57 @@ class WorkoutViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            timer = object : CountDownTimer(timerDuration, 1000L) {
+            timer =
+                object : CountDownTimer(timerDuration, 1000L) {
 
-                override fun onTick(millisUntilFinished: Long) {
-                    _state = TimerState.RUNNING
-                    _timerState.value = TimerState.RUNNING
-                    _remainingTime = millisUntilFinished
-                    _remainingTimeString.value =
-                        _remainingTime.toDuration(DurationUnit.MILLISECONDS)
-                            .toComponents { minutes, seconds, _ ->
-                                "$minutes:${
-                                    seconds.toString().padStart(2, '0')
-                                }"
-                            }
+                    override fun onTick(millisUntilFinished: Long) {
+                        _state = TimerState.RUNNING
+                        _timerState.value = TimerState.RUNNING
+                        _remainingTime = millisUntilFinished
+                        _remainingTimeString.value =
+                            _remainingTime.toDuration(DurationUnit.MILLISECONDS)
+                                .toComponents { minutes,
+                                                seconds,
+                                                _ ->
+                                    "$minutes:${
+                                        seconds.toString().padStart(2, '0')
+                                    }"
+                                }
 
-                    _timerDurationString.value =
-                        _timerDuration.toDuration(DurationUnit.MILLISECONDS)
-                            .toComponents { minutes, seconds, _ ->
-                                "$minutes:${
-                                    seconds.toString().padStart(2, '0')
-                                }"
-                            }
+                        _timerDurationString.value =
+                            _timerDuration.toDuration(DurationUnit.MILLISECONDS)
+                                .toComponents { minutes,
+                                                seconds,
+                                                _ ->
+                                    "$minutes:${
+                                        seconds.toString().padStart(2, '0')
+                                    }"
+                                }
 
-                    _remainingTimeProgress.value =
-                        _remainingTime.toFloat().div(_timerDuration.toFloat())
+                        _remainingTimeProgress.value =
+                            _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-                    Log.i("Timer: ", timerVersion)
-                    Log.i("TimerState: ", _timerState.value.name)
+                        Log.i("Timer: ", timerVersion)
+                        Log.i("TimerState: ", _timerState.value.name)
 
-                    Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-                    Log.i("onTick(): timerDuration", "$_timerDuration")
-                    Log.i(
-                        "onTick(): _remainingTimeProgress",
-                        "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-                    )
+                        Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+                        Log.i("onTick(): timerDuration", "$_timerDuration")
+                        Log.i(
+                            "onTick(): _remainingTimeProgress",
+                            "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+                        )
+                    }
+
+                    override fun onFinish() {
+                        _state = TimerState.EXPIRED
+                        _timerState.value = TimerState.EXPIRED
+                        _timerFinished = true
+
+                        Log.i("Timer: ", timerVersion)
+                        Log.i("TimerState: ", _timerState.value.name)
+                    }
                 }
-
-                override fun onFinish() {
-                    _state = TimerState.EXPIRED
-                    _timerState.value = TimerState.EXPIRED
-                    _timerFinished = true
-
-                    Log.i("Timer: ", timerVersion)
-                    Log.i("TimerState: ", _timerState.value.name)
-                }
-            }.start()
+                    .start()
         }
     }
 
@@ -269,8 +294,8 @@ class WorkoutViewModel @Inject constructor(
         if (!completedSets.contains(setUUID)) {
             completedSets.add(setUUID)
             /*
-            * Doesn't allow the new completed set to cancel the timer if one is already running
-            */
+             * Doesn't allow the new completed set to cancel the timer if one is already running
+             */
             if (_state != TimerState.RUNNING) {
                 if (exercise.warmUpSetRestTimerEnabled && (set.setTypeID == WARM_UP_SET)) {
                     _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
@@ -286,8 +311,9 @@ class WorkoutViewModel @Inject constructor(
     private fun resetTimerState() {
         Log.i("resetTimerState() ", "called")
         _remainingTime = 0L
-        _remainingTimeString.value = _remainingTime.toDuration(DurationUnit.MILLISECONDS)
-            .toComponents { minutes, seconds, _ ->
+        _remainingTimeString.value =
+            _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _
+                ->
                 "$minutes:${
                     seconds.toString().padStart(2, '0')
                 }"
@@ -351,18 +377,16 @@ class WorkoutViewModel @Inject constructor(
         _workout.value = _workoutData
     }
 
-    fun finishWorkout() {
+    fun stopWorkoutTimer() {
         workoutCountUpTimer.stop()
         _workoutData.workoutEnded = LocalDateTime.now()
         _workoutData.workoutDuration = workoutDuration
         _workout.value = _workoutData
-//        TODO Save Workout to Database
-//        TODO Navigate to Workout Complete Screen & Summary
+        //        TODO Navigate to Workout Complete Screen & Summary
     }
 
-
     //    ExerciseSets
-    private var _exercisesSetsData = initExercisesSets()
+    private var _exercisesSetsData = mutableListOf<ExerciseSets>()
 
     private var _exercisesSets = MutableStateFlow(_exercisesSetsData.toList())
     val exercisesSets
@@ -373,48 +397,63 @@ class WorkoutViewModel @Inject constructor(
     val allSets
         get() = _allSets.asStateFlow()
 
-    fun addEmptyExerciseSets() {
+    fun addEmptyExerciseSets(exercisesSelectedToBeAddedToWorkout: List<ExerciseModel>) {
+        val temporaryExerciseSets = _exercisesSets.value.toMutableList()
+
         exercisesSelectedToBeAddedToWorkout.forEach {
-            _exercisesSetsData.add(
+            temporaryExerciseSets.add(
                 ExerciseSets(
                     workoutID = _workout.value.workoutID,
                     workoutUUID = _workout.value.uuid,
                     exercise = it,
-                    sets = mutableListOf<SetModel>()
+                    sets = mutableListOf()
                 )
             )
         }
 
-        clearExercisesSelectedToBeAddedToWorkout()
-    }
+        /*        temporaryExerciseSets.forEach(){
+            it.exerciseSetsID = fakeULID()
+            it.exSetsLazyListItemID = newID()
+        }*/
 
-    fun addSet(exerciseSets: ExerciseSets) {
-        val temporarySets: List<SetModel> = if (exerciseSets.sets.isNotEmpty()) {
-            exerciseSets.sets + exerciseSets.sets.last().copy(
-                lazyListItemID = newID(),
-                uuid = UUID.randomUUID(),
-                setNumber = exerciseSets.sets.last().setNumber?.plus(1),
-                setCompleted = false,
-            )
-        } else {
-            listOf(
-                SetModel(
-                    setNumber = 0,
-                    exerciseID = exerciseSets.exercise.exerciseID,
-                    exerciseUUID = exerciseSets.exercise.uuid,
-                    progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
-                    workoutID = workout.value.workoutID, // TODO Replace with workout.workoutID
-                    workoutUUID = workout.value.uuid,
-                )
-            )
-        }
-
-        updateExercisesSetsData(exerciseSets, temporarySets.toMutableList())
+        _exercisesSetsData = temporaryExerciseSets
+        _exercisesSets.value = _exercisesSetsData.toList()
     }
 
     fun removeExerciseSets(exerciseSets: ExerciseSets) {
         _exercisesSetsData = _exercisesSets.value.filter { it != exerciseSets }.toMutableList()
         _exercisesSets.value = _exercisesSetsData
+    }
+
+    fun addSet(exerciseSets: ExerciseSets) {
+        val temporarySets: List<SetModel> =
+            if (exerciseSets.sets.isNotEmpty()) {
+                exerciseSets.sets +
+                        exerciseSets.sets
+                            .last()
+                            .copy(
+                                lazyListItemID = newID(),
+                                uuid = UUID.randomUUID(),
+                                setNumber = exerciseSets.sets.last().setNumber?.plus(1),
+                                setCompleted = false,
+                            )
+            } else {
+                listOf(
+                    SetModel(
+                        setNumber = 0,
+                        exerciseID = exerciseSets.exercise.exerciseID,
+                        exerciseUUID = exerciseSets.exercise.uuid,
+                        progressionSchemeID =
+                        Random()
+                            .nextInt(), // TODO Replace with
+                        // progressionScheme.progressionSchemeID
+                        workoutID = workout.value.workoutID, // TODO Replace with workout.workoutID
+                        workoutUUID = workout.value.uuid,
+                    )
+                )
+            }
+
+        updateExercisesSetsData(exerciseSets, temporarySets.toMutableList())
     }
 
     fun removeSet(exerciseSets: ExerciseSets, set: SetModel) {
@@ -517,10 +556,7 @@ class WorkoutViewModel @Inject constructor(
 
         exerciseSets.sets.addAll(workingSets)
 
-        updateExercisesSetsData(
-            exerciseSets = exerciseSets,
-            temporarySets = exerciseSets.sets
-        )
+        updateExercisesSetsData(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
     }
 
     fun addBackOffSets(exerciseSets: ExerciseSets, backOffSets: List<SetModel>) {
@@ -528,10 +564,7 @@ class WorkoutViewModel @Inject constructor(
             exerciseSets.sets.add(backOffSets[index].copy(lazyListItemID = newID()))
         }
 
-        updateExercisesSetsData(
-            exerciseSets = exerciseSets,
-            temporarySets = exerciseSets.sets
-        )
+        updateExercisesSetsData(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
     }
 
     fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {
@@ -567,7 +600,7 @@ class WorkoutViewModel @Inject constructor(
     }
 
     fun addExerciseNote(note: ExerciseNote) {
-//        TODO Save Exercise Note to Database when Workout is saved
+        //        TODO Save Exercise Note to Database when Workout is saved
     }
 
     fun getExerciseNoteByExercise(exerciseID: Long): StateFlow<List<ExerciseNote>> {
@@ -594,15 +627,16 @@ class WorkoutViewModel @Inject constructor(
 
     fun createWorkoutFromHistoryOrTemplate(workout: Workout) {
 
-        val newWorkout = Workout(
-            uuid = workout.uuid,
-            name = workout.name,
-            workoutAuthor = workout.workoutAuthor,
-            day = workout.day,
-            programID = workout.programID,
-            mesocycleID = workout.mesocycleID,
-            microcycleID = workout.microcycleID
-        )
+        val newWorkout =
+            Workout(
+                uuid = workout.uuid,
+                name = workout.name,
+                workoutAuthor = workout.workoutAuthor,
+                day = workout.day,
+                programID = workout.programID,
+                mesocycleID = workout.mesocycleID,
+                microcycleID = workout.microcycleID
+            )
 
         var newExerciseSets: List<WorkoutWithSetsAndExercise> = emptyList()
         var exercisesSetsMap: Map<ExerciseModel, List<SetsWithExercise>> = emptyMap()
@@ -613,7 +647,9 @@ class WorkoutViewModel @Inject constructor(
             newExerciseSets = exerciseSetsRepository.getSetsAndExerciseByWorkout(workout.workoutID)
         }
 
-        newExerciseSets.groupBy { it.sets.forEach { setsWithExercise -> setsWithExercise.exercise.exerciseID } }
+        newExerciseSets.groupBy {
+            it.sets.forEach { setsWithExercise -> setsWithExercise.exercise.exerciseID }
+        }
 
         newExerciseSets.forEach() { workoutWithSetsAndExercise ->
             exercisesSetsMap = workoutWithSetsAndExercise.sets.groupBy { it.exercise }
@@ -627,19 +663,15 @@ class WorkoutViewModel @Inject constructor(
                     exercise = it.key,
                     sets = MutableList(it.value.size) { i -> it.value[i].set },
                 )
-
             )
         }
 
-        exercisesSets.forEach { exerciseSets ->
-            exerciseSets.resetSets(newWorkout)
-        }
+        exercisesSets.forEach { exerciseSets -> exerciseSets.resetSets(newWorkout) }
         _workoutData = newWorkout
         _exercisesSetsData = exercisesSets
-
     }
 
-    private val exercisesSelectedToBeAddedToWorkout: MutableSet<ExerciseModel> = mutableSetOf()
+    /*    private val exercisesSelectedToBeAddedToWorkout: MutableSet<ExerciseModel> = mutableSetOf()
 
     fun selectExercise(exercise: ExerciseModel, isSelected: Boolean) {
         if (isSelected) {
@@ -647,14 +679,37 @@ class WorkoutViewModel @Inject constructor(
         } else {
             exercisesSelectedToBeAddedToWorkout.remove(exercise)
         }
-    }
+    }*/
 
-    fun cancelExerciseSelection() {
+    /*    fun cancelExerciseSelection() {
         clearExercisesSelectedToBeAddedToWorkout()
+    }*/
+
+    /*    private fun clearExercisesSelectedToBeAddedToWorkout() {
+        exercisesSelectedToBeAddedToWorkout.clear()
+    }*/
+
+    /**
+     * Saves the workout data to the database asynchronously. The function launches a coroutine in
+     * the viewModelScope to perform the database operations. It first inserts the workout data
+     * using the workoutRepository. Then, it iterates over all sets in the _workoutData and inserts
+     * each set into the database using the setsRepository. The function does not return any value.
+     */
+    fun saveWorkout() {
+        viewModelScope.launch {
+            workoutRepository.insertWorkout(_workoutData)
+
+            allSets().forEach {
+                if (it.setCompleted) {
+                    setsRepository.insertSetModel(it)
+                }
+            }
+        }
     }
 
-    private fun clearExercisesSelectedToBeAddedToWorkout() {
-        exercisesSelectedToBeAddedToWorkout.clear()
+    fun finishWorkout() {
+        stopWorkoutTimer()
+        saveWorkout()
     }
 }
 
@@ -663,22 +718,24 @@ private fun initWorkout(): Workout {
 }
 
 private fun initExercisesSets(): MutableList<ExerciseSets> {
-    val exercise = ExerciseModel(
-        equipmentID = "null",
-        force = "null",
-        mechanicsID = "null",
-        muscleGroupID = "null"
-    )
+    val exercise =
+        ExerciseModel(
+            equipmentID = "null",
+            force = "null",
+            mechanicsID = "null",
+            muscleGroupID = "null"
+        )
 
     val workoutUUID = UUID.randomUUID()
     val workoutID = fakeULID()
 
-    return MutableList(6) {
+    return MutableList(1) {
         ExerciseSets(
             workoutID = workoutID,
             workoutUUID = workoutUUID,
             exercise = exercise,
-            sets = MutableList(3) { indices ->
+            sets =
+            MutableList(3) { indices ->
                 SetModel(
                     setNumber = indices,
                     exerciseWeight = 100.00.times(it),
@@ -687,7 +744,10 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
                     exerciseUUID = exercise.uuid,
                     workoutID = workoutID, // TODO Replace with workout.workoutID
                     workoutUUID = workoutUUID,
-                    progressionSchemeID = Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
+                    progressionSchemeID =
+                    Random()
+                        .nextInt(), // TODO Replace with
+                    // progressionScheme.progressionSchemeID
                 )
             }
         )
@@ -712,15 +772,16 @@ abstract class CountUpTimer(private val interval: Long) {
 
     abstract fun onTick(elapsedTime: Long)
 
-    private val handler: Handler = object : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            synchronized(this@CountUpTimer) {
-                val elapsedTime = SystemClock.elapsedRealtime() - base
-                onTick(elapsedTime)
-                sendMessageDelayed(obtainMessage(MSG), interval)
+    private val handler: Handler =
+        object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                synchronized(this@CountUpTimer) {
+                    val elapsedTime = SystemClock.elapsedRealtime() - base
+                    onTick(elapsedTime)
+                    sendMessageDelayed(obtainMessage(MSG), interval)
+                }
             }
         }
-    }
 
     companion object {
         private const val MSG = 1

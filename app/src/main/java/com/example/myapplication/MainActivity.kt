@@ -22,7 +22,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myapplication.components.*
-import com.example.myapplication.components.addExercisesList.AddExercisesLazyColumn
 import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
 import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
 import com.example.myapplication.components.exercisesList.ExercisesScreen
@@ -76,7 +75,7 @@ class MainActivity : ComponentActivity() {
 }
 
 private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
-    navigation("addExercisesList", route = "workout") {
+    navigation("workoutContent", route = "workout") {
         /* composable("workoutScreen") {
             WorkoutScreen()
         }*/
@@ -88,15 +87,7 @@ private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
                 workoutViewModel = workoutViewModel,
             )
         }
-        composable("addExercisesList") {
-            val exercisesViewModel = hiltViewModel<ExercisesViewModel>()
-            val workoutViewModel = hiltViewModel<WorkoutViewModel>()
-            AddExercisesLazyColumn(
-                navController = navController,
-                exercisesViewModel = exercisesViewModel,
-                workoutViewModel = workoutViewModel
-            )
-        }
+
         composable(
             "exerciseDetails/{exerciseID}",
             arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })

@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 
@@ -61,7 +60,7 @@ fun FinishWorkoutButton(
         Text(
             text = "FINISH",
             color = MaterialTheme.colorScheme.primary,
-            fontSize = 16.sp
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }
@@ -71,6 +70,7 @@ fun FinishWorkoutDialog(
     openDialog: (Boolean) -> Unit,
     confirmFinishWorkout: () -> Unit,
 ) {
+//    TODO Fix Dark Mode
     AlertDialog(
         onDismissRequest = {
             // Dismiss the dialog when the user clicks outside the dialog or on the back
@@ -98,7 +98,7 @@ fun FinishWorkoutDialog(
                     openDialog(false)
                 }
             ) {
-                Text("Cancel", color = MaterialTheme.colorScheme.primary)
+                Text("Cancel", color = MaterialTheme.colorScheme.tertiary)
             }
         }
     )
@@ -123,9 +123,15 @@ fun PartialFinishWorkoutDialog(
             openDialog(false)
         },
         title = {
-            Text(text = "Are you finished?")
+            Text(text = "Are you finished?", color = MaterialTheme.colorScheme.onSurface)
         },
-        text = { Text("All invalid/empty sets will be discarded. All sets with valid data will be automatically marked as complete.") },
+        text = {
+            Text(
+                color = MaterialTheme.colorScheme.onSurface, text =
+                "All invalid/empty sets will be discarded. " +
+                        " All sets with valid data will be automatically marked as complete."
+            )
+        },
         confirmButton = {
             TextButton(
                 onClick = {
@@ -134,7 +140,7 @@ fun PartialFinishWorkoutDialog(
                     // TODO Save workout
                 }
             ) {
-                Text("Finish Workout")
+                Text("Finish Workout", color = MaterialTheme.colorScheme.primary)
             }
         },
         dismissButton = {
@@ -143,7 +149,7 @@ fun PartialFinishWorkoutDialog(
                     openDialog(false)
                 }
             ) {
-                Text("Cancel")
+                Text("Cancel", color = MaterialTheme.colorScheme.tertiary)
             }
         }
     )
