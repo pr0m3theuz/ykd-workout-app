@@ -16,7 +16,8 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
 
   fun getAllEquipment(): Flow<List<Equipment>> = exerciseDao.getAllEquipment()
 
-  fun getAllMuscleGroups(): Flow<List<MuscleGroup>> = exerciseDao.getAllMuscleGroups()
+  @WorkerThread
+  suspend fun getAllMuscleGroups(): Flow<List<MuscleGroup>> = exerciseDao.getAllMuscleGroups()
 
   fun getAllUtilities(): Flow<List<Utility>> = exerciseDao.getAllUtilities()
 
@@ -27,7 +28,7 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
   fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> =
     exerciseDao.getAllMuscleRolesFunctions()
 
-  fun getMuscleGroupNameByID(muscleGroupID: String): List<String> =
+  fun getMuscleGroupNameByID(muscleGroupID: String): Flow<List<String>> =
     exerciseDao.getMuscleGroupNameByID(muscleGroupID)
 
   // By default Room runs suspend queries off the main thread, therefore, we don't need to

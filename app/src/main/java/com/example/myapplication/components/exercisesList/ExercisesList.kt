@@ -1,6 +1,5 @@
 package com.example.myapplication.components.exercisesList
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +35,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,11 +101,12 @@ fun ExercisesLazyColumn(
 
   val exercises by
   exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
-  //    Log.i("ExercisesLazyColumn.exercises", exercises.toString())
 
-  val muscleGroups by
-  exercisesViewModel.muscleGroup.collectAsStateWithLifecycle(initialValue = emptyList())
-  //    Log.i("ExercisesLazyColumn.muscleGroups", muscleGroups.toString())
+  val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
+
+  fun getMuscleGroups() {
+    exercisesViewModel.getAllMuscleGroups()
+  }
 
   fun filterExercises(search: String) {
     exercisesViewModel.filterExercises(search)
@@ -210,7 +211,12 @@ fun ExercisesLazyColumn(
         ) {}
         SelectedFiltersLazyRow(exercisesViewModel)
 
-        ExercisesLazyList(exercises, muscleGroups, navController)
+        ExercisesLazyList(
+          exercises,
+          muscleGroups,
+          getMuscleGroup = { getMuscleGroups() },
+          navController
+        )
       }
     }
   )
@@ -220,9 +226,10 @@ fun ExercisesLazyColumn(
 private fun ExercisesLazyList(
   exercises: List<ExerciseModel>,
   muscleGroups: List<MuscleGroup>,
+  getMuscleGroup: () -> Unit,
   navController: NavController
 ) {
-  Log.i("ExercisesLazyList.muscleGroups", muscleGroups.toString())
+  getMuscleGroup()
   LazyColumn(
     modifier = Modifier.fillMaxWidth(),
     //                    verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -231,12 +238,11 @@ private fun ExercisesLazyList(
     items(count = exercises.size, key = { index: Int -> exercises[index].lazyListItemID }) { index
       ->
       val exercise: ExerciseModel = exercises[index]
-      val muscleGroupName: String? =
-        muscleGroups.firstOrNull { it.id == exercise.muscleGroupID }?.name
-//      Log.i(
-//        "ExercisesLazyList.exercise",
-//        "${exercise.name}, ${exercise.muscleGroupID}, $muscleGroupName"
-//      )
+      val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
+      //      Log.i(
+      //        "ExercisesLazyList.exercise",
+      //        "${exercise.name}, ${exercise.muscleGroupID}, $muscleGroupName"
+      //      )
 
       ExerciseItem(
         exercise = exercise,
@@ -250,6 +256,11 @@ private fun ExercisesLazyList(
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
+  val filterChipColors =
+    ChipDefaults.filterChipColors(
+      backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+      contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+    )
   LazyRow(
     modifier = Modifier /*.align(Alignment.Start)*/.padding(8.dp),
     horizontalArrangement = Arrangement.spacedBy(4.dp).also { Arrangement.Start },
@@ -264,6 +275,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
           !exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
       }
       if (checked) {
+
         FilterChip(
           selected = checked,
           onClick = { updateState() },
@@ -274,11 +286,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
               modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
             )
           },
-          colors =
-          ChipDefaults.filterChipColors(
-            backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-          )
+          colors = filterChipColors
         ) {
           Text(text = muscleGroup.name)
         }
@@ -303,11 +311,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
               modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
             )
           },
-          colors =
-          ChipDefaults.filterChipColors(
-            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-          )
+          colors = filterChipColors
         ) {
           Text(text = equipment.name)
         }
@@ -334,11 +338,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
               modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
             )
           },
-          colors =
-          ChipDefaults.filterChipColors(
-            backgroundColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-          )
+          colors = filterChipColors
         ) {
           Text(text = movementType.printableName)
         }

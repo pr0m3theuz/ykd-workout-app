@@ -33,9 +33,9 @@ constructor(
   val equipment: StateFlow<List<Equipment>>
     get() = _equipment.asStateFlow()
 
-  private val _muscleGroup: MutableStateFlow<List<MuscleGroup>> = MutableStateFlow(emptyList())
+  private var _muscleGroup: MutableStateFlow<List<MuscleGroup>> = MutableStateFlow(emptyList())
   val muscleGroup: StateFlow<List<MuscleGroup>>
-    get() = _muscleGroup.asStateFlow()
+    get() = _muscleGroup
 
   private val _utility: MutableStateFlow<List<Utility>> = MutableStateFlow(emptyList())
   val utility: StateFlow<List<Utility>>
@@ -54,14 +54,14 @@ constructor(
       println("ExercisesViewModel: collected exercises!")
       exercisesRepository.getExercises().collect { _exercises.value = it }
 
-      exercisesRepository.getAllEquipment().collect { _equipment.value = it }
-      exercisesRepository.getAllMuscleGroups().collect {
-        _muscleGroup.value = it
-        Log.i("MuscleGroup", _muscleGroup.value.toString())
-      }
+      Log.i("MuscleGroup", _muscleGroup.toString())
+
+      /*exercisesRepository.getAllEquipment().collect { _equipment.value = it }
+
+
       exercisesRepository.getAllUtilities().collect { _utility.value = it }
       exercisesRepository.getAllForces().collect { _force.value = it }
-      exercisesRepository.getAllMechanics().collect { _mechanic.value = it }
+      exercisesRepository.getAllMechanics().collect { _mechanic.value = it }*/
     }
   }
 
@@ -190,11 +190,30 @@ constructor(
     //        return exercise.first()
   }
 
+  fun getAllMuscleGroups() {
+    viewModelScope.launch {
+      exercisesRepository.getAllMuscleGroups().collect() { _muscleGroup.value = it }
+    }
+  }
+
+  fun updateMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
+    muscleGroupsChecked[muscleGroup] = checked
+  }
+
+  fun getAllEquipment() {
+    viewModelScope.launch {
+      exercisesRepository.getAllEquipment().collect() { _equipment.value = it }
+    }
+  }
+
+
   fun getMuscleGroupNameByID(muscleGroupID: String): String? {
     var muscleGroupName: String? = null
 
     viewModelScope.launch {
-      muscleGroupName = exercisesRepository.getMuscleGroupNameByID(muscleGroupID).firstOrNull()
+      exercisesRepository.getMuscleGroupNameByID(muscleGroupID).collect() {
+        muscleGroupName = it.firstOrNull()
+      }
     }
 
     return muscleGroupName

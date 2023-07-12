@@ -26,8 +26,8 @@ interface ExerciseDao {
     @Query("SELECT * FROM muscleRolesFunctions ORDER BY roleFunction ASC")
     fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>>
 
-    @Query("SELECT name FROM muscleGroups WHERE id = :muscleGroupID ORDER BY name ASC")
-    fun getMuscleGroupNameByID(muscleGroupID: String): List<String>
+    @Query("SELECT name FROM muscleGroups WHERE id = :muscleGroupID")
+    fun getMuscleGroupNameByID(muscleGroupID: String): Flow<List<String>>
 
 
     @Query("SELECT * FROM exercises WHERE name LIKE :exercise ORDER BY name ASC")
