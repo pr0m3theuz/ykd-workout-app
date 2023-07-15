@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
@@ -28,6 +30,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -35,14 +38,19 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,8 +60,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.components.BottomNavigationBar
+import com.example.myapplication.data.Equipment
 import com.example.myapplication.data.ExerciseModel
 import com.example.myapplication.data.MuscleGroup
+import kotlinx.coroutines.launch
 
 // TODO Create Advanced Search Options & Exercise Creation & Editing Screens
 // @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -109,12 +119,14 @@ fun ExercisesLazyColumn(
   }
 
   fun filterExercises(search: String) {
-    exercisesViewModel.filterExercises(search)
+    exercisesViewModel.setSearchExerciseName(search)
+    exercisesViewModel.filterExercises()
   }
 
   val context = LocalContext.current
-  var text by rememberSaveable { mutableStateOf("") }
-  var active by rememberSaveable { mutableStateOf(false) }
+  var query by rememberSaveable { mutableStateOf(exercisesViewModel.searchExerciseName) }
+  var active by remember { mutableStateOf(false) }
+  val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
   Scaffold(
     topBar = {
@@ -149,15 +161,7 @@ fun ExercisesLazyColumn(
         actions = {
           val iconColors = IconButtonDefaults.iconButtonColors()
           IconButton(
-            onClick = {
-              /*TODO*/
-              Toast.makeText(
-                context,
-                "TODO: On Click, Replace Title with Search Bar",
-                Toast.LENGTH_SHORT
-              )
-                .show()
-            },
+            onClick = { setSearchBarVisibility(!searchBarVisibility) },
             enabled = true,
             colors = iconColors
           ) {
@@ -184,11 +188,17 @@ fun ExercisesLazyColumn(
               unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
             )
           )
-
+        /*
+        AnimatedVisibility(
+          visible = searchBarVisibility,
+          enter = expandVertically(),
+          exit = shrinkVertically()
+        ) {
+        */
         SearchBar(
-          query = text,
+          query = query,
           onQueryChange = {
-            text = it
+            query = it
             filterExercises("%$it%")
           },
           onSearch = { active = false },
@@ -209,17 +219,73 @@ fun ExercisesLazyColumn(
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
         ) {}
+        //        }
+
         SelectedFiltersLazyRow(exercisesViewModel)
 
-        ExercisesLazyList(
-          exercises,
-          muscleGroups,
-          getMuscleGroup = { getMuscleGroups() },
-          navController
-        )
+        when {
+          exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
+          exercises.isNotEmpty() -> {
+            ExercisesLazyList(
+              exercises,
+              muscleGroups,
+              getMuscleGroup = { getMuscleGroups() },
+              navController,
+            )
+          }
+
+          exercises.isEmpty() && query.isBlank() -> {
+            Column(
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+              horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+              LinearProgressIndicator(
+                modifier = Modifier
+                  .semantics(mergeDescendants = true) {}
+                  .padding(10.dp),
+              )
+            }
+          }
+        }
+
+        /*        if (exercises.isNotEmpty()) {
+          ExercisesLazyList(
+            exercises,
+            muscleGroups,
+            getMuscleGroup = { getMuscleGroups() },
+            navController,
+          )
+        } else {
+          NoResultsFound(query = query)
+        }*/
       }
     }
   )
+}
+
+@Composable
+fun NoResultsFound(query: String) {
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(16.dp),
+    verticalArrangement = Arrangement.Top,
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Text(
+      text = "No exercises found for \"$query\".",
+      style = MaterialTheme.typography.titleMedium,
+      textAlign = TextAlign.Center
+    )
+    Text(
+      text = "Try refining your search criteria.",
+      style = MaterialTheme.typography.bodyMedium,
+      textAlign = TextAlign.Center,
+      modifier = Modifier.padding(top = 8.dp)
+    )
+  }
 }
 
 @Composable
@@ -227,13 +293,24 @@ private fun ExercisesLazyList(
   exercises: List<ExerciseModel>,
   muscleGroups: List<MuscleGroup>,
   getMuscleGroup: () -> Unit,
-  navController: NavController
+  navController: NavController,
 ) {
+  val lazyListState = rememberLazyListState()
+  // Remember a CoroutineScope to be able to launch
+  val coroutineScope = rememberCoroutineScope()
+
+  val firstVisibleItemIndex by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
+  if (firstVisibleItemIndex > 0) {
+    LaunchedEffect(lazyListState) { coroutineScope.launch { lazyListState.animateScrollToItem(0) } }
+  }
+
   getMuscleGroup()
+
   LazyColumn(
+    state = lazyListState,
     modifier = Modifier.fillMaxWidth(),
-    //                    verticalArrangement = Arrangement.spacedBy(8.dp),
-    //                    contentPadding = PaddingValues(0.dp)
+    //     verticalArrangement = Arrangement.spacedBy(8.dp),
+    //     contentPadding = PaddingValues(8.dp)
   ) {
     items(count = exercises.size, key = { index: Int -> exercises[index].lazyListItemID }) { index
       ->
@@ -256,29 +333,57 @@ private fun ExercisesLazyList(
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
+  val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsState()
+  val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsState()
+
+  val labelSmall = MaterialTheme.typography.labelLarge
+
   val filterChipColors =
     ChipDefaults.filterChipColors(
       backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
       contentColor = MaterialTheme.colorScheme.onTertiaryContainer
     )
+
+  fun setMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
+    exercisesViewModel.updateMuscleGroupsChecked(muscleGroup, checked)
+    exercisesViewModel.filterExercises()
+  }
+
+  fun setEquipmentsChecked(equipment: Equipment, checked: Boolean) {
+    exercisesViewModel.updateEquipmentsChecked(equipment, checked)
+    exercisesViewModel.filterExercises()
+  }
+
   LazyRow(
     modifier = Modifier /*.align(Alignment.Start)*/.padding(8.dp),
     horizontalArrangement = Arrangement.spacedBy(4.dp).also { Arrangement.Start },
     contentPadding = PaddingValues(0.dp)
   ) {
-    items(
-      items = exercisesViewModel.muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }
-    ) { muscleGroup ->
-      val checked = exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
-      fun updateState() {
-        exercisesViewModel.muscleGroupsChecked[muscleGroup] =
-          !exercisesViewModel.muscleGroupsChecked[muscleGroup]!!
+    items(items = muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }) { muscleGroup
+      ->
+      if (muscleGroupsChecked[muscleGroup] == true) {
+        FilterChip(
+          selected = muscleGroupsChecked[muscleGroup] == true,
+          onClick = { setMuscleGroupsChecked(muscleGroup, false) },
+          selectedIcon = {
+            Icon(
+              imageVector = Icons.Filled.Done,
+              contentDescription = "Localized Description",
+              modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+            )
+          },
+          colors = filterChipColors
+        ) {
+          Text(text = muscleGroup.name, style = labelSmall)
+        }
       }
-      if (checked) {
+    }
 
+    items(items = equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }) { equipment ->
+      if (equipmentsChecked[equipment] == true) {
         FilterChip(
-          selected = checked,
-          onClick = { updateState() },
+          selected = equipmentsChecked[equipment] == true,
+          onClick = { setEquipmentsChecked(equipment, false) },
           selectedIcon = {
             Icon(
               imageVector = Icons.Filled.Done,
@@ -288,49 +393,21 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
           },
           colors = filterChipColors
         ) {
-          Text(text = muscleGroup.name)
+          Text(text = equipment.name, style = labelSmall)
         }
       }
     }
-    items(
-      items = exercisesViewModel.equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }
-    ) { equipment ->
-      val checked = exercisesViewModel.equipmentsChecked[equipment]!!
-      fun updateState() {
-        exercisesViewModel.equipmentsChecked[equipment] =
-          !exercisesViewModel.equipmentsChecked[equipment]!!
-      }
-      if (checked) {
-        FilterChip(
-          selected = checked,
-          onClick = { updateState() },
-          selectedIcon = {
-            Icon(
-              imageVector = Icons.Filled.Done,
-              contentDescription = "Localized Description",
-              modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
-            )
-          },
-          colors = filterChipColors
-        ) {
-          Text(text = equipment.name)
-        }
-      }
-    }
+
     items(
       items = exercisesViewModel.movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }
     ) {
         movementType,
       ->
-      val checked = exercisesViewModel.movementTypesChecked[movementType]!!
-      fun updateState() {
-        exercisesViewModel.movementTypesChecked[movementType] =
-          !exercisesViewModel.movementTypesChecked[movementType]!!
-      }
-      if (checked) {
+      val checked = exercisesViewModel.movementTypesChecked[movementType] == true
+      if (exercisesViewModel.movementTypesChecked[movementType] == true) {
         FilterChip(
           selected = checked,
-          onClick = { updateState() },
+          onClick = {},
           selectedIcon = {
             Icon(
               imageVector = Icons.Filled.Done,
@@ -340,7 +417,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
           },
           colors = filterChipColors
         ) {
-          Text(text = movementType.printableName)
+          Text(text = movementType.printableName, style = labelSmall)
         }
       }
     }
@@ -362,7 +439,7 @@ fun ExerciseOptionsDropdownMenu() {
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
       DropdownMenuItem(
-        text = { androidx.compose.material3.Text("Create Exercise") },
+        text = { Text("Create Exercise") },
         onClick = { /* TODO Navigate to Create Exercise Screen*/ }
       )
     }

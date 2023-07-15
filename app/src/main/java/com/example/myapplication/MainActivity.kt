@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "workout") {
+                NavHost(navController = navController, startDestination = "exercises") {
                     addExercisesGraph(navController)
                     addWorkoutGraph(navController)
                     addProgramsGraph(navController)

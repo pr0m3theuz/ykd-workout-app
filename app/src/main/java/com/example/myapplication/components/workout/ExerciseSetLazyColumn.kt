@@ -22,43 +22,48 @@ import com.example.myapplication.data.SetModel
 
 @Composable
 fun ExercisesSetsScreen(
-    navController: NavController,
-    workoutViewModel: WorkoutViewModel = hiltViewModel(),
-    /*exercisesSets: List<ExerciseSets>,*/
+  navController: NavController,
+  workoutViewModel: WorkoutViewModel = hiltViewModel(),
+  /*exercisesSets: List<ExerciseSets>,*/
 ) {
-    val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
-    ExerciseSetLazyColumn(navController = navController, exercises = exercisesSets)
+  val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
+  ExerciseSetLazyColumn(navController = navController, exercises = exercisesSets)
 }
 
 @Composable
 fun ExerciseSetLazyColumn(
-    navController: NavController,
-    workoutViewModel: WorkoutViewModel = viewModel(),
-    exercises: List<ExerciseSets>,
+  navController: NavController,
+  workoutViewModel: WorkoutViewModel = viewModel(),
+  exercises: List<ExerciseSets>,
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth()
-        //  verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        items(exercises, key = { item -> item.exSetsLazyListItemID }) { exerciseSets ->
-            ExerciseScreen(navController = navController, _exerciseSets = exerciseSets)
+  fun cancelWorkout() {
+    workoutViewModel.cancelWorkout()
+    // navController.popBackStack()
+  }
 
-            exerciseSets.sets.forEachIndexed { index: Int, set: SetModel ->
-                SetItem(
-                    exerciseSets = exerciseSets,
-                    index = index,
-                    set = set,
-                    removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
-                )
-            }
+  LazyColumn(
+    modifier = Modifier.fillMaxWidth()
+    //  verticalArrangement = Arrangement.spacedBy(4.dp)
+  ) {
+    items(exercises, key = { item -> item.exSetsLazyListItemID }) { exerciseSets ->
+      ExerciseScreen(navController = navController, _exerciseSets = exerciseSets)
 
-            AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
-        }
+      exerciseSets.sets.forEachIndexed { index: Int, set: SetModel ->
+        SetItem(
+          exerciseSets = exerciseSets,
+          index = index,
+          set = set,
+          removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
+        )
+      }
 
-        item { AddExercise() }
-        item { CancelWorkout() }
-        item { Box(modifier = Modifier
-            .height(128.dp)
-            .fillMaxWidth()) }
+      AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
     }
+
+    item { AddExercise() }
+    item { CancelWorkout({ cancelWorkout() }) }
+    item { Box(modifier = Modifier
+      .height(128.dp)
+      .fillMaxWidth()) }
+  }
 }

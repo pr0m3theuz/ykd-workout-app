@@ -51,10 +51,10 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
 
   fun filterExercises(
     exercise: String,
-    //        bodyParts: List<String>,
-    //        equipments: List<String>
+    muscleGroupIDs: List<String>,
+    equipmentIDs: List<String>
     //        movementTypes: List<String>
   ): Flow<List<ExerciseModel>> {
-    return exerciseDao.filterExercises(exercise /*, bodyParts, equipments, movementTypes*/)
+    return exerciseDao.filterExercises(exercise, muscleGroupIDs, equipmentIDs /*movementTypes*/)
   }
 }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.myapplication.components.addExercisesList.ReplaceExerciseScreen
 import com.example.myapplication.components.exercise.EquateVolumeScreen
 import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
 import com.example.myapplication.data.ExerciseSets
@@ -37,6 +38,7 @@ fun ExerciseOptionsDropdownMenu(
     var openRestTimePicker by remember { mutableStateOf(false) }
     var openReplaceExerciseDialog by remember { mutableStateOf(false) }
     var openEquateVolumeDialog by remember { mutableStateOf(false) }
+    var openReplaceExerciseScreen by remember { mutableStateOf(false) }
 
     fun closeAddWarmUpSetsDialog(close: Boolean) {
         openAddWarmUpSetsDialog = close
@@ -180,7 +182,9 @@ fun ExerciseOptionsDropdownMenu(
 
         if (openReplaceExerciseDialog) {
             ReplaceExerciseDialog(
-                openDialog = { close -> closeReplaceExerciseDialog(close) }
+                openDialog = { closeReplaceExerciseDialog(it) },
+                closeMenu = { expandedExerciseOptionsDropdownMenu = true },
+                openReplaceExerciseScreen = { openReplaceExerciseScreen = it }
             )
         }
 
@@ -188,6 +192,14 @@ fun ExerciseOptionsDropdownMenu(
             EquateVolumeScreen(
                 openDialog = { close -> closeEquateVolumeDialog(close) },
                 exerciseSets = exerciseSets
+            )
+        }
+
+
+        if (openReplaceExerciseScreen) {
+            ReplaceExerciseScreen(
+                exerciseSets = exerciseSets,
+                setOpenDialog = { close -> openReplaceExerciseScreen = close }
             )
         }
     }

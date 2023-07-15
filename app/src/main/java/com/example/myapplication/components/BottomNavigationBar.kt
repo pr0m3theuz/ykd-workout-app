@@ -1,6 +1,7 @@
 package com.example.myapplication.components
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
@@ -11,9 +12,11 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -44,12 +47,17 @@ fun BottomNavigationBar(navController: NavController) {
     NavigationBar {
         items.forEach { item ->
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = stringResource(item.resourceId)) },
+                icon = {
+                    Icon(
+                        item.icon, contentDescription = stringResource(item.resourceId),
+                        modifier = Modifier.size(NavigationBarDefaults.Elevation)
+                    )
+                },
                 label = {
                     Text(
                         stringResource(item.resourceId),
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelSmall
                     )
                 },
                 selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,

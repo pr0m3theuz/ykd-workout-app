@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 @Composable
 fun DiscardWorkoutDialog(
     openDialog: (Boolean) -> Unit,
-    confirmCancelWorkout: (Boolean) -> Unit
+    cancelWorkout: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -25,7 +25,7 @@ fun DiscardWorkoutDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    confirmCancelWorkout(true)
+                    cancelWorkout()
                 }
             ) {
                 Text("Cancel Workout")
@@ -35,7 +35,6 @@ fun DiscardWorkoutDialog(
             TextButton(
                 onClick = {
                     openDialog(false)
-                    confirmCancelWorkout(false)
                 }
             ) {
                 Text("Resume")

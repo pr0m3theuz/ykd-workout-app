@@ -50,113 +50,157 @@ constructor(
     get() = _mechanic.asStateFlow()
 
   init {
+    viewModelScope.launch { exercisesRepository.getExercises().collect { _exercises.value = it } }
+  }
+
+  val movementTypes = MovementType.values().sortedBy { it.name }
+  fun getAllMuscleGroups() {
     viewModelScope.launch {
-      println("ExercisesViewModel: collected exercises!")
-      exercisesRepository.getExercises().collect { _exercises.value = it }
+      exercisesRepository.getAllMuscleGroups().collect() { _muscleGroup.value = it }
+    }
 
-      Log.i("MuscleGroup", _muscleGroup.toString())
-
-      /*exercisesRepository.getAllEquipment().collect { _equipment.value = it }
-
-
-      exercisesRepository.getAllUtilities().collect { _utility.value = it }
-      exercisesRepository.getAllForces().collect { _force.value = it }
-      exercisesRepository.getAllMechanics().collect { _mechanic.value = it }*/
+    if (_muscleGroupsChecked.value.isEmpty()) {
+      _muscleGroupsChecked.value =
+        _muscleGroup.value.map { it to false }.toMutableStateMap().toMutableMap()
     }
   }
 
-  val muscleGroups = _muscleGroup.value
-  val equipments = _equipment.value
-  val movementTypes = MovementType.values().sortedBy { it.name }
+  fun getAllEquipment() {
+    viewModelScope.launch {
+      exercisesRepository.getAllEquipment().collect() { _equipment.value = it }
+    }
+    if (_equipmentsChecked.value.isEmpty()) {
+      _equipmentsChecked.value =
+        _equipment.value.map { it to false }.toMutableStateMap().toMutableMap()
+    }
+  }
 
-  val muscleGroupsChecked = muscleGroups.map { it to false }.toMutableStateMap()
-  val equipmentsChecked = equipments.map { it to false }.toMutableStateMap()
-  val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
+  fun getAllUtilities() {
+    viewModelScope.launch {
+      exercisesRepository.getAllUtilities().collect() { _utility.value = it }
+    }
+  }
 
-  private val all = muscleGroupsChecked + movementTypesChecked + equipmentsChecked
-  val selected = all.filterValues { it }
+  fun getAllForces() {
+    viewModelScope.launch { exercisesRepository.getAllForces().collect() { _force.value = it } }
+  }
 
-  //    TODO Implement
-  //    private val _selectedCategories = MutableStateFlow(_selected)
-  //    val selectedCategories: StateFlow<Map<Enum<*>, Boolean>>
-  //        get() = _selectedCategories
+  fun getAllMechanics() {
+    viewModelScope.launch {
+      exercisesRepository.getAllMechanics().collect() { _mechanic.value = it }
+    }
+  }
 
-  //    TODO Implement
-  /*    fun onCategoryChange(category: Enum<*>) {
-      if (muscleGroupsChecked.containsKey(category)) {
-          muscleGroupsChecked[category as MuscleGroup] = false
-      } else if (equipmentsChecked.containsKey(category)) {
-          equipmentsChecked[category as Equipment] = false
-      } else if (movementTypesChecked.containsKey(category)) {
-          movementTypesChecked[category as MovementType] = false
+  fun getMuscleGroupNameByID(muscleGroupID: String): String? {
+    var muscleGroupName: String? = null
+
+    viewModelScope.launch {
+      exercisesRepository.getMuscleGroupNameByID(muscleGroupID).collect() {
+        muscleGroupName = it.firstOrNull()
       }
-  }*/
-
-  //    TODO Implement
-  /*fun getPrintableName(category: Enum<*>): String {
-      var printableName: String = ""
-
-      if (muscleGroups.contains(category)) {
-          muscleGroups.forEach {
-              if (it.name == category.name) {
-                  printableName = it.printableName
-              }
-          }
-      } else if (equipmentsChecked.containsKey(category)) {
-          equipments.forEach {
-              if (it.name == category.name) {
-                  printableName = it.printableName
-              }
-          }
-      } else if (movementTypesChecked.containsKey(category)) {
-          movementTypes.forEach {
-              if (it.name == category.name) {
-                  printableName = it.printableName
-              }
-          }
-      }
-      return printableName
-  }*/
-
-  fun filterExercises(search: String) {
-    var searchExerciseName = search
-
-    if (searchExerciseName.isEmpty()) {
-      searchExerciseName = "%%"
     }
 
-    //        TODO Implement Filter
-    /*val selectedMuscleGroups = mutableListOf<String>()
-    muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.printableName }
-        .forEach { selectedMuscleGroups.add(it.printableName) }
-    val selectedEquipments = mutableListOf<String>()
-    equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }
-        .forEach { selectedEquipments.add(it.printableName) }
-    val selectedMovementTypes = mutableListOf<String>()
-    movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }
-        .forEach { selectedMovementTypes.add(it.printableName) }
+    return muscleGroupName
+  }
 
-    if (selectedEquipments.isEmpty()) {
-        selectedEquipments.add("%%")
-    } else if (selectedMovementTypes.isEmpty()) {
-        selectedMovementTypes.add("%%")
-    } else if (selectedMuscleGroups.isEmpty()) {
-        selectedMuscleGroups.add("%%")
-    }*/
+  private val _muscleGroupsChecked = MutableStateFlow(mutableMapOf<MuscleGroup, Boolean>())
+  val muscleGroupsChecked
+    get() = _muscleGroupsChecked.asStateFlow()
 
-    //        TODO If _exercises is empty, display "No results" Message
+  private val _equipmentsChecked = MutableStateFlow(mutableMapOf<Equipment, Boolean>())
+  val equipmentsChecked
+    get() = _equipmentsChecked.asStateFlow()
+
+  val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
+
+  fun updateMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
+    _muscleGroupsChecked.value[muscleGroup] = checked
+    Log.i(
+      "updateMuscleGroupsChecked",
+      "${muscleGroup.name}: ${_muscleGroupsChecked.value[muscleGroup]}"
+    )
+    Log.i("updateMuscleGroupsChecked", "${_muscleGroupsChecked.value}")
+  }
+
+  fun getMuscleGroupsCheckedBoolean(muscleGroup: MuscleGroup): Boolean {
+    return _muscleGroupsChecked.value[muscleGroup] == true
+  }
+
+  fun updateEquipmentsChecked(equipment: Equipment, checked: Boolean) {
+    _equipmentsChecked.value[equipment] = checked
+    Log.i("updateEquipmentsChecked", "${_equipmentsChecked.value.filterValues { it }.keys}")
+  }
+
+  private var _searchExerciseName = ""
+
+  val searchExerciseName: String
+    get() = _searchExerciseName
+
+  fun setSearchExerciseName(value: String) {
+    _searchExerciseName = value
+  }
+
+  fun filterExercises() {
+
+    if (searchExerciseName.isEmpty()) {
+      _searchExerciseName = "%"
+    }
+
+    var selectedMuscleGroups = mutableListOf<String>()
+    _muscleGroupsChecked.value
+      .filterValues { !it }
+      .keys
+      .sortedBy { it.name }
+      .forEach { selectedMuscleGroups.add(it.id) }
+
+    var selectedEquipments = mutableListOf<String>()
+    _equipmentsChecked.value
+      .filterValues { !it }
+      .keys
+      .sortedBy { it.name }
+      .forEach { selectedEquipments.add(it.id) }
+
+    var selectedMovementTypes = mutableListOf<String>()
+    movementTypesChecked
+      .filterValues { !it }
+      .keys
+      .sortedBy { it.name }
+      .forEach { selectedMovementTypes.add(it.printableName) }
+
+    if (selectedMuscleGroups.size == muscleGroupsChecked.value.size) {
+      selectedMuscleGroups = mutableListOf("%")
+    }
+
+    if (selectedEquipments.size == equipmentsChecked.value.size) {
+      selectedEquipments = mutableListOf("%")
+    }
+
+    /*
+    if (selectedMovementTypes.size == movementTypesChecked.value.size) {
+      selectedMovementTypes = mutableListOf("%")
+    }
+    */
+
+    /*
+        Log.i("muscleGroups", "${_muscleGroup.value}")
+        Log.i("muscleGroups.map ", "${_muscleGroup.value.map { it to false }.toList()}")
+        Log.i("muscleGroupsChecked", "${_muscleGroupsChecked.value
+          .filterValues { it }.keys}")
+        Log.i("selectedMuscleGroups", selectedMuscleGroups.toString())
+        Log.i("selectedEquipments", selectedEquipments.toString())
+        Log.i("selectedMovementTypes", selectedMovementTypes.toString())
+    */
+
+    // TODO If _exercises is empty, display "No results" Message
     viewModelScope.launch {
       exercisesRepository
         .filterExercises(
-          searchExerciseName
-          //                selectedMuscleGroups.toList(),
-          //                selectedEquipments.toList()
+          exercise = searchExerciseName,
+          muscleGroupIDs = selectedMuscleGroups.toList(),
+          equipmentIDs = selectedEquipments.toList()
           //                movementTypes = selectedMovementTypes.toList()
         )
-        .collect() {
-          _exercises.value = it
-          Log.i("repository.filterExercises", it.toString())
-        }
+        .collect() { _exercises.value = it }
     }
   }
 
@@ -174,48 +218,11 @@ constructor(
    */
   fun getExerciseDetails(exerciseID: String?) {
     if (exerciseID != null) {
-      //            println("getExerciseDetails() called")
       viewModelScope.launch {
-        println("getExerciseDetails() viewModelScope launched")
         exercisesRepository.getExerciseDetails(exercisePK = exerciseID.toLong()).collect() {
           _exercise.value = it
-          //                    println("getExerciseDetails() query results it: $it")
-          //                    println("getExerciseDetails() query results exercise:
-          // ${_exercise.value}")
         }
       }
     }
-    println("getExerciseDetails() exercise.first(): ${_exercise.value}")
-    //        }
-    //        return exercise.first()
-  }
-
-  fun getAllMuscleGroups() {
-    viewModelScope.launch {
-      exercisesRepository.getAllMuscleGroups().collect() { _muscleGroup.value = it }
-    }
-  }
-
-  fun updateMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
-    muscleGroupsChecked[muscleGroup] = checked
-  }
-
-  fun getAllEquipment() {
-    viewModelScope.launch {
-      exercisesRepository.getAllEquipment().collect() { _equipment.value = it }
-    }
-  }
-
-
-  fun getMuscleGroupNameByID(muscleGroupID: String): String? {
-    var muscleGroupName: String? = null
-
-    viewModelScope.launch {
-      exercisesRepository.getMuscleGroupNameByID(muscleGroupID).collect() {
-        muscleGroupName = it.firstOrNull()
-      }
-    }
-
-    return muscleGroupName
   }
 }

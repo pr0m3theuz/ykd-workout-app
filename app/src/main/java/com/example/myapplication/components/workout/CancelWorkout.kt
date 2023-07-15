@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.myapplication.components.DiscardWorkoutDialog
 
 @Composable
-fun CancelWorkout() {
+fun CancelWorkout(cancelWorkout: () -> Unit) {
     val openDiscardWorkoutDialog = remember { mutableStateOf(false) }
 
     fun closeDiscardWorkoutDialog() {
@@ -24,7 +24,7 @@ fun CancelWorkout() {
     if (openDiscardWorkoutDialog.value) {
         DiscardWorkoutDialog(
             openDialog = { closeDiscardWorkoutDialog() },
-            confirmCancelWorkout = { /* TODO cancel -> (cancel) */ }
+            cancelWorkout = { cancelWorkout() }
         )
     }
 
