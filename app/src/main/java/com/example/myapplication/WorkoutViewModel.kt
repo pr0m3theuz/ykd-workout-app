@@ -25,11 +25,11 @@ import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetsRepository
 import com.example.myapplication.data.SetsWithExercise
 import com.example.myapplication.data.Workout
+import com.example.myapplication.data.WorkoutNote
 import com.example.myapplication.data.WorkoutNotesRepository
 import com.example.myapplication.data.WorkoutRepository
 import com.example.myapplication.data.WorkoutWithSetsAndExercise
 import com.example.myapplication.data.addWarmUpSets
-import com.example.myapplication.data.pinNotes
 import com.example.myapplication.data.resetSets
 import com.example.myapplication.data.setComplete
 import com.example.myapplication.data.updateSetRIR
@@ -355,14 +355,52 @@ constructor(
     _workout.value = _workoutData
   }
 
-  fun setWorkoutNote(note: String) {
-    _workoutData.notes = note
-    _workout.value = _workoutData
+  private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
+  private var _workoutNotes: MutableStateFlow<List<WorkoutNote>> =
+    MutableStateFlow(_workoutNotesData.toList())
+  val workoutNotes
+    get() = _workoutNotes.asStateFlow()
+
+  private fun getWorkoutNotes(workoutID: Long) /*: StateFlow<List<WorkoutNote>>*/ {
+    viewModelScope.launch {
+      // TODO get Workout Notes
+      workoutNotesRepository.getWorkoutNotes(workoutID).collect() { _workoutNotes.value = it }
+    }
   }
 
-  fun pinWorkoutNote(pinned: Boolean) {
-    _workoutData.pinNotes(pinned)
-    _workout.value = _workoutData
+  fun addWorkoutNote() {
+    _workoutNotesData.add(
+      WorkoutNote(
+        workoutID = _workout.value.workoutID,
+        programID = _workout.value.programID,
+        mesocycleID = _workout.value.mesocycleID,
+        microcycleID = _workout.value.microcycleID
+      )
+    )
+
+    _workoutNotes.value = _workoutNotesData.toList()
+  }
+
+  fun removeWorkoutNote(workoutNote: WorkoutNote) {
+    _workoutNotesData = _workoutNotesData.filter { it != workoutNote }.toMutableList()
+    _workoutNotes.value = _workoutNotesData.toList()
+  }
+
+  fun setWorkoutNote(workoutNote: WorkoutNote, note: String) {
+    val index = _workoutNotesData.indexOf(workoutNote)
+    _workoutNotesData[index].note = note
+
+    _workoutNotes.value = _workoutNotesData.toList()
+  }
+
+  fun pinWorkoutNote(workoutNote: WorkoutNote, pinned: Boolean) {
+    val index = _workoutNotes.value.indexOf(workoutNote)
+    _workoutNotes.value[index].pinned = pinned
+  }
+
+  fun updateWorkoutNotes(note: WorkoutNote) {
+    _workoutNotesData.first { it == note }.id = newID()
+    _workoutNotes.value = _workoutNotesData.toList()
   }
 
   private fun stopWorkoutTimer() {
@@ -370,7 +408,7 @@ constructor(
     _workoutData.workoutEnded = LocalDateTime.now()
     _workoutData.workoutDuration = workoutDuration
     _workout.value = _workoutData
-    //        TODO Navigate to Workout Complete Screen & Summary
+    // TODO Navigate to Workout Complete Screen & Summary
   }
 
   //    ExerciseSets
@@ -380,6 +418,7 @@ constructor(
   val exercisesSets
     get() = _exercisesSets.asStateFlow()
 
+  //  TODO What is this used for or purpose, Workout Summary?
   private var _allSetsData: MutableList<SetModel> = allSets()
   private var _allSets = MutableStateFlow(_allSetsData.toList())
   val allSets
@@ -388,21 +427,25 @@ constructor(
   fun addMultipleEmptyExerciseSets(exercisesSelectedToBeAddedToWorkout: List<ExerciseModel>) {
     val temporaryExerciseSets = _exercisesSets.value.toMutableList()
 
-    exercisesSelectedToBeAddedToWorkout.forEach {
+    exercisesSelectedToBeAddedToWorkout.forEach { exercise ->
+      var pinnedNotes = listOf<ExerciseNote>()
+
+      viewModelScope.launch {
+        exerciseNotesRepository.getPinnedExerciseNotes(exercise.exerciseID).collect() {
+          pinnedNotes = it
+        }
+      }
+
       temporaryExerciseSets.add(
         ExerciseSets(
           workoutID = _workout.value.workoutID,
           workoutUUID = _workout.value.uuid,
-          exercise = it,
-          sets = mutableListOf()
+          exercise = exercise,
+          sets = mutableListOf(),
+          notes = pinnedNotes.toMutableList(),
         )
       )
     }
-
-    /*        temporaryExerciseSets.forEach(){
-        it.exerciseSetsID = fakeULID()
-        it.exSetsLazyListItemID = newID()
-    }*/
 
     _exercisesSetsData = temporaryExerciseSets
     _exercisesSets.value = _exercisesSetsData.toList()
@@ -458,7 +501,61 @@ constructor(
     _exercisesSets.value = _exercisesSetsData.toMutableList()
   }
 
-  private fun updateSetData(
+  fun addExerciseNote(exerciseSets: ExerciseSets) {
+    val temporaryNotes: List<ExerciseNote> =
+      if (exerciseSets.notes.isNotEmpty()) {
+        exerciseSets.notes +
+                ExerciseNote(
+                  exerciseID = exerciseSets.exercise.exerciseID,
+                  workoutID = _workout.value.workoutID,
+                  programID = _workout.value.programID,
+                  mesocycleID = _workout.value.mesocycleID,
+                  microcycleID = _workout.value.microcycleID
+                )
+      } else {
+        listOf(
+          ExerciseNote(
+            exerciseID = exerciseSets.exercise.exerciseID,
+            workoutID = _workout.value.workoutID,
+            programID = _workout.value.programID,
+            mesocycleID = _workout.value.mesocycleID,
+            microcycleID = _workout.value.microcycleID
+          )
+        )
+      }
+    Log.i("addExerciseNote", "$temporaryNotes")
+
+    updateExercisesNotesData(exerciseSets, temporaryNotes.toMutableList())
+  }
+
+  fun removeExerciseNote(exerciseSets: ExerciseSets, exerciseNote: ExerciseNote) {
+    val temporaryNotes = exerciseSets.notes.minusElement(exerciseNote).toMutableList()
+
+    updateExercisesNotesData(exerciseSets, temporaryNotes)
+    Log.i("removeExerciseNote", "removeExerciseNote: ${temporaryNotes.size}")
+
+  }
+
+  fun pinExerciseNote(exerciseSets: ExerciseSets, exerciseNote: ExerciseNote, pinned: Boolean) {
+    val index = exerciseSets.notes.indexOf(exerciseNote)
+
+    val temporaryNotes = exerciseSets.notes
+    temporaryNotes[index].pinned = pinned
+
+    updateExercisesNotesData(exerciseSets, temporaryNotes)
+  }
+
+  private fun updateExercisesNotesData(
+    exerciseSets: ExerciseSets,
+    temporaryNotes: MutableList<ExerciseNote>,
+  ) {
+    val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
+    _exercisesSetsData[index] =
+      exerciseSets.copy(exSetsLazyListItemID = newID(), notes = temporaryNotes)
+    _exercisesSets.value = _exercisesSetsData.toMutableList()
+  }
+
+  private fun updateExerciseSetIDData(
     exerciseSets: ExerciseSets,
   ) {
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
@@ -476,6 +573,17 @@ constructor(
     return setsList
   }
 
+  private fun allExerciseNotes(): MutableList<ExerciseNote> {
+    val notesList = mutableListOf<ExerciseNote>()
+    _exercisesSetsData.forEach { exerciseSet ->
+      exerciseSet.notes.forEach { note -> notesList.add(note) }
+    }
+
+    notesList.removeAll { it.note.isNullOrBlank() }
+
+    return notesList
+  }
+
   fun getSetData(setUUID: UUID): SetModel {
     return allSets().first { it.uuid == setUUID }
   }
@@ -486,32 +594,32 @@ constructor(
       newWeight = newWeight,
     )
 
-    updateSetData(exerciseSets)
+    updateExerciseSetIDData(exerciseSets)
   }
 
   fun updateSetReps(exerciseSets: ExerciseSets, setUUID: UUID, newReps: Int?) {
     exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
-    updateSetData(exerciseSets)
+    updateExerciseSetIDData(exerciseSets)
   }
 
   fun updateSetRIR(exerciseSets: ExerciseSets, setUUID: UUID, newRIR: Double?) {
     exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
-    updateSetData(exerciseSets)
+    updateExerciseSetIDData(exerciseSets)
   }
 
   fun updateSetRPE(exerciseSets: ExerciseSets, setUUID: UUID, newRPE: Double?) {
     exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
-    updateSetData(exerciseSets)
+    updateExerciseSetIDData(exerciseSets)
   }
 
   fun setComplete(exerciseSets: ExerciseSets, setUUID: UUID, setComplete: Boolean) {
     exerciseSets.setComplete(setUUID, setComplete)
-    updateSetData(exerciseSets)
+    updateExerciseSetIDData(exerciseSets)
   }
 
   fun updateSetType(exerciseSets: ExerciseSets, setUUID: UUID, setTypeID: Int) {
     exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
-    updateSetData(exerciseSets)
+    updateExerciseSetIDData(exerciseSets)
   }
 
   fun addWarmUpSets(exerciseSets: ExerciseSets, warmUpSets: List<SetModel>) {
@@ -582,35 +690,38 @@ constructor(
       }
     }
 
-    return countSetsCompleted == countSets
+    return countSetsCompleted == countSets && countSets > 0
   }
 
-  fun addExerciseNote(note: ExerciseNote) {
+  fun saveExerciseNote(note: ExerciseNote) {
     //        TODO Save Exercise Note to Database when Workout is saved
   }
 
-  fun getExerciseNoteByExercise(exerciseID: Long): StateFlow<List<ExerciseNote>> {
-    val exerciseNotes: MutableStateFlow<List<ExerciseNote>> = MutableStateFlow(emptyList())
-
-    viewModelScope.launch {
-      exerciseNotesRepository.getExerciseNotes(exerciseID).collect() { exerciseNotes.value = it }
-    }
-
-    return exerciseNotes.asStateFlow()
+  fun saveWorkoutNote(note: WorkoutNote) {
+    //        TODO Save Workout Notes to Database when Workout is saved
   }
 
-  fun getWorkoutNotes(): StateFlow<List<ExerciseNote>> {
-    val workoutNotes: MutableStateFlow<List<ExerciseNote>> = MutableStateFlow(emptyList())
+  fun saveExerciseNotes() {
+    //      TODO Save Exercise Notes to Database when Workout is saved
+  }
+
+  private fun getPinnedExerciseNotesByExercise(
+    exerciseSets: ExerciseSets
+  ): MutableList<ExerciseNote> {
+    var pinnedNotes = listOf<ExerciseNote>()
 
     viewModelScope.launch {
-      // TODO get Workout Notes
+      exerciseNotesRepository.getPinnedExerciseNotes(exerciseSets.exercise.exerciseID).collect() {
+        pinnedNotes = it
+      }
     }
 
-    return workoutNotes.asStateFlow()
+    return pinnedNotes.toMutableList()
   }
 
   fun createWorkoutFromHistoryOrTemplate(workout: Workout) {
-
+    //    TODO Think out how to get Exercise Notes from previous workout or last time the exercise
+    // was performed
     val newWorkout =
       Workout(
         uuid = workout.uuid,
@@ -621,6 +732,8 @@ constructor(
         mesocycleID = workout.mesocycleID,
         microcycleID = workout.microcycleID
       )
+
+    getWorkoutNotes(workout.workoutID)
 
     var newExerciseSets: List<WorkoutWithSetsAndExercise> = emptyList()
     var exercisesSetsMap: Map<ExerciseModel, List<SetsWithExercise>> = emptyMap()
@@ -638,14 +751,15 @@ constructor(
     newExerciseSets.forEach() { workoutWithSetsAndExercise ->
       exercisesSetsMap = workoutWithSetsAndExercise.sets.groupBy { it.exercise }
     }
-
-    exercisesSetsMap.forEach() {
+    // TODO Test
+    exercisesSetsMap.forEach() { exercise ->
       exercisesSets.add(
         ExerciseSets(
           workoutID = newWorkout.workoutID,
           workoutUUID = newWorkout.uuid,
-          exercise = it.key,
-          sets = MutableList(it.value.size) { i -> it.value[i].set },
+          exercise = exercise.key,
+          sets = MutableList(exercise.value.size) { index -> exercise.value[index].set },
+          notes = mutableListOf()
         )
       )
     }
@@ -653,25 +767,19 @@ constructor(
     exercisesSets.forEach { exerciseSets -> exerciseSets.resetSets(newWorkout) }
     _workoutData = newWorkout
     _exercisesSetsData = exercisesSets
+
+    exercisesSets.forEach { exerciseSets ->
+      exerciseSets.notes.addAll(getPinnedExerciseNotesByExercise(exerciseSets))
+    }
   }
 
-  /*    private val exercisesSelectedToBeAddedToWorkout: MutableSet<ExerciseModel> = mutableSetOf()
-
-  fun selectExercise(exercise: ExerciseModel, isSelected: Boolean) {
-      if (isSelected) {
-          exercisesSelectedToBeAddedToWorkout.add(exercise)
-      } else {
-          exercisesSelectedToBeAddedToWorkout.remove(exercise)
-      }
-  }*/
-
-  /*    fun cancelExerciseSelection() {
-      clearExercisesSelectedToBeAddedToWorkout()
-  }*/
-
-  /*    private fun clearExercisesSelectedToBeAddedToWorkout() {
-      exercisesSelectedToBeAddedToWorkout.clear()
-  }*/
+  /**
+   * Saves the workout data to the database asynchronously. The function launches a coroutine in the
+   * viewModelScope to perform the database operations. It first inserts the workout data using the
+   * workoutRepository. Then, it iterates over all sets in the _workoutData and inserts each set if
+   * it is completed into the database using the setsRepository. The function does not return any
+   * value.
+   */
 
   /**
    * Saves the workout data to the database asynchronously. The function launches a coroutine in the
@@ -684,10 +792,20 @@ constructor(
     viewModelScope.launch {
       workoutRepository.insertWorkout(_workoutData)
 
+      for (workoutNote in _workoutNotes.value) {
+        if (workoutNote.note?.isNotBlank() == true) {
+          workoutNotesRepository.insertWorkoutNote(workoutNote)
+        }
+      }
+
       allSets().forEach {
         if (it.setCompleted) {
           setsRepository.insertSetModel(it)
         }
+      }
+
+      allExerciseNotes().forEach() { exerciseNote ->
+        exerciseNotesRepository.insertExerciseNote(exerciseNote)
       }
     }
   }
@@ -730,11 +848,9 @@ private fun initWorkout(): Workout {
     in 0..11 -> {
       Workout(name = "Morning Workout")
     }
-
     in 12..17 -> {
       Workout(name = "Afternoon Workout")
     }
-
     else -> {
       Workout(name = "Evening Workout")
     }
@@ -771,7 +887,8 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
           progressionSchemeID = Random().nextInt(), // TODO Replace with
           // progressionScheme.progressionSchemeID
         )
-      }
+      },
+      notes = mutableListOf()
     )
   }
 }

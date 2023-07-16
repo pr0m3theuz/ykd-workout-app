@@ -1,6 +1,5 @@
 package com.example.myapplication.data
 
-import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -43,8 +42,8 @@ data class Workout(
     val uuid: UUID = UUID.randomUUID(),
     var name: String,
     var workoutAuthor: String? = null,
-//    TODO Remove
-    var notes: String? = null, // TODO Create Note Object that takes a string and a boolean for pinned status
+//    TODO Remove. Deprecated.
+    var notes: String? = null,
     var pinnedNotes: String? = null,
     var notesPinned: Boolean = false,
 //
@@ -59,10 +58,10 @@ data class Workout(
     @ColumnInfo(name = "microcycleID") val microcycleID: Long? = null,
 )
 
-fun Workout.pinNotes(pinned: Boolean) {
-    notesPinned = pinned
-    Log.i("pinNotes()", notesPinned.toString())
-}
+//fun Workout.pinNotes(pinned: Boolean) {
+//    notesPinned = pinned
+//    Log.i("pinNotes()", notesPinned.toString())
+//}
 
 @Entity(primaryKeys = ["workoutID", "exerciseSetsID"/*, "exerciseNotePrimaryKey"*/])
 data class WorkoutExerciseSetsCrossRef(

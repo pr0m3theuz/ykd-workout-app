@@ -42,6 +42,7 @@ data class ExerciseSets(
     @Embedded val exercise: ExerciseModel,
     @Relation(parentColumn = "exerciseID", entityColumn = "setID", entity = SetModel::class)
     val sets: MutableList<SetModel>,
+    val notes: MutableList<ExerciseNote>,
 )
 
 // TODO to use for exercise history

@@ -45,9 +45,35 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
   }
 
   @WorkerThread
-  suspend fun updateExercise(exercise: ExerciseModel) {
+  fun updateExercise(exercise: ExerciseModel) {
     exerciseDao.updateExercise(exercise)
   }
+
+  @WorkerThread
+  fun updateWeightUnitsforExercise(exerciseID: Long, weightUnit: String) {
+    exerciseDao.updateWeightUnitsforExercise(exerciseID, weightUnit)
+  }
+
+  @WorkerThread
+  fun updateWorkingSetRestTimerforExercise(exerciseID: Long, restDuration: Long) {
+    exerciseDao.updateWorkingSetRestTimerforExercise(exerciseID, restDuration)
+  }
+
+  @WorkerThread
+  fun updateWarmUpSetRestTimerforExercise(exerciseID: Long, restDuration: Long) {
+    exerciseDao.updateWarmUpSetRestTimerforExercise(exerciseID, restDuration)
+  }
+
+  @WorkerThread
+  fun enableWorkingSetRestTimerforExercise(exerciseID: Long, enable: Boolean) {
+    exerciseDao.enableWorkingSetRestTimerforExercise(exerciseID, enable)
+  }
+
+  @WorkerThread
+  fun enableWarmUpSetRestTimerforExercise(exerciseID: Long, enable: Boolean) {
+    exerciseDao.enableWarmUpSetRestTimerforExercise(exerciseID, enable)
+  }
+
 
   fun filterExercises(
     exercise: String,

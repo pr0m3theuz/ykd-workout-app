@@ -36,7 +36,6 @@ import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.FinishWorkoutButton
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
-import com.example.myapplication.components.exercise.WorkoutNotes
 import com.example.myapplication.components.setRestTimer.RestTimerButton
 
 // TODO Takes a Workout Object
@@ -51,7 +50,10 @@ fun WorkoutScreen(navController: NavHostController = rememberNavController()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewModel) {
-  val workout by workoutViewModel.workout.collectAsState()
+  //  val workout by workoutViewModel.workout.collectAsState()
+  val workoutName by workoutViewModel.workoutName.collectAsState()
+
+  val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
 
   val openFinishWorkoutDialog = remember { mutableStateOf(false) }
 
@@ -60,10 +62,8 @@ fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewMo
     openFinishWorkoutDialog.value = false
   }
 
-  val workoutName by workoutViewModel.workoutName.collectAsState()
-//  val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
-
   val context = LocalContext.current
+
 
   Scaffold(
     topBar = {
@@ -73,7 +73,7 @@ fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewMo
             workoutName,
             setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) }
           )
-          /*                    Text(
+          /* Text(
               text = "Exercises",
               color = MaterialTheme.colorScheme.onSurface,
               fontSize = 20.sp,
@@ -102,7 +102,7 @@ fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewMo
         },
         actions = {
           RestTimerButton()
-          WorkoutOptionsDropdownMenu()
+          WorkoutOptionsDropdownMenu(addWorkoutNote = { workoutViewModel.addWorkoutNote() })
         },
       )
     },
@@ -119,13 +119,11 @@ fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewMo
         WorkoutDuration()
         FinishWorkoutButton()
       }
-      WorkoutNotes(
-        placeholder = "Workout Note",
-        pinNote = { pin -> workoutViewModel.pinWorkoutNote(pin) },
-        notesPinned = workout.notesPinned
-      )
 
-      ExercisesSetsScreen(navController = navController /*exercisesSets = exercisesSets*/)
+      ExercisesSetsScreen(
+        navController = navController,
+
+        )
     }
   }
 }
@@ -143,12 +141,13 @@ private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = viewModel()) {
 @Composable
 private fun WorkoutNameTextField(
   workoutName: String,
+  editable: Boolean = false,
   setWorkoutName: (String) -> Unit,
 ) {
   var name by remember { mutableStateOf(workoutName) }
-
+  //
   BasicTextField(
-    enabled = false,
+    enabled = editable,
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
     TextStyle(
@@ -160,6 +159,6 @@ private fun WorkoutNameTextField(
     onValueChange = {
       name = it
       setWorkoutName(it)
-    }
+    },
   )
 }

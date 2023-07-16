@@ -3,6 +3,7 @@ package com.example.myapplication.components.workout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,13 +26,12 @@ fun AddExercise() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = {
-            /*TODO Do something!*/
-            setOpenDialog(true)
-        }) {
+        TextButton(
+            onClick = { setOpenDialog(true) },
+            modifier = Modifier.weight(1.0f, fill = true),
+            shape = MaterialTheme.shapes.extraSmall,
+        ) {
             Text("Add Exercise")
         }
     }
 }
-
-// TODO Create Add Exercise Dialog

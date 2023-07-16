@@ -94,7 +94,7 @@ data class ExerciseNote(
 )
 data class WorkoutNote(
     @PrimaryKey(autoGenerate = true) val primaryKey: Long = fakeULID(),
-    val id: Long = newID(),
+    var id: Long = newID(),
     val uuid: UUID = UUID.randomUUID(),
     var note: String? = null,
     var pinned: Boolean = false,

@@ -14,11 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.tooling.preview.Preview
 
-@Preview
 @Composable
-fun WorkoutOptionsDropdownMenu() {
+fun WorkoutOptionsDropdownMenu(addWorkoutNote: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
     Box {
@@ -29,21 +27,25 @@ fun WorkoutOptionsDropdownMenu() {
                 tint = MaterialTheme.colorScheme.primary
             )
         }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
                 text = { Text("Rename Workout") },
-                onClick = { /* TODO */ }
+                onClick = { /* TODO */
+                    expanded = false
+                }
             )
             DropdownMenuItem(
-                text = { Text("Add Workout Notes") },
-                onClick = { /* TODO Show Workout Notes */ }
+                text = { Text("Add Workout Note") },
+                onClick = {
+                    addWorkoutNote()
+                    expanded = false
+                }
             )
             DropdownMenuItem(
                 text = { Text("Adjust Start/End Time") },
-                onClick = { /* TODO */ }
+                onClick = { /* TODO */
+                    expanded = false
+                }
             )
         }
     }

@@ -269,11 +269,9 @@ fun SetContent(
                     repetitionsInReserveText =
                         when {
                             rir.isBlank() -> ""
-                            else ->
-                                checkDoubleInput(rir)
-                                    ?.takeIf { it.toDouble() in 0.0..10.0 }
-                                    ?.toString()
-                                    ?: repetitionsInReserveText
+                            else -> checkDoubleInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }
+                                ?.toString()
+                                ?: repetitionsInReserveText
                         }
                 },
                 onImeAction = { updateRIR(repetitionsInReserveText) }
@@ -343,8 +341,7 @@ private fun ExerciseRepsTextField(
     onImeAction: () -> Unit = {},
 ) {
     BasicTextField(
-        modifier =
-        modifier.padding(PaddingValues(4.dp)),
+        modifier = modifier.padding(PaddingValues(4.dp)),
         textStyle =
         TextStyle(
             fontSize = 5.em,

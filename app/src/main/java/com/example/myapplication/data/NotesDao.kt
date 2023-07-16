@@ -2,6 +2,7 @@ package com.example.myapplication.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 // TODO Switch to use UUIDs instead of IDs
 @Dao
@@ -83,6 +84,9 @@ interface WorkoutNotesDao {
     @Query("SELECT * FROM workoutNotes WHERE workoutID = :workoutID ORDER BY id ASC")
     fun getWorkoutNotes(workoutID: Long): Flow<List<WorkoutNote>>
 
+    @Query("SELECT * FROM workoutNotes WHERE uuid = :workoutUUID ORDER BY id ASC")
+    fun getWorkoutNotesByUUID(workoutUUID: UUID): Flow<List<WorkoutNote>>
+
     @Query(
         "SELECT * FROM workoutNotes " +
                 "WHERE workoutID = :workoutID AND pinned = :pinned " +
@@ -97,6 +101,22 @@ interface WorkoutNotesDao {
         mesocyclePinned: Boolean = false,
         microcyclePinned: Boolean = false,
     ): Flow<List<WorkoutNote>>
+
+    @Query(
+        "SELECT * FROM workoutNotes " +
+                "WHERE uuid = :workoutUUID AND pinned = :pinned " +
+                "AND programPinned = :programPinned AND mesocyclePinned = :mesocyclePinned " +
+                "AND microcyclePinned = :microcyclePinned " +
+                "ORDER BY id ASC"
+    )
+    fun getPinnedWorkoutNotesByUUID(
+        workoutUUID: UUID,
+        pinned: Boolean = true,
+        programPinned: Boolean = false,
+        mesocyclePinned: Boolean = false,
+        microcyclePinned: Boolean = false,
+    ): Flow<List<WorkoutNote>>
+
 
     @Query(
         "SELECT * FROM workoutNotes " +

@@ -1,6 +1,5 @@
 package com.example.myapplication.components
 
-import android.util.Log
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material3.AlertDialog
@@ -26,11 +25,6 @@ fun FinishWorkoutButton(
         openFinishWorkoutDialog.value = false
     }
 
-    Log.i(
-        "workoutViewModel.checkAllSetsComplete()",
-        workoutViewModel.checkAllSetsComplete().toString()
-    )
-
     fun openFinishWorkoutDialog() {
         if (workoutViewModel.checkAllSetsComplete()) {
             openFinishWorkoutDialog.value = true
@@ -52,7 +46,6 @@ fun FinishWorkoutButton(
             confirmFinishWorkout = { workoutViewModel.finishWorkout() }
         )
     }
-    Log.i("openPartialFinishWorkoutDialog.value", openPartialFinishWorkoutDialog.value.toString())
 
     TextButton(
         onClick = { openFinishWorkoutDialog() }

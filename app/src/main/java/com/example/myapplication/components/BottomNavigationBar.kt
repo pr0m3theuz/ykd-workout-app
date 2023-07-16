@@ -12,13 +12,13 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,17 +29,18 @@ import com.example.myapplication.myiconpack.MyIconPack
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
-//    var selectedItem by remember { mutableIntStateOf(0) }
-//    val items = listOf("Profile", "History", "Workout", "Programs", "Exercise", "Settings")
+    //    var selectedItem by remember { mutableIntStateOf(0) }
+    //    val items = listOf("Profile", "History", "Workout", "Programs", "Exercise", "Settings")
 
-    val items = listOf(
-        Screens.Profile,
-        Screens.History,
-        Screens.Workout,
-        Screens.Programs,
-        Screens.Exercise,
-        Screens.Settings
-    )
+    val items =
+        listOf(
+            Screens.Profile,
+            Screens.History,
+            Screens.Workout,
+            Screens.Programs,
+            Screens.Exercise,
+            Screens.Settings
+        )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -49,8 +50,9 @@ fun BottomNavigationBar(navController: NavController) {
             NavigationBarItem(
                 icon = {
                     Icon(
-                        item.icon, contentDescription = stringResource(item.resourceId),
-                        modifier = Modifier.size(NavigationBarDefaults.Elevation)
+                        item.icon,
+                        contentDescription = stringResource(item.resourceId),
+                        modifier = Modifier.size(24.dp)
                     )
                 },
                 label = {
@@ -66,9 +68,7 @@ fun BottomNavigationBar(navController: NavController) {
                         // Pop up to the start destination of the graph to
                         // avoid building up a large stack of destinations
                         // on the back stack as users select items
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         // Avoid multiple copies of the same destination when
                         // reselecting the same item
                         launchSingleTop = true

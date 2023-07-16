@@ -57,6 +57,22 @@ interface ExerciseDao {
   @Update
   fun updateExercise(exercise: ExerciseModel)
 
+  @Query("UPDATE exercises SET weightUnit=:weightUnit WHERE exerciseID=:exerciseID")
+  fun updateWeightUnitsforExercise(exerciseID: Long, weightUnit: String)
+
+  @Query("UPDATE exercises SET workingSetRestInWholeMilliseconds=:restDuration WHERE exerciseID=:exerciseID")
+  fun updateWorkingSetRestTimerforExercise(exerciseID: Long, restDuration: Long)
+
+  @Query("UPDATE exercises SET warmUpSetRestInWholeMilliseconds=:restDuration WHERE exerciseID=:exerciseID")
+  fun updateWarmUpSetRestTimerforExercise(exerciseID: Long, restDuration: Long)
+
+  @Query("UPDATE exercises SET workingSetRestTimerEnabled=:enable WHERE exerciseID=:exerciseID")
+  fun enableWorkingSetRestTimerforExercise(exerciseID: Long, enable: Boolean)
+
+  @Query("UPDATE exercises SET warmUpSetRestTimerEnabled=:enable WHERE exerciseID=:exerciseID")
+  fun enableWarmUpSetRestTimerforExercise(exerciseID: Long, enable: Boolean)
+
+
   @Delete
   fun deleteExercise(exercise: ExerciseModel)
 }
