@@ -1,0 +1,114 @@
+Column(Modifier.fillMaxWidth().fillMaxHeight().padding(contentPadding)) {
+  WorkoutSearchBar()
+  Column(modifier = Modifier.padding(12.dp).verticalScroll(scrollState)) {
+    Row(Modifier.fillMaxWidth().padding(padding8)) {
+      Text("Continue Program", style = titleMedium)
+    }
+
+    CurrentProgramCard(navController)
+
+    Row(Modifier.fillMaxWidth().padding(padding8)) { Text("Quick Start", style = titleMedium) }
+
+    Button(onClick = { /*TODO*/}) {
+      Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
+      Text(text = "Start An Empty Workout")
+    }
+
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text(text = "Programs", style = titleMedium)
+
+      Box() {
+        Row() {
+          IconButton(onClick = { /*TODO*/}) {
+            Icon(
+              imageVector = Icons.Outlined.FileUpload,
+              contentDescription = "Import/Export New Program"
+            )
+          }
+          IconButton(onClick = { /*TODO*/}) {
+            Icon(
+              imageVector = Icons.Outlined.CreateNewFolder,
+              contentDescription = "Add New Program"
+            )
+          }
+        }
+      }
+    }
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Button(onClick = { /*TODO*/}) {
+        Icon(imageVector = Icons.Outlined.Assignment, contentDescription = "Add New Workout")
+        Text(text = "New Workout")
+      }
+    }
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      IconButton(onClick = { setProgramVisible(!programVisible) }) {
+        Icon(
+          imageVector = if (programVisible) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+          contentDescription = "Show workouts for this program"
+        )
+      }
+      Text(
+        text = "Program Name/Macrocycle (Workout Count)",
+        style = MaterialTheme.typography.bodySmall
+      )
+      IconButton(onClick = { /*TODO*/}) {
+        Icon(
+          imageVector = Icons.Outlined.MoreVert,
+          contentDescription = "Localized Description"
+        )
+      }
+    }
+
+    ProgramLists(navController, visible = programVisible)
+
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      IconButton(onClick = { /*TODO*/}) {
+        Icon(
+          imageVector = Icons.Outlined.ExpandMore,
+          contentDescription = "Show workouts for this program"
+        )
+      }
+      Text(text = "Mesocycle (Workout Count)")
+      IconButton(onClick = { /*TODO*/}) {
+        Icon(
+          imageVector = Icons.Outlined.MoreVert,
+          contentDescription = "Localized Description"
+        )
+      }
+    }
+
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      IconButton(onClick = { /*TODO*/}) {
+        Icon(imageVector = Icons.Outlined.ExpandMore, contentDescription = "Show workouts")
+      }
+      Text(text = "Workouts (Workout Count)")
+      IconButton(onClick = { /*TODO*/}) {
+        Icon(
+          imageVector = Icons.Outlined.MoreVert,
+          contentDescription = "Localized Description"
+        )
+      }
+    }
+    WorkoutCard()
+  }
+}

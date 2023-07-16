@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Screens.Workout.route) {
+                NavHost(navController = navController, startDestination = Screens.Programs.route) {
                     addExercisesGraph(navController)
                     addWorkoutGraph(navController)
                     addProgramsGraph(navController)

@@ -1,5 +1,10 @@
 package com.example.myapplication.components.programs
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,8 +13,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
@@ -17,6 +22,7 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material.icons.outlined.CreateNewFolder
+import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.LibraryBooks
@@ -40,6 +46,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
@@ -51,389 +58,411 @@ import com.example.myapplication.components.BottomNavigationBar
 // TODO Add a card/button to add new mesocycle/block
 // TODO Add animatedVisibility Function to expand more/less buttons
 // TODO Create screens to show all programs and all workouts respectively
+// TODO Fix MoreVert Icon Alignment on all composables
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 // @Preview
 @Composable
 fun ProgramsScreen(navController: NavController) {
-    val padding8 = 8.dp
-    val titleMedium = MaterialTheme.typography.titleMedium
-    val scrollState = rememberScrollState()
+  val padding8 = 8.dp
+  val titleMedium = MaterialTheme.typography.titleMedium
+  val scrollState = rememberScrollState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Programs", style = MaterialTheme.typography.titleLarge)
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.navigateUp()
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            contentDescription = "Go to the previous screen"
-                        )
-                    }
-                },
-                actions = {
-                    ProgramDetailsOptionsDropdownMenu()
-                }
-            )
-        },
-        bottomBar = { BottomNavigationBar(navController = navController) }
-    ) { contentPadding ->
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(contentPadding)
-        ) {
-            WorkoutSearchBar()
-            Column(modifier = Modifier
-                .padding(12.dp)
-                .verticalScroll(scrollState)) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(padding8)
-                ) { Text("Continue Program", style = titleMedium) }
+  val (programVisible, setProgramVisible) = rememberSaveable { mutableStateOf(false) }
+  val (mesocycleVisible, setMesocycleVisible) = rememberSaveable { mutableStateOf(false) }
+  val (workoutVisible, setWorkoutVisible) = rememberSaveable { mutableStateOf(false) }
 
-                CurrentProgramCard(navController)
-
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(padding8)
-                ) { Text("Quick Start", style = titleMedium) }
-
-                Button(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Add,
-                        contentDescription = "Localized Description"
-                    )
-                    Text(text = "Start An Empty Workout")
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Programs", style = titleMedium)
-
-                    Box() {
-                        Row() {
-                            IconButton(onClick = { /*TODO*/ }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.FileUpload,
-                                    contentDescription = "Import/Export New Program"
-                                )
-                            }
-                            IconButton(onClick = { /*TODO*/ }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.CreateNewFolder,
-                                    contentDescription = "Add New Program"
-                                )
-                            }
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Assignment,
-                            contentDescription = "Add New Workout"
-                        )
-                        Text(text = "New Workout")
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ExpandMore,
-                            contentDescription = "Show workouts for this program"
-                        )
-                    }
-                    Text(text = "Program Name/Macrocycle (Workout Count)")
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "Localized Description"
-                        )
-                    }
-                }
-
-                ProgramCard(navController)
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ExpandMore,
-                            contentDescription = "Show workouts for this program"
-                        )
-                    }
-                    Text(text = "Mesocycle (Workout Count)")
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "Localized Description"
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ExpandMore,
-                            contentDescription = "Show workouts"
-                        )
-                    }
-                    Text(text = "Workouts (Workout Count)")
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "Localized Description"
-                        )
-                    }
-                }
-                WorkoutCard()
-            }
-        }
+  fun getExpandCollapseIcon(visible: Boolean): ImageVector {
+    return if (visible) {
+      Icons.Outlined.ExpandLess
+    } else {
+      Icons.Outlined.ExpandMore
     }
+  }
+
+  Scaffold(
+    topBar = {
+      TopAppBar(
+        title = { Text(text = "Programs", style = MaterialTheme.typography.titleLarge) },
+        navigationIcon = {
+          IconButton(
+            onClick = { navController.navigateUp() },
+          ) {
+            Icon(
+              imageVector = Icons.Outlined.ArrowBack,
+              tint = MaterialTheme.colorScheme.onSurface,
+              contentDescription = "Go to the previous screen"
+            )
+          }
+        },
+        actions = { ProgramDetailsOptionsDropdownMenu() }
+      )
+    },
+    bottomBar = { BottomNavigationBar(navController = navController) }
+  ) { contentPadding ->
+
+
+    LazyColumn(
+      contentPadding = contentPadding,
+      modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .padding(horizontal = 12.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+      stickyHeader { WorkoutSearchBar() }
+
+      item {
+        Text("Continue Program", style = titleMedium)
+        CurrentProgramCard(navController)
+      }
+
+      item {
+        Text("Quick Start", style = titleMedium)
+        Button(onClick = { /*TODO*/ }) {
+          Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
+          Text(text = "Start An Empty Workout")
+        }
+      }
+
+      item {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text(text = "Programs", style = titleMedium)
+
+          Box {
+            Row {
+              IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                  imageVector = Icons.Outlined.FileUpload,
+                  contentDescription = "Import/Export New Program"
+                )
+              }
+              IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                  imageVector = Icons.Outlined.CreateNewFolder,
+                  contentDescription = "Add New Program"
+                )
+              }
+            }
+          }
+        }
+      }
+
+      item {
+        Button(onClick = { /*TODO*/ }) {
+          Icon(imageVector = Icons.Outlined.Assignment, contentDescription = "Add New Workout")
+          Text(text = "New Workout")
+        }
+      }
+
+      item {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          IconButton(onClick = { setProgramVisible(!programVisible) }) {
+            Icon(
+              imageVector = getExpandCollapseIcon(programVisible),
+              contentDescription = "Show workouts for this program"
+            )
+          }
+          Text(
+            text = "Program Name/Macrocycle (Workout Count)",
+            style = MaterialTheme.typography.bodySmall
+          )
+          IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+              imageVector = Icons.Outlined.MoreVert,
+              contentDescription = "Localized Description"
+            )
+          }
+        }
+      }
+
+      items(20) {
+        AnimatedVisibility(
+          visible = programVisible,
+          enter = expandVertically(animationSpec = tween(500)),
+          exit = shrinkVertically(animationSpec = tween(500))
+        ) {
+          ProgramCard(navController)
+        }
+      }
+
+      item {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
+            Icon(
+              imageVector = getExpandCollapseIcon(mesocycleVisible),
+              contentDescription = "Show workouts for this program"
+            )
+          }
+          Text(text = "Mesocycle (Workout Count)")
+          IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+              imageVector = Icons.Outlined.MoreVert,
+              contentDescription = "Localized Description"
+            )
+          }
+        }
+      }
+
+      item {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
+            Icon(
+              imageVector = getExpandCollapseIcon(workoutVisible),
+              contentDescription = "Show workouts"
+            )
+          }
+          Text(text = "Workouts (Workout Count)")
+          IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+              imageVector = Icons.Outlined.MoreVert,
+              contentDescription = "Localized Description"
+            )
+          }
+        }
+      }
+
+      items(20) {
+        AnimatedVisibility(
+          visible = workoutVisible,
+          enter = expandVertically(animationSpec = tween(500)),
+          exit = shrinkVertically(animationSpec = tween(500))
+        ) {
+          WorkoutCard()
+        }
+      }
+    }
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutSearchBar() {
-//    val context = LocalContext.current
-    var text by rememberSaveable { mutableStateOf("") }
-    var active by rememberSaveable { mutableStateOf(false) }
+  //    val context = LocalContext.current
+  var text by rememberSaveable { mutableStateOf("") }
+  var active by rememberSaveable { mutableStateOf(false) }
 
-    val color = SearchBarDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        inputFieldColors = TextFieldDefaults.colors(
-            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
-        )
+  val color =
+    SearchBarDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.secondaryContainer,
+      inputFieldColors =
+      TextFieldDefaults.colors(
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
+      )
     )
 
-    SearchBar(
-        query = text,
-        onQueryChange = {
-            text = it
-// TODO filterWorkouts("%$it%")
-            // TODO filterPrograms("%$it%")
-        },
-        onSearch = { active = false },
-        active = active,
-        colors = color,
-        onActiveChange = { active = false },
-        placeholder = {
-            androidx.compose.material.Text(
-                "Search Exercises",
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-        },
-        leadingIcon = {
-            androidx.compose.material.Icon(
-                Icons.Default.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-    ) {}
+  SearchBar(
+    query = text,
+    onQueryChange = {
+      text = it
+      // TODO filterWorkouts("%$it%")
+      // TODO filterPrograms("%$it%")
+    },
+    onSearch = { active = false },
+    active = active,
+    colors = color,
+    onActiveChange = { active = false },
+    placeholder = {
+      androidx.compose.material.Text(
+        "Search Exercises",
+        color = MaterialTheme.colorScheme.onSecondaryContainer
+      )
+    },
+    leadingIcon = {
+      Icon(
+        Icons.Default.Search,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.onSecondaryContainer
+      )
+    },
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 8.dp)
+  ) {}
 }
 
 // @Preview
 @Composable
 fun WorkoutCard() {
-    val padding = 8.dp
-    val titleMedium = MaterialTheme.typography.titleMedium
+  val padding = 8.dp
+  val titleMedium = MaterialTheme.typography.titleMedium
 
-    Card(modifier = Modifier.clickable { /* TODO Navigate to Workout Details Screen */ }) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(padding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column() {
-                Text(text = "Workout Title", style = titleMedium)
-                Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
-                Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
-            }
-//            TODO To Keep or not to not Keep
-            Column(verticalArrangement = Arrangement.Top) {
-                IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.MoreVert,
-                        contentDescription = "Localized Description"
-                    )
-                }
-            }
+  Card(modifier = Modifier.clickable { /* TODO Navigate to Workout Details Screen */ }) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Column() {
+        Text(text = "Workout Title", style = titleMedium)
+        Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
+        Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
+      }
+      //            TODO To Keep or not to not Keep
+      Column(verticalArrangement = Arrangement.Top) {
+        IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
+          Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
         }
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding)) {
-            Column() {
-//                TODO List Exercises
-                Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
-            }
-        }
+      }
     }
+    Row(modifier = Modifier
+      .fillMaxWidth()
+      .padding(padding)) {
+      Column() {
+        //                TODO List Exercises
+        Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
+      }
+    }
+  }
+}
+
+@Composable
+fun ProgramLists(navController: NavController, visible: Boolean = false) {
+  ProgramCard(navController)
 }
 
 @Composable
 fun ProgramCard(navController: NavController) {
-    val padding = 8.dp
-    val titleMedium = MaterialTheme.typography.titleMedium
+  val padding = 8.dp
+  val titleMedium = MaterialTheme.typography.titleMedium
 
-    Card(
-        modifier = Modifier.clickable {
-            /* TODO Navigate to Program Details Screen */ navController.navigate(
-                "programDetails"
-            )
-        }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(padding),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            androidx.compose.material.Icon(
-                imageVector = Icons.Outlined.BrokenImage,
-                contentDescription = "Missing Image",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = padding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column() {
-                Text(text = "Program Title", style = titleMedium)
-                Text(text = "Program Author", style = MaterialTheme.typography.titleSmall)
-            }
-//            TODO To Keep or not to not Keep
-            IconButton(onClick = { /* TODO */ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = "Localized Description"
-                )
-            }
-        }
+  Card(
+    modifier =
+    Modifier.clickable {
+      /* TODO Navigate to Program Details Screen */ navController.navigate("programDetails")
     }
+  ) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.Center,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      androidx.compose.material.Icon(
+        imageVector = Icons.Outlined.BrokenImage,
+        contentDescription = "Missing Image",
+        tint = MaterialTheme.colorScheme.primary
+      )
+    }
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Column() {
+        Text(text = "Program Title", style = titleMedium)
+        Text(text = "Program Author", style = MaterialTheme.typography.titleSmall)
+      }
+      //            TODO To Keep or not to not Keep
+      IconButton(onClick = { /* TODO */ }) {
+        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
+      }
+    }
+  }
 }
 
 // @Preview
 @Composable
 fun CurrentProgramCard(navController: NavController) {
-    val padding = 8.dp
+  val padding = 8.dp
 
-    val titleSmall = MaterialTheme.typography.titleSmall
+  val titleSmall = MaterialTheme.typography.titleSmall
 
-    Card() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = padding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Program Title",
-                style = titleSmall,
-                modifier = Modifier.clickable {
-                    /* TODO Navigate to Program Details Screen */
-                    navController.navigate("programDetails")
-                }
-            )
-            IconButton(onClick = { /* TODO */ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = "Localized Description"
-                )
-            }
+  Card(modifier = Modifier.padding(vertical = padding)) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text(
+        text = "Program Title",
+        style = titleSmall,
+        modifier =
+        Modifier.clickable {
+          /* TODO Navigate to Program Details Screen */
+          navController.navigate("programDetails")
         }
-        Text(
-            text = "Microcycle Week # Day #",
-            modifier = Modifier.padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.bodySmall
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(padding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Exercise", style = titleSmall)
-            Box(Modifier.fillMaxWidth(0.5f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(text = "Sets", style = titleSmall)
-                    Text(text = "Top Set", style = titleSmall)
-                    Text(text = "RIR", style = titleSmall)
-                }
-            }
-        }
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding)) {
-            Column() {
-//                TODO List Exercises
-                Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(padding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(onClick = { /*TODO*/ }) {
-                Text(text = "Start Microcycle Week # Day #")
-            }
-            IconButton(onClick = { /*TODO*/ navController.navigate("programDetails") }) {
-                Icon(
-                    imageVector = Icons.Outlined.LibraryBooks,
-                    contentDescription = "Localized Description"
-                )
-            }
-        }
+      )
+      IconButton(onClick = { /* TODO */ }) {
+        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
+      }
     }
+    Text(
+      text = "Microcycle Week # Day #",
+      modifier = Modifier.padding(horizontal = 8.dp),
+      style = MaterialTheme.typography.bodySmall
+    )
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text(text = "Exercise", style = titleSmall)
+      Box(Modifier.fillMaxWidth(0.5f)) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+          Text(text = "Sets", style = titleSmall)
+          Text(text = "Top Set", style = titleSmall)
+          Text(text = "RIR", style = titleSmall)
+        }
+      }
+    }
+
+    Row(modifier = Modifier
+      .fillMaxWidth()
+      .padding(padding)) {
+      Column() {
+        //                TODO List Exercises
+        Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
+      }
+    }
+
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Button(onClick = { /*TODO*/ }) { Text(text = "Start Microcycle Week # Day #") }
+      IconButton(
+        onClick = { /*TODO*/
+          navController.navigate("programDetails")
+        }
+      ) {
+        Icon(
+          imageVector = Icons.Outlined.LibraryBooks,
+          contentDescription = "Localized Description"
+        )
+      }
+    }
+  }
 }

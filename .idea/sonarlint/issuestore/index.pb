@@ -7,8 +7,6 @@ Mapp/src/androidTest/java/com/example/myapplication/ExampleInstrumentedTest.kt,
 gradlew,5/b/5bbfa66edb4db3c7c33c5181f43510990d3307f9
 n
 >app/src/test/java/com/example/myapplication/ExampleUnitTest.kt,e/1/e110aede2d9b606b5e7c8b653b7e7a4905cf45b6
-<
-build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
 Œ
 \app/src/test/java/com/example/myapplication/components/warmUpSets/WarmUpSetsViewModelTest.kt,3/f/3f6af7ab97998eee5bfb8fce6b2cf99bb194298d
 P
