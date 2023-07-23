@@ -47,6 +47,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
@@ -100,29 +102,34 @@ fun ProgramsScreen(navController: NavController) {
     },
     bottomBar = { BottomNavigationBar(navController = navController) }
   ) { contentPadding ->
-
-
     LazyColumn(
-      contentPadding = contentPadding,
-      modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .padding(horizontal = 12.dp),
-      verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = contentPadding,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(horizontal = 12.dp),
+        //      verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       stickyHeader { WorkoutSearchBar() }
 
       item {
-        Text("Continue Program", style = titleMedium)
-        CurrentProgramCard(navController)
+          Column(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(vertical = 12.dp),
+              verticalArrangement = Arrangement.spacedBy(padding8)
+          ) {
+              Text("Continue Program", style = titleMedium)
+              CurrentProgramCard(navController)
+          }
       }
 
       item {
-        Text("Quick Start", style = titleMedium)
-        Button(onClick = { /*TODO*/ }) {
-          Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
-          Text(text = "Start An Empty Workout")
-        }
+          Text("Quick Start", style = titleMedium)
+          Button(onClick = { /*TODO*/ }) {
+              Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
+              Text(text = "Start An Empty Workout")
+          }
       }
 
       item {
@@ -135,28 +142,28 @@ fun ProgramsScreen(navController: NavController) {
 
           Box {
             Row {
-              IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                  imageVector = Icons.Outlined.FileUpload,
-                  contentDescription = "Import/Export New Program"
-                )
-              }
-              IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                  imageVector = Icons.Outlined.CreateNewFolder,
-                  contentDescription = "Add New Program"
-                )
-              }
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.FileUpload,
+                        contentDescription = "Import/Export New Program"
+                    )
+                }
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.CreateNewFolder,
+                        contentDescription = "Add New Program"
+                    )
+                }
             }
           }
         }
       }
 
       item {
-        Button(onClick = { /*TODO*/ }) {
-          Icon(imageVector = Icons.Outlined.Assignment, contentDescription = "Add New Workout")
-          Text(text = "New Workout")
-        }
+          Button(onClick = { /*TODO*/ }) {
+              Icon(imageVector = Icons.Outlined.Assignment, contentDescription = "Add New Program")
+              Text(text = "New Program", Modifier.padding(start = 8.dp))
+          }
       }
 
       item {
@@ -171,16 +178,17 @@ fun ProgramsScreen(navController: NavController) {
               contentDescription = "Show workouts for this program"
             )
           }
-          Text(
-            text = "Program Name/Macrocycle (Workout Count)",
-            style = MaterialTheme.typography.bodySmall
-          )
-          IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-              imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
+            Text(
+                text = "Program/Macrocycle (###)",
+
+//            style = MaterialTheme.typography.bodySmall
             )
-          }
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Outlined.MoreVert,
+                    contentDescription = "Localized Description"
+                )
+            }
         }
       }
 
@@ -200,19 +208,19 @@ fun ProgramsScreen(navController: NavController) {
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically
         ) {
-          IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
-            Icon(
-              imageVector = getExpandCollapseIcon(mesocycleVisible),
-              contentDescription = "Show workouts for this program"
-            )
-          }
-          Text(text = "Mesocycle (Workout Count)")
-          IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-              imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
-            )
-          }
+            IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
+                Icon(
+                    imageVector = getExpandCollapseIcon(mesocycleVisible),
+                    contentDescription = "Show workouts for this program"
+                )
+            }
+            Text(text = "Mesocycle (###)")
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Outlined.MoreVert,
+                    contentDescription = "Localized Description"
+                )
+            }
         }
       }
 
@@ -222,19 +230,19 @@ fun ProgramsScreen(navController: NavController) {
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically
         ) {
-          IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
-            Icon(
-              imageVector = getExpandCollapseIcon(workoutVisible),
-              contentDescription = "Show workouts"
-            )
-          }
-          Text(text = "Workouts (Workout Count)")
-          IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-              imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
-            )
-          }
+            IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
+                Icon(
+                    imageVector = getExpandCollapseIcon(workoutVisible),
+                    contentDescription = "Show workouts"
+                )
+            }
+            Text(text = "Workouts (###")
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Outlined.MoreVert,
+                    contentDescription = "Localized Description"
+                )
+            }
         }
       }
 
@@ -261,11 +269,11 @@ fun WorkoutSearchBar() {
   val color =
     SearchBarDefaults.colors(
       containerColor = MaterialTheme.colorScheme.secondaryContainer,
-      inputFieldColors =
-      TextFieldDefaults.colors(
-        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
-      )
+        inputFieldColors =
+        TextFieldDefaults.colors(
+            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
+        )
     )
 
   SearchBar(
@@ -280,10 +288,10 @@ fun WorkoutSearchBar() {
     colors = color,
     onActiveChange = { active = false },
     placeholder = {
-      androidx.compose.material.Text(
-        "Search Exercises",
-        color = MaterialTheme.colorScheme.onSecondaryContainer
-      )
+        Text(
+            "Search Exercises",
+            color = MaterialTheme.colorScheme.onSecondaryContainer
+        )
     },
     leadingIcon = {
       Icon(
@@ -292,9 +300,7 @@ fun WorkoutSearchBar() {
         tint = MaterialTheme.colorScheme.onSecondaryContainer
       )
     },
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = 8.dp)
+      modifier = Modifier.fillMaxWidth()
   ) {}
 }
 
@@ -304,34 +310,40 @@ fun WorkoutCard() {
   val padding = 8.dp
   val titleMedium = MaterialTheme.typography.titleMedium
 
-  Card(modifier = Modifier.clickable { /* TODO Navigate to Workout Details Screen */ }) {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
-    ) {
-      Column() {
-        Text(text = "Workout Title", style = titleMedium)
-        Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
-        Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
-      }
-      //            TODO To Keep or not to not Keep
-      Column(verticalArrangement = Arrangement.Top) {
-        IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
-          Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
+    Card(
+        modifier = Modifier
+            .padding(vertical = padding)
+            .clickable { /* TODO Navigate to Workout Details Screen */ }) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(padding),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Column() {
+                Text(text = "Workout Title", style = titleMedium)
+                Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
+                Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
+            }
+            //            TODO To Keep or not to not Keep
+            Column(verticalArrangement = Arrangement.Top) {
+                IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = "Localized Description"
+                    )
+                }
+            }
         }
-      }
-    }
-    Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
-      Column() {
-        //                TODO List Exercises
-        Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
-      }
-    }
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, bottom = padding)) {
+            Column() {
+                //                TODO List Exercises
+                Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
+            }
+        }
   }
 }
 
@@ -346,17 +358,19 @@ fun ProgramCard(navController: NavController) {
   val titleMedium = MaterialTheme.typography.titleMedium
 
   Card(
-    modifier =
-    Modifier.clickable {
-      /* TODO Navigate to Program Details Screen */ navController.navigate("programDetails")
-    }
+      modifier =
+      Modifier
+          .padding(vertical = padding)
+          .clickable {
+              /* TODO Navigate to Program Details Screen */ navController.navigate("programDetails")
+          }
   ) {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
-      horizontalArrangement = Arrangement.Center,
-      verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
       androidx.compose.material.Icon(
         imageVector = Icons.Outlined.BrokenImage,
@@ -365,20 +379,23 @@ fun ProgramCard(navController: NavController) {
       )
     }
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = padding),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, bottom = padding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom
     ) {
       Column() {
         Text(text = "Program Title", style = titleMedium)
         Text(text = "Program Author", style = MaterialTheme.typography.titleSmall)
       }
       //            TODO To Keep or not to not Keep
-      IconButton(onClick = { /* TODO */ }) {
-        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
-      }
+        IconButton(onClick = { /* TODO */ }) {
+            Icon(
+                imageVector = Icons.Outlined.MoreVert,
+                contentDescription = "Localized Description"
+            )
+        }
     }
   }
 }
@@ -392,24 +409,27 @@ fun CurrentProgramCard(navController: NavController) {
 
   Card(modifier = Modifier.padding(vertical = padding)) {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = padding),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = padding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-      Text(
-        text = "Program Title",
-        style = titleSmall,
-        modifier =
-        Modifier.clickable {
-          /* TODO Navigate to Program Details Screen */
-          navController.navigate("programDetails")
+        Text(
+            text = "Program Title",
+            style = MaterialTheme.typography.titleMedium,
+            modifier =
+            Modifier.clickable {
+                /* TODO Navigate to Program Details Screen */
+                navController.navigate("programDetails")
+            }
+        )
+        IconButton(onClick = { /* TODO */ }) {
+            Icon(
+                imageVector = Icons.Outlined.MoreVert,
+                contentDescription = "Localized Description"
+            )
         }
-      )
-      IconButton(onClick = { /* TODO */ }) {
-        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
-      }
     }
     Text(
       text = "Microcycle Week # Day #",
@@ -417,11 +437,11 @@ fun CurrentProgramCard(navController: NavController) {
       style = MaterialTheme.typography.bodySmall
     )
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
       Text(text = "Exercise", style = titleSmall)
       Box(Modifier.fillMaxWidth(0.5f)) {
@@ -436,33 +456,39 @@ fun CurrentProgramCard(navController: NavController) {
       }
     }
 
-    Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
-      Column() {
-        //                TODO List Exercises
-        Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
+      Row(modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)) {
+          Column() {
+              //                TODO List Exercises
+              Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
+          }
       }
-    }
 
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-      Button(onClick = { /*TODO*/ }) { Text(text = "Start Microcycle Week # Day #") }
-      IconButton(
-        onClick = { /*TODO*/
-          navController.navigate("programDetails")
+        Button(onClick = { /*TODO*/ }) { Text(text = "Start Microcycle Week # Day #") }
+        IconButton(
+            onClick = { /*TODO*/
+                navController.navigate("programDetails")
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.LibraryBooks,
+                contentDescription = "Localized Description"
+            )
         }
-      ) {
-        Icon(
-          imageVector = Icons.Outlined.LibraryBooks,
-          contentDescription = "Localized Description"
-        )
-      }
     }
   }
+}
+
+@Preview
+@Composable
+fun CurrentProgramCardPreview() {
+    ProgramsScreen(navController = NavController(LocalContext.current))
 }

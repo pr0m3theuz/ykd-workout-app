@@ -42,8 +42,23 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideWorkoutDao(database: AppRoomDatabase): WorkoutDao {
-        return database.workoutDao()
+    fun provideProgramDao(database: AppRoomDatabase): ProgramsDao {
+        return database.programsDao()
+    }
+
+    @Provides
+    fun provideMesocycleDao(database: AppRoomDatabase): MesocyclesDao {
+        return database.mesocyclesDao()
+    }
+
+    @Provides
+    fun provideMicrocyclesDao(database: AppRoomDatabase): MicrocyclesDao {
+        return database.microcyclesDao()
+    }
+
+    @Provides
+    fun provideWorkoutDao(database: AppRoomDatabase): WorkoutsDao {
+        return database.workoutsDao()
     }
 
     @Provides
@@ -64,7 +79,7 @@ object DatabaseModule {
             AppRoomDatabase::class.java,
             "app_database.db"
         )
-            .createFromAsset("database/test_v3.db")
+            .createFromAsset("database/test_v5.db")
             .build()
     }
 }

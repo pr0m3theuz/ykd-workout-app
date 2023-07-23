@@ -10,23 +10,23 @@ import javax.inject.Singleton
 @Singleton
 class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseDao) {
 
-  // Room executes all queries on a separate thread.
-  // Observed Flow will notify the observer when the data has changed.
-  fun getExercises(): Flow<List<ExerciseModel>> = exerciseDao.getAllExercises()
+    // Room executes all queries on a separate thread.
+    // Observed Flow will notify the observer when the data has changed.
+    fun getExercises(): Flow<List<ExerciseModel>> = exerciseDao.getAllExercises()
 
-  fun getAllEquipment(): Flow<List<Equipment>> = exerciseDao.getAllEquipment()
+    fun getAllEquipment(): Flow<List<Equipment>> = exerciseDao.getAllEquipment()
 
-  @WorkerThread
-  suspend fun getAllMuscleGroups(): Flow<List<MuscleGroup>> = exerciseDao.getAllMuscleGroups()
 
-  fun getAllUtilities(): Flow<List<Utility>> = exerciseDao.getAllUtilities()
+    fun getAllMuscleGroups(): Flow<List<MuscleGroup>> = exerciseDao.getAllMuscleGroups()
 
-  fun getAllForces(): Flow<List<Force>> = exerciseDao.getAllForces()
+    fun getAllUtilities(): Flow<List<Utility>> = exerciseDao.getAllUtilities()
 
-  fun getAllMechanics(): Flow<List<Mechanic>> = exerciseDao.getAllMechanics()
+    fun getAllForces(): Flow<List<Force>> = exerciseDao.getAllForces()
 
-  fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> =
-    exerciseDao.getAllMuscleRolesFunctions()
+    fun getAllMechanics(): Flow<List<Mechanic>> = exerciseDao.getAllMechanics()
+
+    fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> =
+        exerciseDao.getAllMuscleRolesFunctions()
 
   fun getMuscleGroupNameByID(muscleGroupID: String): Flow<List<String>> =
     exerciseDao.getMuscleGroupNameByID(muscleGroupID)

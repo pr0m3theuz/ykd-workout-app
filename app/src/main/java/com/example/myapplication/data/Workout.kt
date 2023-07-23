@@ -43,9 +43,9 @@ data class Workout(
     var name: String,
     var workoutAuthor: String? = null,
 //    TODO Remove. Deprecated.
-    var notes: String? = null,
-    var pinnedNotes: String? = null,
-    var notesPinned: Boolean = false,
+//    var notes: String? = null,
+//    var pinnedNotes: String? = null,
+//    var notesPinned: Boolean = false,
 //
     var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds,
     var workoutType: String? = null,

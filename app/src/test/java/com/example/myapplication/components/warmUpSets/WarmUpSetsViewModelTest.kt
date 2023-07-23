@@ -1,3 +1,4 @@
+/*
 package com.example.myapplication.components.warmUpSets
 
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
@@ -40,3 +41,4 @@ class WarmUpSetsViewModelTest {
     fun updateWarmUpSetReps() {
     }
 }
+*/

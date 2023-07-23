@@ -19,15 +19,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// TODO Implement Clone Exercise Feature
+
 @HiltViewModel
 class ExercisesViewModel
 @Inject
 constructor(
-  private val exercisesRepository: ExercisesRepository,
+    private val exercisesRepository: ExercisesRepository,
 ) : ViewModel() {
-  private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
-  val exercises: StateFlow<List<ExerciseModel>>
-    get() = _exercises.asStateFlow()
+    private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
+    val exercises: StateFlow<List<ExerciseModel>>
+        get() = _exercises.asStateFlow()
 
   private val _equipment: MutableStateFlow<List<Equipment>> = MutableStateFlow(emptyList())
   val equipment: StateFlow<List<Equipment>>

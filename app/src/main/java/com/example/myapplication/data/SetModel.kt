@@ -42,7 +42,7 @@ data class SetModel(
     var ratePerceivedEffort: Double? = null,
     var repetitionsInReserve: Double? = null,
     var targetWeight: Double? = null,
-    var targetRepetitions: Int? = null,
+    var targetRepetitions: String? = null,
     var targetRatePerceivedEffort: Double? = null,
     var targetRepetitionsInReserve: Double? = null,
     var percentage1RM: Double? = 1.0,

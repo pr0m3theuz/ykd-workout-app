@@ -2,32 +2,57 @@ package com.example.myapplication.data
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class WorkoutRepository @Inject constructor(private val workoutDao: WorkoutDao) {
+class WorkoutRepository @Inject constructor(private val workoutsDao: WorkoutsDao) {
     @WorkerThread
     suspend fun getWorkoutById(workoutID: Long): Workout? {
-        return workoutDao.getWorkoutById(workoutID)
+        return workoutsDao.getWorkoutById(workoutID)
+    }
+
+    suspend fun getWorkoutByMicrocycleUUID(microcycleUUID: UUID): List<Workout> {
+        return workoutsDao.getWorkoutsByMicrocycleUUID(microcycleUUID)
+    }
+
+    suspend fun getWorkoutByMesocycleUUID(mesocycleUUID: UUID): List<Workout> {
+        return workoutsDao.getWorkoutsByMesocycleUUID(mesocycleUUID)
+    }
+
+    suspend fun getWorkoutByProgramUUID(programUUID: UUID): List<Workout> {
+        return workoutsDao.getWorkoutsByProgramUUID(programUUID)
+    }
+
+    suspend fun getWorkoutsByMicrocycleID(microcycleID: Long): List<Workout> {
+        return workoutsDao.getWorkoutsByMicrocycleID(microcycleID)
+    }
+
+    suspend fun getWorkoutByMesocycleID(mesocycleID: Long): List<Workout> {
+        return workoutsDao.getWorkoutsByMesocycleID(mesocycleID)
+    }
+
+    suspend fun getWorkoutByProgramID(programID: Long): List<Workout> {
+        return workoutsDao.getWorkoutsByProgramID(programID)
     }
 
     @WorkerThread
     suspend fun insertWorkout(workout: Workout) {
-        workoutDao.insertWorkout(workout)
+        workoutsDao.insertWorkout(workout)
     }
 
     @WorkerThread
     suspend fun updateWorkout(workout: Workout) {
-        workoutDao.updateWorkout(workout)
+        workoutsDao.updateWorkout(workout)
     }
 
     @WorkerThread
     suspend fun deleteWorkout(workout: Workout) {
-        workoutDao.deleteWorkout(workout)
+        workoutsDao.deleteWorkout(workout)
     }
 
     fun getAllWorkouts(): Flow<List<Workout>> {
-        return workoutDao.getAllWorkouts()
+        return workoutsDao.getAllWorkouts()
     }
 }
