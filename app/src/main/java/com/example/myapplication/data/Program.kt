@@ -27,8 +27,13 @@ data class Program(
   var dateCreated: LocalDateTime = LocalDateTime.now(),
   var startDate: LocalDateTime? = null,
   var endDate: LocalDateTime? = null,
+  var shortDescription: String? = null,
   var description: String? = null,
   var uri: String? = null,
+  var level: String? = null,
+  var programEquipment: String? = null,
+  var daysPerWeek: String? = null,
+  var programLength: String? = null,
 //    var tags: String, // TODO Should be a List<String>
 )
 

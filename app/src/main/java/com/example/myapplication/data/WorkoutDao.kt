@@ -2,7 +2,6 @@ package com.example.myapplication.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 
 @Dao
 interface WorkoutsDao {
@@ -12,14 +11,14 @@ interface WorkoutsDao {
     @Query("SELECT * FROM workouts WHERE workoutID = :workoutID")
     suspend fun getWorkoutById(workoutID: Long): Workout?
 
-    @Query("SELECT * FROM workouts WHERE microcycleUUID = :microcycleUUID")
+/*    @Query("SELECT * FROM workouts WHERE microcycleUUID = :microcycleUUID")
     suspend fun getWorkoutsByMicrocycleUUID(microcycleUUID: UUID): List<Workout>
 
     @Query("SELECT * FROM workouts WHERE mesocycleUUID = :mesocycleUUID")
     suspend fun getWorkoutsByMesocycleUUID(mesocycleUUID: UUID): List<Workout>
 
     @Query("SELECT * FROM workouts WHERE programUUID = :programUUID")
-    suspend fun getWorkoutsByProgramUUID(programUUID: UUID): List<Workout>
+    suspend fun getWorkoutsByProgramUUID(programUUID: UUID): List<Workout>*/
 
     @Query("SELECT * FROM workouts WHERE microcycleID = :microcycleID")
     suspend fun getWorkoutsByMicrocycleID(microcycleID: Long): List<Workout>

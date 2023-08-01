@@ -42,12 +42,12 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideProgramDao(database: AppRoomDatabase): ProgramsDao {
+    fun provideProgramsDao(database: AppRoomDatabase): ProgramsDao {
         return database.programsDao()
     }
 
     @Provides
-    fun provideMesocycleDao(database: AppRoomDatabase): MesocyclesDao {
+    fun provideMesocyclesDao(database: AppRoomDatabase): MesocyclesDao {
         return database.mesocyclesDao()
     }
 

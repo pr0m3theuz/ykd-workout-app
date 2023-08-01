@@ -37,6 +37,11 @@ interface ExerciseDao {
     exerciseID: Long,
   ): Flow<List<ExerciseModel>>
 
+  @Query("SELECT * FROM exercises WHERE exerciseID=:exerciseID")
+  suspend fun getExercise(
+    exerciseID: Long,
+  ): List<ExerciseModel>
+
   //    @Query("SELECT * FROM exercises WHERE name LIKE :exercise ORDER BY name ASC")
   @Query(
     "SELECT * FROM exercises WHERE name LIKE :exercise " +

@@ -29,6 +29,7 @@ import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.homeScreen.HomeScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
+import com.example.myapplication.components.programs.ProgramsViewModel
 import com.example.myapplication.components.workout.WorkoutContent
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,11 +38,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        val database = Room.databaseBuilder(
-//            applicationContext,
-//            AppRoomDatabase::class.java,
-//            "app_database_v3"
-//        ).build()
+        //        val database = Room.databaseBuilder(
+        //            applicationContext,
+        //            AppRoomDatabase::class.java,
+        //            "app_database_v3"
+        //        ).build()
 
         setContent {
             MyApplicationTheme {
@@ -53,16 +54,12 @@ class MainActivity : ComponentActivity() {
                     navigation(
                         "homeScreen",
                         route = "home"
-                    ) {
-                        composable("homeScreen") {
-                            HomeScreen()
-                        }
-                    }
+                    ) { composable("homeScreen") { HomeScreen() } }
                 }
-//                Surface {
-//                    WorkoutScreen()
-//                    ExercisesScreen(exercisesViewModel = exercisesViewModel)
-//                }
+                //                Surface {
+                //                    WorkoutScreen()
+                //                    ExercisesScreen(exercisesViewModel = exercisesViewModel)
+                //                }
             }
         }
     }
@@ -106,9 +103,7 @@ private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
 
 private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
     navigation("exercisesList", route = "exercises") {
-        composable("exercisesScreen") {
-            ExercisesScreen()
-        }
+        composable("exercisesScreen") { ExercisesScreen() }
 
         composable("exercisesList") {
             val viewModel = hiltViewModel<ExercisesViewModel>()
@@ -136,10 +131,21 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
 private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
     navigation("programsScreen", route = "programs") {
         composable("programsScreen") {
-            ProgramsScreen(navController)
+            val viewModel = hiltViewModel<ProgramsViewModel>()
+            ProgramsScreen(navController, programsViewModel = viewModel)
         }
-        composable("programDetails") {
-            ProgramDetailsScreen(navController)
+        composable(
+            "programDetails/{programID}",
+            arguments = listOf(navArgument("programID") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val viewModel = hiltViewModel<ProgramsViewModel>()
+            navBackStackEntry.arguments?.getString("programID")?.let {
+                ProgramDetailsScreen(
+                    navController,
+                    programID = it,
+                    programsViewModel = viewModel,
+                )
+            }
         }
         /*composable("exercisesList") {
             val viewModel = hiltViewModel<ExercisesViewModel>()

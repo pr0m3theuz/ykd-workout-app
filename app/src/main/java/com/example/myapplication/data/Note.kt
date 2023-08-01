@@ -53,12 +53,12 @@ data class ExerciseNote(
     var pinned: Boolean = false,
     var dateCreated: LocalDateTime = LocalDateTime.now(),
     @ColumnInfo(name = "exerciseID") val exerciseID: Long,
-    @ColumnInfo(name = "workoutID") val workoutID: Long? = null,
-    @ColumnInfo(name = "programID") val programID: Long? = null,
+    @ColumnInfo(name = "workoutID") var workoutID: Long? = null,
+    @ColumnInfo(name = "programID") var programID: Long? = null,
     var programPinned: Boolean = false,
-    @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
+    @ColumnInfo(name = "mesocycleID") var mesocycleID: Long? = null,
     var mesocyclePinned: Boolean = false,
-    @ColumnInfo(name = "microcycleID") val microcycleID: Long? = null,
+    @ColumnInfo(name = "microcycleID") var microcycleID: Long? = null,
     var microcyclePinned: Boolean = false,
 )
 
@@ -99,11 +99,11 @@ data class WorkoutNote(
     var note: String? = null,
     var pinned: Boolean = false,
     @ColumnInfo(name = "workoutID") val workoutID: Long,
-    @ColumnInfo(name = "programID") val programID: Long? = null,
+    @ColumnInfo(name = "programID") var programID: Long? = null,
     var programPinned: Boolean = false,
-    @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
+    @ColumnInfo(name = "mesocycleID") var mesocycleID: Long? = null,
     var mesocyclePinned: Boolean = false,
-    @ColumnInfo(name = "microcycleID") val microcycleID: Long? = null,
+    @ColumnInfo(name = "microcycleID") var microcycleID: Long? = null,
     var microcyclePinned: Boolean = false,
 )
 
@@ -124,7 +124,7 @@ data class ProgramNote(
     val uuid: UUID = UUID.randomUUID(),
     var note: String? = null,
     var pinned: Boolean = false,
-    @ColumnInfo(name = "programID") val programID: Long? = null,
+    @ColumnInfo(name = "programID") var programID: Long? = null,
 )
 
 @Entity(
@@ -150,9 +150,9 @@ data class MesocycleNote(
     val uuid: UUID = UUID.randomUUID(),
     var note: String? = null,
     var pinned: Boolean = false,
-    @ColumnInfo(name = "programID") val programID: Long? = null,
+    @ColumnInfo(name = "programID") var programID: Long? = null,
     var programPinned: Boolean = false,
-    @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
+    @ColumnInfo(name = "mesocycleID") var mesocycleID: Long? = null,
 )
 
 @Entity(
@@ -184,9 +184,9 @@ data class MicrocycleNote(
     val uuid: UUID = UUID.randomUUID(),
     var note: String? = null,
     var pinned: Boolean = false,
-    @ColumnInfo(name = "microcycleID") val microcycleID: Long? = null,
-    @ColumnInfo(name = "programID") val programID: Long? = null,
+    @ColumnInfo(name = "microcycleID") var microcycleID: Long? = null,
+    @ColumnInfo(name = "programID") var programID: Long? = null,
     var programPinned: Boolean = false,
-    @ColumnInfo(name = "mesocycleID") val mesocycleID: Long? = null,
+    @ColumnInfo(name = "mesocycleID") var mesocycleID: Long? = null,
     var mesocyclePinned: Boolean = false,
 )

@@ -52,7 +52,9 @@ constructor(
     get() = _mechanic.asStateFlow()
 
   init {
-    viewModelScope.launch { exercisesRepository.getExercises().collect { _exercises.value = it } }
+      viewModelScope.launch {
+          exercisesRepository.getAllExercises().collect { _exercises.value = it }
+      }
   }
 
   val movementTypes = MovementType.values().sortedBy { it.name }
@@ -221,9 +223,9 @@ constructor(
   fun getExerciseDetails(exerciseID: String?) {
     if (exerciseID != null) {
       viewModelScope.launch {
-        exercisesRepository.getExerciseDetails(exercisePK = exerciseID.toLong()).collect() {
-          _exercise.value = it
-        }
+          exercisesRepository.getExerciseDetails(exerciseID = exerciseID.toLong()).collect() {
+              _exercise.value = it
+          }
       }
     }
   }

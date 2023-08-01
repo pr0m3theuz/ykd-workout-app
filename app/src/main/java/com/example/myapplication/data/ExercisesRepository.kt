@@ -12,7 +12,7 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    fun getExercises(): Flow<List<ExerciseModel>> = exerciseDao.getAllExercises()
+    fun getAllExercises(): Flow<List<ExerciseModel>> = exerciseDao.getAllExercises()
 
     fun getAllEquipment(): Flow<List<Equipment>> = exerciseDao.getAllEquipment()
 
@@ -40,9 +40,14 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
     exerciseDao.insertExercise(exercise)
   }
 
-  fun getExerciseDetails(exercisePK: Long): Flow<List<ExerciseModel>> {
-    return exerciseDao.getExerciseDetails(exercisePK)
+  fun getExerciseDetails(exerciseID: Long): Flow<List<ExerciseModel>> {
+    return exerciseDao.getExerciseDetails(exerciseID)
   }
+
+  suspend fun getExercise(exerciseID: Long): List<ExerciseModel> {
+    return exerciseDao.getExercise(exerciseID)
+  }
+
 
   @WorkerThread
   fun updateExercise(exercise: ExerciseModel) {

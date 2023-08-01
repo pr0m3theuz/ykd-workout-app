@@ -47,6 +47,7 @@ data class SetModel(
     var targetRepetitionsInReserve: Double? = null,
     var percentage1RM: Double? = 1.0,
     var setCompleted: Boolean = false,
+//   TODO var exerciseOrder: Int,
     @ColumnInfo(name = "setTypeID", defaultValue = "1") var setTypeID: Int = 1,
     @ColumnInfo(name = "exerciseID") var exerciseID: Long,
     @ColumnInfo(name = "exerciseUUID") var exerciseUUID: UUID,

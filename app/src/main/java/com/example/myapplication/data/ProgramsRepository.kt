@@ -48,39 +48,43 @@ constructor(
     mesocyclesDao.insertMesocycle(mesocycle)
   }
 
-  suspend fun updateMesocycle(mesocycle: Mesocycle) {
-    mesocyclesDao.updateMesocycle(mesocycle)
-  }
+    suspend fun updateMesocycle(mesocycle: Mesocycle) {
+        mesocyclesDao.updateMesocycle(mesocycle)
+    }
 
-  suspend fun deleteMesocycle(mesocycle: Mesocycle) {
-    mesocyclesDao.deleteMesocycle(mesocycle)
-  }
+    suspend fun deleteMesocycle(mesocycle: Mesocycle) {
+        mesocyclesDao.deleteMesocycle(mesocycle)
+    }
 
-  suspend fun getAllMicrocycles(): List<Microcycle> {
-    return microcyclesDao.getAllMicrocycles()
-  }
+    suspend fun getAllMicrocycles(): List<Microcycle> {
+        return microcyclesDao.getAllMicrocycles()
+    }
 
-  suspend fun getMicrocycleById(microcycleID: Long): Microcycle? {
-    return microcyclesDao.getMicrocycleById(microcycleID)
-  }
+    suspend fun getMicrocycleById(microcycleID: Long): Microcycle? {
+        return microcyclesDao.getMicrocycleById(microcycleID)
+    }
 
-  suspend fun getMicrocyclesByMesocycle(mesocycleID: Long): List<Microcycle> {
-    return microcyclesDao.getMicrocyclesByMesocycle(mesocycleID)
-  }
+    suspend fun getMicrocyclesByMesocycle(mesocycleID: Long): List<Microcycle> {
+        return microcyclesDao.getMicrocyclesByMesocycle(mesocycleID)
+    }
 
-  suspend fun getMicrocyclesByProgram(programID: Long): List<Microcycle> {
-    return microcyclesDao.getMicrocyclesByProgram(programID)
-  }
+    suspend fun getMicrocyclesByProgram(programID: Long): List<Microcycle> {
+        return microcyclesDao.getMicrocyclesByProgram(programID)
+    }
 
-  suspend fun insertMicrocycle(microcycle: Microcycle) {
-    microcyclesDao.insertMicrocycle(microcycle)
-  }
+    suspend fun getMicrocyclesByProgramSorted(programID: Long): List<Microcycle> {
+        return microcyclesDao.getMicrocyclesByProgramSorted(programID)
+    }
 
-  suspend fun updateMicrocycle(microcycle: Microcycle) {
-    microcyclesDao.updateMicrocycle(microcycle)
-  }
+    suspend fun insertMicrocycle(microcycle: Microcycle) {
+        microcyclesDao.insertMicrocycle(microcycle)
+    }
 
-  suspend fun deleteMicrocycle(microcycle: Microcycle) {
-    microcyclesDao.deleteMicrocycle(microcycle)
-  }
+    suspend fun updateMicrocycle(microcycle: Microcycle) {
+        microcyclesDao.updateMicrocycle(microcycle)
+    }
+
+    suspend fun deleteMicrocycle(microcycle: Microcycle) {
+        microcyclesDao.deleteMicrocycle(microcycle)
+    }
 }

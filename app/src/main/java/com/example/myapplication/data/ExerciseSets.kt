@@ -78,7 +78,7 @@ data class ExerciseWithSets(
 data class SetsWithExercise(
     @Embedded val set: SetModel,
     @Relation(
-        parentColumn = "setID",
+        parentColumn = "exerciseID",
         entityColumn = "exerciseID",
         associateBy = Junction(ExerciseSetCrossRef::class)
     )

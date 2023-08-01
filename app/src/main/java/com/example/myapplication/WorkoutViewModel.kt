@@ -95,19 +95,19 @@ constructor(
         workoutDuration = elapsedTime
 
         _workoutDurationString.value =
-          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
-                                                                               minutes,
-                                                                               seconds,
-                                                                               _ ->
-            if (hours > 0) {
-              "$hours:" +
-                      minutes.toString().padStart(2, '0') +
-                      ":" +
-                      seconds.toString().padStart(2, '0')
-            } else {
-              "$minutes:${seconds.toString().padStart(2, '0')}"
+            workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                                 minutes,
+                                                                                 seconds,
+                                                                                 _ ->
+                if (hours > 0) {
+                    "$hours:" +
+                            minutes.toString().padStart(2, '0') +
+                            ":" +
+                            seconds.toString().padStart(2, '0')
+                } else {
+                    "$minutes:${seconds.toString().padStart(2, '0')}"
+                }
             }
-          }
       }
     }
 
@@ -205,45 +205,46 @@ constructor(
       timer =
         object : CountDownTimer(timerDuration, 1000L) {
 
-          override fun onTick(millisUntilFinished: Long) {
-            _state = TimerState.RUNNING
-            _timerState.value = TimerState.RUNNING
-            _remainingTime = millisUntilFinished
-            _remainingTimeString.value =
-              _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                  seconds,
-                                                                                  _ ->
-                "$minutes:${seconds.toString().padStart(2, '0')}"
-              }
+            override fun onTick(millisUntilFinished: Long) {
+                _state = TimerState.RUNNING
+                _timerState.value = TimerState.RUNNING
+                _remainingTime = millisUntilFinished
+                _remainingTimeString.value =
+                    _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                        seconds,
+                                                                                        _ ->
+                        "$minutes:${seconds.toString().padStart(2, '0')}"
+                    }
 
-            _timerDurationString.value =
-              _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                  seconds,
-                                                                                  _ ->
-                "$minutes:${seconds.toString().padStart(2, '0')}"
-              }
+                _timerDurationString.value =
+                    _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                        seconds,
+                                                                                        _ ->
+                        "$minutes:${seconds.toString().padStart(2, '0')}"
+                    }
 
-            _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
+                _remainingTimeProgress.value =
+                    _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-            Log.i("Timer: ", timerVersion)
-            Log.i("TimerState: ", _timerState.value.name)
+                Log.i("Timer: ", timerVersion)
+                Log.i("TimerState: ", _timerState.value.name)
 
-            Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-            Log.i("onTick(): timerDuration", "$_timerDuration")
-            Log.i(
-              "onTick(): _remainingTimeProgress",
-              "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-            )
-          }
+                Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+                Log.i("onTick(): timerDuration", "$_timerDuration")
+                Log.i(
+                    "onTick(): _remainingTimeProgress",
+                    "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+                )
+            }
 
-          override fun onFinish() {
-            _state = TimerState.EXPIRED
-            _timerState.value = TimerState.EXPIRED
-            _timerFinished = true
+            override fun onFinish() {
+                _state = TimerState.EXPIRED
+                _timerState.value = TimerState.EXPIRED
+                _timerFinished = true
 
-            Log.i("Timer: ", timerVersion)
-            Log.i("TimerState: ", _timerState.value.name)
-          }
+                Log.i("Timer: ", timerVersion)
+                Log.i("TimerState: ", _timerState.value.name)
+            }
         }
           .start()
     }
@@ -459,15 +460,15 @@ constructor(
   fun addSet(exerciseSets: ExerciseSets) {
     val temporarySets: List<SetModel> =
       if (exerciseSets.sets.isNotEmpty()) {
-        exerciseSets.sets +
-                exerciseSets.sets
-                  .last()
-                  .copy(
-                    lazyListItemID = newID(),
-                    uuid = UUID.randomUUID(),
-                    setNumber = exerciseSets.sets.last().setNumber?.plus(1),
-                    setCompleted = false,
-                  )
+          exerciseSets.sets +
+                  exerciseSets.sets
+                      .last()
+                      .copy(
+                          lazyListItemID = newID(),
+                          uuid = UUID.randomUUID(),
+                          setNumber = exerciseSets.sets.last().setNumber?.plus(1),
+                          setCompleted = false,
+                      )
       } else {
         listOf(
           SetModel(
@@ -504,14 +505,14 @@ constructor(
   fun addExerciseNote(exerciseSets: ExerciseSets) {
     val temporaryNotes: List<ExerciseNote> =
       if (exerciseSets.notes.isNotEmpty()) {
-        exerciseSets.notes +
-                ExerciseNote(
-                  exerciseID = exerciseSets.exercise.exerciseID,
-                  workoutID = _workout.value.workoutID,
-                  programID = _workout.value.programID,
-                  mesocycleID = _workout.value.mesocycleID,
-                  microcycleID = _workout.value.microcycleID
-                )
+          exerciseSets.notes +
+                  ExerciseNote(
+                      exerciseID = exerciseSets.exercise.exerciseID,
+                      workoutID = _workout.value.workoutID,
+                      programID = _workout.value.programID,
+                      mesocycleID = _workout.value.mesocycleID,
+                      microcycleID = _workout.value.microcycleID
+                  )
       } else {
         listOf(
           ExerciseNote(
@@ -533,7 +534,6 @@ constructor(
 
     updateExercisesNotesData(exerciseSets, temporaryNotes)
     Log.i("removeExerciseNote", "removeExerciseNote: ${temporaryNotes.size}")
-
   }
 
   fun pinExerciseNote(exerciseSets: ExerciseSets, exerciseNote: ExerciseNote, pinned: Boolean) {
@@ -871,24 +871,24 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
 
   return MutableList(1) {
     ExerciseSets(
-      workoutID = workoutID,
-      workoutUUID = workoutUUID,
-      exercise = exercise,
-      sets =
-      MutableList(3) { indices ->
-        SetModel(
-          setNumber = indices,
-          exerciseWeight = 100.00.times(it),
-          repetitions = 10.times(it),
-          exerciseID = exercise.exerciseID,
-          exerciseUUID = exercise.uuid,
-          workoutID = workoutID, // TODO Replace with workout.workoutID
-          workoutUUID = workoutUUID,
-          progressionSchemeID = Random().nextInt(), // TODO Replace with
-          // progressionScheme.progressionSchemeID
-        )
-      },
-      notes = mutableListOf()
+        workoutID = workoutID,
+        workoutUUID = workoutUUID,
+        exercise = exercise,
+        sets =
+        MutableList(3) { indices ->
+            SetModel(
+                setNumber = indices,
+                exerciseWeight = 100.00.times(it),
+                repetitions = 10.times(it),
+                exerciseID = exercise.exerciseID,
+                exerciseUUID = exercise.uuid,
+                workoutID = workoutID, // TODO Replace with workout.workoutID
+                workoutUUID = workoutUUID,
+                progressionSchemeID = Random().nextInt(), // TODO Replace with
+                // progressionScheme.progressionSchemeID
+            )
+        },
+        notes = mutableListOf()
     )
   }
 }

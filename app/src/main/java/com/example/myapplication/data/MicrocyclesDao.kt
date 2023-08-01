@@ -1,11 +1,13 @@
 package com.example.myapplication.data
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 
+@Dao
 interface MicrocyclesDao {
     @Query("SELECT * FROM microcycles")
     suspend fun getAllMicrocycles(): List<Microcycle>
@@ -18,6 +20,9 @@ interface MicrocyclesDao {
 
     @Query("SELECT * FROM microcycles WHERE programID = :programID")
     suspend fun getMicrocyclesByProgram(programID: Long): List<Microcycle>
+
+    @Query("SELECT * FROM microcycles WHERE programID = :programID ORDER BY dateCreated")
+    suspend fun getMicrocyclesByProgramSorted(programID: Long): List<Microcycle>
 
     @Insert(onConflict = OnConflictStrategy.ABORT, entity = Microcycle::class)
     suspend fun insertMicrocycle(microcycle: Microcycle)

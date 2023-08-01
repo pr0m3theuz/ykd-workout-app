@@ -2,7 +2,6 @@ package com.example.myapplication.data
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -13,7 +12,7 @@ class WorkoutRepository @Inject constructor(private val workoutsDao: WorkoutsDao
         return workoutsDao.getWorkoutById(workoutID)
     }
 
-    suspend fun getWorkoutByMicrocycleUUID(microcycleUUID: UUID): List<Workout> {
+/*    suspend fun getWorkoutByMicrocycleUUID(microcycleUUID: UUID): List<Workout> {
         return workoutsDao.getWorkoutsByMicrocycleUUID(microcycleUUID)
     }
 
@@ -23,7 +22,7 @@ class WorkoutRepository @Inject constructor(private val workoutsDao: WorkoutsDao
 
     suspend fun getWorkoutByProgramUUID(programUUID: UUID): List<Workout> {
         return workoutsDao.getWorkoutsByProgramUUID(programUUID)
-    }
+    }*/
 
     suspend fun getWorkoutsByMicrocycleID(microcycleID: Long): List<Workout> {
         return workoutsDao.getWorkoutsByMicrocycleID(microcycleID)

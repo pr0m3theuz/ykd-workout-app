@@ -5,13 +5,15 @@ import javax.inject.Singleton
 
 @Singleton
 class ExerciseSetsRepository @Inject constructor(private val exerciseSetsDao: ExerciseSetsDao) {
+//    suspend fun getSetForExercise(exerciseID: Long): List<TestExerciseSets> {
+//        return exerciseSetsDao.getSetForExercise(exerciseID)
+//    }
 
-
-    fun getSetModelsForExercise(exerciseID: Long): List<TestExerciseSets> {
-        return exerciseSetsDao.getSetModelsForExercise(exerciseID)
+    suspend fun getSetsWithExercise(workoutID: Long): List<SetsWithExercise> {
+        return exerciseSetsDao.getSetsWithExercise(workoutID)
     }
 
-    fun getSetsAndExerciseByWorkout(workoutID: Long): List<WorkoutWithSetsAndExercise> {
+    suspend fun getSetsAndExerciseByWorkout(workoutID: Long): List<WorkoutWithSetsAndExercise> {
         return exerciseSetsDao.getSetsAndExerciseByWorkout(workoutID)
     }
 
