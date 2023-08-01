@@ -7,13 +7,17 @@ import com.example.myapplication.data.ExerciseModel
 import com.example.myapplication.data.ExerciseSetsRepository
 import com.example.myapplication.data.ExercisesRepository
 import com.example.myapplication.data.Mesocycle
+import com.example.myapplication.data.MesocycleTree
 import com.example.myapplication.data.Microcycle
+import com.example.myapplication.data.MicrocycleTree
 import com.example.myapplication.data.Program
+import com.example.myapplication.data.ProgramTree
 import com.example.myapplication.data.ProgramsRepository
 import com.example.myapplication.data.SetModel
 import com.example.myapplication.data.SetsRepository
 import com.example.myapplication.data.Workout
 import com.example.myapplication.data.WorkoutRepository
+import com.example.myapplication.data.WorkoutTree
 import com.example.myapplication.data.WorkoutWithSetsAndExercise
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -129,7 +133,9 @@ constructor(
     }
   }
 
-  fun getWorkoutWithSetsAndExerciseByWorkoutID(workoutID: Long): StateFlow<List<WorkoutWithSetsAndExercise>> {
+  fun getWorkoutWithSetsAndExerciseByWorkoutID(
+    workoutID: Long
+  ): StateFlow<List<WorkoutWithSetsAndExercise>> {
     val setsAndExercise = MutableStateFlow(emptyList<WorkoutWithSetsAndExercise>())
     viewModelScope.launch {
       setsAndExercise.value = exerciseSetsRepository.getSetsAndExerciseByWorkout(workoutID)
@@ -140,9 +146,7 @@ constructor(
   fun getSetsByWorkoutID(workoutID: Long): StateFlow<List<SetModel>> {
     val sets = MutableStateFlow(emptyList<SetModel>())
 
-    viewModelScope.launch {
-      sets.value = setsRepository.getSetsByWorkout(workoutID)
-    }
+    viewModelScope.launch { sets.value = setsRepository.getSetsByWorkout(workoutID) }
 
     /*
         val exerciseIDs = sets.associateBy { it.exerciseID }.keys
@@ -162,7 +166,7 @@ constructor(
         }
     */
 
-//    Log.i("getSetsByWorkoutID()", sets.toString())
+    //    Log.i("getSetsByWorkoutID()", sets.toString())
     return sets
   }
 
@@ -198,9 +202,7 @@ constructor(
   fun getExercise(exerciseID: Long): StateFlow<List<ExerciseModel>> {
     val exercise = MutableStateFlow(emptyList<ExerciseModel>())
 
-    viewModelScope.launch {
-      exercise.value = exercisesRepository.getExercise(exerciseID)
-    }
+    viewModelScope.launch { exercise.value = exercisesRepository.getExercise(exerciseID) }
 
     return exercise
   }
@@ -209,7 +211,7 @@ constructor(
     //    TODO
   }
 
-  /*fun buildProgramTree(program: Program) {
+  fun buildProgramTree(program: Program) {
     val programTree: ProgramTree = ProgramTree(program)
 
     getMesocyclesByProgram(programTree.program.programID).forEach() { mesocycle ->
@@ -232,5 +234,6 @@ constructor(
         }
       }
     }
-  }*/
+    Log.i("buildProgramTree", programTree.mesocyclesTree.toString())
+  }
 }

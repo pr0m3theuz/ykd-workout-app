@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -139,9 +140,12 @@ fun ProgramsScreen(
 
       item {
           Text("Quick Start", style = titleMedium)
-          Button(onClick = { /*TODO*/ }) {
+          Button(
+              onClick = { /*TODO*/ },
+              contentPadding = PaddingValues(start = 16.dp, end = 24.dp)
+          ) {
               Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
-              Text(text = "Start An Empty Workout")
+              Text(text = "Start An Empty Workout", Modifier.padding(start = 8.dp))
           }
       }
 
@@ -173,7 +177,10 @@ fun ProgramsScreen(
       }
 
       item {
-          Button(onClick = { /*TODO*/ }) {
+          Button(
+              onClick = { /*TODO*/ },
+              contentPadding = PaddingValues(start = 16.dp, end = 24.dp)
+          ) {
               Icon(imageVector = Icons.Outlined.Assignment, contentDescription = "Add New Program")
               Text(text = "New Program", Modifier.padding(start = 8.dp))
           }
@@ -192,7 +199,8 @@ fun ProgramsScreen(
                 )
             }
             Text(
-                text = "Program/Macrocycle (###)",
+                text = "Programs/Macrocycles (${programs.size})",
+//                style = titleMedium
 
                 //            style = MaterialTheme.typography.bodySmall
             )

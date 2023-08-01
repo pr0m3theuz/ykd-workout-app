@@ -1,6 +1,5 @@
 package com.example.myapplication.components.programs
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -446,7 +445,7 @@ fun WorkoutOverviewCard(microcycles: List<Microcycle>, programsViewModel: Progra
         ) {
           if (workouts.isNotEmpty()) {
             workouts.forEachIndexed { index, workout ->
-              Log.i("WorkoutOverviewCard", workout.toString())
+//              Log.i("WorkoutOverviewCard", workout.toString())
               WorkoutDayCard(index, workout, programsViewModel)
               //              programsViewModel.getExerciseSetsByWorkout(workout.workoutID)
             }
@@ -471,7 +470,7 @@ fun WorkoutDayCard(index: Int, workout: Workout, programsViewModel: ProgramsView
 
   val setsGroupedByExercise = sets.groupBy { it.exerciseID }
 
-  Log.i("WorkoutDayCard", sets.toString())
+//  Log.i("WorkoutDayCard", sets.toString())
 
   ElevatedCard() {
     Column(
