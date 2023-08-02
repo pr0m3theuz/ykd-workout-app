@@ -54,7 +54,7 @@ import com.example.myapplication.components.exercisesList.ExerciseOptionsDropdow
 import com.example.myapplication.components.exercisesList.ExercisesFilterMenu
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.exercisesList.SelectedFiltersLazyRow
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 import com.example.myapplication.data.MuscleGroup
 import kotlinx.coroutines.launch
 
@@ -85,15 +85,15 @@ fun AddExercisesScreen(
   var active by remember { mutableStateOf(false) }
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
-  val exercisesSelectedToBeAddedToWorkout = remember { mutableStateListOf<ExerciseModel>() }
+    val exercisesSelectedToBeAddedToWorkout = remember { mutableStateListOf<Exercise>() }
 
-  fun selectExercise(exercise: ExerciseModel, isSelected: Boolean) {
-    if (isSelected) {
-      exercisesSelectedToBeAddedToWorkout.add(exercise)
-    } else {
-      exercisesSelectedToBeAddedToWorkout.remove(exercise)
+    fun selectExercise(exercise: Exercise, isSelected: Boolean) {
+        if (isSelected) {
+            exercisesSelectedToBeAddedToWorkout.add(exercise)
+        } else {
+            exercisesSelectedToBeAddedToWorkout.remove(exercise)
+        }
     }
-  }
 
   val dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
 
@@ -196,8 +196,8 @@ fun AddExercisesScreen(
               )
             },
             modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 8.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
           ) {}
 
           SelectedFiltersLazyRow(exercisesViewModel)
@@ -216,14 +216,14 @@ fun AddExercisesScreen(
             exercises.isEmpty() && query.isBlank() -> {
               Column(
                 modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(top = 24.dp),
+                    .fillMaxWidth()
+                    .padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
               ) {
                 LinearProgressIndicator(
                   modifier = Modifier
-                    .semantics(mergeDescendants = true) {}
-                    .padding(10.dp),
+                      .semantics(mergeDescendants = true) {}
+                      .padding(10.dp),
                 )
               }
             }
@@ -249,8 +249,8 @@ fun AddExercisesScreen(
 fun NoResultsFound(query: String) {
   Column(
     modifier = Modifier
-      .fillMaxSize()
-      .padding(16.dp),
+        .fillMaxSize()
+        .padding(16.dp),
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -270,10 +270,10 @@ fun NoResultsFound(query: String) {
 
 @Composable
 private fun ExercisesLazyList(
-  exercises: List<ExerciseModel>,
-  selectExercise: (_exercise: ExerciseModel, selected: Boolean) -> Unit,
-  muscleGroups: List<MuscleGroup>,
-  getMuscleGroup: () -> Unit,
+    exercises: List<Exercise>,
+    selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
+    muscleGroups: List<MuscleGroup>,
+    getMuscleGroup: () -> Unit,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -294,8 +294,8 @@ private fun ExercisesLazyList(
   ) {
     items(count = exercises.size, key = { index: Int -> exercises[index].lazyListItemID }) { index
       ->
-      val exercise: ExerciseModel = exercises[index]
-      val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
+        val exercise: Exercise = exercises[index]
+        val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
 
       ToggleableExerciseItem(
         exercise = exercise,

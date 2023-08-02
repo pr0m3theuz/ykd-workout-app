@@ -2,15 +2,14 @@ package com.example.myapplication.components.workoutDialogs.equateVolume
 
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.data.setVolume
 import com.example.myapplication.newID
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.RoundingMode
-import java.util.Random
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -23,12 +22,12 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
   val oneRepMax: StateFlow<Double>
     get() = _oneRepMax
 
-  private var _sets = MutableStateFlow(emptyList<SetModel>())
-  val sets: StateFlow<List<SetModel>>
+  private var _sets = MutableStateFlow(emptyList<Set>())
+  val sets: StateFlow<List<Set>>
     get() = _sets
 
   private var _setsPercentage = MutableStateFlow(_sets.value.associate { it.uuid to 1.0 })
-  val setsPercentage: StateFlow<Map<UUID, Double>>
+  val setsPercentage: StateFlow<Map<RealmUUID, Double>>
     get() = _setsPercentage
 
   private var _totalVolume: Double = 0.0
@@ -41,19 +40,19 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
 
   private var _exerciseSets: ExerciseSets? = null
 
-  private var exerciseID: Long = 0
-  private var exerciseUUID: UUID = UUID.randomUUID()
-  private var workoutID: Long = 0
-  private var workoutUUID: UUID = UUID.randomUUID()
+//  private var exerciseID: Long = 0
+//  private var exerciseUUID: RealmUUID = RealmUUID.random()
+//  private var workoutID: Long = 0
+//  private var workoutUUID: RealmUUID = RealmUUID.random()
 
   private fun getExerciseSets(exerciseSets: ExerciseSets) {
     _exerciseSets = exerciseSets
-    exerciseID = exerciseSets.exercise.exerciseID
-    exerciseUUID = exerciseSets.exercise.uuid
-    workoutID = exerciseSets.workoutID
-    workoutUUID = exerciseSets.workoutUUID
+//    exerciseID = exerciseSets.exercise.exerciseID
+//    exerciseUUID = exerciseSets.exercise.uuid
+//    workoutID = exerciseSets.workoutID
+//    workoutUUID = exerciseSets.workoutUUID
 
-    _sets.value = initSets()
+    _sets.value = exerciseSets.sets.toList()
   }
 
   fun initialize(exerciseSets: ExerciseSets) {
@@ -74,36 +73,28 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
     _oneRepMax.value = newWorkingWeight
   }
 
-  fun changeWorkingSets(sets: List<SetModel>) {
+  fun changeWorkingSets(sets: List<Set>) {
     _sets.value = sets.filter { it.setTypeID != WARM_UP_SET }
     setNewTotalVolume(calculateTotalVolume(_sets.value))
   }
 
   fun addSet() {
-    val temporarySets: MutableList<SetModel> = _sets.value.toMutableList()
+    val temporarySets: MutableList<Set> = _sets.value.toMutableList()
 
     if (_sets.value.isNotEmpty()) {
       temporarySets.add(
-        temporarySets
-          .last()
-          .copy(
-            lazyListItemID = newID(),
-            uuid = UUID.randomUUID(),
-            setNumber = sets.value.last().setNumber?.plus(1),
-            setCompleted = false,
-          )
+        Set().apply {
+          setNumber = _sets.value.last().setNumber?.plus(1)
+          exerciseWeight = temporarySets.last().exerciseWeight
+          repetitions = temporarySets.last().repetitions
+          ratePerceivedEffort = temporarySets.last().ratePerceivedEffort
+          repetitionsInReserve = temporarySets.last().repetitionsInReserve
+          setTypeID = temporarySets.last().setTypeID
+          percentage1RM = temporarySets.last().percentage1RM
+        }
       )
     } else {
-      temporarySets.add(
-        SetModel(
-          exerciseID = exerciseID,
-          exerciseUUID = exerciseUUID,
-          workoutID = workoutID,
-          workoutUUID = workoutUUID,
-          progressionSchemeID =
-          Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
-        )
-      )
+      temporarySets.add(Set())
     }
     _sets.value = temporarySets.toList()
     setNewTotalVolume(calculateTotalVolume(_sets.value))
@@ -126,32 +117,32 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
    * set number incremented by 1 and the completion status set to false. The new set is then added
    * to the list of sets and the total volume is recalculated.
    */
-  fun chatgptAddSet() {
-    val currentSets = _sets.value.toMutableList()
-    val lastSet = currentSets.lastOrNull()
+  /*  fun chatgptAddSet() {
+      val currentSets = _sets.value.toMutableList()
+      val lastSet = currentSets.lastOrNull()
 
-    val newSet =
-      lastSet?.copy(
-        lazyListItemID = newID(),
-        uuid = UUID.randomUUID(),
-        setNumber = lastSet.setNumber?.plus(1),
-        exerciseID = exerciseID,
-        workoutID = workoutID
-      )
-        ?: SetModel(
-          exerciseID = exerciseID,
-          exerciseUUID = exerciseUUID,
-          workoutID = workoutID,
-          workoutUUID = workoutUUID,
-          progressionSchemeID =
-          Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
+      val newSet =
+        lastSet?.copy(
+          lazyListItemID = newID(),
+          RealmUUID = RealmUUID.random(),
+          setNumber = lastSet.setNumber?.plus(1),
+  //        exerciseID = exerciseID,
+  //        workoutID = workoutID
         )
+          ?: Set().apply{
+  //          exerciseID = exerciseID
+  //          exerciseUUID = exerciseUUID
+  //          workoutID = workoutID
+  //          workoutUUID = workoutUUID
 
-    currentSets.add(newSet)
-    _sets.value = currentSets.toList()
+            // TODO Replace with progressionScheme.progressionSchemeID
+          }
 
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
-  }
+      currentSets.add(newSet)
+      _sets.value = currentSets.toList()
+
+      setNewTotalVolume(calculateTotalVolume(_sets.value))
+    }*/
 
   fun removeSet(id: Long) {
     val temporarySets = _sets.value.toMutableList()
@@ -163,7 +154,7 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
     setNewTotalVolume(calculateTotalVolume(_sets.value))
   }
 
-  fun updateSetWeight(uuid: UUID, newWeight: Double?) {
+  fun updateSetWeight(uuid: RealmUUID, newWeight: Double?) {
     val temporarySets = _sets.value.toMutableList()
     temporarySets.forEach {
       if (it.uuid == uuid) {
@@ -174,14 +165,14 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
     setNewTotalVolume(calculateTotalVolume(_sets.value))
   }
 
-  fun updateSetReps(uuid: UUID, newReps: Int) {
+  fun updateSetReps(uuid: RealmUUID, newReps: Int) {
     val temporarySets = _sets.value.toMutableList()
     temporarySets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
     _sets.value = temporarySets
     setNewTotalVolume(calculateTotalVolume(_sets.value))
   }
 
-  fun updateSetPercentage(uuid: UUID, newPercentage: Double) {
+  fun updateSetPercentage(uuid: RealmUUID, newPercentage: Double) {
     val temporaryMap = _setsPercentage.value.toMutableMap()
     temporaryMap[uuid] = newPercentage
     _setsPercentage.value = temporaryMap
@@ -240,7 +231,7 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
     return numberOfWorkingSets
   }
 
-  private fun calculateTotalVolume(temporarySets: List<SetModel>): Double {
+  private fun calculateTotalVolume(temporarySets: List<Set>): Double {
     var totalVolume: Double = 0.0
 
     temporarySets.filter { it.setTypeID != WARM_UP_SET }.forEach { totalVolume += (it.setVolume()) }
@@ -248,20 +239,20 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
     return totalVolume
   }
 
-  private fun initSets(): List<SetModel> {
-    return List(3) { index ->
-      SetModel(
-        setNumber = index,
-        exerciseWeight = 100.00,
-        repetitions = 10,
-        percentage1RM = 1.0,
-        exerciseID = exerciseID!!,
-        exerciseUUID = exerciseUUID!!,
-        workoutID = workoutID!!,
-        workoutUUID = workoutUUID!!,
-        progressionSchemeID =
-        Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
-      )
-    }
-  }
+  /*  private fun initSets(): List<Set> {
+      return List(3) { index ->
+        Set(
+            setNumber = index,
+            exerciseWeight = 100.00,
+            repetitions = 10,
+            percentage1RM = 1.0,
+            exerciseID = exerciseID!!,
+            exerciseUUID = exerciseUUID!!,
+            workoutID = workoutID!!,
+            workoutUUID = workoutUUID!!,
+            progressionSchemeID =
+            Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
+        )
+      }
+    }*/
 }

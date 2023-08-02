@@ -29,7 +29,7 @@ import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.SetTypeOptionsMenu
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
@@ -42,7 +42,7 @@ import com.example.myapplication.utils.doubleFormatted
 fun SetContent(
     exerciseSets: ExerciseSets,
     setIndex: Int,
-    set: SetModel,
+    set: Set,
     //    isSetCompleted: (Boolean) -> Unit,
     //    newWeight: (newWeight: Double?) -> Unit,
     //    newReps: (newReps: Int?) -> Unit,
@@ -391,22 +391,22 @@ private fun ExerciseWeightTextField(
     )
 }
 
-private fun getSetIconText(set: SetModel, setIndex: Int): String =
+private fun getSetIconText(set: Set, setIndex: Int): String =
     if (set.setTypeID == 1) {
         setIndex.inc().toString()
     } else {
         "TODO"
     }
 
-private fun getRatePerceivedEffort(set: SetModel): String = doubleFormatted(set.ratePerceivedEffort)
+private fun getRatePerceivedEffort(set: Set): String = doubleFormatted(set.ratePerceivedEffort)
 
-private fun getRepetitionsInReserve(set: SetModel): String =
+private fun getRepetitionsInReserve(set: Set): String =
     doubleFormatted(set.repetitionsInReserve)
 
-private fun getRepetitions(set: SetModel): String =
+private fun getRepetitions(set: Set): String =
     when (set.repetitions) {
         null -> ""
         else -> set.repetitions.toString()
     }
 
-private fun getExerciseWeight(set: SetModel): String = doubleFormatted(set.exerciseWeight)
+private fun getExerciseWeight(set: Set): String = doubleFormatted(set.exerciseWeight)

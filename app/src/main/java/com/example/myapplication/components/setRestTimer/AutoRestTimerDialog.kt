@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -33,7 +33,7 @@ import kotlin.time.toDuration
 fun AutoRestTimerScreen(
     workoutViewModel: WorkoutViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    exercise: ExerciseModel
+    exercise: Exercise
 ) {
     AutoRestTimerDialog(
         { close -> openDialog(close) },
@@ -42,14 +42,14 @@ fun AutoRestTimerScreen(
         isWorkingSetRestTimerEnabled = exercise.workingSetRestTimerEnabled,
         warmUpSetRestTime = exercise.warmUpSetRestInWholeMilliseconds.toDuration(DurationUnit.MILLISECONDS),
         isWarmUpSetRestTimerEnabled = exercise.warmUpSetRestTimerEnabled,
-        { tabRowState: Int, _exercise: ExerciseModel, time: Duration ->
+        { tabRowState: Int, _exercise: Exercise, time: Duration ->
             workoutViewModel.updateExerciseAutoRestTimer(
                 tabRowState = tabRowState,
                 exercise = _exercise,
                 time = time
             )
         },
-        { tabRowState: Int, _exercise: ExerciseModel, enable: Boolean ->
+        { tabRowState: Int, _exercise: Exercise, enable: Boolean ->
             workoutViewModel.enableExerciseAutoRestTimer(
                 tabRowState = tabRowState,
                 exercise = _exercise,
@@ -64,13 +64,13 @@ fun AutoRestTimerScreen(
 @Composable
 fun AutoRestTimerDialog(
     openDialog: (Boolean) -> Unit,
-    exercise: ExerciseModel,
+    exercise: Exercise,
     workSetRestTime: Duration,
     isWorkingSetRestTimerEnabled: Boolean,
     warmUpSetRestTime: Duration,
     isWarmUpSetRestTimerEnabled: Boolean,
-    updateExerciseAutoRestTimer: (tabRowState: Int, _exercise: ExerciseModel, time: Duration) -> Unit,
-    enableExerciseAutoRestTimer: (tabRowState: Int, exercise: ExerciseModel, enable: Boolean) -> Unit
+    updateExerciseAutoRestTimer: (tabRowState: Int, _exercise: Exercise, time: Duration) -> Unit,
+    enableExerciseAutoRestTimer: (tabRowState: Int, exercise: Exercise, enable: Boolean) -> Unit
 ) {
     val titles = listOf("Work Set", "Warm Up Set")
     var tabRowState by remember { mutableStateOf(0) }

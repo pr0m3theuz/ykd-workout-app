@@ -12,7 +12,7 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    fun getAllExercises(): Flow<List<ExerciseModel>> = exerciseDao.getAllExercises()
+    fun getAllExercises(): Flow<List<Exercise>> = exerciseDao.getAllExercises()
 
     fun getAllEquipment(): Flow<List<Equipment>> = exerciseDao.getAllEquipment()
 
@@ -35,24 +35,24 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
   // implement anything else to ensure we're not doing long running database work
   // off the main thread.
 
-  @WorkerThread
-  suspend fun insertExercise(exercise: ExerciseModel) {
-    exerciseDao.insertExercise(exercise)
-  }
+    @WorkerThread
+    suspend fun insertExercise(exercise: Exercise) {
+        exerciseDao.insertExercise(exercise)
+    }
 
-  fun getExerciseDetails(exerciseID: Long): Flow<List<ExerciseModel>> {
-    return exerciseDao.getExerciseDetails(exerciseID)
-  }
+    fun getExerciseDetails(exerciseID: Long): Flow<List<Exercise>> {
+        return exerciseDao.getExerciseDetails(exerciseID)
+    }
 
-  suspend fun getExercise(exerciseID: Long): List<ExerciseModel> {
-    return exerciseDao.getExercise(exerciseID)
-  }
+    suspend fun getExercise(exerciseID: Long): List<Exercise> {
+        return exerciseDao.getExercise(exerciseID)
+    }
 
 
-  @WorkerThread
-  fun updateExercise(exercise: ExerciseModel) {
-    exerciseDao.updateExercise(exercise)
-  }
+    @WorkerThread
+    fun updateExercise(exercise: Exercise) {
+        exerciseDao.updateExercise(exercise)
+    }
 
   @WorkerThread
   fun updateWeightUnitsforExercise(exerciseID: Long, weightUnit: String) {
@@ -80,12 +80,12 @@ class ExercisesRepository @Inject constructor(private val exerciseDao: ExerciseD
   }
 
 
-  fun filterExercises(
-    exercise: String,
-    muscleGroupIDs: List<String>,
-    equipmentIDs: List<String>
-    //        movementTypes: List<String>
-  ): Flow<List<ExerciseModel>> {
-    return exerciseDao.filterExercises(exercise, muscleGroupIDs, equipmentIDs /*movementTypes*/)
-  }
+    fun filterExercises(
+        exercise: String,
+        muscleGroupIDs: List<String>,
+        equipmentIDs: List<String>
+        //        movementTypes: List<String>
+    ): Flow<List<Exercise>> {
+        return exerciseDao.filterExercises(exercise, muscleGroupIDs, equipmentIDs /*movementTypes*/)
+    }
 }

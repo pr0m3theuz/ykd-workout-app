@@ -22,15 +22,15 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 
 @Composable
 fun SelectableExerciseItem(
-  exercise: ExerciseModel,
-  selectedExercise: Boolean,
-  muscleGroupName: String?,
-  selectExercise: (_exercise: ExerciseModel, selected: Boolean) -> Unit,
-  workoutViewModel: WorkoutViewModel = hiltViewModel()
+    exercise: Exercise,
+    selectedExercise: Boolean,
+    muscleGroupName: String?,
+    selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
+    workoutViewModel: WorkoutViewModel = hiltViewModel()
 ) {
 
   val padding = 8.dp
@@ -47,15 +47,15 @@ fun SelectableExerciseItem(
     colors = colors,
     modifier =
     Modifier /*.padding(vertical = 8.dp)*/
-      .fillMaxWidth()
-      .selectable(
-        enabled = true,
-        role = Role.RadioButton,
-        selected = selectedExercise,
-        onClick = {
-          selectExercise(exercise, !selectedExercise)
-        }
-      ),
+        .fillMaxWidth()
+        .selectable(
+            enabled = true,
+            role = Role.RadioButton,
+            selected = selectedExercise,
+            onClick = {
+                selectExercise(exercise, !selectedExercise)
+            }
+        ),
     headlineContent = {
       Text(
         text = exercise.name,

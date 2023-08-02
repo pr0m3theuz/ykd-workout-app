@@ -46,7 +46,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +64,7 @@ fun ExerciseDetailsScreen(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<ExerciseModel>) {
+private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<Exercise>) {
     val exercise = _exercise.firstOrNull()
 
     val context = LocalContext.current
@@ -132,7 +132,10 @@ private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<
                 }
             }
 
-            Column(Modifier.padding(8.dp).fillMaxWidth()) {
+            Column(
+                Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()) {
                 when (state) {
                     0 -> AboutTab(exercise?.name ?: "never gonna give you up")
                     1 -> HistoryTab()

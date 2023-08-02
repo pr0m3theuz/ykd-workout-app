@@ -11,7 +11,7 @@ enum class Equipment(val printableName: String) {
     PLATE_LOADED_MACHINE("Plate Loaded"),
     MACHINE("Machine"),
     KETTLEBELL("Kettlebell"),
-    MEDICINEBALL("Medicine Ball"),
+    MEDICINEBALL("Medicine Ball"),@Entity(tableName = "programs")
     BODY_WEIGHT("Body Weight"),
     CARDIO("Cardio"),
     OTHER("Other"),

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ExerciseDao {
   @Query("SELECT * FROM exercises ORDER BY name ASC")
-  fun getAllExercises(): Flow<List<ExerciseModel>>
+  fun getAllExercises(): Flow<List<Exercise>>
 
   @Query("SELECT * FROM equipment ORDER BY name ASC")
   fun getAllEquipment(): Flow<List<Equipment>>
@@ -30,17 +30,17 @@ interface ExerciseDao {
   fun getMuscleGroupNameByID(muscleGroupID: String): Flow<List<String>>
 
   @Query("SELECT * FROM exercises WHERE name LIKE :exercise ORDER BY name ASC")
-  fun searchExercises(exercise: String): Flow<List<ExerciseModel>>
+  fun searchExercises(exercise: String): Flow<List<Exercise>>
 
   @Query("SELECT * FROM exercises WHERE exerciseID=:exerciseID")
   fun getExerciseDetails(
     exerciseID: Long,
-  ): Flow<List<ExerciseModel>>
+  ): Flow<List<Exercise>>
 
   @Query("SELECT * FROM exercises WHERE exerciseID=:exerciseID")
   suspend fun getExercise(
     exerciseID: Long,
-  ): List<ExerciseModel>
+  ): List<Exercise>
 
   //    @Query("SELECT * FROM exercises WHERE name LIKE :exercise ORDER BY name ASC")
   @Query(
@@ -54,13 +54,13 @@ interface ExerciseDao {
     muscleGroupIDs: List<String> = listOf("%"),
     equipmentIDs: List<String> = listOf("%")
     //        movementTypes: List<String> = listOf("%%")
-  ): Flow<List<ExerciseModel>>
+  ): Flow<List<Exercise>>
 
-  @Insert(onConflict = OnConflictStrategy.ABORT, entity = ExerciseModel::class)
-  suspend fun insertExercise(exercise: ExerciseModel)
+  @Insert(onConflict = OnConflictStrategy.ABORT, entity = Exercise::class)
+  suspend fun insertExercise(exercise: Exercise)
 
   @Update
-  fun updateExercise(exercise: ExerciseModel)
+  fun updateExercise(exercise: Exercise)
 
   @Query("UPDATE exercises SET weightUnit=:weightUnit WHERE exerciseID=:exerciseID")
   fun updateWeightUnitsforExercise(exerciseID: Long, weightUnit: String)
@@ -79,5 +79,5 @@ interface ExerciseDao {
 
 
   @Delete
-  fun deleteExercise(exercise: ExerciseModel)
+  fun deleteExercise(exercise: Exercise)
 }

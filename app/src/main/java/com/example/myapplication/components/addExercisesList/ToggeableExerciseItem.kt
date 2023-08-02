@@ -21,14 +21,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 
 @Composable
 fun ToggleableExerciseItem(
-  exercise: ExerciseModel,
-  muscleGroupName: String?,
-  selectExercise: (_exercise: ExerciseModel, selected: Boolean) -> Unit,
-  workoutViewModel: WorkoutViewModel = hiltViewModel()
+    exercise: Exercise,
+    muscleGroupName: String?,
+    selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
+    workoutViewModel: WorkoutViewModel = hiltViewModel()
 ) {
 
   val padding = 8.dp
@@ -45,16 +45,16 @@ fun ToggleableExerciseItem(
     colors = colors,
     modifier =
     Modifier /*.padding(vertical = 8.dp)*/
-      .fillMaxWidth()
-      .toggleable(
-        enabled = true,
-        role = Role.Checkbox,
-        value = selected,
-        onValueChange = {
-          onSelected(it)
-          selectExercise(exercise, it)
-        }
-      ),
+        .fillMaxWidth()
+        .toggleable(
+            enabled = true,
+            role = Role.Checkbox,
+            value = selected,
+            onValueChange = {
+                onSelected(it)
+                selectExercise(exercise, it)
+            }
+        ),
     headlineContent = {
       Text(
         text = exercise.name,

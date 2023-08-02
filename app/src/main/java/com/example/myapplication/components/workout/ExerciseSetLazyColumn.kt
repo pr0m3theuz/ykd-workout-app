@@ -21,7 +21,7 @@ import com.example.myapplication.components.exercise.SetItem
 import com.example.myapplication.components.exercise.SwipeToDismissItem
 import com.example.myapplication.components.exercise.WorkoutNoteTextField
 import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.data.WorkoutNote
 
 @Composable
@@ -74,14 +74,14 @@ fun ExerciseSetLazyColumn(
         _exerciseSets = exerciseSets,
       )
 
-      exerciseSets.sets.forEachIndexed { index: Int, set: SetModel ->
-        SetItem(
-          exerciseSets = exerciseSets,
-          index = index,
-          set = set,
-          removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
-        )
-      }
+        exerciseSets.sets.forEachIndexed { index: Int, set: Set ->
+            SetItem(
+                exerciseSets = exerciseSets,
+                index = index,
+                set = set,
+                removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
+            )
+        }
 
       AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
     }
@@ -89,7 +89,7 @@ fun ExerciseSetLazyColumn(
     item { AddExercise() }
     item { CancelWorkout() { cancelWorkout() } }
     item { Box(modifier = Modifier
-      .height(128.dp)
-      .fillMaxWidth()) }
+        .height(128.dp)
+        .fillMaxWidth()) }
   }
 }

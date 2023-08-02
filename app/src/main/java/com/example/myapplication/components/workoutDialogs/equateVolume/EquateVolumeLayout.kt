@@ -11,14 +11,14 @@ import com.example.myapplication.components.workoutDialogs.SetContent
 import com.example.myapplication.components.workoutDialogs.calculateNewSetResults
 import com.example.myapplication.components.workoutDialogs.calculatePercentage
 import com.example.myapplication.components.workoutDialogs.getFormattedPercentageText
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.utils.checkIntInput
 
 @Composable
 fun EquateVolumeLayout(
     equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
     setIndex: Int,
-    workingSet: SetModel,
+    workingSet: Set,
 ) {
     var workingSetPercentage: Double? by remember { mutableStateOf(workingSet.percentage1RM) }
 

@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
 import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 fun SetItem(
   exerciseSets: ExerciseSets,
   index: Int,
-  set: SetModel,
+  set: Set,
   removeSet: () -> Unit,
 ) {
   //    Log.i("SetColumn()", "$set")

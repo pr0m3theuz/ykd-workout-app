@@ -23,7 +23,7 @@ import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetLazyColumn
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetViewModel
 import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
 
@@ -54,8 +54,8 @@ fun AddWorkingSetsScreen(
 fun AddWorkingSetsDialog(
     workingSetViewModel: WorkingSetViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    insertSets: (workingSets: List<SetModel>) -> Unit,
-    insertBackOffSets: (backOffSets: List<SetModel>) -> Unit,
+    insertSets: (workingSets: List<Set>) -> Unit,
+    insertBackOffSets: (backOffSets: List<Set>) -> Unit,
 ) {
     val sets by workingSetViewModel.sets.collectAsState()
 

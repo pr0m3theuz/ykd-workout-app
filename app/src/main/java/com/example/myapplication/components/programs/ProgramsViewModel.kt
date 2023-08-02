@@ -3,14 +3,14 @@ package com.example.myapplication.components.programs
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 import com.example.myapplication.data.ExerciseSetsRepository
 import com.example.myapplication.data.ExercisesRepository
 import com.example.myapplication.data.Mesocycle
 import com.example.myapplication.data.Microcycle
 import com.example.myapplication.data.Program
 import com.example.myapplication.data.ProgramsRepository
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.data.SetsRepository
 import com.example.myapplication.data.Workout
 import com.example.myapplication.data.WorkoutRepository
@@ -137,8 +137,8 @@ constructor(
     return setsAndExercise
   }
 
-  fun getSetsByWorkoutID(workoutID: Long): StateFlow<List<SetModel>> {
-    val sets = MutableStateFlow(emptyList<SetModel>())
+  fun getSetsByWorkoutID(workoutID: Long): StateFlow<List<Set>> {
+    val sets = MutableStateFlow(emptyList<Set>())
 
     viewModelScope.launch {
       sets.value = setsRepository.getSetsByWorkout(workoutID)
@@ -195,8 +195,8 @@ constructor(
     return MutableStateFlow(exercisesSets)
   }*/
 
-  fun getExercise(exerciseID: Long): StateFlow<List<ExerciseModel>> {
-    val exercise = MutableStateFlow(emptyList<ExerciseModel>())
+  fun getExercise(exerciseID: Long): StateFlow<List<Exercise>> {
+    val exercise = MutableStateFlow(emptyList<Exercise>())
 
     viewModelScope.launch {
       exercise.value = exercisesRepository.getExercise(exerciseID)

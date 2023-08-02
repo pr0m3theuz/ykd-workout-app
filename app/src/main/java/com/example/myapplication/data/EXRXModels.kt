@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
     tableName = "muscleExercises",
     foreignKeys = [
         ForeignKey(
-            entity = ExerciseModel::class,
+            entity = Exercise::class,
             parentColumns = ["exerciseID"],
             childColumns = ["exerciseID"],
             onDelete = ForeignKey.CASCADE

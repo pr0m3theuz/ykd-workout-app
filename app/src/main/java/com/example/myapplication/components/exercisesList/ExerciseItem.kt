@@ -16,29 +16,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 
 @Composable
-fun ExerciseItem(exercise: ExerciseModel, muscleGroupName: String?, navController: NavController) {
+fun ExerciseItem(exercise: Exercise, muscleGroupName: String?, navController: NavController) {
 
-  val padding = 8.dp
+    val padding = 8.dp
 
-  val colors =
-    when (isSystemInDarkTheme()) {
-      true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
-      else -> ListItemDefaults.colors(containerColor = Color.Transparent)
-    }
+    val colors =
+        when (isSystemInDarkTheme()) {
+            true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
+            else -> ListItemDefaults.colors(containerColor = Color.Transparent)
+        }
 
-  ListItem(
+    ListItem(
     colors = colors,
     modifier =
     Modifier /*.padding(vertical = 8.dp)*/
-      .fillMaxWidth()
-      .clickable(
-        enabled = true,
-        onClickLabel = "See more details about ${exercise.name} ",
-        onClick = { navController.navigate("exerciseDetails/${exercise.exerciseID}") }
-      ),
+        .fillMaxWidth()
+        .clickable(
+            enabled = true,
+            onClickLabel = "See more details about ${exercise.name} ",
+            onClick = { navController.navigate("exerciseDetails/${exercise.exerciseID}") }
+        ),
     headlineContent = {
       Text(
         text = exercise.name,

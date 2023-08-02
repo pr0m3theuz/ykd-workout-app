@@ -23,7 +23,7 @@ import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeLazyColumn
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
 import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.data.totalWorkingSetVolume
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
@@ -53,12 +53,12 @@ fun EquateVolumeScreen(
 
 @Composable
 fun EquateVolumeDialog(
-  equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
-  openDialog: (Boolean) -> Unit,
-  _workingSetWeight: Double?,
-  _workingSetRepetitions: Int?,
-  insertSets: (workingSets: List<SetModel>) -> Unit,
-  totalWorkingSetVolume: Double?,
+    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
+    openDialog: (Boolean) -> Unit,
+    _workingSetWeight: Double?,
+    _workingSetRepetitions: Int?,
+    insertSets: (workingSets: List<Set>) -> Unit,
+    totalWorkingSetVolume: Double?,
 ) {
   val sets by equateVolumeViewModel.sets.collectAsState()
   val newTotalWorkingSetVolume by equateVolumeViewModel.newTotalVolume.collectAsState()

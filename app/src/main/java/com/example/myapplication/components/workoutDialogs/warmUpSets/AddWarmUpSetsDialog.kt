@@ -17,7 +17,7 @@ import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
 
@@ -50,7 +50,7 @@ fun AddWarmUpSetsScreen(
 fun AddWarmUpSetsDialog(
     warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
     openDialog: (Boolean) -> Unit,
-    insertWarmUpSets: (warmUpSets: List<SetModel>) -> Unit,
+    insertWarmUpSets: (warmUpSets: List<Set>) -> Unit,
 ) {
     val workingSetWeight by warmUpSetsViewModel.workingSetWeight.collectAsState()
 

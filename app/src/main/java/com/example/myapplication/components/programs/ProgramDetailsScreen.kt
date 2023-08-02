@@ -62,7 +62,7 @@ import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.data.Microcycle
 import com.example.myapplication.data.Program
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.data.Workout
 
 @Composable
@@ -506,7 +506,7 @@ fun WorkoutDayCard(index: Int, workout: Workout, programsViewModel: ProgramsView
 fun ExerciseOverview(
   index: Int,
   exerciseID: Long,
-  sets: List<SetModel>,
+  sets: List<Set>,
   programsViewModel: ProgramsViewModel
 ) {
   val labelMedium = MaterialTheme.typography.labelMedium

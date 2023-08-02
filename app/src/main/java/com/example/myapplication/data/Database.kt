@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 
 @Database(
     entities = [
-        ExerciseModel::class, SetModel::class, Workout::class, Program::class,
+        Exercise::class, Set::class, Workout::class, Program::class,
         Mesocycle::class, Microcycle::class, ExerciseNote::class, WorkoutNote::class,
         ProgramNote::class, MesocycleNote::class, MicrocycleNote::class,
         MuscleExercise::class, MuscleRoleFunction::class, Muscle::class,

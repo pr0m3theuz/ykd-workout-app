@@ -32,11 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditExerciseScreen(exercise: ExerciseModel, onSaveClicked: (ExerciseModel) -> Unit) {
+fun EditExerciseScreen(exercise: Exercise, onSaveClicked: (Exercise) -> Unit) {
     var name by remember { mutableStateOf(exercise.name) }
     var mechanic by remember { mutableStateOf(exercise.mechanicsID) }
     var muscleGroup by remember { mutableStateOf(exercise.muscleGroupID) }
@@ -47,7 +47,7 @@ fun EditExerciseScreen(exercise: ExerciseModel, onSaveClicked: (ExerciseModel) -
     var weightUnit by remember { mutableStateOf(exercise.weightUnit) }
     var mediaURI by remember { mutableStateOf(exercise.mediaURI) }
 
-    fun getUpdatedExercise(): ExerciseModel {
+    fun getUpdatedExercise(): Exercise {
         return exercise
     }
 

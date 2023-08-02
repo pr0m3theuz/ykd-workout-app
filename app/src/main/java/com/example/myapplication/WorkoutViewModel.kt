@@ -16,21 +16,18 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 import com.example.myapplication.data.ExerciseNote
 import com.example.myapplication.data.ExerciseNotesRepository
 import com.example.myapplication.data.ExerciseSets
 import com.example.myapplication.data.ExerciseSetsRepository
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.data.SetsRepository
-import com.example.myapplication.data.SetsWithExercise
 import com.example.myapplication.data.Workout
 import com.example.myapplication.data.WorkoutNote
 import com.example.myapplication.data.WorkoutNotesRepository
 import com.example.myapplication.data.WorkoutRepository
-import com.example.myapplication.data.WorkoutWithSetsAndExercise
 import com.example.myapplication.data.addWarmUpSets
-import com.example.myapplication.data.resetSets
 import com.example.myapplication.data.setComplete
 import com.example.myapplication.data.updateSetRIR
 import com.example.myapplication.data.updateSetRPE
@@ -41,6 +38,8 @@ import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.sendNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,7 +47,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.Random
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -95,19 +93,19 @@ constructor(
         workoutDuration = elapsedTime
 
         _workoutDurationString.value =
-            workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
-                                                                                 minutes,
-                                                                                 seconds,
-                                                                                 _ ->
-                if (hours > 0) {
-                    "$hours:" +
-                            minutes.toString().padStart(2, '0') +
-                            ":" +
-                            seconds.toString().padStart(2, '0')
-                } else {
-                    "$minutes:${seconds.toString().padStart(2, '0')}"
-                }
+          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                               minutes,
+                                                                               seconds,
+                                                                               _ ->
+            if (hours > 0) {
+              "$hours:" +
+                      minutes.toString().padStart(2, '0') +
+                      ":" +
+                      seconds.toString().padStart(2, '0')
+            } else {
+              "$minutes:${seconds.toString().padStart(2, '0')}"
             }
+          }
       }
     }
 
@@ -206,44 +204,43 @@ constructor(
         object : CountDownTimer(timerDuration, 1000L) {
 
             override fun onTick(millisUntilFinished: Long) {
-                _state = TimerState.RUNNING
-                _timerState.value = TimerState.RUNNING
-                _remainingTime = millisUntilFinished
-                _remainingTimeString.value =
-                    _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                        seconds,
-                                                                                        _ ->
-                        "$minutes:${seconds.toString().padStart(2, '0')}"
-                    }
+              _state = TimerState.RUNNING
+              _timerState.value = TimerState.RUNNING
+              _remainingTime = millisUntilFinished
+              _remainingTimeString.value =
+                _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                    seconds,
+                                                                                    _ ->
+                  "$minutes:${seconds.toString().padStart(2, '0')}"
+                }
 
-                _timerDurationString.value =
-                    _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                        seconds,
-                                                                                        _ ->
-                        "$minutes:${seconds.toString().padStart(2, '0')}"
-                    }
+              _timerDurationString.value =
+                _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                    seconds,
+                                                                                    _ ->
+                  "$minutes:${seconds.toString().padStart(2, '0')}"
+                }
 
-                _remainingTimeProgress.value =
-                    _remainingTime.toFloat().div(_timerDuration.toFloat())
+              _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-                Log.i("Timer: ", timerVersion)
-                Log.i("TimerState: ", _timerState.value.name)
+              Log.i("Timer: ", timerVersion)
+              Log.i("TimerState: ", _timerState.value.name)
 
-                Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-                Log.i("onTick(): timerDuration", "$_timerDuration")
-                Log.i(
-                    "onTick(): _remainingTimeProgress",
-                    "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-                )
+              Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+              Log.i("onTick(): timerDuration", "$_timerDuration")
+              Log.i(
+                "onTick(): _remainingTimeProgress",
+                "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+              )
             }
 
             override fun onFinish() {
-                _state = TimerState.EXPIRED
-                _timerState.value = TimerState.EXPIRED
-                _timerFinished = true
+              _state = TimerState.EXPIRED
+              _timerState.value = TimerState.EXPIRED
+              _timerFinished = true
 
-                Log.i("Timer: ", timerVersion)
-                Log.i("TimerState: ", _timerState.value.name)
+              Log.i("Timer: ", timerVersion)
+              Log.i("TimerState: ", _timerState.value.name)
             }
         }
           .start()
@@ -273,9 +270,9 @@ constructor(
     createTimer(_timerDuration)
   }
 
-  private var completedSets = mutableListOf<UUID>()
+  private var completedSets = mutableListOf<RealmUUID>()
 
-  fun startSetCompletedTimer(exerciseSet: ExerciseSets, setUUID: UUID) {
+  fun startSetCompletedTimer(exerciseSet: ExerciseSets, setUUID: RealmUUID) {
     Log.i("startSetCompletedTimer() ", "called")
 
     val exercise = exerciseSet.exercise
@@ -286,7 +283,7 @@ constructor(
       /*
        * Doesn't allow the new completed set to cancel the timer if one is already running
        */
-      if (_state != TimerState.RUNNING) {
+      if (exercise != null && _state != TimerState.RUNNING) {
         if (exercise.warmUpSetRestTimerEnabled && (set.setTypeID == WARM_UP_SET)) {
           _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
@@ -420,31 +417,31 @@ constructor(
     get() = _exercisesSets.asStateFlow()
 
   //  TODO What is this used for or purpose, Workout Summary?
-  private var _allSetsData: MutableList<SetModel> = allSets()
+  private var _allSetsData: MutableList<Set> = allSets()
   private var _allSets = MutableStateFlow(_allSetsData.toList())
   val allSets
     get() = _allSets.asStateFlow()
 
-  fun addMultipleEmptyExerciseSets(exercisesSelectedToBeAddedToWorkout: List<ExerciseModel>) {
+  fun addMultipleEmptyExerciseSets(exercisesSelectedToBeAddedToWorkout: List<Exercise>) {
     val temporaryExerciseSets = _exercisesSets.value.toMutableList()
 
-    exercisesSelectedToBeAddedToWorkout.forEach { exercise ->
+    exercisesSelectedToBeAddedToWorkout.forEach { _exercise ->
       var pinnedNotes = listOf<ExerciseNote>()
 
       viewModelScope.launch {
-        exerciseNotesRepository.getPinnedExerciseNotes(exercise.exerciseID).collect() {
+        exerciseNotesRepository.getPinnedExerciseNotes(_exercise.exerciseID).collect() {
           pinnedNotes = it
         }
       }
 
       temporaryExerciseSets.add(
-        ExerciseSets(
-          workoutID = _workout.value.workoutID,
-          workoutUUID = _workout.value.uuid,
-          exercise = exercise,
-          sets = mutableListOf(),
-          notes = pinnedNotes.toMutableList(),
-        )
+        ExerciseSets().apply {
+          //          workoutID = _workout.value.workoutID
+          //          workoutUUID = _workout.value.uuid
+          exerciseOrder = temporaryExerciseSets.last().exerciseOrder.plus(1)
+          exercise = _exercise
+          notes = pinnedNotes.toRealmList()
+        }
       )
     }
 
@@ -458,35 +455,32 @@ constructor(
   }
 
   fun addSet(exerciseSets: ExerciseSets) {
-    val temporarySets: List<SetModel> =
+    val temporarySets: List<Set> =
       if (exerciseSets.sets.isNotEmpty()) {
-          exerciseSets.sets +
-                  exerciseSets.sets
-                      .last()
-                      .copy(
-                          lazyListItemID = newID(),
-                          uuid = UUID.randomUUID(),
-                          setNumber = exerciseSets.sets.last().setNumber?.plus(1),
-                          setCompleted = false,
-                      )
+        exerciseSets.sets +
+                Set().apply {
+                  setNumber = exerciseSets.sets.last().setNumber?.plus(1)
+                  exerciseWeight = exerciseSets.sets.last().exerciseWeight
+                  repetitions = exerciseSets.sets.last().repetitions
+                  ratePerceivedEffort = exerciseSets.sets.last().ratePerceivedEffort
+                  repetitionsInReserve = exerciseSets.sets.last().repetitionsInReserve
+                  setTypeID = exerciseSets.sets.last().setTypeID
+                  percentage1RM = exerciseSets.sets.last().percentage1RM
+                }
       } else {
         listOf(
-          SetModel(
-            setNumber = 0,
-            exerciseID = exerciseSets.exercise.exerciseID,
-            exerciseUUID = exerciseSets.exercise.uuid,
-            progressionSchemeID = Random().nextInt(), // TODO Replace with
+          Set().apply {
+            setNumber = 0
+            progressionSchemeID = Random().nextInt() // TODO Replace with
             // progressionScheme.progressionSchemeID
-            workoutID = workout.value.workoutID, // TODO Replace with workout.workoutID
-            workoutUUID = workout.value.uuid,
-          )
+          }
         )
       }
 
     updateExercisesSetsData(exerciseSets, temporarySets.toMutableList())
   }
 
-  fun removeSet(exerciseSets: ExerciseSets, set: SetModel) {
+  fun removeSet(exerciseSets: ExerciseSets, set: Set) {
     val temporarySets = exerciseSets.sets.minusElement(set).toMutableList()
 
     updateExercisesSetsData(exerciseSets, temporarySets)
@@ -494,7 +488,7 @@ constructor(
 
   private fun updateExercisesSetsData(
     exerciseSets: ExerciseSets,
-    temporarySets: MutableList<SetModel>,
+    temporarySets: MutableList<Set>,
   ) {
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
     _exercisesSetsData[index] =
@@ -505,14 +499,14 @@ constructor(
   fun addExerciseNote(exerciseSets: ExerciseSets) {
     val temporaryNotes: List<ExerciseNote> =
       if (exerciseSets.notes.isNotEmpty()) {
-          exerciseSets.notes +
-                  ExerciseNote(
-                      exerciseID = exerciseSets.exercise.exerciseID,
-                      workoutID = _workout.value.workoutID,
-                      programID = _workout.value.programID,
-                      mesocycleID = _workout.value.mesocycleID,
-                      microcycleID = _workout.value.microcycleID
-                  )
+        exerciseSets.notes +
+                ExerciseNote(
+                  exerciseID = exerciseSets.exercise.exerciseID,
+                  workoutID = _workout.value.workoutID,
+                  programID = _workout.value.programID,
+                  mesocycleID = _workout.value.mesocycleID,
+                  microcycleID = _workout.value.microcycleID
+                )
       } else {
         listOf(
           ExerciseNote(
@@ -564,8 +558,8 @@ constructor(
     _allSets.value = allSets().toList()
   }
 
-  private fun allSets(): MutableList<SetModel> {
-    val setsList = mutableListOf<SetModel>()
+  private fun allSets(): MutableList<Set> {
+    val setsList = mutableListOf<Set>()
     _exercisesSetsData.forEach { exerciseSet ->
       exerciseSet.sets.forEach { set -> setsList.add(set) }
     }
@@ -584,11 +578,11 @@ constructor(
     return notesList
   }
 
-  fun getSetData(setUUID: UUID): SetModel {
+  fun getSetData(setUUID: RealmUUID): Set {
     return allSets().first { it.uuid == setUUID }
   }
 
-  fun updateSetWeight(exerciseSets: ExerciseSets, setUUID: UUID, newWeight: Double?) {
+  fun updateSetWeight(exerciseSets: ExerciseSets, setUUID: RealmUUID, newWeight: Double?) {
     exerciseSets.updateSetWeight(
       uuid = setUUID,
       newWeight = newWeight,
@@ -597,32 +591,32 @@ constructor(
     updateExerciseSetIDData(exerciseSets)
   }
 
-  fun updateSetReps(exerciseSets: ExerciseSets, setUUID: UUID, newReps: Int?) {
+  fun updateSetReps(exerciseSets: ExerciseSets, setUUID: RealmUUID, newReps: Int?) {
     exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
     updateExerciseSetIDData(exerciseSets)
   }
 
-  fun updateSetRIR(exerciseSets: ExerciseSets, setUUID: UUID, newRIR: Double?) {
+  fun updateSetRIR(exerciseSets: ExerciseSets, setUUID: RealmUUID, newRIR: Double?) {
     exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
     updateExerciseSetIDData(exerciseSets)
   }
 
-  fun updateSetRPE(exerciseSets: ExerciseSets, setUUID: UUID, newRPE: Double?) {
+  fun updateSetRPE(exerciseSets: ExerciseSets, setUUID: RealmUUID, newRPE: Double?) {
     exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
     updateExerciseSetIDData(exerciseSets)
   }
 
-  fun setComplete(exerciseSets: ExerciseSets, setUUID: UUID, setComplete: Boolean) {
+  fun setComplete(exerciseSets: ExerciseSets, setUUID: RealmUUID, setComplete: Boolean) {
     exerciseSets.setComplete(setUUID, setComplete)
     updateExerciseSetIDData(exerciseSets)
   }
 
-  fun updateSetType(exerciseSets: ExerciseSets, setUUID: UUID, setTypeID: Int) {
+  fun updateSetType(exerciseSets: ExerciseSets, setUUID: RealmUUID, setTypeID: Int) {
     exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
     updateExerciseSetIDData(exerciseSets)
   }
 
-  fun addWarmUpSets(exerciseSets: ExerciseSets, warmUpSets: List<SetModel>) {
+  fun addWarmUpSets(exerciseSets: ExerciseSets, warmUpSets: List<Set>) {
     exerciseSets.addWarmUpSets(warmUpSets)
 
     updateExercisesSetsData(exerciseSets, exerciseSets.sets)
@@ -643,7 +637,7 @@ constructor(
     return repetitions
   }
 
-  fun addWorkingSets(exerciseSets: ExerciseSets, workingSets: List<SetModel>) {
+  fun addWorkingSets(exerciseSets: ExerciseSets, workingSets: List<Set>) {
     workingSets.forEach { it.lazyListItemID = newID() }
 
     exerciseSets.sets.removeAll { it.setTypeID != WARM_UP_SET }
@@ -653,15 +647,26 @@ constructor(
     updateExercisesSetsData(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
   }
 
-  fun addBackOffSets(exerciseSets: ExerciseSets, backOffSets: List<SetModel>) {
+  fun addBackOffSets(exerciseSets: ExerciseSets, backOffSets: List<Set>) {
     for (index in backOffSets.indices) {
-      exerciseSets.sets.add(backOffSets[index].copy(lazyListItemID = newID()))
+      exerciseSets.sets.add(
+        Set().apply {
+          setNumber = exerciseSets.sets.last().setNumber?.plus(1)
+          exerciseWeight = backOffSets[index].exerciseWeight
+          repetitions = backOffSets[index].repetitions
+          ratePerceivedEffort = backOffSets[index].ratePerceivedEffort
+          repetitionsInReserve = backOffSets[index].repetitionsInReserve
+          setTypeID = backOffSets[index].setTypeID
+          percentage1RM = backOffSets[index].percentage1RM
+        }
+        //        backOffSets[index].copy(lazyListItemID = newID())
+      )
     }
 
     updateExercisesSetsData(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
   }
 
-  fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, time: Duration) {
+  fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, time: Duration) {
     if (tabRowState == 1) {
       exercise.warmUpSetRestInWholeMilliseconds = time.inWholeMilliseconds
     } else if (tabRowState == 0) {
@@ -669,7 +674,7 @@ constructor(
     }
   }
 
-  fun enableExerciseAutoRestTimer(tabRowState: Int, exercise: ExerciseModel, enable: Boolean) {
+  fun enableExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, enable: Boolean) {
     if (tabRowState == 1) {
       exercise.warmUpSetRestTimerEnabled = enable
     } else if (tabRowState == 0) {
@@ -711,8 +716,10 @@ constructor(
     var pinnedNotes = listOf<ExerciseNote>()
 
     viewModelScope.launch {
-      exerciseNotesRepository.getPinnedExerciseNotes(exerciseSets.exercise.exerciseID).collect() {
-        pinnedNotes = it
+      exerciseSets.exercise?.let {
+        exerciseNotesRepository.getPinnedExerciseNotes(it.exerciseID).collect() { notes ->
+          pinnedNotes = notes
+        }
       }
     }
 
@@ -720,57 +727,10 @@ constructor(
   }
 
   fun createWorkoutFromHistoryOrTemplate(workout: Workout) {
-    //    TODO Think out how to get Exercise Notes from previous workout or last time the exercise
+    //    TODO Implement this
+    // TODO Think out how to get Exercise Notes from previous workout or last time the exercise
     // was performed
-    val newWorkout =
-      Workout(
-        uuid = workout.uuid,
-        name = workout.name,
-        workoutAuthor = workout.workoutAuthor,
-        day = workout.day,
-        programID = workout.programID,
-        mesocycleID = workout.mesocycleID,
-        microcycleID = workout.microcycleID
-      )
 
-    getWorkoutNotes(workout.workoutID)
-
-    var newExerciseSets: List<WorkoutWithSetsAndExercise> = emptyList()
-    var exercisesSetsMap: Map<ExerciseModel, List<SetsWithExercise>> = emptyMap()
-
-    val exercisesSets: MutableList<ExerciseSets> = mutableListOf()
-
-    viewModelScope.launch {
-      newExerciseSets = exerciseSetsRepository.getSetsAndExerciseByWorkout(workout.workoutID)
-    }
-
-    newExerciseSets.groupBy {
-      it.sets.forEach { setsWithExercise -> setsWithExercise.exercise.exerciseID }
-    }
-
-    newExerciseSets.forEach() { workoutWithSetsAndExercise ->
-      exercisesSetsMap = workoutWithSetsAndExercise.sets.groupBy { it.exercise }
-    }
-    // TODO Test
-    exercisesSetsMap.forEach() { exercise ->
-      exercisesSets.add(
-        ExerciseSets(
-          workoutID = newWorkout.workoutID,
-          workoutUUID = newWorkout.uuid,
-          exercise = exercise.key,
-          sets = MutableList(exercise.value.size) { index -> exercise.value[index].set },
-          notes = mutableListOf()
-        )
-      )
-    }
-
-    exercisesSets.forEach { exerciseSets -> exerciseSets.resetSets(newWorkout) }
-    _workoutData = newWorkout
-    _exercisesSetsData = exercisesSets
-
-    exercisesSets.forEach { exerciseSets ->
-      exerciseSets.notes.addAll(getPinnedExerciseNotesByExercise(exerciseSets))
-    }
   }
 
   /**
@@ -789,25 +749,8 @@ constructor(
    * value.
    */
   private fun saveWorkout() {
-    viewModelScope.launch {
-      workoutRepository.insertWorkout(_workoutData)
-
-      for (workoutNote in _workoutNotes.value) {
-        if (workoutNote.note?.isNotBlank() == true) {
-          workoutNotesRepository.insertWorkoutNote(workoutNote)
-        }
-      }
-
-      allSets().forEach {
-        if (it.setCompleted) {
-          setsRepository.insertSetModel(it)
-        }
-      }
-
-      allExerciseNotes().forEach() { exerciseNote ->
-        exerciseNotesRepository.insertExerciseNote(exerciseNote)
-      }
-    }
+    //    TODO Implement this
+    //
   }
 
   fun finishWorkout() {
@@ -824,7 +767,7 @@ constructor(
     _exercisesSets.value = _exercisesSetsData
   }
 
-  fun replaceExerciseInExerciseSets(exerciseSets: ExerciseSets, newExercise: ExerciseModel) {
+  fun replaceExerciseInExerciseSets(exerciseSets: ExerciseSets, newExercise: Exercise) {
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
 
     _exercisesSetsData.apply {
@@ -857,16 +800,16 @@ private fun initWorkout(): Workout {
   }
 }
 
-private fun initExercisesSets(): MutableList<ExerciseSets> {
+/*private fun initExercisesSets(): MutableList<ExerciseSets> {
   val exercise =
-    ExerciseModel(
+    Exercise(
       equipmentID = "null",
       force = "null",
       mechanicsID = "null",
       muscleGroupID = "null"
     )
 
-  val workoutUUID = UUID.randomUUID()
+  val workoutUUID = RealmUUID.random()
   val workoutID = fakeULID()
 
   return MutableList(1) {
@@ -876,22 +819,22 @@ private fun initExercisesSets(): MutableList<ExerciseSets> {
         exercise = exercise,
         sets =
         MutableList(3) { indices ->
-            SetModel(
-                setNumber = indices,
-                exerciseWeight = 100.00.times(it),
-                repetitions = 10.times(it),
-                exerciseID = exercise.exerciseID,
-                exerciseUUID = exercise.uuid,
-                workoutID = workoutID, // TODO Replace with workout.workoutID
-                workoutUUID = workoutUUID,
-                progressionSchemeID = Random().nextInt(), // TODO Replace with
-                // progressionScheme.progressionSchemeID
-            )
+          Set(
+            setNumber = indices,
+            exerciseWeight = 100.00.times(it),
+            repetitions = 10.times(it),
+            exerciseID = exercise.exerciseID,
+            exerciseUUID = exercise.uuid,
+            workoutID = workoutID, // TODO Replace with workout.workoutID
+            workoutUUID = workoutUUID,
+            progressionSchemeID = Random().nextInt(), // TODO Replace with
+            // progressionScheme.progressionSchemeID
+          )
         },
         notes = mutableListOf()
     )
   }
-}
+}*/
 
 abstract class CountUpTimer(private val interval: Long) {
   private var base: Long = 0

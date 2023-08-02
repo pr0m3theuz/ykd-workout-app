@@ -13,14 +13,14 @@ import com.example.myapplication.components.workoutDialogs.calculateNewSetResult
 import com.example.myapplication.components.workoutDialogs.calculatePercentage
 import com.example.myapplication.components.workoutDialogs.getFormattedPercentageText
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
-import com.example.myapplication.data.SetModel
+import com.example.myapplication.data.Set
 import com.example.myapplication.utils.checkIntInput
 
 @Composable
 fun WarmUpSetLayout(
     warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
     setIndex: Int,
-    warmUpSet: SetModel,
+    warmUpSet: Set,
 ) {
     val workingWeight by warmUpSetsViewModel.workingSetWeight.collectAsState()
 

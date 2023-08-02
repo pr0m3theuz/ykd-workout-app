@@ -6,23 +6,23 @@ import javax.inject.Singleton
 
 @Singleton
 class SetsRepository @Inject constructor(private val setsDao: SetsDao) {
-    suspend fun insertSetModel(setModel: SetModel) {
-        setsDao.insertSetModel(setModel)
+    suspend fun insertSetModel(set: Set) {
+        setsDao.insertSetModel(set)
     }
 
-    suspend fun updateSetModel(setModel: SetModel) {
-        setsDao.updateSetModel(setModel)
+    suspend fun updateSetModel(set: Set) {
+        setsDao.updateSetModel(set)
     }
 
-    suspend fun deleteSetModel(setModel: SetModel) {
-        setsDao.deleteSetModel(setModel)
+    suspend fun deleteSetModel(set: Set) {
+        setsDao.deleteSetModel(set)
     }
 
-    suspend fun getSetBySetId(setID: Long): SetModel? {
+    suspend fun getSetBySetId(setID: Long): Set? {
         return setsDao.getSetBySetId(setID)
     }
 
-    suspend fun getSetsByWorkout(workoutID: Long): List<SetModel> {
+    suspend fun getSetsByWorkout(workoutID: Long): List<Set> {
         return setsDao.getSetsByWorkoutID(workoutID)
     }
 }

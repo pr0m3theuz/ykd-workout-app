@@ -5,7 +5,7 @@ import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.Equipment
-import com.example.myapplication.data.ExerciseModel
+import com.example.myapplication.data.Exercise
 import com.example.myapplication.data.ExercisesRepository
 import com.example.myapplication.data.Force
 import com.example.myapplication.data.Mechanic
@@ -27,17 +27,17 @@ class ExercisesViewModel
 constructor(
     private val exercisesRepository: ExercisesRepository,
 ) : ViewModel() {
-    private val _exercises: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
-    val exercises: StateFlow<List<ExerciseModel>>
+    private val _exercises: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())
+    val exercises: StateFlow<List<Exercise>>
         get() = _exercises.asStateFlow()
 
-  private val _equipment: MutableStateFlow<List<Equipment>> = MutableStateFlow(emptyList())
-  val equipment: StateFlow<List<Equipment>>
-    get() = _equipment.asStateFlow()
+    private val _equipment: MutableStateFlow<List<Equipment>> = MutableStateFlow(emptyList())
+    val equipment: StateFlow<List<Equipment>>
+        get() = _equipment.asStateFlow()
 
-  private var _muscleGroup: MutableStateFlow<List<MuscleGroup>> = MutableStateFlow(emptyList())
-  val muscleGroup: StateFlow<List<MuscleGroup>>
-    get() = _muscleGroup
+    private var _muscleGroup: MutableStateFlow<List<MuscleGroup>> = MutableStateFlow(emptyList())
+    val muscleGroup: StateFlow<List<MuscleGroup>>
+        get() = _muscleGroup
 
   private val _utility: MutableStateFlow<List<Utility>> = MutableStateFlow(emptyList())
   val utility: StateFlow<List<Utility>>
@@ -208,11 +208,11 @@ constructor(
     }
   }
 
-  // TODO Get Exercise Details
-  private val _exercise: MutableStateFlow<List<ExerciseModel>> = MutableStateFlow(emptyList())
+    // TODO Get Exercise Details
+    private val _exercise: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())
 
-  val selectedExerciseDetails: StateFlow<List<ExerciseModel>>
-    get() = _exercise.asStateFlow()
+    val selectedExerciseDetails: StateFlow<List<Exercise>>
+        get() = _exercise.asStateFlow()
 
   /**
    * Retrieves the detailed information of an exercise from the repository.
