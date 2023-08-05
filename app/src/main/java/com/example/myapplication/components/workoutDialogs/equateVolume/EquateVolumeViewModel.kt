@@ -1,22 +1,19 @@
 package com.example.myapplication.components.workoutDialogs.equateVolume
 
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.Set
-import com.example.myapplication.data.setVolume
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.newID
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.RoundingMode
-import javax.inject.Inject
 import kotlin.math.roundToInt
 
 private const val WARM_UP_SET = 2
 
-@HiltViewModel
-class EquateVolumeViewModel @Inject constructor() : ViewModel() {
+class EquateVolumeViewModel : ViewModel() {
   //    TODO Implement getOneRepMax() Query
   private var _oneRepMax = MutableStateFlow(100.0)
   val oneRepMax: StateFlow<Double>
@@ -52,7 +49,8 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
 //    workoutID = exerciseSets.workoutID
 //    workoutUUID = exerciseSets.workoutUUID
 
-    _sets.value = exerciseSets.sets.toList()
+    _sets.value =
+      if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
   }
 
   fun initialize(exerciseSets: ExerciseSets) {
@@ -234,25 +232,24 @@ class EquateVolumeViewModel @Inject constructor() : ViewModel() {
   private fun calculateTotalVolume(temporarySets: List<Set>): Double {
     var totalVolume: Double = 0.0
 
-    temporarySets.filter { it.setTypeID != WARM_UP_SET }.forEach { totalVolume += (it.setVolume()) }
+    temporarySets.filter { it.setTypeID != WARM_UP_SET }
+      .forEach { totalVolume += (it.setVolume()) }
 
     return totalVolume
   }
 
-  /*  private fun initSets(): List<Set> {
-      return List(3) { index ->
-        Set(
-            setNumber = index,
-            exerciseWeight = 100.00,
-            repetitions = 10,
-            percentage1RM = 1.0,
-            exerciseID = exerciseID!!,
-            exerciseUUID = exerciseUUID!!,
-            workoutID = workoutID!!,
-            workoutUUID = workoutUUID!!,
-            progressionSchemeID =
-            Random().nextInt(), // TODO Replace with progressionScheme.progressionSchemeID
-        )
+  private fun initSets(): MutableList<Set> {
+    return MutableList(3) { index ->
+      Set().apply {
+        setNumber = index
+        exerciseWeight = 100.00
+        repetitions = 10
+        percentage1RM = 1.0
+        //        exerciseID = exerciseID,
+        //        exerciseUUID = exerciseUUID,
+        //        workoutID = workoutID,
+        //        workoutUUID = workoutUUID,
       }
-    }*/
+    }
+  }
 }

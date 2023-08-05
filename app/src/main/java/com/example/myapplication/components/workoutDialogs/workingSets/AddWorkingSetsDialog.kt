@@ -15,24 +15,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetLazyColumn
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetViewModel
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.Set
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
+import org.koin.androidx.compose.koinViewModel
 
 // @Preview
 
 @Composable
 fun AddWorkingSetsScreen(
-    workingSetViewModel: WorkingSetViewModel = hiltViewModel(),
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workingSetViewModel: WorkingSetViewModel = koinViewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
     openDialog: (Boolean) -> Unit,
     exerciseSets: ExerciseSets,
 ) {

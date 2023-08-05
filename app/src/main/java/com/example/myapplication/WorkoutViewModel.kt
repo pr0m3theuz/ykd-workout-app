@@ -6,48 +6,49 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.os.SystemClock
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.setRestTimer.TimerState
-import com.example.myapplication.data.Exercise
-import com.example.myapplication.data.ExerciseNote
-import com.example.myapplication.data.ExerciseNotesRepository
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.ExerciseSetsRepository
-import com.example.myapplication.data.Set
-import com.example.myapplication.data.SetsRepository
-import com.example.myapplication.data.Workout
-import com.example.myapplication.data.WorkoutNote
-import com.example.myapplication.data.WorkoutNotesRepository
-import com.example.myapplication.data.WorkoutRepository
-import com.example.myapplication.data.addWarmUpSets
-import com.example.myapplication.data.setComplete
-import com.example.myapplication.data.updateSetRIR
-import com.example.myapplication.data.updateSetRPE
-import com.example.myapplication.data.updateSetReps
-import com.example.myapplication.data.updateSetType
-import com.example.myapplication.data.updateSetWeight
+import com.example.myapplication.data.model.Exercise
+import com.example.myapplication.data.model.ExerciseNote
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.Workout
+import com.example.myapplication.data.model.WorkoutNote
+import com.example.myapplication.data.model.addWarmUpSets
+import com.example.myapplication.data.model.setComplete
+import com.example.myapplication.data.model.updateSetRIR
+import com.example.myapplication.data.model.updateSetRPE
+import com.example.myapplication.data.model.updateSetReps
+import com.example.myapplication.data.model.updateSetType
+import com.example.myapplication.data.model.updateSetWeight
+import com.example.myapplication.data.network.ExerciseNotesRepository
+import com.example.myapplication.data.network.WorkoutNotesRepository
+import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.sendNotification
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
+import org.mongodb.kbson.ObjectId
 import java.time.LocalTime
 import java.util.Random
-import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -55,17 +56,15 @@ import kotlin.time.toDuration
 private const val WARM_UP_SET = 2
 
 // TODO Croate queries to save workouts and sets
-@HiltViewModel
-class WorkoutViewModel
-@Inject
-constructor(
+class WorkoutViewModel(
   private val application: Application,
-  private val exerciseNotesRepository: ExerciseNotesRepository,
   private val workoutRepository: WorkoutRepository,
+  //  private val setsRepository: SetsRepository,
+  //  private val exerciseSetsRepository: ExerciseSetsRepository,
   private val workoutNotesRepository: WorkoutNotesRepository,
-  private val setsRepository: SetsRepository,
-  private val exerciseSetsRepository: ExerciseSetsRepository,
+  private val exerciseNotesRepository: ExerciseNotesRepository
 ) : ViewModel() {
+
   //    fun currentTimeMillis(): Long = System.currentTimeMillis()
   //    fun elapsedTimeMillis(): Long = System.
   private val REQUEST_CODE = 0
@@ -189,67 +188,76 @@ constructor(
   val isExpired: Boolean
     get() = _state == TimerState.EXPIRED
 
+  @RequiresApi(Build.VERSION_CODES.S)
   private fun createTimer(timerDuration: Long) {
     val timerVersion = System.currentTimeMillis().toString()
     val alarmTriggerTime = SystemClock.elapsedRealtime() + timerDuration
 
-    alarmManager.setExactAndAllowWhileIdle(
-      AlarmManager.ELAPSED_REALTIME_WAKEUP,
-      alarmTriggerTime,
-      notifyPendingIntent
-    )
+    if (alarmManager.canScheduleExactAlarms()) {
+      alarmManager.setExactAndAllowWhileIdle(
+        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+        alarmTriggerTime,
+        notifyPendingIntent
+      )
+    } else {
+      startActivity(
+        application.applicationContext,
+        Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM),
+        null
+      )
+    }
 
     viewModelScope.launch {
       timer =
         object : CountDownTimer(timerDuration, 1000L) {
 
-            override fun onTick(millisUntilFinished: Long) {
-              _state = TimerState.RUNNING
-              _timerState.value = TimerState.RUNNING
-              _remainingTime = millisUntilFinished
-              _remainingTimeString.value =
-                _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                    seconds,
-                                                                                    _ ->
-                  "$minutes:${seconds.toString().padStart(2, '0')}"
-                }
+          override fun onTick(millisUntilFinished: Long) {
+            _state = TimerState.RUNNING
+            _timerState.value = TimerState.RUNNING
+            _remainingTime = millisUntilFinished
+            _remainingTimeString.value =
+              _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                  seconds,
+                                                                                  _ ->
+                "$minutes:${seconds.toString().padStart(2, '0')}"
+              }
 
-              _timerDurationString.value =
-                _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                    seconds,
-                                                                                    _ ->
-                  "$minutes:${seconds.toString().padStart(2, '0')}"
-                }
+            _timerDurationString.value =
+              _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                  seconds,
+                                                                                  _ ->
+                "$minutes:${seconds.toString().padStart(2, '0')}"
+              }
 
-              _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
+            _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-              Log.i("Timer: ", timerVersion)
-              Log.i("TimerState: ", _timerState.value.name)
+            Log.i("Timer: ", timerVersion)
+            Log.i("TimerState: ", _timerState.value.name)
 
-              Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-              Log.i("onTick(): timerDuration", "$_timerDuration")
-              Log.i(
-                "onTick(): _remainingTimeProgress",
-                "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-              )
-            }
+            Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+            Log.i("onTick(): timerDuration", "$_timerDuration")
+            Log.i(
+              "onTick(): _remainingTimeProgress",
+              "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+            )
+          }
 
-            override fun onFinish() {
-              _state = TimerState.EXPIRED
-              _timerState.value = TimerState.EXPIRED
-              _timerFinished = true
+          override fun onFinish() {
+            _state = TimerState.EXPIRED
+            _timerState.value = TimerState.EXPIRED
+            _timerFinished = true
 
-              Log.i("Timer: ", timerVersion)
-              Log.i("TimerState: ", _timerState.value.name)
-            }
+            Log.i("Timer: ", timerVersion)
+            Log.i("TimerState: ", _timerState.value.name)
+          }
         }
           .start()
     }
   }
 
   private fun createRestTimerNotification() {
-    Log.i("createTimer()", "called")
-    Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
+//    Log.i("createTimer()", "called")
+//    Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
 
     notificationManager.sendNotification(
       application.getString(R.string.rest_timer_running_text),
@@ -257,14 +265,16 @@ constructor(
     )
   }
 
+  @RequiresApi(Build.VERSION_CODES.S)
   fun startRestTimer(time: Duration) {
-    Log.i("startRestTimer() ", "called")
+//    Log.i("startRestTimer() ", "called")
     _timerDuration = time.inWholeMilliseconds
 
     createRestTimerNotification()
     createTimer(_timerDuration)
   }
 
+  @RequiresApi(Build.VERSION_CODES.S)
   fun startLastTimer() {
     createRestTimerNotification()
     createTimer(_timerDuration)
@@ -272,8 +282,9 @@ constructor(
 
   private var completedSets = mutableListOf<RealmUUID>()
 
+  @RequiresApi(Build.VERSION_CODES.S)
   fun startSetCompletedTimer(exerciseSet: ExerciseSets, setUUID: RealmUUID) {
-    Log.i("startSetCompletedTimer() ", "called")
+//    Log.i("startSetCompletedTimer() ", "called")
 
     val exercise = exerciseSet.exercise
     val set = exerciseSet.sets.first { it.uuid == setUUID }
@@ -318,6 +329,7 @@ constructor(
     alarmManager.cancel(notifyPendingIntent)
   }
 
+  @RequiresApi(Build.VERSION_CODES.S)
   fun moreRestTime() {
     _remainingTime += _restTimerAdjustment
     _timerDuration += _restTimerAdjustment
@@ -326,6 +338,7 @@ constructor(
     createTimer(_remainingTime)
   }
 
+  @RequiresApi(Build.VERSION_CODES.S)
   fun lessRestTime() {
     _remainingTime -= _restTimerAdjustment
     _timerDuration -= _restTimerAdjustment
@@ -359,21 +372,22 @@ constructor(
   val workoutNotes
     get() = _workoutNotes.asStateFlow()
 
-  private fun getWorkoutNotes(workoutID: Long) /*: StateFlow<List<WorkoutNote>>*/ {
+  private fun getPinnedWorkoutNotes(workoutID: ObjectId) /*: StateFlow<List<WorkoutNote>>*/ {
     viewModelScope.launch {
       // TODO get Workout Notes
-      workoutNotesRepository.getWorkoutNotes(workoutID).collect() { _workoutNotes.value = it }
+      workoutNotesRepository.getPinnedWorkoutNotes(workoutID).collect() { _workoutNotes.value = it }
     }
   }
 
   fun addWorkoutNote() {
     _workoutNotesData.add(
-      WorkoutNote(
-        workoutID = _workout.value.workoutID,
-        programID = _workout.value.programID,
-        mesocycleID = _workout.value.mesocycleID,
-        microcycleID = _workout.value.microcycleID
-      )
+      WorkoutNote().apply {
+        workout = _workout.value
+        //        workoutID = _workout.value.workoutID,
+        //        programID = _workout.value.programID,
+        //        mesocycleID = _workout.value.mesocycleID,
+        //        microcycleID = _workout.value.microcycleID
+      }
     )
 
     _workoutNotes.value = _workoutNotesData.toList()
@@ -403,7 +417,7 @@ constructor(
 
   private fun stopWorkoutTimer() {
     workoutCountUpTimer.stop()
-    _workoutData.workoutEnded = LocalDateTime.now()
+    _workoutData.workoutEnded = RealmInstant.now()
     _workoutData.workoutDuration = workoutDuration
     _workout.value = _workoutData
     // TODO Navigate to Workout Complete Screen & Summary
@@ -491,36 +505,23 @@ constructor(
     temporarySets: MutableList<Set>,
   ) {
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
-    _exercisesSetsData[index] =
-      exerciseSets.copy(exSetsLazyListItemID = newID(), sets = temporarySets)
+    _exercisesSetsData[index].exSetsLazyListItemID = newID()
+    _exercisesSetsData[index].sets = temporarySets.toRealmList()
+
     _exercisesSets.value = _exercisesSetsData.toMutableList()
   }
 
   fun addExerciseNote(exerciseSets: ExerciseSets) {
     val temporaryNotes: List<ExerciseNote> =
       if (exerciseSets.notes.isNotEmpty()) {
-        exerciseSets.notes +
-                ExerciseNote(
-                  exerciseID = exerciseSets.exercise.exerciseID,
-                  workoutID = _workout.value.workoutID,
-                  programID = _workout.value.programID,
-                  mesocycleID = _workout.value.mesocycleID,
-                  microcycleID = _workout.value.microcycleID
-                )
+        exerciseSets.notes + ExerciseNote()
       } else {
-        listOf(
-          ExerciseNote(
-            exerciseID = exerciseSets.exercise.exerciseID,
-            workoutID = _workout.value.workoutID,
-            programID = _workout.value.programID,
-            mesocycleID = _workout.value.mesocycleID,
-            microcycleID = _workout.value.microcycleID
-          )
-        )
+        listOf<ExerciseNote>()
       }
+
     Log.i("addExerciseNote", "$temporaryNotes")
 
-    updateExercisesNotesData(exerciseSets, temporaryNotes.toMutableList())
+    updateExercisesNotesData(exerciseSets, temporaryNotes)
   }
 
   fun removeExerciseNote(exerciseSets: ExerciseSets, exerciseNote: ExerciseNote) {
@@ -541,11 +542,11 @@ constructor(
 
   private fun updateExercisesNotesData(
     exerciseSets: ExerciseSets,
-    temporaryNotes: MutableList<ExerciseNote>,
+    temporaryNotes: List<ExerciseNote>,
   ) {
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
-    _exercisesSetsData[index] =
-      exerciseSets.copy(exSetsLazyListItemID = newID(), notes = temporaryNotes)
+    _exercisesSetsData[index].exSetsLazyListItemID = newID()
+    _exercisesSetsData[index].notes = temporaryNotes.toRealmList()
     _exercisesSets.value = _exercisesSetsData.toMutableList()
   }
 
@@ -553,7 +554,7 @@ constructor(
     exerciseSets: ExerciseSets,
   ) {
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
-    _exercisesSetsData[index] = exerciseSets.copy(exSetsLazyListItemID = newID())
+    _exercisesSetsData[index].exSetsLazyListItemID = newID()
     _exercisesSets.value = _exercisesSetsData.toMutableList()
     _allSets.value = allSets().toList()
   }
@@ -770,15 +771,8 @@ constructor(
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseSets, newExercise: Exercise) {
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
 
-    _exercisesSetsData.apply {
-      val updatedExerciseSets =
-        this[index].copy(
-          exercise = newExercise,
-          exSetsLazyListItemID = newID(),
-          exerciseSetsID = fakeULID()
-        )
-      this[index] = updatedExerciseSets
-    }
+    _exercisesSetsData[index].exercise = newExercise
+    _exercisesSetsData[index].exSetsLazyListItemID = newID()
 
     _exercisesSets.value = _exercisesSetsData
   }
@@ -789,13 +783,13 @@ private fun initWorkout(): Workout {
 
   return when (currentTime.hour) {
     in 0..11 -> {
-      Workout(name = "Morning Workout")
+      Workout().apply { name = "Morning Workout" }
     }
     in 12..17 -> {
-      Workout(name = "Afternoon Workout")
+      Workout().apply { name = "Afternoon Workout" }
     }
     else -> {
-      Workout(name = "Evening Workout")
+      Workout().apply { name = "Evening Workout" }
     }
   }
 }

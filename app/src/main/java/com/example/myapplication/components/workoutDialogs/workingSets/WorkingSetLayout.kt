@@ -12,7 +12,7 @@ import com.example.myapplication.components.workoutDialogs.SetContent
 import com.example.myapplication.components.workoutDialogs.calculateNewSetResults
 import com.example.myapplication.components.workoutDialogs.calculatePercentage
 import com.example.myapplication.components.workoutDialogs.getFormattedPercentageText
-import com.example.myapplication.data.Set
+import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkIntInput
 
 @Composable

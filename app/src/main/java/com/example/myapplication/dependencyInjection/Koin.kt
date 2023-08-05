@@ -1,0 +1,71 @@
+package com.example.myapplication.dependencyInjection
+
+import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.exercisesList.ExercisesViewModel
+import com.example.myapplication.components.programs.ProgramsViewModel
+import com.example.myapplication.data.database.RealmDatabase
+import com.example.myapplication.data.network.ExerciseNotesRepository
+import com.example.myapplication.data.network.ExercisesRepository
+import com.example.myapplication.data.network.ProgramsRepository
+import com.example.myapplication.data.network.WorkoutNotesRepository
+import com.example.myapplication.data.network.WorkoutRepository
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.KoinApplication
+import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.KoinAppDeclaration
+import org.koin.dsl.module
+
+// For Kotlin Mulitplatform
+fun initKoin(appDeclaration: KoinAppDeclaration = {}): KoinApplication {
+    return startKoin {
+        appDeclaration()
+        modules(
+            commonModule
+        )
+    }
+}
+
+val commonModule = module {
+    /*    single<Configuration> {
+        RealmConfiguration.create(
+        schema =
+        setOf(
+            Exercise::class,
+            Set::class,
+            Workout::class,
+            Program::class,
+            Mesocycle::class,
+            Microcycle::class,
+            ExerciseNote::class,
+            WorkoutNote::class,
+            ProgramNote::class,
+            MesocycleNote::class,
+            MicrocycleNote::class,
+            MuscleExercise::class,
+            MuscleRoleFunction::class,
+            Muscle::class,
+            MuscleGroup::class,
+            Equipment::class,
+            Utility::class,
+            Force::class,
+            Mechanic::class,
+            //            ProgressionScheme::class,
+        )
+    )}
+    single {
+        Realm.open(get<Configuration>())
+    }*/
+
+    singleOf(::RealmDatabase)
+    singleOf(::WorkoutRepository)
+    singleOf(::ProgramsRepository)
+    singleOf(::ExercisesRepository)
+    singleOf(::ExerciseNotesRepository)
+    singleOf(::WorkoutNotesRepository)
+
+    viewModelOf(::ProgramsViewModel)
+    viewModelOf(::ExercisesViewModel)
+    viewModelOf(::WorkoutViewModel)
+//  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
+}

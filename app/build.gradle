@@ -1,9 +1,11 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
-    id 'com.google.dagger.hilt.android'
-    id 'io.realm.kotlin' version '1.10.0' apply false
+//    id 'kotlin-kapt'
+    id 'io.realm.kotlin'
+    id 'com.google.devtools.ksp'
+
+
 }
 
 tasks.withType(Test).configureEach {
@@ -78,7 +80,6 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-extended:1.6.0-alpha01'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
-    implementation 'com.google.dagger:hilt-android:2.46.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.10.3'
@@ -116,7 +117,6 @@ dependencies {
 
     testImplementation 'io.mockk:mockk:1.13.5'
 
-    kapt 'com.google.dagger:hilt-compiler:2.46.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -127,30 +127,35 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling:1.4.3'
     debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.3'
 
-    def room_version = '2.5.2'
-
-    implementation "androidx.room:room-runtime:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-
     def core_version = '1.10.1'
 
     implementation "androidx.core:core:$core_version"
 
     // Navigation
     implementation "androidx.navigation:navigation-compose:2.6.0"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
     // realm
     implementation 'io.realm.kotlin:library-base:1.10.0' // Add to use local realm (no sync)
 //    implementation 'io.realm.kotlin:library-sync:1.10.0' // Add to use device sync
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0'
+    // Add to use coroutines with the SDK
 
+
+//    Koin
+    implementation "io.insert-koin:koin-core:3.4.3"
+    implementation "io.insert-koin:koin-android:3.4.3"
+//    implementation "io.insert-koin:koin-annotations:3.4.3"
+//    ksp "io.insert-koin:koin-ksp-compiler:3.4.3"
+    implementation "io.insert-koin:koin-androidx-navigation:3.4.3"
+    implementation "io.insert-koin:koin-androidx-compose:3.4.3"
+
+    testImplementation "io.insert-koin:koin-test:3.4.3"
+    testImplementation "io.insert-koin:koin-test-junit5:3.4.3"
 }
 
-kapt {
+/*kapt {
     correctErrorTypes true
-}
+}*/
 
 class RoomSchemaArgProvider implements CommandLineArgumentProvider {
 

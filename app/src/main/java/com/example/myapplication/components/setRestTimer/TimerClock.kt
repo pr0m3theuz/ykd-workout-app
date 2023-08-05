@@ -23,12 +23,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TimerScreen(
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
     openDialog: (Boolean) -> Unit,
 ) {
     val remainingTimeString by workoutViewModel.remainingTimeString.collectAsState()

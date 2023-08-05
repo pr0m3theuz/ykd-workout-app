@@ -1,7 +1,4 @@
-package com.example.myapplication.data
-
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+package com.example.myapplication.data.model
 
 /*
 TODO Remove
@@ -52,12 +49,15 @@ enum class ProgressionSchemeEnum {
     WEIGHT_DISTANCE_TIME,
 }
 
-@Entity(tableName = "progressionSchemes")
-data class ProgressionScheme(
-    @PrimaryKey val progressionSchemeID: Int,
-    val name: String,
-    val description: String? = null,
-)
+// TODO To Implement in Realm
+// TODO To Implement
+// class ProgressionScheme() : RealmObject{
+//    @PrimaryKey
+//    lateinit var progressionSchemeID: Int
+//    lateinit var name: String
+//    val description: String? = null
+//
+// }
 
 /*
 TODO Remove

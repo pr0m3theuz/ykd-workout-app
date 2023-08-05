@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 import com.example.myapplication.components.addExercisesList.ReplaceExerciseScreen
 import com.example.myapplication.components.exercise.EquateVolumeScreen
 import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
-import com.example.myapplication.data.ExerciseSets
+import com.example.myapplication.data.model.ExerciseSets
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -116,13 +116,15 @@ fun ExerciseOptionsDropdownMenu(
             DropdownMenuItem(
                 text = { Text("Auto Rest Timer") },
                 trailingIcon = {
-                    Text(
-                        exerciseSets.exercise.workingSetRestInWholeMilliseconds.toDuration(
-                            DurationUnit.MILLISECONDS
-                        ).toComponents { minutes, seconds, _ ->
-                            "$minutes:${seconds.toString().padStart(2, '0')}"
-                        }
-                    )
+                    exerciseSets.exercise?.workingSetRestInWholeMilliseconds?.toDuration(
+                        DurationUnit.MILLISECONDS
+                    )?.let {
+                        Text(
+                            it.toComponents { minutes, seconds, _ ->
+                                "$minutes:${seconds.toString().padStart(2, '0')}"
+                            }
+                        )
+                    }
                 },
                 onClick = { openRestTimePicker = true }
             )
@@ -174,10 +176,12 @@ fun ExerciseOptionsDropdownMenu(
         }
 
         if (openRestTimePicker) {
-            AutoRestTimerScreen(
-                openDialog = { close -> closeRestTimerDialog(close) },
-                exercise = exerciseSets.exercise
-            )
+            exerciseSets.exercise?.let {
+                AutoRestTimerScreen(
+                    openDialog = { close -> closeRestTimerDialog(close) },
+                    exercise = it
+                )
+            }
         }
 
         if (openReplaceExerciseDialog) {

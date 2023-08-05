@@ -11,8 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.exercise.AddSet
@@ -20,14 +18,15 @@ import com.example.myapplication.components.exercise.ExerciseScreen
 import com.example.myapplication.components.exercise.SetItem
 import com.example.myapplication.components.exercise.SwipeToDismissItem
 import com.example.myapplication.components.exercise.WorkoutNoteTextField
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.Set
-import com.example.myapplication.data.WorkoutNote
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.WorkoutNote
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ExercisesSetsScreen(
-  navController: NavController,
-  workoutViewModel: WorkoutViewModel = hiltViewModel(),
+    navController: NavController,
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
   val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
   val workoutNotes by workoutViewModel.workoutNotes.collectAsState(emptyList())
@@ -41,10 +40,10 @@ fun ExercisesSetsScreen(
 
 @Composable
 fun ExerciseSetLazyColumn(
-  navController: NavController,
-  workoutViewModel: WorkoutViewModel = viewModel(),
-  exercises: List<ExerciseSets>,
-  workoutNotes: List<WorkoutNote>,
+    navController: NavController,
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
+    exercises: List<ExerciseSets>,
+    workoutNotes: List<WorkoutNote>,
 ) {
   fun cancelWorkout() {
     workoutViewModel.cancelWorkout()

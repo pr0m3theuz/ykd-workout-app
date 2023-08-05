@@ -1,9 +1,6 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.database
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-
+/*
 @Database(
     entities = [
         Exercise::class, Set::class, Workout::class, Program::class,
@@ -15,7 +12,7 @@ import androidx.room.TypeConverters
     ],
     exportSchema = true,
     version = 1,
-    /*autoMigrations = [AutoMigration(from = 1, to = 2, spec = AppRoomDatabase.Migration1to2::class)]*/
+    *//*autoMigrations = [AutoMigration(from = 1, to = 2, spec = AppRoomDatabase.Migration1to2::class)]*//*
 )
 @TypeConverters(Converters::class)
 abstract class AppRoomDatabase : RoomDatabase() {
@@ -33,3 +30,4 @@ abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun microcyclesDao(): MicrocyclesDao
 
 }
+*/

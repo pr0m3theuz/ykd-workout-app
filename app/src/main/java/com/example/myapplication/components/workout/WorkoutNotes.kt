@@ -26,16 +26,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.data.WorkoutNote
+import com.example.myapplication.data.model.WorkoutNote
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutNoteTextField(
-  workoutNote: WorkoutNote,
-  workoutViewModel: WorkoutViewModel = viewModel(),
-  placeholder: String = "Write a note",
+    workoutNote: WorkoutNote,
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
+    placeholder: String = "Write a note",
 ) {
   //        TODO Refactor this to workoutNotes
 
@@ -76,40 +76,40 @@ fun WorkoutNoteTextField(
     backgroundColor = MaterialTheme.colorScheme.background
   ) {
     TextField(
-      placeholder = { Text(placeholderText, color = MaterialTheme.colorScheme.secondary) },
-      modifier = Modifier
-        .padding(/*horizontal = */ 8.dp)
-        .fillMaxWidth(),
-      textStyle = MaterialTheme.typography.bodyMedium,
-      value = note,
-      onValueChange = {
-        note = it
-        workoutViewModel.setWorkoutNote(workoutNote, it.text)
-      },
-      trailingIcon = {
-        Button(
-          onClick = {
-            onPin(!pinned)
-            workoutViewModel.pinWorkoutNote(workoutNote, !workoutNote.pinned)
-          },
-          shape = MaterialTheme.shapes.small,
-          contentPadding = PaddingValues(0.dp),
-          modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .size(36.dp),
-          colors =
-          ButtonDefaults.buttonColors(
-            containerColor = animateNoteButtonContainerColor.value,
-            contentColor = animateNoteButtonContentColor.value
-          )
-        ) {
-          Icon(
-            Icons.Default.PushPin,
-            contentDescription = "Localized description",
-            modifier = Modifier.size(24.dp)
-          )
+        placeholder = { Text(placeholderText, color = MaterialTheme.colorScheme.secondary) },
+        modifier = Modifier
+            .padding(/*horizontal = */ 8.dp)
+            .fillMaxWidth(),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        value = note,
+        onValueChange = {
+            note = it
+            workoutViewModel.setWorkoutNote(workoutNote, it.text)
+        },
+        trailingIcon = {
+            Button(
+                onClick = {
+                    onPin(!pinned)
+                    workoutViewModel.pinWorkoutNote(workoutNote, !workoutNote.pinned)
+                },
+                shape = MaterialTheme.shapes.small,
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(36.dp),
+                colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = animateNoteButtonContainerColor.value,
+                    contentColor = animateNoteButtonContentColor.value
+                )
+            ) {
+                Icon(
+                    Icons.Default.PushPin,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
-      }
     )
   }
 }

@@ -1,6 +1,8 @@
 package com.example.myapplication.components.setRestTimer
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -19,15 +21,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
+import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun ManualRestTimerScreen(
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
     openDialog: (Boolean) -> Unit
 ) {
     ManualRestTimerDialog(
@@ -181,7 +184,11 @@ fun ManualRestTimerDialog(
                                 )
                             }*/
                             Spacer(modifier = Modifier.width(80.dp))
-                            Box(modifier = Modifier.width(80.dp).padding(0.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .width(80.dp)
+                                    .padding(0.dp)
+                            ) {
                                 this@Row.AnimatedVisibility(
                                     visible = visible,
                                     enter = scaleIn(animationSpec = tween(500)),

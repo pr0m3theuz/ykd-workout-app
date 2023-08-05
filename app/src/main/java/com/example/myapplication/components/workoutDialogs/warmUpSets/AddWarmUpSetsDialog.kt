@@ -10,22 +10,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.Set
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
+import org.koin.androidx.compose.koinViewModel
 
 // @Preview
 @Composable
 fun AddWarmUpSetsScreen(
-    workoutViewModel: WorkoutViewModel = viewModel(),
-    warmUpSetsViewModel: WarmUpSetsViewModel = hiltViewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
+    warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
     openDialog: (Boolean) -> Unit,
     exerciseSets: ExerciseSets,
 ) {

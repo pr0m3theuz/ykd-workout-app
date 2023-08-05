@@ -46,16 +46,17 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
-import com.example.myapplication.data.Exercise
+import com.example.myapplication.data.model.Exercise
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseDetailsScreen(
     navController: NavController,
-    exercisePK: String,
-    exercisesViewModel: ExercisesViewModel,
+    exerciseID: String,
+    exercisesViewModel: ExercisesViewModel = koinViewModel(),
 ) {
-    exercisesViewModel.getExerciseDetails(exercisePK)
+    exercisesViewModel.getExerciseDetails(exerciseID)
 
     val exercise by exercisesViewModel.selectedExerciseDetails.collectAsStateWithLifecycle()
 
@@ -64,8 +65,8 @@ fun ExerciseDetailsScreen(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<Exercise>) {
-    val exercise = _exercise.firstOrNull()
+private fun ExerciseDetailsLayout(navController: NavController, exercise: Exercise) {
+//    val exercise = _exercise.firstOrNull()
 
     val context = LocalContext.current
     var state by remember { mutableIntStateOf(0) }
@@ -77,7 +78,7 @@ private fun ExerciseDetailsLayout(navController: NavController, _exercise: List<
             TopAppBar(
                 title = {
                     Text(
-                        text = exercise?.name ?: "Loading...",
+                        text = exercise.name ?: "Loading...",
                         maxLines = 2,
                         overflow = TextOverflow.Visible,
                         color = onSurface,

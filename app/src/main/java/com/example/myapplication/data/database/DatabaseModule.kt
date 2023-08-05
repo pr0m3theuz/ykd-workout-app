@@ -1,17 +1,10 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.database
 
-import android.app.Application
-import androidx.room.Room
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
-
-@InstallIn(SingletonComponent::class)
+/*@InstallIn(SingletonComponent::class)
 @Module
 object DatabaseModule {
-    @Provides
+*/
+/* @Provides
     fun provideExerciseDao(database: AppRoomDatabase): ExerciseDao {
         return database.exerciseDao()
     }
@@ -70,16 +63,41 @@ object DatabaseModule {
     fun provideExerciseSetsDao(database: AppRoomDatabase): ExerciseSetsDao {
         return database.exerciseSetsDao()
     }
+*/
+/* @Provides
+ @Singleton
+ fun provideDatabase(app: Application): Realm {
+   val configuration =
+     RealmConfiguration.Builder(
+         schema =
+           setOf(
+             Exercise::class,
+             Set::class,
+             Workout::class,
+             Program::class,
+             Mesocycle::class,
+             Microcycle::class,
+             ExerciseNote::class,
+             WorkoutNote::class,
+             ProgramNote::class,
+             MesocycleNote::class,
+             MicrocycleNote::class,
+             MuscleExercise::class,
+             MuscleRoleFunction::class,
+             Muscle::class,
+             MuscleGroup::class,
+             Equipment::class,
+             Utility::class,
+             Force::class,
+             Mechanic::class,
+             //            ProgressionScheme::class,
+           )
+       )
+       .name("realm_database.db")
+       .build()
 
-    @Provides
-    @Singleton
-    fun provideDatabase(app: Application): AppRoomDatabase {
-        return Room.databaseBuilder(
-            app,
-            AppRoomDatabase::class.java,
-            "app_database.db"
-        )
-            .createFromAsset("database/test_v5.db")
-            .build()
-    }
+     Realm.open(configuration)
+
+ }
 }
+*/

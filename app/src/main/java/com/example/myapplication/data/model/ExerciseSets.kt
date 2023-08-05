@@ -1,7 +1,5 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.model
 
-import androidx.room.PrimaryKey
-import com.example.myapplication.fakeULID
 import com.example.myapplication.newID
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
@@ -9,43 +7,29 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
+import io.realm.kotlin.types.annotations.PrimaryKey
+import org.mongodb.kbson.ObjectId
 
-/*@Entity(
-    tableName = "exerciseSets",
-    foreignKeys = [
-        ForeignKey(
-            entity = Workout::class,
-            parentColumns = ["workoutID"],
-            childColumns = ["workoutID"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = ExerciseModel::class,
-            parentColumns = ["exerciseID"],
-            childColumns = ["exerciseID"],
-            onDelete = ForeignKey.CASCADE
-        ),
-    ]
-)*/
+
 /*
  TODO:
     @Query(SELECT * FROM sets WHERE workoutID:=workoutID) return ExerciseSets
     @Query(SELECT * FROM sets WHERE exerciseID:=exerciseID) return WorkoutSets
 */
 
-open class ExerciseSets() : RealmObject {
+class ExerciseSets() : RealmObject {
   @PrimaryKey
-  val exerciseSetsID: Long = fakeULID()
+  var exerciseSetsID: ObjectId = ObjectId()
   var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
-  val exSetsUUID: RealmUUID = RealmUUID.random()
+  var exSetsUUID: RealmUUID = RealmUUID.random()
   val workout: RealmResults<Workout> by backlinks(Workout::exerciseSets)
 
   //  val workoutID: Long? = null // TODO May be useless
 //  val workoutUUID: RealmUUID? = null // TODO May be useless
   var exerciseOrder: Int = 1
   var exercise: Exercise? = null
-  val sets: RealmList<Set> = realmListOf()
-  var notes: RealmList<ExerciseNote> = realmListOf()
+  var sets: RealmList<Set> = realmListOf<Set>()
+  var notes: RealmList<ExerciseNote> = realmListOf<ExerciseNote>()
 }
 
 /*fun ExerciseSets.addSet() {
@@ -165,9 +149,9 @@ fun ExerciseSets.averageWeight(): Double {
  *
  * @param workout The workout to associate the sets with.
  */
-fun ExerciseSets.resetSets(workout: Workout) {
+fun ExerciseSets.resetSets(/*workout: Workout*/) {
   sets.forEach { set ->
-    set.setID = newID()
+    set.setID = ObjectId()
     set.lazyListItemID = newID()
     set.uuid = RealmUUID.random()
 //    set.workoutID = workout.workoutID

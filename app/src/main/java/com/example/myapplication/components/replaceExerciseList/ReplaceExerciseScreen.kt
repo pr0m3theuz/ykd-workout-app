@@ -45,18 +45,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExerciseOptionsDropdownMenu
 import com.example.myapplication.components.exercisesList.ExercisesFilterMenu
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.exercisesList.SelectedFiltersLazyRow
-import com.example.myapplication.data.Exercise
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.MuscleGroup
+import com.example.myapplication.data.model.Exercise
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.MuscleGroup
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 // TODO Create Advanced Search Options & Exercise Creation & Editing Screens
 
@@ -65,8 +64,8 @@ import kotlinx.coroutines.launch
 fun ReplaceExerciseScreen(
   exerciseSets: ExerciseSets,
   setOpenDialog: (Boolean) -> Unit,
-  exercisesViewModel: ExercisesViewModel = hiltViewModel(),
-  workoutViewModel: WorkoutViewModel = viewModel(),
+  exercisesViewModel: ExercisesViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
   val exercises by
   exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -201,8 +200,8 @@ fun ReplaceExerciseScreen(
               )
             },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
+              .fillMaxWidth()
+              .padding(horizontal = 8.dp)
           ) {}
 
           SelectedFiltersLazyRow(exercisesViewModel)
@@ -222,14 +221,14 @@ fun ReplaceExerciseScreen(
             exercises.isEmpty() && query.isBlank() -> {
               Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
+                  .fillMaxWidth()
+                  .padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
               ) {
                 LinearProgressIndicator(
                   modifier = Modifier
-                      .semantics(mergeDescendants = true) {}
-                      .padding(10.dp),
+                    .semantics(mergeDescendants = true) {}
+                    .padding(10.dp),
                 )
               }
             }
@@ -262,8 +261,8 @@ private fun ExercisesLazyList(
   LazyColumn(
     state = lazyListState,
     modifier = Modifier
-        .fillMaxWidth()
-        .selectableGroup(),
+      .fillMaxWidth()
+      .selectableGroup(),
     // verticalArrangement = Arrangement.spacedBy(8.dp),
     // contentPadding = PaddingValues(0.dp)
   ) {

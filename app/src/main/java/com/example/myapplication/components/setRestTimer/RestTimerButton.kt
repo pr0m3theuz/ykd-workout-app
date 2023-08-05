@@ -32,16 +32,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalTextApi::class)
 @Preview
 @Composable
 fun RestTimerButton(
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
-    var progress by remember { mutableStateOf(1f) }
+    var progress by remember { mutableFloatStateOf(1f) }
     val remainingTimeProgress by workoutViewModel.remainingTimeProgress.collectAsState()
     val timerState by workoutViewModel.workoutTimerState.collectAsState()
 
@@ -55,7 +55,7 @@ fun RestTimerButton(
         animationSpec = tween(
             durationMillis = 1000,
             easing = LinearEasing
-        )
+        ),
     )
 
     val animatedEndX by animateFloatAsState(

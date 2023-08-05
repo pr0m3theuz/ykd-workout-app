@@ -30,13 +30,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.FinishWorkoutButton
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.setRestTimer.RestTimerButton
+import org.koin.androidx.compose.koinViewModel
 
 // TODO Takes a Workout Object
 
@@ -49,7 +49,10 @@ fun WorkoutScreen(navController: NavHostController = rememberNavController()) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewModel) {
+fun WorkoutContent(
+  navController: NavController,
+  workoutViewModel: WorkoutViewModel = koinViewModel()
+) {
   //  val workout by workoutViewModel.workout.collectAsState()
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
@@ -64,13 +67,12 @@ fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewMo
 
   val context = LocalContext.current
 
-
   Scaffold(
     topBar = {
       TopAppBar(
         title = {
           WorkoutNameTextField(
-            workoutName,
+            workoutName ?: "Workout",
             setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) }
           )
           /* Text(
@@ -122,14 +124,13 @@ fun WorkoutContent(navController: NavController, workoutViewModel: WorkoutViewMo
 
       ExercisesSetsScreen(
         navController = navController,
-
-        )
+      )
     }
   }
 }
 
 @Composable
-private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = viewModel()) {
+private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = koinViewModel()) {
   val workoutDuration by workoutViewModel.workoutDurationString.collectAsState()
   Text(
     modifier = Modifier.padding(8.dp),

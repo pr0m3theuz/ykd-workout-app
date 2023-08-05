@@ -1,6 +1,8 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.database
+/*
 
 import androidx.room.*
+import com.example.myapplication.data.model.Workout
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -11,6 +13,7 @@ interface WorkoutsDao {
     @Query("SELECT * FROM workouts WHERE workoutID = :workoutID")
     suspend fun getWorkoutById(workoutID: Long): Workout?
 
+*/
 /*    @Query("SELECT * FROM workouts WHERE microcycleUUID = :microcycleUUID")
     suspend fun getWorkoutsByMicrocycleUUID(microcycleUUID: UUID): List<Workout>
 
@@ -18,7 +21,8 @@ interface WorkoutsDao {
     suspend fun getWorkoutsByMesocycleUUID(mesocycleUUID: UUID): List<Workout>
 
     @Query("SELECT * FROM workouts WHERE programUUID = :programUUID")
-    suspend fun getWorkoutsByProgramUUID(programUUID: UUID): List<Workout>*/
+    suspend fun getWorkoutsByProgramUUID(programUUID: UUID): List<Workout>*//*
+
 
     @Query("SELECT * FROM workouts WHERE microcycleID = :microcycleID")
     suspend fun getWorkoutsByMicrocycleID(microcycleID: Long): List<Workout>
@@ -37,4 +41,4 @@ interface WorkoutsDao {
 
     @Delete
     suspend fun deleteWorkout(workout: Workout)
-}
+}*/

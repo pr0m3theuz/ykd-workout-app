@@ -41,7 +41,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.ExerciseNote
+import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
@@ -99,27 +99,27 @@ fun ExerciseNotes(
     backgroundColor = MaterialTheme.colorScheme.background
   ) {
     TextField(
-      placeholder = { Text(placeholderText, color = MaterialTheme.colorScheme.secondary) },
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .fillMaxWidth(),
-      textStyle = MaterialTheme.typography.bodyMedium,
-      value = note,
-      onValueChange = { note = it },
-      trailingIcon = {
-        Button(
-          onClick = { pinNote() },
-          shape = MaterialTheme.shapes.small,
-          contentPadding = PaddingValues(0.dp),
-          modifier = Modifier
-            .padding(8.dp)
-            .size(36.dp),
-          colors =
-          ButtonDefaults.buttonColors(
-            containerColor = animateNoteButtonContainerColor.value,
-            contentColor = animateNoteButtonContentColor.value
-          )
-        ) {
+        placeholder = { Text(placeholderText, color = MaterialTheme.colorScheme.secondary) },
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth(),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        value = note,
+        onValueChange = { note = it },
+        trailingIcon = {
+            Button(
+                onClick = { pinNote() },
+                shape = MaterialTheme.shapes.small,
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(36.dp),
+                colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = animateNoteButtonContainerColor.value,
+                    contentColor = animateNoteButtonContentColor.value
+                )
+            ) {
           Icon(
             Icons.Default.PushPin,
             contentDescription = "Localized description",
@@ -195,11 +195,11 @@ fun SwipeToDismissItem(
       )
 
       Box(
-        Modifier
-          .fillMaxSize()
-          .background(color)
-          .padding(horizontal = 12.dp),
-        contentAlignment = alignment
+          Modifier
+              .fillMaxSize()
+              .background(color)
+              .padding(horizontal = 12.dp),
+          contentAlignment = alignment
       ) {
         Icon(
           icon,

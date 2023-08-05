@@ -1,7 +1,6 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.database
 
-import androidx.room.*
-import kotlinx.coroutines.flow.Flow
+/*
 
 @Dao
 interface ExerciseDao {
@@ -81,3 +80,4 @@ interface ExerciseDao {
   @Delete
   fun deleteExercise(exercise: Exercise)
 }
+*/

@@ -32,7 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.Exercise
+import com.example.myapplication.data.model.Exercise
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

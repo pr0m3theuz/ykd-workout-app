@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -25,147 +24,120 @@ import com.example.myapplication.components.*
 import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
 import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
 import com.example.myapplication.components.exercisesList.ExercisesScreen
-import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.homeScreen.HomeScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
-import com.example.myapplication.components.programs.ProgramsViewModel
 import com.example.myapplication.components.workout.WorkoutContent
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        //        val database = Room.databaseBuilder(
-        //            applicationContext,
-        //            AppRoomDatabase::class.java,
-        //            "app_database_v3"
-        //        ).build()
 
-        setContent {
-            MyApplicationTheme {
-                val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Screens.Programs.route) {
-                    addExercisesGraph(navController)
-                    addWorkoutGraph(navController)
-                    addProgramsGraph(navController)
-                    navigation(
-                        "homeScreen",
-                        route = "home"
-                    ) { composable("homeScreen") { HomeScreen() } }
-                }
-                //                Surface {
-                //                    WorkoutScreen()
-                //                    ExercisesScreen(exercisesViewModel = exercisesViewModel)
-                //                }
-            }
-        }
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-    companion object {
-        fun newIntent(context: Context): Intent {
-            return Intent(context, MainActivity::class.java)
+    setContent {
+      MyApplicationTheme {
+        val navController = rememberNavController()
+        NavHost(navController = navController, startDestination = Screens.Programs.route) {
+          addExercisesGraph(navController)
+          addWorkoutGraph(navController)
+          addProgramsGraph(navController)
+          navigation("homeScreen", route = "home") { composable("homeScreen") { HomeScreen() } }
         }
+      }
     }
+  }
+
+  companion object {
+    fun newIntent(context: Context): Intent {
+      return Intent(context, MainActivity::class.java)
+    }
+  }
 }
 
 private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
-    navigation("workoutContent", route = "workout") {
-        /* composable("workoutScreen") {
-            WorkoutScreen()
-        }*/
-
-        composable("workoutContent") {
-            val workoutViewModel = hiltViewModel<WorkoutViewModel>()
-            WorkoutContent(
-                navController = navController,
-                workoutViewModel = workoutViewModel,
-            )
-        }
-
-        composable(
-            "exerciseDetails/{exerciseID}",
-            arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
-        ) { navBackStackEntry ->
-            val exercisesViewModel = hiltViewModel<ExercisesViewModel>()
-            navBackStackEntry.arguments?.getString("exerciseID")?.let {
-                ExerciseDetailsScreen(
-                    navController,
-                    exercisePK = it,
-                    exercisesViewModel = exercisesViewModel,
-                )
-            }
-        }
+  navigation("workoutContent", route = "workout") {
+    /* composable("workoutScreen") {
+        WorkoutScreen()
+    }*/
+    composable("workoutContent") {
+      WorkoutContent(
+        navController = navController,
+      )
     }
+
+    composable(
+      "exerciseDetails/{exerciseID}",
+      arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
+    ) { navBackStackEntry ->
+      navBackStackEntry.arguments?.getString("exerciseID")?.let {
+        ExerciseDetailsScreen(
+          navController,
+          exerciseID = it,
+        )
+      }
+    }
+  }
 }
 
 private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
-    navigation("exercisesList", route = "exercises") {
-        composable("exercisesScreen") { ExercisesScreen() }
+  navigation("exercisesList", route = "exercises") {
+    composable("exercisesScreen") { ExercisesScreen() }
 
-        composable("exercisesList") {
-            val viewModel = hiltViewModel<ExercisesViewModel>()
-            ExercisesLazyColumn(
-                navController = navController,
-                exercisesViewModel = viewModel,
-            )
-        }
-        composable(
-            "exerciseDetails/{exerciseID}",
-            arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
-        ) { navBackStackEntry ->
-            val viewModel = hiltViewModel<ExercisesViewModel>()
-            navBackStackEntry.arguments?.getString("exerciseID")?.let {
-                ExerciseDetailsScreen(
-                    navController,
-                    exercisePK = it,
-                    exercisesViewModel = viewModel,
-                )
-            }
-        }
+    composable("exercisesList") {
+      ExercisesLazyColumn(
+        navController = navController,
+      )
     }
+    composable(
+      "exerciseDetails/{exerciseID}",
+      arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
+    ) { navBackStackEntry ->
+      navBackStackEntry.arguments?.getString("exerciseID")?.let {
+        ExerciseDetailsScreen(
+          navController,
+          exerciseID = it,
+        )
+      }
+    }
+  }
 }
 
 private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
-    navigation("programsScreen", route = "programs") {
-        composable("programsScreen") {
-            val viewModel = hiltViewModel<ProgramsViewModel>()
-            ProgramsScreen(navController, programsViewModel = viewModel)
-        }
-        composable(
-            "programDetails/{programID}",
-            arguments = listOf(navArgument("programID") { type = NavType.StringType })
-        ) { navBackStackEntry ->
-            val viewModel = hiltViewModel<ProgramsViewModel>()
-            navBackStackEntry.arguments?.getString("programID")?.let {
-                ProgramDetailsScreen(
-                    navController,
-                    programID = it,
-                    programsViewModel = viewModel,
-                )
-            }
-        }
-        /*composable("exercisesList") {
-            val viewModel = hiltViewModel<ExercisesViewModel>()
-            ExercisesLazyColumn(
-                navController = navController,
+  navigation("programsScreen", route = "programs") {
+    composable("programsScreen") {
+      ProgramsScreen(navController)
+    }
+    composable(
+      "programDetails/{programID}",
+      arguments = listOf(navArgument("programID") { type = NavType.StringType })
+    ) { navBackStackEntry ->
+      navBackStackEntry.arguments?.getString("programID")?.let {
+        ProgramDetailsScreen(
+          navController,
+          programID = it,
+        )
+      }
+    }
+    /*composable("exercisesList") {
+        val viewModel = hiltViewModel<ExercisesViewModel>()
+        ExercisesLazyColumn(
+            navController = navController,
+            exercisesViewModel = viewModel,
+        )
+    }
+    composable(
+        "exerciseDetails/{exerciseID}",
+        arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
+    ) { navBackStackEntry ->
+        val viewModel = hiltViewModel<ExercisesViewModel>()
+        navBackStackEntry.arguments?.getString("exerciseID")?.let {
+            ExerciseDetailsScreen(
+                navController,
+                exercisePK = it,
                 exercisesViewModel = viewModel,
             )
         }
-        composable(
-            "exerciseDetails/{exerciseID}",
-            arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
-        ) { navBackStackEntry ->
-            val viewModel = hiltViewModel<ExercisesViewModel>()
-            navBackStackEntry.arguments?.getString("exerciseID")?.let {
-                ExerciseDetailsScreen(
-                    navController,
-                    exercisePK = it,
-                    exercisesViewModel = viewModel,
-                )
-            }
-        }*/
-    }
+    }*/
+  }
 }

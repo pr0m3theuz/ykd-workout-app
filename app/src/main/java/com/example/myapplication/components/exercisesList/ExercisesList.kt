@@ -60,10 +60,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.components.BottomNavigationBar
-import com.example.myapplication.data.Equipment
-import com.example.myapplication.data.Exercise
-import com.example.myapplication.data.MuscleGroup
+import com.example.myapplication.data.model.Equipment
+import com.example.myapplication.data.model.Exercise
+import com.example.myapplication.data.model.MuscleGroup
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 // TODO Create Advanced Search Options & Exercise Creation & Editing Screens
 // @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -103,7 +104,7 @@ fun ExercisesScreen(
 @Composable
 fun ExercisesLazyColumn(
   navController: NavController,
-  exercisesViewModel: ExercisesViewModel,
+  exercisesViewModel: ExercisesViewModel = koinViewModel(),
 ) {
   //    val selectedCategoriesMap by
   // exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
@@ -216,8 +217,8 @@ fun ExercisesLazyColumn(
             )
           },
           modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
         ) {}
         //        }
 
@@ -237,14 +238,14 @@ fun ExercisesLazyColumn(
           exercises.isEmpty() && query.isBlank() -> {
             Column(
               modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(top = 24.dp),
+                .fillMaxWidth()
+                .padding(top = 24.dp),
               horizontalAlignment = Alignment.CenterHorizontally
             ) {
               LinearProgressIndicator(
                 modifier = Modifier
-                    .semantics(mergeDescendants = true) {}
-                    .padding(10.dp),
+                  .semantics(mergeDescendants = true) {}
+                  .padding(10.dp),
               )
             }
           }
@@ -269,8 +270,8 @@ fun ExercisesLazyColumn(
 fun NoResultsFound(query: String) {
   Column(
     modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
+      .fillMaxSize()
+      .padding(16.dp),
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -374,7 +375,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
           },
           colors = filterChipColors
         ) {
-          Text(text = muscleGroup.name, style = labelSmall)
+          Text(text = muscleGroup.name ?: "Unknown", style = labelSmall)
         }
       }
     }
@@ -393,7 +394,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
           },
           colors = filterChipColors
         ) {
-          Text(text = equipment.name, style = labelSmall)
+          Text(text = equipment.name ?: "Unknown", style = labelSmall)
         }
       }
     }

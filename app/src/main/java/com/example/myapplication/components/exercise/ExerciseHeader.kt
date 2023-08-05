@@ -47,18 +47,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
-import com.example.myapplication.data.ExerciseNote
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.averageWeight
-import com.example.myapplication.data.totalRepetitions
-import com.example.myapplication.data.totalVolume
+import com.example.myapplication.data.model.ExerciseNote
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.averageWeight
+import com.example.myapplication.data.model.totalRepetitions
+import com.example.myapplication.data.model.totalVolume
+import org.koin.androidx.compose.koinViewModel
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
 @Composable
 fun ExerciseScreen(
     navController: NavController,
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
     _exerciseSets: ExerciseSets,
 ) {
     val exerciseSet by remember { mutableStateOf(_exerciseSets) }
@@ -120,15 +121,17 @@ fun ExerciseHeader(
             ) {
                 ExerciseTitleButton(
                     onClick = {
-                        navController.navigate("exerciseDetails/${exerciseSets.exercise.exerciseID}")
+                        navController.navigate("exerciseDetails/${exerciseSets.exercise?.exerciseID}")
                     },
                     modifier = Modifier.weight(1.0f, fill = true)
                 ) {
-                    Text(
-                        text = exerciseSets.exercise.name,
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleSmall,
-                    )
+                    exerciseSets.exercise?.name?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                    }
                 }
 
                 ExerciseOptionsDropdownMenu(
@@ -254,7 +257,7 @@ private fun SetContentHeader() {
 
 @Composable
 private fun ExerciseSetsWorkoutSummary(
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
     _exerciseSets: ExerciseSets,
 ) {
     // TODO Give option to show either Total Volume or Total Working Volume
@@ -281,7 +284,7 @@ private fun ExerciseSetsWorkoutSummary(
     ) {
         Text(
             //      TODO get default value for weight
-            text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise.weightUnit}",
+            text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise?.weightUnit}",
             style = textStyle
         )
         Text(text = "Reps: $totalRepetitions", style = textStyle)

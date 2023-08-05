@@ -4,40 +4,36 @@ import android.util.Log
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.Equipment
-import com.example.myapplication.data.Exercise
-import com.example.myapplication.data.ExercisesRepository
-import com.example.myapplication.data.Force
-import com.example.myapplication.data.Mechanic
-import com.example.myapplication.data.MovementType
-import com.example.myapplication.data.MuscleGroup
-import com.example.myapplication.data.Utility
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.example.myapplication.data.model.Equipment
+import com.example.myapplication.data.model.Exercise
+import com.example.myapplication.data.model.Force
+import com.example.myapplication.data.model.Mechanic
+import com.example.myapplication.data.model.MovementType
+import com.example.myapplication.data.model.MuscleGroup
+import com.example.myapplication.data.model.Utility
+import com.example.myapplication.data.network.ExercisesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.mongodb.kbson.ObjectId
 
 // TODO Implement Clone Exercise Feature
 
-@HiltViewModel
-class ExercisesViewModel
-@Inject
-constructor(
-    private val exercisesRepository: ExercisesRepository,
-) : ViewModel() {
-    private val _exercises: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())
-    val exercises: StateFlow<List<Exercise>>
-        get() = _exercises.asStateFlow()
 
-    private val _equipment: MutableStateFlow<List<Equipment>> = MutableStateFlow(emptyList())
-    val equipment: StateFlow<List<Equipment>>
-        get() = _equipment.asStateFlow()
+class ExercisesViewModel constructor(private val exercisesRepository: ExercisesRepository) :
+  ViewModel() {
+  private val _exercises: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())
+  val exercises: StateFlow<List<Exercise>>
+    get() = _exercises.asStateFlow()
 
-    private var _muscleGroup: MutableStateFlow<List<MuscleGroup>> = MutableStateFlow(emptyList())
-    val muscleGroup: StateFlow<List<MuscleGroup>>
-        get() = _muscleGroup
+  private val _equipment: MutableStateFlow<List<Equipment>> = MutableStateFlow(emptyList())
+  val equipment: StateFlow<List<Equipment>>
+    get() = _equipment.asStateFlow()
+
+  private var _muscleGroup: MutableStateFlow<List<MuscleGroup>> = MutableStateFlow(emptyList())
+  val muscleGroup: StateFlow<List<MuscleGroup>>
+    get() = _muscleGroup
 
   private val _utility: MutableStateFlow<List<Utility>> = MutableStateFlow(emptyList())
   val utility: StateFlow<List<Utility>>
@@ -99,9 +95,7 @@ constructor(
     var muscleGroupName: String? = null
 
     viewModelScope.launch {
-      exercisesRepository.getMuscleGroupNameByID(muscleGroupID).collect() {
-        muscleGroupName = it.firstOrNull()
-      }
+      muscleGroupName = exercisesRepository.getMuscleGroupNameByID(muscleGroupID)
     }
 
     return muscleGroupName
@@ -155,16 +149,16 @@ constructor(
       .filterValues { !it }
       .keys
       .sortedBy { it.name }
-      .forEach { selectedMuscleGroups.add(it.id) }
+      .forEach { muscleGroup -> muscleGroup.id?.let { selectedMuscleGroups.add(it) } }
 
     var selectedEquipments = mutableListOf<String>()
     _equipmentsChecked.value
       .filterValues { !it }
       .keys
       .sortedBy { it.name }
-      .forEach { selectedEquipments.add(it.id) }
+      .forEach { equipment -> equipment.id?.let { selectedEquipments.add(it) } }
 
-    var selectedMovementTypes = mutableListOf<String>()
+    val selectedMovementTypes = mutableListOf<String>()
     movementTypesChecked
       .filterValues { !it }
       .keys
@@ -208,11 +202,11 @@ constructor(
     }
   }
 
-    // TODO Get Exercise Details
-    private val _exercise: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())
+  // TODO Get Exercise Details
+  private lateinit var _exercise: MutableStateFlow<Exercise>
 
-    val selectedExerciseDetails: StateFlow<List<Exercise>>
-        get() = _exercise.asStateFlow()
+  val selectedExerciseDetails: StateFlow<Exercise>
+    get() = _exercise.asStateFlow()
 
   /**
    * Retrieves the detailed information of an exercise from the repository.
@@ -223,9 +217,8 @@ constructor(
   fun getExerciseDetails(exerciseID: String?) {
     if (exerciseID != null) {
       viewModelScope.launch {
-          exercisesRepository.getExerciseDetails(exerciseID = exerciseID.toLong()).collect() {
-              _exercise.value = it
-          }
+        _exercise.value =
+          exercisesRepository.getExerciseDetails(exerciseID = ObjectId.invoke(exerciseID))
       }
     }
   }

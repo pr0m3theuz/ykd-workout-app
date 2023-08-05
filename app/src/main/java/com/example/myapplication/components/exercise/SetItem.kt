@@ -20,18 +20,18 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.Set
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Set
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SetItem(
-  exerciseSets: ExerciseSets,
-  index: Int,
-  set: Set,
-  removeSet: () -> Unit,
+    exerciseSets: ExerciseSets,
+    index: Int,
+    set: Set,
+    removeSet: () -> Unit,
 ) {
   //    Log.i("SetColumn()", "$set")
 
@@ -85,11 +85,11 @@ fun SetItem(
       animateFloatAsState(if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f)
 
       Box(
-        Modifier
-          .fillMaxSize()
-          .background(color)
-          .padding(horizontal = 12.dp),
-        contentAlignment = alignment
+          Modifier
+              .fillMaxSize()
+              .background(color)
+              .padding(horizontal = 12.dp),
+          contentAlignment = alignment
       ) {
         Icon(
           icon,

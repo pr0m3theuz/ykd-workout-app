@@ -1,6 +1,12 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.database
+/*
 
 import androidx.room.*
+import com.example.myapplication.data.model.ExerciseNote
+import com.example.myapplication.data.model.MesocycleNote
+import com.example.myapplication.data.model.MicrocycleNote
+import com.example.myapplication.data.model.ProgramNote
+import com.example.myapplication.data.model.WorkoutNote
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
@@ -290,3 +296,4 @@ interface ProgramNotesDao {
     @Delete
     suspend fun deleteProgramNote(programNote: ProgramNote)
 }
+*/

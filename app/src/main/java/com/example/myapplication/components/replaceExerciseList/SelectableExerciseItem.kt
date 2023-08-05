@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.data.Exercise
+import com.example.myapplication.data.model.Exercise
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SelectableExerciseItem(
@@ -30,7 +30,7 @@ fun SelectableExerciseItem(
     selectedExercise: Boolean,
     muscleGroupName: String?,
     selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
-    workoutViewModel: WorkoutViewModel = hiltViewModel()
+    workoutViewModel: WorkoutViewModel = koinViewModel()
 ) {
 
   val padding = 8.dp

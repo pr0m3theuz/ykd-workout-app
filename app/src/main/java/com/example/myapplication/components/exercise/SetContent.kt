@@ -24,15 +24,15 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.SetTypeOptionsMenu
 import com.example.myapplication.components.setRestTimer.TimerScreen
-import com.example.myapplication.data.ExerciseSets
-import com.example.myapplication.data.Set
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
+import org.koin.androidx.compose.koinViewModel
 
 // TODO Add ability to rearrange sets
 // TODO Add placeholder text for target weight, reps, & rpe/rir
@@ -49,7 +49,7 @@ fun SetContent(
     //    newRIR: (newRIR: Double?) -> Unit,
     //    newRPE: (newRPE: Double?) -> Unit,
     //    updateSetType: (setType: SetTypeModel) -> Unit,
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
     val setUUID = set.uuid
 

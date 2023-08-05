@@ -53,7 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
-import com.example.myapplication.data.Program
+import com.example.myapplication.data.model.Program
+import org.koin.androidx.compose.koinViewModel
 
 // TODO Add a placeholder card if there is no active program
 // TODO Add FAB
@@ -69,7 +70,7 @@ import com.example.myapplication.data.Program
 @Composable
 fun ProgramsScreen(
     navController: NavController,
-    programsViewModel: ProgramsViewModel /*= viewModel()*/
+    programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
     val padding8 = 8.dp
     val titleMedium = MaterialTheme.typography.titleMedium
@@ -408,7 +409,7 @@ fun ProgramCard(navController: NavController, program: Program) {
             verticalAlignment = Alignment.Bottom
         ) {
             Column() {
-                Text(text = program.name, style = titleMedium)
+                Text(text = program.name ?: "New Program", style = titleMedium)
                 Text(text = program.author ?: "", style = MaterialTheme.typography.titleSmall)
             }
             //            TODO To Keep or not to not Keep
@@ -438,7 +439,7 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = program.name,
+                text = program.name ?: "New Program",
                 style = MaterialTheme.typography.titleMedium,
                 modifier =
                 Modifier.clickable {

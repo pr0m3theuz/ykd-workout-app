@@ -1,44 +1,46 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.network
 
 import androidx.annotation.WorkerThread
+import com.example.myapplication.data.database.RealmDatabase
+import com.example.myapplication.data.model.ExerciseNote
+import com.example.myapplication.data.model.WorkoutNote
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
-import javax.inject.Singleton
+import org.mongodb.kbson.ObjectId
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
-@Singleton
-class ExerciseNotesRepository @Inject constructor(private val exerciseNotesDao: ExerciseNotesDao) {
+
+class ExerciseNotesRepository(private val database: RealmDatabase) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    fun getExerciseNotes(exerciseID: Long): Flow<List<ExerciseNote>> =
-        exerciseNotesDao.getExerciseNotes(exerciseID)
+//    fun getExerciseNotes(exerciseID: ObjectId): Flow<List<ExerciseNote>> =
+//        database.getExerciseNotes()
 
-    fun getExerciseNotesforWorkout(exerciseID: Long, workoutID: Long): Flow<List<ExerciseNote>> =
-        exerciseNotesDao.getExerciseNotesforWorkout(exerciseID, workoutID)
+//    fun getExerciseNotesforWorkout(exerciseID: Long, workoutID: Long): Flow<List<ExerciseNote>> =
+//        database.getExerciseNotesforWorkout(exerciseID, workoutID)
 
     fun getPinnedExerciseNotes(
-        exerciseID: Long,
+        exerciseID: ObjectId,
     ): Flow<List<ExerciseNote>> =
-        exerciseNotesDao.getPinnedExerciseNotes(exerciseID)
+        database.getPinnedExerciseNotes(exerciseID)
 
-    fun getExerciseNotesforMicrocycle(
-        exerciseID: Long,
-        microcycleID: Long,
-    ): Flow<List<ExerciseNote>> =
-        exerciseNotesDao.getExerciseNotesforMicrocycle(exerciseID, microcycleID)
-
-    fun getExerciseNotesforMesocycle(
-        exerciseID: Long,
-        mesocycleID: Long,
-    ): Flow<List<ExerciseNote>> =
-        exerciseNotesDao.getExerciseNotesforMesocycle(exerciseID, mesocycleID)
-
-    fun getExerciseNotesforProgram(
-        exerciseID: Long,
-        programID: Long,
-    ): Flow<List<ExerciseNote>> = exerciseNotesDao.getExerciseNotesforProgram(exerciseID, programID)
+//    fun getExerciseNotesforMicrocycle(
+//        exerciseID: Long,
+//        microcycleID: Long,
+//    ): Flow<List<ExerciseNote>> =
+//        database.getExerciseNotesforMicrocycle(exerciseID, microcycleID)
+//
+//    fun getExerciseNotesforMesocycle(
+//        exerciseID: Long,
+//        mesocycleID: Long,
+//    ): Flow<List<ExerciseNote>> =
+//        database.getExerciseNotesforMesocycle(exerciseID, mesocycleID)
+//
+//    fun getExerciseNotesforProgram(
+//        exerciseID: Long,
+//        programID: Long,
+//    ): Flow<List<ExerciseNote>> = database.getExerciseNotesforProgram(exerciseID, programID)
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
@@ -46,69 +48,71 @@ class ExerciseNotesRepository @Inject constructor(private val exerciseNotesDao: 
 
     @WorkerThread
     suspend fun insertExerciseNote(exerciseNote: ExerciseNote) {
-        exerciseNotesDao.insertExerciseNote(exerciseNote)
+        database.insertExerciseNote(exerciseNote)
     }
 
-    @WorkerThread
-    fun updateInsertExerciseNote(exerciseNote: ExerciseNote) {
-        exerciseNotesDao.updateInsertExerciseNote(exerciseNote)
-    }
-
-    @WorkerThread
-    fun deleteExerciseNote(exerciseNote: ExerciseNote) {
-        exerciseNotesDao.deleteExerciseNote(exerciseNote)
-    }
+//    @WorkerThread
+//    fun updateInsertExerciseNote(exerciseNote: ExerciseNote) {
+//        database.updateInsertExerciseNote(exerciseNote)
+//    }
+//
+//    @WorkerThread
+//    fun deleteExerciseNote(exerciseNote: ExerciseNote) {
+//        database.deleteExerciseNote(exerciseNote)
+//    }
 }
 
-@Singleton
-class WorkoutNotesRepository @Inject constructor(private val workoutNotesDao: WorkoutNotesDao) {
+class WorkoutNotesRepository(private val database: RealmDatabase) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    fun getWorkoutNotes(workoutID: Long): Flow<List<WorkoutNote>> =
-        workoutNotesDao.getWorkoutNotes(workoutID)
+//    fun getWorkoutNotes(workoutID: Long): Flow<List<WorkoutNote>> =
+//        database.getWorkoutNotes(workoutID)
 
     fun getPinnedWorkoutNotes(
-        workoutID: Long,
+        workoutID: ObjectId,
     ): Flow<List<WorkoutNote>> =
-        workoutNotesDao.getPinnedWorkoutNotes(workoutID)
+        database.getPinnedWorkoutNotes(workoutID)
 
-    fun getWorkoutNotesforMicrocycle(
-        workoutID: Long,
-        microcycleID: Long,
-    ): Flow<List<WorkoutNote>> =
-        workoutNotesDao.getWorkoutNotesforMicrocycle(workoutID, microcycleID)
-
-    fun getWorkoutNotesforMesocycle(
-        workoutID: Long,
-        mesocycleID: Long,
-    ): Flow<List<WorkoutNote>> =
-        workoutNotesDao.getWorkoutNotesforMesocycle(workoutID, mesocycleID)
-
-    fun getWorkoutNotesforProgram(
-        workoutID: Long,
-        programID: Long,
-    ): Flow<List<WorkoutNote>> = workoutNotesDao.getWorkoutNotesforProgram(workoutID, programID)
+//    fun getWorkoutNotesforMicrocycle(
+//        workoutID: Long,
+//        microcycleID: Long,
+//    ): Flow<List<WorkoutNote>> =
+//        database.getWorkoutNotesforMicrocycle(workoutID, microcycleID)
+//
+//    fun getWorkoutNotesforMesocycle(
+//        workoutID: Long,
+//        mesocycleID: Long,
+//    ): Flow<List<WorkoutNote>> =
+//        database.getWorkoutNotesforMesocycle(workoutID, mesocycleID)
+//
+//    fun getWorkoutNotesforProgram(
+//        workoutID: Long,
+//        programID: Long,
+//    ): Flow<List<WorkoutNote>> = database.getWorkoutNotesforProgram(workoutID, programID)
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.
 
-    @WorkerThread
-    suspend fun insertWorkoutNote(workoutNote: WorkoutNote) {
-        workoutNotesDao.insertWorkoutNote(workoutNote)
-    }
-
-    @WorkerThread
-    suspend fun updateWorkoutNote(workoutNote: WorkoutNote) {
-        workoutNotesDao.updateWorkoutNote(workoutNote)
-    }
-
-    @WorkerThread
-    suspend fun deleteWorkoutNote(workoutNote: WorkoutNote) {
-        workoutNotesDao.deleteWorkoutNote(workoutNote)
-    }
+//    @WorkerThread
+//    suspend fun insertWorkoutNote(workoutNote: WorkoutNote) {
+//        database.insertWorkoutNote(workoutNote)
+//    }
+//
+//    @WorkerThread
+//    suspend fun updateWorkoutNote(workoutNote: WorkoutNote) {
+//        database.updateWorkoutNote(workoutNote)
+//    }
+//
+//    @WorkerThread
+//    suspend fun deleteWorkoutNote(workoutNote: WorkoutNote) {
+//        database.deleteWorkoutNote(workoutNote)
+//    }
 }
+
+
+/*
 
 @Singleton
 class MicrocycleNotesRepository @Inject constructor(private val microcycleNotesDao: MicrocycleNotesDao) {
@@ -226,3 +230,4 @@ class ProgramNotesRepository @Inject constructor(private val programNotesDao: Pr
         programNotesDao.deleteProgramNote(programNote)
     }
 }
+*/

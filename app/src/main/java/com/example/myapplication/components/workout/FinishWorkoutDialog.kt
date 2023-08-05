@@ -7,12 +7,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FinishWorkoutButton(
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
     val openFinishWorkoutDialog = remember { mutableStateOf(false) }
     val openPartialFinishWorkoutDialog = remember { mutableStateOf(false) }

@@ -32,8 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.data.Equipment
-import com.example.myapplication.data.MuscleGroup
+import com.example.myapplication.data.model.Equipment
+import com.example.myapplication.data.model.MuscleGroup
 
 // @Preview
 @Composable
@@ -155,7 +155,7 @@ fun ExercisesFilterMenu(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                   ) {
-                      Text(text = muscleGroup.name)
+                      Text(text = muscleGroup.name ?: "Unknown")
 
                       val (checked, onCheckedChange) = remember { mutableStateOf(false) }
 
@@ -222,7 +222,7 @@ fun ExercisesFilterMenu(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                   ) {
-                      Text(text = equipment.name)
+                      Text(text = equipment.name ?: "Unknown")
 
                       val (checked, onCheckedChange) = remember { mutableStateOf(false) }
 

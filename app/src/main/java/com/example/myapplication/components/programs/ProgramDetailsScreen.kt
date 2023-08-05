@@ -60,19 +60,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
-import com.example.myapplication.data.Microcycle
-import com.example.myapplication.data.Program
-import com.example.myapplication.data.Set
-import com.example.myapplication.data.Workout
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Microcycle
+import com.example.myapplication.data.model.Program
+import com.example.myapplication.data.model.Workout
+import org.koin.androidx.compose.koinViewModel
+import org.mongodb.kbson.ObjectId
 
 @Composable
 fun ProgramDetailsScreen(
   navController: NavController,
-  programsViewModel: ProgramsViewModel /*= viewModel()*/,
+  programsViewModel: ProgramsViewModel = koinViewModel(),
   programID: String
 ) {
-  programsViewModel.getProgramById(programID.toLong())
-  programsViewModel.getMicrocyclesByProgram(programID.toLong())
+  programsViewModel.getProgramById(ObjectId(programID))
+  programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
 
   val program by programsViewModel.selectedProgram.collectAsStateWithLifecycle(null)
   val programMicrocycles by
@@ -106,7 +108,7 @@ fun ProgramDetailsLayout(
       TopAppBar(
         title = {
           Text(
-            text = program.name,
+            text = program.name ?: "New Program",
             maxLines = 2,
             overflow = TextOverflow.Visible,
             color = onSurface,
@@ -221,7 +223,7 @@ fun ProgramDetailsOptionsDropdownMenu() {
 fun OverviewTab(
   program: Program,
   microcycles: List<Microcycle>,
-  programsViewModel: ProgramsViewModel
+  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
     CoachsCard(program = program)
@@ -371,12 +373,10 @@ fun ProgramDescriptionCard(program: Program) {
           }
         }
       }
-//      TODO Hide if not needed
+      //      TODO Hide if not needed
       TextButton(
-        onClick = { onClick(!expanded) }, contentPadding = PaddingValues(
-          start = 0.dp,
-          bottom = 0.dp
-        )
+        onClick = { onClick(!expanded) },
+        contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp)
       ) {
         Text(
           text = if (expanded) "Show less" else "Show more",
@@ -388,7 +388,10 @@ fun ProgramDescriptionCard(program: Program) {
 }
 
 @Composable
-fun WorkoutOverviewCard(microcycles: List<Microcycle>, programsViewModel: ProgramsViewModel) {
+fun WorkoutOverviewCard(
+  microcycles: List<Microcycle>,
+  programsViewModel: ProgramsViewModel = koinViewModel()
+) {
   val padding = 12.dp
   val spacedByPadding = 4.dp
   val titleMedium = MaterialTheme.typography.titleMedium
@@ -458,7 +461,11 @@ fun WorkoutOverviewCard(microcycles: List<Microcycle>, programsViewModel: Progra
 }
 
 @Composable
-fun WorkoutDayCard(index: Int, workout: Workout, programsViewModel: ProgramsViewModel) {
+fun WorkoutDayCard(
+  index: Int,
+  workout: Workout,
+  programsViewModel: ProgramsViewModel = koinViewModel()
+) {
   val padding = 12.dp
   val spacedByPadding = 12.dp
   val titleMedium = MaterialTheme.typography.titleMedium
@@ -467,11 +474,9 @@ fun WorkoutDayCard(index: Int, workout: Workout, programsViewModel: ProgramsView
   val bodySmall = MaterialTheme.typography.bodySmall
   val cardColors = CardDefaults.cardColors()
 
-  val sets by programsViewModel.getSetsByWorkoutID(workout.workoutID).collectAsStateWithLifecycle()
+  val exercisesSets = workout.exerciseSets
 
-  val setsGroupedByExercise = sets.groupBy { it.exerciseID }
-
-  Log.i("WorkoutDayCard", sets.toString())
+  Log.i("WorkoutDayCard", exercisesSets.toString())
 
   ElevatedCard() {
     Column(
@@ -487,13 +492,13 @@ fun WorkoutDayCard(index: Int, workout: Workout, programsViewModel: ProgramsView
       ) {
         Text(text = "Day ${index.plus(1)}", style = labelMedium)
       }
-      if (sets.isNotEmpty()) {
-        setsGroupedByExercise.onEachIndexed { index, entry ->
+      if (!exercisesSets.isNullOrEmpty()) {
+        exercisesSets.forEachIndexed { index, exerciseSet ->
           ExerciseOverview(
             index = index,
-            exerciseID = entry.key,
-            sets = entry.value,
-            programsViewModel = programsViewModel
+//            exerciseID = entry.key,
+            exerciseSets = exerciseSet
+//            programsViewModel = programsViewModel
           )
           Spacer(modifier = Modifier.height(spacedByPadding))
         }
@@ -505,21 +510,21 @@ fun WorkoutDayCard(index: Int, workout: Workout, programsViewModel: ProgramsView
 @Composable
 fun ExerciseOverview(
   index: Int,
-  exerciseID: Long,
-  sets: List<Set>,
-  programsViewModel: ProgramsViewModel
+//  exerciseID: Long,
+  exerciseSets: ExerciseSets,
+//  programsViewModel: ProgramsViewModel
 ) {
   val labelMedium = MaterialTheme.typography.labelMedium
 
-  val exercise by programsViewModel.getExercise(exerciseID).collectAsStateWithLifecycle()
+  val exercise = exerciseSets.exercise
 
   Row(
     modifier = Modifier
       .fillMaxWidth()
       .padding(bottom = 4.dp),
   ) {
-    if (exercise.isNotEmpty()) {
-      Text(text = "${index.plus(1)}. ${exercise.first().name}", style = labelMedium)
+    if (exercise != null) {
+      Text(text = "${index.plus(1)}. ${exercise.name}", style = labelMedium)
     }
   }
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -537,7 +542,7 @@ fun ExerciseOverview(
       textAlign = TextAlign.Center
     )
   }
-  sets.forEach { set ->
+  exerciseSets.sets.forEach { set ->
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
       Text(
         text = set.setNumber.toString(),

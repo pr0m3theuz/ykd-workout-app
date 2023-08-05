@@ -20,9 +20,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.WorkoutViewModel
-import com.example.myapplication.data.Exercise
+import com.example.myapplication.data.model.Exercise
+import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -31,7 +31,7 @@ import kotlin.time.toDuration
 // @Preview
 @Composable
 fun AutoRestTimerScreen(
-    workoutViewModel: WorkoutViewModel = viewModel(),
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
     openDialog: (Boolean) -> Unit,
     exercise: Exercise
 ) {
