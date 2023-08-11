@@ -32,7 +32,7 @@ class RealmDatabase {
 
   val realm: Realm by lazy {
     val configuration =
-      RealmConfiguration.create(
+      RealmConfiguration.Builder(
         schema =
         setOf(
           Exercise::class,
@@ -58,43 +58,104 @@ class RealmDatabase {
           //            ProgressionScheme::class,
         )
       )
+//        .initialRealmFile("./database/default.realm")
+        .build()
     Realm.open(configuration)
   }
 
+  //  val app: App = App.create("gymcats-rmmte")
+  //  var credentials: Credentials
+
+  //  CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
+  // interactions
+  //    val user = app.login(Credentials.anonymous())
+  //  }
+
+  /*  init {
+  //    CoroutineScope(Dispatchers.Main).launch {
+  //      app.login(Credentials.anonymous())
+  //    }
+     runBlocking {
+        app.login(Credentials.anonymous())
+      }
+    }
+
+    val realm: Realm by lazy {
+      val config =
+        app.currentUser?.let {
+          SyncConfiguration.Builder(
+              user = it,
+              schema =
+                setOf(
+                  Exercise::class,
+                  ExerciseSets::class,
+                  Set::class,
+                  Workout::class,
+                  Program::class,
+                  Mesocycle::class,
+                  Microcycle::class,
+                  ExerciseNote::class,
+                  WorkoutNote::class,
+                  ProgramNote::class,
+                  MesocycleNote::class,
+                  MicrocycleNote::class,
+                  MuscleExercise::class,
+                  MuscleRoleFunction::class,
+                  Muscle::class,
+                  MuscleGroup::class,
+                  Equipment::class,
+                  Utility::class,
+                  Force::class,
+                  Mechanic::class,
+                  // ProgressionScheme::class,)
+                )
+            )
+            .build()
+        }
+
+      Realm.open(config!!)
+    }*/
   // Exercise & Related Queries
   fun getAllExercises(): Flow<List<Exercise>> {
-    return realm.query<Exercise>().find().asFlow()
-      .map { exercises -> exercises.list.sortedBy { exercise -> exercise.name } }
+    return realm.query<Exercise>().find().asFlow().map { exercises ->
+      exercises.list.sortedBy { exercise -> exercise.name }
+    }
   }
 
   fun getAllEquipment(): Flow<List<Equipment>> {
-    return realm.query<Equipment>().find().asFlow()
-      .map { equipments -> equipments.list.sortedBy { equipment -> equipment.name } }
+    return realm.query<Equipment>().find().asFlow().map { equipments ->
+      equipments.list.sortedBy { equipment -> equipment.name }
+    }
   }
 
   fun getAllMuscleGroups(): Flow<List<MuscleGroup>> {
-    return realm.query<MuscleGroup>().find().asFlow()
-      .map { muscleGroups -> muscleGroups.list.sortedBy { muscleGroup -> muscleGroup.name } }
+    return realm.query<MuscleGroup>().find().asFlow().map { muscleGroups ->
+      muscleGroups.list.sortedBy { muscleGroup -> muscleGroup.name }
+    }
   }
 
   fun getAllUtilities(): Flow<List<Utility>> {
-    return realm.query<Utility>().find().asFlow()
-      .map { utilities -> utilities.list.sortedBy { utility -> utility.name } }
+    return realm.query<Utility>().find().asFlow().map { utilities ->
+      utilities.list.sortedBy { utility -> utility.name }
+    }
   }
 
   fun getAllForces(): Flow<List<Force>> {
-    return realm.query<Force>().find().asFlow()
-      .map { forces -> forces.list.sortedBy { force -> force.name } }
+    return realm.query<Force>().find().asFlow().map { forces ->
+      forces.list.sortedBy { force -> force.name }
+    }
   }
 
   fun getAllMechanics(): Flow<List<Mechanic>> {
-    return realm.query<Mechanic>().find().asFlow()
-      .map { mechanics -> mechanics.list.sortedBy { mechanic -> mechanic.name } }
+    return realm.query<Mechanic>().find().asFlow().map { mechanics ->
+      mechanics.list.sortedBy { mechanic -> mechanic.name }
+    }
   }
 
   fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> {
-    return realm.query<MuscleRoleFunction>().find().asFlow()
-      .map { functions -> functions.list.sortedBy { function -> function.roleFunction } }
+    return realm.query<MuscleRoleFunction>().find().asFlow().map { functions ->
+      functions.list.sortedBy { function -> function.roleFunction }
+    }
   }
 
   fun getMuscleGroupNameByID(muscleGroupID: String): String {
@@ -214,8 +275,9 @@ class RealmDatabase {
   // Workout Queries
 
   fun getAllWorkouts(): Flow<List<Workout>> {
-    return realm.query<Workout>("SORT(dateCreated DESC)").find().asFlow()
-      .map { workouts -> workouts.list.sortedByDescending { workout -> workout.dateCreated } }
+    return realm.query<Workout>("SORT(dateCreated DESC)").find().asFlow().map { workouts ->
+      workouts.list.sortedByDescending { workout -> workout.dateCreated }
+    }
   }
 
   suspend fun getWorkoutByID(workoutID: ObjectId): Workout? {
@@ -245,7 +307,7 @@ class RealmDatabase {
   suspend fun deleteWorkout(_workout: Workout) {
     _workout.isManaged()
     realm.write {
-      val workout = realm.query<Workout>("workoutID = $0", _workout.workoutID).first().find()
+      val workout = realm.query<Workout>("workoutID = $0", _workout._id).first().find()
       if (workout != null) {
         delete(workout)
       }
@@ -254,8 +316,9 @@ class RealmDatabase {
 
   //  Program Queries
   fun getAllPrograms(): Flow<List<Program>> {
-    return realm.query<Program>().find().asFlow()
-      .map { programs -> programs.list.sortedByDescending { program -> program.dateCreated } }
+    return realm.query<Program>().find().asFlow().map { programs ->
+      programs.list.sortedByDescending { program -> program.dateCreated }
+    }
   }
 
   suspend fun getProgramByID(programID: ObjectId): Program? {
@@ -273,7 +336,7 @@ class RealmDatabase {
   suspend fun deleteProgram(_program: Program) {
     _program.isManaged()
     realm.write {
-      val program = realm.query<Program>("programID = $0", _program.programID).first().find()
+      val program = realm.query<Program>("programID = $0", _program._id).first().find()
       if (program != null) {
         delete(program)
       }
@@ -282,8 +345,9 @@ class RealmDatabase {
 
   //  Mesocycle Queries
   fun getAllMesocycles(): Flow<List<Mesocycle>> {
-    return realm.query<Mesocycle>().find().asFlow()
-      .map { mesocycles -> mesocycles.list.sortedByDescending { mesocycle -> mesocycle.dateCreated } }
+    return realm.query<Mesocycle>().find().asFlow().map { mesocycles ->
+      mesocycles.list.sortedByDescending { mesocycle -> mesocycle.dateCreated }
+    }
   }
 
   fun getMesocycleByID(mesocycleID: ObjectId): Mesocycle? {
@@ -305,8 +369,7 @@ class RealmDatabase {
   suspend fun deleteMesocycle(_mesocycle: Mesocycle) {
     _mesocycle.isManaged()
     realm.write {
-      val mesocycle =
-        realm.query<Mesocycle>("mesocycleID = $0", _mesocycle.mesocycleID).first().find()
+      val mesocycle = realm.query<Mesocycle>("mesocycleID = $0", _mesocycle._id).first().find()
       if (mesocycle != null) {
         delete(mesocycle)
       }
@@ -316,8 +379,9 @@ class RealmDatabase {
   //  Microcycle Queries
 
   fun getAllMicrocycles(): Flow<List<Microcycle>> {
-    return realm.query<Microcycle>().find().asFlow()
-      .map { microcycles -> microcycles.list.sortedByDescending { microcycle -> microcycle.dateCreated } }
+    return realm.query<Microcycle>().find().asFlow().map { microcycles ->
+      microcycles.list.sortedByDescending { microcycle -> microcycle.dateCreated }
+    }
   }
 
   fun getMicrocycleByID(microcycleID: ObjectId): Microcycle? {
@@ -347,8 +411,7 @@ class RealmDatabase {
   suspend fun deleteMicrocycle(_microcycle: Microcycle) {
     _microcycle.isManaged()
     realm.write {
-      val microcycle =
-        realm.query<Mesocycle>("microcycleID = $0", _microcycle.microcycleID).first().find()
+      val microcycle = realm.query<Mesocycle>("microcycleID = $0", _microcycle._id).first().find()
       if (microcycle != null) {
         delete(microcycle)
       }
@@ -418,4 +481,26 @@ class RealmDatabase {
   suspend fun updateWorkoutNote(workoutNote: WorkoutNote) {
     realm.write { workoutNote }
   }
+
+  /* @OptIn(ExperimentalSerializationApi::class)
+   suspend fun migrateData() {
+
+     val program = Json.decodeFromStream<Program>(assetFileAsStream("./database/programs_202308111151.json"))
+
+     realm.write {
+       this.copyToRealm(
+         Program().apply {
+           name = program.name
+           author = program.author
+           description = program.description
+           shortDescription = program.shortDescription
+           uri = program.uri
+           level = program.level
+           programEquipment = program.programEquipment
+           daysPerWeek = program.daysPerWeek
+           programLength = program.programLength
+         }
+       )
+     }
+   }*/
 }

@@ -19,7 +19,7 @@ import org.mongodb.kbson.ObjectId
 
 class ExerciseSets() : RealmObject {
   @PrimaryKey
-  var exerciseSetsID: ObjectId = ObjectId()
+  var _id: ObjectId = ObjectId()
   var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
   var exSetsUUID: RealmUUID = RealmUUID.random()
   val workout: RealmResults<Workout> by backlinks(Workout::exerciseSets)
@@ -80,7 +80,7 @@ fun ExerciseSets.setComplete(uuid: RealmUUID, setComplete: Boolean) {
 }
 
 fun ExerciseSets.updateSetType(uuid: RealmUUID, setTypeID: Int) {
-  sets?.forEach { if (it.uuid == uuid) it.setTypeID = setTypeID }
+  sets.forEach { if (it.uuid == uuid) it.setTypeID = setTypeID }
 }
 
 fun ExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
@@ -151,7 +151,7 @@ fun ExerciseSets.averageWeight(): Double {
  */
 fun ExerciseSets.resetSets(/*workout: Workout*/) {
   sets.forEach { set ->
-    set.setID = ObjectId()
+    set._id = ObjectId()
     set.lazyListItemID = newID()
     set.uuid = RealmUUID.random()
 //    set.workoutID = workout.workoutID

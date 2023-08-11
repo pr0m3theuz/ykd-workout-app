@@ -411,7 +411,7 @@ fun WorkoutOverviewCard(
   if (microcycles.isNotEmpty()) {
     val workouts by
     programsViewModel
-      .getWorkoutsByMicrocycle(microcycles[selectedTabIndex].microcycleID)
+      .getWorkoutsByMicrocycle(microcycles[selectedTabIndex]._id)
       .collectAsStateWithLifecycle()
 
     Card() {

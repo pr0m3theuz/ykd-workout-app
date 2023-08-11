@@ -12,7 +12,7 @@ import kotlin.time.Duration
 
 class Workout() : RealmObject {
     @PrimaryKey
-    var workoutID: ObjectId = ObjectId()
+    var _id: ObjectId = ObjectId()
     var lazyListItemID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var name: String? = null

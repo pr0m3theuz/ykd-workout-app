@@ -10,8 +10,8 @@ import kotlin.time.toDuration
 
 class Exercise() : RealmObject {
   @PrimaryKey
-  var exerciseID: ObjectId = ObjectId()
-  var lazyListItemID: Long = newID()
+  var _id: ObjectId = ObjectId()
+    var lazyListItemID: Long = newID()
   var uuid: RealmUUID = RealmUUID.random()
   var name: String = "Exercise Name" // TODO Remove Assignment
 

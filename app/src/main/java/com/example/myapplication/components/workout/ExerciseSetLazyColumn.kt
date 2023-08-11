@@ -54,16 +54,16 @@ fun ExerciseSetLazyColumn(
     modifier = Modifier.fillMaxWidth()
     //  verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
-    items(workoutNotes, key = { item -> item.id }) { workoutNote ->
-      SwipeToDismissItem(
-        onDismissRequest = { workoutViewModel.removeWorkoutNote(workoutNote) },
-        dismissStateBoolean = true
-      ) {
-        WorkoutNoteTextField(
-          workoutNote = workoutNote,
-          placeholder = "Workout Note",
-        )
-      }
+    items(workoutNotes, key = { item -> item.lazyListID }) { workoutNote ->
+        SwipeToDismissItem(
+            onDismissRequest = { workoutViewModel.removeWorkoutNote(workoutNote) },
+            dismissStateBoolean = true
+        ) {
+            WorkoutNoteTextField(
+                workoutNote = workoutNote,
+                placeholder = "Workout Note",
+            )
+        }
     }
 
     items(exercises, key = { item -> item.exSetsLazyListItemID }) { exerciseSets ->

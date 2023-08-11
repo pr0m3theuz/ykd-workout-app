@@ -13,7 +13,7 @@ import org.mongodb.kbson.ObjectId
 // TODO Switch to use UUIDs instead of IDs
 class ExerciseNote() : RealmObject {
     @PrimaryKey
-    var exerciseNoteID: ObjectId = ObjectId()
+    var _id: ObjectId = ObjectId()
     var id: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var note: String? = null
@@ -32,8 +32,8 @@ class ExerciseNote() : RealmObject {
 // TODO Are the below necessary? TBD
 class WorkoutNote() : RealmObject {
     @PrimaryKey
-    var primaryKey: ObjectId = ObjectId()
-    var id: Long = newID()
+    var _id: ObjectId = ObjectId()
+    var lazyListID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var note: String? = null
     var pinned: Boolean = false
@@ -48,8 +48,8 @@ class WorkoutNote() : RealmObject {
 
 class ProgramNote() : RealmObject {
     @PrimaryKey
-    var primaryKey: ObjectId = ObjectId()
-    var id: Long = newID()
+    var _id: ObjectId = ObjectId()
+    var lazyListID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var note: String? = null
     var pinned: Boolean = false
@@ -58,8 +58,8 @@ class ProgramNote() : RealmObject {
 
 class MesocycleNote() : RealmObject {
     @PrimaryKey
-    var primaryKey: Long = fakeULID()
-    var id: Long = newID()
+    var _id: Long = fakeULID()
+    var lazyListID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var note: String? = null
     var pinned: Boolean = false
@@ -69,8 +69,8 @@ class MesocycleNote() : RealmObject {
 
 class MicrocycleNote() : RealmObject {
     @PrimaryKey
-    var primaryKey: Long = fakeULID()
-    var id: Long = newID()
+    var _id: Long = fakeULID()
+    var lazyListID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var note: String? = null
     var pinned: Boolean = false

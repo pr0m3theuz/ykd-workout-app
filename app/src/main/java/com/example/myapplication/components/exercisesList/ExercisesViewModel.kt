@@ -146,17 +146,17 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
 
     var selectedMuscleGroups = mutableListOf<String>()
     _muscleGroupsChecked.value
-      .filterValues { !it }
-      .keys
-      .sortedBy { it.name }
-      .forEach { muscleGroup -> muscleGroup.id?.let { selectedMuscleGroups.add(it) } }
+        .filterValues { !it }
+        .keys
+        .sortedBy { it.name }
+        .forEach { muscleGroup -> muscleGroup._id?.let { selectedMuscleGroups.add(it) } }
 
     var selectedEquipments = mutableListOf<String>()
-    _equipmentsChecked.value
-      .filterValues { !it }
-      .keys
-      .sortedBy { it.name }
-      .forEach { equipment -> equipment.id?.let { selectedEquipments.add(it) } }
+      _equipmentsChecked.value
+          .filterValues { !it }
+          .keys
+          .sortedBy { it.name }
+          .forEach { equipment -> equipment._id?.let { selectedEquipments.add(it) } }
 
     val selectedMovementTypes = mutableListOf<String>()
     movementTypesChecked

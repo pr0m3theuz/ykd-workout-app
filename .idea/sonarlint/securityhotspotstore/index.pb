@@ -21,3 +21,9 @@ Mapp/src/main/java/com/example/myapplication/components/workout/AddExercise.kt,
 Mapp/src/main/java/com/example/myapplication/components/BottomNavigationBar.kt,b/d/bdbcb64cae1596874acc04969bf6a31a8736f83a
 
 Oapp/src/main/java/com/example/myapplication/components/workout/CancelWorkout.kt,5/2/522e4d2b15b136a26bc4dc07cd0c1f8cf1bc356a
+v
+Fapp/src/main/java/com/example/myapplication/components/programs/column,7/0/70491f8e1ae692add6739b45f97977eba2958818
+F
+app/proguard-rules.pro,9/e/9e08934d811afe28fbc77aaa3c0d747b94348db9
+w
+Gapp/src/main/java/com/example/myapplication/dependencyInjection/Koin.kt,5/5/55251e9434270cde64e8f24659ae22e47df3a49a

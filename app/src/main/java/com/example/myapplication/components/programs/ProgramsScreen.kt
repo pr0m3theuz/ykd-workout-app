@@ -207,7 +207,7 @@ fun ProgramsScreen(
       }
 
             if (programs.isNotEmpty()) {
-                items(programs, key = { it.programID }) { program ->
+                items(programs, key = { it._id }) { program ->
                     AnimatedVisibility(
                         visible = programVisible,
                         enter = expandVertically(animationSpec = tween(500)),
@@ -384,7 +384,7 @@ fun ProgramCard(navController: NavController, program: Program) {
             .padding(vertical = padding)
             .clickable {
                 /* TODO Navigate to Program Details Screen */ navController.navigate(
-                "programDetails/${program.programID}"
+                "programDetails/${program._id}"
             )
             }
     ) {
@@ -444,7 +444,7 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
                 modifier =
                 Modifier.clickable {
                     /* TODO Navigate to Program Details Screen */
-                    navController.navigate("programDetails/${program.programID}")
+                    navController.navigate("programDetails/${program._id}")
                 }
             )
             IconButton(onClick = { /* TODO */ }) {
@@ -500,7 +500,7 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
             Button(onClick = { /*TODO*/ }) { Text(text = "Start Microcycle Week # Day #") }
             IconButton(
                 onClick = { /*TODO*/
-                    navController.navigate("programDetails/${program.programID}")
+                    navController.navigate("programDetails/${program._id}")
                 }
             ) {
                 Icon(

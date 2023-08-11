@@ -217,8 +217,8 @@ fun ExercisesLazyColumn(
             )
           },
           modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+              .fillMaxWidth()
+              .padding(horizontal = 8.dp)
         ) {}
         //        }
 
@@ -238,14 +238,14 @@ fun ExercisesLazyColumn(
           exercises.isEmpty() && query.isBlank() -> {
             Column(
               modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp),
+                  .fillMaxWidth()
+                  .padding(top = 24.dp),
               horizontalAlignment = Alignment.CenterHorizontally
             ) {
               LinearProgressIndicator(
                 modifier = Modifier
-                  .semantics(mergeDescendants = true) {}
-                  .padding(10.dp),
+                    .semantics(mergeDescendants = true) {}
+                    .padding(10.dp),
               )
             }
           }
@@ -270,8 +270,8 @@ fun ExercisesLazyColumn(
 fun NoResultsFound(query: String) {
   Column(
     modifier = Modifier
-      .fillMaxSize()
-      .padding(16.dp),
+        .fillMaxSize()
+        .padding(16.dp),
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -316,7 +316,7 @@ private fun ExercisesLazyList(
     items(count = exercises.size, key = { index: Int -> exercises[index].lazyListItemID }) { index
       ->
         val exercise: Exercise = exercises[index]
-        val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
+        val muscleGroupName: String? = muscleGroups.find { it._id == exercise.muscleGroupID }?.name
       //      Log.i(
       //        "ExercisesLazyList.exercise",
       //        "${exercise.name}, ${exercise.muscleGroupID}, $muscleGroupName"

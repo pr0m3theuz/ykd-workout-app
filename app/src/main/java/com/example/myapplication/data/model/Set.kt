@@ -13,7 +13,7 @@ import org.mongodb.kbson.ObjectId
 
 class Set() : RealmObject {
     @PrimaryKey
-    var setID: ObjectId = ObjectId()
+    var _id: ObjectId = ObjectId()
     var lazyListItemID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var setNumber: Int? = 0

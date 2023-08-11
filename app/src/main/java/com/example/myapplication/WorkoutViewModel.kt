@@ -411,8 +411,8 @@ class WorkoutViewModel(
   }
 
   fun updateWorkoutNotes(note: WorkoutNote) {
-    _workoutNotesData.first { it == note }.id = newID()
-    _workoutNotes.value = _workoutNotesData.toList()
+    _workoutNotesData.first { it == note }.lazyListID = newID()
+      _workoutNotes.value = _workoutNotesData.toList()
   }
 
   private fun stopWorkoutTimer() {
@@ -443,9 +443,9 @@ class WorkoutViewModel(
       var pinnedNotes = listOf<ExerciseNote>()
 
       viewModelScope.launch {
-        exerciseNotesRepository.getPinnedExerciseNotes(_exercise.exerciseID).collect() {
-          pinnedNotes = it
-        }
+          exerciseNotesRepository.getPinnedExerciseNotes(_exercise._id).collect() {
+              pinnedNotes = it
+          }
       }
 
       temporaryExerciseSets.add(
@@ -718,9 +718,9 @@ class WorkoutViewModel(
 
     viewModelScope.launch {
       exerciseSets.exercise?.let {
-        exerciseNotesRepository.getPinnedExerciseNotes(it.exerciseID).collect() { notes ->
-          pinnedNotes = notes
-        }
+          exerciseNotesRepository.getPinnedExerciseNotes(it._id).collect() { notes ->
+              pinnedNotes = notes
+          }
       }
     }
 

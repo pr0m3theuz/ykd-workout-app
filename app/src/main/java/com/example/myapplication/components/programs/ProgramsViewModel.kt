@@ -37,7 +37,10 @@ constructor(
 
     init {
         viewModelScope.launch {
+            programsRepository.migrateData()
+//            App.create(APP_ID).login(Credentials.anonymous()) // TODO: Determine if this is needed here
             programsRepository.getAllPrograms().collect() { _programs.value = it }
+
         }
     }
 

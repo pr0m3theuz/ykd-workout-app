@@ -121,7 +121,7 @@ fun ExerciseHeader(
             ) {
                 ExerciseTitleButton(
                     onClick = {
-                        navController.navigate("exerciseDetails/${exerciseSets.exercise?.exerciseID}")
+                        navController.navigate("exerciseDetails/${exerciseSets.exercise?._id}")
                     },
                     modifier = Modifier.weight(1.0f, fill = true)
                 ) {

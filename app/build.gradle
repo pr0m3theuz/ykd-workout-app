@@ -28,13 +28,13 @@ android {
             useSupportLibrary true
         }
 
-        javaCompileOptions {
+        /*javaCompileOptions {
             annotationProcessorOptions {
                 compilerArgumentProviders(
                         new RoomSchemaArgProvider(new File(projectDir, "schemas"))
                 )
             }
-        }
+        }*/
     }
 
     buildTypes {
@@ -54,6 +54,10 @@ android {
                 "-Xjvm-default=all",
         ]
     }
+//    kotlin {
+//        jvmToolchain 1.8
+//    }
+
     buildFeatures {
         compose true
     }
@@ -80,6 +84,7 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-extended:1.6.0-alpha01'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
+    implementation 'com.google.dagger:hilt-android:2.46.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.10.3'
@@ -97,6 +102,7 @@ dependencies {
     // Assertions
     androidTestImplementation "androidx.test.ext:junit:1.1.5"
     androidTestImplementation "androidx.test.ext:truth:1.5.0"
+
 
 
     // Espresso dependencies
@@ -120,26 +126,24 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.4.3'
-    debugImplementation 'androidx.compose.ui:ui-tooling:1.4.3'
-    debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.3'
-
-    def core_version = '1.10.1'
-
-    implementation "androidx.core:core:$core_version"
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.5.0'
+    debugImplementation 'androidx.compose.ui:ui-tooling:1.5.0'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest:1.5.0'
 
     // Navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0"
+    implementation "androidx.navigation:navigation-compose:2.7.0"
 
     // realm
-    implementation 'io.realm.kotlin:library-base:1.10.0' // Add to use local realm (no sync)
-//    implementation 'io.realm.kotlin:library-sync:1.10.0' // Add to use device sync
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0'
+//    implementation 'io.realm.kotlin:library-base:1.10.0' // Add to use local realm (no sync)
+    implementation 'io.realm.kotlin:library-sync:1.10.2' // Add to use device sync
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
     // Add to use coroutines with the SDK
 
+// Serialization
+//    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
 
 //    Koin
     implementation "io.insert-koin:koin-core:3.4.3"
@@ -147,7 +151,7 @@ dependencies {
 //    implementation "io.insert-koin:koin-annotations:3.4.3"
 //    ksp "io.insert-koin:koin-ksp-compiler:3.4.3"
     implementation "io.insert-koin:koin-androidx-navigation:3.4.3"
-    implementation "io.insert-koin:koin-androidx-compose:3.4.3"
+    implementation 'io.insert-koin:koin-androidx-compose:3.4.6'
 
     testImplementation "io.insert-koin:koin-test:3.4.3"
     testImplementation "io.insert-koin:koin-test-junit5:3.4.3"
@@ -157,6 +161,7 @@ dependencies {
     correctErrorTypes true
 }*/
 
+/*
 class RoomSchemaArgProvider implements CommandLineArgumentProvider {
 
     @InputDirectory
@@ -173,4 +178,4 @@ class RoomSchemaArgProvider implements CommandLineArgumentProvider {
         // ["room.schemaLocation=${schemaDir.path}".toString()].
         return ["-Aroom.schemaLocation=${schemaDir.path}".toString()]
     }
-}
+}*/

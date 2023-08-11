@@ -16,7 +16,7 @@ import org.mongodb.kbson.ObjectId
 
 class Program() : RealmObject {
     @PrimaryKey
-    var programID: ObjectId = ObjectId()
+    var _id: ObjectId = ObjectId()
     var lazyListItemID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var name: String? = null
@@ -37,7 +37,7 @@ class Program() : RealmObject {
 
 class Mesocycle() : RealmObject {
     @PrimaryKey
-    var mesocycleID: ObjectId = ObjectId()
+    var _id: ObjectId = ObjectId()
     var lazyListItemID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var name: String? = null
@@ -54,7 +54,7 @@ class Mesocycle() : RealmObject {
 
 class Microcycle() : RealmObject {
     @PrimaryKey
-    var microcycleID: ObjectId = ObjectId()
+    var _id: ObjectId = ObjectId()
     var lazyListItemID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
     var name: String? = null

@@ -200,8 +200,8 @@ fun ReplaceExerciseScreen(
               )
             },
             modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 8.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
           ) {}
 
           SelectedFiltersLazyRow(exercisesViewModel)
@@ -221,14 +221,14 @@ fun ReplaceExerciseScreen(
             exercises.isEmpty() && query.isBlank() -> {
               Column(
                 modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(top = 24.dp),
+                    .fillMaxWidth()
+                    .padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
               ) {
                 LinearProgressIndicator(
                   modifier = Modifier
-                    .semantics(mergeDescendants = true) {}
-                    .padding(10.dp),
+                      .semantics(mergeDescendants = true) {}
+                      .padding(10.dp),
                 )
               }
             }
@@ -261,8 +261,8 @@ private fun ExercisesLazyList(
   LazyColumn(
     state = lazyListState,
     modifier = Modifier
-      .fillMaxWidth()
-      .selectableGroup(),
+        .fillMaxWidth()
+        .selectableGroup(),
     // verticalArrangement = Arrangement.spacedBy(8.dp),
     // contentPadding = PaddingValues(0.dp)
   ) {
@@ -270,7 +270,7 @@ private fun ExercisesLazyList(
       ->
         var selectedExerciseModel by remember { mutableStateOf(false) }
         val exercise: Exercise = exercises[index]
-        val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
+        val muscleGroupName: String? = muscleGroups.find { it._id == exercise.muscleGroupID }?.name
       selectedExerciseModel = selectedExercise == exercise
       SelectableExerciseItem(
         exercise = exercise,
