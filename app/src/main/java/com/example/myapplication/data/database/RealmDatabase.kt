@@ -1,5 +1,6 @@
 package com.example.myapplication.data.database
 
+import android.util.Log
 import com.example.myapplication.data.model.Equipment
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseNote
@@ -16,69 +17,79 @@ import com.example.myapplication.data.model.MuscleGroup
 import com.example.myapplication.data.model.MuscleRoleFunction
 import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.ProgramNote
+import com.example.myapplication.data.model.Programs
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Utility
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.internal.platform.assetFileAsStream
+import io.realm.kotlin.internal.platform.runBlocking
+import io.realm.kotlin.mongodb.App
+import io.realm.kotlin.mongodb.Credentials
+import io.realm.kotlin.mongodb.subscriptions
+import io.realm.kotlin.mongodb.sync.SyncConfiguration
+import io.realm.kotlin.mongodb.syncSession
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
+import org.json.JSONArray
+import org.json.JSONObject
 import org.mongodb.kbson.ObjectId
 
 class RealmDatabase {
 
-  val realm: Realm by lazy {
-    val configuration =
-      RealmConfiguration.Builder(
-        schema =
-        setOf(
-          Exercise::class,
-          ExerciseSets::class,
-          Set::class,
-          Workout::class,
-          Program::class,
-          Mesocycle::class,
-          Microcycle::class,
-          ExerciseNote::class,
-          WorkoutNote::class,
-          ProgramNote::class,
-          MesocycleNote::class,
-          MicrocycleNote::class,
-          MuscleExercise::class,
-          MuscleRoleFunction::class,
-          Muscle::class,
-          MuscleGroup::class,
-          Equipment::class,
-          Utility::class,
-          Force::class,
-          Mechanic::class,
-          //            ProgressionScheme::class,
-        )
-      )
-//        .initialRealmFile("./database/default.realm")
-        .build()
-    Realm.open(configuration)
-  }
+  /*  val realm: Realm by lazy {
+      val configuration =
+        RealmConfiguration.Builder(
+            schema =
+              setOf(
+                Exercise::class,
+                ExerciseSets::class,
+                Set::class,
+                Workout::class,
+                Program::class,
+                Mesocycle::class,
+                Microcycle::class,
+                ExerciseNote::class,
+                WorkoutNote::class,
+                ProgramNote::class,
+                MesocycleNote::class,
+                MicrocycleNote::class,
+                MuscleExercise::class,
+                MuscleRoleFunction::class,
+                Muscle::class,
+                MuscleGroup::class,
+                Equipment::class,
+                Utility::class,
+                Force::class,
+                Mechanic::class,
+                //            ProgressionScheme::class,
+              )
+          )
+  //        .initialRealmFile("./database/default.realm")
+          .build()
+      Realm.open(configuration)
+    }*/
 
-  //  val app: App = App.create("gymcats-rmmte")
-  //  var credentials: Credentials
+  val app: App = App.create("gymcats-rmmte")
+//    var credentials: Credentials
 
-  //  CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
-  // interactions
-  //    val user = app.login(Credentials.anonymous())
-  //  }
+//    CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
+//   interactions
+//      val user = app.login(Credentials.anonymous())
+//    }
 
-  /*  init {
-  //    CoroutineScope(Dispatchers.Main).launch {
-  //      app.login(Credentials.anonymous())
-  //    }
-     runBlocking {
-        app.login(Credentials.anonymous())
-      }
+  init {
+    //    CoroutineScope(Dispatchers.Main).launch {
+    //      app.login(Credentials.anonymous())
+    //    }
+    runBlocking {
+      app.login(Credentials.anonymous())
     }
+  }
 
     val realm: Realm by lazy {
       val config =
@@ -109,12 +120,40 @@ class RealmDatabase {
                   Mechanic::class,
                   // ProgressionScheme::class,)
                 )
-            )
+          )
+            .initialSubscriptions { realm ->
+              add(realm.query<Program>(), "programStream", updateExisting = true)
+              add(realm.query<ProgramNote>(), "programNote", updateExisting = true)
+              add(realm.query<Exercise>(), "exerciseStream", updateExisting = true)
+              add(realm.query<ExerciseNote>(), "exerciseNote", updateExisting = true)
+              add(realm.query<Mesocycle>(), "mesocycleStream", updateExisting = true)
+              add(realm.query<MesocycleNote>(), "mesocycleNote", updateExisting = true)
+              add(realm.query<Microcycle>(), "microcycleStream", updateExisting = true)
+              add(realm.query<MicrocycleNote>(), "microcycleNote", updateExisting = true)
+              add(realm.query<Workout>(), "workoutStream", updateExisting = true)
+              add(realm.query<WorkoutNote>(), "workoutNote", updateExisting = true)
+              add(realm.query<ExerciseSets>(), "exerciseSetsStream", updateExisting = true)
+              add(realm.query<Set>(), "setStream", updateExisting = true)
+              add(realm.query<MuscleExercise>(), "muscleExerciseStream", updateExisting = true)
+              add(
+                realm.query<MuscleRoleFunction>(),
+                "muscleRoleFunctionStream",
+                updateExisting = true
+              )
+              add(realm.query<Muscle>(), "muscleStream", updateExisting = true)
+              add(realm.query<MuscleGroup>(), "muscleGroupStream", updateExisting = true)
+              add(realm.query<Equipment>(), "equipmentStream", updateExisting = true)
+              add(realm.query<Utility>(), "utilityStream", updateExisting = true)
+              add(realm.query<Force>(), "forceStream", updateExisting = true)
+              add(realm.query<Mechanic>(), "mechanicStream", updateExisting = true)
+            }
             .build()
         }
 
       Realm.open(config!!)
-    }*/
+    }
+
+
   // Exercise & Related Queries
   fun getAllExercises(): Flow<List<Exercise>> {
     return realm.query<Exercise>().find().asFlow().map { exercises ->
@@ -482,25 +521,37 @@ class RealmDatabase {
     realm.write { workoutNote }
   }
 
-  /* @OptIn(ExperimentalSerializationApi::class)
-   suspend fun migrateData() {
+  suspend fun migrateData() {
+    val json =
+      assetFileAsStream("database/programs_202308111151.json").bufferedReader().use {
+        it.readText()
+      }
 
-     val program = Json.decodeFromStream<Program>(assetFileAsStream("./database/programs_202308111151.json"))
+    val parsedJson: JSONObject = JSONObject(json)
+    val pra = JSONArray(parsedJson["programs"].toString())
 
-     realm.write {
-       this.copyToRealm(
-         Program().apply {
-           name = program.name
-           author = program.author
-           description = program.description
-           shortDescription = program.shortDescription
-           uri = program.uri
-           level = program.level
-           programEquipment = program.programEquipment
-           daysPerWeek = program.daysPerWeek
-           programLength = program.programLength
-         }
-       )
-     }
-   }*/
+    Log.i("DATABASE.migrateData()", pra[0].toString())
+    Log.i("Sync Enabled", realm.syncSession.toString())
+    Log.i("Realm Subscriptions", realm.subscriptions.toString())
+
+    val programs = Json.decodeFromString<Programs>(json)
+
+    programs.programs.forEach { program ->
+      realm.write {
+        this.copyToRealm(
+          Program().apply {
+            name = program.name
+            author = program.author
+            description = program.description
+            shortDescription = program.shortDescription
+            uri = program.uri
+            level = program.level
+            programEquipment = program.programEquipment
+            daysPerWeek = program.daysPerWeek
+            programLength = program.programLength
+          }
+        )
+      }
+    }
+  }
 }

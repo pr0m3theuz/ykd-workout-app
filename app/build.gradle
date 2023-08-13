@@ -4,8 +4,7 @@ plugins {
 //    id 'kotlin-kapt'
     id 'io.realm.kotlin'
     id 'com.google.devtools.ksp'
-
-
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 tasks.withType(Test).configureEach {
@@ -143,7 +142,7 @@ dependencies {
     // Add to use coroutines with the SDK
 
 // Serialization
-//    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
 
 //    Koin
     implementation "io.insert-koin:koin-core:3.4.3"

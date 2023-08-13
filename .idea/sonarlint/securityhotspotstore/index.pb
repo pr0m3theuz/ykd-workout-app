@@ -1,8 +1,6 @@
 
 }
 Mapp/src/androidTest/java/com/example/myapplication/ExampleInstrumentedTest.kt,0/a/0a28f1e072c85bcdbdcfd768fc3c33d3274928e9
-?
-settings.gradle,0/5/05efc8b1657769a27696d478ded1e95f38737233
 7
 gradlew,5/b/5bbfa66edb4db3c7c33c5181f43510990d3307f9
 n
@@ -23,7 +21,29 @@ Mapp/src/main/java/com/example/myapplication/components/BottomNavigationBar.kt,
 Oapp/src/main/java/com/example/myapplication/components/workout/CancelWorkout.kt,5/2/522e4d2b15b136a26bc4dc07cd0c1f8cf1bc356a
 v
 Fapp/src/main/java/com/example/myapplication/components/programs/column,7/0/70491f8e1ae692add6739b45f97977eba2958818
-F
-app/proguard-rules.pro,9/e/9e08934d811afe28fbc77aaa3c0d747b94348db9
 w
 Gapp/src/main/java/com/example/myapplication/dependencyInjection/Koin.kt,5/5/55251e9434270cde64e8f24659ae22e47df3a49a
+á
+Wapp/src/main/java/com/example/myapplication/components/workout/ExerciseSetLazyColumn.kt,8/e/8e2b1fb3c5c9c9920375d14d3cec871a4467a731
+Ö
+Uapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesList.kt,2/a/2a7dd877d030e002a109fdde0cebf0d30c6ac83b
+Å
+Qapp/src/main/java/com/example/myapplication/components/exercise/ExerciseHeader.kt,5/f/5f648ea010abf7f514e12f760983c8cd77bf964c
+P
+ app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
+ç
+]app/src/main/java/com/example/myapplication/components/addExercisesList/AddExercisesScreen.kt,4/0/40fc496f9cb66b17307ae6245dafb9f8f4bbe287
+m
+=app/src/main/java/com/example/myapplication/data/model/Set.kt,d/8/d83901cfae7fead9a04fd81a68b191b0b751b3ca
+Ñ
+Tapp/src/main/java/com/example/myapplication/components/exercisesList/ExerciseItem.kt,2/1/214944efb3abe9e07e31d6bff139de98b02b501f
+o
+?app/src/main/java/com/example/myapplication/WorkoutViewModel.kt,0/3/03810d5ca4c1984458d1b44222627df041bc205e
+ì
+capp/src/main/java/com/example/myapplication/components/replaceExerciseList/ReplaceExerciseScreen.kt,f/e/fea72fa79ef564b3d8a163bb3a3e5abda7e96f06
+ä
+Zapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesViewModel.kt,0/9/090e8e9f514d9413e3dd3b6a9748c09f20d8690f
+q
+Aapp/src/main/java/com/example/myapplication/data/model/Workout.kt,3/c/3ca2bfc0e6ea8fa93071e3e6d15220155c032f60
+t
+Dapp/src/main/java/com/example/myapplication/data/model/EXRXModels.kt,3/6/36c4935e7152f8667ff03adf4f34ca78769a892a

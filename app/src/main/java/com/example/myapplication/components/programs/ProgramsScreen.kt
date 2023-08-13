@@ -193,7 +193,7 @@ fun ProgramsScreen(
                 )
             }
             Text(
-                text = "Program/Macrocycle (###)",
+                text = "Program/Macrocycle (${programs.size})",
 
                 //            style = MaterialTheme.typography.bodySmall
             )
@@ -207,7 +207,7 @@ fun ProgramsScreen(
       }
 
             if (programs.isNotEmpty()) {
-                items(programs, key = { it._id }) { program ->
+                items(programs, key = { it.lazyListItemID }) { program ->
                     AnimatedVisibility(
                         visible = programVisible,
                         enter = expandVertically(animationSpec = tween(500)),
