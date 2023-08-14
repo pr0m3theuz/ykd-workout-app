@@ -10,6 +10,8 @@ import org.mongodb.kbson.ObjectId
 class ProgramsRepository constructor(private val database: RealmDatabase) {
     suspend fun migrateData() {
 //        database.migrateData()
+//        database.migrateMesocycles()
+        database.migrateMicrocycles()
     }
 
     fun getAllPrograms(): Flow<List<Program>> {

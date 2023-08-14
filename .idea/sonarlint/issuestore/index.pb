@@ -41,9 +41,5 @@ t
 Dapp/src/main/java/com/example/myapplication/data/model/EXRXModels.kt,3/6/36c4935e7152f8667ff03adf4f34ca78769a892a
 “
 capp/src/main/java/com/example/myapplication/components/replaceExerciseList/ReplaceExerciseScreen.kt,f/e/fea72fa79ef564b3d8a163bb3a3e5abda7e96f06
-m
-=app/src/main/java/com/example/myapplication/data/model/Set.kt,d/8/d83901cfae7fead9a04fd81a68b191b0b751b3ca
-q
-Aapp/src/main/java/com/example/myapplication/data/model/Workout.kt,3/c/3ca2bfc0e6ea8fa93071e3e6d15220155c032f60
 o
 ?app/src/main/java/com/example/myapplication/WorkoutViewModel.kt,0/3/03810d5ca4c1984458d1b44222627df041bc205e

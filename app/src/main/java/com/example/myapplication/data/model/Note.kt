@@ -30,6 +30,7 @@ import kotlinx.serialization.UseSerializers
 import org.mongodb.kbson.ObjectId
 
 // TODO Switch to use UUIDs instead of IDs
+@Serializable
 class ExerciseNote() : RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
@@ -49,6 +50,7 @@ class ExerciseNote() : RealmObject {
 }
 
 // TODO Are the below necessary? TBD
+@Serializable
 class WorkoutNote() : RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
@@ -76,6 +78,7 @@ class ProgramNote() : RealmObject {
     val program: RealmResults<Program> by backlinks(Program::notes)
 }
 
+@Serializable
 class MesocycleNote() : RealmObject {
     @PrimaryKey
     var _id: Long = fakeULID()

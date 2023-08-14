@@ -9,8 +9,10 @@ import com.example.myapplication.data.model.Force
 import com.example.myapplication.data.model.Mechanic
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.MesocycleNote
+import com.example.myapplication.data.model.Mesocycles
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.MicrocycleNote
+import com.example.myapplication.data.model.Microcycles
 import com.example.myapplication.data.model.Muscle
 import com.example.myapplication.data.model.MuscleExercise
 import com.example.myapplication.data.model.MuscleGroup
@@ -22,6 +24,7 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Utility
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
+import com.example.myapplication.data.model.Workouts
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
@@ -75,84 +78,81 @@ class RealmDatabase {
     }*/
 
   val app: App = App.create("gymcats-rmmte")
-//    var credentials: Credentials
+  //    var credentials: Credentials
 
-//    CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
-//   interactions
-//      val user = app.login(Credentials.anonymous())
-//    }
+  //    CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
+  //   interactions
+  //      val user = app.login(Credentials.anonymous())
+  //    }
 
   init {
     //    CoroutineScope(Dispatchers.Main).launch {
     //      app.login(Credentials.anonymous())
     //    }
-    runBlocking {
-      app.login(Credentials.anonymous())
-    }
+    runBlocking { app.login(Credentials.anonymous()) }
   }
 
-    val realm: Realm by lazy {
-      val config =
-        app.currentUser?.let {
-          SyncConfiguration.Builder(
-              user = it,
-              schema =
-                setOf(
-                  Exercise::class,
-                  ExerciseSets::class,
-                  Set::class,
-                  Workout::class,
-                  Program::class,
-                  Mesocycle::class,
-                  Microcycle::class,
-                  ExerciseNote::class,
-                  WorkoutNote::class,
-                  ProgramNote::class,
-                  MesocycleNote::class,
-                  MicrocycleNote::class,
-                  MuscleExercise::class,
-                  MuscleRoleFunction::class,
-                  Muscle::class,
-                  MuscleGroup::class,
-                  Equipment::class,
-                  Utility::class,
-                  Force::class,
-                  Mechanic::class,
-                  // ProgressionScheme::class,)
-                )
+  val realm: Realm by lazy {
+    val config =
+      app.currentUser?.let {
+        SyncConfiguration.Builder(
+          user = it,
+          schema =
+          setOf(
+            Exercise::class,
+            ExerciseSets::class,
+            Set::class,
+            Workout::class,
+            Program::class,
+            Mesocycle::class,
+            Microcycle::class,
+            ExerciseNote::class,
+            WorkoutNote::class,
+            ProgramNote::class,
+            MesocycleNote::class,
+            MicrocycleNote::class,
+            MuscleExercise::class,
+            MuscleRoleFunction::class,
+            Muscle::class,
+            MuscleGroup::class,
+            Equipment::class,
+            Utility::class,
+            Force::class,
+            Mechanic::class,
+            // ProgressionScheme::class,)
           )
-            .initialSubscriptions { realm ->
-              add(realm.query<Program>(), "programStream", updateExisting = true)
-              add(realm.query<ProgramNote>(), "programNote", updateExisting = true)
-              add(realm.query<Exercise>(), "exerciseStream", updateExisting = true)
-              add(realm.query<ExerciseNote>(), "exerciseNote", updateExisting = true)
-              add(realm.query<Mesocycle>(), "mesocycleStream", updateExisting = true)
-              add(realm.query<MesocycleNote>(), "mesocycleNote", updateExisting = true)
-              add(realm.query<Microcycle>(), "microcycleStream", updateExisting = true)
-              add(realm.query<MicrocycleNote>(), "microcycleNote", updateExisting = true)
-              add(realm.query<Workout>(), "workoutStream", updateExisting = true)
-              add(realm.query<WorkoutNote>(), "workoutNote", updateExisting = true)
-              add(realm.query<ExerciseSets>(), "exerciseSetsStream", updateExisting = true)
-              add(realm.query<Set>(), "setStream", updateExisting = true)
-              add(realm.query<MuscleExercise>(), "muscleExerciseStream", updateExisting = true)
-              add(
-                realm.query<MuscleRoleFunction>(),
-                "muscleRoleFunctionStream",
-                updateExisting = true
-              )
-              add(realm.query<Muscle>(), "muscleStream", updateExisting = true)
-              add(realm.query<MuscleGroup>(), "muscleGroupStream", updateExisting = true)
-              add(realm.query<Equipment>(), "equipmentStream", updateExisting = true)
-              add(realm.query<Utility>(), "utilityStream", updateExisting = true)
-              add(realm.query<Force>(), "forceStream", updateExisting = true)
-              add(realm.query<Mechanic>(), "mechanicStream", updateExisting = true)
-            }
-            .build()
-        }
+        )
+          .initialSubscriptions { realm ->
+            add(realm.query<Program>(), "programStream", updateExisting = true)
+            add(realm.query<ProgramNote>(), "programNote", updateExisting = true)
+            add(realm.query<Exercise>(), "exerciseStream", updateExisting = true)
+            add(realm.query<ExerciseNote>(), "exerciseNote", updateExisting = true)
+            add(realm.query<Mesocycle>(), "mesocycleStream", updateExisting = true)
+            add(realm.query<MesocycleNote>(), "mesocycleNote", updateExisting = true)
+            add(realm.query<Microcycle>(), "microcycleStream", updateExisting = true)
+            add(realm.query<MicrocycleNote>(), "microcycleNote", updateExisting = true)
+            add(realm.query<Workout>(), "workoutStream", updateExisting = true)
+            add(realm.query<WorkoutNote>(), "workoutNote", updateExisting = true)
+            add(realm.query<ExerciseSets>(), "exerciseSetsStream", updateExisting = true)
+            add(realm.query<Set>(), "setStream", updateExisting = true)
+            add(realm.query<MuscleExercise>(), "muscleExerciseStream", updateExisting = true)
+            add(
+              realm.query<MuscleRoleFunction>(),
+              "muscleRoleFunctionStream",
+              updateExisting = true
+            )
+            add(realm.query<Muscle>(), "muscleStream", updateExisting = true)
+            add(realm.query<MuscleGroup>(), "muscleGroupStream", updateExisting = true)
+            add(realm.query<Equipment>(), "equipmentStream", updateExisting = true)
+            add(realm.query<Utility>(), "utilityStream", updateExisting = true)
+            add(realm.query<Force>(), "forceStream", updateExisting = true)
+            add(realm.query<Mechanic>(), "mechanicStream", updateExisting = true)
+          }
+          .build()
+      }
 
-      Realm.open(config!!)
-    }
-
+    Realm.open(config!!)
+  }
 
   // Exercise & Related Queries
   fun getAllExercises(): Flow<List<Exercise>> {
@@ -549,6 +549,77 @@ class RealmDatabase {
             programEquipment = program.programEquipment
             daysPerWeek = program.daysPerWeek
             programLength = program.programLength
+          }
+        )
+      }
+    }
+  }
+
+  suspend fun migrateMesocycles() {
+    val json =
+      assetFileAsStream("database/mesocycles_202308111154.json").bufferedReader().use {
+        it.readText()
+      }
+
+    val mesocycles = Json.decodeFromString<Mesocycles>(json)
+
+    Log.i("DATABASE.migrateMesocycles()", mesocycles.toString())
+
+    mesocycles.mesocycles.forEach { mesocycle ->
+      realm.write {
+        this.copyToRealm(
+          Mesocycle().apply {
+            name = mesocycle.name
+            description = mesocycle.description
+            order = mesocycle.order
+          }
+        )
+      }
+    }
+  }
+
+  suspend fun migrateMicrocycles() {
+    val json =
+      assetFileAsStream("database/microcycles_202308111153.json").bufferedReader().use {
+        it.readText()
+      }
+
+    val microcycles = Json.decodeFromString<Microcycles>(json)
+
+    Log.i("DATABASE.migrateMicrocycles()", microcycles.toString())
+
+    microcycles.microcycles.forEach { microcycle ->
+      realm.write {
+        this.copyToRealm(
+          Microcycle().apply {
+            name = microcycle.name
+            description = microcycle.description
+            order = microcycle.order
+            mesocycleID = microcycle.mesocycleID
+            programID = microcycle.programID
+          }
+        )
+      }
+    }
+  }
+
+  suspend fun migrateWorkouts() {
+    val json =
+      assetFileAsStream("database/workouts_202308111153.json").bufferedReader().use {
+        it.readText()
+      }
+
+    val workouts = Json.decodeFromString<Workouts>(json)
+
+    Log.i("DATABASE.migrateWorkouts()", workouts.toString())
+
+    workouts.workouts.forEach { workout ->
+      realm.write {
+        this.copyToRealm(
+          Workout().apply {
+            name = workout.name
+            day = workout.day
+            microcycle = workout.microcycle
           }
         )
       }

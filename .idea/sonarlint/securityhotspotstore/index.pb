@@ -33,8 +33,6 @@ P
  app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
 ç
 ]app/src/main/java/com/example/myapplication/components/addExercisesList/AddExercisesScreen.kt,4/0/40fc496f9cb66b17307ae6245dafb9f8f4bbe287
-m
-=app/src/main/java/com/example/myapplication/data/model/Set.kt,d/8/d83901cfae7fead9a04fd81a68b191b0b751b3ca
 Ñ
 Tapp/src/main/java/com/example/myapplication/components/exercisesList/ExerciseItem.kt,2/1/214944efb3abe9e07e31d6bff139de98b02b501f
 o
@@ -43,7 +41,5 @@ o
 capp/src/main/java/com/example/myapplication/components/replaceExerciseList/ReplaceExerciseScreen.kt,f/e/fea72fa79ef564b3d8a163bb3a3e5abda7e96f06
 ä
 Zapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesViewModel.kt,0/9/090e8e9f514d9413e3dd3b6a9748c09f20d8690f
-q
-Aapp/src/main/java/com/example/myapplication/data/model/Workout.kt,3/c/3ca2bfc0e6ea8fa93071e3e6d15220155c032f60
 t
 Dapp/src/main/java/com/example/myapplication/data/model/EXRXModels.kt,3/6/36c4935e7152f8667ff03adf4f34ca78769a892a

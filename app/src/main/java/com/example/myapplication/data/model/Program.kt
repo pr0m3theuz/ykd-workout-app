@@ -56,6 +56,13 @@ class Program() : RealmObject {
 @Serializable
 data class Programs(val programs: List<Program>)
 
+@Serializable
+data class Mesocycles(val mesocycles: List<Mesocycle>)
+
+@Serializable
+data class Microcycles(val microcycles: List<Microcycle>)
+
+@Serializable
 class Mesocycle() : RealmObject {
   @PrimaryKey
   var _id: ObjectId = ObjectId()
@@ -69,9 +76,10 @@ class Mesocycle() : RealmObject {
   var order: Int = 0
 
   //    var tags: String // TODO Should be a List<String>
-  var programID: Long? = null
+  var programID: ObjectId? = null
 }
 
+@Serializable
 class Microcycle() : RealmObject {
   @PrimaryKey
   var _id: ObjectId = ObjectId()
@@ -85,6 +93,6 @@ class Microcycle() : RealmObject {
   var order: Int = 0
 
   //    var tags: String // TODO Should be a List<String>
-  var programID: Long? = null
-  var mesocycleID: Long? = null
+  var programID: ObjectId? = null
+  var mesocycleID: ObjectId? = null
 }
