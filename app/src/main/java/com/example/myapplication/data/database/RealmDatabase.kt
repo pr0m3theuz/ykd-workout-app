@@ -605,7 +605,7 @@ class RealmDatabase {
 
   suspend fun migrateWorkouts() {
     val json =
-      assetFileAsStream("database/workouts_202308111153.json").bufferedReader().use {
+      assetFileAsStream("database/workouts_202308111151.json").bufferedReader().use {
         it.readText()
       }
 
@@ -619,7 +619,7 @@ class RealmDatabase {
           Workout().apply {
             name = workout.name
             day = workout.day
-            microcycle = workout.microcycle
+            microcycleID = workout.microcycleID
           }
         )
       }

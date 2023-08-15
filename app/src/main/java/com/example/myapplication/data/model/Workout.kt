@@ -50,13 +50,15 @@ class Workout() : RealmObject {
     var workoutStarted: RealmInstant? = null
     var workoutEnded: RealmInstant? = null
     var day: Int? = null
-    var exerciseSets: RealmList<ExerciseSets> = realmListOf<ExerciseSets>()
+
+    var exerciseSets: RealmList<ExerciseSets> = realmListOf()
 
     //    val programID: Long? = null
 //    val mesocycleID: Long? = null
-    var microcycle: Microcycle? = null
+    var microcycleID: ObjectId? = null
 }
 
+@Serializable
 data class Workouts(val workouts: List<Workout>)
 
 //fun Workout.pinNotes(pinned: Boolean) {
