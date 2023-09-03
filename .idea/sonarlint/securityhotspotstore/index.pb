@@ -41,5 +41,3 @@ o
 capp/src/main/java/com/example/myapplication/components/replaceExerciseList/ReplaceExerciseScreen.kt,f/e/fea72fa79ef564b3d8a163bb3a3e5abda7e96f06
 Š
 Zapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesViewModel.kt,0/9/090e8e9f514d9413e3dd3b6a9748c09f20d8690f
-t
-Dapp/src/main/java/com/example/myapplication/data/model/EXRXModels.kt,3/6/36c4935e7152f8667ff03adf4f34ca78769a892a

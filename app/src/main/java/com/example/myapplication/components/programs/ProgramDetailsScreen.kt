@@ -73,12 +73,17 @@ fun ProgramDetailsScreen(
   programsViewModel: ProgramsViewModel = koinViewModel(),
   programID: String
 ) {
-  programsViewModel.getProgramById(ObjectId(programID))
-  programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
+
+  programsViewModel.getProgramById(ObjectId(programID).asObjectId())
+  programsViewModel.getMicrocyclesByProgram(ObjectId(programID).asObjectId())
 
   val program by programsViewModel.selectedProgram.collectAsStateWithLifecycle(null)
+//  val programMicrocycles =
+//    programsViewModel.activeProgramMicrocycles
+  //  program?.let { programsViewModel.getProgramData() }
+
   val programMicrocycles by
-  programsViewModel.selectedProgramMicrocycle.collectAsStateWithLifecycle()
+  programsViewModel.selectedProgramMicrocycles.collectAsStateWithLifecycle()
   //  val mesocycles by programsViewModel.get
 
   program?.let { ProgramDetailsLayout(navController, programsViewModel, it, programMicrocycles) }
@@ -146,8 +151,7 @@ fun ProgramDetailsLayout(
       Row(
         Modifier
           .fillMaxWidth()
-          .padding(padding8), horizontalArrangement = Arrangement.Center
-      ) {
+          .padding(padding8), horizontalArrangement = Arrangement.Center) {
         Icon(
           imageVector = Icons.Outlined.BrokenImage,
           contentDescription = "Missing Image",
@@ -178,8 +182,7 @@ fun ProgramDetailsLayout(
       Column(
         Modifier
           .padding(12.dp)
-          .fillMaxWidth()
-      ) {
+          .fillMaxWidth()) {
         when (selectedTabIndex) {
           0 ->
             OverviewTab(
@@ -252,11 +255,9 @@ fun CoachsCard(program: Program) {
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card() {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)
-    ) {
+    Column(modifier = Modifier
+      .fillMaxWidth()
+      .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Coach Overview", style = titleSmall)
@@ -286,11 +287,9 @@ fun ProgramOverviewCard(program: Program) {
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card() {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)
-    ) {
+    Column(modifier = Modifier
+      .fillMaxWidth()
+      .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Program Overview", style = titleSmall)
@@ -342,15 +341,13 @@ fun ProgramDescriptionCard(program: Program) {
   val labelMedium = MaterialTheme.typography.labelMedium
   val bodySmall = MaterialTheme.typography.bodySmall
 
-  var (expanded, onClick) = remember { mutableStateOf(false) }
+  val (expanded, onClick) = remember { mutableStateOf(false) }
 
   //  TODO Add Expand/Hide Text Button
   Card() {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)
-    ) {
+    Column(modifier = Modifier
+      .fillMaxWidth()
+      .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Program Description", style = titleSmall)
@@ -409,17 +406,12 @@ fun WorkoutOverviewCard(
     }
 
   if (microcycles.isNotEmpty()) {
-    val workouts by
-    programsViewModel
-      .getWorkoutsByMicrocycle(microcycles[selectedTabIndex]._id)
-      .collectAsStateWithLifecycle()
+    val workouts = microcycles[selectedTabIndex].workouts
 
     Card() {
-      Column(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)
-      ) {
+      Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)) {
         Row(
           modifier = Modifier.fillMaxWidth(),
         ) {
@@ -447,11 +439,10 @@ fun WorkoutOverviewCard(
             .horizontalScroll(scrollState),
           horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-          if (workouts.isNotEmpty()) {
+          if (!workouts.isEmpty()) {
             workouts.forEachIndexed { index, workout ->
               Log.i("WorkoutOverviewCard", workout.toString())
               WorkoutDayCard(index, workout, programsViewModel)
-              //              programsViewModel.getExerciseSetsByWorkout(workout.workoutID)
             }
           }
         }
@@ -479,11 +470,9 @@ fun WorkoutDayCard(
   Log.i("WorkoutDayCard", exercisesSets.toString())
 
   ElevatedCard() {
-    Column(
-      modifier = Modifier
-        .width(300.dp)
-        .padding(padding)
-    ) {
+    Column(modifier = Modifier
+      .width(300.dp)
+      .padding(padding)) {
       Row(
         modifier = Modifier
           .fillMaxWidth()
@@ -492,13 +481,13 @@ fun WorkoutDayCard(
       ) {
         Text(text = "Day ${index.plus(1)}", style = labelMedium)
       }
-      if (!exercisesSets.isNullOrEmpty()) {
+      if (!exercisesSets.isEmpty()) {
         exercisesSets.forEachIndexed { index, exerciseSet ->
           ExerciseOverview(
             index = index,
-//            exerciseID = entry.key,
+            //            exerciseID = entry.key,
             exerciseSets = exerciseSet
-//            programsViewModel = programsViewModel
+            //            programsViewModel = programsViewModel
           )
           Spacer(modifier = Modifier.height(spacedByPadding))
         }
@@ -510,9 +499,9 @@ fun WorkoutDayCard(
 @Composable
 fun ExerciseOverview(
   index: Int,
-//  exerciseID: Long,
+  //  exerciseID: Long,
   exerciseSets: ExerciseSets,
-//  programsViewModel: ProgramsViewModel
+  //  programsViewModel: ProgramsViewModel
 ) {
   val labelMedium = MaterialTheme.typography.labelMedium
 
@@ -579,11 +568,9 @@ fun MicrocycleCard() {
   val cardColors = CardDefaults.cardColors()
 
   Card() {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)
-    ) {
+    Column(modifier = Modifier
+      .fillMaxWidth()
+      .padding(padding)) {
       Row(
         modifier = Modifier
           .fillMaxWidth()

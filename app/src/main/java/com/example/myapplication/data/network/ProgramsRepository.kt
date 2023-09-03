@@ -12,6 +12,8 @@ class ProgramsRepository constructor(private val database: RealmDatabase) {
 //        database.migrateData()
 //        database.migrateMesocycles()
 //        database.migrateWorkouts()
+//        database.migrateExercises()
+        database.importExerciseSets()
     }
 
     fun getAllPrograms(): Flow<List<Program>> {

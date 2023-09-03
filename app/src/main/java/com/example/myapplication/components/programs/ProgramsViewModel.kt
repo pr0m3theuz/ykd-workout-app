@@ -90,11 +90,15 @@ constructor(
     }
 
     private val _selectedProgramMicrocycles = MutableStateFlow(emptyList<Microcycle>())
-    val selectedProgramMicrocycle: StateFlow<List<Microcycle>>
+    val selectedProgramMicrocycles: StateFlow<List<Microcycle>>
         get() = _selectedProgramMicrocycles
 
+    private var _activeProgramMicrocycles = emptyList<Microcycle>()
+    val activeProgramMicrocycles: List<Microcycle>
+        get() = _activeProgramMicrocycles
+
     fun getMicrocyclesByProgram(programID: ObjectId) /*: List<Microcycle>*/ {
-        var microcycles = emptyList<Microcycle>()
+//        var microcycles = emptyList<Microcycle>()
         viewModelScope.launch {
             programsRepository.getMicrocyclesByProgram(programID)
                 .collect() { _selectedProgramMicrocycles.value = it }
@@ -110,13 +114,28 @@ constructor(
         return microcycles
     }
 
-    fun getWorkoutsByMicrocycle(microcycleID: ObjectId): StateFlow<List<Workout>> {
-        val workouts = MutableStateFlow(emptyList<Workout>())
+    private var _selectedProgramWorkouts = MutableStateFlow(
+        mutableMapOf<Microcycle, List<Workout>>()
+    )
+    val selectedProgramWorkouts: StateFlow<Map<Microcycle, List<Workout>>>
+        get() = _selectedProgramWorkouts
+
+    fun getWorkoutsByMicrocycle(microcycle: Microcycle) {
+//        val workouts = emptyList<Workout>()
         viewModelScope.launch {
-            workoutRepository.getWorkoutsByMicrocycleID(microcycleID)
-                .collect() { workouts.value = it }
+            _selectedProgramWorkouts.value[microcycle] =
+                workoutRepository.getWorkoutsByMicrocycleID(microcycle._id)
+
         }
-        return workouts
+//        return workouts
+    }
+
+    fun getProgramData() {
+        _selectedProgram.value?.let { getMicrocyclesByProgram(it._id) }
+
+        _selectedProgramMicrocycles.value.forEach {
+            getWorkoutsByMicrocycle(it)
+        }
     }
 
     fun getExerciseSetsByWorkout(workoutID: Long) {

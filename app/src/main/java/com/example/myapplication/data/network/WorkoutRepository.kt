@@ -23,7 +23,7 @@ class WorkoutRepository constructor(private val database: RealmDatabase) {
             return workoutsDao.getWorkoutsByProgramUUID(programUUID)
         }*/
 
-    fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): Flow<List<Workout>> {
+    fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout> {
         return database.getWorkoutsByMicrocycleID(microcycleID)
     }
 

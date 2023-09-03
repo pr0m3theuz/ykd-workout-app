@@ -75,3 +75,6 @@ class Exercise() : RealmObject {
   var mediaURI: String? = null
   var pageURI: String? = null
 }
+
+@Serializable
+data class Exercises(val exercises: List<Exercise>)

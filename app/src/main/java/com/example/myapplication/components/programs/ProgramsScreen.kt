@@ -378,13 +378,15 @@ fun ProgramCard(navController: NavController, program: Program) {
     val padding = 8.dp
     val titleMedium = MaterialTheme.typography.titleMedium
 
+
+
     Card(
         modifier =
         Modifier
             .padding(vertical = padding)
             .clickable {
                 /* TODO Navigate to Program Details Screen */ navController.navigate(
-                "programDetails/${program._id}"
+                "programDetails/${program._id.toHexString()}"
             )
             }
     ) {

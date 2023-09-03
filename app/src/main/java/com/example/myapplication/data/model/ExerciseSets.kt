@@ -29,7 +29,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.mongodb.kbson.ObjectId
 
-
 /*
  TODO:
     @Query(SELECT * FROM sets WHERE workoutID:=workoutID) return ExerciseSets
@@ -40,12 +39,12 @@ import org.mongodb.kbson.ObjectId
 class ExerciseSets() : RealmObject {
   @PrimaryKey
   var _id: ObjectId = ObjectId()
-  var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
+    var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
   var exSetsUUID: RealmUUID = RealmUUID.random()
   val workout: RealmResults<Workout> by backlinks(Workout::exerciseSets)
 
-  //  val workoutID: Long? = null // TODO May be useless
-//  val workoutUUID: RealmUUID? = null // TODO May be useless
+    //  val workoutID: Long? = null // TODO May be useless
+    //  val workoutUUID: RealmUUID? = null // TODO May be useless
   var exerciseOrder: Int = 1
   var exercise: Exercise? = null
   var sets: RealmList<Set> = realmListOf<Set>()
@@ -106,21 +105,20 @@ fun ExerciseSets.updateSetType(uuid: RealmUUID, setTypeID: Int) {
 fun ExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
   for (index in warmUpSets.indices) {
     sets.add(
-      index,
-//      warmUpSets[index]
-//      TODO: Check this
-      Set().apply {
-        setNumber = warmUpSets[index].setNumber
-        exerciseWeight = warmUpSets[index].exerciseWeight
-        repetitions = warmUpSets[index].repetitions
-        ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort
-        repetitionsInReserve = warmUpSets[index].repetitionsInReserve
-        setTypeID = warmUpSets[index].setTypeID
-        percentage1RM = warmUpSets[index].percentage1RM
-        progressionSchemeID = warmUpSets[index].progressionSchemeID
-      }
+        index,
+        //      warmUpSets[index]
+        //      TODO: Check this
+        Set().apply {
+            setNumber = warmUpSets[index].setNumber
+            exerciseWeight = warmUpSets[index].exerciseWeight
+            repetitions = warmUpSets[index].repetitions
+            ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort
+            repetitionsInReserve = warmUpSets[index].repetitionsInReserve
+            setTypeID = warmUpSets[index].setTypeID
+            percentage1RM = warmUpSets[index].percentage1RM
+            progressionSchemeID = warmUpSets[index].progressionSchemeID
+        }
     )
-
   }
 }
 
@@ -169,15 +167,17 @@ fun ExerciseSets.averageWeight(): Double {
  *
  * @param workout The workout to associate the sets with.
  */
-fun ExerciseSets.resetSets(/*workout: Workout*/) {
-  sets.forEach { set ->
-    set._id = ObjectId()
-    set.lazyListItemID = newID()
-    set.uuid = RealmUUID.random()
-//    set.workoutID = workout.workoutID
-//    set.workoutUUID = workout.uuid
-    set.setCompleted = false
-  }
+fun ExerciseSets.resetSets(
+    /*workout: Workout*/
+) {
+    sets.forEach { set ->
+        set._id = ObjectId()
+        set.lazyListItemID = newID()
+        set.uuid = RealmUUID.random()
+        //    set.workoutID = workout.workoutID
+        //    set.workoutUUID = workout.uuid
+        set.setCompleted = false
+    }
 }
 
 /*
@@ -245,3 +245,27 @@ fun ExerciseSets.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double 
     }
     return newWeight
 }*/
+
+@Serializable
+data class ExercisesSets(
+    val identical: Boolean,
+    val numberOfIdenticalWorkouts: Int,
+    val exercisesSets: List<SerializableExerciseSets>
+)
+
+@Serializable
+data class SerializableExerciseSets(
+    @PrimaryKey var _id: ObjectId = ObjectId(),
+    var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+    var exSetsUUID: RealmUUID = RealmUUID.random(),
+    val workout: ObjectId = ObjectId(),
+    //  val workoutID: Long? = null // TODO May be useless
+    //  val workoutUUID: RealmUUID? = null // TODO May be useless
+    var exerciseOrder: Int,
+    var exerciseObjectID: ObjectId,
+//  var sets: List<Set> = listOf(),
+    var sets: List<ObjectId> = listOf(),
+    var notes: List<ExerciseNote> = listOf(),
+    val identicalSets: Boolean,
+    val numberOfIdenticalSets: Int,
+)

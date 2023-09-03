@@ -5,6 +5,8 @@ import com.example.myapplication.data.model.Equipment
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Exercises
+import com.example.myapplication.data.model.ExercisesSets
 import com.example.myapplication.data.model.Force
 import com.example.myapplication.data.model.Mechanic
 import com.example.myapplication.data.model.Mesocycle
@@ -212,7 +214,7 @@ class RealmDatabase {
   }
 
   suspend fun getExercise(exerciseID: ObjectId): Exercise? {
-    return realm.query<Exercise>("exerciseID = $0", exerciseID).first().find()
+    return realm.query<Exercise>("_id = $0", exerciseID).first().find()
   }
 
   suspend fun insertExercise(exercise: Exercise) {
@@ -323,8 +325,8 @@ class RealmDatabase {
     return realm.query<Workout>("workoutID = $0", workoutID).first().find()
   }
 
-  fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): Flow<List<Workout>> {
-    return realm.query<Workout>("microcycleID = $0", microcycleID).find().asFlow().map { it.list }
+  fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout> {
+    return realm.query<Workout>("microcycleID = $0 SORT(day ASC)", microcycleID).find()
   }
 
   fun getWorkoutsByMesocycleID(mesocycleID: ObjectId): Flow<List<Workout>> {
@@ -361,7 +363,7 @@ class RealmDatabase {
   }
 
   suspend fun getProgramByID(programID: ObjectId): Program? {
-    return realm.query<Program>("programID = $0", programID).first().find()
+    return realm.query<Program>("_id = $0", programID).first().find()
   }
 
   suspend fun insertProgram(program: Program) {
@@ -390,7 +392,7 @@ class RealmDatabase {
   }
 
   fun getMesocycleByID(mesocycleID: ObjectId): Mesocycle? {
-    return realm.query<Mesocycle>("mesocycleID = $0", mesocycleID).first().find()
+    return realm.query<Mesocycle>("_id = $0", mesocycleID).first().find()
   }
 
   fun getMesocyclesByProgramID(programID: ObjectId): Flow<List<Mesocycle>> {
@@ -408,7 +410,7 @@ class RealmDatabase {
   suspend fun deleteMesocycle(_mesocycle: Mesocycle) {
     _mesocycle.isManaged()
     realm.write {
-      val mesocycle = realm.query<Mesocycle>("mesocycleID = $0", _mesocycle._id).first().find()
+      val mesocycle = realm.query<Mesocycle>("_id = $0", _mesocycle._id).first().find()
       if (mesocycle != null) {
         delete(mesocycle)
       }
@@ -424,7 +426,7 @@ class RealmDatabase {
   }
 
   fun getMicrocycleByID(microcycleID: ObjectId): Microcycle? {
-    return realm.query<Microcycle>("microcycleID = $0", microcycleID).first().find()
+    return realm.query<Microcycle>("_id = $0", microcycleID).first().find()
   }
 
   fun getMicrocyclesByMesocycleID(mesocycleID: ObjectId): Flow<List<Microcycle>> {
@@ -433,10 +435,8 @@ class RealmDatabase {
 
   fun getMicrocycleByProgramID(programID: ObjectId): Flow<List<Microcycle>> {
     return realm
-      .query<Microcycle>("programID = $0 SORT(dateCreated DESC)", programID)
-      .find()
-      .asFlow()
-      .map { it.list }
+      .query<Microcycle>("programID = $0 SORT(name ASC, order ASC)", programID)
+      .find().asFlow().map { it.list }
   }
 
   suspend fun insertMicrocycle(microcycle: Microcycle) {
@@ -450,11 +450,15 @@ class RealmDatabase {
   suspend fun deleteMicrocycle(_microcycle: Microcycle) {
     _microcycle.isManaged()
     realm.write {
-      val microcycle = realm.query<Mesocycle>("microcycleID = $0", _microcycle._id).first().find()
+      val microcycle = realm.query<Mesocycle>("_id = $0", _microcycle._id).first().find()
       if (microcycle != null) {
         delete(microcycle)
       }
     }
+  }
+
+  suspend fun getSetsByID(setID: ObjectId): Set? {
+    return realm.query<Set>("_id = $0", setID).first().find()
   }
 
   //  Notes Queries
@@ -622,6 +626,115 @@ class RealmDatabase {
             microcycleID = workout.microcycleID
           }
         )
+      }
+    }
+  }
+
+  suspend fun migrateExercises() {
+    val json =
+      assetFileAsStream("database/exercises_202308111148.json").bufferedReader().use {
+        it.readText()
+      }
+
+    val exercises = Json.decodeFromString<Exercises>(json)
+
+    Log.i("DATABASE.migrateExercises()", exercises.toString())
+
+    exercises.exercises.forEach { exercise ->
+      realm.write {
+        this.copyToRealm(
+          Exercise().apply {
+            name = exercise.name
+            exrxExerciseID = exercise.exrxExerciseID
+            equipmentID = exercise.equipmentID
+            primaryMuscleID = exercise.primaryMuscleID
+            muscleGroupID = exercise.muscleGroupID
+            utilityID = exercise.utilityID
+            mechanicsID = exercise.mechanicsID
+            functionID = exercise.functionID
+            intensityID = exercise.intensityID
+            weightUnit = exercise.weightUnit
+            mediaURI = exercise.mediaURI
+            pageURI = exercise.pageURI
+          }
+        )
+      }
+    }
+  }
+
+  suspend fun importExerciseSets() {
+    val json =
+      assetFileAsStream("database/Break-In Phase Block 1 ExercisesSets copy.json").bufferedReader()
+        .use {
+          it.readText()
+        }
+
+    val exercisesSets = Json.decodeFromString<ExercisesSets>(json)
+
+    Log.i("DATABASE.importExerciseSets()", exercisesSets.toString())
+
+    exercisesSets.exercisesSets.forEach { _exerciseSets ->
+      val _exercise = getExercise(_exerciseSets.exerciseObjectID) ?: return@forEach
+
+      val realmSets = mutableListOf<Set>()
+      val identicalSets = _exerciseSets.identicalSets
+      val numberOfIdenticalSets = _exerciseSets.numberOfIdenticalSets
+      val _sets = _exerciseSets.sets
+      /*
+            val setIDs = mutableListOf<Set>()
+
+            for (setID in _sets) {
+              setIDs.add(getSetsByID(setID) ?: return)
+            }
+      */
+
+      /*
+      if (_sets.isNotEmpty() && identicalSets && _sets.size == 1) {
+        _sets.forEach { set ->
+          for (i in 1..numberOfIdenticalSets) {
+            realmSets.add(
+              Set().apply {
+                setNumber = i
+                exerciseWeight = set.exerciseWeight
+                targetWeight = set.targetWeight
+                targetRepetitions = set.targetRepetitions
+                targetRatePerceivedEffort = set.targetRatePerceivedEffort
+                targetRepetitionsInReserve = set.targetRepetitionsInReserve
+                percentage1RM = set.percentage1RM
+              }
+            )
+          }
+        }
+      } else if (_sets.isNotEmpty() && !identicalSets) {
+        var count = 0
+        _sets.forEach { set ->
+          count++
+          realmSets.add(
+            Set().apply {
+              setNumber = count
+              exerciseWeight = set.exerciseWeight
+              targetRepetitions = set.targetRepetitions
+              percentage1RM = set.percentage1RM
+            }
+          )
+        }
+      }
+      */
+
+      realm.write {
+        val latestExercise = findLatest(_exercise) ?: return@write
+        val latestSets = mutableListOf<Set>()
+
+//       setIDs.forEach { set ->
+//         val latestSet = findLatest(set) ?: return@write
+//         latestSets.add(latestSet)
+//       }
+
+        val exerciseSets = copyToRealm(ExerciseSets())
+        exerciseSets.apply {
+          exerciseOrder = _exerciseSets.exerciseOrder
+          exercise = latestExercise
+        }
       }
     }
   }

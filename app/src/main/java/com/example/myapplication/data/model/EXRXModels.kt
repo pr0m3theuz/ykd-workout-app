@@ -7,8 +7,9 @@ import org.mongodb.kbson.ObjectId
 class MuscleExercise() : RealmObject {
   @PrimaryKey
   var _id: ObjectId = ObjectId()
-    var exerciseID: String? = null
-  var exrxExerciseID: String? = null
+  var exerciseID: String? = null
+
+  //  var exrxExerciseID: String? = null
   var muscleID: String? = null
   var muscleGroupID: String? = null
   var roleFunction: String? = null
@@ -35,46 +36,46 @@ class MuscleExercise() : RealmObject {
  *   muscles.
  */
 class MuscleRoleFunction() : RealmObject {
-    @PrimaryKey
-    var _id: String? = null
-    var roleFunction: String? = null
+  @PrimaryKey
+  var _id: String? = null
+  var roleFunction: String? = null
   var description: String? = null
 }
 
 class Muscle() : RealmObject {
-    @PrimaryKey
-    var _id: String? = null
-    var muscleGroupID: String? = null
+  @PrimaryKey
+  var _id: String? = null
+  var muscleGroupID: String? = null
   var name: String? = null
 }
 
 class MuscleGroup() : RealmObject {
-    @PrimaryKey
-    var _id: String? = null
-    var name: String? = null
+  @PrimaryKey
+  var _id: String? = null
+  var name: String? = null
   var exrxName: String? = null
 }
 
 class Equipment() : RealmObject {
-    @PrimaryKey
-    var _id: String? = null
-    var exrxID: String? = null
+  @PrimaryKey
+  var _id: String? = null
+  var exrxID: String? = null
   var name: String? = null
   var exrxName: String? = null
   var description: String? = null
 }
 
 class Utility() : RealmObject {
-    @PrimaryKey
-    var _id: String? = null
-    var name: String? = null
+  @PrimaryKey
+  var _id: String? = null
+  var name: String? = null
   var description: String? = null
 }
 
 class Force() : RealmObject {
-    @PrimaryKey
-    var _id: String? = null
-    var name: String? = null
+  @PrimaryKey
+  var _id: String? = null
+  var name: String? = null
   var description: String? = null
 }
 
@@ -87,8 +88,8 @@ class Force() : RealmObject {
  * @param description Additional information or details about the exercise mechanics (optional).
  */
 class Mechanic() : RealmObject {
-    @PrimaryKey
-    var _id: String? = null
-    var name: String? = null
+  @PrimaryKey
+  var _id: String? = null
+  var name: String? = null
   var description: String? = null
 }

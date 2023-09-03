@@ -91,8 +91,8 @@ class Microcycle() : RealmObject {
   var startDate: RealmInstant? = null
   var endDate: RealmInstant? = null
   var order: Int = 0
-
   //    var tags: String // TODO Should be a List<String>
   var programID: ObjectId? = null
   var mesocycleID: ObjectId? = null
+  var workouts: RealmList<Workout> = realmListOf()
 }

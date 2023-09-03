@@ -44,6 +44,8 @@ class Set() : RealmObject {
     var targetRatePerceivedEffort: Double? = null
     var targetRepetitionsInReserve: Double? = null
     var percentage1RM: Double? = 1.0
+
+    // var targetPercentage1RM: Double? = null
     var setCompleted: Boolean = false
 
     //    var exerciseOrder: Int = 1
@@ -62,3 +64,8 @@ fun Set.setVolume(): Double {
         0.0
     }
 }
+
+@Serializable
+data class Sets(
+    val sets: List<Set>
+)
