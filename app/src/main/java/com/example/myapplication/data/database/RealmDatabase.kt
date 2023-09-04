@@ -209,7 +209,7 @@ class RealmDatabase {
   }
 
   fun getExerciseDetails(exerciseID: ObjectId): Exercise {
-    return realm.query<Exercise>("exerciseID = $0", exerciseID).first().find()
+    return realm.query<Exercise>("_id = $0", exerciseID).first().find()
       ?: throw Exception("Exercise not found")
   }
 

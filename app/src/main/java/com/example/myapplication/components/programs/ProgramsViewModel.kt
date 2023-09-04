@@ -44,7 +44,7 @@ constructor(
         }
     }
 
-    fun getProgramById(programID: ObjectId): Program? {
+    fun getProgramById(programID: ObjectId) {
         var program: Program? = null
 
         viewModelScope.launch {
@@ -52,7 +52,7 @@ constructor(
             _selectedProgram.value = program
         }
 
-        return program
+//        return program
     }
 
     fun insertProgram(program: Program) {

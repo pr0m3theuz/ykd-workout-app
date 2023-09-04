@@ -37,7 +37,7 @@ fun ExerciseItem(exercise: Exercise, muscleGroupName: String?, navController: Na
         .clickable(
             enabled = true,
             onClickLabel = "See more details about ${exercise.name} ",
-            onClick = { navController.navigate("exerciseDetails/${exercise._id}") }
+            onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
         ),
     headlineContent = {
       Text(

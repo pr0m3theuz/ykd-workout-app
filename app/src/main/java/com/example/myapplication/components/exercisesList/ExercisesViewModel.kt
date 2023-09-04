@@ -203,9 +203,9 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   }
 
   // TODO Get Exercise Details
-  private lateinit var _exercise: MutableStateFlow<Exercise>
+  private var _exercise: MutableStateFlow<Exercise?> = MutableStateFlow(null)
 
-  val selectedExerciseDetails: StateFlow<Exercise>
+  val selectedExerciseDetails: StateFlow<Exercise?>
     get() = _exercise.asStateFlow()
 
   /**
@@ -218,7 +218,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     if (exerciseID != null) {
       viewModelScope.launch {
         _exercise.value =
-          exercisesRepository.getExerciseDetails(exerciseID = ObjectId.invoke(exerciseID))
+          exercisesRepository.getExerciseDetails(exerciseID = ObjectId(exerciseID).asObjectId())
       }
     }
   }

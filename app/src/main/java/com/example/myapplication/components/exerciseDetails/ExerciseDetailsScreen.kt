@@ -60,7 +60,7 @@ fun ExerciseDetailsScreen(
 
     val exercise by exercisesViewModel.selectedExerciseDetails.collectAsStateWithLifecycle()
 
-    ExerciseDetailsLayout(navController, exercise)
+    exercise?.let { ExerciseDetailsLayout(navController, it) }
 }
 
 @Composable

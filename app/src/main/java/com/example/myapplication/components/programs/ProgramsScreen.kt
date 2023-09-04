@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -192,11 +194,15 @@ fun ProgramsScreen(
                     contentDescription = "Show workouts for this program"
                 )
             }
-            Text(
-                text = "Program/Macrocycle (${programs.size})",
-
+            TextButton(
+                onClick = { setProgramVisible(!programVisible) },
+                modifier = Modifier.weight(1f),
+                enabled = true,
+                contentPadding = PaddingValues(0.dp)
                 //            style = MaterialTheme.typography.bodySmall
-            )
+            ) {
+                Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
+            }
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(
                     imageVector = Icons.Outlined.MoreVert,
@@ -377,8 +383,6 @@ fun WorkoutCard() {
 fun ProgramCard(navController: NavController, program: Program) {
     val padding = 8.dp
     val titleMedium = MaterialTheme.typography.titleMedium
-
-
 
     Card(
         modifier =

@@ -50,6 +50,7 @@ class Program() : RealmObject {
   var programEquipment: String? = null
   var daysPerWeek: String? = null
   var programLength: String? = null
+  var active: Boolean = false
   var notes: RealmList<ProgramNote> = realmListOf()
 }
 
