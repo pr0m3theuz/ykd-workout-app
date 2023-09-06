@@ -396,7 +396,8 @@ class RealmDatabase {
   }
 
   fun getMesocyclesByProgramID(programID: ObjectId): Flow<List<Mesocycle>> {
-    return realm.query<Mesocycle>("programID = $0", programID).find().asFlow().map { it.list }
+    return realm.query<Mesocycle>("programID = $0 SORT(order ASC)", programID).find().asFlow()
+      .map { it.list }
   }
 
   suspend fun insertMesocycle(mesocycle: Mesocycle) {

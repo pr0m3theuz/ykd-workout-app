@@ -67,14 +67,18 @@ constructor(
         viewModelScope.launch { programsRepository.deleteProgram(program) }
     }
 
-    fun getMesocyclesByProgram(programID: ObjectId): List<Mesocycle> {
-        var mesocycles = emptyList<Mesocycle>()
+    private val _selectedProgramMesocycles = MutableStateFlow(emptyList<Mesocycle>())
+    val selectedProgramMesocycles: StateFlow<List<Mesocycle>>
+        get() = _selectedProgramMesocycles
+
+    fun getMesocyclesByProgram(programID: ObjectId) {
+//        var mesocycles = emptyList<Mesocycle>()
         viewModelScope.launch {
             programsRepository.getMesocyclesByProgram(programID).collect() {
-                mesocycles = it
+                _selectedProgramMesocycles.value = it
             }
         }
-        return mesocycles
+//        return mesocycles
     }
 
     fun insertMesocycle(mesocycle: Mesocycle) {
@@ -92,10 +96,6 @@ constructor(
     private val _selectedProgramMicrocycles = MutableStateFlow(emptyList<Microcycle>())
     val selectedProgramMicrocycles: StateFlow<List<Microcycle>>
         get() = _selectedProgramMicrocycles
-
-    private var _activeProgramMicrocycles = emptyList<Microcycle>()
-    val activeProgramMicrocycles: List<Microcycle>
-        get() = _activeProgramMicrocycles
 
     fun getMicrocyclesByProgram(programID: ObjectId) /*: List<Microcycle>*/ {
 //        var microcycles = emptyList<Microcycle>()

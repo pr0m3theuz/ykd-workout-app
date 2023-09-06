@@ -1,5 +1,6 @@
 package com.example.myapplication.components.programs
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -66,6 +67,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Workout
@@ -80,18 +82,26 @@ fun ProgramDetailsScreen(
 ) {
 
   programsViewModel.getProgramById(ObjectId(programID).asObjectId())
+  programsViewModel.getMesocyclesByProgram(ObjectId(programID).asObjectId())
   programsViewModel.getMicrocyclesByProgram(ObjectId(programID).asObjectId())
 
   val program by programsViewModel.selectedProgram.collectAsStateWithLifecycle(null)
-  //  val programMicrocycles =
-  //    programsViewModel.activeProgramMicrocycles
-  //  program?.let { programsViewModel.getProgramData() }
+
+  val programMesocycles by programsViewModel.selectedProgramMesocycles.collectAsStateWithLifecycle()
 
   val programMicrocycles by
   programsViewModel.selectedProgramMicrocycles.collectAsStateWithLifecycle()
   //  val mesocycles by programsViewModel.get
 
-  program?.let { ProgramDetailsLayout(navController, programsViewModel, it, programMicrocycles) }
+  program?.let {
+    ProgramDetailsLayout(
+      navController,
+      programsViewModel,
+      it,
+      programMesocycles,
+      programMicrocycles
+    )
+  }
 }
 
 // TODO Add animatedVisibility Function to expand more/less buttons
@@ -103,6 +113,7 @@ fun ProgramDetailsLayout(
   navController: NavController,
   programsViewModel: ProgramsViewModel, /*= viewModel()*/
   program: Program,
+  mesocycles: List<Mesocycle>,
   microcycles: List<Microcycle>,
 ) {
   val padding8 = 8.dp
@@ -197,7 +208,7 @@ fun ProgramDetailsLayout(
               programsViewModel = programsViewModel
             )
 
-          1 -> MesocyclesTab()
+          1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
           2 ->
             WorkoutsTab(
               activeProgram = program.active,
@@ -247,8 +258,14 @@ fun OverviewTab(
 }
 
 @Composable
-fun MesocyclesTab() {
+fun MesocyclesTab(
+  activeProgram: Boolean,
+  mesocycles: List<Mesocycle>,
+) {
   //  TODO
+  Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    MesocycleCard(activeProgram = activeProgram, mesocycles = mesocycles)
+  }
 }
 
 // @Preview
@@ -637,6 +654,44 @@ fun MicrocycleCard(
             exit = shrinkVertically(animationSpec = tween(500))
           ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+              val (expanded, onClick) = remember { mutableStateOf(false) }
+              val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
+
+              Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+                  if (expanded) {
+                    Text(
+                      text = microcycle.description ?: "Description, Use Markdown Potentially",
+                      style = bodySmall,
+                    )
+                  } else {
+                    Text(
+                      text = microcycle.description ?: "Description, Use Markdown Potentially",
+                      style = bodySmall,
+                      maxLines = 20,
+                      overflow = TextOverflow.Ellipsis,
+                      onTextLayout = { textLayoutResult ->
+                        if (textLayoutResult.hasVisualOverflow) {
+                          unhideShowMoreButton(true)
+                        }
+                      }
+                    )
+                  }
+                }
+              }
+
+              if (showShowMoreButton) {
+                TextButton(
+                  onClick = { onClick(!expanded) },
+                  contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp)
+                ) {
+                  Text(
+                    text = if (expanded) "Show less" else "Show more",
+                    style = MaterialTheme.typography.labelMedium
+                  )
+                }
+              }
+
               microcycle.workouts.forEach { workout ->
                 Row(
                   modifier = Modifier.fillMaxWidth(),
@@ -692,6 +747,180 @@ fun MicrocycleCard(
                     }
                   ) {
                     Text(text = "Start")
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+fun MesocycleCard(
+  activeProgram: Boolean,
+  mesocycles: List<Mesocycle>,
+) {
+
+  val context = LocalContext.current
+  val padding = 12.dp
+  val spacedByPadding = 4.dp
+  val titleMedium = MaterialTheme.typography.titleMedium
+  val titleSmall = MaterialTheme.typography.titleSmall
+  val labelMedium = MaterialTheme.typography.labelMedium
+  val bodySmall = MaterialTheme.typography.bodySmall
+
+  val cardColors = CardDefaults.cardColors()
+
+  fun getExpandCollapseIcon(visible: Boolean): ImageVector {
+    return if (visible) {
+      Icons.Outlined.ExpandLess
+    } else {
+      Icons.Outlined.ExpandMore
+    }
+  }
+
+  if (mesocycles.isNotEmpty()) {
+    mesocycles.forEachIndexed { index, mesocycle ->
+      val (workoutVisible, setWorkoutVisible) =
+        rememberSaveable { mutableStateOf(!activeProgram && index == 0) }
+
+      //      TODO Figure out a way to show the most recent microcycle with completed workouts
+
+      Card() {
+        Column(modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text(
+              text = "Mesocycle ${index.plus(1)} - ${mesocycle.name}",
+              style = titleMedium,
+              //              overflow = TextOverflow.Ellipsis,
+              softWrap = true,
+              modifier = Modifier.weight(1f)
+            )
+
+            IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
+              Icon(
+                imageVector = getExpandCollapseIcon(workoutVisible),
+                contentDescription = "Show mesocycle"
+              )
+            }
+          }
+
+          AnimatedVisibility(
+            visible = workoutVisible,
+            enter = expandVertically(animationSpec = tween(500)),
+            exit = shrinkVertically(animationSpec = tween(500))
+          ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+              val (expanded, onClick) = remember { mutableStateOf(false) }
+              val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
+
+              Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                  Text(text = "Mesocycle Description", style = titleSmall)
+                }
+              }
+
+              Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+                  if (expanded) {
+                    Text(
+                      text = mesocycle.description ?: "Description, Use Markdown Potentially",
+                      style = bodySmall,
+                    )
+                  } else {
+                    Text(
+                      text = mesocycle.description ?: "Description, Use Markdown Potentially",
+                      style = bodySmall,
+                      maxLines = 20,
+                      overflow = TextOverflow.Ellipsis,
+                      onTextLayout = { textLayoutResult ->
+                        if (textLayoutResult.hasVisualOverflow) {
+                          unhideShowMoreButton(true)
+                        }
+                      }
+                    )
+                  }
+                }
+              }
+
+              if (showShowMoreButton) {
+                TextButton(
+                  onClick = { onClick(!expanded) },
+                  contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp)
+                ) {
+                  Text(
+                    text = if (expanded) "Show less" else "Show more",
+                    style = MaterialTheme.typography.labelMedium
+                  )
+                }
+              }
+
+              mesocycle.microcycles.forEach { microcycle ->
+                Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  //                    .padding(bottom = 8.dp),
+                  //                horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  var completedWorkouts: Int = 0
+
+                  microcycle.workouts.forEach { workout ->
+                    if (workout.workoutEnded != null) {
+                      completedWorkouts++
+                    }
+                  }
+                  Log.i(
+                    "${microcycle.name} completedWorkouts == microcycle.workouts.size",
+                    "${completedWorkouts == microcycle.workouts.size}"
+                  )
+                  Checkbox(
+                    checked = completedWorkouts == microcycle.workouts.size,
+                    onCheckedChange = {},
+                    colors = CheckboxDefaults.colors(),
+                  )
+                  Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Text(
+                        text = "${microcycle.name}",
+                        style = titleMedium,
+                        softWrap = true,
+                        modifier = Modifier.weight(1f),
+                        overflow = TextOverflow.Ellipsis
+                      )
+                    }
+                    //                  TODO Hide if workout not completed in Active Program
+                    if (completedWorkouts == microcycle.workouts.size) {
+                      Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                        Modifier
+                          .padding(horizontal = 0.dp)
+                          .height(22.dp)
+                          .background(
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = ShapeDefaults.ExtraSmall
+                          )
+                      ) {
+                        Text(
+                          text = "Date Completed",
+                          style = bodySmall,
+                          modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                      }
+                    }
+
+                    Text(text = "${microcycle.workouts.size} Workouts", style = bodySmall)
                   }
                 }
               }

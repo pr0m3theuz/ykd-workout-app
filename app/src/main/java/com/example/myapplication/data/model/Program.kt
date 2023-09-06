@@ -78,6 +78,7 @@ class Mesocycle() : RealmObject {
 
   //    var tags: String // TODO Should be a List<String>
   var programID: ObjectId? = null
+  var microcycles: RealmList<Microcycle> = realmListOf()
 }
 
 @Serializable
