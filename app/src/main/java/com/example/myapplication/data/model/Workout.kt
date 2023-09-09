@@ -10,7 +10,7 @@
 
 package com.example.myapplication.data.model
 
-import com.example.myapplication.newID
+import com.example.myapplication.utils.newID
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.MutableRealmIntKSerializer
 import io.realm.kotlin.serializers.RealmAnyKSerializer
@@ -35,23 +35,16 @@ class Workout() : RealmObject {
     var _id: ObjectId = ObjectId()
     var lazyListItemID: Long = newID()
     var uuid: RealmUUID = RealmUUID.random()
-    var name: String? = null
+    var name: String? = null // TODO make name default = User
     var workoutAuthor: String? = null
-
-    //    TODO Remove. Deprecated.
     var notes: RealmList<WorkoutNote> = realmListOf()
-
-    //    var pinnedNotes: String? = null
-//    var notesPinned: Boolean = false
-//
     var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
     var workoutType: String? = null
     var dateCreated: RealmInstant = RealmInstant.now()
     var workoutStarted: RealmInstant? = null
     var workoutEnded: RealmInstant? = null
     var day: Int? = null
-
-    var exerciseSets: RealmList<ExerciseSets> = realmListOf()
+    var exercisesSets: RealmList<ExerciseSets> = realmListOf()
 
     //    val programID: Long? = null
 //    val mesocycleID: Long? = null

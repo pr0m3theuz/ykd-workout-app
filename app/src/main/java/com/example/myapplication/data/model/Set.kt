@@ -11,7 +11,7 @@
 package com.example.myapplication.data.model
 
 
-import com.example.myapplication.newID
+import com.example.myapplication.utils.newID
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.serializers.MutableRealmIntKSerializer

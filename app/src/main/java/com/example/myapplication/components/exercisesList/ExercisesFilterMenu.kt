@@ -1,6 +1,5 @@
 package com.example.myapplication.components.exercisesList
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.expandVertically
@@ -23,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.model.Equipment
 import com.example.myapplication.data.model.MuscleGroup
@@ -40,28 +39,19 @@ import com.example.myapplication.data.model.MuscleGroup
 fun ExercisesFilterMenu(
   exercisesViewModel: ExercisesViewModel = viewModel() /*modifier: Modifier*/
 ) {
-  exercisesViewModel.getAllMuscleGroups()
-  exercisesViewModel.getAllEquipment()
+    var filterMenuExpanded by remember { mutableStateOf(false) }
+    fun expandFilterMenu() {
+        filterMenuExpanded = !filterMenuExpanded
+    }
 
-  val muscleGroup by exercisesViewModel.muscleGroup.collectAsState()
-  val equipment by exercisesViewModel.equipment.collectAsState()
-
-  var filterMenuExpanded by remember { mutableStateOf(false) }
-  fun expandFilterMenu() {
-    filterMenuExpanded = !filterMenuExpanded
-  }
-
-    val muscleGroups = muscleGroup
     var muscleGroupsVisibility by remember { mutableStateOf(false) }
-
-    val equipments = equipment
     var equipmentVisibility by remember { mutableStateOf(false) }
 
     val movementTypes = exercisesViewModel.movementTypes
     var movementTypeVisibility by remember { mutableStateOf(false) }
 
-    val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsState()
-    val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsState()
+    val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsStateWithLifecycle()
+    val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsStateWithLifecycle()
     val movementTypesChecked = remember { exercisesViewModel.movementTypesChecked }
 
     fun expandMuscleGroups() {
@@ -72,23 +62,23 @@ fun ExercisesFilterMenu(
         equipmentVisibility = !equipmentVisibility
     }
 
-  fun expandMovementType() {
-    movementTypeVisibility = !movementTypeVisibility
-  }
-
-  fun collapseOthers() {
-    if (muscleGroupsVisibility) {
-      muscleGroupsVisibility = false
+    fun expandMovementType() {
+        movementTypeVisibility = !movementTypeVisibility
     }
 
-    if (equipmentVisibility) {
-      equipmentVisibility = false
-    }
+    fun collapseOthers() {
+        if (muscleGroupsVisibility) {
+            muscleGroupsVisibility = false
+        }
 
-    if (movementTypeVisibility) {
-      movementTypeVisibility = false
+        if (equipmentVisibility) {
+            equipmentVisibility = false
+        }
+
+        if (movementTypeVisibility) {
+            movementTypeVisibility = false
+        }
     }
-  }
 
     fun closeAll() {
         muscleGroupsVisibility = false
@@ -112,25 +102,35 @@ fun ExercisesFilterMenu(
         DropdownMenu(
             expanded = filterMenuExpanded,
             onDismissRequest = {
-        expandFilterMenu()
-        closeAll()
-      },
-      modifier = Modifier.fillMaxWidth(0.5f)
-    ) {
-      DropdownMenuItem(
-        text = {
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-          ) {
-            Text(text = "Muscle Groups")
-            Crossfade(targetState = muscleGroupsVisibility) { muscleGroupsVisibility ->
-              when (muscleGroupsVisibility) {
-                true -> Icon(Icons.Default.ExpandLess, contentDescription = "Hide Muscle Groups")
-                false -> Icon(Icons.Default.ExpandMore, contentDescription = "Show Muscle Groups")
-              }
-            }
-          }
+                expandFilterMenu()
+                closeAll()
+            },
+            modifier = Modifier.fillMaxWidth(0.5f)
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Muscle Groups")
+                        Crossfade(
+                            targetState = muscleGroupsVisibility,
+                            label = "Muscle Groups Visibility"
+                        ) { muscleGroupsVisibility ->
+                            when (muscleGroupsVisibility) {
+                                true -> Icon(
+                                    Icons.Default.ExpandLess,
+                                    contentDescription = "Hide Muscle Groups"
+                                )
+
+                                false -> Icon(
+                                    Icons.Default.ExpandMore,
+                                    contentDescription = "Show Muscle Groups"
+                                )
+                            }
+                        }
+                    }
         },
         onClick = {
           if (!muscleGroupsVisibility) {
@@ -146,36 +146,37 @@ fun ExercisesFilterMenu(
         exit = shrinkVertically()
       ) {
         Column {
-          muscleGroups.forEach { muscleGroup ->
-            Row() {
-              DropdownMenuItem(
-                text = {
-                  Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                  ) {
-                      Text(text = muscleGroup.name ?: "Unknown")
+            muscleGroupsChecked.toSortedMap(compareBy<MuscleGroup> { it.name })
+                .forEach { muscleGroup ->
+                    Row() {
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(text = muscleGroup.key.name ?: "Unknown")
 
-                      val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                                    val boolean: Boolean = muscleGroup.value
 
-                      Log.i(
-                          "muscleGroupChecked",
-                          "$muscleGroup: ${muscleGroupsChecked[muscleGroup]}"
-                      )
-                      Log.i("checked", "$checked")
+                                    val (checked, onCheckedChange) = remember {
+                                        mutableStateOf(
+                                            boolean
+                                        )
+                                    }
 
-                      Checkbox(
-                          checked = checked,
-                          onCheckedChange = {
-                              onCheckedChange(it)
-                              setMuscleGroupsChecked(muscleGroup, it)
-                              exercisesViewModel.filterExercises()
-                          }
-                      )
+                                    Checkbox(
+                                        checked = checked,
+                                        onCheckedChange = {
+                                            onCheckedChange(it)
+                                            setMuscleGroupsChecked(muscleGroup.key, it)
+                                            exercisesViewModel.filterExercises()
+                                        }
+                                    )
                   }
                 },
-                  onClick = {}
+                            onClick = {}
               )
             }
           }
@@ -190,13 +191,16 @@ fun ExercisesFilterMenu(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
-            Text(text = "Equipment")
-            Crossfade(targetState = equipmentVisibility) { equipmentVisibility ->
-              when (equipmentVisibility) {
-                true -> Icon(Icons.Default.ExpandLess, contentDescription = "Hide equipment")
-                false -> Icon(Icons.Default.ExpandMore, contentDescription = "Show equipment")
+              Text(text = "Equipment")
+              Crossfade(
+                  targetState = equipmentVisibility,
+                  label = "Equipment Menu Visibility"
+              ) { equipmentVisibility ->
+                  when (equipmentVisibility) {
+                      true -> Icon(Icons.Default.ExpandLess, contentDescription = "Hide equipment")
+                      false -> Icon(Icons.Default.ExpandMore, contentDescription = "Show equipment")
+                  }
               }
-            }
           }
         },
         onClick = {
@@ -213,30 +217,32 @@ fun ExercisesFilterMenu(
         exit = shrinkVertically()
       ) {
         Column {
-          equipments.forEach { equipment ->
-            Row {
-              DropdownMenuItem(
-                text = {
-                  Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                  ) {
-                      Text(text = equipment.name ?: "Unknown")
+            equipmentsChecked.toSortedMap(compareBy<Equipment> { it.name }).forEach { equipment ->
+                Row {
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = equipment.key.name ?: "Unknown")
 
-                      val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                                val boolean: Boolean = equipment.value
 
-                      Checkbox(
-                          checked = checked,
-                          onCheckedChange = {
-                              onCheckedChange(it)
-                              setEquipmentsChecked(equipment, it)
-                              exercisesViewModel.filterExercises()
-                          }
-                      )
+                                val (checked, onCheckedChange) = remember { mutableStateOf(boolean) }
+
+                                Checkbox(
+                                    checked = checked,
+                                    onCheckedChange = {
+                                        onCheckedChange(it)
+                                        setEquipmentsChecked(equipment.key, it)
+                                        exercisesViewModel.filterExercises()
+                                    }
+                                )
                   }
                 },
-                  onClick = {}
+                        onClick = {}
               )
             }
           }
@@ -251,13 +257,23 @@ fun ExercisesFilterMenu(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
-            Text(text = "Movement Types")
-            Crossfade(targetState = movementTypeVisibility) { movementTypeVisibility ->
-              when (movementTypeVisibility) {
-                true -> Icon(Icons.Default.ExpandLess, contentDescription = "Hide Movement Types")
-                false -> Icon(Icons.Default.ExpandMore, contentDescription = "Show Movement Types")
+              Text(text = "Movement Types")
+              Crossfade(
+                  targetState = movementTypeVisibility,
+                  label = "Movement Type Visibility"
+              ) { movementTypeVisibility ->
+                  when (movementTypeVisibility) {
+                      true -> Icon(
+                          Icons.Default.ExpandLess,
+                          contentDescription = "Hide Movement Types"
+                      )
+
+                      false -> Icon(
+                          Icons.Default.ExpandMore,
+                          contentDescription = "Show Movement Types"
+                      )
+                  }
               }
-            }
           }
         },
         onClick = {
@@ -285,15 +301,10 @@ fun ExercisesFilterMenu(
                       Text(text = movementType.printableName)
                       val (checked, onCheckedChange) = remember { mutableStateOf(false) }
 
-                      Checkbox(
-                          checked = checked,
-                          onCheckedChange = {
-                              onCheckedChange(it)
-                          }
-                      )
+                      Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
                   }
                 },
-                  onClick = { }
+                  onClick = {}
               )
             }
           }

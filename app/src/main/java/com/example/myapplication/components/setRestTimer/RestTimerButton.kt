@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.WorkoutViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalTextApi::class)

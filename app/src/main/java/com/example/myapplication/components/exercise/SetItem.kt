@@ -77,19 +77,22 @@ fun SetItem(
           DismissValue.Default -> MaterialTheme.colorScheme.primary
           DismissValue.DismissedToStart -> Color.Red
           DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
-        }
+        }, label = "Background Color"
       )
       val alignment = Alignment.CenterEnd
       val icon = Icons.Filled.Delete
       val scale by
-      animateFloatAsState(if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f)
+      animateFloatAsState(
+        if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f,
+        label = "Delete Icon Scale",
+      )
 
       Box(
-          Modifier
-              .fillMaxSize()
-              .background(color)
-              .padding(horizontal = 12.dp),
-          contentAlignment = alignment
+        Modifier
+          .fillMaxSize()
+          .background(color)
+          .padding(horizontal = 12.dp),
+        contentAlignment = alignment
       ) {
         Icon(
           icon,

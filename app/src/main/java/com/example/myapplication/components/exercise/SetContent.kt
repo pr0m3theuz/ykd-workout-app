@@ -1,5 +1,7 @@
 package com.example.myapplication.components.exercise
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,8 +26,8 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.SetTypeOptionsMenu
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
@@ -37,6 +39,7 @@ import org.koin.androidx.compose.koinViewModel
 // TODO Add ability to rearrange sets
 // TODO Add placeholder text for target weight, reps, & rpe/rir
 // TODO FocusRequester.requestFocus() to tab to next field doesn't work
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SetContent(

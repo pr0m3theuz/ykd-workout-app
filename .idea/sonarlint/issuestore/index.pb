@@ -39,5 +39,3 @@ Uapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesL
 Zapp/src/main/java/com/example/myapplication/components/exercisesList/ExercisesViewModel.kt,0/9/090e8e9f514d9413e3dd3b6a9748c09f20d8690f
 “
 capp/src/main/java/com/example/myapplication/components/replaceExerciseList/ReplaceExerciseScreen.kt,f/e/fea72fa79ef564b3d8a163bb3a3e5abda7e96f06
-o
-?app/src/main/java/com/example/myapplication/WorkoutViewModel.kt,0/3/03810d5ca4c1984458d1b44222627df041bc205e

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.setVolume
-import com.example.myapplication.newID
+import com.example.myapplication.utils.newID
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

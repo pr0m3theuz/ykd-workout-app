@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExerciseOptionsDropdownMenu
 import com.example.myapplication.components.exercisesList.ExercisesFilterMenu
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
@@ -71,8 +71,7 @@ fun AddExercisesScreen(
 
     val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
 
-    fun getMuscleGroups() {
-        exercisesViewModel.getAllMuscleGroups()
+    fun getMuscleGroups() { /*TODO*/
     }
 
     fun filterExercises(search: String) {
@@ -178,7 +177,7 @@ fun AddExercisesScreen(
               query = query,
               onQueryChange = {
                   query = it
-                  filterExercises("%$it%")
+                  filterExercises(it)
               },
               onSearch = { active = false },
               active = active,
@@ -208,7 +207,6 @@ fun AddExercisesScreen(
                 exercises,
                 selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
                 muscleGroups,
-                getMuscleGroup = { getMuscleGroups() },
               )
             }
             exercises.isEmpty() && query.isBlank() -> {
@@ -271,7 +269,6 @@ private fun ExercisesLazyList(
     exercises: List<Exercise>,
     selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
     muscleGroups: List<MuscleGroup>,
-    getMuscleGroup: () -> Unit,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -281,8 +278,6 @@ private fun ExercisesLazyList(
   if (firstVisibleItemIndex > 0) {
     LaunchedEffect(lazyListState) { coroutineScope.launch { lazyListState.animateScrollToItem(0) } }
   }
-
-  getMuscleGroup()
 
   LazyColumn(
     state = lazyListState,

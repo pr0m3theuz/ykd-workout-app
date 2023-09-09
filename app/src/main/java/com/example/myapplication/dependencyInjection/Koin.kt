@@ -1,6 +1,6 @@
 package com.example.myapplication.dependencyInjection
 
-import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.programs.ProgramsViewModel
 import com.example.myapplication.data.database.RealmDatabase

@@ -26,7 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.WorkoutNote
 import org.koin.androidx.compose.koinViewModel
 

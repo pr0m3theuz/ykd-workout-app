@@ -10,7 +10,7 @@
 
 package com.example.myapplication.data.model
 
-import com.example.myapplication.newID
+import com.example.myapplication.utils.newID
 import io.realm.kotlin.serializers.MutableRealmIntKSerializer
 import io.realm.kotlin.serializers.RealmAnyKSerializer
 import io.realm.kotlin.serializers.RealmDictionaryKSerializer

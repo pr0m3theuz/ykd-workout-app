@@ -2,6 +2,7 @@ package com.example.myapplication.data.network
 
 import androidx.annotation.WorkerThread
 import com.example.myapplication.data.database.RealmDatabase
+import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.WorkoutNote
 import kotlinx.coroutines.flow.Flow
@@ -21,9 +22,9 @@ class ExerciseNotesRepository(private val database: RealmDatabase) {
 //        database.getExerciseNotesforWorkout(exerciseID, workoutID)
 
     fun getPinnedExerciseNotes(
-        exerciseID: ObjectId,
+        exercise: Exercise,
     ): Flow<List<ExerciseNote>> =
-        database.getPinnedExerciseNotes(exerciseID)
+        database.getPinnedExerciseNotes(exercise)
 
 //    fun getExerciseNotesforMicrocycle(
 //        exerciseID: Long,

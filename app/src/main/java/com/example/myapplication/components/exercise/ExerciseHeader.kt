@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ButtonColors
@@ -45,8 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.averageWeight
@@ -120,9 +121,7 @@ fun ExerciseHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ExerciseTitleButton(
-                    onClick = {
-                        navController.navigate("exerciseDetails/${exerciseSets.exercise?._id}")
-                    },
+                    onClick = { navController.navigate("exerciseDetails/${exerciseSets.exercise?._id}") },
                     modifier = Modifier.weight(1.0f, fill = true)
                 ) {
                     exerciseSets.exercise?.name?.let {
@@ -166,7 +165,7 @@ private fun ExerciseNotesList(
     _pinNote: (note: ExerciseNote, pin: Boolean) -> Unit,
     removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit
 ) {
-    Log.i("ExerciseNotesList", "$exerciseSets.notes")
+    Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
     var visible by remember { mutableStateOf(notesVisible) }
 
     if (exerciseSets.notes.isEmpty()) {
@@ -189,6 +188,7 @@ private fun ExerciseNotesList(
                 _pinNote = { pin -> _pinNote(note, pin) },
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }
 

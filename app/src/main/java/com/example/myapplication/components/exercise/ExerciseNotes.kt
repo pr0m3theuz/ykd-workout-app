@@ -178,20 +178,20 @@ fun SwipeToDismissItem(
     background = {
       val color by
       animateColorAsState(
-        targetValue =
-        when (dismissState.targetValue) {
-          DismissValue.Default -> MaterialTheme.colorScheme.primary
-          DismissValue.DismissedToStart -> Color.Red
-          DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
-        },
-        animationSpec = TweenSpec(durationMillis = 1000)
+          targetValue =
+          when (dismissState.targetValue) {
+              DismissValue.Default -> MaterialTheme.colorScheme.primary
+              DismissValue.DismissedToStart -> Color.Red
+              DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
+          },
+          animationSpec = TweenSpec(durationMillis = 1000), label = "Background Color"
       )
       val alignment = Alignment.CenterEnd
       val icon = Icons.Filled.Delete
       val scale by
       animateFloatAsState(
-        if (dismissState.targetValue == DismissValue.Default) 1f else 1.33f,
-        animationSpec = TweenSpec(500)
+          if (dismissState.targetValue == DismissValue.Default) 1f else 1.33f,
+          animationSpec = TweenSpec(500), label = "Delete Icon Scale"
       )
 
       Box(

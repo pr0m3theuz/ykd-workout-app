@@ -19,9 +19,9 @@ class ExercisesRepository(private val database: RealmDatabase) {
   // Observed Flow will notify the observer when the data has changed.
   fun getAllExercises(): Flow<List<Exercise>> = database.getAllExercises()
 
-  fun getAllEquipment(): Flow<List<Equipment>> = database.getAllEquipment()
+  fun getAllEquipment(): List<Equipment> = database.getAllEquipment()
 
-  fun getAllMuscleGroups(): Flow<List<MuscleGroup>> = database.getAllMuscleGroups()
+  fun getAllMuscleGroups(): List<MuscleGroup> = database.getAllMuscleGroups()
 
   fun getAllUtilities(): Flow<List<Utility>> = database.getAllUtilities()
 

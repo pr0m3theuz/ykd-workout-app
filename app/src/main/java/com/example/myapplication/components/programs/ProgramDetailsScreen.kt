@@ -168,7 +168,8 @@ fun ProgramDetailsLayout(
       Row(
         Modifier
           .fillMaxWidth()
-          .padding(padding8), horizontalArrangement = Arrangement.Center) {
+          .padding(padding8), horizontalArrangement = Arrangement.Center
+      ) {
         Icon(
           imageVector = Icons.Outlined.BrokenImage,
           contentDescription = "Missing Image",
@@ -199,7 +200,8 @@ fun ProgramDetailsLayout(
       Column(
         Modifier
           .padding(12.dp)
-          .fillMaxWidth()) {
+          .fillMaxWidth()
+      ) {
         when (selectedTabIndex) {
           0 ->
             OverviewTab(
@@ -287,9 +289,11 @@ fun CoachsCard(program: Program) {
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card() {
-    Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)
+    ) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Coach Overview", style = titleSmall)
@@ -319,9 +323,11 @@ fun ProgramOverviewCard(program: Program) {
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card() {
-    Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)
+    ) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Program Overview", style = titleSmall)
@@ -377,9 +383,11 @@ fun ProgramDescriptionCard(program: Program) {
 
   //  TODO Add Expand/Hide Text Button
   Card() {
-    Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)
+    ) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Program Description", style = titleSmall)
@@ -441,9 +449,11 @@ fun WorkoutOverviewCard(
     val workouts = microcycles[selectedTabIndex].workouts
 
     Card() {
-      Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)
+      ) {
         Row(
           modifier = Modifier.fillMaxWidth(),
         ) {
@@ -497,14 +507,16 @@ fun WorkoutDayCard(
   val bodySmall = MaterialTheme.typography.bodySmall
   val cardColors = CardDefaults.cardColors()
 
-  val exercisesSets = workout.exerciseSets
+  val exercisesSets = workout.exercisesSets
 
   //  Log.i("WorkoutDayCard", exercisesSets.toString())
 
   ElevatedCard() {
-    Column(modifier = Modifier
-      .width(300.dp)
-      .padding(padding)) {
+    Column(
+      modifier = Modifier
+        .width(300.dp)
+        .padding(padding)
+    ) {
       Row(
         modifier = Modifier
           .fillMaxWidth()
@@ -622,9 +634,11 @@ fun MicrocycleCard(
       //      TODO Figure out a way to show the most recent microcycle with completed workouts
 
       Card() {
-        Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)) {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)
+        ) {
           Row(
             modifier = Modifier
               .fillMaxWidth()
@@ -735,13 +749,14 @@ fun MicrocycleCard(
                       }
                     }
 
-                    Text(text = "${workout.exerciseSets.size} Exercises", style = bodySmall)
+                    Text(text = "${workout.exercisesSets.size} Exercises", style = bodySmall)
                   }
 
-                  // TODO if completed = true "View" else "Start"
+
                   Button(
                     enabled = activeProgram,
                     onClick = {
+//                      TODO Implement Start Workout
                       Toast.makeText(context, "TODO: Implement Start Workout", Toast.LENGTH_SHORT)
                         .show()
                     }
@@ -790,9 +805,11 @@ fun MesocycleCard(
       //      TODO Figure out a way to show the most recent microcycle with completed workouts
 
       Card() {
-        Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)) {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)
+        ) {
           Row(
             modifier = Modifier
               .fillMaxWidth()

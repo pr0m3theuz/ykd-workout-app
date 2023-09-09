@@ -35,8 +35,6 @@ P
 ]app/src/main/java/com/example/myapplication/components/addExercisesList/AddExercisesScreen.kt,4/0/40fc496f9cb66b17307ae6245dafb9f8f4bbe287
 „
 Tapp/src/main/java/com/example/myapplication/components/exercisesList/ExerciseItem.kt,2/1/214944efb3abe9e07e31d6bff139de98b02b501f
-o
-?app/src/main/java/com/example/myapplication/WorkoutViewModel.kt,0/3/03810d5ca4c1984458d1b44222627df041bc205e
 “
 capp/src/main/java/com/example/myapplication/components/replaceExerciseList/ReplaceExerciseScreen.kt,f/e/fea72fa79ef564b3d8a163bb3a3e5abda7e96f06
 Š

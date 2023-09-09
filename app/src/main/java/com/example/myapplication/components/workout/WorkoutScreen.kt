@@ -31,10 +31,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
-import com.example.myapplication.WorkoutViewModel
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.FinishWorkoutButton
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.RestTimerButton
 import org.koin.androidx.compose.koinViewModel
 

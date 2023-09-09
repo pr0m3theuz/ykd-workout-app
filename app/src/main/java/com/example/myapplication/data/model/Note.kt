@@ -10,8 +10,8 @@
 
 package com.example.myapplication.data.model
 
-import com.example.myapplication.fakeULID
-import com.example.myapplication.newID
+import com.example.myapplication.utils.fakeULID
+import com.example.myapplication.utils.newID
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.serializers.MutableRealmIntKSerializer
@@ -39,8 +39,8 @@ class ExerciseNote() : RealmObject {
     var note: String? = null
     var pinned: Boolean = false
     var dateCreated: RealmInstant = RealmInstant.now()
-    var exercise: Exercise? = null
-    var workout: Workout? = null
+    var exercise: ObjectId? = null
+    var workout: ObjectId? = null
 //    var program: Program
 //    var programPinned: Boolean = false
 //    var mesocycle: Mesocycle
@@ -58,7 +58,7 @@ class WorkoutNote() : RealmObject {
     var uuid: RealmUUID = RealmUUID.random()
     var note: String? = null
     var pinned: Boolean = false
-    var workout: Workout? = null
+    var workout: ObjectId? = null
 //    var program: Program
 //    var programPinned: Boolean = false
 //    var mesocycle: Mesocycle

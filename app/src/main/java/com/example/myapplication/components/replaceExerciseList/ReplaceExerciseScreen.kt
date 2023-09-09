@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.myapplication.WorkoutViewModel
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExerciseOptionsDropdownMenu
 import com.example.myapplication.components.exercisesList.ExercisesFilterMenu
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
@@ -71,10 +71,6 @@ fun ReplaceExerciseScreen(
   exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
 
   val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
-
-  fun getMuscleGroups() {
-    exercisesViewModel.getAllMuscleGroups()
-  }
 
   fun filterExercises(search: String) {
     exercisesViewModel.setSearchExerciseName(search)
@@ -200,8 +196,8 @@ fun ReplaceExerciseScreen(
               )
             },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
+              .fillMaxWidth()
+              .padding(horizontal = 8.dp)
           ) {}
 
           SelectedFiltersLazyRow(exercisesViewModel)
@@ -214,21 +210,20 @@ fun ReplaceExerciseScreen(
                 selectedExercise = exerciseSelectedToBeAddedToWorkout.firstOrNull(),
                 selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
                 muscleGroups,
-                getMuscleGroup = { getMuscleGroups() },
               )
             }
 
             exercises.isEmpty() && query.isBlank() -> {
               Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
+                  .fillMaxWidth()
+                  .padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
               ) {
                 LinearProgressIndicator(
                   modifier = Modifier
-                      .semantics(mergeDescendants = true) {}
-                      .padding(10.dp),
+                    .semantics(mergeDescendants = true) {}
+                    .padding(10.dp),
                 )
               }
             }
@@ -245,7 +240,6 @@ private fun ExercisesLazyList(
     selectedExercise: Exercise?,
     selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
     muscleGroups: List<MuscleGroup>,
-    getMuscleGroup: () -> Unit,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -256,13 +250,11 @@ private fun ExercisesLazyList(
     LaunchedEffect(lazyListState) { coroutineScope.launch { lazyListState.animateScrollToItem(0) } }
   }
 
-  getMuscleGroup()
-
   LazyColumn(
     state = lazyListState,
     modifier = Modifier
-        .fillMaxWidth()
-        .selectableGroup(),
+      .fillMaxWidth()
+      .selectableGroup(),
     // verticalArrangement = Arrangement.spacedBy(8.dp),
     // contentPadding = PaddingValues(0.dp)
   ) {

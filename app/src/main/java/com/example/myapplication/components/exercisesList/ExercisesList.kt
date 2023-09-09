@@ -115,10 +115,6 @@ fun ExercisesLazyColumn(
 
   val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
 
-  fun getMuscleGroups() {
-    exercisesViewModel.getAllMuscleGroups()
-  }
-
   fun filterExercises(search: String) {
     exercisesViewModel.setSearchExerciseName(search)
     exercisesViewModel.filterExercises()
@@ -200,7 +196,7 @@ fun ExercisesLazyColumn(
           query = query,
           onQueryChange = {
             query = it
-            filterExercises("%$it%")
+            filterExercises(it)
           },
           onSearch = { active = false },
           active = active,
@@ -217,8 +213,8 @@ fun ExercisesLazyColumn(
             )
           },
           modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
         ) {}
         //        }
 
@@ -230,7 +226,6 @@ fun ExercisesLazyColumn(
             ExercisesLazyList(
               exercises,
               muscleGroups,
-              getMuscleGroup = { getMuscleGroups() },
               navController,
             )
           }
@@ -238,14 +233,14 @@ fun ExercisesLazyColumn(
           exercises.isEmpty() && query.isBlank() -> {
             Column(
               modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(top = 24.dp),
+                .fillMaxWidth()
+                .padding(top = 24.dp),
               horizontalAlignment = Alignment.CenterHorizontally
             ) {
               LinearProgressIndicator(
                 modifier = Modifier
-                    .semantics(mergeDescendants = true) {}
-                    .padding(10.dp),
+                  .semantics(mergeDescendants = true) {}
+                  .padding(10.dp),
               )
             }
           }
@@ -270,8 +265,8 @@ fun ExercisesLazyColumn(
 fun NoResultsFound(query: String) {
   Column(
     modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
+      .fillMaxSize()
+      .padding(16.dp),
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -293,7 +288,6 @@ fun NoResultsFound(query: String) {
 private fun ExercisesLazyList(
     exercises: List<Exercise>,
     muscleGroups: List<MuscleGroup>,
-    getMuscleGroup: () -> Unit,
     navController: NavController,
 ) {
   val lazyListState = rememberLazyListState()
@@ -304,8 +298,6 @@ private fun ExercisesLazyList(
   if (firstVisibleItemIndex > 0) {
     LaunchedEffect(lazyListState) { coroutineScope.launch { lazyListState.animateScrollToItem(0) } }
   }
-
-  getMuscleGroup()
 
   LazyColumn(
     state = lazyListState,

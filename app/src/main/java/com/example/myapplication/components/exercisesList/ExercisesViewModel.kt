@@ -1,6 +1,5 @@
 package com.example.myapplication.components.exercisesList
 
-import android.util.Log
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +11,8 @@ import com.example.myapplication.data.model.MovementType
 import com.example.myapplication.data.model.MuscleGroup
 import com.example.myapplication.data.model.Utility
 import com.example.myapplication.data.network.ExercisesRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,6 @@ import kotlinx.coroutines.launch
 import org.mongodb.kbson.ObjectId
 
 // TODO Implement Clone Exercise Feature
-
 
 class ExercisesViewModel constructor(private val exercisesRepository: ExercisesRepository) :
   ViewModel() {
@@ -47,32 +47,63 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   val mechanic: StateFlow<List<Mechanic>>
     get() = _mechanic.asStateFlow()
 
-  init {
-      viewModelScope.launch {
-          exercisesRepository.getAllExercises().collect { _exercises.value = it }
-      }
-  }
+  private val _muscleGroupsChecked = MutableStateFlow(mutableMapOf<MuscleGroup, Boolean>())
+  val muscleGroupsChecked
+    get() = _muscleGroupsChecked.asStateFlow()
+
+  private val _equipmentsChecked = MutableStateFlow(mutableMapOf<Equipment, Boolean>())
+  val equipmentsChecked
+    get() = _equipmentsChecked.asStateFlow()
 
   val movementTypes = MovementType.values().sortedBy { it.name }
-  fun getAllMuscleGroups() {
-    viewModelScope.launch {
-      exercisesRepository.getAllMuscleGroups().collect() { _muscleGroup.value = it }
-    }
 
-    if (_muscleGroupsChecked.value.isEmpty()) {
-      _muscleGroupsChecked.value =
-        _muscleGroup.value.map { it to false }.toMutableStateMap().toMutableMap()
+  val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
+
+  init {
+    viewModelScope.launch {
+      getEquipmentAndMuscleGroups()
+      getAllExercises()
     }
   }
 
-  fun getAllEquipment() {
-    viewModelScope.launch {
-      exercisesRepository.getAllEquipment().collect() { _equipment.value = it }
+  val exeseaoeuta = {
+
+  }
+
+  private suspend fun getAllExercises() {
+//    Log.i("ExercisesViewModel", "getAllExercises")
+
+    return coroutineScope {
+      exercisesRepository.getAllExercises().collect() { _exercises.value = it }
     }
+  }
+
+  private suspend fun getEquipmentAndMuscleGroups() {
+//    Log.i("ExercisesViewModel", "getEquipmentAndMuscleGroups")
+    return coroutineScope {
+      val equipments = async { exercisesRepository.getAllEquipment() }
+      val muscleGroups = async { exercisesRepository.getAllMuscleGroups() }
+      init(equipments.await(), muscleGroups.await())
+    }
+  }
+
+  private fun init(equipment: List<Equipment>, muscleGroup: List<MuscleGroup>) {
+//    Log.i("ExercisesViewModel", "init: _muscleGroupsChecked")
+
+    _equipment.value = equipment
     if (_equipmentsChecked.value.isEmpty()) {
       _equipmentsChecked.value =
-        _equipment.value.map { it to false }.toMutableStateMap().toMutableMap()
+        equipment.map { it to false }.toMutableStateMap().toMutableMap()
     }
+
+    _muscleGroup.value = muscleGroup
+    if (_muscleGroupsChecked.value.isEmpty()) {
+      _muscleGroupsChecked.value =
+        muscleGroup.map { it to false }.toMutableStateMap().toMutableMap()
+    }
+
+//    Log.i("ExercisesViewModel", "${_muscleGroupsChecked.value.keys.toList()}")
+//    Log.i("ExercisesViewModel", "${_equipmentsChecked.value.keys.toList()}")
   }
 
   fun getAllUtilities() {
@@ -101,32 +132,12 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     return muscleGroupName
   }
 
-  private val _muscleGroupsChecked = MutableStateFlow(mutableMapOf<MuscleGroup, Boolean>())
-  val muscleGroupsChecked
-    get() = _muscleGroupsChecked.asStateFlow()
-
-  private val _equipmentsChecked = MutableStateFlow(mutableMapOf<Equipment, Boolean>())
-  val equipmentsChecked
-    get() = _equipmentsChecked.asStateFlow()
-
-  val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
-
   fun updateMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
     _muscleGroupsChecked.value[muscleGroup] = checked
-    Log.i(
-      "updateMuscleGroupsChecked",
-      "${muscleGroup.name}: ${_muscleGroupsChecked.value[muscleGroup]}"
-    )
-    Log.i("updateMuscleGroupsChecked", "${_muscleGroupsChecked.value}")
-  }
-
-  fun getMuscleGroupsCheckedBoolean(muscleGroup: MuscleGroup): Boolean {
-    return _muscleGroupsChecked.value[muscleGroup] == true
   }
 
   fun updateEquipmentsChecked(equipment: Equipment, checked: Boolean) {
     _equipmentsChecked.value[equipment] = checked
-    Log.i("updateEquipmentsChecked", "${_equipmentsChecked.value.filterValues { it }.keys}")
   }
 
   private var _searchExerciseName = ""
@@ -140,53 +151,51 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
 
   fun filterExercises() {
 
-    if (searchExerciseName.isEmpty()) {
-      _searchExerciseName = "%"
-    }
+    //    if (searchExerciseName.isEmpty()) {
+    //      _searchExerciseName = ".*"
+    //    }
 
-    var selectedMuscleGroups = mutableListOf<String>()
+    val selectedMuscleGroups = mutableListOf<String>()
     _muscleGroupsChecked.value
-        .filterValues { !it }
-        .keys
-        .sortedBy { it.name }
-        .forEach { muscleGroup -> muscleGroup._id?.let { selectedMuscleGroups.add(it) } }
+      .filterValues { it }
+      .keys
+      .sortedBy { it.name }
+      .forEach { muscleGroup -> muscleGroup._id?.let { selectedMuscleGroups.add(it) } }
 
-    var selectedEquipments = mutableListOf<String>()
-      _equipmentsChecked.value
-          .filterValues { !it }
-          .keys
-          .sortedBy { it.name }
-          .forEach { equipment -> equipment._id?.let { selectedEquipments.add(it) } }
+    val selectedEquipments = mutableListOf<String>()
+    _equipmentsChecked.value
+      .filterValues { it }
+      .keys
+      .sortedBy { it.name }
+      .forEach { equipment -> equipment._id?.let { selectedEquipments.add(it) } }
 
     val selectedMovementTypes = mutableListOf<String>()
     movementTypesChecked
-      .filterValues { !it }
+      .filterValues { it }
       .keys
       .sortedBy { it.name }
       .forEach { selectedMovementTypes.add(it.printableName) }
 
-    if (selectedMuscleGroups.size == muscleGroupsChecked.value.size) {
-      selectedMuscleGroups = mutableListOf("%")
+    if (selectedMuscleGroups.isEmpty()) {
+      _muscleGroupsChecked.value
+        .filterValues { !it }
+        .keys
+        .sortedBy { it.name }
+        .forEach { muscleGroup -> muscleGroup._id?.let { selectedMuscleGroups.add(it) } }
     }
 
-    if (selectedEquipments.size == equipmentsChecked.value.size) {
-      selectedEquipments = mutableListOf("%")
+    if (selectedEquipments.isEmpty()) {
+      _equipmentsChecked.value
+        .filterValues { !it }
+        .keys
+        .sortedBy { it.name }
+        .forEach { equipment -> equipment._id?.let { selectedEquipments.add(it) } }
     }
 
     /*
     if (selectedMovementTypes.size == movementTypesChecked.value.size) {
       selectedMovementTypes = mutableListOf("%")
     }
-    */
-
-    /*
-        Log.i("muscleGroups", "${_muscleGroup.value}")
-        Log.i("muscleGroups.map ", "${_muscleGroup.value.map { it to false }.toList()}")
-        Log.i("muscleGroupsChecked", "${_muscleGroupsChecked.value
-          .filterValues { it }.keys}")
-        Log.i("selectedMuscleGroups", selectedMuscleGroups.toString())
-        Log.i("selectedEquipments", selectedEquipments.toString())
-        Log.i("selectedMovementTypes", selectedMovementTypes.toString())
     */
 
     // TODO If _exercises is empty, display "No results" Message

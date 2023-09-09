@@ -45,7 +45,7 @@ constructor(
     }
 
     fun getProgramById(programID: ObjectId) {
-        var program: Program? = null
+        var program: Program?
 
         viewModelScope.launch {
             program = programsRepository.getProgramById(programID)
