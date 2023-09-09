@@ -233,15 +233,15 @@ class WorkoutViewModel(
 
             _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-            Log.i("Timer: ", timerVersion)
-            Log.i("TimerState: ", _timerState.value.name)
+            /*              Log.i("Timer: ", timerVersion)
+                          Log.i("TimerState: ", _timerState.value.name)
 
-            Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-            Log.i("onTick(): timerDuration", "$_timerDuration")
-            Log.i(
-              "onTick(): _remainingTimeProgress",
-              "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-            )
+                          Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+                          Log.i("onTick(): timerDuration", "$_timerDuration")
+                          Log.i(
+                            "onTick(): _remainingTimeProgress",
+                            "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+                          )*/
           }
 
           override fun onFinish() {
@@ -249,8 +249,8 @@ class WorkoutViewModel(
             _timerState.value = TimerState.EXPIRED
             _timerFinished = true
 
-            Log.i("Timer: ", timerVersion)
-            Log.i("TimerState: ", _timerState.value.name)
+//              Log.i("Timer: ", timerVersion)
+//              Log.i("TimerState: ", _timerState.value.name)
           }
         }
           .start()
@@ -493,81 +493,65 @@ class WorkoutViewModel(
         )
       }
 
-    updateExercisesSetsData(exerciseSets, temporarySets.toMutableList())
+    updateExercisesSetsData(exerciseSets, temporarySets)
   }
 
   fun removeSet(exerciseSets: ExerciseSets, set: Set) {
-    val temporarySets = exerciseSets.sets.minusElement(set).toMutableList()
+    val temporarySets = exerciseSets.sets.minusElement(set)
 
     updateExercisesSetsData(exerciseSets, temporarySets)
   }
 
   private fun updateExercisesSetsData(
     exerciseSets: ExerciseSets,
-    temporarySets: MutableList<Set>,
+    temporarySets: List<Set>,
   ) {
-    val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
-
-    exerciseSets.exSetsLazyListItemID = newID()
     exerciseSets.sets = temporarySets.toRealmList()
 
-    _exercisesSetsData[index] =
-      ExerciseSets().apply {
-        exSetsUUID = exerciseSets.exSetsUUID
-        exerciseOrder = exerciseSets.exerciseOrder
-        exercise = exerciseSets.exercise
-        sets = exerciseSets.sets
-        notes = exerciseSets.notes
-      }
-
-    _exercisesSets.value = _exercisesSetsData.toMutableList()
+    updateExerciseSetsData(exerciseSets)
   }
 
   fun addExerciseNote(exerciseSets: ExerciseSets) {
-    val temporaryNotes: List<ExerciseNote> =
-      if (exerciseSets.notes.isNotEmpty()) {
-        exerciseSets.notes +
-                ExerciseNote().apply {
-                  exercise = exerciseSets.exercise?._id
-                  workout = _workout.value._id
-                }
-      } else {
-        List(1) {
-          ExerciseNote().apply {
-            exercise = exerciseSets.exercise?._id
-            workout = _workout.value._id
-          }
-        }
+    exerciseSets.notes.add(
+      ExerciseNote().apply {
+        exercise = exerciseSets.exercise?._id
+        workout = _workout.value._id
       }
+    )
 
-    Log.i("addExerciseNote", "$temporaryNotes")
+    Log.i("addExerciseNote", "$exerciseSets.notes")
 
-    updateExercisesNotesData(exerciseSets, temporaryNotes)
+    updateExercisesNotesData(exerciseSets, exerciseSets.notes)
   }
 
   fun removeExerciseNote(exerciseSets: ExerciseSets, exerciseNote: ExerciseNote) {
-    val temporaryNotes = exerciseSets.notes.minusElement(exerciseNote).toMutableList()
+    exerciseSets.notes.minusElement(exerciseNote)
 
-    updateExercisesNotesData(exerciseSets, temporaryNotes)
-    Log.i("removeExerciseNote", "removeExerciseNote: ${temporaryNotes.size}")
+    updateExercisesNotesData(exerciseSets, exerciseSets.notes)
+    Log.i("removeExerciseNote", "removeExerciseNote: ${exerciseSets.notes.size}")
   }
 
   fun pinExerciseNote(exerciseSets: ExerciseSets, exerciseNote: ExerciseNote, pinned: Boolean) {
     val index = exerciseSets.notes.indexOf(exerciseNote)
 
-    val temporaryNotes = exerciseSets.notes
-    temporaryNotes[index].pinned = pinned
+    exerciseSets.notes[index].pinned = pinned
 
-    updateExercisesNotesData(exerciseSets, temporaryNotes)
+    updateExercisesNotesData(exerciseSets, exerciseSets.notes)
   }
 
   private fun updateExercisesNotesData(
     exerciseSets: ExerciseSets,
     temporaryNotes: List<ExerciseNote>,
   ) {
-    val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
-    exerciseSets.exSetsLazyListItemID = newID()
     exerciseSets.notes = temporaryNotes.toRealmList()
+
+    updateExerciseSetsData(exerciseSets)
+  }
+
+  private fun updateExerciseSetsData(exerciseSets: ExerciseSets) {
+    val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
+
+    exerciseSets.exSetsLazyListItemID = newID()
 
     _exercisesSetsData[index] =
       ExerciseSets().apply {
@@ -577,17 +561,8 @@ class WorkoutViewModel(
         sets = exerciseSets.sets
         notes = exerciseSets.notes
       }
-
-    _exercisesSets.value = _exercisesSetsData.toMutableList()
-  }
-
-  private fun updateExerciseSetIDData(
-    exerciseSets: ExerciseSets,
-  ) {
-    val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
-    _exercisesSetsData[index].exSetsLazyListItemID = newID()
-    _exercisesSets.value = _exercisesSetsData.toMutableList()
     _allSets.value = allSets().toList()
+    _exercisesSets.value = _exercisesSetsData.toMutableList()
   }
 
   private fun allSets(): MutableList<Set> {
@@ -620,32 +595,32 @@ class WorkoutViewModel(
       newWeight = newWeight,
     )
 
-    updateExerciseSetIDData(exerciseSets)
+    updateExerciseSetsData(exerciseSets)
   }
 
   fun updateSetReps(exerciseSets: ExerciseSets, setUUID: RealmUUID, newReps: Int?) {
     exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
-    updateExerciseSetIDData(exerciseSets)
+    updateExerciseSetsData(exerciseSets)
   }
 
   fun updateSetRIR(exerciseSets: ExerciseSets, setUUID: RealmUUID, newRIR: Double?) {
     exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
-    updateExerciseSetIDData(exerciseSets)
+    updateExerciseSetsData(exerciseSets)
   }
 
   fun updateSetRPE(exerciseSets: ExerciseSets, setUUID: RealmUUID, newRPE: Double?) {
     exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
-    updateExerciseSetIDData(exerciseSets)
+    updateExerciseSetsData(exerciseSets)
   }
 
   fun setComplete(exerciseSets: ExerciseSets, setUUID: RealmUUID, setComplete: Boolean) {
     exerciseSets.setComplete(setUUID, setComplete)
-    updateExerciseSetIDData(exerciseSets)
+    updateExerciseSetsData(exerciseSets)
   }
 
   fun updateSetType(exerciseSets: ExerciseSets, setUUID: RealmUUID, setTypeID: Int) {
     exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
-    updateExerciseSetIDData(exerciseSets)
+    updateExerciseSetsData(exerciseSets)
   }
 
   fun addWarmUpSets(exerciseSets: ExerciseSets, warmUpSets: List<Set>) {
@@ -784,22 +759,23 @@ class WorkoutViewModel(
     //    TODO Implement this
     //
     _workoutData.notes = _workoutNotesData.toRealmList()
-//    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
+    //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     _workoutData.exercisesSets = _exercisesSetsData.toRealmList()
 
     viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
   }
 
   fun finishWorkout() {
+//    TODO Navigate to Workout Summary Screen
+    cancelSetCompletedTimer()
     stopWorkoutTimer()
     saveWorkout()
-//    TODO Stop Rest Timer
   }
 
   fun cancelWorkout() {
     //    TODO Pop workout screen of the backstack inclusively
     //    TODO navController.popBackStack( route = Programs.route, inclusive = true)
-//    TODO Stop Rest Timer
+    cancelSetCompletedTimer()
     stopWorkoutTimer()
     _workoutData = initWorkout()
     _exercisesSetsData = mutableListOf<ExerciseSets>()
@@ -821,13 +797,22 @@ private fun initWorkout(): Workout {
 
   return when (currentTime.hour) {
     in 0..11 -> {
-      Workout().apply { name = "Morning Workout" }
+      Workout().apply {
+        name = "Morning Workout"
+        workoutStarted = RealmInstant.now()
+      }
     }
     in 12..17 -> {
-      Workout().apply { name = "Afternoon Workout" }
+      Workout().apply {
+        name = "Afternoon Workout"
+        workoutStarted = RealmInstant.now()
+      }
     }
     else -> {
-      Workout().apply { name = "Evening Workout" }
+      Workout().apply {
+        name = "Evening Workout"
+        workoutStarted = RealmInstant.now()
+      }
     }
   }
 }

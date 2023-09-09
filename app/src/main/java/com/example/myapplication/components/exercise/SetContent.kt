@@ -222,6 +222,7 @@ fun SetContent(
                             it.isBlank() -> ""
                             else -> checkDoubleInput(it) ?: weightState.text
                         }
+                    set.exerciseWeight = weightState.text.toDoubleOrNull()
                 },
                 onImeAction = {
                     updateSetData()
@@ -245,7 +246,10 @@ fun SetContent(
             ExerciseRepsTextField(
                 modifier = Modifier.focusRequester(repsFocusRequester),
                 repetitionsText = repetitionsText,
-                onRepsChange = { reps -> repetitionsText = checkIntInput(reps) },
+                onRepsChange = { reps ->
+                    repetitionsText = checkIntInput(reps)
+                    set.repetitions = repetitionsText.toIntOrNull()
+                },
                 onImeAction = {
                     updateSetData()
                     rirFocusRequester.requestFocus()
@@ -276,6 +280,7 @@ fun SetContent(
                                 ?.toString()
                                 ?: repetitionsInReserveText
                         }
+                    set.repetitionsInReserve = repetitionsInReserveText.toDoubleOrNull()
                 },
                 onImeAction = { updateRIR(repetitionsInReserveText) }
             )
@@ -403,8 +408,7 @@ private fun getSetIconText(set: Set, setIndex: Int): String =
 
 private fun getRatePerceivedEffort(set: Set): String = doubleFormatted(set.ratePerceivedEffort)
 
-private fun getRepetitionsInReserve(set: Set): String =
-    doubleFormatted(set.repetitionsInReserve)
+private fun getRepetitionsInReserve(set: Set): String = doubleFormatted(set.repetitionsInReserve)
 
 private fun getRepetitions(set: Set): String =
     when (set.repetitions) {

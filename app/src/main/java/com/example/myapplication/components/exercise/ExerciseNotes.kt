@@ -85,8 +85,10 @@ fun ExerciseNotes(
       MaterialTheme.colorScheme.primary.copy(0.75f)
     }
 
-  val animateNoteButtonContainerColor = animateColorAsState(noteButtonContainerColor)
-  val animateNoteButtonContentColor = animateColorAsState(noteButtonContentColor)
+  val animateNoteButtonContainerColor =
+    animateColorAsState(noteButtonContainerColor, label = "Pin Button Background Color")
+  val animateNoteButtonContentColor =
+    animateColorAsState(noteButtonContentColor, label = "Pin Icon Color")
 
   if (exerciseNote.note == "" && notesPinned) {
     placeholderText = "Pin a note for next time"
@@ -99,27 +101,30 @@ fun ExerciseNotes(
     backgroundColor = MaterialTheme.colorScheme.background
   ) {
     TextField(
-        placeholder = { Text(placeholderText, color = MaterialTheme.colorScheme.secondary) },
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .fillMaxWidth(),
-        textStyle = MaterialTheme.typography.bodyMedium,
-        value = note,
-        onValueChange = { note = it },
-        trailingIcon = {
-            Button(
-                onClick = { pinNote() },
-                shape = MaterialTheme.shapes.small,
-                contentPadding = PaddingValues(0.dp),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(36.dp),
-                colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = animateNoteButtonContainerColor.value,
-                    contentColor = animateNoteButtonContentColor.value
-                )
-            ) {
+      placeholder = { Text(placeholderText, color = MaterialTheme.colorScheme.secondary) },
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .fillMaxWidth(),
+      textStyle = MaterialTheme.typography.bodyMedium,
+      value = note,
+      onValueChange = {
+        note = it
+        exerciseNote.note = it.text
+      },
+      trailingIcon = {
+        Button(
+          onClick = { pinNote() },
+          shape = MaterialTheme.shapes.small,
+          contentPadding = PaddingValues(0.dp),
+          modifier = Modifier
+            .padding(8.dp)
+            .size(36.dp),
+          colors =
+          ButtonDefaults.buttonColors(
+            containerColor = animateNoteButtonContainerColor.value,
+            contentColor = animateNoteButtonContentColor.value
+          )
+        ) {
           Icon(
             Icons.Default.PushPin,
             contentDescription = "Localized description",
@@ -178,28 +183,30 @@ fun SwipeToDismissItem(
     background = {
       val color by
       animateColorAsState(
-          targetValue =
-          when (dismissState.targetValue) {
-              DismissValue.Default -> MaterialTheme.colorScheme.primary
-              DismissValue.DismissedToStart -> Color.Red
-              DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
-          },
-          animationSpec = TweenSpec(durationMillis = 1000), label = "Background Color"
+        targetValue =
+        when (dismissState.targetValue) {
+          DismissValue.Default -> MaterialTheme.colorScheme.primary
+          DismissValue.DismissedToStart -> Color.Red
+          DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
+        },
+        animationSpec = TweenSpec(durationMillis = 1000),
+        label = "Background Color"
       )
       val alignment = Alignment.CenterEnd
       val icon = Icons.Filled.Delete
       val scale by
       animateFloatAsState(
-          if (dismissState.targetValue == DismissValue.Default) 1f else 1.33f,
-          animationSpec = TweenSpec(500), label = "Delete Icon Scale"
+        if (dismissState.targetValue == DismissValue.Default) 1f else 1.33f,
+        animationSpec = TweenSpec(500),
+        label = "Delete Icon Scale"
       )
 
       Box(
-          Modifier
-              .fillMaxSize()
-              .background(color)
-              .padding(horizontal = 12.dp),
-          contentAlignment = alignment
+        Modifier
+          .fillMaxSize()
+          .background(color)
+          .padding(horizontal = 12.dp),
+        contentAlignment = alignment
       ) {
         Icon(
           icon,
