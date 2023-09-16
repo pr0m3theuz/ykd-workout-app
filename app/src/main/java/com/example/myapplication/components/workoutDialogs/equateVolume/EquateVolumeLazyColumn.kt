@@ -36,16 +36,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.components.workoutDialogs.AddSetText
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 // @Preview
 @Composable
 fun EquateVolumeLazyColumn(
-  equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
+    equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
 ) {
   val listState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -56,8 +56,8 @@ fun EquateVolumeLazyColumn(
   LazyColumn(
     state = listState,
     modifier = Modifier
-      .fillMaxWidth()
-      .height(235.dp)
+        .fillMaxWidth()
+        .height(235.dp)
     //  verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
     items(count = workingSets.size, key = { index -> workingSets[index].lazyListItemID }) { index ->
@@ -99,10 +99,10 @@ fun EquateVolumeLazyColumn(
           )
 
           Box(
-            Modifier
-              .fillMaxSize()
-              .background(color)
-              .padding(horizontal = 12.dp),
+              Modifier
+                  .fillMaxSize()
+                  .background(color)
+                  .padding(horizontal = 12.dp),
             contentAlignment = alignment
           ) {
             Icon(

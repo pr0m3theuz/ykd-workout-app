@@ -59,6 +59,7 @@ class WorkoutNote() : RealmObject {
     var note: String? = null
     var pinned: Boolean = false
     var workout: ObjectId? = null
+    var workoutUUID: RealmUUID? = null
 //    var program: Program
 //    var programPinned: Boolean = false
 //    var mesocycle: Mesocycle

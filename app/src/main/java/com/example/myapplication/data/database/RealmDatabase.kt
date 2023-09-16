@@ -40,6 +40,7 @@ import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
 import io.realm.kotlin.mongodb.syncSession
 import io.realm.kotlin.types.RealmList
+import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
@@ -333,7 +334,11 @@ class RealmDatabase {
     }
   }
 
-  suspend fun getWorkoutByID(workoutID: ObjectId): Workout? {
+  fun getWorkoutsCount(): Int {
+    return realm.query<Workout>().find().count()
+  }
+
+  fun getWorkoutByID(workoutID: ObjectId): Workout? {
     return realm.query<Workout>("workoutID = $0", workoutID).first().find()
   }
 
@@ -508,12 +513,8 @@ class RealmDatabase {
   fun getPinnedExerciseNotes(
     exercise: Exercise,
     pinned: Boolean = true,
-  ): Flow<List<ExerciseNote>> {
-    return realm
-      .query<ExerciseNote>("exercise = $0 AND pinned = $1", exercise._id, pinned)
-      .find()
-      .asFlow()
-      .map { it.list }
+  ): List<ExerciseNote> {
+    return realm.query<ExerciseNote>("exercise = $0 AND pinned = $1", exercise._id, pinned).find()
   }
 
   /*  fun getPinnedExerciseNotes(
@@ -546,24 +547,22 @@ class RealmDatabase {
   }
 
   fun getPinnedWorkoutNotes(
-    workoutID: ObjectId,
+    workoutUUID: RealmUUID,
     pinned: Boolean = true,
     //    programPinned: Boolean = false,
     //    mesocyclePinned: Boolean = false,
     //    microcyclePinned: Boolean = false,
-  ): Flow<List<WorkoutNote>> {
+  ): List<WorkoutNote> {
     return realm
       .query<WorkoutNote>(
-        "workout = $0 AND pinned = $1",
-        workoutID,
+        "uuid = $0 AND pinned = $1",
+        workoutUUID,
         pinned,
         //        programPinned,
         //        mesocyclePinned,
         //        microcyclePinned
       )
       .find()
-      .asFlow()
-      .map { it.list }
   }
 
   suspend fun insertWorkoutNote(workoutNote: WorkoutNote) {
@@ -574,7 +573,18 @@ class RealmDatabase {
     realm.write { workoutNote }
   }
 
-  suspend fun migrateData() {
+  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
+    return realm
+      .query<Set>(
+        "exerciseID = $0 AND setNumber = $1 SORT (dateCreated DESC)",
+        exerciseID,
+        setNumber
+      )
+      .first()
+      .find()
+  }
+
+  suspend fun migratePrograms() {
     val json =
       assetFileAsStream("database/programs_202308111151.json").bufferedReader().use {
         it.readText()
@@ -787,7 +797,7 @@ class RealmDatabase {
     }
   }
 
-  suspend fun insertCompletedSets(sets: RealmList<Set>): RealmList<Set> {
+  private suspend fun insertCompletedSets(sets: RealmList<Set>): RealmList<Set> {
     val realmSets = realmListOf<Set>()
     sets.forEach { set ->
       if (set.setCompleted) {
@@ -805,6 +815,8 @@ class RealmDatabase {
             targetRepetitionsInReserve = set.targetRepetitionsInReserve
             percentage1RM = set.percentage1RM
             setCompleted = set.setCompleted
+            exerciseID = set.exerciseID
+            dateCreated = set.dateCreated
           }
           realmSets.add(newSet)
         }
@@ -813,7 +825,9 @@ class RealmDatabase {
     return realmSets
   }
 
-  suspend fun insertExerciseSets(exercisesSets: RealmList<ExerciseSets>): RealmList<ExerciseSets> {
+  private suspend fun insertExerciseSets(
+    exercisesSets: RealmList<ExerciseSets>
+  ): RealmList<ExerciseSets> {
     val realmExerciseSets = realmListOf<ExerciseSets>()
     exercisesSets.forEach { exerciseSets ->
       val insertedSets = insertCompletedSets(exerciseSets.sets)
@@ -824,13 +838,11 @@ class RealmDatabase {
           val newExerciseSets =
             this.copyToRealm(
               ExerciseSets().apply {
-                _id = exerciseSets._id
                 exerciseOrder = exerciseSets.exerciseOrder
                 exercise = latestExercise
                 sets = insertedSets
                 notes = insertedNotes
               },
-              updatePolicy = UpdatePolicy.ALL
             )
 
           realmExerciseSets.add(newExerciseSets)
@@ -840,7 +852,7 @@ class RealmDatabase {
     return realmExerciseSets
   }
 
-  suspend fun insertExerciseNotes(notes: RealmList<ExerciseNote>): RealmList<ExerciseNote> {
+  private suspend fun insertExerciseNotes(notes: RealmList<ExerciseNote>): RealmList<ExerciseNote> {
     val realmExerciseNotes = realmListOf<ExerciseNote>()
     notes.forEach { exerciseNote ->
       if (exerciseNote.note?.isNotBlank() == true) {
@@ -864,7 +876,7 @@ class RealmDatabase {
     return realmExerciseNotes
   }
 
-  suspend fun insertWorkoutNotes(notes: RealmList<WorkoutNote>): RealmList<WorkoutNote> {
+  private suspend fun insertWorkoutNotes(notes: RealmList<WorkoutNote>): RealmList<WorkoutNote> {
     val realmWorkoutNotes = realmListOf<WorkoutNote>()
     notes.forEach { workoutNote ->
       if (workoutNote.note?.isNotEmpty() == true) {

@@ -28,6 +28,7 @@ import com.example.myapplication.components.homeScreen.HomeScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.WorkoutContent
+import com.example.myapplication.components.workout.WorkoutSummaryScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -62,6 +63,12 @@ private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
     }*/
     composable("workoutContent") {
       WorkoutContent(
+        navController = navController,
+      )
+    }
+
+    composable("workoutSummary") {
+      WorkoutSummaryScreen(
         navController = navController,
       )
     }

@@ -1,14 +1,19 @@
 package com.example.myapplication.data.network
 
 import com.example.myapplication.data.database.RealmDatabase
+import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import kotlinx.coroutines.flow.Flow
 import org.mongodb.kbson.ObjectId
 
 
 class WorkoutRepository constructor(private val database: RealmDatabase) {
-    suspend fun getWorkoutByID(workoutID: ObjectId): Workout? {
+    fun getWorkoutByID(workoutID: ObjectId): Workout? {
         return database.getWorkoutByID(workoutID)
+    }
+
+    fun getWorkoutsCount(): Int {
+        return database.getWorkoutsCount()
     }
 
     /*    suspend fun getWorkoutByMicrocycleUUID(microcycleUUID: UUID): List<Workout> {
@@ -52,5 +57,9 @@ class WorkoutRepository constructor(private val database: RealmDatabase) {
 
     fun getAllWorkouts(): Flow<List<Workout>> {
         return database.getAllWorkouts()
+    }
+
+    fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
+        return database.getPreviousSetForExercise(exerciseID, setNumber)
     }
 }

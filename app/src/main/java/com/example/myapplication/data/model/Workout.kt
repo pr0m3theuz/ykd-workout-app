@@ -1,11 +1,11 @@
 @file:UseSerializers(
-    MutableRealmIntKSerializer::class,
-    RealmAnyKSerializer::class,
-    RealmDictionaryKSerializer::class,
-    RealmInstantKSerializer::class,
-    RealmListKSerializer::class,
-    RealmSetKSerializer::class,
-    RealmUUIDKSerializer::class
+  MutableRealmIntKSerializer::class,
+  RealmAnyKSerializer::class,
+  RealmDictionaryKSerializer::class,
+  RealmInstantKSerializer::class,
+  RealmListKSerializer::class,
+  RealmSetKSerializer::class,
+  RealmUUIDKSerializer::class
 )
 
 package com.example.myapplication.data.model
@@ -27,34 +27,60 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.mongodb.kbson.ObjectId
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Serializable
 class Workout() : RealmObject {
-    @PrimaryKey
-    var _id: ObjectId = ObjectId()
-    var lazyListItemID: Long = newID()
-    var uuid: RealmUUID = RealmUUID.random()
-    var name: String? = null // TODO make name default = User
-    var workoutAuthor: String? = null
-    var notes: RealmList<WorkoutNote> = realmListOf()
-    var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
-    var workoutType: String? = null
-    var dateCreated: RealmInstant = RealmInstant.now()
-    var workoutStarted: RealmInstant? = null
-    var workoutEnded: RealmInstant? = null
-    var day: Int? = null
-    var exercisesSets: RealmList<ExerciseSets> = realmListOf()
+  @PrimaryKey
+  var _id: ObjectId = ObjectId()
+  var lazyListItemID: Long = newID()
+  var uuid: RealmUUID = RealmUUID.random()
+  var name: String? = null // TODO make name default = User
+  var workoutAuthor: String? = null
+  var notes: RealmList<WorkoutNote> = realmListOf()
+  var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
+  var workoutType: String? = null
+  var dateCreated: RealmInstant = RealmInstant.now()
+  var workoutStarted: RealmInstant? = null
+  var workoutEnded: RealmInstant? = null
+  var day: Int? = null
+  var exercisesSets: RealmList<ExerciseSets> = realmListOf()
 
-    //    val programID: Long? = null
-//    val mesocycleID: Long? = null
-    var microcycleID: ObjectId? = null
+  //    val programID: Long? = null
+  //    val mesocycleID: Long? = null
+  var microcycleID: ObjectId? = null
 }
 
 @Serializable
 data class Workouts(val workouts: List<Workout>)
 
-//fun Workout.pinNotes(pinned: Boolean) {
-//    notesPinned = pinned
-//    Log.i("pinNotes()", notesPinned.toString())
-//}
+fun Workout.formatWorkoutDuration(): String {
+
+  return workoutDuration.toDuration(DurationUnit.MILLISECONDS)
+    .toComponents { hours, minutes, seconds, _ ->
+      when (hours) {
+        0L -> "$minutes" + "m"
+        else -> "$hours" + "h" + " " + minutes.toString().padStart(2, '0') + "m"
+      }
+    }
+}
+
+fun Workout.formatWorkoutDate(): String {
+  val dateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+//  TODO Confirm if UTC or local
+  return if (workoutStarted != null) {
+    LocalDateTime.ofEpochSecond(
+      workoutStarted!!.epochSeconds,
+      workoutStarted!!.nanosecondsOfSecond,
+      ZoneOffset.UTC
+    ).format(dateTimeFormatter)
+  } else {
+    ""
+  }
+}

@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,7 +53,6 @@ fun WorkoutContent(
   navController: NavController,
   workoutViewModel: WorkoutViewModel = koinViewModel()
 ) {
-  //  val workout by workoutViewModel.workout.collectAsState()
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
   val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
@@ -61,11 +60,12 @@ fun WorkoutContent(
   val openFinishWorkoutDialog = remember { mutableStateOf(false) }
 
   if (openFinishWorkoutDialog.value) {
-    FinishWorkoutButton()
+    FinishWorkoutButton(navController = navController)
     openFinishWorkoutDialog.value = false
   }
 
   val context = LocalContext.current
+  val (editable, setEditable) = remember { mutableStateOf(true) }
 
   Scaffold(
     topBar = {
@@ -73,7 +73,7 @@ fun WorkoutContent(
         title = {
           WorkoutNameTextField(
             workoutName ?: "Workout",
-            setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) }
+            setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) },
           )
           /* Text(
               text = "Exercises",
@@ -96,7 +96,7 @@ fun WorkoutContent(
             },
           ) {
             Icon(
-              imageVector = Icons.Outlined.ArrowBack,
+              imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
               contentDescription = "Go to the previous screen"
             )
@@ -104,7 +104,12 @@ fun WorkoutContent(
         },
         actions = {
           RestTimerButton()
-          WorkoutOptionsDropdownMenu(addWorkoutNote = { workoutViewModel.addWorkoutNote() })
+          WorkoutOptionsDropdownMenu(
+            addWorkoutNote = { workoutViewModel.addWorkoutNote() },
+            enableWorkoutNameTextfield = { setEditable(!editable) },
+            workoutName = workoutName ?: "",
+            setWorkoutName = { workoutViewModel.setWorkoutName(it) },
+          )
         },
       )
     },
@@ -119,7 +124,7 @@ fun WorkoutContent(
         verticalAlignment = Alignment.CenterVertically
       ) {
         WorkoutDuration()
-        FinishWorkoutButton()
+        FinishWorkoutButton(navController = navController)
       }
 
       ExercisesSetsScreen(
@@ -142,13 +147,12 @@ private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = koinViewModel()
 @Composable
 private fun WorkoutNameTextField(
   workoutName: String,
-  editable: Boolean = false,
   setWorkoutName: (String) -> Unit,
 ) {
   var name by remember { mutableStateOf(workoutName) }
-  //
+
   BasicTextField(
-    enabled = editable,
+    enabled = false,
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
     TextStyle(

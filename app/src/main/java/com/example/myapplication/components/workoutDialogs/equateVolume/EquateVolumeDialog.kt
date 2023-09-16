@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
@@ -53,7 +52,7 @@ fun EquateVolumeScreen(
 
 @Composable
 fun EquateVolumeDialog(
-    equateVolumeViewModel: EquateVolumeViewModel = viewModel(),
+    equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
     openDialog: (Boolean) -> Unit,
     _workingSetWeight: Double?,
     _workingSetRepetitions: Int?,

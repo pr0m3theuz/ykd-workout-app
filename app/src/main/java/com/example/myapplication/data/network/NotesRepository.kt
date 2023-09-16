@@ -5,8 +5,7 @@ import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.WorkoutNote
-import kotlinx.coroutines.flow.Flow
-import org.mongodb.kbson.ObjectId
+import io.realm.kotlin.types.RealmUUID
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
@@ -23,7 +22,7 @@ class ExerciseNotesRepository(private val database: RealmDatabase) {
 
     fun getPinnedExerciseNotes(
         exercise: Exercise,
-    ): Flow<List<ExerciseNote>> =
+    ): List<ExerciseNote> =
         database.getPinnedExerciseNotes(exercise)
 
 //    fun getExerciseNotesforMicrocycle(
@@ -71,9 +70,9 @@ class WorkoutNotesRepository(private val database: RealmDatabase) {
 //        database.getWorkoutNotes(workoutID)
 
     fun getPinnedWorkoutNotes(
-        workoutID: ObjectId,
-    ): Flow<List<WorkoutNote>> =
-        database.getPinnedWorkoutNotes(workoutID)
+        workoutUUID: RealmUUID,
+    ): List<WorkoutNote> =
+        database.getPinnedWorkoutNotes(workoutUUID)
 
 //    fun getWorkoutNotesforMicrocycle(
 //        workoutID: Long,

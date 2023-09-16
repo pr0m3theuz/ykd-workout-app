@@ -21,6 +21,7 @@ import io.realm.kotlin.serializers.RealmInstantKSerializer
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.serializers.RealmSetKSerializer
 import io.realm.kotlin.serializers.RealmUUIDKSerializer
+import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -52,6 +53,10 @@ class Set() : RealmObject {
     var setTypeID: Int = 1
     val exerciseSet: RealmResults<ExerciseSets> by backlinks(ExerciseSets::sets) // TODO Use backlinks for ExerciseSets or not
     var progressionSchemeID: Int = 0
+
+    //    To use in query for previous sets
+    var exerciseID: ObjectId? = null
+    var dateCreated: RealmInstant = RealmInstant.now()
 //    var programUUID: RealmUUID? = null
 //    var mesocycleUUID: RealmUUID? = null
 //    var microcycleUUID: RealmUUID? = null

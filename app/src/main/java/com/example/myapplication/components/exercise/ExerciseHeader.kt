@@ -121,7 +121,7 @@ fun ExerciseHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ExerciseTitleButton(
-                    onClick = { navController.navigate("exerciseDetails/${exerciseSets.exercise?._id}") },
+                    onClick = { navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}") },
                     modifier = Modifier.weight(1.0f, fill = true)
                 ) {
                     exerciseSets.exercise?.name?.let {

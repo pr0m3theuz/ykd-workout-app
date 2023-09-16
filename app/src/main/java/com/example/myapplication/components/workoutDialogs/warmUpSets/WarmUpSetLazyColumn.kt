@@ -18,17 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.components.workoutDialogs.AddSetText
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 // @Preview
 @Composable
 fun WarmUpSetLazyColumn(
-    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
+    warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
 ) {
     val listState = rememberLazyListState()
     // Remember a CoroutineScope to be able to launch
@@ -38,7 +38,9 @@ fun WarmUpSetLazyColumn(
 
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxWidth().height(235.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(235.dp)
         //  verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(
@@ -88,7 +90,10 @@ fun WarmUpSetLazyColumn(
                     )
 
                     Box(
-                        Modifier.fillMaxSize().background(color).padding(horizontal = 12.dp),
+                        Modifier
+                            .fillMaxSize()
+                            .background(color)
+                            .padding(horizontal = 12.dp),
                         contentAlignment = alignment
                     ) {
                         Icon(

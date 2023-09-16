@@ -3,6 +3,9 @@ package com.example.myapplication.dependencyInjection
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.programs.ProgramsViewModel
+import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
+import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
+import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetViewModel
 import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.network.ExerciseNotesRepository
 import com.example.myapplication.data.network.ExercisesRepository
@@ -20,9 +23,7 @@ import org.koin.dsl.module
 fun initKoin(appDeclaration: KoinAppDeclaration = {}): KoinApplication {
     return startKoin {
         appDeclaration()
-        modules(
-            commonModule
-        )
+        modules(commonModule)
     }
 }
 
@@ -67,5 +68,9 @@ val commonModule = module {
     viewModelOf(::ProgramsViewModel)
     viewModelOf(::ExercisesViewModel)
     viewModelOf(::WorkoutViewModel)
-//  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
+    viewModelOf(::EquateVolumeViewModel)
+    viewModelOf(::WorkingSetViewModel)
+    viewModelOf(::WarmUpSetsViewModel)
+
+    //  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
 }

@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.components.workoutDialogs.SetContent
 import com.example.myapplication.components.workoutDialogs.calculateNewSetResults
 import com.example.myapplication.components.workoutDialogs.calculatePercentage
@@ -15,10 +14,11 @@ import com.example.myapplication.components.workoutDialogs.getFormattedPercentag
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkIntInput
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun WarmUpSetLayout(
-    warmUpSetsViewModel: WarmUpSetsViewModel = viewModel(),
+    warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
     setIndex: Int,
     warmUpSet: Set,
 ) {

@@ -41,14 +41,15 @@ import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.newID
 import com.example.myapplication.utils.sendNotification
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmInstant
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
 import java.time.LocalTime
 import java.util.Random
 import kotlin.time.Duration
@@ -57,7 +58,6 @@ import kotlin.time.toDuration
 
 private const val WARM_UP_SET = 2
 
-// TODO Croate queries to save workouts and sets
 class WorkoutViewModel(
   private val application: Application,
   private val workoutRepository: WorkoutRepository,
@@ -234,14 +234,14 @@ class WorkoutViewModel(
             _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
 
             /*              Log.i("Timer: ", timerVersion)
-                          Log.i("TimerState: ", _timerState.value.name)
+            Log.i("TimerState: ", _timerState.value.name)
 
-                          Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-                          Log.i("onTick(): timerDuration", "$_timerDuration")
-                          Log.i(
-                            "onTick(): _remainingTimeProgress",
-                            "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-                          )*/
+            Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+            Log.i("onTick(): timerDuration", "$_timerDuration")
+            Log.i(
+              "onTick(): _remainingTimeProgress",
+              "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+            )*/
           }
 
           override fun onFinish() {
@@ -249,8 +249,8 @@ class WorkoutViewModel(
             _timerState.value = TimerState.EXPIRED
             _timerFinished = true
 
-//              Log.i("Timer: ", timerVersion)
-//              Log.i("TimerState: ", _timerState.value.name)
+            //              Log.i("Timer: ", timerVersion)
+            //              Log.i("TimerState: ", _timerState.value.name)
           }
         }
           .start()
@@ -324,9 +324,12 @@ class WorkoutViewModel(
   }
 
   fun cancelSetCompletedTimer() {
-    Log.i("cancelSetCompletedTimer() ", "called")
-    timer.cancel()
-    resetTimerState()
+    //    TODO Bug: lateinit property timer has not been initialized
+
+    if (this::timer.isInitialized) {
+      timer.cancel()
+      resetTimerState()
+    }
     notificationManager.cancelNotifications()
     alarmManager.cancel(notifyPendingIntent)
   }
@@ -368,23 +371,125 @@ class WorkoutViewModel(
     _workout.value = _workoutData
   }
 
+  fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
+    val newWorkout =
+      Workout().apply {
+        uuid = workoutTemplate.uuid
+        name = workoutTemplate.name
+        workoutAuthor = workoutTemplate.workoutAuthor
+        //        notes = workoutTemplate.notes.filter { it.pinned }.toRealmList()
+        workoutType = workoutTemplate.workoutType
+        dateCreated = workoutTemplate.dateCreated
+        workoutStarted = RealmInstant.now()
+        day = workoutTemplate.day
+        //        exercisesSets =
+        // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets)
+        microcycleID = workoutTemplate.microcycleID
+      }
+
+    _workoutData = newWorkout
+    _workout.value = _workoutData
+
+    getPinnedWorkoutNotes(workoutTemplate.uuid)
+    _exercisesSetsData = copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets)
+  }
+
+  fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout) {
+    val newWorkout =
+      Workout().apply {
+        uuid = previousWorkout.uuid
+        name = previousWorkout.name
+        workoutAuthor = previousWorkout.workoutAuthor
+        //        notes = previousWorkout.notes.filter { it.pinned }.toRealmList()
+        workoutType = previousWorkout.workoutType
+        workoutStarted = RealmInstant.now()
+        day = previousWorkout.day
+        exercisesSets = copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets)
+        microcycleID = previousWorkout.microcycleID
+      }
+
+    _workoutData = newWorkout
+    _workout.value = _workoutData
+
+    getPinnedWorkoutNotes(previousWorkout.uuid)
+    _exercisesSetsData = copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets)
+  }
+
+  private fun copyExercisesSetsFromPreviousWorkout(
+    previousExercisesSets: RealmList<ExerciseSets>
+  ): RealmList<ExerciseSets> {
+    val newExercisesSets = realmListOf<ExerciseSets>()
+    previousExercisesSets.forEach { exerciseSets ->
+      val newExerciseSets =
+        ExerciseSets().apply {
+          exSetsUUID = exerciseSets.exSetsUUID
+          exerciseOrder = exerciseSets.exerciseOrder
+          exercise = exerciseSets.exercise
+          sets = copySetsFromPreviousWorkout(exerciseSets.sets)
+          notes = exerciseSets.notes.filter { it.pinned }.toRealmList()
+        }
+
+      if (exerciseSets.exercise != null) {
+        newExerciseSets.notes =
+          exerciseNotesRepository.getPinnedExerciseNotes(exerciseSets.exercise!!).toRealmList()
+      }
+
+      newExercisesSets.add(newExerciseSets)
+    }
+
+    return newExercisesSets
+  }
+
+  private fun copySetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
+    // TODO Think out how to get Previous Set from the last time the exercise was performed and what
+    // data structure to store them in
+
+    val newSets = realmListOf<Set>()
+    val latestPreviousSets = realmListOf<Set>()
+    previousSets.forEach { set ->
+      val newSet =
+        Set().apply {
+          uuid = set.uuid
+          setNumber = set.setNumber
+          exerciseWeight = set.exerciseWeight
+          repetitions = set.repetitions
+          ratePerceivedEffort = set.ratePerceivedEffort
+          repetitionsInReserve = set.repetitionsInReserve
+          targetWeight = set.targetWeight
+          targetRepetitions = set.targetRepetitions
+          targetRatePerceivedEffort = set.targetRatePerceivedEffort
+          percentage1RM = set.percentage1RM
+          setTypeID = set.setTypeID
+          progressionSchemeID = set.progressionSchemeID
+        }
+      newSets.add(newSet)
+      if (set.exerciseID != null && set.setNumber != null) {
+        val previousSet =
+          workoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
+        previousSet?.let { latestPreviousSets.add(it) }
+      }
+    }
+
+    return newSets
+  }
+
   private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
   private var _workoutNotes: MutableStateFlow<List<WorkoutNote>> =
     MutableStateFlow(_workoutNotesData.toList())
   val workoutNotes
     get() = _workoutNotes.asStateFlow()
 
-  private fun getPinnedWorkoutNotes(workoutID: ObjectId) /*: StateFlow<List<WorkoutNote>>*/ {
-    viewModelScope.launch {
-      // TODO get Workout Notes
-      workoutNotesRepository.getPinnedWorkoutNotes(workoutID).collect() { _workoutNotes.value = it }
-    }
+  private fun getPinnedWorkoutNotes(workoutUUID: RealmUUID) {
+    _workoutNotesData = workoutNotesRepository.getPinnedWorkoutNotes(workoutUUID).toMutableList()
+    _workoutNotesData.forEach { workoutNote -> workoutNote.workout = _workout.value._id }
+    _workoutNotes.value = _workoutNotesData
   }
 
   fun addWorkoutNote() {
     _workoutNotesData.add(
       WorkoutNote().apply {
         workout = _workout.value._id
+        workoutUUID = _workout.value.uuid
         //        workoutID = _workout.value.workoutID,
         //        programID = _workout.value.programID,
         //        mesocycleID = _workout.value.mesocycleID,
@@ -442,11 +547,7 @@ class WorkoutViewModel(
     val temporaryExerciseSets = _exercisesSets.value.toMutableList()
 
     exercisesSelectedToBeAddedToWorkout.forEach { _exercise ->
-      var pinnedNotes = listOf<ExerciseNote>()
-
-      viewModelScope.launch {
-        exerciseNotesRepository.getPinnedExerciseNotes(_exercise).collect() { pinnedNotes = it }
-      }
+      val pinnedNotes = exerciseNotesRepository.getPinnedExerciseNotes(_exercise)
 
       temporaryExerciseSets.add(
         ExerciseSets().apply {
@@ -717,28 +818,11 @@ class WorkoutViewModel(
     //      TODO Save Exercise Notes to Database when Workout is saved
   }
 
-  private fun getPinnedExerciseNotesByExercise(
-    exerciseSets: ExerciseSets
-  ): MutableList<ExerciseNote> {
-    var pinnedNotes = listOf<ExerciseNote>()
-
-    viewModelScope.launch {
-      exerciseSets.exercise?.let {
-        exerciseNotesRepository.getPinnedExerciseNotes(it).collect() { notes ->
-          pinnedNotes = notes
-        }
-      }
-    }
-
-    return pinnedNotes.toMutableList()
-  }
-
-  fun createWorkoutFromHistoryOrTemplate(workout: Workout) {
-    //    TODO Implement this
-    // TODO Think out how to get Exercise Notes from previous workout or last time the exercise
-    // was performed
-
-  }
+  /*
+    private fun getPinnedExerciseNotesByExercise(
+      exercise: Exercise
+    ): RealmList<ExerciseNote> {  }
+  */
 
   /**
    * Saves the workout data to the database asynchronously. The function launches a coroutine in the
@@ -760,16 +844,26 @@ class WorkoutViewModel(
     //
     _workoutData.notes = _workoutNotesData.toRealmList()
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
+    removeUncompletedSets()
     _workoutData.exercisesSets = _exercisesSetsData.toRealmList()
 
     viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
   }
 
+  private lateinit var _completedWorkout: Workout
+  val completedWorkout: Workout
+    get() = _completedWorkout
+
+  fun getWorkoutsCount(): Int {
+    return workoutRepository.getWorkoutsCount()
+  }
+
   fun finishWorkout() {
-//    TODO Navigate to Workout Summary Screen
+    //    TODO Navigate to Workout Summary Screen
     cancelSetCompletedTimer()
     stopWorkoutTimer()
     saveWorkout()
+    _completedWorkout = _workoutData
   }
 
   fun cancelWorkout() {
@@ -778,7 +872,13 @@ class WorkoutViewModel(
     cancelSetCompletedTimer()
     stopWorkoutTimer()
     _workoutData = initWorkout()
-    _exercisesSetsData = mutableListOf<ExerciseSets>()
+    _exercisesSetsData = mutableListOf()
+    _exercisesSets.value = _exercisesSetsData
+  }
+
+  private fun removeUncompletedSets() {
+    _exercisesSetsData =
+      _exercisesSetsData.filter { it.sets.any { set -> set.setCompleted } }.toMutableList()
     _exercisesSets.value = _exercisesSetsData
   }
 
