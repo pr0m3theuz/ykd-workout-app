@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.components.BottomNavigationBar
-import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
@@ -46,7 +45,6 @@ import com.example.myapplication.data.model.totalVolume
 import com.example.myapplication.utils.doubleFormatted
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
-import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -55,7 +53,8 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun WorkoutSummaryScreen(
   navController: NavController,
-  workoutViewModel: WorkoutViewModel = koinViewModel()
+  completedWorkout: Workout,
+  workoutsCount: Int,
 ) {
   Scaffold(
     topBar = {
@@ -65,7 +64,9 @@ fun WorkoutSummaryScreen(
           IconButton(
             onClick = {
               /*TODO Navigate to Previous Screen */
-              navController.navigate("programsScreen")
+              navController.navigate("programsScreen") {
+                popUpTo("programsScreen")
+              }
             },
           ) {
             Icon(
@@ -81,7 +82,7 @@ fun WorkoutSummaryScreen(
     bottomBar = { BottomNavigationBar(navController = navController) },
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
-      WorkoutSummaryContent(workoutViewModel.completedWorkout, workoutViewModel.getWorkoutsCount())
+      WorkoutSummaryContent(completedWorkout, workoutsCount)
     }
   }
 }

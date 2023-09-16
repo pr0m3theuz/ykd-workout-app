@@ -7,12 +7,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun FinishWorkoutButton(
-    navController: NavController,
+    navigateToWorkoutSummaryScreen: () -> Unit,
     workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
     val openFinishWorkoutDialog = remember { mutableStateOf(false) }
@@ -36,7 +36,7 @@ fun FinishWorkoutButton(
 
     if (openFinishWorkoutDialog.value) {
         FinishWorkoutDialog(
-            navController = navController,
+            navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() },
             openDialog = { closeFinishWorkoutDialog() },
             confirmFinishWorkout = { workoutViewModel.finishWorkout() }
         )
@@ -44,7 +44,7 @@ fun FinishWorkoutButton(
 
     if (openPartialFinishWorkoutDialog.value) {
         PartialFinishWorkoutDialog(
-            navController = navController,
+            navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() },
             openDialog = { closePartialFinishWorkoutDialog() },
             confirmFinishWorkout = { workoutViewModel.finishWorkout() }
         )
@@ -63,7 +63,7 @@ fun FinishWorkoutButton(
 
 @Composable
 fun FinishWorkoutDialog(
-    navController: NavController,
+    navigateToWorkoutSummaryScreen: () -> Unit,
     openDialog: (Boolean) -> Unit,
     confirmFinishWorkout: () -> Unit,
 ) {
@@ -84,7 +84,7 @@ fun FinishWorkoutDialog(
                 onClick = {
                     openDialog(false)
                     confirmFinishWorkout()
-                    navController.navigate("workoutSummary")
+                    navigateToWorkoutSummaryScreen()
                 }
             ) {
                 Text("Finish", color = MaterialTheme.colorScheme.primary)
@@ -110,7 +110,7 @@ fun FinishWorkoutDialog(
 
 @Composable
 fun PartialFinishWorkoutDialog(
-    navController: NavController,
+    navigateToWorkoutSummaryScreen: () -> Unit,
     openDialog: (Boolean) -> Unit,
     confirmFinishWorkout: () -> Unit,
 ) {
@@ -136,7 +136,7 @@ fun PartialFinishWorkoutDialog(
                 onClick = {
                     openDialog(false)
                     confirmFinishWorkout()
-                    navController.navigate("workoutSummary")
+                    navigateToWorkoutSummaryScreen()
                 }
             ) {
                 Text("Finish Workout", color = MaterialTheme.colorScheme.primary)

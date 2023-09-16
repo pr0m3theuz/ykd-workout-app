@@ -29,7 +29,9 @@ import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.WorkoutContent
 import com.example.myapplication.components.workout.WorkoutSummaryScreen
+import com.example.myapplication.data.model.Workout
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
@@ -61,16 +63,27 @@ private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
     /* composable("workoutScreen") {
         WorkoutScreen()
     }*/
+
     composable("workoutContent") {
       WorkoutContent(
         navController = navController,
       )
     }
 
-    composable("workoutSummary") {
-      WorkoutSummaryScreen(
-        navController = navController,
-      )
+    composable("workoutSummary/{completedWorkout}/{workoutsCount}") { navBackStackEntry ->
+      val completedWorkout =
+        navBackStackEntry.arguments?.getString("completedWorkout")?.let {
+          Json.decodeFromString<Workout>(it)
+        }
+      val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
+
+      if (completedWorkout != null && workoutsCount != null) {
+        WorkoutSummaryScreen(
+          navController = navController,
+          completedWorkout = completedWorkout,
+          workoutsCount = workoutsCount
+        )
+      }
     }
 
     composable(
@@ -112,9 +125,7 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
 
 private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
   navigation("programsScreen", route = "programs") {
-    composable("programsScreen") {
-      ProgramsScreen(navController)
-    }
+    composable("programsScreen") { ProgramsScreen(navController) }
     composable(
       "programDetails/{programID}",
       arguments = listOf(navArgument("programID") { type = NavType.StringType })

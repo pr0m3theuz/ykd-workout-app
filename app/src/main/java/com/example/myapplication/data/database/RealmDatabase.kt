@@ -335,7 +335,7 @@ class RealmDatabase {
   }
 
   fun getWorkoutsCount(): Int {
-    return realm.query<Workout>().find().count()
+    return realm.query<Workout>("workoutEnded != null").find().count()
   }
 
   fun getWorkoutByID(workoutID: ObjectId): Workout? {

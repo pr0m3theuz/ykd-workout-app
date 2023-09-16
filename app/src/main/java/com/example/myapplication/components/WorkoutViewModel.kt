@@ -846,11 +846,11 @@ class WorkoutViewModel(
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     removeUncompletedSets()
     _workoutData.exercisesSets = _exercisesSetsData.toRealmList()
-
-    viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
+    _completedWorkout = _workoutData
+//    viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
   }
 
-  private lateinit var _completedWorkout: Workout
+  private var _completedWorkout: Workout = Workout()
   val completedWorkout: Workout
     get() = _completedWorkout
 
@@ -863,7 +863,6 @@ class WorkoutViewModel(
     cancelSetCompletedTimer()
     stopWorkoutTimer()
     saveWorkout()
-    _completedWorkout = _workoutData
   }
 
   fun cancelWorkout() {

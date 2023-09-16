@@ -36,6 +36,8 @@ import com.example.myapplication.components.FinishWorkoutButton
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.RestTimerButton
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 
 // TODO Takes a Workout Object
@@ -55,17 +57,22 @@ fun WorkoutContent(
 ) {
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
-  val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
-
-  val openFinishWorkoutDialog = remember { mutableStateOf(false) }
-
-  if (openFinishWorkoutDialog.value) {
-    FinishWorkoutButton(navController = navController)
-    openFinishWorkoutDialog.value = false
-  }
-
+  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
   val context = LocalContext.current
   val (editable, setEditable) = remember { mutableStateOf(true) }
+
+  fun navigateToWorkoutSummaryScreen() {
+    val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
+    val workoutsCount = workoutViewModel.getWorkoutsCount()
+    navController.navigate("workoutSummary/$workoutSerialized/$workoutsCount") {
+      popUpTo("workoutSummary") { inclusive = true }
+    }
+  }
+
+  if (openFinishWorkoutDialog) {
+    FinishWorkoutButton(navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
+    openFinishWorkoutDialog = false
+  }
 
   Scaffold(
     topBar = {
@@ -75,16 +82,6 @@ fun WorkoutContent(
             workoutName ?: "Workout",
             setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) },
           )
-          /* Text(
-              text = "Exercises",
-              color = MaterialTheme.colorScheme.onSurface,
-              fontSize = 20.sp,
-              fontWeight = FontWeight.Medium,
-              textAlign = TextAlign.Center,
-              //                    modifier = Modifier.align(Alignment.CenterVertically),
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis
-          )*/
         },
         navigationIcon = {
           IconButton(
@@ -124,7 +121,7 @@ fun WorkoutContent(
         verticalAlignment = Alignment.CenterVertically
       ) {
         WorkoutDuration()
-        FinishWorkoutButton(navController = navController)
+        FinishWorkoutButton(navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
       }
 
       ExercisesSetsScreen(
