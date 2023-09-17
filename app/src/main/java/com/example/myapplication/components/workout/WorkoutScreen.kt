@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
-import com.example.myapplication.components.FinishWorkoutButton
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.RestTimerButton
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
@@ -49,7 +49,7 @@ fun WorkoutScreen(navController: NavHostController = rememberNavController()) {
     }
 }*/
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class)
 @Composable
 fun WorkoutContent(
   navController: NavController,
@@ -65,7 +65,7 @@ fun WorkoutContent(
     val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
     val workoutsCount = workoutViewModel.getWorkoutsCount()
     navController.navigate("workoutSummary/$workoutSerialized/$workoutsCount") {
-      popUpTo("workoutSummary") { inclusive = true }
+      popUpTo("workoutContent") { inclusive = true }
     }
   }
 

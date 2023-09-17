@@ -3,12 +3,16 @@ package com.example.myapplication.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
 // TODO Takes an Arroy List of Bar Types
@@ -47,7 +51,10 @@ fun BarTypeDropdownMenu(
             text = { Text("") },
             leadingIcon = {
                 // TODO Change IconToggleButton to Icon
-                Icon(Icons.Outlined.ArrowBack, contentDescription = "Localized description")
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowBack,
+                    contentDescription = "Localized description"
+                )
             },
             onClick = { onDismiss(); onClickArrowBack() }
         )

@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterialApi::class)
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalSerializationApi::class)
 
 package com.example.myapplication
 
@@ -8,10 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -20,7 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.myapplication.components.*
+import com.example.myapplication.components.Screens
 import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
 import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
 import com.example.myapplication.components.exercisesList.ExercisesScreen
@@ -31,6 +28,7 @@ import com.example.myapplication.components.workout.WorkoutContent
 import com.example.myapplication.components.workout.WorkoutSummaryScreen
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +55,7 @@ class MainActivity : ComponentActivity() {
     }
   }
 }
+
 
 private fun NavGraphBuilder.addWorkoutGraph(navController: NavController) {
   navigation("workoutContent", route = "workout") {

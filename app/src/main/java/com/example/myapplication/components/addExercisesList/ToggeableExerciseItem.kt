@@ -6,7 +6,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -19,77 +19,74 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.Exercise
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ToggleableExerciseItem(
     exercise: Exercise,
     muscleGroupName: String?,
     selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
-    workoutViewModel: WorkoutViewModel = koinViewModel()
 ) {
 
-  val padding = 8.dp
+    val padding = 8.dp
 
-  val (selected, onSelected) = remember { mutableStateOf(false) }
+    val (selected, onSelected) = remember { mutableStateOf(false) }
 
-  val colors =
-    when (isSystemInDarkTheme()) {
-      true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
-      else -> ListItemDefaults.colors(containerColor = Color.Transparent)
-    }
+    val colors =
+        when (isSystemInDarkTheme()) {
+            true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
+            else -> ListItemDefaults.colors(containerColor = Color.Transparent)
+        }
 
-  ListItem(
-    colors = colors,
-    modifier =
-    Modifier /*.padding(vertical = 8.dp)*/
-        .fillMaxWidth()
-        .toggleable(
-            enabled = true,
-            role = Role.Checkbox,
-            value = selected,
-            onValueChange = {
-                onSelected(it)
-                selectExercise(exercise, it)
+    ListItem(
+        colors = colors,
+        modifier =
+        Modifier /*.padding(vertical = 8.dp)*/
+            .fillMaxWidth()
+            .toggleable(
+                enabled = true,
+                role = Role.Checkbox,
+                value = selected,
+                onValueChange = {
+                    onSelected(it)
+                    selectExercise(exercise, it)
+                }
+            ),
+        headlineContent = {
+            Text(
+                text = exercise.name,
+                //        style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        },
+        supportingContent = {
+            Text(
+                text = muscleGroupName ?: "-",
+                //        style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        },
+        trailingContent = {},
+        leadingContent = {
+            if (selected) {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    tint = Color.Green,
+                    contentDescription = "Selected"
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.Error,
+                    tint = MaterialTheme.colorScheme.error,
+                    contentDescription = "No exercise image available."
+                )
             }
-        ),
-    headlineContent = {
-      Text(
-        text = exercise.name,
-        //        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onBackground
-      )
-    },
-    supportingContent = {
-      Text(
-        text = muscleGroupName ?: "-",
-        //        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onBackground
-      )
-    },
-    trailingContent = {},
-    leadingContent = {
-      if (selected) {
-        Icon(
-          imageVector = Icons.Filled.CheckCircle,
-          tint = Color.Green,
-          contentDescription = "Selected"
-        )
-      } else {
-        Icon(
-          imageVector = Icons.Outlined.Error,
-          tint = MaterialTheme.colorScheme.error,
-          contentDescription = "No exercise image available."
-        )
-      }
-    }
-  )
+        }
+    )
 
-  Divider()
+    HorizontalDivider()
 
-  /*  Row(
+    /*  Row(
     modifier =
       Modifier.padding(vertical = 8.dp)
         .fillMaxWidth()

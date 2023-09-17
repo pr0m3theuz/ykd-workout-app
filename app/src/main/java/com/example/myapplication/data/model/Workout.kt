@@ -84,3 +84,19 @@ fun Workout.formatWorkoutDate(): String {
     ""
   }
 }
+
+fun Workout.totalSets(): Int {
+  var totalSets: Int = 0
+  exercisesSets.forEach { exerciseSets ->
+    totalSets += exerciseSets.sets.size
+  }
+  return totalSets
+}
+
+fun Workout.totalVolume(): Double {
+  var totalVolume: Double = 0.0
+  exercisesSets.forEach { exerciseSets ->
+    totalVolume += exerciseSets.totalVolume()
+  }
+  return totalVolume
+}

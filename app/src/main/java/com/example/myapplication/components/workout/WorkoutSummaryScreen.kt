@@ -22,10 +22,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -41,6 +37,7 @@ import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.data.model.formatWorkoutDuration
 import com.example.myapplication.data.model.setVolume
+import com.example.myapplication.data.model.totalSets
 import com.example.myapplication.data.model.totalVolume
 import com.example.myapplication.utils.doubleFormatted
 import io.realm.kotlin.ext.realmListOf
@@ -65,7 +62,7 @@ fun WorkoutSummaryScreen(
             onClick = {
               /*TODO Navigate to Previous Screen */
               navController.navigate("programsScreen") {
-                popUpTo("programsScreen")
+                popUpTo("workoutSummary") { inclusive = true }
               }
             },
           ) {
@@ -93,8 +90,9 @@ fun WorkoutSummaryContent(
   completedWorkout: Workout,
   workoutsCount: Int,
 ) {
-  var totalSets by remember { mutableIntStateOf(0) }
-  var totalVolume by remember { mutableIntStateOf(0) }
+  val totalSets = completedWorkout.totalSets()
+  val totalVolume = doubleFormatted(completedWorkout.totalVolume())
+
   Surface {
     Column(
       modifier = Modifier
@@ -215,7 +213,7 @@ fun WorkoutSummaryContent(
               .background(color = backgroundColor),
             verticalAlignment = Alignment.CenterVertically
           ) {
-            val style = MaterialTheme.typography.titleSmall
+            val style = MaterialTheme.typography.titleMedium
             Text(text = "Exercise", style = style, modifier = Modifier.weight(1f))
             Text(text = "Top Set", style = style, modifier = Modifier.weight(0.5f))
           }
@@ -226,10 +224,8 @@ fun WorkoutSummaryContent(
                 .padding(vertical = 2.dp, horizontal = 4.dp),
               verticalAlignment = Alignment.CenterVertically
             ) {
-              val style = MaterialTheme.typography.bodySmall
+              val style = MaterialTheme.typography.bodyMedium
               // TODO Change to Total Volume comparison or Max Weight or lowest
-              totalSets += exerciseSets.sets.size
-              totalVolume += exerciseSets.totalVolume().toInt()
               val maxWeight = exerciseSets.sets.maxBy { it.exerciseWeight ?: 0.0 }
               val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
               val maxVolume = exerciseSets.sets.maxBy { it.setVolume() }

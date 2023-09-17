@@ -20,9 +20,9 @@ import androidx.compose.material.FilterChip
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.DropdownMenu
@@ -149,7 +149,7 @@ fun ExercisesLazyColumn(
             },
           ) {
             Icon(
-              imageVector = Icons.Outlined.ArrowBack,
+              imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
               contentDescription = "Go to the previous screen"
             )

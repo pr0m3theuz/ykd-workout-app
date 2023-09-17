@@ -14,7 +14,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Button
@@ -78,7 +78,7 @@ private fun ExerciseDetailsLayout(navController: NavController, exercise: Exerci
             TopAppBar(
                 title = {
                     Text(
-                        text = exercise.name ?: "Loading...",
+                        text = exercise.name,
                         maxLines = 2,
                         overflow = TextOverflow.Visible,
                         color = onSurface,
@@ -100,7 +100,7 @@ private fun ExerciseDetailsLayout(navController: NavController, exercise: Exerci
                         },
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             tint = MaterialTheme.colorScheme.onSurface,
                             contentDescription = "Go to the previous screen"
                         )
@@ -138,7 +138,7 @@ private fun ExerciseDetailsLayout(navController: NavController, exercise: Exerci
                     .padding(8.dp)
                     .fillMaxWidth()) {
                 when (state) {
-                    0 -> AboutTab(exercise?.name ?: "never gonna give you up")
+                    0 -> AboutTab(exercise.name)
                     1 -> HistoryTab()
                     2 -> ChartTab()
                     3 -> RecordsTab()

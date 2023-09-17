@@ -876,9 +876,13 @@ class WorkoutViewModel(
   }
 
   private fun removeUncompletedSets() {
-    _exercisesSetsData =
-      _exercisesSetsData.filter { it.sets.any { set -> set.setCompleted } }.toMutableList()
-    _exercisesSets.value = _exercisesSetsData
+//    TODO Doesn't Work, FIX
+    val newData = _exercisesSetsData
+
+    newData.forEach { it.sets.removeIf { set -> !set.setCompleted } }
+    newData.filter { it.sets.isNotEmpty() }
+    _exercisesSetsData = newData
+    _exercisesSets.value = newData
   }
 
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseSets, newExercise: Exercise) {

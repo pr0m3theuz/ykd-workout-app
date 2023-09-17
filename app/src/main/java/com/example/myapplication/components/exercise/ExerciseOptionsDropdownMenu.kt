@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -107,12 +107,12 @@ fun ExerciseOptionsDropdownMenu(
 //                text = { Text("Create Myo-Rep Set") },
 //                onClick = { /* TODO */ }
 //            )
-            Divider()
+            HorizontalDivider()
             DropdownMenuItem(
                 text = { Text("Replace Exercise") },
                 onClick = { openReplaceExerciseDialog = true }
             )
-            Divider()
+            HorizontalDivider()
             DropdownMenuItem(
                 text = { Text("Auto Rest Timer") },
                 trailingIcon = {
@@ -144,7 +144,7 @@ fun ExerciseOptionsDropdownMenu(
                     expandedBarTypeOptionsDropdownMenu = true
                 }
             )
-            Divider()
+            HorizontalDivider()
             DropdownMenuItem(
                 text = { Text("Remove Exercise") },
                 onClick = { removeExercise() }

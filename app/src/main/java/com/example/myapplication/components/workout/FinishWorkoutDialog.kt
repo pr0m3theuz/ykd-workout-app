@@ -1,4 +1,4 @@
-package com.example.myapplication.components
+package com.example.myapplication.components.workout
 
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -7,8 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.myapplication.components.WorkoutViewModel
 import org.koin.androidx.compose.koinViewModel
-
 
 @Composable
 fun FinishWorkoutButton(

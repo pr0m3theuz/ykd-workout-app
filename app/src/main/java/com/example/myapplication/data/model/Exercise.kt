@@ -21,8 +21,13 @@ import io.realm.kotlin.serializers.RealmUUIDKSerializer
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
 import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import org.mongodb.kbson.ObjectId
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -72,9 +77,27 @@ class Exercise() : RealmObject {
     3.toDuration(DurationUnit.MINUTES).inWholeMilliseconds
   var workingSetRestTimerEnabled: Boolean = true
   var warmUpSetRestTimerEnabled: Boolean = false
+
+  @Serializable(URLSerializer::class)
   var mediaURI: String? = null
+
+  @Serializable(URLSerializer::class)
   var pageURI: String? = null
 }
 
 @Serializable
 data class Exercises(val exercises: List<Exercise>)
+
+object URLSerializer : KSerializer<String> {
+  override val descriptor: SerialDescriptor = String.serializer().descriptor
+
+  @OptIn(ExperimentalStdlibApi::class)
+  override fun deserialize(decoder: Decoder): String {
+    return decoder.decodeString().hexToByteArray().toString(Charsets.UTF_8)
+  }
+
+  @OptIn(ExperimentalStdlibApi::class)
+  override fun serialize(encoder: Encoder, value: String) {
+    encoder.encodeString(value.encodeToByteArray().toHexString())
+  }
+}

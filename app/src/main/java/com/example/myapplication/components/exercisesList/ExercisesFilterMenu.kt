@@ -16,8 +16,8 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -131,185 +131,203 @@ fun ExercisesFilterMenu(
                             }
                         }
                     }
-        },
-        onClick = {
-          if (!muscleGroupsVisibility) {
-            collapseOthers()
-          }
-          expandMuscleGroups()
-        }
-      )
+                },
+                onClick = {
+                    if (!muscleGroupsVisibility) {
+                        collapseOthers()
+                    }
+                    expandMuscleGroups()
+                }
+            )
 
-      AnimatedVisibility(
-        visible = muscleGroupsVisibility,
-        enter = expandVertically(),
-        exit = shrinkVertically()
-      ) {
-        Column {
-            muscleGroupsChecked.toSortedMap(compareBy<MuscleGroup> { it.name })
-                .forEach { muscleGroup ->
-                    Row() {
-                        DropdownMenuItem(
-                            text = {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(text = muscleGroup.key.name ?: "Unknown")
+            AnimatedVisibility(
+                visible = muscleGroupsVisibility,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column {
+                    muscleGroupsChecked.toSortedMap(compareBy<MuscleGroup> { it.name })
+                        .forEach { muscleGroup ->
+                            Row() {
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(text = muscleGroup.key.name ?: "Unknown")
 
-                                    val boolean: Boolean = muscleGroup.value
+                                            val boolean: Boolean = muscleGroup.value
 
-                                    val (checked, onCheckedChange) = remember {
-                                        mutableStateOf(
-                                            boolean
-                                        )
-                                    }
+                                            val (checked, onCheckedChange) = remember {
+                                                mutableStateOf(
+                                                    boolean
+                                                )
+                                            }
 
-                                    Checkbox(
-                                        checked = checked,
-                                        onCheckedChange = {
-                                            onCheckedChange(it)
-                                            setMuscleGroupsChecked(muscleGroup.key, it)
-                                            exercisesViewModel.filterExercises()
+                                            Checkbox(
+                                                checked = checked,
+                                                onCheckedChange = {
+                                                    onCheckedChange(it)
+                                                    setMuscleGroupsChecked(muscleGroup.key, it)
+                                                    exercisesViewModel.filterExercises()
+                                                }
+                                            )
                                         }
-                                    )
-                  }
-                },
-                            onClick = {}
-              )
-            }
-          }
-        }
-      }
-
-      Divider()
-
-      DropdownMenuItem(
-        text = {
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-          ) {
-              Text(text = "Equipment")
-              Crossfade(
-                  targetState = equipmentVisibility,
-                  label = "Equipment Menu Visibility"
-              ) { equipmentVisibility ->
-                  when (equipmentVisibility) {
-                      true -> Icon(Icons.Default.ExpandLess, contentDescription = "Hide equipment")
-                      false -> Icon(Icons.Default.ExpandMore, contentDescription = "Show equipment")
-                  }
-              }
-          }
-        },
-        onClick = {
-          if (!equipmentVisibility) {
-            collapseOthers()
-          }
-          expandEquipment()
-        }
-      )
-
-      AnimatedVisibility(
-        visible = equipmentVisibility,
-        enter = expandVertically(),
-        exit = shrinkVertically()
-      ) {
-        Column {
-            equipmentsChecked.toSortedMap(compareBy<Equipment> { it.name }).forEach { equipment ->
-                Row {
-                    DropdownMenuItem(
-                        text = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = equipment.key.name ?: "Unknown")
-
-                                val boolean: Boolean = equipment.value
-
-                                val (checked, onCheckedChange) = remember { mutableStateOf(boolean) }
-
-                                Checkbox(
-                                    checked = checked,
-                                    onCheckedChange = {
-                                        onCheckedChange(it)
-                                        setEquipmentsChecked(equipment.key, it)
-                                        exercisesViewModel.filterExercises()
-                                    }
+                                    },
+                                    onClick = {}
                                 )
-                  }
-                },
-                        onClick = {}
-              )
+                            }
+                        }
+                }
             }
-          }
-        }
-      }
 
-      Divider()
+            HorizontalDivider()
 
-      DropdownMenuItem(
-        text = {
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-          ) {
-              Text(text = "Movement Types")
-              Crossfade(
-                  targetState = movementTypeVisibility,
-                  label = "Movement Type Visibility"
-              ) { movementTypeVisibility ->
-                  when (movementTypeVisibility) {
-                      true -> Icon(
-                          Icons.Default.ExpandLess,
-                          contentDescription = "Hide Movement Types"
-                      )
-
-                      false -> Icon(
-                          Icons.Default.ExpandMore,
-                          contentDescription = "Show Movement Types"
-                      )
-                  }
-              }
-          }
-        },
-        onClick = {
-          if (!movementTypeVisibility) {
-            collapseOthers()
-          }
-          expandMovementType()
-        }
-      )
-      AnimatedVisibility(
-        visible = movementTypeVisibility,
-        enter = expandVertically(),
-        exit = shrinkVertically()
-      ) {
-        Column {
-          movementTypes.forEach { movementType ->
-            Row {
-              DropdownMenuItem(
+            DropdownMenuItem(
                 text = {
-                  Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                  ) {
-                      Text(text = movementType.printableName)
-                      val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Equipment")
+                        Crossfade(
+                            targetState = equipmentVisibility,
+                            label = "Equipment Menu Visibility"
+                        ) { equipmentVisibility ->
+                            when (equipmentVisibility) {
+                                true -> Icon(
+                                    Icons.Default.ExpandLess,
+                                    contentDescription = "Hide equipment"
+                                )
 
-                      Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
-                  }
+                                false -> Icon(
+                                    Icons.Default.ExpandMore,
+                                    contentDescription = "Show equipment"
+                                )
+                            }
+                        }
+                    }
                 },
-                  onClick = {}
-              )
+                onClick = {
+                    if (!equipmentVisibility) {
+                        collapseOthers()
+                    }
+                    expandEquipment()
+                }
+            )
+
+            AnimatedVisibility(
+                visible = equipmentVisibility,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column {
+                    equipmentsChecked.toSortedMap(compareBy<Equipment> { it.name })
+                        .forEach { equipment ->
+                            Row {
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(text = equipment.key.name ?: "Unknown")
+
+                                            val boolean: Boolean = equipment.value
+
+                                            val (checked, onCheckedChange) = remember {
+                                                mutableStateOf(
+                                                    boolean
+                                                )
+                                            }
+
+                                            Checkbox(
+                                                checked = checked,
+                                                onCheckedChange = {
+                                                    onCheckedChange(it)
+                                                    setEquipmentsChecked(equipment.key, it)
+                                                    exercisesViewModel.filterExercises()
+                                                }
+                                            )
+                                        }
+                                    },
+                                    onClick = {}
+                                )
+                            }
+                        }
+                }
             }
-          }
+
+            HorizontalDivider()
+
+            DropdownMenuItem(
+                text = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Movement Types")
+                        Crossfade(
+                            targetState = movementTypeVisibility,
+                            label = "Movement Type Visibility"
+                        ) { movementTypeVisibility ->
+                            when (movementTypeVisibility) {
+                                true -> Icon(
+                                    Icons.Default.ExpandLess,
+                                    contentDescription = "Hide Movement Types"
+                                )
+
+                                false -> Icon(
+                                    Icons.Default.ExpandMore,
+                                    contentDescription = "Show Movement Types"
+                                )
+                            }
+                        }
+                    }
+                },
+                onClick = {
+                    if (!movementTypeVisibility) {
+                        collapseOthers()
+                    }
+                    expandMovementType()
+                }
+            )
+            AnimatedVisibility(
+                visible = movementTypeVisibility,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column {
+                    movementTypes.forEach { movementType ->
+                        Row {
+                            DropdownMenuItem(
+                                text = {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(text = movementType.printableName)
+                                        val (checked, onCheckedChange) = remember {
+                                            mutableStateOf(
+                                                false
+                                            )
+                                        }
+
+                                        Checkbox(
+                                            checked = checked,
+                                            onCheckedChange = { onCheckedChange(it) })
+                                    }
+                                },
+                                onClick = {}
+                            )
+                        }
+                    }
+                }
+            }
         }
-      }
-    }
   }
 }

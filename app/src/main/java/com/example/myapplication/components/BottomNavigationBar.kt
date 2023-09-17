@@ -4,9 +4,9 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -84,8 +84,8 @@ fun BottomNavigationBar(navController: NavController) {
 sealed class Screens(val route: String, @StringRes val resourceId: Int, val icon: ImageVector) {
     object Profile : Screens("profile", R.string.profile, Icons.Filled.Person)
     object History : Screens("history", R.string.history, Icons.Filled.History)
-    object Workout : Screens("workout", R.string.workout, Icons.Filled.Assignment)
-    object Programs : Screens("programs", R.string.programs, Icons.Filled.LibraryBooks)
+    object Workout : Screens("workout", R.string.workout, Icons.AutoMirrored.Filled.Assignment)
+    object Programs : Screens("programs", R.string.programs, Icons.AutoMirrored.Filled.LibraryBooks)
     object Exercise : Screens("exercises", R.string.exercises, MyIconPack.ExerciseFilled)
 
     object Settings : Screens("settings", R.string.settings, Icons.Filled.Settings)

@@ -3,8 +3,8 @@ package com.example.myapplication.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -45,7 +45,7 @@ fun WeightUnitOptionsDropdownMenu(
       text = {},
       leadingIcon = {
         // TODO Change IconToggleButton to Icon
-        Icon(Icons.Outlined.ArrowBack, contentDescription = "Localized description")
+        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Localized description")
       },
       onClick = {
         onDismiss()

@@ -18,16 +18,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material.icons.outlined.CreateNewFolder
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FileUpload
-import androidx.compose.material.icons.outlined.LibraryBooks
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -102,7 +102,7 @@ fun ProgramsScreen(
                         onClick = { navController.navigateUp() },
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             tint = MaterialTheme.colorScheme.onSurface,
                             contentDescription = "Go to the previous screen"
                         )
@@ -177,7 +177,10 @@ fun ProgramsScreen(
 
       item {
           Button(onClick = { /*TODO*/ }) {
-              Icon(imageVector = Icons.Outlined.Assignment, contentDescription = "Add New Program")
+              Icon(
+                  imageVector = Icons.AutoMirrored.Outlined.Assignment,
+                  contentDescription = "Add New Program"
+              )
               Text(text = "New Program", Modifier.padding(start = 8.dp))
           }
       }
@@ -510,7 +513,7 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.LibraryBooks,
+                    imageVector = Icons.AutoMirrored.Outlined.LibraryBooks,
                     contentDescription = "Localized Description"
                 )
             }

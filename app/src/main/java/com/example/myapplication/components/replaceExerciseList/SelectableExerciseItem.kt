@@ -6,7 +6,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -33,64 +33,64 @@ fun SelectableExerciseItem(
     workoutViewModel: WorkoutViewModel = koinViewModel()
 ) {
 
-  val padding = 8.dp
+    val padding = 8.dp
 
-  val selected by remember { mutableStateOf(selectedExercise) }
+    val selected by remember { mutableStateOf(selectedExercise) }
 
-  val colors =
-    when (isSystemInDarkTheme()) {
-      true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
-      else -> ListItemDefaults.colors(containerColor = Color.Transparent)
-    }
+    val colors =
+        when (isSystemInDarkTheme()) {
+            true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
+            else -> ListItemDefaults.colors(containerColor = Color.Transparent)
+        }
 
-  ListItem(
-    colors = colors,
-    modifier =
-    Modifier /*.padding(vertical = 8.dp)*/
-        .fillMaxWidth()
-        .selectable(
-            enabled = true,
-            role = Role.RadioButton,
-            selected = selectedExercise,
-            onClick = {
-                selectExercise(exercise, !selectedExercise)
+    ListItem(
+        colors = colors,
+        modifier =
+        Modifier /*.padding(vertical = 8.dp)*/
+            .fillMaxWidth()
+            .selectable(
+                enabled = true,
+                role = Role.RadioButton,
+                selected = selectedExercise,
+                onClick = {
+                    selectExercise(exercise, !selectedExercise)
+                }
+            ),
+        headlineContent = {
+            Text(
+                text = exercise.name,
+                //        style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        },
+        supportingContent = {
+            Text(
+                text = muscleGroupName ?: "-",
+                //        style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        },
+        trailingContent = {},
+        leadingContent = {
+            if (selectedExercise) {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    tint = Color.Green,
+                    contentDescription = "Selected"
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.Error,
+                    tint = MaterialTheme.colorScheme.error,
+                    contentDescription = "No exercise image available."
+                )
             }
-        ),
-    headlineContent = {
-      Text(
-        text = exercise.name,
-        //        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onBackground
-      )
-    },
-    supportingContent = {
-      Text(
-        text = muscleGroupName ?: "-",
-        //        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onBackground
-      )
-    },
-    trailingContent = {},
-    leadingContent = {
-      if (selectedExercise) {
-        Icon(
-          imageVector = Icons.Filled.CheckCircle,
-          tint = Color.Green,
-          contentDescription = "Selected"
-        )
-      } else {
-        Icon(
-          imageVector = Icons.Outlined.Error,
-          tint = MaterialTheme.colorScheme.error,
-          contentDescription = "No exercise image available."
-        )
-      }
-    }
-  )
+        }
+    )
 
-  Divider()
+    HorizontalDivider()
 
-  /*  Row(
+    /*  Row(
     modifier =
       Modifier.padding(vertical = 8.dp)
         .fillMaxWidth()

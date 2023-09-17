@@ -5,7 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -30,44 +30,44 @@ fun ExerciseItem(exercise: Exercise, muscleGroupName: String?, navController: Na
         }
 
     ListItem(
-    colors = colors,
-    modifier =
-    Modifier /*.padding(vertical = 8.dp)*/
-        .fillMaxWidth()
-        .clickable(
-            enabled = true,
-            onClickLabel = "See more details about ${exercise.name} ",
-            onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
-        ),
-    headlineContent = {
-      Text(
-        text = exercise.name,
-        //        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onBackground
-      )
-    },
-    supportingContent = {
-      Text(
-        text = muscleGroupName ?: "-",
-        //        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onBackground
-      )
-    },
-    trailingContent = {},
-    leadingContent = {
-      // TODO Get Image from YouTube Thumbnail
-      Icon(
-        //        modifier = Modifier.size(40.dp),
-        imageVector = Icons.Outlined.Error,
-        tint = MaterialTheme.colorScheme.error,
-        contentDescription = "No exercise image available."
-      )
-    }
-  )
+        colors = colors,
+        modifier =
+        Modifier /*.padding(vertical = 8.dp)*/
+            .fillMaxWidth()
+            .clickable(
+                enabled = true,
+                onClickLabel = "See more details about ${exercise.name} ",
+                onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
+            ),
+        headlineContent = {
+            Text(
+                text = exercise.name,
+                //        style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        },
+        supportingContent = {
+            Text(
+                text = muscleGroupName ?: "-",
+                //        style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        },
+        trailingContent = {},
+        leadingContent = {
+            // TODO Get Image from YouTube Thumbnail
+            Icon(
+                //        modifier = Modifier.size(40.dp),
+                imageVector = Icons.Outlined.Error,
+                tint = MaterialTheme.colorScheme.error,
+                contentDescription = "No exercise image available."
+            )
+        }
+    )
 
-  Divider()
+    HorizontalDivider()
 
-  /*Row(
+    /*Row(
     modifier =
       Modifier.padding(vertical = 8.dp)
         .fillMaxWidth()
