@@ -99,3 +99,7 @@ Tapp/src/test/java/com/example/myapplication/components/exercise/NumberUtilsKtTe
 \app/src/test/java/com/example/myapplication/components/warmUpSets/WarmUpSetsViewModelTest.kt,3/f/3f6af7ab97998eee5bfb8fce6b2cf99bb194298d
 <
 build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
+}
+Mapp/src/main/java/com/example/myapplication/components/exercise/SetContent.kt,0/2/02fe01f11d7b0fc8bf5343d1de2081c66713abe2
+j
+:app/src/main/java/com/example/myapplication/Application.kt,d/1/d14001a80843e603f9ff0d82ec6097000c60b9a1

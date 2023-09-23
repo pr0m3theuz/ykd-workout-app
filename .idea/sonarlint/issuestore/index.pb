@@ -99,3 +99,7 @@ A
 Tapp/src/test/java/com/example/myapplication/components/exercise/NumberUtilsKtTest.kt,6/d/6d0857ddac59fd3d960868649441487719f5712c
 <
 build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
+}
+Mapp/src/main/java/com/example/myapplication/components/exercise/SetContent.kt,0/2/02fe01f11d7b0fc8bf5343d1de2081c66713abe2
+j
+:app/src/main/java/com/example/myapplication/Application.kt,d/1/d14001a80843e603f9ff0d82ec6097000c60b9a1

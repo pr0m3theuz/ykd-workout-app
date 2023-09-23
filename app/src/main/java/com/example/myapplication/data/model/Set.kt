@@ -1,16 +1,16 @@
 @file:UseSerializers(
-    MutableRealmIntKSerializer::class,
-    RealmAnyKSerializer::class,
-    RealmDictionaryKSerializer::class,
-    RealmInstantKSerializer::class,
-    RealmListKSerializer::class,
-    RealmSetKSerializer::class,
-    RealmUUIDKSerializer::class
+  MutableRealmIntKSerializer::class,
+  RealmAnyKSerializer::class,
+  RealmDictionaryKSerializer::class,
+  RealmInstantKSerializer::class,
+  RealmListKSerializer::class,
+  RealmSetKSerializer::class,
+  RealmUUIDKSerializer::class
 )
 
 package com.example.myapplication.data.model
 
-
+import com.example.myapplication.utils.doubleFormatted
 import com.example.myapplication.utils.newID
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.query.RealmResults
@@ -31,46 +31,61 @@ import org.mongodb.kbson.ObjectId
 
 @Serializable
 class Set() : RealmObject {
-    @PrimaryKey
-    var _id: ObjectId = ObjectId()
-    var lazyListItemID: Long = newID()
-    var uuid: RealmUUID = RealmUUID.random()
-    var setNumber: Int? = 0
-    var exerciseWeight: Double? = null
-    var repetitions: Int? = null
-    var ratePerceivedEffort: Double? = null
-    var repetitionsInReserve: Double? = null
-    var targetWeight: Double? = null
-    var targetRepetitions: String? = null
-    var targetRatePerceivedEffort: Double? = null
-    var targetRepetitionsInReserve: Double? = null
-    var percentage1RM: Double? = 1.0
+  @PrimaryKey
+  var _id: ObjectId = ObjectId()
+  var lazyListItemID: Long = newID()
+  var uuid: RealmUUID = RealmUUID.random()
+  var setNumber: Int? = 0
+  var exerciseWeight: Double? = null
+  var repetitions: Int? = null
+  var ratePerceivedEffort: Double? = null
+  var repetitionsInReserve: Double? = null
+  var targetWeight: Double? = null
+  var targetRepetitions: String? = null
+  var targetRatePerceivedEffort: Double? = null
+  var targetRepetitionsInReserve: Double? = null
+  var percentage1RM: Double? = 1.0
 
-    // var targetPercentage1RM: Double? = null
-    var setCompleted: Boolean = false
+  // var targetPercentage1RM: Double? = null
+  var setCompleted: Boolean = false
 
-    //    var exerciseOrder: Int = 1
-    var setTypeID: Int = 1
-    val exerciseSet: RealmResults<ExerciseSets> by backlinks(ExerciseSets::sets) // TODO Use backlinks for ExerciseSets or not
-    var progressionSchemeID: Int = 0
+  //    var exerciseOrder: Int = 1
+  var setTypeID: Int = 1
+  val exerciseSet: RealmResults<ExerciseSets> by
+  backlinks(ExerciseSets::sets) // TODO Use backlinks for ExerciseSets or not
+  var progressionSchemeID: Int = 0
 
-    //    To use in query for previous sets
-    var exerciseID: ObjectId? = null
-    var dateCreated: RealmInstant = RealmInstant.now()
-//    var programUUID: RealmUUID? = null
-//    var mesocycleUUID: RealmUUID? = null
-//    var microcycleUUID: RealmUUID? = null
+  //    To use in query for previous sets
+  var exerciseID: ObjectId? = null
+  var dateCreated: RealmInstant = RealmInstant.now()
+  //    var programUUID: RealmUUID? = null
+  //    var mesocycleUUID: RealmUUID? = null
+  //    var microcycleUUID: RealmUUID? = null
 }
 
 fun Set.setVolume(): Double {
-    return if (exerciseWeight != null && repetitions != null) {
-        exerciseWeight!!.times(repetitions!!)
-    } else {
-        0.0
-    }
+  return if (exerciseWeight != null && repetitions != null) {
+    exerciseWeight!!.times(repetitions!!)
+  } else {
+    0.0
+  }
+}
+
+fun Set.setTextRIR(): String {
+
+
+  return "${doubleFormatted(exerciseWeight)} × $repetitions ${
+    if (repetitionsInReserve != null) "@ ${
+      doubleFormatted(
+        repetitionsInReserve
+      )
+    } RIR" else ""
+  }"
+}
+
+fun Set.setTextRPE(): String {
+  return "${doubleFormatted(exerciseWeight)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
 }
 
 @Serializable
-data class Sets(
-    val sets: List<Set>
-)
+data class Sets(val sets: List<Set>)

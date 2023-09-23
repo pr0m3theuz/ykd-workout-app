@@ -31,6 +31,7 @@ import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.setTextRIR
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
@@ -55,6 +56,20 @@ fun SetContent(
     workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
     val setUUID = set.uuid
+
+    val previousSetText by remember {
+        mutableStateOf(
+            exerciseSets.exercise?.let { exercise ->
+                set.setNumber?.let { setNumber ->
+                    workoutViewModel
+                        .populatePreviousSetField(exercise._id, setNumber = setNumber)
+                        ?.setTextRIR()
+                        ?: ""
+                }
+            }
+                ?: ""
+        )
+    }
 
     //    val sets = workoutViewModel.allSets.collectAsState()
     //
@@ -139,7 +154,9 @@ fun SetContent(
         iconText = getSetIconText(set, setIndex)
     }
 
-    fun getSetTypeColor(setTypeID: Int) {}
+    fun getSetTypeColor(setTypeID: Int) {
+        /*TODO*/
+    }
 
     var iconColor: Color = Color.White
 
@@ -195,11 +212,19 @@ fun SetContent(
 
         // TODO Get Previous Set Data by Exercise, Workout, Block, Plan
         // TODO If Previous RIR is null, text = "110 x 10" or "110 x 10 @ 1RM%"
-        Text(
-            "110 x 10 @ RIR 0",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall
-        )
+
+        Box(/*modifier = Modifier.width(110.dp)*/) {
+            TextButton(
+                onClick = {/*TODO Make Current Set = Previous Set*/ },
+                modifier = Modifier.width(110.dp),
+            ) {
+                Text(
+                    text = previousSetText,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
 
         Box(
             modifier =
@@ -208,7 +233,7 @@ fun SetContent(
                 .clip(RoundedCornerShape(8.dp))
                 .background(textFieldBackgroundColor)
                 .align(Alignment.CenterVertically)
-                .width(72.dp)
+                .width(96.dp)
                 .wrapContentSize(Alignment.Center),
             propagateMinConstraints = true,
             contentAlignment = Alignment.Center

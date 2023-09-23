@@ -52,6 +52,7 @@ class Program() : RealmObject {
   var programLength: String? = null
   var active: Boolean = false
   var notes: RealmList<ProgramNote> = realmListOf()
+    var mesocycles: RealmList<Mesocycle> = realmListOf()
 }
 
 @Serializable

@@ -21,6 +21,7 @@ import io.realm.kotlin.serializers.RealmInstantKSerializer
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.serializers.RealmSetKSerializer
 import io.realm.kotlin.serializers.RealmUUIDKSerializer
+import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
@@ -49,6 +50,7 @@ class ExerciseSets() : RealmObject {
   var exercise: Exercise? = null
   var sets: RealmList<Set> = realmListOf<Set>()
   var notes: RealmList<ExerciseNote> = realmListOf<ExerciseNote>()
+  var datePerformed: RealmInstant? = null
 }
 
 /*fun ExerciseSets.addSet() {

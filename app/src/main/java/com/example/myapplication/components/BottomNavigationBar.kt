@@ -1,5 +1,6 @@
 package com.example.myapplication.components
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
@@ -29,64 +30,82 @@ import com.example.myapplication.myiconpack.MyIconPack
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
-    //    var selectedItem by remember { mutableIntStateOf(0) }
-    //    val items = listOf("Profile", "History", "Workout", "Programs", "Exercise", "Settings")
+  //    var selectedItem by remember { mutableIntStateOf(0) }
+  //    val items = listOf("Profile", "History", "Workout", "Programs", "Exercise", "Settings")
 
-    val items =
-        listOf(
-            Screens.Profile,
-            Screens.History,
-            Screens.Workout,
-            Screens.Programs,
-            Screens.Exercise,
-            Screens.Settings
-        )
+  val items =
+    listOf(
+      Screens.Profile,
+      Screens.History,
+      Screens.Workout,
+      Screens.Programs,
+      Screens.Exercise,
+      Screens.Settings
+    )
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+  val navBackStackEntry by navController.currentBackStackEntryAsState()
+  val currentDestination = navBackStackEntry?.destination
+  Log.i("BottomNavigationBar", "currentDestination: $currentDestination")
 
-    NavigationBar {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        item.icon,
-                        contentDescription = stringResource(item.resourceId),
-                        modifier = Modifier.size(24.dp)
-                    )
-                },
-                label = {
-                    Text(
-                        stringResource(item.resourceId),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
-                selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
-                onClick = {
-                    navController.navigate(item.route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
-                }
-            )
+  NavigationBar {
+    items.forEach { item ->
+      Log.i("BottomNavigationBar", "item.route: ${item.route}")
+      NavigationBarItem(
+        icon = {
+          Icon(
+            item.icon,
+            contentDescription = stringResource(item.resourceId),
+            modifier = Modifier.size(24.dp)
+          )
+        },
+        label = {
+          Text(
+            stringResource(item.resourceId),
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            style = MaterialTheme.typography.labelSmall
+          )
+        },
+        selected = currentDestination?.hierarchy?.any {
+          it.route?.contains(item.baseRoute) ?: false
+        } == true,
+        enabled = currentDestination?.hierarchy?.any {
+          it.route?.contains(item.baseRoute) ?: false
+        } != true,
+        onClick = {
+          navController.navigate(item.route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
         }
+      )
     }
+  }
 }
 
-sealed class Screens(val route: String, @StringRes val resourceId: Int, val icon: ImageVector) {
-    object Profile : Screens("profile", R.string.profile, Icons.Filled.Person)
-    object History : Screens("history", R.string.history, Icons.Filled.History)
-    object Workout : Screens("workout", R.string.workout, Icons.AutoMirrored.Filled.Assignment)
-    object Programs : Screens("programs", R.string.programs, Icons.AutoMirrored.Filled.LibraryBooks)
-    object Exercise : Screens("exercises", R.string.exercises, MyIconPack.ExerciseFilled)
+sealed class Screens(
+  val route: String,
+  val baseRoute: String,
+  @StringRes val resourceId: Int,
+  val icon: ImageVector
+) {
+  object Profile : Screens("profile", "profile", R.string.profile, Icons.Filled.Person)
 
-    object Settings : Screens("settings", R.string.settings, Icons.Filled.Settings)
+  object History : Screens("history", "history", R.string.history, Icons.Filled.History)
+
+  object Workout :
+    Screens("workout?workoutID=", "workout", R.string.workout, Icons.AutoMirrored.Filled.Assignment)
+
+  object Programs :
+    Screens("programs", "programs", R.string.programs, Icons.AutoMirrored.Filled.LibraryBooks)
+
+  object Exercise : Screens("exercises", "exercises", R.string.exercises, MyIconPack.ExerciseFilled)
+
+  object Settings : Screens("settings", "settings", R.string.settings, Icons.Filled.Settings)
 }

@@ -121,7 +121,9 @@ fun ExerciseHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ExerciseTitleButton(
-                    onClick = { navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}") },
+                    onClick = {
+                        navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
+                    },
                     modifier = Modifier.weight(1.0f, fill = true)
                 ) {
                     exerciseSets.exercise?.name?.let {
@@ -201,13 +203,11 @@ private fun SetContentHeader() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val textStyle = MaterialTheme.typography.bodySmall
+        val textStyle = MaterialTheme.typography.bodyMedium
 
-        Box(
-            modifier = Modifier
-                .padding(0.dp)
-                .width(48.dp), contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier
+            .padding(0.dp)
+            .width(48.dp), contentAlignment = Alignment.Center) {
             Text("Set", style = textStyle)
         }
 
@@ -223,8 +223,8 @@ private fun SetContentHeader() {
 
         Box(
             modifier = Modifier
-                .padding(PaddingValues(horizontal = 4.dp))
-                .width(64.dp),
+                .padding(PaddingValues(horizontal = 0.dp))
+                .width(92.dp),
             contentAlignment = Alignment.Center
         ) {
             Text("Weight", style = textStyle)
@@ -232,26 +232,23 @@ private fun SetContentHeader() {
 
         Box(
             modifier = Modifier
-                .padding(PaddingValues(horizontal = 4.dp))
-                .width(76.dp),
+                .padding(PaddingValues(horizontal = 0.dp))
+                .width(60.dp),
             contentAlignment = Alignment.Center
         ) {
             Text("Reps", style = textStyle)
         }
 
-        Box(
-            modifier = Modifier
-                .padding(0.dp)
-                .width(40.dp), contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier
+            .padding(0.dp)
+            .width(40.dp), contentAlignment = Alignment.Center) {
             Text("RIR", style = textStyle)
         }
 
         Spacer(
             Modifier
-                .width(100.dp)
-                .padding(PaddingValues(horizontal = 4.dp))
-        )
+                .width(32.dp)
+                .padding(PaddingValues(horizontal = 4.dp)))
     }
 }
 

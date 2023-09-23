@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.myapplication.components.Screens
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercise.AddSet
 import com.example.myapplication.components.exercise.ExerciseScreen
@@ -50,8 +51,8 @@ fun ExerciseSetLazyColumn(
   workoutNotes: List<WorkoutNote>,
 ) {
   fun cancelWorkout() {
-    workoutViewModel.cancelWorkout()
-    //     navController.popBackStack(Screens.WorkoutScreen.route, inclusive = true)
+      workoutViewModel.cancelWorkout()
+      navController.popBackStack(Screens.Workout.route, inclusive = true)
   }
 
   LazyColumn(
@@ -95,13 +96,9 @@ fun ExerciseSetLazyColumn(
     }
 
     item { AddExercise() }
-    item { CancelWorkout() { cancelWorkout() } }
-    item {
-      Box(
-        modifier = Modifier
+      item { CancelWorkout() { cancelWorkout() } }
+      item { Box(modifier = Modifier
           .height(128.dp)
-          .fillMaxWidth()
-      )
-    }
+          .fillMaxWidth()) }
   }
 }

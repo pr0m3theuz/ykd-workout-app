@@ -16,183 +16,160 @@ import org.mongodb.kbson.ObjectId
 
 class ProgramsViewModel
 constructor(
-    private val programsRepository: ProgramsRepository,
-    private val workoutRepository: WorkoutRepository,
-//  private val exerciseSetsRepository: ExerciseSetsRepository,
-    //  private val setsRepository: SetsRepository,
-    private val exercisesRepository: ExercisesRepository
+  private val programsRepository: ProgramsRepository,
+  private val workoutRepository: WorkoutRepository,
+  //  private val exerciseSetsRepository: ExerciseSetsRepository,
+  //  private val setsRepository: SetsRepository,
+  private val exercisesRepository: ExercisesRepository
 ) : ViewModel() {
-    private val _programs = MutableStateFlow(emptyList<Program>())
+  private val _programs = MutableStateFlow(emptyList<Program>())
 
-    val programs: StateFlow<List<Program>>
-        get() = _programs
+  val programs: StateFlow<List<Program>>
+    get() = _programs
 
-    private val _selectedProgram = MutableStateFlow<Program?>(null)
-    val selectedProgram: StateFlow<Program?>
-        get() = _selectedProgram
+  private val _selectedProgram = MutableStateFlow<Program?>(null)
+  val selectedProgram: StateFlow<Program?>
+    get() = _selectedProgram
 
-    private val _activeProgram = MutableStateFlow<Program?>(null)
-    val activeProgram: StateFlow<Program?>
-        get() = _activeProgram
+  private val _activeProgram = MutableStateFlow<Program?>(null)
+  val activeProgram: StateFlow<Program?>
+    get() = _activeProgram
 
-    init {
-        viewModelScope.launch {
-            programsRepository.migrateData()
-//            App.create(APP_ID).login(Credentials.anonymous()) // TODO: Determine if this is needed here
-            programsRepository.getAllPrograms().collect() { _programs.value = it }
+  init {
+    viewModelScope.launch {
+      programsRepository.migrateData()
+      //            App.create(APP_ID).login(Credentials.anonymous()) // TODO: Determine if this is
+      // needed here
+      programsRepository.getAllPrograms().collect() { _programs.value = it }
+    }
+  }
 
-        }
+  fun getProgramById(programID: ObjectId) {
+    var program: Program?
+
+    viewModelScope.launch {
+      program = programsRepository.getProgramById(programID)
+      _selectedProgram.value = program
     }
 
-    fun getProgramById(programID: ObjectId) {
-        var program: Program?
+    //        return program
+  }
 
-        viewModelScope.launch {
-            program = programsRepository.getProgramById(programID)
-            _selectedProgram.value = program
-        }
+  fun insertProgram(program: Program) {
+    viewModelScope.launch { programsRepository.insertProgram(program) }
+  }
 
-//        return program
-    }
+  fun updateProgram(program: Program) {
+    viewModelScope.launch { programsRepository.updateProgram(program) }
+  }
 
-    fun insertProgram(program: Program) {
-        viewModelScope.launch { programsRepository.insertProgram(program) }
-    }
+  fun deleteProgram(program: Program) {
+    viewModelScope.launch { programsRepository.deleteProgram(program) }
+  }
 
-    fun updateProgram(program: Program) {
-        viewModelScope.launch { programsRepository.updateProgram(program) }
-    }
+  fun startNewProgram(program: Program) {
+    // TODO Create a copy of selected program, Keep UUID the same -> Implemented
+    viewModelScope.launch { programsRepository.copyProgramFromTemplate(program) }
 
-    fun deleteProgram(program: Program) {
-        viewModelScope.launch { programsRepository.deleteProgram(program) }
-    }
+    // TODO Navigate to Workouts Tab of the Active Program
+    // TODO Enable Workout Start Buttons -> Implemented
+    // TODO If workout completed, shaw "View" Workout button, navigate to EditWorkoutScreen -> Implemented
+    // TODO Navigate to Workout Screen with workoutID, getWorkoutbyID() -> Implemented
+  }
 
-    private val _selectedProgramMesocycles = MutableStateFlow(emptyList<Mesocycle>())
-    val selectedProgramMesocycles: StateFlow<List<Mesocycle>>
-        get() = _selectedProgramMesocycles
+  private val _selectedProgramMesocycles = MutableStateFlow(emptyList<Mesocycle>())
+  val selectedProgramMesocycles: StateFlow<List<Mesocycle>>
+    get() = _selectedProgramMesocycles
 
-    fun getMesocyclesByProgram(programID: ObjectId) {
-//        var mesocycles = emptyList<Mesocycle>()
-        viewModelScope.launch {
-            programsRepository.getMesocyclesByProgram(programID).collect() {
-                _selectedProgramMesocycles.value = it
-            }
-        }
-//        return mesocycles
-    }
-
-    fun insertMesocycle(mesocycle: Mesocycle) {
-        viewModelScope.launch { programsRepository.insertMesocycle(mesocycle) }
-    }
-
-    fun updateMesocycle(mesocycle: Mesocycle) {
-        viewModelScope.launch { programsRepository.updateMesocycle(mesocycle) }
-    }
-
-    fun deleteMesocycle(mesocycle: Mesocycle) {
-        viewModelScope.launch { programsRepository.deleteMesocycle(mesocycle) }
-    }
-
-    private val _selectedProgramMicrocycles = MutableStateFlow(emptyList<Microcycle>())
-    val selectedProgramMicrocycles: StateFlow<List<Microcycle>>
-        get() = _selectedProgramMicrocycles
-
-    fun getMicrocyclesByProgram(programID: ObjectId) /*: List<Microcycle>*/ {
-//        var microcycles = emptyList<Microcycle>()
-        viewModelScope.launch {
-            programsRepository.getMicrocyclesByProgram(programID)
-                .collect() { _selectedProgramMicrocycles.value = it }
-        }
-        //    return microcycles
-    }
-
-    fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): List<Microcycle> {
-        var microcycles = emptyList<Microcycle>()
-        viewModelScope.launch {
-            programsRepository.getMicrocyclesByMesocycle(mesocycleID).collect() { microcycles = it }
-        }
-        return microcycles
-    }
-
-    private var _selectedProgramWorkouts = MutableStateFlow(
-        mutableMapOf<Microcycle, List<Workout>>()
-    )
-    val selectedProgramWorkouts: StateFlow<Map<Microcycle, List<Workout>>>
-        get() = _selectedProgramWorkouts
-
-    fun getWorkoutsByMicrocycle(microcycle: Microcycle) {
-//        val workouts = emptyList<Workout>()
-        viewModelScope.launch {
-            _selectedProgramWorkouts.value[microcycle] =
-                workoutRepository.getWorkoutsByMicrocycleID(microcycle._id)
-
-        }
-//        return workouts
-    }
-
-    fun getProgramData() {
-        _selectedProgram.value?.let { getMicrocyclesByProgram(it._id) }
-
-        _selectedProgramMicrocycles.value.forEach {
-            getWorkoutsByMicrocycle(it)
-        }
-    }
-
-    fun getExerciseSetsByWorkout(workoutID: Long) {
-        //    viewModelScope.launch {
-        //      Log.i(
-        //        "getExerciseSetsByWorkout",
-        //        exerciseSetsRepository.getSetsWithExercise(workoutID).toString()
-        //      )
-        //    }
-    }
-
-    //  fun getWorkoutWithSetsAndExerciseByWorkoutID(
-    //    workoutID: Long
-    //  ): StateFlow<List<WorkoutWithSetsAndExercise>> {
-    //    val setsAndExercise = MutableStateFlow(emptyList<WorkoutWithSetsAndExercise>())
-    //    viewModelScope.launch {
-    //      setsAndExercise.value = exerciseSetsRepository.getSetsAndExerciseByWorkout(workoutID)
-    //    }
-    //    return setsAndExercise
-    //  }
-
-    /*  fun getSetsByWorkoutID(workoutID: Long): StateFlow<List<Set>> {
-    //    val sets = MutableStateFlow(emptyList<Set>())
-
-    //    viewModelScope.launch { sets.value = setsRepository.getSetsByWorkout(workoutID) }
-
-        */
-    /*
-        val exerciseIDs = sets.associateBy { it.exerciseID }.keys
-        val exercises = mutableListOf<ExerciseModel>()
-
-        exerciseIDs.forEach {
-          viewModelScope.launch {
-            exercises.add(getExercisesForWorkout(it))
-          }
-        }
-
-        val setsGroupedByExercise = sets.groupBy { it.exerciseID }
-
-        val exercisesSets = mutableMapOf<ExerciseModel, List<SetModel>>()
-        exercises.forEach { exercise ->
-          exercisesSets[exercise] = setsGroupedByExercise[exercise.exerciseID] ?: emptyList()
-        }
-    */
-    /*
-
-      //    Log.i("getSetsByWorkoutID()", sets.toString())
-      return sets
-    }*/
-
-    /*fun getExerciseSetsByWorkoutID(workoutID: Long): StateFlow<MutableMap<ExerciseModel, List<SetModel>>> {
-      var sets = emptyList<SetModel>()
-
-      viewModelScope.launch {
-        sets = setsRepository.getSetsByWorkout(workoutID)
+  fun getMesocyclesByProgram(programID: ObjectId) {
+    //        var mesocycles = emptyList<Mesocycle>()
+    viewModelScope.launch {
+      programsRepository.getMesocyclesByProgram(programID).collect() {
+        _selectedProgramMesocycles.value = it
       }
+    }
+    //        return mesocycles
+  }
 
+  fun insertMesocycle(mesocycle: Mesocycle) {
+    viewModelScope.launch { programsRepository.insertMesocycle(mesocycle) }
+  }
+
+  fun updateMesocycle(mesocycle: Mesocycle) {
+    viewModelScope.launch { programsRepository.updateMesocycle(mesocycle) }
+  }
+
+  fun deleteMesocycle(mesocycle: Mesocycle) {
+    viewModelScope.launch { programsRepository.deleteMesocycle(mesocycle) }
+  }
+
+  private val _selectedProgramMicrocycles = MutableStateFlow(emptyList<Microcycle>())
+  val selectedProgramMicrocycles: StateFlow<List<Microcycle>>
+    get() = _selectedProgramMicrocycles
+
+  fun getMicrocyclesByProgram(programID: ObjectId) /*: List<Microcycle>*/ {
+    //        var microcycles = emptyList<Microcycle>()
+    viewModelScope.launch {
+      programsRepository.getMicrocyclesByProgram(programID).collect() {
+        _selectedProgramMicrocycles.value = it
+      }
+    }
+    //    return microcycles
+  }
+
+  fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): List<Microcycle> {
+    var microcycles = emptyList<Microcycle>()
+    viewModelScope.launch {
+      programsRepository.getMicrocyclesByMesocycle(mesocycleID).collect() { microcycles = it }
+    }
+    return microcycles
+  }
+
+  private var _selectedProgramWorkouts = MutableStateFlow(mutableMapOf<Microcycle, List<Workout>>())
+  val selectedProgramWorkouts: StateFlow<Map<Microcycle, List<Workout>>>
+    get() = _selectedProgramWorkouts
+
+  fun getWorkoutsByMicrocycle(microcycle: Microcycle) {
+    //        val workouts = emptyList<Workout>()
+    viewModelScope.launch {
+      _selectedProgramWorkouts.value[microcycle] =
+        workoutRepository.getWorkoutsByMicrocycleID(microcycle._id)
+    }
+    //        return workouts
+  }
+
+  fun getProgramData() {
+    _selectedProgram.value?.let { getMicrocyclesByProgram(it._id) }
+
+    _selectedProgramMicrocycles.value.forEach { getWorkoutsByMicrocycle(it) }
+  }
+
+  fun getExerciseSetsByWorkout(workoutID: Long) {
+    //    viewModelScope.launch {
+    //      Log.i(
+    //        "getExerciseSetsByWorkout",
+    //        exerciseSetsRepository.getSetsWithExercise(workoutID).toString()
+    //      )
+    //    }
+  }
+
+  //  fun getWorkoutWithSetsAndExerciseByWorkoutID(
+  //    workoutID: Long
+  //  ): StateFlow<List<WorkoutWithSetsAndExercise>> {
+  //    val setsAndExercise = MutableStateFlow(emptyList<WorkoutWithSetsAndExercise>())
+  //    viewModelScope.launch {
+  //      setsAndExercise.value = exerciseSetsRepository.getSetsAndExerciseByWorkout(workoutID)
+  //    }
+  //    return setsAndExercise
+  //  }
+
+  /*  fun getSetsByWorkoutID(workoutID: Long): StateFlow<List<Set>> {
+  //    val sets = MutableStateFlow(emptyList<Set>())
+
+  //    viewModelScope.launch { sets.value = setsRepository.getSetsByWorkout(workoutID) }
+
+      */
+  /*
       val exerciseIDs = sets.associateBy { it.exerciseID }.keys
       val exercises = mutableListOf<ExerciseModel>()
 
@@ -208,47 +185,76 @@ constructor(
       exercises.forEach { exercise ->
         exercisesSets[exercise] = setsGroupedByExercise[exercise.exerciseID] ?: emptyList()
       }
+  */
+  /*
 
+    //    Log.i("getSetsByWorkoutID()", sets.toString())
+    return sets
+  }*/
 
+  /*fun getExerciseSetsByWorkoutID(workoutID: Long): StateFlow<MutableMap<ExerciseModel, List<SetModel>>> {
+    var sets = emptyList<SetModel>()
 
-      println("setsAndExercise: ${exercisesSets}")
-      return MutableStateFlow(exercisesSets)
-    }*/
-
-    /*  fun getExercise(exerciseID: Long): StateFlow<List<Exercise>> {
-      val exercise = MutableStateFlow(emptyList<Exercise>())
-
-      viewModelScope.launch { exercise.value = exercisesRepository.getExercise(exerciseID) }
-
-      return exercise
-    }*/
-
-    fun getNextWorkoutInProgram() {
-        //    TODO
+    viewModelScope.launch {
+      sets = setsRepository.getSetsByWorkout(workoutID)
     }
 
-    /*fun buildProgramTree(program: Program) {
-      val programTree: ProgramTree = ProgramTree(program)
+    val exerciseIDs = sets.associateBy { it.exerciseID }.keys
+    val exercises = mutableListOf<ExerciseModel>()
 
-      getMesocyclesByProgram(programTree.program.programID).forEach() { mesocycle ->
-        programTree.mesocyclesTree.add(MesocycleTree(mesocycle))
+    exerciseIDs.forEach {
+      viewModelScope.launch {
+        exercises.add(getExercisesForWorkout(it))
       }
+    }
 
-      programTree.mesocyclesTree.forEachIndexed { index, mesocycle ->
-        getMicrocyclesByMesocycle(mesocycle.mesocycle.mesocycleID).forEach { microcycle ->
-          programTree.mesocyclesTree[index].microcyclesTree.add(MicrocycleTree(microcycle))
+    val setsGroupedByExercise = sets.groupBy { it.exerciseID }
+
+    val exercisesSets = mutableMapOf<ExerciseModel, List<SetModel>>()
+    exercises.forEach { exercise ->
+      exercisesSets[exercise] = setsGroupedByExercise[exercise.exerciseID] ?: emptyList()
+    }
+
+
+
+    println("setsAndExercise: ${exercisesSets}")
+    return MutableStateFlow(exercisesSets)
+  }*/
+
+  /*  fun getExercise(exerciseID: Long): StateFlow<List<Exercise>> {
+    val exercise = MutableStateFlow(emptyList<Exercise>())
+
+    viewModelScope.launch { exercise.value = exercisesRepository.getExercise(exerciseID) }
+
+    return exercise
+  }*/
+
+  fun getNextWorkoutInProgram() {
+    //    TODO
+  }
+
+  /*fun buildProgramTree(program: Program) {
+    val programTree: ProgramTree = ProgramTree(program)
+
+    getMesocyclesByProgram(programTree.program.programID).forEach() { mesocycle ->
+      programTree.mesocyclesTree.add(MesocycleTree(mesocycle))
+    }
+
+    programTree.mesocyclesTree.forEachIndexed { index, mesocycle ->
+      getMicrocyclesByMesocycle(mesocycle.mesocycle.mesocycleID).forEach { microcycle ->
+        programTree.mesocyclesTree[index].microcyclesTree.add(MicrocycleTree(microcycle))
+      }
+    }
+
+    programTree.mesocyclesTree.forEachIndexed { iMesocycle, mesocycle ->
+      mesocycle.microcyclesTree.forEachIndexed { iMicrocycle, microcycle ->
+        getWorkoutsByMicrocycle(microcycle.microcycle.microcycleID).value.forEach { workout ->
+          programTree.mesocyclesTree[iMesocycle]
+            .microcyclesTree[iMicrocycle]
+            .workoutsTree
+            .add(WorkoutTree(workout))
         }
       }
-
-      programTree.mesocyclesTree.forEachIndexed { iMesocycle, mesocycle ->
-        mesocycle.microcyclesTree.forEachIndexed { iMicrocycle, microcycle ->
-          getWorkoutsByMicrocycle(microcycle.microcycle.microcycleID).value.forEach { workout ->
-            programTree.mesocyclesTree[iMesocycle]
-              .microcyclesTree[iMicrocycle]
-              .workoutsTree
-              .add(WorkoutTree(workout))
-          }
-        }
-      }
-    }*/
+    }
+  }*/
 }

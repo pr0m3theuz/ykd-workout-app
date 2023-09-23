@@ -30,18 +30,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.components.BottomNavigationBar
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.data.model.formatWorkoutDuration
+import com.example.myapplication.data.model.setTextRIR
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.model.totalSets
 import com.example.myapplication.data.model.totalVolume
 import com.example.myapplication.utils.doubleFormatted
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
+import org.koin.androidx.compose.koinViewModel
+import org.mongodb.kbson.ObjectId
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -50,9 +54,15 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun WorkoutSummaryScreen(
   navController: NavController,
-  completedWorkout: Workout,
-  workoutsCount: Int,
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutID: String,
+  workoutsCount: Int
 ) {
+  val completedWorkout = workoutViewModel.getCompletedWorkout(ObjectId.invoke(workoutID))
+
+//  Log.i("WorkoutSummaryScreen", "completedWorkout: ${Json.encodeToString(completedWorkout)}")
+//  Log.i("WorkoutSummaryScreen", "completedWorkout2: ${Json.encodeToString(completedWorkout2)}")
+//  Log.i("WorkoutSummaryScreen", "workoutViewModel: $workoutViewModel")
   Scaffold(
     topBar = {
       TopAppBar(
@@ -61,9 +71,7 @@ fun WorkoutSummaryScreen(
           IconButton(
             onClick = {
               /*TODO Navigate to Previous Screen */
-              navController.navigate("programsScreen") {
-                popUpTo("workoutSummary") { inclusive = true }
-              }
+              navController.navigate("programs") { popUpTo("workout") { inclusive = true } }
             },
           ) {
             Icon(
@@ -79,12 +87,16 @@ fun WorkoutSummaryScreen(
     bottomBar = { BottomNavigationBar(navController = navController) },
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
-      WorkoutSummaryContent(completedWorkout, workoutsCount)
+      if (completedWorkout != null) {
+        WorkoutSummaryContent(completedWorkout = completedWorkout, workoutsCount)
+      } else {
+        navController.navigate("programs") { popUpTo("workout") { inclusive = true } }
+      }
     }
   }
 }
 
-//@Preview(showSystemUi = true, showBackground = true)
+// @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun WorkoutSummaryContent(
   completedWorkout: Workout,
@@ -225,7 +237,7 @@ fun WorkoutSummaryContent(
               verticalAlignment = Alignment.CenterVertically
             ) {
               val style = MaterialTheme.typography.bodyMedium
-              // TODO Change to Total Volume comparison or Max Weight or lowest
+              // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
               val maxWeight = exerciseSets.sets.maxBy { it.exerciseWeight ?: 0.0 }
               val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
               val maxVolume = exerciseSets.sets.maxBy { it.setVolume() }
@@ -237,12 +249,7 @@ fun WorkoutSummaryContent(
               )
               Text(
                 // RIR
-                text =
-                "${doubleFormatted(maxWeight.exerciseWeight)} × ${maxWeight.repetitions} @ ${
-                  doubleFormatted(
-                    maxWeight.repetitionsInReserve
-                  )
-                } RIR",
+                text = maxWeight.setTextRIR(),
                 style = style,
                 modifier = Modifier.weight(0.5f)
               )

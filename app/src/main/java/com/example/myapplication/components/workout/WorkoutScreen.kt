@@ -1,6 +1,8 @@
 package com.example.myapplication.components.workout
 
-import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +18,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,38 +37,51 @@ import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.RestTimerButton
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
+import org.mongodb.kbson.ObjectId
 
 // TODO Takes a Workout Object
 
-/*@Composable
-fun WorkoutScreen(navController: NavHostController = rememberNavController()) {
-    NavHost(navController = navController, startDestination = "workoutContent") {
+@Composable
+fun WorkoutScreen(
+  navController: NavController,
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutID: String?
+) {
+  //  Log.i("WorkoutContent", "workoutViewModel: $workoutViewModel")
+  //  val workoutViewModel = koinInject<WorkoutViewModel>()
 
-    }
-}*/
+  if (!workoutID.isNullOrBlank()) {
+    workoutViewModel.getWorkoutByID(ObjectId.invoke(workoutID))
+  } else {
+    workoutViewModel.initWorkoutData()
+  }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class)
+  WorkoutContent(navController = navController)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutContent(
   navController: NavController,
-  workoutViewModel: WorkoutViewModel = koinViewModel()
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
   var openFinishWorkoutDialog by remember { mutableStateOf(false) }
-  val context = LocalContext.current
+
   val (editable, setEditable) = remember { mutableStateOf(true) }
 
   fun navigateToWorkoutSummaryScreen() {
-    val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
+    //    val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
+    val thisworkoutID = workoutViewModel.workout.value._id.toHexString()
     val workoutsCount = workoutViewModel.getWorkoutsCount()
-    navController.navigate("workoutSummary/$workoutSerialized/$workoutsCount") {
-      popUpTo("workoutContent") { inclusive = true }
-    }
+
+    navController.navigate("workoutSummary/$thisworkoutID/$workoutsCount") /*{
+              popUpTo("workoutContent") { inclusive = true }
+            }*/
+    //    navController.navigate("workoutSummary")
+
   }
 
   if (openFinishWorkoutDialog) {
@@ -85,12 +100,7 @@ fun WorkoutContent(
         },
         navigationIcon = {
           IconButton(
-            onClick = {
-              /*TODO Navigate to Previous Screen */
-              navController.navigateUp()
-              Toast.makeText(context, "TODO: Navigate to Previous Screen", Toast.LENGTH_SHORT)
-                .show()
-            },
+            onClick = { navController.navigateUp() },
           ) {
             Icon(
               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -133,12 +143,35 @@ fun WorkoutContent(
 
 @Composable
 private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = koinViewModel()) {
-  val workoutDuration by workoutViewModel.workoutDurationString.collectAsState()
-  Text(
+  val workoutDurationString by workoutViewModel.workoutDurationString.collectAsState()
+  val isWorkoutCountUpTimerPaused by workoutViewModel.isWorkoutCountUpTimerPaused.collectAsState()
+
+  TextButton(
+    onClick = {
+      if (isWorkoutCountUpTimerPaused) workoutViewModel.startWorkoutTimer()
+      else workoutViewModel.pauseWorkoutTimer()
+    },
     modifier = Modifier.padding(8.dp),
-    text = workoutDuration,
-    style = MaterialTheme.typography.bodyLarge
-  )
+  ) {
+    val colorAlpha by
+    animateFloatAsState(
+      targetValue =
+      if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") 0f else 1f,
+      animationSpec = infiniteRepeatable(animation = tween(1000)),
+      label = "textColorAlpha"
+    )
+    Text(
+      text =
+      if (isWorkoutCountUpTimerPaused && workoutDurationString == "0:00") "Start Workout"
+      else workoutDurationString,
+      style = MaterialTheme.typography.bodyLarge,
+      color =
+      MaterialTheme.colorScheme.primary.copy(
+        alpha =
+        if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") colorAlpha else 1f
+      )
+    )
+  }
 }
 
 @Composable

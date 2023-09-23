@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.mongodb.kbson.ObjectId
 import java.time.LocalTime
 import java.util.Random
 import kotlin.time.Duration
@@ -73,6 +74,10 @@ class WorkoutViewModel(
   private val notifyPendingIntent: PendingIntent
 
   private var workoutDuration: Long = 0
+  private var pausedElapsedTime: Long = 0
+  private var _isWorkoutCountUpTimerPaused = MutableStateFlow<Boolean>(true)
+  val isWorkoutCountUpTimerPaused: StateFlow<Boolean>
+    get() = _isWorkoutCountUpTimerPaused.asStateFlow()
 
   private var _workoutDurationFormatted =
     workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours, minutes, seconds, _
@@ -110,6 +115,23 @@ class WorkoutViewModel(
       }
     }
 
+  // TODO Create WorkoutCountUpTimer State Object to use to manage timer TextButton
+  fun startWorkoutTimer() {
+    workoutCountUpTimer.start(pausedElapsedTime)
+    _isWorkoutCountUpTimerPaused.value = false
+  }
+
+  fun pauseWorkoutTimer() {
+    workoutCountUpTimer.stop()
+    pausedElapsedTime = workoutDuration
+    _isWorkoutCountUpTimerPaused.value = true
+  }
+
+  fun resumeWorkoutTimer() {
+    workoutCountUpTimer.start(pausedElapsedTime)
+    _isWorkoutCountUpTimerPaused.value = false
+  }
+
   //  Rest Timer
   private val notificationManager =
     ContextCompat.getSystemService(
@@ -122,7 +144,7 @@ class WorkoutViewModel(
   private val notifyIntent = Intent(application, AlarmReceiver::class.java)
 
   init {
-    workoutCountUpTimer.start()
+    //    startWorkoutTimer()
 
     notifyPendingIntent =
       PendingIntent.getBroadcast(
@@ -357,18 +379,43 @@ class WorkoutViewModel(
   }
 
   //    Workout
-  private var _workoutData = initWorkout()
+  lateinit var initialWorkoutData: Workout
+  private var _workoutData: Workout = initWorkout()
   private var _workout = MutableStateFlow(_workoutData)
   val workout
     get() = _workout.asStateFlow()
 
-  private var _workoutName = MutableStateFlow(_workoutData.name)
+  private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(_workoutData.name)
   val workoutName
     get() = _workoutName.asStateFlow()
 
   fun setWorkoutName(newName: String) {
     _workoutData.name = newName
     _workout.value = _workoutData
+    _workout.value = _workoutData
+  }
+
+  fun forceInitWorkoutData() {
+    if (this::initialWorkoutData.isInitialized) {
+      _workoutData = initialWorkoutData
+      _workout.value = _workoutData
+      _workoutName.value = initialWorkoutData.name
+    }
+  }
+
+  fun initWorkoutData() {
+    initialWorkoutData = initWorkout()
+    _workoutData = initialWorkoutData
+    _workout.value = _workoutData
+  }
+
+  fun getWorkoutByID(workoutID: ObjectId) {
+    initialWorkoutData = workoutRepository.getWorkoutByID(workoutID = workoutID) ?: initWorkout()
+    _workoutName.value = initialWorkoutData.name
+    _workoutData = initialWorkoutData
+    _workout.value = _workoutData
+    _exercisesSetsData = initialWorkoutData.exercisesSets
+    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
@@ -473,6 +520,10 @@ class WorkoutViewModel(
     return newSets
   }
 
+  fun populatePreviousSetField(exerciseID: ObjectId, setNumber: Int): Set? {
+    return workoutRepository.getPreviousSetForExercise(exerciseID, setNumber)
+  }
+
   private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
   private var _workoutNotes: MutableStateFlow<List<WorkoutNote>> =
     MutableStateFlow(_workoutNotesData.toList())
@@ -558,6 +609,7 @@ class WorkoutViewModel(
             else temporaryExerciseSets.last().exerciseOrder.plus(1)
           exercise = _exercise
           notes = pinnedNotes.toRealmList()
+          datePerformed = RealmInstant.now()
         }
       )
     }
@@ -846,13 +898,13 @@ class WorkoutViewModel(
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     removeUncompletedSets()
     _workoutData.exercisesSets = _exercisesSetsData.toRealmList()
-    _completedWorkout = _workoutData
-//    viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
+
+    //    viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
   }
 
-  private var _completedWorkout: Workout = Workout()
-  val completedWorkout: Workout
-    get() = _completedWorkout
+  fun getCompletedWorkout(workoutID: ObjectId): Workout? {
+    return workoutRepository.getWorkoutByID(workoutID)
+  }
 
   fun getWorkoutsCount(): Int {
     return workoutRepository.getWorkoutsCount()
@@ -876,13 +928,13 @@ class WorkoutViewModel(
   }
 
   private fun removeUncompletedSets() {
-//    TODO Doesn't Work, FIX
+    //    TODO Doesn't Work, FIX
     val newData = _exercisesSetsData
 
     newData.forEach { it.sets.removeIf { set -> !set.setCompleted } }
     newData.filter { it.sets.isNotEmpty() }
     _exercisesSetsData = newData
-    _exercisesSets.value = newData
+    _exercisesSets.value = _exercisesSetsData
   }
 
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseSets, newExercise: Exercise) {
@@ -957,10 +1009,13 @@ private fun initWorkout(): Workout {
 }*/
 
 abstract class CountUpTimer(private val interval: Long) {
+  //  TODO Figure out to old elapsed time to new elapsed time
   private var base: Long = 0
+  private var oldElapsedTime: Long = 0
 
-  fun start() {
+  fun start(elapsedTime: Long) {
     base = SystemClock.elapsedRealtime()
+    oldElapsedTime = elapsedTime
     handler.sendMessage(handler.obtainMessage(MSG))
   }
 
@@ -978,7 +1033,7 @@ abstract class CountUpTimer(private val interval: Long) {
     object : Handler(Looper.getMainLooper()) {
       override fun handleMessage(msg: Message) {
         synchronized(this@CountUpTimer) {
-          val elapsedTime = SystemClock.elapsedRealtime() - base
+          val elapsedTime = SystemClock.elapsedRealtime() - base + oldElapsedTime
           onTick(elapsedTime)
           sendMessageDelayed(obtainMessage(MSG), interval)
         }

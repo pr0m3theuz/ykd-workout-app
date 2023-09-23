@@ -8,87 +8,95 @@ import kotlinx.coroutines.flow.Flow
 import org.mongodb.kbson.ObjectId
 
 class ProgramsRepository constructor(private val database: RealmDatabase) {
-    suspend fun migrateData() {
-//        database.migrateData()
-//        database.migrateMesocycles()
-//        database.migrateWorkouts()
-//        database.migrateExercises()
-//        database.importExerciseSets()
-    }
+  suspend fun migrateData() {
+    //        database.migrateData()
+    //        database.migrateMesocycles()
+    //        database.migrateWorkouts()
+    //        database.migrateExercises()
+    //        database.importExerciseSets()
+  }
 
-    fun getAllPrograms(): Flow<List<Program>> {
-        return database.getAllPrograms()
-    }
+  fun getAllPrograms(): Flow<List<Program>> {
+    return database.getAllPrograms()
+  }
 
-    suspend fun getProgramById(programID: ObjectId): Program? {
-        return database.getProgramByID(programID)
-    }
+  fun getProgramById(programID: ObjectId): Program? {
+    return database.getProgramByID(programID)
+  }
 
-    suspend fun insertProgram(program: Program) {
-        database.insertProgram(program)
-    }
+  fun getActivePrograms(): Flow<List<Program>> {
+    return database.getActivePrograms()
+  }
 
-    suspend fun updateProgram(program: Program) {
-        database.updateProgram(program)
-    }
+  suspend fun copyProgramFromTemplate(program: Program) {
+    database.copyProgramFromTemplate(program)
+  }
 
-    suspend fun deleteProgram(program: Program) {
-        database.deleteProgram(program)
-    }
+  suspend fun insertProgram(program: Program) {
+    database.insertProgram(program)
+  }
 
-    fun getAllMesocycles(): Flow<List<Mesocycle>> {
-        return database.getAllMesocycles()
-    }
+  suspend fun updateProgram(program: Program) {
+    database.updateProgram(program)
+  }
 
-    fun getMesocycleById(mesocycleID: ObjectId): Mesocycle? {
-        return database.getMesocycleByID(mesocycleID)
-    }
+  suspend fun deleteProgram(program: Program) {
+    database.deleteProgram(program)
+  }
 
-    fun getMesocyclesByProgram(programID: ObjectId): Flow<List<Mesocycle>> {
-        return database.getMesocyclesByProgramID(programID)
-    }
+  fun getAllMesocycles(): Flow<List<Mesocycle>> {
+    return database.getAllMesocycles()
+  }
 
-    suspend fun insertMesocycle(mesocycle: Mesocycle) {
-        database.insertMesocycle(mesocycle)
-    }
+  fun getMesocycleById(mesocycleID: ObjectId): Mesocycle? {
+    return database.getMesocycleByID(mesocycleID)
+  }
 
-    suspend fun updateMesocycle(mesocycle: Mesocycle) {
-        database.updateMesocycle(mesocycle)
-    }
+  fun getMesocyclesByProgram(programID: ObjectId): Flow<List<Mesocycle>> {
+    return database.getMesocyclesByProgramID(programID)
+  }
 
-    suspend fun deleteMesocycle(mesocycle: Mesocycle) {
-        database.deleteMesocycle(mesocycle)
-    }
+  suspend fun insertMesocycle(mesocycle: Mesocycle) {
+    database.insertMesocycle(mesocycle)
+  }
 
-    fun getAllMicrocycles(): Flow<List<Microcycle>> {
-        return database.getAllMicrocycles()
-    }
+  suspend fun updateMesocycle(mesocycle: Mesocycle) {
+    database.updateMesocycle(mesocycle)
+  }
 
-    suspend fun getMicrocycleByID(microcycleID: ObjectId): Microcycle? {
-        return database.getMicrocycleByID(microcycleID)
-    }
+  suspend fun deleteMesocycle(mesocycle: Mesocycle) {
+    database.deleteMesocycle(mesocycle)
+  }
 
-    fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): Flow<List<Microcycle>> {
-        return database.getMicrocyclesByMesocycleID(mesocycleID)
-    }
+  fun getAllMicrocycles(): Flow<List<Microcycle>> {
+    return database.getAllMicrocycles()
+  }
 
-    fun getMicrocyclesByProgram(programID: ObjectId): Flow<List<Microcycle>> {
-        return database.getMicrocycleByProgramID(programID)
-    }
+  suspend fun getMicrocycleByID(microcycleID: ObjectId): Microcycle? {
+    return database.getMicrocycleByID(microcycleID)
+  }
 
-//    suspend fun getMicrocyclesByProgramSorted(programID: Long): List<Microcycle> {
-//        return database.getMicrocycleByProgramSorted(programID)
-//    }
+  fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): Flow<List<Microcycle>> {
+    return database.getMicrocyclesByMesocycleID(mesocycleID)
+  }
 
-    suspend fun insertMicrocycle(microcycle: Microcycle) {
-        database.insertMicrocycle(microcycle)
-    }
+  fun getMicrocyclesByProgram(programID: ObjectId): Flow<List<Microcycle>> {
+    return database.getMicrocycleByProgramID(programID)
+  }
 
-    suspend fun updateMicrocycle(microcycle: Microcycle) {
-        database.updateMicrocycle(microcycle)
-    }
+  //    suspend fun getMicrocyclesByProgramSorted(programID: Long): List<Microcycle> {
+  //        return database.getMicrocycleByProgramSorted(programID)
+  //    }
 
-    suspend fun deleteMicrocycle(microcycle: Microcycle) {
-        database.deleteMicrocycle(microcycle)
-    }
+  suspend fun insertMicrocycle(microcycle: Microcycle) {
+    database.insertMicrocycle(microcycle)
+  }
+
+  suspend fun updateMicrocycle(microcycle: Microcycle) {
+    database.updateMicrocycle(microcycle)
+  }
+
+  suspend fun deleteMicrocycle(microcycle: Microcycle) {
+    database.deleteMicrocycle(microcycle)
+  }
 }
