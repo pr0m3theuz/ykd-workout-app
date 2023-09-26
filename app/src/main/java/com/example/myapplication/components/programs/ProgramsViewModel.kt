@@ -24,6 +24,7 @@ constructor(
 ) : ViewModel() {
   private val _programs = MutableStateFlow(emptyList<Program>())
 
+  //  TODO Get unique list of programs, DISTINCT (name and author and dateCreated)
   val programs: StateFlow<List<Program>>
     get() = _programs
 

@@ -65,23 +65,25 @@ fun BottomNavigationBar(navController: NavController) {
             style = MaterialTheme.typography.labelSmall
           )
         },
-        selected = currentDestination?.hierarchy?.any {
-          it.route?.contains(item.baseRoute) ?: false
-        } == true,
-        enabled = currentDestination?.hierarchy?.any {
-          it.route?.contains(item.baseRoute) ?: false
-        } != true,
+        selected =
+        currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) ?: false } ==
+                true,
         onClick = {
-          navController.navigate(item.route) {
-            // Pop up to the start destination of the graph to
-            // avoid building up a large stack of destinations
-            // on the back stack as users select items
-            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-            // Avoid multiple copies of the same destination when
-            // reselecting the same item
-            launchSingleTop = true
-            // Restore state when reselecting a previously selected item
-            restoreState = true
+          if (
+            currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) ?: false } !=
+            true
+          ) {
+            navController.navigate(item.route) {
+              // Pop up to the start destination of the graph to
+              // avoid building up a large stack of destinations
+              // on the back stack as users select items
+              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+              // Avoid multiple copies of the same destination when
+              // reselecting the same item
+              launchSingleTop = true
+              // Restore state when reselecting a previously selected item
+              restoreState = true
+            }
           }
         }
       )
@@ -100,12 +102,18 @@ sealed class Screens(
   object History : Screens("history", "history", R.string.history, Icons.Filled.History)
 
   object Workout :
-    Screens("workout?workoutID=", "workout", R.string.workout, Icons.AutoMirrored.Filled.Assignment)
+    Screens(
+      "workout?workoutID=",
+      "workout",
+      R.string.workout,
+      Icons.AutoMirrored.Filled.Assignment
+    )
 
   object Programs :
     Screens("programs", "programs", R.string.programs, Icons.AutoMirrored.Filled.LibraryBooks)
 
-  object Exercise : Screens("exercises", "exercises", R.string.exercises, MyIconPack.ExerciseFilled)
+  object Exercise :
+    Screens("exercises", "exercises", R.string.exercises, MyIconPack.ExerciseFilled)
 
   object Settings : Screens("settings", "settings", R.string.settings, Icons.Filled.Settings)
 }

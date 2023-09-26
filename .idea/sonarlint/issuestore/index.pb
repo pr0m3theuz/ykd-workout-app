@@ -103,3 +103,13 @@ Tapp/src/test/java/com/example/myapplication/components/exercise/NumberUtilsKtTe
 Mapp/src/main/java/com/example/myapplication/components/exercise/SetContent.kt,0/2/02fe01f11d7b0fc8bf5343d1de2081c66713abe2
 j
 :app/src/main/java/com/example/myapplication/Application.kt,d/1/d14001a80843e603f9ff0d82ec6097000c60b9a1
+q
+Aapp/src/main/java/com/example/myapplication/data/model/Program.kt,3/8/38f190e53eebab4b1685f515d2fecbbef99009e5
+~
+Napp/src/main/java/com/example/myapplication/data/network/ProgramsRepository.kt,6/2/62371d8eba5fb061825dd1606d426d10776d0338
+Ñ
+Tapp/src/main/java/com/example/myapplication/components/programs/ProgramsViewModel.kt,5/9/5931bc44afe03eba569665145a4e2dc03cdf8934
+á
+Wapp/src/main/java/com/example/myapplication/components/programs/ProgramDetailsScreen.kt,7/f/7fd9f1b6ac4593053040dcd8c6318bc2705b3fe2
+Å
+Qapp/src/main/java/com/example/myapplication/components/programs/ProgramsScreen.kt,9/4/9438529be2d12acdadb1833a342afb4fede0215d

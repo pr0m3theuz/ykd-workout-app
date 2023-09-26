@@ -54,9 +54,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.data.model.Program
 import org.koin.androidx.compose.koinViewModel
@@ -85,8 +88,10 @@ fun ProgramsScreen(
   val (mesocycleVisible, setMesocycleVisible) = rememberSaveable { mutableStateOf(false) }
   val (workoutVisible, setWorkoutVisible) = rememberSaveable { mutableStateOf(false) }
 
+  //  TODO Get unique list of programs
   val programs by programsViewModel.programs.collectAsState()
-  val activeProgram by programsViewModel.activeProgram.collectAsState()
+  val activeProgram by
+  programsViewModel.activeProgram.collectAsState() // TODO Get List of Active Programs
 
   fun getExpandCollapseIcon(visible: Boolean): ImageVector {
     return if (visible) {
@@ -127,13 +132,18 @@ fun ProgramsScreen(
       stickyHeader { WorkoutSearchBar() }
 
       item {
+        //        https://developer.android.com/jetpack/compose/layouts/pager
+        //        val pagerState = rememberPagerState(pageCount = {4})
+        //        HorizontalPager(state = a) {
+        //          //
+        //        }
         Column(
           modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp),
           verticalArrangement = Arrangement.spacedBy(padding8)
         ) {
-          if (activeProgram != null) {
+          if (activeProgram == null) { // TODO Change back to activeProgram == null
             Text("Start a Program", style = titleMedium)
             // TODO No Active Programs Card
           } else {
@@ -147,7 +157,18 @@ fun ProgramsScreen(
 
       item {
         Text("Quick Start", style = titleMedium)
-        Button(onClick = { /*TODO*/ }) {
+        Button(
+          onClick = {
+            navController.navigate("workout?workoutID=") {
+              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+              // Avoid multiple copies of the same destination when
+              // reselecting the same item
+              launchSingleTop = true
+              // Restore state when reselecting a previously selected item
+              restoreState = true
+            }
+          }
+        ) {
           Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
           Text(text = "Start An Empty Workout")
         }
@@ -328,7 +349,7 @@ fun WorkoutSearchBar() {
     colors = color,
     onActiveChange = { active = false },
     placeholder = {
-      Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
+      Text("Search Programs", color = MaterialTheme.colorScheme.onSecondaryContainer)
     },
     leadingIcon = {
       Icon(
@@ -433,13 +454,17 @@ fun ProgramCard(navController: NavController, program: Program) {
 // @Preview
 @Composable
 fun CurrentProgramCard(
-  navController: NavController, /*program: Program*/
+  navController: NavController,
+  /*program: Program*/
 ) {
+
+  // TODO Get the next workout in the program
   val padding = 8.dp
 
   val titleSmall = MaterialTheme.typography.titleSmall
   val (expandMenu, setExpandMenu) = remember { mutableStateOf(false) }
 
+  val bodySmall = MaterialTheme.typography.bodySmall
   Card(modifier = Modifier.padding(vertical = padding)) {
     Row(
       modifier = Modifier
@@ -450,6 +475,7 @@ fun CurrentProgramCard(
     ) {
       Text(
         text = /*program.name ?: */ "New Program",
+        overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.titleMedium,
         modifier =
         Modifier.clickable {
@@ -471,36 +497,94 @@ fun CurrentProgramCard(
     }
 
     Text(
-      text = "Microcycle Week # Day #",
+      text = "Microcycle # Day #",
       modifier = Modifier.padding(horizontal = 8.dp),
-      style = MaterialTheme.typography.bodySmall
+      style = bodySmall
     )
     Row(
-      modifier = Modifier
+      modifier =
+      Modifier
         .fillMaxWidth()
-        .padding(padding),
+        .padding(horizontal = padding)
+        .padding(top = 12.dp, bottom = 2.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Text(text = "Exercise", style = titleSmall)
-      Box(Modifier.fillMaxWidth(0.5f)) {
+      Text(text = "Exercise", style = titleSmall, modifier = Modifier.weight(0.5f))
+      Box(Modifier.weight(0.5f)) {
         Row(
           modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
+          horizontalArrangement = Arrangement.SpaceAround,
         ) {
-          Text(text = "Sets", style = titleSmall)
-          Text(text = "Top Set", style = titleSmall)
-          Text(text = "RIR", style = titleSmall)
+          Text(
+            text = "Sets",
+            style = titleSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(weight = 1f, fill = true)
+          )
+          Text(
+            text = "Top Set",
+            style = titleSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(weight = 1f, fill = true)
+          )
+          Text(
+            text = "RIR",
+            style = titleSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(weight = 1f, fill = true)
+          )
         }
       }
     }
 
     Row(modifier = Modifier
       .fillMaxWidth()
-      .padding(padding)) {
+      .padding(horizontal = padding)) {
       Column() {
-        //                TODO List Exercises
-        Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
+        // TODO List Exercises
+        //        Text("Workout Summary", style = bodySmall)
+        List(9) { _ ->
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text(
+              text = "Exercise Name",
+              style = bodySmall,
+              overflow = TextOverflow.Ellipsis,
+              modifier = Modifier.weight(0.5f)
+            )
+            Box(Modifier.weight(0.5f)) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+              ) {
+                Text(
+                  text = "#",
+                  style = bodySmall,
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.weight(weight = 1f, fill = true)
+                )
+                Text(
+                  text = "## reps",
+                  style = bodySmall,
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.weight(weight = 1f, fill = true)
+                )
+                Text(
+                  text = "Min",
+                  style = bodySmall,
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.weight(weight = 1f, fill = true)
+                )
+              }
+            }
+          }
+        }
       }
     }
 
@@ -511,10 +595,28 @@ fun CurrentProgramCard(
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Button(onClick = { /*TODO*/ }) { Text(text = "Start Microcycle Week # Day #") }
+      Button(
+        onClick = {
+          //          navController.navigate("workout?workoutID=${workoutID.toHexString()}") {
+          //            popUpTo(navController.graph.findStartDestination().id) {
+          //              saveState = true
+          //            }
+          //            // Avoid multiple copies of the same destination when
+          //            // reselecting the same item
+          //            launchSingleTop = true
+          //            // Restore state when reselecting a previously selected item
+          //            restoreState = true
+          //          }
+        }
+      ) {
+        Text(text = "Start Microcycle # Day #")
+      }
+
       IconButton(
         onClick = { /*TODO*/
-          //          navController.navigate("programDetails/${program._id}")
+          // TODO Navigate to Program's Workout Tab
+          // navController.navigate("programDetails/${program._id}")
+
         }
       ) {
         Icon(

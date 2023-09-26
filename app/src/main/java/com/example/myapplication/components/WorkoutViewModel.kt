@@ -404,18 +404,22 @@ class WorkoutViewModel(
   }
 
   fun initWorkoutData() {
-    initialWorkoutData = initWorkout()
-    _workoutData = initialWorkoutData
-    _workout.value = _workoutData
+    if (!this::initialWorkoutData.isInitialized) {
+      initialWorkoutData = initWorkout()
+      _workoutData = initialWorkoutData
+      _workout.value = _workoutData
+    }
   }
 
   fun getWorkoutByID(workoutID: ObjectId) {
-    initialWorkoutData = workoutRepository.getWorkoutByID(workoutID = workoutID) ?: initWorkout()
-    _workoutName.value = initialWorkoutData.name
-    _workoutData = initialWorkoutData
-    _workout.value = _workoutData
-    _exercisesSetsData = initialWorkoutData.exercisesSets
-    _exercisesSets.value = _exercisesSetsData.toList()
+    if (!this::initialWorkoutData.isInitialized) {
+      initialWorkoutData = workoutRepository.getWorkoutByID(workoutID = workoutID) ?: initWorkout()
+      _workoutName.value = initialWorkoutData.name
+      _workoutData = initialWorkoutData
+      _workout.value = _workoutData
+      _exercisesSetsData = initialWorkoutData.exercisesSets
+      _exercisesSets.value = _exercisesSetsData.toList()
+    }
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {

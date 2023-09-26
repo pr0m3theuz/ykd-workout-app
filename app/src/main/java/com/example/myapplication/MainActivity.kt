@@ -158,7 +158,8 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
       arguments = listOf(navArgument("programID") { type = NavType.StringType })
     ) { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("programID")?.let {
-        ProgramDetailsScreen(
+
+      ProgramDetailsScreen(
           navController,
           programID = it,
         )
