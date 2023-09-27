@@ -90,8 +90,8 @@ fun ProgramsScreen(
 
   //  TODO Get unique list of programs
   val programs by programsViewModel.programs.collectAsState()
-  val activeProgram by
-  programsViewModel.activeProgram.collectAsState() // TODO Get List of Active Programs
+  val activePrograms by
+  programsViewModel.activePrograms.collectAsState() // TODO Get List of Active Programs
 
   fun getExpandCollapseIcon(visible: Boolean): ImageVector {
     return if (visible) {
@@ -132,6 +132,7 @@ fun ProgramsScreen(
       stickyHeader { WorkoutSearchBar() }
 
       item {
+// TODO Implement Horizontal Pager/LazyRow
         //        https://developer.android.com/jetpack/compose/layouts/pager
         //        val pagerState = rememberPagerState(pageCount = {4})
         //        HorizontalPager(state = a) {
@@ -143,15 +144,14 @@ fun ProgramsScreen(
             .padding(vertical = 12.dp),
           verticalArrangement = Arrangement.spacedBy(padding8)
         ) {
-          if (activeProgram == null) { // TODO Change back to activeProgram == null
+          if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
             Text("Start a Program", style = titleMedium)
             // TODO No Active Programs Card
           } else {
             Text("Continue Program", style = titleMedium)
-            CurrentProgramCard(
-              navController, /*activeProgram!!*/
-            )
+            activePrograms.forEach { program -> CurrentProgramCard(navController, program) }
           }
+
         }
       }
 
@@ -386,7 +386,7 @@ fun WorkoutCard() {
         Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
         Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
       }
-      //            TODO To Keep or not to not Keep
+      // TODO To Keep or not to not Keep
       Column(verticalArrangement = Arrangement.Top) {
         IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
           Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
@@ -397,7 +397,7 @@ fun WorkoutCard() {
       .fillMaxWidth()
       .padding(start = 16.dp, bottom = padding)) {
       Column() {
-        //                TODO List Exercises
+        // TODO List Exercises
         Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
       }
     }
@@ -414,9 +414,8 @@ fun ProgramCard(navController: NavController, program: Program) {
     Modifier
       .padding(vertical = padding)
       .clickable {
-        /* TODO Navigate to Program Details Screen */ navController.navigate(
-        "programDetails/${program._id.toHexString()}"
-      )
+        /* TODO Navigate to Program Details Screen */
+        navController.navigate("programDetails/${program._id.toHexString()}")
       }
   ) {
     Row(
@@ -426,7 +425,7 @@ fun ProgramCard(navController: NavController, program: Program) {
       horizontalArrangement = Arrangement.Center,
       verticalAlignment = Alignment.CenterVertically
     ) {
-      androidx.compose.material.Icon(
+      Icon(
         imageVector = Icons.Outlined.BrokenImage,
         contentDescription = "Missing Image",
         tint = MaterialTheme.colorScheme.primary
@@ -453,11 +452,7 @@ fun ProgramCard(navController: NavController, program: Program) {
 
 // @Preview
 @Composable
-fun CurrentProgramCard(
-  navController: NavController,
-  /*program: Program*/
-) {
-
+fun CurrentProgramCard(navController: NavController, program: Program) {
   // TODO Get the next workout in the program
   val padding = 8.dp
 
@@ -474,13 +469,13 @@ fun CurrentProgramCard(
       verticalAlignment = Alignment.CenterVertically
     ) {
       Text(
-        text = /*program.name ?: */ "New Program",
+        text = program.name ?: "Program Name",
         overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.titleMedium,
         modifier =
         Modifier.clickable {
           /* TODO Navigate to Program Details Screen */
-          // navController.navigate("programDetails/${program._id}")
+          navController.navigate("programDetails/${program._id.toHexString()}")
         }
       )
       Box {
@@ -615,8 +610,7 @@ fun CurrentProgramCard(
       IconButton(
         onClick = { /*TODO*/
           // TODO Navigate to Program's Workout Tab
-          // navController.navigate("programDetails/${program._id}")
-
+          navController.navigate("programDetails/${program._id.toHexString()}")
         }
       ) {
         Icon(

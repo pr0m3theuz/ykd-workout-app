@@ -16,8 +16,8 @@ class ProgramsRepository constructor(private val database: RealmDatabase) {
     //        database.importExerciseSets()
   }
 
-  fun getAllPrograms(): Flow<List<Program>> {
-    return database.getAllPrograms()
+  fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
+    return database.getAllDistinctProgramTemplates()
   }
 
   fun getProgramById(programID: ObjectId): Program? {

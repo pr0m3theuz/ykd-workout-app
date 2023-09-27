@@ -422,10 +422,11 @@ class RealmDatabase {
   }
 
   //  Program Queries
-  fun getAllPrograms(): Flow<List<Program>> {
-    return realm.query<Program>().find().asFlow().map { programs ->
-      programs.list.sortedByDescending { program -> program.dateCreated }
-    }
+  fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
+    return realm.query<Program>("startDate = null DISTINCT (uuid)").find().asFlow()
+      .map { programs ->
+        programs.list.sortedByDescending { program -> program.dateCreated }
+      }
   }
 
   fun getProgramByID(programID: ObjectId): Program? {
@@ -433,7 +434,7 @@ class RealmDatabase {
   }
 
   fun getActivePrograms(): Flow<List<Program>> {
-    return realm.query<Program>("active == true").find().asFlow().map { it.list }
+    return realm.query<Program>("active = true").find().asFlow().map { it.list }
   }
 
   suspend fun insertProgram(program: Program) {

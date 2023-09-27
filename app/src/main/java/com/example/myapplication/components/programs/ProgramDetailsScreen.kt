@@ -159,6 +159,7 @@ fun ProgramDetailsLayout(
     floatingActionButton = {
       ExtendedFloatingActionButton(
         onClick = { /*TODO*/
+          programsViewModel.startNewProgram(program = program)
           Toast.makeText(context, "TODO Implement Start Program", Toast.LENGTH_SHORT).show()
         },
       ) {

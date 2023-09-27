@@ -32,16 +32,18 @@ constructor(
   val selectedProgram: StateFlow<Program?>
     get() = _selectedProgram
 
-  private val _activeProgram = MutableStateFlow<Program?>(null)
-  val activeProgram: StateFlow<Program?>
-    get() = _activeProgram
+  private val _activePrograms = MutableStateFlow<List<Program>>(emptyList())
+  val activePrograms: StateFlow<List<Program>>
+    get() = _activePrograms
 
   init {
     viewModelScope.launch {
-      programsRepository.migrateData()
-      //            App.create(APP_ID).login(Credentials.anonymous()) // TODO: Determine if this is
-      // needed here
-      programsRepository.getAllPrograms().collect() { _programs.value = it }
+      // programsRepository.migrateData() // Used to import data
+      programsRepository.getAllDistinctProgramTemplates().collect() { _programs.value = it }
+    }
+
+    viewModelScope.launch {
+      programsRepository.getActivePrograms().collect() { _activePrograms.value = it }
     }
   }
 
