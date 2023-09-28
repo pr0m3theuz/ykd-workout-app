@@ -113,3 +113,7 @@ Tapp/src/main/java/com/example/myapplication/components/programs/ProgramsViewMod
 Wapp/src/main/java/com/example/myapplication/components/programs/ProgramDetailsScreen.kt,7/f/7fd9f1b6ac4593053040dcd8c6318bc2705b3fe2
 Å
 Qapp/src/main/java/com/example/myapplication/components/programs/ProgramsScreen.kt,9/4/9438529be2d12acdadb1833a342afb4fede0215d
+u
+Eapp/src/main/java/com/example/myapplication/data/database/Database.kt,6/d/6ddfb55f435b0a193f94e645863ecd4e06ed9f62
+{
+Kapp/src/main/java/com/example/myapplication/data/database/DatabaseModule.kt,e/e/ee058452fef14ca30a4ed37552b79ebd387bfc4a
