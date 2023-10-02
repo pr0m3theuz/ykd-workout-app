@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
@@ -30,103 +32,96 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AddWorkingSetsScreen(
-    workingSetViewModel: WorkingSetViewModel = koinViewModel(),
-    workoutViewModel: WorkoutViewModel = koinViewModel(),
-    openDialog: (Boolean) -> Unit,
-    exerciseSets: ExerciseSets,
+  workingSetViewModel: WorkingSetViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  openDialog: (Boolean) -> Unit,
+  exerciseSets: ExerciseSets,
 ) {
-    workingSetViewModel.getExerciseSets(exerciseSets)
+  workingSetViewModel.getExerciseSets(exerciseSets)
+  val weightUnit = exerciseSets.exercise?.weightUnit ?: workingSetViewModel.userDefaultWeightUnit
 
-    /* TODO Get User's One Rep Max or Estimated One Rep Max*/
-    workingSetViewModel.changeWorkingSetWeight(
-        workoutViewModel.getWorkingSetWeight(exerciseSets) ?: 0.0
-    )
+  /* TODO Get User's One Rep Max or Estimated One Rep Max*/
+  workingSetViewModel.changeWorkingSetWeight(
+    workoutViewModel.getWorkingSetWeight(exerciseSets) ?: 0.0
+  )
 
-    AddWorkingSetsDialog(
-        openDialog = { close -> openDialog(close) },
-        insertSets = { sets -> workoutViewModel.addWorkingSets(exerciseSets, sets) },
-        insertBackOffSets = { sets -> workoutViewModel.addBackOffSets(exerciseSets, sets) }
-    )
+  AddWorkingSetsDialog(
+    openDialog = { close -> openDialog(close) },
+    insertSets = { sets -> workoutViewModel.addWorkingSets(exerciseSets, sets) },
+    insertBackOffSets = { sets -> workoutViewModel.addBackOffSets(exerciseSets, sets) },
+    weightUnit = weightUnit,
+  )
 }
 
 @Composable
 fun AddWorkingSetsDialog(
-    workingSetViewModel: WorkingSetViewModel = viewModel(),
-    openDialog: (Boolean) -> Unit,
-    insertSets: (workingSets: List<Set>) -> Unit,
-    insertBackOffSets: (backOffSets: List<Set>) -> Unit,
+  workingSetViewModel: WorkingSetViewModel = viewModel(),
+  openDialog: (Boolean) -> Unit,
+  insertSets: (workingSets: List<Set>) -> Unit,
+  insertBackOffSets: (backOffSets: List<Set>) -> Unit,
+  weightUnit: String,
 ) {
-    val sets by workingSetViewModel.sets.collectAsState()
+  val sets by workingSetViewModel.sets.collectAsState()
 
-    val workingSetWeight by workingSetViewModel.workingSetWeight.collectAsState()
+  val workingSetWeight by workingSetViewModel.workingSetWeight.collectAsState()
 
-    var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
+  var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
 
-    AlertDialog(
-        onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onDismissRequest.
-            openDialog(false)
-        },
-        title = {
-            Text(text = "Add working sets")
-        },
-        text = {
-            Column {
-                Text(text = "1RM or Estimated 1RM (***USER DEFAULT WEIGHT UNIT***)") // TODO USE USER SELECTED WEIGHT
+  AlertDialog(
+    properties = DialogProperties(usePlatformDefaultWidth = false),
+    onDismissRequest = {
+      // Dismiss the dialog when the user clicks outside the dialog or on the back
+      // button. If you want to disable that functionality, simply use an empty
+      // onDismissRequest.
+      openDialog(false)
+    },
+    title = { Text(text = "Add working sets") },
+    text = {
+      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "1RM or Estimated 1RM ($weightUnit)") // TODO USE USER SELECTED WEIGHT
 
-                DialogInput(
-                    text = workingSetWeightText,
-                    onValueChange = {
-                        workingSetWeightText = when {
-                            it.isBlank() -> ""
-                            else -> checkDoubleInput(it.take(7)) ?: workingSetWeightText
-                        }
-                        workingSetViewModel.changeWorkingSetWeight(
-                            workingSetWeightText.toDoubleOrNull() ?: 0.0
-                        )
-                    }
-                )
+        DialogInput(
+          text = workingSetWeightText,
+          onValueChange = {
+            workingSetWeightText =
+              when {
+                it.isBlank() -> ""
+                else -> checkDoubleInput(it.take(7)) ?: workingSetWeightText
+              }
+            workingSetViewModel.changeWorkingSetWeight(workingSetWeightText.toDoubleOrNull() ?: 0.0)
+          }
+        )
 
-                SetsHeaderRow()
+        SetsHeaderRow()
 
-                WorkingSetLazyColumn()
+        WorkingSetLazyColumn()
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(
-                        onClick = {
-                            openDialog(false)
-                            insertBackOffSets(sets)
-                        }
-                    ) {
-                        Text("Insert Back Off Sets")
-                    }
-                }
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.Center,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          TextButton(
+            onClick = {
+              openDialog(false)
+              insertBackOffSets(sets)
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    openDialog(false)
-                    insertSets(sets)
-                }
-            ) {
-                Text("Insert Working Sets")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    openDialog(false)
-                }
-            ) {
-                Text("Cancel")
-            }
+          ) {
+            Text("Insert Back Off Sets")
+          }
         }
-    )
+      }
+    },
+    confirmButton = {
+      TextButton(
+        onClick = {
+          openDialog(false)
+          insertSets(sets)
+        }
+      ) {
+        Text("Insert Working Sets")
+      }
+    },
+    dismissButton = { TextButton(onClick = { openDialog(false) }) { Text("Cancel") } }
+  )
 }

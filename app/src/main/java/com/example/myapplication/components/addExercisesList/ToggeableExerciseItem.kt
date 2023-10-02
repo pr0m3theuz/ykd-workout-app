@@ -71,7 +71,7 @@ fun ToggleableExerciseItem(
             if (selected) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
-                    tint = Color.Green,
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = "Selected"
                 )
             } else {

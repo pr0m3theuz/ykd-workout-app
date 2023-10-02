@@ -9,6 +9,7 @@ import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.data.network.ProgramsRepository
 import com.example.myapplication.data.network.WorkoutRepository
+import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -48,25 +49,33 @@ constructor(
   }
 
   fun getProgramById(programID: ObjectId) {
-    var program: Program?
+      var program: Program?
 
-    viewModelScope.launch {
-      program = programsRepository.getProgramById(programID)
-      _selectedProgram.value = program
+      viewModelScope.launch {
+          program = programsRepository.getProgramById(programID)
+          _selectedProgram.value = program
+      }
+
+      //        return program
+  }
+
+    fun isProgramActive(programUUID: RealmUUID): Boolean {
+        return programsRepository.isProgramActive(programUUID)
     }
 
-    //        return program
-  }
+    fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
+        return programsRepository.getNextWorkoutByProgramID(programID)
+    }
 
-  fun insertProgram(program: Program) {
-    viewModelScope.launch { programsRepository.insertProgram(program) }
-  }
+    fun insertProgram(program: Program) {
+        viewModelScope.launch { programsRepository.insertProgram(program) }
+    }
 
-  fun updateProgram(program: Program) {
-    viewModelScope.launch { programsRepository.updateProgram(program) }
-  }
+    fun updateProgram(program: Program) {
+        viewModelScope.launch { programsRepository.updateProgram(program) }
+    }
 
-  fun deleteProgram(program: Program) {
+    fun deleteProgram(program: Program) {
     viewModelScope.launch { programsRepository.deleteProgram(program) }
   }
 

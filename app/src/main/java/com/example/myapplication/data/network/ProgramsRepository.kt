@@ -4,6 +4,8 @@ import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
+import com.example.myapplication.data.model.Workout
+import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.Flow
 import org.mongodb.kbson.ObjectId
 
@@ -26,6 +28,10 @@ class ProgramsRepository constructor(private val database: RealmDatabase) {
 
   fun getActivePrograms(): Flow<List<Program>> {
     return database.getActivePrograms()
+  }
+
+  fun isProgramActive(programUUID: RealmUUID): Boolean {
+    return database.isProgramActive(programUUID)
   }
 
   suspend fun copyProgramFromTemplate(program: Program) {
@@ -98,5 +104,9 @@ class ProgramsRepository constructor(private val database: RealmDatabase) {
 
   suspend fun deleteMicrocycle(microcycle: Microcycle) {
     database.deleteMicrocycle(microcycle)
+  }
+
+  fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
+    return database.getNextWorkoutByProgramID(programID)
   }
 }

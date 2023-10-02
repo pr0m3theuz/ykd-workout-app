@@ -1,5 +1,7 @@
 package com.example.myapplication.components.workout
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
@@ -13,12 +15,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -42,6 +44,7 @@ import org.mongodb.kbson.ObjectId
 
 // TODO Takes a Workout Object
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun WorkoutScreen(
   navController: NavController,
@@ -60,6 +63,7 @@ fun WorkoutScreen(
   WorkoutContent(navController = navController)
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutContent(
@@ -77,10 +81,7 @@ fun WorkoutContent(
     val thisworkoutID = workoutViewModel.workout.value._id.toHexString()
     val workoutsCount = workoutViewModel.getWorkoutsCount()
 
-    navController.navigate("workoutSummary/$thisworkoutID/$workoutsCount") /*{
-              popUpTo("workoutContent") { inclusive = true }
-            }*/
-    //    navController.navigate("workoutSummary")
+    navController.navigate("workoutSummary/$thisworkoutID/$workoutsCount")
 
   }
 
@@ -146,7 +147,7 @@ private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = koinViewModel()
   val workoutDurationString by workoutViewModel.workoutDurationString.collectAsState()
   val isWorkoutCountUpTimerPaused by workoutViewModel.isWorkoutCountUpTimerPaused.collectAsState()
 
-  TextButton(
+  Button(
     onClick = {
       if (isWorkoutCountUpTimerPaused) workoutViewModel.startWorkoutTimer()
       else workoutViewModel.pauseWorkoutTimer()
@@ -162,11 +163,11 @@ private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = koinViewModel()
     )
     Text(
       text =
-      if (isWorkoutCountUpTimerPaused && workoutDurationString == "0:00") "Start Workout"
+      if (isWorkoutCountUpTimerPaused && workoutDurationString == "0:00") "Start Workout Clock"
       else workoutDurationString,
       style = MaterialTheme.typography.bodyLarge,
       color =
-      MaterialTheme.colorScheme.primary.copy(
+      MaterialTheme.colorScheme.onPrimary.copy(
         alpha =
         if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") colorAlpha else 1f
       )

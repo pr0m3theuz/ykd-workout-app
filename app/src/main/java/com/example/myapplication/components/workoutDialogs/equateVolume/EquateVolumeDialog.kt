@@ -3,7 +3,15 @@ package com.example.myapplication.components.exercise
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -14,7 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
@@ -30,12 +40,14 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EquateVolumeScreen(
-    openDialog: (Boolean) -> Unit,
-    workoutViewModel: WorkoutViewModel = koinViewModel(),
-    exerciseSets: ExerciseSets,
-    equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
+  openDialog: (Boolean) -> Unit,
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  exerciseSets: ExerciseSets,
+  equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
 ) {
-  val totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume()
+  val weightUnit = exerciseSets.exercise?.weightUnit ?: equateVolumeViewModel.userDefaultWeightUnit
+
+  val totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume(weightUnit)
   val workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets)
   val workingSetRepetitions = workoutViewModel.getWorkingSetRepetitions(exerciseSets)
 
@@ -47,17 +59,19 @@ fun EquateVolumeScreen(
     _workingSetRepetitions = workingSetRepetitions,
     insertSets = { newSets -> workoutViewModel.addWorkingSets(exerciseSets, newSets) },
     totalWorkingSetVolume = totalWorkingSetVolume,
+    weightUnit = weightUnit,
   )
 }
 
 @Composable
 fun EquateVolumeDialog(
-    equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
-    openDialog: (Boolean) -> Unit,
-    _workingSetWeight: Double?,
-    _workingSetRepetitions: Int?,
-    insertSets: (workingSets: List<Set>) -> Unit,
-    totalWorkingSetVolume: Double?,
+  equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
+  openDialog: (Boolean) -> Unit,
+  _workingSetWeight: Double?,
+  _workingSetRepetitions: Int?,
+  insertSets: (workingSets: List<Set>) -> Unit,
+  totalWorkingSetVolume: Double?,
+  weightUnit: String,
 ) {
   val sets by equateVolumeViewModel.sets.collectAsState()
   val newTotalWorkingSetVolume by equateVolumeViewModel.newTotalVolume.collectAsState()
@@ -124,19 +138,30 @@ fun EquateVolumeDialog(
       // onDismissRequest.
       openDialog(false)
     },
-    title = { Text(text = "Equate Volume") },
+    modifier = Modifier.fillMaxSize(),
+    properties = DialogProperties(usePlatformDefaultWidth = false),
+    shape = RoundedCornerShape(0),
+    title = {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { openDialog(false) }) {
+          Icon(
+            Icons.AutoMirrored.Outlined.ArrowBack,
+            contentDescription = "Localized description",
+            modifier = Modifier.size(22.dp)
+          )
+        }
+        Text(text = "Equate Volume")
+      }
+    },
     text = {
       Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row {
-          Text(
-            text =
-            "Equate Volume of Working Sets based on Weight or Repetitions (***USER DEFAULT WEIGHT UNIT***)"
-          ) // TODO USE USER SELECTED WEIGHT
+          Text(text = "Equate Volume of Working Sets based on Weight ($weightUnit) or Repetitions")
         }
 
-        Row { Text("Total Volume: $totalWorkingSetVolume") }
+        Row { Text("Total Volume: $totalWorkingSetVolume $weightUnit") }
 
-        Row { Text("New Total Volume: $newTotalWorkingSetVolume") }
+        Row { Text("New Total Volume: $newTotalWorkingSetVolume $weightUnit") }
 
         DialogInput(
           text = getWorkingSetWeightOrWorkingSetRepetitions(),
@@ -147,21 +172,24 @@ fun EquateVolumeDialog(
           },
         )
 
-        Column() {
-          Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.SpaceAround
+        ) {
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             RadioButton(
               selected = isByWeightSelected,
               onClick = { selectByWeight() },
             )
-            Text(text = "By Weight")
+            Text(text = "By Weight ($weightUnit)", style = MaterialTheme.typography.bodySmall)
           }
 
-          Row(verticalAlignment = Alignment.CenterVertically) {
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             RadioButton(
               selected = isByRepetitionsSelected,
               onClick = { selectByRepetitions() },
             )
-            Text(text = "By Repetitions")
+            Text(text = "By Repetitions", style = MaterialTheme.typography.bodySmall)
           }
         }
 

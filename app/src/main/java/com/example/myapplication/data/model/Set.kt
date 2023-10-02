@@ -36,7 +36,8 @@ class Set() : RealmObject {
   var lazyListItemID: Long = newID()
   var uuid: RealmUUID = RealmUUID.random()
   var setNumber: Int? = 0
-  var exerciseWeight: Double? = null
+  var weightPounds: Double? = null
+  var weightKilograms: Double? = null
   var repetitions: Int? = null
   var ratePerceivedEffort: Double? = null
   var repetitionsInReserve: Double? = null
@@ -63,28 +64,51 @@ class Set() : RealmObject {
   //    var microcycleUUID: RealmUUID? = null
 }
 
-fun Set.setVolume(): Double {
-  return if (exerciseWeight != null && repetitions != null) {
-    exerciseWeight!!.times(repetitions!!)
+fun Set.setVolume(weightUnit: String): Double {
+  return if (weightPounds != null && repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation) {
+    weightPounds!!.times(repetitions!!)
+  } else if (weightKilograms != null && repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation) {
+    weightKilograms!!.times(repetitions!!)
   } else {
     0.0
   }
 }
 
-fun Set.setTextRIR(): String {
+fun Set.setTextRIR(weightUnit: String): String {
 
-
-  return "${doubleFormatted(exerciseWeight)} × $repetitions ${
+  return "${doubleFormatted(weightPounds)} $weightUnit × $repetitions ${
     if (repetitionsInReserve != null) "@ ${
       doubleFormatted(
         repetitionsInReserve
       )
     } RIR" else ""
   }"
+
+//  ${doubleFormatted(weightKilograms)} × $repetitions ${
+//    if (repetitionsInReserve != null) "@ ${
+//      doubleFormatted(
+//        repetitionsInReserve
+//      )
+//    } RIR" else ""
+//  }"
 }
 
 fun Set.setTextRPE(): String {
-  return "${doubleFormatted(exerciseWeight)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
+  return "${doubleFormatted(weightPounds)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
+//  "${doubleFormatted(weightKilograms)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
+}
+
+fun Set.convertPoundToKg(): Double {
+  return weightPounds?.times(0.45359237) ?: 0.0
+}
+
+fun Set.convertKgToPound(): Double {
+  return weightKilograms?.times(2.2046226218) ?: 0.0
+}
+
+fun Set.getWeight(weightUnit: String?) {
+  // TODO Check if this would work or would have to use viewModel
+  // TODO take exercise.weightUnit to update weight
 }
 
 @Serializable

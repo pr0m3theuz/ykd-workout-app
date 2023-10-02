@@ -1,6 +1,7 @@
 package com.example.myapplication.components.workout
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,81 +25,79 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.WorkoutNote
 import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun ExercisesSetsScreen(
-  navController: NavController,
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+    navController: NavController,
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
 ) {
-  val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
-  Log.i(
-    "ExercisesSetsScreen",
-    "exercisesSets: ${exercisesSets.firstOrNull()?.exSetsLazyListItemID}"
-  )
-  val workoutNotes by workoutViewModel.workoutNotes.collectAsState(emptyList())
+    val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
+    val workoutNotes by workoutViewModel.workoutNotes.collectAsState(emptyList())
 
-  ExerciseSetLazyColumn(
-    navController = navController,
-    exercises = exercisesSets,
-    workoutNotes = workoutNotes
-  )
+    ExerciseSetLazyColumn(
+        navController = navController,
+        exercises = exercisesSets,
+        workoutNotes = workoutNotes
+    )
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun ExerciseSetLazyColumn(
-  navController: NavController,
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
-  exercises: List<ExerciseSets>,
-  workoutNotes: List<WorkoutNote>,
+    navController: NavController,
+    workoutViewModel: WorkoutViewModel = koinViewModel(),
+    exercises: List<ExerciseSets>,
+    workoutNotes: List<WorkoutNote>,
 ) {
-  fun cancelWorkout() {
-      workoutViewModel.cancelWorkout()
-      navController.popBackStack(Screens.Workout.route, inclusive = true)
-  }
-
-  LazyColumn(
-    modifier = Modifier.fillMaxWidth()
-    //  verticalArrangement = Arrangement.spacedBy(4.dp)
-  ) {
-    items(workoutNotes, key = { item -> item.lazyListID }) { workoutNote ->
-      SwipeToDismissItem(
-        onDismissRequest = { workoutViewModel.removeWorkoutNote(workoutNote) },
-        dismissStateBoolean = true
-      ) {
-        WorkoutNoteTextField(
-          workoutNote = workoutNote,
-          placeholder = "Workout Note",
-        )
-      }
+    fun cancelWorkout() {
+        workoutViewModel.cancelWorkout()
+        navController.popBackStack(Screens.Workout.route, inclusive = true)
     }
 
-    items(exercises, key = { item -> item.exSetsLazyListItemID }) { exerciseSets ->
-      Log.i(
-        "ExerciseSetLazyColumn",
-        "exSetsLazyListItemID: ${exerciseSets.exercise?.name}: ${exerciseSets.exSetsLazyListItemID}"
-      )
-      //      Log.i("ExerciseSetLazyColumn", "${exerciseSets.notes}")
-      //      Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
-      ExerciseScreen(
-        navController = navController,
-        _exerciseSets = exerciseSets,
-      )
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+        //  verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        items(workoutNotes, key = { item -> item.lazyListID }) { workoutNote ->
+            SwipeToDismissItem(
+                onDismissRequest = { workoutViewModel.removeWorkoutNote(workoutNote) },
+                dismissStateBoolean = true
+            ) {
+                WorkoutNoteTextField(
+                    workoutNote = workoutNote,
+                    placeholder = "Workout Note",
+                )
+            }
+        }
 
-      exerciseSets.sets.forEachIndexed { index: Int, set: Set ->
-        SetItem(
-          exerciseSets = exerciseSets,
-          index = index,
-          set = set,
-          removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
-        )
-      }
+        items(exercises, key = { item -> item.exSetsLazyListItemID }) { exerciseSets ->
+//      Log.i(
+//        "ExerciseSetLazyColumn",
+//        "exSetsLazyListItemID: ${exerciseSets.exercise?.name}: ${exerciseSets.exSetsLazyListItemID}"
+//      )
+            //      Log.i("ExerciseSetLazyColumn", "${exerciseSets.notes}")
+            //      Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
+            ExerciseScreen(
+                navController = navController,
+                _exerciseSets = exerciseSets,
+            )
 
-      AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
+            exerciseSets.sets.forEachIndexed { index: Int, set: Set ->
+                SetItem(
+                    exerciseSets = exerciseSets,
+                    index = index,
+                    set = set,
+                    removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
+                )
+            }
+
+            AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
+        }
+
+        item { AddExercise() }
+        item { CancelWorkout() { cancelWorkout() } }
+        item { Box(modifier = Modifier
+            .height(128.dp)
+            .fillMaxWidth()) }
     }
-
-    item { AddExercise() }
-      item { CancelWorkout() { cancelWorkout() } }
-      item { Box(modifier = Modifier
-          .height(128.dp)
-          .fillMaxWidth()) }
-  }
 }

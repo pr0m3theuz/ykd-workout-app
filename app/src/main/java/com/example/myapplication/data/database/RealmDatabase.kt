@@ -8,6 +8,7 @@ import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Exercises
 import com.example.myapplication.data.model.ExercisesSets
 import com.example.myapplication.data.model.Force
+import com.example.myapplication.data.model.GymCatUser
 import com.example.myapplication.data.model.Mechanic
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.MesocycleNote
@@ -116,17 +117,18 @@ class RealmDatabase {
             ExerciseNote::class,
             WorkoutNote::class,
             ProgramNote::class,
-            MesocycleNote::class,
-            MicrocycleNote::class,
-            MuscleExercise::class,
-            MuscleRoleFunction::class,
-            Muscle::class,
-            MuscleGroup::class,
-            Equipment::class,
-            Utility::class,
-            Force::class,
-            Mechanic::class,
-            // ProgressionScheme::class,)
+              MesocycleNote::class,
+              MicrocycleNote::class,
+              MuscleExercise::class,
+              MuscleRoleFunction::class,
+              Muscle::class,
+              MuscleGroup::class,
+              Equipment::class,
+              Utility::class,
+              Force::class,
+              Mechanic::class,
+              GymCatUser::class,
+              // ProgressionScheme::class,)
           )
         )
           .initialSubscriptions { realm ->
@@ -151,25 +153,30 @@ class RealmDatabase {
             add(realm.query<Muscle>(), "muscleStream", updateExisting = true)
             add(realm.query<MuscleGroup>(), "muscleGroupStream", updateExisting = true)
             add(realm.query<Equipment>(), "equipmentStream", updateExisting = true)
-            add(realm.query<Utility>(), "utilityStream", updateExisting = true)
-            add(realm.query<Force>(), "forceStream", updateExisting = true)
-            add(realm.query<Mechanic>(), "mechanicStream", updateExisting = true)
+              add(realm.query<Utility>(), "utilityStream", updateExisting = true)
+              add(realm.query<Force>(), "forceStream", updateExisting = true)
+              add(realm.query<Mechanic>(), "mechanicStream", updateExisting = true)
           }
-          .build()
+            .build()
       }
 
-    Realm.open(config!!)
+      Realm.open(config!!)
   }
 
-  // Exercise & Related Queries
-  fun getAllExercises(): Flow<List<Exercise>> {
-    return realm.query<Exercise>().find().asFlow().map { exercises ->
-      exercises.list.sortedBy { exercise -> exercise.name }
+    // User & User Settings
+    fun getUser(): GymCatUser? {
+        return realm.query<GymCatUser>().find().firstOrNull()
     }
-  }
 
-  fun getAllEquipment(): List<Equipment> {
-    return realm.query<Equipment>().find().toList().sortedBy { equipment -> equipment.name }
+    // Exercise & Related Queries
+    fun getAllExercises(): Flow<List<Exercise>> {
+        return realm.query<Exercise>().find().asFlow().map { exercises ->
+            exercises.list.sortedBy { exercise -> exercise.name }
+        }
+    }
+
+    fun getAllEquipment(): List<Equipment> {
+        return realm.query<Equipment>().find().toList().sortedBy { equipment -> equipment.name }
   }
 
   fun getAllMuscleGroups(): List<MuscleGroup> {
@@ -343,23 +350,28 @@ class RealmDatabase {
     return realm.query<Workout>("microcycleID = $0 SORT(day ASC)", microcycleID).find()
   }
 
-  fun getWorkoutsByMesocycleID(mesocycleID: ObjectId): Flow<List<Workout>> {
-    return realm.query<Workout>("mesocycleID = $0", mesocycleID).find().asFlow().map { it.list }
-  }
+    fun getWorkoutsByMesocycleID(mesocycleID: ObjectId): Flow<List<Workout>> {
+        return realm.query<Workout>("mesocycleID = $0", mesocycleID).find().asFlow().map { it.list }
+    }
 
-  fun getWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>> {
-    return realm.query<Workout>("programID = $0", programID).find().asFlow().map { it.list }
-  }
+    fun getWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>> {
+        return realm.query<Workout>("programID = $0", programID).find().asFlow().map { it.list }
+    }
 
-  suspend fun insertWorkout(workout: Workout) {
-    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
-    val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
-    realm.write {
-      this.copyToRealm(
-        Workout().apply {
-          _id = workout._id
-          name = workout.name
-          workoutAuthor = workout.workoutAuthor
+    fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
+        return realm.query<Workout>("programID = $0 && workoutEnded == null", programID).find()
+            .firstOrNull()
+    }
+
+    suspend fun insertWorkout(workout: Workout) {
+        val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
+        val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
+        realm.write {
+            this.copyToRealm(
+                Workout().apply {
+                    _id = workout._id
+                    name = workout.name
+                    workoutAuthor = workout.workoutAuthor
           notes = insertedWorkoutNotes
           workoutDuration = workout.workoutDuration
           workoutType = workout.workoutType
@@ -367,16 +379,18 @@ class RealmDatabase {
           workoutStarted = workout.workoutStarted
           workoutEnded = workout.workoutEnded
           day = workout.day
-          exercisesSets = insertedExercisesSets
-          microcycleID = workout.microcycleID
+                    exercisesSets = insertedExercisesSets
+                    programID = workout.programID
+                    microcycleID = workout.microcycleID
         }
       )
     }
   }
 
   suspend fun copyWorkoutsFromTemplate(
-    workouts: RealmList<Workout>,
-    _microcycleID: ObjectId
+      workouts: RealmList<Workout>,
+      _microcycleID: ObjectId,
+      _programID: ObjectId
   ): RealmList<Workout> {
 
     val realmWorkouts = realmListOf<Workout>()
@@ -393,9 +407,11 @@ class RealmDatabase {
             notes = realmListOf()
             workoutDuration = workout.workoutDuration
             workoutType = workout.workoutType
-            dateCreated = workout.dateCreated
-            microcycleID = _microcycleID
+              dateCreated = workout.dateCreated
+              programID = _programID
+              microcycleID = _microcycleID
             exercisesSets = insertedExerciseSets
+
           }
         )
         realmWorkouts.add(newWorkout)
@@ -429,23 +445,27 @@ class RealmDatabase {
       }
   }
 
-  fun getProgramByID(programID: ObjectId): Program? {
-    return realm.query<Program>("_id = $0", programID).first().find()
-  }
+    fun getProgramByID(programID: ObjectId): Program? {
+        return realm.query<Program>("_id = $0", programID).first().find()
+    }
 
-  fun getActivePrograms(): Flow<List<Program>> {
-    return realm.query<Program>("active = true").find().asFlow().map { it.list }
-  }
+    fun getActivePrograms(): Flow<List<Program>> {
+        return realm.query<Program>("active = true").find().asFlow().map { it.list }
+    }
 
-  suspend fun insertProgram(program: Program) {
-    realm.write { this.copyToRealm(program) }
-  }
+    fun isProgramActive(programUUID: RealmUUID): Boolean {
+        return realm.query<Program>("uuid = $0 && active = true", programUUID).find().isNotEmpty()
+    }
 
-  suspend fun copyProgramFromTemplate(program: Program) {
-    val newProgramID = ObjectId()
-    val insertedMesocycles = copyMesocycleFromTemplate(program.mesocycles, newProgramID)
-    realm.write {
-      this.copyToRealm(
+    suspend fun insertProgram(program: Program) {
+        realm.write { this.copyToRealm(program) }
+    }
+
+    suspend fun copyProgramFromTemplate(program: Program) {
+        val newProgramID = ObjectId()
+        val insertedMesocycles = copyMesocycleFromTemplate(program.mesocycles, newProgramID)
+        realm.write {
+            this.copyToRealm(
         Program().apply {
           _id = newProgramID
           uuid = program.uuid
@@ -509,18 +529,19 @@ class RealmDatabase {
 
     val realmMesocycles = realmListOf<Mesocycle>()
     mesocycles.forEach { mesocycle ->
-      val newMesocycleID = ObjectId()
-      val insertedMicrocycles = copyMicrocyclesFromTemplate(mesocycle.microcycles, newMesocycleID)
-      realm.write {
-        val newMesocycle = this.copyToRealm(
-          Mesocycle().apply {
-            _id = newMesocycleID
-            uuid = mesocycle.uuid
-            name = mesocycle.name
-            description = mesocycle.description
-            dateCreated = mesocycle.dateCreated
+        val newMesocycleID = ObjectId()
+        val insertedMicrocycles =
+            copyMicrocyclesFromTemplate(mesocycle.microcycles, newMesocycleID, _programID)
+        realm.write {
+            val newMesocycle = this.copyToRealm(
+                Mesocycle().apply {
+                    _id = newMesocycleID
+                    uuid = mesocycle.uuid
+                    name = mesocycle.name
+                    description = mesocycle.description
+                    dateCreated = mesocycle.dateCreated
 //            startDate = RealmInstant.now()
-            order = mesocycle.order
+                    order = mesocycle.order
             programID = _programID
             microcycles = insertedMicrocycles
           }
@@ -574,24 +595,26 @@ class RealmDatabase {
   }
 
   suspend fun copyMicrocyclesFromTemplate(
-    microcycles: RealmList<Microcycle>,
-    _mesocycleID: ObjectId
+      microcycles: RealmList<Microcycle>,
+      _mesocycleID: ObjectId,
+      _programID: ObjectId
   ): RealmList<Microcycle> {
 
     val realmMicrocycles = realmListOf<Microcycle>()
     microcycles.forEach { microcycle ->
-      val newMicrocycleID = ObjectId()
-      val insertedWorkouts = copyWorkoutsFromTemplate(microcycle.workouts, newMicrocycleID)
-      realm.write {
-        val newMicrocycle = this.copyToRealm(
-          Microcycle().apply {
-            _id = newMicrocycleID
-            uuid = microcycle.uuid
-            name = microcycle.name
-            description = microcycle.description
-            dateCreated = microcycle.dateCreated
+        val newMicrocycleID = ObjectId()
+        val insertedWorkouts =
+            copyWorkoutsFromTemplate(microcycle.workouts, newMicrocycleID, _programID)
+        realm.write {
+            val newMicrocycle = this.copyToRealm(
+                Microcycle().apply {
+                    _id = newMicrocycleID
+                    uuid = microcycle.uuid
+                    name = microcycle.name
+                    description = microcycle.description
+                    dateCreated = microcycle.dateCreated
 //            startDate = RealmInstant.now()
-            order = microcycle.order
+                    order = microcycle.order
             programID = microcycle.programID
             mesocycleID = _mesocycleID
             workouts = insertedWorkouts
@@ -922,19 +945,20 @@ class RealmDatabase {
         realm.write {
           val newSet = copyToRealm(Set())
           newSet.apply {
-            _id = set._id // updates existing ExerciseSets
-            setNumber = set.setNumber
-            exerciseWeight = set.exerciseWeight
-            repetitions = set.repetitions
-            ratePerceivedEffort = set.ratePerceivedEffort
-            repetitionsInReserve = set.repetitionsInReserve
-            targetWeight = set.targetWeight
-            targetRepetitions = set.targetRepetitions
-            targetRatePerceivedEffort = set.targetRatePerceivedEffort
-            targetRepetitionsInReserve = set.targetRepetitionsInReserve
-            percentage1RM = set.percentage1RM
-            setCompleted = set.setCompleted
-            exerciseID = set.exerciseID
+//            _id = set._id // updates existing ExerciseSets TODO Create UpdateSets Function
+              setNumber = set.setNumber
+              weightPounds = set.weightPounds
+              weightKilograms = set.weightKilograms
+              repetitions = set.repetitions
+              ratePerceivedEffort = set.ratePerceivedEffort
+              repetitionsInReserve = set.repetitionsInReserve
+              targetWeight = set.targetWeight
+              targetRepetitions = set.targetRepetitions
+              targetRatePerceivedEffort = set.targetRatePerceivedEffort
+              targetRepetitionsInReserve = set.targetRepetitionsInReserve
+              percentage1RM = set.percentage1RM
+              setCompleted = set.setCompleted
+              exerciseID = set.exerciseID
             dateCreated = set.dateCreated
           }
           realmSets.add(newSet)
@@ -1006,19 +1030,20 @@ class RealmDatabase {
       realm.write {
         val newSet = this.copyToRealm(
           Set().apply {
-            uuid = set.uuid
-            setNumber = set.setNumber
-            exerciseWeight = set.exerciseWeight
-            repetitions = set.repetitions
-            ratePerceivedEffort = set.ratePerceivedEffort
-            repetitionsInReserve = set.repetitionsInReserve
-            targetWeight = set.targetWeight
-            targetRepetitions = set.targetRepetitions
-            targetRatePerceivedEffort = set.targetRatePerceivedEffort
-            targetRepetitionsInReserve = set.targetRepetitionsInReserve
-            percentage1RM = set.percentage1RM
-            setCompleted = set.setCompleted
-            setTypeID = set.setTypeID
+              uuid = set.uuid
+              setNumber = set.setNumber
+              weightPounds = set.weightPounds
+              weightKilograms = set.weightKilograms
+              repetitions = set.repetitions
+              ratePerceivedEffort = set.ratePerceivedEffort
+              repetitionsInReserve = set.repetitionsInReserve
+              targetWeight = set.targetWeight
+              targetRepetitions = set.targetRepetitions
+              targetRatePerceivedEffort = set.targetRatePerceivedEffort
+              targetRepetitionsInReserve = set.targetRepetitionsInReserve
+              percentage1RM = set.percentage1RM
+              setCompleted = set.setCompleted
+              setTypeID = set.setTypeID
             progressionSchemeID = set.progressionSchemeID
             exerciseID = set.exerciseID
             dateCreated = set.dateCreated

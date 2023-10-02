@@ -40,7 +40,7 @@ import org.mongodb.kbson.ObjectId
 class ExerciseSets() : RealmObject {
   @PrimaryKey
   var _id: ObjectId = ObjectId()
-  var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
+    var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
   var exSetsUUID: RealmUUID = RealmUUID.random()
   val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
 
@@ -80,8 +80,22 @@ fun ExerciseSets.removeSet(uuid: RealmUUID) {
     sets.removeIf { it.uuid == uuid }
 }*/
 
-fun ExerciseSets.updateSetWeight(uuid: RealmUUID, newWeight: Double?) {
-  sets.forEach { if (it.uuid == uuid) it.exerciseWeight = newWeight }
+fun ExerciseSets.updateSetWeight(uuid: RealmUUID, newWeight: Double?, weightUnit: String) {
+    if (weightUnit == MassUnit.POUNDS.abbreviation) {
+        sets.forEach {
+            if (it.uuid == uuid) {
+                it.weightPounds = newWeight
+                it.weightKilograms = it.convertPoundToKg()
+            }
+        }
+    } else {
+        sets.forEach {
+            if (it.uuid == uuid) {
+                it.weightKilograms = newWeight
+                it.weightPounds = it.convertKgToPound()
+            }
+        }
+    }
 }
 
 fun ExerciseSets.updateSetReps(uuid: RealmUUID, newReps: Int?) {
@@ -111,14 +125,15 @@ fun ExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
       //      warmUpSets[index]
       //      TODO: Check this
       Set().apply {
-        setNumber = warmUpSets[index].setNumber
-        exerciseWeight = warmUpSets[index].exerciseWeight
-        repetitions = warmUpSets[index].repetitions
-        ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort
-        repetitionsInReserve = warmUpSets[index].repetitionsInReserve
-        setTypeID = warmUpSets[index].setTypeID
-        percentage1RM = warmUpSets[index].percentage1RM
-        progressionSchemeID = warmUpSets[index].progressionSchemeID
+          setNumber = warmUpSets[index].setNumber
+          weightPounds = warmUpSets[index].weightPounds
+          weightKilograms = warmUpSets[index].weightKilograms
+          repetitions = warmUpSets[index].repetitions
+          ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort
+          repetitionsInReserve = warmUpSets[index].repetitionsInReserve
+          setTypeID = warmUpSets[index].setTypeID
+          percentage1RM = warmUpSets[index].percentage1RM
+          progressionSchemeID = warmUpSets[index].progressionSchemeID
       }
     )
   }
@@ -126,20 +141,22 @@ fun ExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
 
 private const val WARM_UP_SET = 2
 
-fun ExerciseSets.totalWorkingSetVolume(): Double {
-  var totalVolume = 0.0
+fun ExerciseSets.totalWorkingSetVolume(weightUnit: String): Double {
+    var totalVolume = 0.0
 
-  sets.filter { it.setTypeID != WARM_UP_SET }.forEach { totalVolume += (it.setVolume()) }
+    sets.filter { it.setTypeID != WARM_UP_SET }
+        .forEach { totalVolume += (it.setVolume(weightUnit)) }
 
-  return totalVolume
+    return totalVolume
 }
 
-fun ExerciseSets.totalVolume(): Double {
-  var totalVolume = 0.0
+fun ExerciseSets.totalVolume(userDefaultWeightUnit: String): Double {
+    var totalVolume = 0.0
+    val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
 
-  sets.forEach { totalVolume += it.setVolume() }
+    sets.forEach { totalVolume += it.setVolume(weightUnit) }
 
-  return totalVolume
+    return totalVolume
 }
 
 fun ExerciseSets.totalRepetitions(): Int {
@@ -152,14 +169,15 @@ fun ExerciseSets.totalRepetitions(): Int {
   return totalRepetitions
 }
 
-fun ExerciseSets.averageWeight(): Double {
-  val averageWeight: Double = totalVolume() / totalRepetitions()
+fun ExerciseSets.averageWeight(userDefaultWeightUnit: String): Double {
+    val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+    val averageWeight: Double = totalVolume(weightUnit) / totalRepetitions()
 
-  return if (averageWeight.isNaN()) {
-    0.0
-  } else {
-    averageWeight
-  }
+    return if (averageWeight.isNaN()) {
+        0.0
+    } else {
+        averageWeight
+    }
 }
 
 /**

@@ -1,5 +1,6 @@
 package com.example.myapplication.components.programs
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -63,12 +64,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.data.model.Program
+import com.example.myapplication.data.model.Workout
 import org.koin.androidx.compose.koinViewModel
 
 // TODO Add a placeholder card if there is no active program
@@ -131,9 +132,9 @@ fun ProgramsScreen(
     LazyColumn(
       contentPadding = contentPadding,
       modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .padding(horizontal = 12.dp),
+          .fillMaxWidth()
+          .fillMaxHeight()
+          .padding(horizontal = 12.dp),
       //      verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       stickyHeader { WorkoutSearchBar() }
@@ -161,24 +162,32 @@ fun ProgramsScreen(
           activePrograms[page].let { program ->
             Column(
               modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 0.dp),
+                  .fillMaxWidth()
+                  .padding(vertical = 0.dp),
               //              verticalArrangement = Arrangement.spacedBy(padding8)
             ) {
               if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
                 // Text("Start a Program", style = titleMedium)
                 // TODO No Active Programs Card
               } else {
-                // Text("Continue Program", style = titleMedium)
-                CurrentProgramCard(navController, program)
+                  // Text("Continue Program", style = titleMedium)
+                  val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program._id)
+                  Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
+                  Log.i("PROGRAMS", "program: ${program.mesocycles}")
+                  if (nextWorkout != null) {
+                      CurrentProgramCard(navController, program, nextWorkout)
+                  } else {
+                      Text(text = "This program has no workouts and has been completed. You can start a new program.")
+                  }
+
               }
             }
           }
         }
         Row(
-          Modifier
-            .height(20.dp)
-            .fillMaxWidth(),
+            Modifier
+                .height(20.dp)
+                .fillMaxWidth(),
           //                    .align(Alignment.BottomCenter),
           //          verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Center
@@ -189,10 +198,10 @@ fun ProgramsScreen(
               if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
             Box(
               modifier = Modifier
-                .padding(2.dp)
-                .clip(CircleShape)
-                .background(color)
-                .size(12.dp)
+                  .padding(2.dp)
+                  .clip(CircleShape)
+                  .background(color)
+                  .size(8.dp)
             )
           }
         }
@@ -414,13 +423,13 @@ fun WorkoutCard() {
   Card(
     modifier =
     Modifier
-      .padding(vertical = padding)
-      .clickable { /* TODO Navigate to Workout Details Screen */ }
+        .padding(vertical = padding)
+        .clickable { /* TODO Navigate to Workout Details Screen */ }
   ) {
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
+          .fillMaxWidth()
+          .padding(padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.Top
     ) {
@@ -437,8 +446,8 @@ fun WorkoutCard() {
       }
     }
     Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 16.dp, bottom = padding)) {
+        .fillMaxWidth()
+        .padding(start = 16.dp, bottom = padding)) {
       Column() {
         // TODO List Exercises
         Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
@@ -455,16 +464,16 @@ fun ProgramCard(navController: NavController, program: Program) {
   Card(
     modifier =
     Modifier
-      .padding(vertical = padding)
-      .clickable {
-        /* TODO Navigate to Program Details Screen */
-        navController.navigate("programDetails/${program._id.toHexString()}")
-      }
+        .padding(vertical = padding)
+        .clickable {
+            /* TODO Navigate to Program Details Screen */
+            navController.navigate("programDetails/${program._id.toHexString()}")
+        }
   ) {
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
+          .fillMaxWidth()
+          .padding(padding),
       horizontalArrangement = Arrangement.Center,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -476,8 +485,8 @@ fun ProgramCard(navController: NavController, program: Program) {
     }
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, bottom = padding),
+          .fillMaxWidth()
+          .padding(start = 16.dp, bottom = padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.Bottom
     ) {
@@ -495,21 +504,21 @@ fun ProgramCard(navController: NavController, program: Program) {
 
 // @Preview
 @Composable
-fun CurrentProgramCard(navController: NavController, program: Program) {
-  // TODO Get the next workout in the program
-  // TODO Add programID to Workout
-  // TODO Write query to get next workout in program
-  val padding = 8.dp
+fun CurrentProgramCard(navController: NavController, program: Program, workout: Workout) {
+    // TODO Get the next workout in the program
+    // TODO Add programID to Workout
+    // TODO Write query to get next workout in program
+    val padding = 8.dp
 
-  val titleSmall = MaterialTheme.typography.titleSmall
-  val (expandMenu, setExpandMenu) = remember { mutableStateOf(false) }
+    val titleSmall = MaterialTheme.typography.titleSmall
+    val (expandMenu, setExpandMenu) = remember { mutableStateOf(false) }
 
-  val bodySmall = MaterialTheme.typography.bodySmall
-  Card(modifier = Modifier.padding(vertical = padding)) {
+    val bodySmall = MaterialTheme.typography.bodySmall
+    Card(modifier = Modifier.padding(vertical = padding)) {
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = padding),
+          .fillMaxWidth()
+          .padding(start = padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -544,9 +553,9 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
     Row(
       modifier =
       Modifier
-        .fillMaxWidth()
-        .padding(horizontal = padding)
-        .padding(top = 12.dp, bottom = 2.dp),
+          .fillMaxWidth()
+          .padding(horizontal = padding)
+          .padding(top = 12.dp, bottom = 2.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -579,47 +588,47 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
     }
 
     Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = padding)) {
+        .fillMaxWidth()
+        .padding(horizontal = padding)) {
       Column() {
         // TODO List Exercises
         //        Text("Workout Summary", style = bodySmall)
-        List(9) { _ ->
-          Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(2.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            Text(
-              text = "Exercise Name",
-              style = bodySmall,
-              overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.weight(0.5f)
-            )
+          workout.exercisesSets.forEach { exerciseSets ->
+              Row(
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(2.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+              ) {
+                  Text(
+                      text = exerciseSets.exercise?.name ?: "Exercise Name",
+                      style = bodySmall,
+                      overflow = TextOverflow.Ellipsis,
+                      modifier = Modifier.weight(0.5f)
+                  )
             Box(Modifier.weight(0.5f)) {
               Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
               ) {
                 Text(
-                  text = "#",
-                  style = bodySmall,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true)
+                    text = exerciseSets.sets.size.toString(),
+                    style = bodySmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(weight = 1f, fill = true)
                 )
                 Text(
-                  text = "## reps",
-                  style = bodySmall,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true)
+                    text = "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }} reps",
+                    style = bodySmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(weight = 1f, fill = true)
                 )
                 Text(
-                  text = "Min",
-                  style = bodySmall,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true)
+                    text = "${exerciseSets.sets.minBy { it.repetitionsInReserve ?: 10.0 }}",
+                    style = bodySmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(weight = 1f, fill = true)
                 )
               }
             }
@@ -630,8 +639,8 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
 
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
+          .fillMaxWidth()
+          .padding(padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -667,13 +676,3 @@ fun CurrentProgramCard(navController: NavController, program: Program) {
   }
 }
 
-@Preview
-@Composable
-fun CurrentProgramCardPreview() {
-  //  ProgramsScreen(navController = NavController(LocalContext.current))
-}
-
-@Preview
-@Composable
-fun PageIndicator() {
-}

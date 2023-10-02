@@ -2,12 +2,21 @@ package com.example.myapplication.components.workoutDialogs.workingSets
 
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.convertKgToPound
+import com.example.myapplication.data.model.convertPoundToKg
+import com.example.myapplication.data.network.UserRepository
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class WorkingSetViewModel : ViewModel() {
+class WorkingSetViewModel(
+    private val userRepository: UserRepository,
+) : ViewModel() {
+    val userDefaultWeightUnit: String =
+        userRepository.getUser()?.defaultWeightUnit ?: MassUnit.POUNDS.abbreviation
+    var exerciseWeightUnit: String? = null
     private var _oneRepMax: Double = 100.0
     val oneRepMax: Double
         get() = _oneRepMax
@@ -34,7 +43,7 @@ class WorkingSetViewModel : ViewModel() {
         //    exerciseUUID = exerciseSets.exercise.uuid
         //    workoutID = exerciseSets.workoutID
         //    workoutUUID = exerciseSets.workoutUUID
-
+        exerciseWeightUnit = exerciseSets.exercise?.weightUnit
         _sets.value =
             if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
     }
@@ -44,7 +53,8 @@ class WorkingSetViewModel : ViewModel() {
             _sets.value.add(
                 Set().apply {
                     setNumber = _sets.value.last().setNumber?.plus(1)
-                    exerciseWeight = _sets.value.last().exerciseWeight
+                    weightPounds = _sets.value.last().weightPounds
+                    weightKilograms = _sets.value.last().weightKilograms
                     repetitions = _sets.value.last().repetitions
                     ratePerceivedEffort = _sets.value.last().ratePerceivedEffort
                     repetitionsInReserve = _sets.value.last().repetitionsInReserve
@@ -62,7 +72,22 @@ class WorkingSetViewModel : ViewModel() {
     }
 
     fun updateSetWeight(uuid: RealmUUID, newWeight: Double?) {
-        _sets.value.forEach { if (it.uuid == uuid) it.exerciseWeight = newWeight }
+        val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
+        if (weightUnit == MassUnit.POUNDS.abbreviation) {
+            _sets.value.forEach {
+                if (it.uuid == uuid) {
+                    it.weightPounds = newWeight
+                    it.weightKilograms = it.convertPoundToKg()
+                }
+            }
+        } else {
+            _sets.value.forEach {
+                if (it.uuid == uuid) {
+                    it.weightKilograms = newWeight
+                    it.weightPounds = it.convertKgToPound()
+                }
+            }
+        }
     }
 
     fun updateSetReps(uuid: RealmUUID, newReps: Int) {
@@ -74,17 +99,17 @@ class WorkingSetViewModel : ViewModel() {
     }
 
     private fun initSets(): MutableList<Set> {
-    return MutableList(3) { index ->
-        Set().apply {
-            setNumber = index
-            exerciseWeight = 100.00
-            repetitions = 10
-            percentage1RM = 1.0
-            //        exerciseID = exerciseID,
-            //        exerciseUUID = exerciseUUID,
-            //        workoutID = workoutID,
-            //        workoutUUID = workoutUUID,
+        return MutableList(3) { index ->
+            Set().apply {
+                setNumber = index
+                weightPounds = 100.00
+                repetitions = 10
+                percentage1RM = 1.0
+                //        exerciseID = exerciseID,
+                //        exerciseUUID = exerciseUUID,
+                //        workoutID = workoutID,
+                //        workoutUUID = workoutUUID,
+            }
         }
-    }
   }
 }

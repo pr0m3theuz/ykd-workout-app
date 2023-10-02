@@ -10,6 +10,7 @@ import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.network.ExerciseNotesRepository
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.data.network.ProgramsRepository
+import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutNotesRepository
 import com.example.myapplication.data.network.WorkoutRepository
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -64,6 +65,7 @@ val commonModule = module {
     singleOf(::ExercisesRepository)
     singleOf(::ExerciseNotesRepository)
     singleOf(::WorkoutNotesRepository)
+    singleOf(::UserRepository)
 
     viewModelOf(::ProgramsViewModel)
     viewModelOf(::ExercisesViewModel)

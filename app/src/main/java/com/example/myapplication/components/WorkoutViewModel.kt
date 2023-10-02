@@ -24,6 +24,7 @@ import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
@@ -35,6 +36,7 @@ import com.example.myapplication.data.model.updateSetReps
 import com.example.myapplication.data.model.updateSetType
 import com.example.myapplication.data.model.updateSetWeight
 import com.example.myapplication.data.network.ExerciseNotesRepository
+import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutNotesRepository
 import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.AlarmReceiver
@@ -60,12 +62,13 @@ import kotlin.time.toDuration
 private const val WARM_UP_SET = 2
 
 class WorkoutViewModel(
-  private val application: Application,
-  private val workoutRepository: WorkoutRepository,
-  //  private val setsRepository: SetsRepository,
-  //  private val exerciseSetsRepository: ExerciseSetsRepository,
-  private val workoutNotesRepository: WorkoutNotesRepository,
-  private val exerciseNotesRepository: ExerciseNotesRepository
+    private val application: Application,
+    private val workoutRepository: WorkoutRepository,
+    //  private val setsRepository: SetsRepository,
+    //  private val exerciseSetsRepository: ExerciseSetsRepository,
+    private val workoutNotesRepository: WorkoutNotesRepository,
+    private val exerciseNotesRepository: ExerciseNotesRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
   //    fun currentTimeMillis(): Long = System.currentTimeMillis()
@@ -98,20 +101,20 @@ class WorkoutViewModel(
       override fun onTick(elapsedTime: Long) {
         workoutDuration = elapsedTime
 
-        _workoutDurationString.value =
-          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
-                                                                               minutes,
-                                                                               seconds,
-                                                                               _ ->
-            if (hours > 0) {
-              "$hours:" +
-                      minutes.toString().padStart(2, '0') +
-                      ":" +
-                      seconds.toString().padStart(2, '0')
-            } else {
-              "$minutes:${seconds.toString().padStart(2, '0')}"
-            }
-          }
+          _workoutDurationString.value =
+              workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                                   minutes,
+                                                                                   seconds,
+                                                                                   _ ->
+                  if (hours > 0) {
+                      "$hours:" +
+                              minutes.toString().padStart(2, '0') +
+                              ":" +
+                              seconds.toString().padStart(2, '0')
+                  } else {
+                      "$minutes:${seconds.toString().padStart(2, '0')}"
+                  }
+              }
       }
     }
 
@@ -134,25 +137,27 @@ class WorkoutViewModel(
 
   //  Rest Timer
   private val notificationManager =
-    ContextCompat.getSystemService(
-      application,
-      NotificationManager::class.java,
-    ) as NotificationManager
+      ContextCompat.getSystemService(
+          application,
+          NotificationManager::class.java,
+      ) as NotificationManager
 
-  private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-  private val notifyIntent = Intent(application, AlarmReceiver::class.java)
+    private val notifyIntent = Intent(application, AlarmReceiver::class.java)
 
-  init {
-    //    startWorkoutTimer()
+    val userDefaultWeightUnit: String =
+        userRepository.getUser()?.defaultWeightUnit ?: MassUnit.POUNDS.abbreviation
 
-    notifyPendingIntent =
-      PendingIntent.getBroadcast(
-        application,
-        REQUEST_CODE,
-        notifyIntent,
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-      )
+    init {
+        //    startWorkoutTimer()
+        notifyPendingIntent =
+            PendingIntent.getBroadcast(
+                application,
+                REQUEST_CODE,
+                notifyIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
   }
 
   private var _timerDuration: Long = 60000L
@@ -235,45 +240,46 @@ class WorkoutViewModel(
       timer =
         object : CountDownTimer(timerDuration, 1000L) {
 
-          override fun onTick(millisUntilFinished: Long) {
-            _state = TimerState.RUNNING
-            _timerState.value = TimerState.RUNNING
-            _remainingTime = millisUntilFinished
-            _remainingTimeString.value =
-              _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                  seconds,
-                                                                                  _ ->
-                "$minutes:${seconds.toString().padStart(2, '0')}"
-              }
+            override fun onTick(millisUntilFinished: Long) {
+                _state = TimerState.RUNNING
+                _timerState.value = TimerState.RUNNING
+                _remainingTime = millisUntilFinished
+                _remainingTimeString.value =
+                    _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                        seconds,
+                                                                                        _ ->
+                        "$minutes:${seconds.toString().padStart(2, '0')}"
+                    }
 
-            _timerDurationString.value =
-              _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                  seconds,
-                                                                                  _ ->
-                "$minutes:${seconds.toString().padStart(2, '0')}"
-              }
+                _timerDurationString.value =
+                    _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                        seconds,
+                                                                                        _ ->
+                        "$minutes:${seconds.toString().padStart(2, '0')}"
+                    }
 
-            _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
+                _remainingTimeProgress.value =
+                    _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-            /*              Log.i("Timer: ", timerVersion)
-            Log.i("TimerState: ", _timerState.value.name)
+                /*              Log.i("Timer: ", timerVersion)
+                Log.i("TimerState: ", _timerState.value.name)
 
-            Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-            Log.i("onTick(): timerDuration", "$_timerDuration")
-            Log.i(
-              "onTick(): _remainingTimeProgress",
-              "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-            )*/
-          }
+                Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+                Log.i("onTick(): timerDuration", "$_timerDuration")
+                Log.i(
+                  "onTick(): _remainingTimeProgress",
+                  "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+                )*/
+            }
 
-          override fun onFinish() {
-            _state = TimerState.EXPIRED
-            _timerState.value = TimerState.EXPIRED
-            _timerFinished = true
+            override fun onFinish() {
+                _state = TimerState.EXPIRED
+                _timerState.value = TimerState.EXPIRED
+                _timerFinished = true
 
-            //              Log.i("Timer: ", timerVersion)
-            //              Log.i("TimerState: ", _timerState.value.name)
-          }
+                //              Log.i("Timer: ", timerVersion)
+                //              Log.i("TimerState: ", _timerState.value.name)
+            }
         }
           .start()
     }
@@ -368,25 +374,29 @@ class WorkoutViewModel(
   @RequiresApi(Build.VERSION_CODES.S)
   fun lessRestTime() {
     _remainingTime -= _restTimerAdjustment
-    _timerDuration -= _restTimerAdjustment
-    timer.cancel()
-    alarmManager.cancel(notifyPendingIntent)
-    if (_remainingTime < _timerDuration) {
-      createTimer(_remainingTime)
-    } else {
-      resetTimerState()
-    }
+      _timerDuration -= _restTimerAdjustment
+      timer.cancel()
+      alarmManager.cancel(notifyPendingIntent)
+      if (_remainingTime < _timerDuration) {
+          createTimer(_remainingTime)
+      } else {
+          resetTimerState()
+      }
   }
 
-  //    Workout
-  lateinit var initialWorkoutData: Workout
-  private var _workoutData: Workout = initWorkout()
-  private var _workout = MutableStateFlow(_workoutData)
-  val workout
-    get() = _workout.asStateFlow()
+    private var _completedWorkout = MutableStateFlow<Workout?>(null)
+    val completedWorkout
+        get() = _completedWorkout.asStateFlow()
 
-  private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(_workoutData.name)
-  val workoutName
+    //    Workout
+    private lateinit var initialWorkoutData: Workout
+    private var _workoutData: Workout = initWorkout()
+    private var _workout = MutableStateFlow(_workoutData)
+    val workout
+        get() = _workout.asStateFlow()
+
+    private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(_workoutData.name)
+    val workoutName
     get() = _workoutName.asStateFlow()
 
   fun setWorkoutName(newName: String) {
@@ -500,18 +510,19 @@ class WorkoutViewModel(
     previousSets.forEach { set ->
       val newSet =
         Set().apply {
-          uuid = set.uuid
-          setNumber = set.setNumber
-          exerciseWeight = set.exerciseWeight
-          repetitions = set.repetitions
-          ratePerceivedEffort = set.ratePerceivedEffort
-          repetitionsInReserve = set.repetitionsInReserve
-          targetWeight = set.targetWeight
-          targetRepetitions = set.targetRepetitions
-          targetRatePerceivedEffort = set.targetRatePerceivedEffort
-          percentage1RM = set.percentage1RM
-          setTypeID = set.setTypeID
-          progressionSchemeID = set.progressionSchemeID
+            uuid = set.uuid
+            setNumber = set.setNumber
+            weightPounds = set.weightPounds
+            weightKilograms = set.weightKilograms
+            repetitions = set.repetitions
+            ratePerceivedEffort = set.ratePerceivedEffort
+            repetitionsInReserve = set.repetitionsInReserve
+            targetWeight = set.targetWeight
+            targetRepetitions = set.targetRepetitions
+            targetRatePerceivedEffort = set.targetRatePerceivedEffort
+            percentage1RM = set.percentage1RM
+            setTypeID = set.setTypeID
+            progressionSchemeID = set.progressionSchemeID
         }
       newSets.add(newSet)
       if (set.exerciseID != null && set.setNumber != null) {
@@ -630,16 +641,17 @@ class WorkoutViewModel(
   fun addSet(exerciseSets: ExerciseSets) {
     val temporarySets: List<Set> =
       if (exerciseSets.sets.isNotEmpty()) {
-        exerciseSets.sets +
-                Set().apply {
-                  setNumber = exerciseSets.sets.last().setNumber?.plus(1)
-                  exerciseWeight = exerciseSets.sets.last().exerciseWeight
-                  repetitions = exerciseSets.sets.last().repetitions
-                  ratePerceivedEffort = exerciseSets.sets.last().ratePerceivedEffort
-                  repetitionsInReserve = exerciseSets.sets.last().repetitionsInReserve
-                  setTypeID = exerciseSets.sets.last().setTypeID
-                  percentage1RM = exerciseSets.sets.last().percentage1RM
-                }
+          exerciseSets.sets +
+                  Set().apply {
+                      setNumber = exerciseSets.sets.last().setNumber?.plus(1)
+                      weightPounds = exerciseSets.sets.last().weightPounds
+                      weightKilograms = exerciseSets.sets.last().weightKilograms
+                      repetitions = exerciseSets.sets.last().repetitions
+                      ratePerceivedEffort = exerciseSets.sets.last().ratePerceivedEffort
+                      repetitionsInReserve = exerciseSets.sets.last().repetitionsInReserve
+                      setTypeID = exerciseSets.sets.last().setTypeID
+                      percentage1RM = exerciseSets.sets.last().percentage1RM
+                  }
       } else {
         listOf(
           Set().apply {
@@ -747,12 +759,10 @@ class WorkoutViewModel(
   }
 
   fun updateSetWeight(exerciseSets: ExerciseSets, setUUID: RealmUUID, newWeight: Double?) {
-    exerciseSets.updateSetWeight(
-      uuid = setUUID,
-      newWeight = newWeight,
-    )
+      val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
+      exerciseSets.updateSetWeight(uuid = setUUID, newWeight = newWeight, weightUnit = weightUnit)
 
-    updateExerciseSetsData(exerciseSets)
+      updateExerciseSetsData(exerciseSets)
   }
 
   fun updateSetReps(exerciseSets: ExerciseSets, setUUID: RealmUUID, newReps: Int?) {
@@ -780,26 +790,50 @@ class WorkoutViewModel(
     updateExerciseSetsData(exerciseSets)
   }
 
-  fun addWarmUpSets(exerciseSets: ExerciseSets, warmUpSets: List<Set>) {
-    exerciseSets.addWarmUpSets(warmUpSets)
+    fun addWarmUpSets(exerciseSets: ExerciseSets, warmUpSets: List<Set>) {
+        exerciseSets.addWarmUpSets(warmUpSets)
 
-    updateExercisesSetsData(exerciseSets, exerciseSets.sets)
-  }
-
-  fun getWorkingSetWeight(exerciseSets: ExerciseSets): Double? {
-    // TODO Get Previous Working Set if Sets is empty
-
-    return exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.exerciseWeight
-  }
-
-  fun getWorkingSetRepetitions(exerciseSets: ExerciseSets): Int? {
-    // TODO Get Previous Working Set if Sets is empty
-    var repetitions: Int? = null
-    if (exerciseSets.sets.isNotEmpty()) {
-      repetitions = exerciseSets.sets.first { it.setTypeID != WARM_UP_SET }.repetitions
+        updateExercisesSetsData(exerciseSets, exerciseSets.sets)
     }
-    return repetitions
-  }
+
+    fun getWorkingSetWeight(exerciseSets: ExerciseSets): Double? {
+        // TODO Get Previous Working Set if Sets is empty
+
+        return when (exerciseSets.exercise?.weightUnit) {
+            MassUnit.KILOGRAMS.abbreviation ->
+                exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
+
+            MassUnit.POUNDS.abbreviation ->
+                exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightPounds
+
+            else -> {
+                if (userDefaultWeightUnit == MassUnit.KILOGRAMS.abbreviation) {
+                    exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
+                } else {
+                    exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightPounds
+                }
+            }
+        }
+
+        //    return exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightPounds
+    }
+
+    fun getWeightUnit(exerciseSets: ExerciseSets): String {
+        return if (exerciseSets.exercise?.weightUnit != null) {
+            exerciseSets.exercise?.weightUnit ?: MassUnit.POUNDS.abbreviation
+        } else {
+            userDefaultWeightUnit
+        }
+    }
+
+    fun getWorkingSetRepetitions(exerciseSets: ExerciseSets): Int? {
+        // TODO Get Previous Working Set if Sets is empty
+        var repetitions: Int? = null
+        if (exerciseSets.sets.isNotEmpty()) {
+            repetitions = exerciseSets.sets.first { it.setTypeID != WARM_UP_SET }.repetitions
+        }
+        return repetitions
+    }
 
   fun addWorkingSets(exerciseSets: ExerciseSets, workingSets: List<Set>) {
     workingSets.forEach { it.lazyListItemID = newID() }
@@ -815,13 +849,14 @@ class WorkoutViewModel(
     for (index in backOffSets.indices) {
       exerciseSets.sets.add(
         Set().apply {
-          setNumber = exerciseSets.sets.last().setNumber?.plus(1)
-          exerciseWeight = backOffSets[index].exerciseWeight
-          repetitions = backOffSets[index].repetitions
-          ratePerceivedEffort = backOffSets[index].ratePerceivedEffort
-          repetitionsInReserve = backOffSets[index].repetitionsInReserve
-          setTypeID = backOffSets[index].setTypeID
-          percentage1RM = backOffSets[index].percentage1RM
+            setNumber = exerciseSets.sets.last().setNumber?.plus(1)
+            weightPounds = backOffSets[index].weightPounds
+            weightKilograms = backOffSets[index].weightKilograms
+            repetitions = backOffSets[index].repetitions
+            ratePerceivedEffort = backOffSets[index].ratePerceivedEffort
+            repetitionsInReserve = backOffSets[index].repetitionsInReserve
+            setTypeID = backOffSets[index].setTypeID
+            percentage1RM = backOffSets[index].percentage1RM
         }
         //        backOffSets[index].copy(lazyListItemID = newID())
       )
@@ -896,28 +931,28 @@ class WorkoutViewModel(
    * value.
    */
   private fun saveWorkout() {
-    //    TODO Implement this
-    //
-    _workoutData.notes = _workoutNotesData.toRealmList()
-    //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
-    removeUncompletedSets()
-    _workoutData.exercisesSets = _exercisesSetsData.toRealmList()
+      //    TODO Implement this
+      //
+      _workoutData.notes = _workoutNotesData.toRealmList()
+      //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
+      removeUncompletedSets()
+      _workoutData.exercisesSets = _exercisesSetsData.toRealmList()
 
-    //    viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
+      viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
   }
 
-  fun getCompletedWorkout(workoutID: ObjectId): Workout? {
-    return workoutRepository.getWorkoutByID(workoutID)
-  }
+    fun getCompletedWorkout(workoutID: ObjectId) {
+        _completedWorkout.value = workoutRepository.getWorkoutByID(workoutID)
+    }
 
-  fun getWorkoutsCount(): Int {
-    return workoutRepository.getWorkoutsCount()
-  }
+    fun getWorkoutsCount(): Int {
+        return workoutRepository.getWorkoutsCount()
+    }
 
-  fun finishWorkout() {
-    //    TODO Navigate to Workout Summary Screen
-    cancelSetCompletedTimer()
-    stopWorkoutTimer()
+    fun finishWorkout() {
+        //    TODO Navigate to Workout Summary Screen
+        cancelSetCompletedTimer()
+        stopWorkoutTimer()
     saveWorkout()
   }
 

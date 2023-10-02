@@ -119,24 +119,27 @@ fun ProgramDetailsLayout(
   mesocycles: List<Mesocycle>,
   microcycles: List<Microcycle>,
 ) {
-  val padding8 = 8.dp
-  val titleMedium = MaterialTheme.typography.titleLarge
-  val onSurface = MaterialTheme.colorScheme.onSurface
+    val padding8 = 8.dp
+    val titleMedium = MaterialTheme.typography.titleLarge
+    val onSurface = MaterialTheme.colorScheme.onSurface
 
-  val context = LocalContext.current
-  val scrollState = rememberScrollState()
-  var selectedTabIndex by remember { mutableIntStateOf(0) }
-  val titles = listOf("Overview", "Mesocycles", "Workouts")
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val titles = listOf("Overview", "Mesocycles", "Workouts")
 
-  Scaffold(
-    topBar = {
-      TopAppBar(
-        title = {
-          Text(
-            text = program.name ?: "New Program",
-            maxLines = 2,
-            overflow = TextOverflow.Visible,
-            color = onSurface,
+    val programActive = programsViewModel.isProgramActive(program.uuid)
+    Log.i("ProgramDetailsLayout", "programActive: $programActive")
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = program.name ?: "New Program",
+                        maxLines = 2,
+                        overflow = TextOverflow.Visible,
+                        color = onSurface,
             style = titleMedium,
             textAlign = TextAlign.Center,
           )
@@ -157,27 +160,30 @@ fun ProgramDetailsLayout(
     },
     bottomBar = { BottomNavigationBar(navController = navController) },
     floatingActionButton = {
-      ExtendedFloatingActionButton(
-        onClick = { /*TODO*/
-          programsViewModel.startNewProgram(program = program)
-          Toast.makeText(context, "TODO Implement Start Program", Toast.LENGTH_SHORT).show()
-        },
-      ) {
-        Text(text = "Start Program")
-      }
+        if (!programActive) {
+            ExtendedFloatingActionButton(
+                onClick = { /*TODO*/
+                    programsViewModel.startNewProgram(program = program)
+                    Toast.makeText(context, "TODO Implement Start Program", Toast.LENGTH_SHORT)
+                        .show()
+                },
+            ) {
+                Text(text = "Start Program")
+            }
+        }
     }
   ) { contentPadding ->
     Column(
-      Modifier
-        .padding(contentPadding)
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .verticalScroll(scrollState)
+        Modifier
+            .padding(contentPadding)
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .verticalScroll(scrollState)
     ) {
       Row(
-        Modifier
-          .fillMaxWidth()
-          .padding(padding8), horizontalArrangement = Arrangement.Center) {
+          Modifier
+              .fillMaxWidth()
+              .padding(padding8), horizontalArrangement = Arrangement.Center) {
         Icon(
           imageVector = Icons.Outlined.BrokenImage,
           contentDescription = "Missing Image",
@@ -206,9 +212,9 @@ fun ProgramDetailsLayout(
       }
 
       Column(
-        Modifier
-          .padding(12.dp)
-          .fillMaxWidth()) {
+          Modifier
+              .padding(12.dp)
+              .fillMaxWidth()) {
         when (selectedTabIndex) {
           0 ->
             OverviewTab(
@@ -308,8 +314,8 @@ fun CoachsCard(program: Program) {
 
   Card() {
     Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+        .fillMaxWidth()
+        .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Coach Overview", style = titleSmall)
@@ -340,8 +346,8 @@ fun ProgramOverviewCard(program: Program) {
 
   Card() {
     Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+        .fillMaxWidth()
+        .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Program Overview", style = titleSmall)
@@ -398,8 +404,8 @@ fun ProgramDescriptionCard(program: Program) {
   //  TODO Add Expand/Hide Text Button
   Card() {
     Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+        .fillMaxWidth()
+        .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Program Description", style = titleSmall)
@@ -462,8 +468,8 @@ fun WorkoutOverviewCard(
 
     Card() {
       Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)) {
+          .fillMaxWidth()
+          .padding(padding)) {
         Row(
           modifier = Modifier.fillMaxWidth(),
         ) {
@@ -485,10 +491,10 @@ fun WorkoutOverviewCard(
         }
 
         Row(
-          Modifier
-            .padding(top = 8.dp)
-            .fillMaxWidth()
-            .horizontalScroll(scrollState),
+            Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+                .horizontalScroll(scrollState),
           horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
           if (!workouts.isEmpty()) {
@@ -523,12 +529,12 @@ fun WorkoutDayCard(
 
   ElevatedCard() {
     Column(modifier = Modifier
-      .width(300.dp)
-      .padding(padding)) {
+        .width(300.dp)
+        .padding(padding)) {
       Row(
         modifier = Modifier
-          .fillMaxWidth()
-          .padding(bottom = 8.dp),
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
         horizontalArrangement = Arrangement.Center
       ) {
         Text(text = "Day ${index.plus(1)}", style = labelMedium)
@@ -563,8 +569,8 @@ fun ExerciseOverview(
 
   Row(
     modifier = Modifier
-      .fillMaxWidth()
-      .padding(bottom = 4.dp),
+        .fillMaxWidth()
+        .padding(bottom = 4.dp),
   ) {
     if (exercise != null) {
       Text(text = "${index.plus(1)}. ${exercise.name}", style = labelMedium)
@@ -591,8 +597,8 @@ fun ExerciseOverview(
         text = set.setNumber.toString(),
         style = labelMedium,
         modifier = Modifier
-          .weight(1f)
-          .padding(start = 8.dp)
+            .weight(1f)
+            .padding(start = 8.dp)
       )
       Text(
         text = set.targetRepetitions ?: "N/A",
@@ -644,12 +650,12 @@ fun MicrocycleCard(
 
       Card() {
         Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)) {
+            .fillMaxWidth()
+            .padding(padding)) {
           Row(
             modifier = Modifier
-              .fillMaxWidth()
-              .padding(bottom = 8.dp),
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
@@ -741,12 +747,12 @@ fun MicrocycleCard(
                         contentAlignment = Alignment.Center,
                         modifier =
                         Modifier
-                          .padding(horizontal = 0.dp)
-                          .height(22.dp)
-                          .background(
-                            color = MaterialTheme.colorScheme.tertiaryContainer,
-                            shape = ShapeDefaults.ExtraSmall
-                          )
+                            .padding(horizontal = 0.dp)
+                            .height(22.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                shape = ShapeDefaults.ExtraSmall
+                            )
                       ) {
                         Text(
                           text = "Date Completed",
@@ -839,12 +845,12 @@ fun MesocycleCard(
 
       Card() {
         Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)) {
+            .fillMaxWidth()
+            .padding(padding)) {
           Row(
             modifier = Modifier
-              .fillMaxWidth()
-              .padding(bottom = 8.dp),
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
@@ -953,12 +959,12 @@ fun MesocycleCard(
                         contentAlignment = Alignment.Center,
                         modifier =
                         Modifier
-                          .padding(horizontal = 0.dp)
-                          .height(22.dp)
-                          .background(
-                            color = MaterialTheme.colorScheme.tertiaryContainer,
-                            shape = ShapeDefaults.ExtraSmall
-                          )
+                            .padding(horizontal = 0.dp)
+                            .height(22.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                shape = ShapeDefaults.ExtraSmall
+                            )
                       ) {
                         Text(
                           text = "Date Completed",

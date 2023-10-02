@@ -29,6 +29,8 @@ fun ExerciseOptionsDropdownMenu(
     exerciseSets: ExerciseSets,
     addNotes: () -> Unit,
     removeExercise: () -> Unit,
+    userDefaultWeightUnit: String,
+    exerciseWeightUnit: String?,
 ) {
     var expandedExerciseOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
@@ -60,12 +62,14 @@ fun ExerciseOptionsDropdownMenu(
         openEquateVolumeDialog = close
     }
 
+    val primaryColor = MaterialTheme.colorScheme.primary
+
     Box {
         IconButton(onClick = { expandedExerciseOptionsDropdownMenu = true }) {
             Icon(
                 Icons.Outlined.MoreVert,
                 contentDescription = "Exercise Options and Settings",
-                tint = MaterialTheme.colorScheme.primary
+                tint = primaryColor
             )
         }
         DropdownMenu(
@@ -122,7 +126,7 @@ fun ExerciseOptionsDropdownMenu(
                         Text(
                             it.toComponents { minutes, seconds, _ ->
                                 "$minutes:${seconds.toString().padStart(2, '0')}"
-                            }
+                            }, color = primaryColor
                         )
                     }
                 },
@@ -130,15 +134,21 @@ fun ExerciseOptionsDropdownMenu(
             )
             DropdownMenuItem(
                 text = { Text("Weight Unit") },
-                trailingIcon = { Text("lbs") },
+                trailingIcon = {
+                    Text(
+                        exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit,
+                        color = primaryColor
+                    )
+                },
                 onClick = {
                     expandedExerciseOptionsDropdownMenu = false
                     expandedWeightUnitOptionsDropdownMenu = true
                 }
             )
+//          // TODO to keep or not to keep
             DropdownMenuItem(
                 text = { Text("Bar Type") },
-                trailingIcon = { Text("Olympic Bar") },
+                trailingIcon = { Text("Olympic Bar", color = primaryColor) },
                 onClick = {
                     expandedExerciseOptionsDropdownMenu = false
                     expandedBarTypeOptionsDropdownMenu = true
@@ -150,10 +160,13 @@ fun ExerciseOptionsDropdownMenu(
                 onClick = { removeExercise() }
             )
         }
+
         WeightUnitOptionsDropdownMenu(
             expandMenu = { expandedWeightUnitOptionsDropdownMenu },
             onClickArrowBack = { expandedExerciseOptionsDropdownMenu = true },
-            onDismiss = { expandedWeightUnitOptionsDropdownMenu = false }
+            onDismiss = { expandedWeightUnitOptionsDropdownMenu = false },
+            userDefaultWeightUnit = userDefaultWeightUnit,
+            exerciseWeightUnit = exerciseWeightUnit
         )
         BarTypeDropdownMenu(
             expandMenu = { expandedBarTypeOptionsDropdownMenu },

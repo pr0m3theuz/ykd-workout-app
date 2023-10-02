@@ -26,7 +26,7 @@ fun EquateVolumeLayout(
 
     var repetitionsText by remember { mutableStateOf(workingSet.repetitions?.toString() ?: "") }
 
-    val workingWeight = workingSet.exerciseWeight
+    val workingWeight = equateVolumeViewModel.getWorkoutSetWeight(workingSet)
 
     fun newWeight(newWeight: Double) {
         equateVolumeViewModel.updateSetWeight(workingSet.uuid, newWeight)

@@ -59,276 +59,286 @@ import java.text.DecimalFormat
 
 @Composable
 fun ExerciseScreen(
-    navController: NavController,
-    workoutViewModel: WorkoutViewModel = koinViewModel(),
-    _exerciseSets: ExerciseSets,
+  navController: NavController,
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  _exerciseSets: ExerciseSets,
 ) {
-    val exerciseSet by remember { mutableStateOf(_exerciseSets) }
-    //  Log.i("ExerciseScreen", "$_exerciseSets")
-    //  Log.i("ExerciseScreen", "$_exerciseNotes")
+  val exerciseSet by remember { mutableStateOf(_exerciseSets) }
+  //  Log.i("ExerciseScreen", "$_exerciseSets")
+  //  Log.i("ExerciseScreen", "$_exerciseNotes")
 
-    ExerciseHeader(
-        navController = navController,
-        exerciseSets = exerciseSet,
-        removeExercise = { exerciseSets: ExerciseSets ->
-            workoutViewModel.removeExerciseSets(exerciseSets)
-        },
-        //    addNote = { exerciseSets: ExerciseSets -> workoutViewModel.addExerciseNote(exerciseSets)
-        // },
-        //    removeNote = { exerciseSets: ExerciseSets, note: ExerciseNote ->
-        //      workoutViewModel.removeExerciseNote(exerciseSets, note)
-        //    }
-    )
+  ExerciseHeader(
+    navController = navController,
+    exerciseSets = exerciseSet,
+    removeExercise = { exerciseSets: ExerciseSets ->
+      workoutViewModel.removeExerciseSets(exerciseSets)
+    },
+    //    addNote = { exerciseSets: ExerciseSets -> workoutViewModel.addExerciseNote(exerciseSets)
+    // },
+    //    removeNote = { exerciseSets: ExerciseSets, note: ExerciseNote ->
+    //      workoutViewModel.removeExerciseNote(exerciseSets, note)
+    //    }
+  )
 }
 
 @Composable
 fun ExerciseHeader(
-    navController: NavController,
-    exerciseSets: ExerciseSets,
-    removeExercise: (exerciseSets: ExerciseSets) -> Unit,
-    //  addNote: (exerciseSets: ExerciseSets) -> Unit,
-    //  removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit,
-    workoutViewModel: WorkoutViewModel = viewModel()
+  navController: NavController,
+  exerciseSets: ExerciseSets,
+  removeExercise: (exerciseSets: ExerciseSets) -> Unit,
+  //  addNote: (exerciseSets: ExerciseSets) -> Unit,
+  //  removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit,
+  workoutViewModel: WorkoutViewModel = viewModel()
 ) {
-    //    TODO: Create a button that toggle the notes
-    val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
+  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
+  val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
+  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
-    //    TODO fun updateExerciseNotes() updates notes when workout is completed
+  //    TODO: Create a button that toggle the notes
+  val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
 
-    fun removeNote(exerciseSets: ExerciseSets, note: ExerciseNote) {
-        workoutViewModel.removeExerciseNote(exerciseSets, note)
-        //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
-    }
+  //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
-    fun addNote(exerciseSets: ExerciseSets) {
-        workoutViewModel.addExerciseNote(exerciseSets)
-        //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
-    }
+  fun removeNote(exerciseSets: ExerciseSets, note: ExerciseNote) {
+    workoutViewModel.removeExerciseNote(exerciseSets, note)
+    //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
+  }
 
-    fun pinNote(note: ExerciseNote, pin: Boolean) {
-        Log.i("ExerciseHeader.pinNote", "pin: $pin")
-        workoutViewModel.pinExerciseNote(exerciseSets, note, pin)
-    }
+  fun addNote(exerciseSets: ExerciseSets) {
+    workoutViewModel.addExerciseNote(exerciseSets)
+    //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
+  }
 
-    Log.i("ExerciseHeader", "$exerciseSets.notes")
-    //  Log.i("ExerciseHeader", "$notes")
+  fun pinNote(note: ExerciseNote, pin: Boolean) {
+    Log.i("ExerciseHeader.pinNote", "pin: $pin")
+    workoutViewModel.pinExerciseNote(exerciseSets, note, pin)
+  }
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ExerciseTitleButton(
-                    onClick = {
-                        navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
-                    },
-                    modifier = Modifier.weight(1.0f, fill = true)
-                ) {
-                    exerciseSets.exercise?.name?.let {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                    }
-                }
+//  Log.i("ExerciseHeader", "$exerciseSets.notes")
+  //  Log.i("ExerciseHeader", "$notes")
 
-                ExerciseOptionsDropdownMenu(
-                    exerciseSets = exerciseSets,
-                    addNotes = {
-                        setNotesVisible(true)
-                        addNote(exerciseSets)
-                    },
-                    removeExercise = { removeExercise(exerciseSets) }
-                )
-            }
-
-            Log.i("ExerciseHeader", "$notesVisible")
-            ExerciseNotesList(
-                notesVisible = notesVisible,
-                exerciseSets = exerciseSets,
-                _pinNote = { note, pin -> pinNote(note, pin) },
-                removeNote = { exerciseSets, note -> removeNote(exerciseSets, note) },
+  Row(modifier = Modifier.fillMaxWidth()) {
+    Column {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        ExerciseTitleButton(
+          onClick = {
+            navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
+          },
+          modifier = Modifier.weight(1.0f, fill = true)
+        ) {
+          exerciseSets.exercise?.name?.let {
+            Text(
+              text = it,
+              color = MaterialTheme.colorScheme.primary,
+              style = MaterialTheme.typography.titleSmall,
             )
-
-            ExerciseSetsWorkoutSummary(_exerciseSets = exerciseSets)
-
-            SetContentHeader()
+          }
         }
+
+        ExerciseOptionsDropdownMenu(
+          exerciseSets = exerciseSets,
+          addNotes = {
+            setNotesVisible(true)
+            addNote(exerciseSets)
+          },
+          removeExercise = { removeExercise(exerciseSets) },
+          userDefaultWeightUnit = userDefaultWeightUnit,
+          exerciseWeightUnit = exerciseWeightUnit
+        )
+      }
+
+//      Log.i("ExerciseHeader", "$notesVisible")
+      ExerciseNotesList(
+        notesVisible = notesVisible,
+        exerciseSets = exerciseSets,
+        _pinNote = { note, pin -> pinNote(note, pin) },
+        removeNote = { exerciseSets, note -> removeNote(exerciseSets, note) },
+      )
+
+      ExerciseSetsWorkoutSummary(_exerciseSets = exerciseSets, weightUnit = weightUnit)
+      SetContentHeader(weightUnit = weightUnit)
     }
+  }
 }
 
 @Composable
 private fun ExerciseNotesList(
-    notesVisible: Boolean,
-    exerciseSets: ExerciseSets,
-    _pinNote: (note: ExerciseNote, pin: Boolean) -> Unit,
-    removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit
+  notesVisible: Boolean,
+  exerciseSets: ExerciseSets,
+  _pinNote: (note: ExerciseNote, pin: Boolean) -> Unit,
+  removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit
 ) {
-    Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
-    var visible by remember { mutableStateOf(notesVisible) }
+//  Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
+  var visible by remember { mutableStateOf(notesVisible) }
 
-    if (exerciseSets.notes.isEmpty()) {
-        visible = false
+  if (exerciseSets.notes.isEmpty()) {
+    visible = false
+  }
+
+//  Log.i("ExerciseNotesList", "visible: $visible")
+
+  AnimatedVisibility(
+    visible = notesVisible,
+    enter = expandVertically(animationSpec = tween(250)),
+    exit = shrinkVertically(animationSpec = tween(250))
+  ) {}
+
+  exerciseSets.notes.forEach { note ->
+    Log.i("ExerciseNotesList", "Note: $note")
+    SwipeToDismissItem(onDismissRequest = { removeNote(exerciseSets, note) }) {
+      ExerciseNotes(
+        exerciseNote = note,
+        _pinNote = { pin -> _pinNote(note, pin) },
+      )
     }
-
-    Log.i("ExerciseNotesList", "visible: $visible")
-
-    AnimatedVisibility(
-        visible = notesVisible,
-        enter = expandVertically(animationSpec = tween(250)),
-        exit = shrinkVertically(animationSpec = tween(250))
-    ) {}
-
-    exerciseSets.notes.forEach { note ->
-        Log.i("ExerciseNotesList", "Note: $note")
-        SwipeToDismissItem(onDismissRequest = { removeNote(exerciseSets, note) }) {
-            ExerciseNotes(
-                exerciseNote = note,
-                _pinNote = { pin -> _pinNote(note, pin) },
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-    }
+    Spacer(modifier = Modifier.height(4.dp))
+  }
 }
 
 @Composable
-private fun SetContentHeader() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val textStyle = MaterialTheme.typography.bodyMedium
+private fun SetContentHeader(weightUnit: String) {
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(vertical = 8.dp),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    val textStyle = MaterialTheme.typography.bodyMedium
 
-        Box(modifier = Modifier
-            .padding(0.dp)
-            .width(48.dp), contentAlignment = Alignment.Center) {
-            Text("Set", style = textStyle)
-        }
-
-        Box(
-            modifier =
-            Modifier
-                //                        .padding(4.dp)
-                .width(110.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Previous", style = textStyle)
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(PaddingValues(horizontal = 0.dp))
-                .width(92.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Weight", style = textStyle)
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(PaddingValues(horizontal = 0.dp))
-                .width(60.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Reps", style = textStyle)
-        }
-
-        Box(modifier = Modifier
-            .padding(0.dp)
-            .width(40.dp), contentAlignment = Alignment.Center) {
-            Text("RIR", style = textStyle)
-        }
-
-        Spacer(
-            Modifier
-                .width(32.dp)
-                .padding(PaddingValues(horizontal = 4.dp)))
+    Box(modifier = Modifier
+      .padding(0.dp)
+      .width(48.dp), contentAlignment = Alignment.Center) {
+      Text("Set", style = textStyle)
     }
+
+    Box(
+      modifier =
+      Modifier
+        //                        .padding(4.dp)
+        .width(110.dp),
+      contentAlignment = Alignment.Center
+    ) {
+      Text("Previous", style = textStyle)
+    }
+
+    Box(
+      modifier = Modifier
+        .padding(PaddingValues(horizontal = 0.dp))
+        .width(92.dp),
+      contentAlignment = Alignment.Center
+    ) {
+      Text("Weight ($weightUnit)", style = textStyle)
+    }
+
+    Box(
+      modifier = Modifier
+        .padding(PaddingValues(horizontal = 0.dp))
+        .width(60.dp),
+      contentAlignment = Alignment.Center
+    ) {
+      Text("Reps", style = textStyle)
+    }
+
+    Box(modifier = Modifier
+      .padding(0.dp)
+      .width(40.dp), contentAlignment = Alignment.Center) {
+      Text("RIR", style = textStyle)
+    }
+
+    Spacer(
+      Modifier
+        .width(32.dp)
+        .padding(PaddingValues(horizontal = 4.dp)))
+  }
 }
 
 @Composable
 private fun ExerciseSetsWorkoutSummary(
-    workoutViewModel: WorkoutViewModel = koinViewModel(),
-    _exerciseSets: ExerciseSets,
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  _exerciseSets: ExerciseSets,
+  weightUnit: String
 ) {
-    // TODO Give option to show either Total Volume or Total Working Volume
-    // TODO Update Values on user input, cause keyboard to
-    val textStyle = MaterialTheme.typography.bodySmall
+  // TODO Give option to show either Total Volume or Total Working Volume
+  // TODO Update Values on user input, cause keyboard to
+  val textStyle = MaterialTheme.typography.bodySmall
 
-    val exercisesSets by workoutViewModel.exercisesSets.collectAsStateWithLifecycle()
-    val exerciseSets = exercisesSets.first { it.exSetsUUID == _exerciseSets.exSetsUUID }
+  workoutViewModel.userDefaultWeightUnit
 
-    //    val exerciseSets = _exerciseSets
+  val exercisesSets by workoutViewModel.exercisesSets.collectAsStateWithLifecycle()
+  val exerciseSets = exercisesSets.first { it.exSetsUUID == _exerciseSets.exSetsUUID }
 
-    val totalVolume by remember { mutableDoubleStateOf(exerciseSets.totalVolume()) }
-    val totalRepetitions by remember { mutableIntStateOf(exerciseSets.totalRepetitions()) }
-    val averageWeight by remember { mutableDoubleStateOf(exerciseSets.averageWeight()) }
+  //    val exerciseSets = _exerciseSets
+//  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
 
-    val df = DecimalFormat("#,###.##")
-    df.roundingMode = RoundingMode.HALF_UP
+  val totalVolume by remember { mutableDoubleStateOf(exerciseSets.totalVolume(weightUnit)) }
+  val totalRepetitions by remember { mutableIntStateOf(exerciseSets.totalRepetitions()) }
+  val averageWeight by remember { mutableDoubleStateOf(exerciseSets.averageWeight(weightUnit)) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            //      TODO get default value for weight
-            text = "Volume: ${df.format(totalVolume)}${exerciseSets.exercise?.weightUnit}",
-            style = textStyle
-        )
-        Text(text = "Reps: $totalRepetitions", style = textStyle)
-        Text(text = "Avg Weight: ${df.format(averageWeight)}", style = textStyle)
-    }
+  val df = DecimalFormat("#,###.##")
+  df.roundingMode = RoundingMode.HALF_UP
+
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(8.dp),
+    horizontalArrangement = Arrangement.SpaceBetween
+  ) {
+    Text(
+      // TODO get default value for weight
+      text =
+      "Volume: ${df.format(totalVolume)} $weightUnit",
+      style = textStyle
+    )
+    Text(text = "Reps: $totalRepetitions", style = textStyle)
+    Text(text = "Avg Weight: ${df.format(averageWeight)}", style = textStyle)
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ExerciseTitleButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = null,
-    shape: Shape = androidx.compose.material.MaterialTheme.shapes.small,
-    border: BorderStroke? = null,
-    colors: ButtonColors = ButtonDefaults.textButtonColors(),
-    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
-    content: @Composable RowScope.() -> Unit
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  elevation: ButtonElevation? = null,
+  shape: Shape = androidx.compose.material.MaterialTheme.shapes.small,
+  border: BorderStroke? = null,
+  colors: ButtonColors = ButtonDefaults.textButtonColors(),
+  contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+  content: @Composable RowScope.() -> Unit
 ) {
-    val contentColor by colors.contentColor(enabled)
-    Surface(
-        onClick = onClick,
-        modifier = modifier.semantics { role = Role.Button },
-        enabled = enabled,
-        shape = shape,
-        color = colors.backgroundColor(enabled).value,
-        contentColor = contentColor.copy(alpha = 1f),
-        border = border,
-        elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
-        interactionSource = interactionSource,
-    ) {
-        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
-            ProvideTextStyle(value = androidx.compose.material.MaterialTheme.typography.button) {
-                Row(
-                    Modifier
-                        .defaultMinSize(
-                            minWidth = ButtonDefaults.MinWidth,
-                            minHeight = ButtonDefaults.MinHeight
-                        )
-                        .padding(contentPadding),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    content = content
-                )
-            }
-        }
+  val contentColor by colors.contentColor(enabled)
+  Surface(
+    onClick = onClick,
+    modifier = modifier.semantics { role = Role.Button },
+    enabled = enabled,
+    shape = shape,
+    color = colors.backgroundColor(enabled).value,
+    contentColor = contentColor.copy(alpha = 1f),
+    border = border,
+    elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
+    interactionSource = interactionSource,
+  ) {
+    CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
+      ProvideTextStyle(value = androidx.compose.material.MaterialTheme.typography.button) {
+        Row(
+          Modifier
+            .defaultMinSize(
+              minWidth = ButtonDefaults.MinWidth,
+              minHeight = ButtonDefaults.MinHeight
+            )
+            .padding(contentPadding),
+          horizontalArrangement = Arrangement.Start,
+          verticalAlignment = Alignment.CenterVertically,
+          content = content
+        )
+      }
     }
+  }
 }

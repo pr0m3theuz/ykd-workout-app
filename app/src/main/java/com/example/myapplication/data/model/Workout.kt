@@ -42,19 +42,20 @@ class Workout() : RealmObject {
   var lazyListItemID: Long = newID()
   var uuid: RealmUUID = RealmUUID.random()
   var name: String? = null // TODO make name default = User
-  var workoutAuthor: String? = null
-  var notes: RealmList<WorkoutNote> = realmListOf()
-  var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
-  var workoutType: String? = null
-  var dateCreated: RealmInstant = RealmInstant.now()
-  var workoutStarted: RealmInstant? = null
-  var workoutEnded: RealmInstant? = null
-  var day: Int? = null
-  var exercisesSets: RealmList<ExerciseSets> = realmListOf()
+    var workoutAuthor: String? = null
+    var notes: RealmList<WorkoutNote> = realmListOf()
+    var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
+    var workoutType: String? = null
+    var dateCreated: RealmInstant = RealmInstant.now()
+    var workoutStarted: RealmInstant? = null
+    var workoutEnded: RealmInstant? = null
+    var day: Int? = null
+    var exercisesSets: RealmList<ExerciseSets> = realmListOf()
 
-  //    val programID: Long? = null
-  //    val mesocycleID: Long? = null
-  var microcycleID: ObjectId? = null
+    var programID: ObjectId? = null
+
+    //    val mesocycleID: Long? = null
+    var microcycleID: ObjectId? = null
 }
 
 @Serializable
@@ -93,10 +94,10 @@ fun Workout.totalSets(): Int {
   return totalSets
 }
 
-fun Workout.totalVolume(): Double {
-  var totalVolume: Double = 0.0
-  exercisesSets.forEach { exerciseSets ->
-    totalVolume += exerciseSets.totalVolume()
-  }
-  return totalVolume
+fun Workout.totalVolume(userDefaultWeightUnit: String): Double {
+    var totalVolume: Double = 0.0
+    exercisesSets.forEach { exerciseSets ->
+        totalVolume += exerciseSets.totalVolume(userDefaultWeightUnit)
+    }
+    return totalVolume
 }

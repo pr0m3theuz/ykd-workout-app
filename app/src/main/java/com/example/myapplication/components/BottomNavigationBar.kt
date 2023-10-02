@@ -1,6 +1,5 @@
 package com.example.myapplication.components
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
@@ -45,11 +44,11 @@ fun BottomNavigationBar(navController: NavController) {
 
   val navBackStackEntry by navController.currentBackStackEntryAsState()
   val currentDestination = navBackStackEntry?.destination
-  Log.i("BottomNavigationBar", "currentDestination: $currentDestination")
+//  Log.i("BottomNavigationBar", "currentDestination: $currentDestination")
 
   NavigationBar {
     items.forEach { item ->
-      Log.i("BottomNavigationBar", "item.route: ${item.route}")
+//      Log.i("BottomNavigationBar", "item.route: ${item.route}")
       NavigationBarItem(
         icon = {
           Icon(
@@ -70,8 +69,8 @@ fun BottomNavigationBar(navController: NavController) {
                 true,
         onClick = {
           if (
-            currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) ?: false } !=
-            true
+              currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) == true } !=
+              true
           ) {
             navController.navigate(item.route) {
               // Pop up to the start destination of the graph to

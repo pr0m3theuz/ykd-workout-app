@@ -33,27 +33,28 @@ import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 fun getFormattedPercentageText(percentage: Double?): String {
-    val df = DecimalFormat("#.##")
-    df.roundingMode = RoundingMode.HALF_UP
+  val df = DecimalFormat("#.##")
+  df.roundingMode = RoundingMode.HALF_UP
 
-    val reformattedPercentage = df.format(percentage?.times(100.0)).toDouble()
+  val reformattedPercentage = df.format(percentage?.times(100.0)).toDouble()
 
-    return if (reformattedPercentage.minus(reformattedPercentage.roundToInt()) == 0.0) {
-        reformattedPercentage.roundToInt().toString().plus("%")
-    } else {
-        reformattedPercentage.toString().plus("%")
-    }
+  return if (reformattedPercentage.minus(reformattedPercentage.roundToInt()) == 0.0) {
+    reformattedPercentage.roundToInt().toString().plus("%")
+  } else {
+    reformattedPercentage.toString().plus("%")
+  }
 }
 
 fun calculatePercentage(percentage: String): Pair<String, Double> {
-    val formattedPercentage = percentage.replace("%", "").take(6)
-    val percentageText = formattedPercentage.takeIf { formattedPercentage.isNotBlank() } ?: ""
-    val workingSetPercentage = formattedPercentage.toDoubleOrNull()?.div(100.0) ?: 0.0
-    return Pair(percentageText, workingSetPercentage)
+  val formattedPercentage = percentage.replace("%", "").take(6)
+  val percentageText = formattedPercentage.takeIf { formattedPercentage.isNotBlank() } ?: ""
+  val workingSetPercentage = formattedPercentage.toDoubleOrNull()?.div(100.0) ?: 0.0
+  return Pair(percentageText, workingSetPercentage)
 }
 
 /**
- * Calculates and returns a formatted string representing new set results based on the given parameters.
+ * Calculates and returns a formatted string representing new set results based on the given
+ * parameters.
  *
  * @param weight The working weight for the set. Can be null.
  * @param percentage The percentage to apply to the working weight. Can be null.
@@ -63,243 +64,223 @@ fun calculatePercentage(percentage: String): Pair<String, Double> {
  * from ChatGPT
  */
 fun calculateNewSetResults(
-    weight: Double?,
-    percentage: Double?,
-    repetitionsText: String,
+  weight: Double?,
+  percentage: Double?,
+  repetitionsText: String,
 ): String {
-    // Constants for formatting the string
-    val workingWeightXRepetitions = "%s x %s"
+  // Constants for formatting the string
+  val workingWeightXRepetitions = "%s x %s"
 
-    // Calculate new working weight and round to nearest integer
-    val newWorkingWeight = weight?.times(percentage!!)
-    val roundedNewWorkingWeight = weight?.roundToInt()
+  // Calculate new working weight and round to nearest integer
+  val newWorkingWeight = weight?.times(percentage!!)
+  val roundedNewWorkingWeight = weight?.roundToInt()
 
-    // Format new working weight as double with 2 decimal places and round to nearest integer
-    val formattedNewWorkingWeight = "%.2f".format(newWorkingWeight).toDoubleOrNull() ?: 0.0
-    val roundedFormattedNewWorkingWeight = formattedNewWorkingWeight.roundToInt()
+  // Format new working weight as double with 2 decimal places and round to nearest integer
+  val formattedNewWorkingWeight = "%.2f".format(newWorkingWeight).toDoubleOrNull() ?: 0.0
+  val roundedFormattedNewWorkingWeight = formattedNewWorkingWeight.roundToInt()
 
-    // Choose appropriate values for formatting the string based on calculated results
-    return when {
-        newWorkingWeight?.minus(roundedNewWorkingWeight!!) == 0.0 -> {
-            workingWeightXRepetitions.format(roundedNewWorkingWeight, repetitionsText)
-        }
-        formattedNewWorkingWeight.minus(roundedFormattedNewWorkingWeight) == 0.0 -> {
-            workingWeightXRepetitions.format(roundedFormattedNewWorkingWeight, repetitionsText)
-        }
-        else -> {
-            workingWeightXRepetitions.format(formattedNewWorkingWeight, repetitionsText)
-        }
+  // Choose appropriate values for formatting the string based on calculated results
+  return when {
+    newWorkingWeight?.minus(roundedNewWorkingWeight!!) == 0.0 -> {
+      workingWeightXRepetitions.format(roundedNewWorkingWeight, repetitionsText)
     }
+
+    formattedNewWorkingWeight.minus(roundedFormattedNewWorkingWeight) == 0.0 -> {
+      workingWeightXRepetitions.format(roundedFormattedNewWorkingWeight, repetitionsText)
+    }
+
+    else -> {
+      workingWeightXRepetitions.format(formattedNewWorkingWeight, repetitionsText)
+    }
+  }
 }
 
 @Composable
 fun RoundedBox(
-    modifier: Modifier,
-    content: @Composable () -> Unit,
+  modifier: Modifier,
+  content: @Composable () -> Unit,
 ) {
-    Box(
-        modifier = modifier,
-        propagateMinConstraints = true,
-        contentAlignment = Alignment.Center
-
-    ) {
-        content()
-    }
+  Box(modifier = modifier, propagateMinConstraints = true, contentAlignment = Alignment.Center) {
+    content()
+  }
 }
 
 @Composable
 fun Textfield(
-    text: String,
-    onValueChange: (String) -> Unit,
+  text: String,
+  onValueChange: (String) -> Unit,
 ) {
-    BasicTextField(
-        modifier = Modifier
-            .padding(PaddingValues(4.dp)),
-        textStyle = TextStyle(
-            fontSize = 4.em,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground
-        ),
-//                placeholder = { Text(warmUpSet.exerciseWeight.toString())},
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next
-        ),
-        value = text,
-        onValueChange = {
-            onValueChange(it)
-        }
-    )
+  BasicTextField(
+    modifier = Modifier.padding(PaddingValues(4.dp)),
+    textStyle =
+    TextStyle(
+      fontSize = 4.em,
+      textAlign = TextAlign.Center,
+      color = MaterialTheme.colorScheme.onBackground
+    ),
+    //                placeholder = { Text(warmUpSet.exerciseWeight.toString())},
+    keyboardOptions =
+    KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+    value = text,
+    onValueChange = { onValueChange(it) }
+  )
 }
 
 @Composable
 fun SetTypeButton(
-    setTypeText: String,
-    setTypeColor: Color,
-    onClick: () -> Unit,
+  setTypeText: String,
+  setTypeColor: Color,
+  onClick: () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .wrapContentSize(Alignment.Center),
-        propagateMinConstraints = true
+  Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
+    Button(
+      modifier = Modifier
+        .padding(8.dp)
+        .size(32.dp),
+      shape = RoundedCornerShape(size = 8.dp),
+      contentPadding = PaddingValues(0.dp),
+      onClick = onClick
     ) {
-        Button(
-            modifier = Modifier
-                .padding(8.dp)
-                .size(32.dp),
-            shape = RoundedCornerShape(size = 8.dp),
-            contentPadding = PaddingValues(0.dp),
-            onClick = onClick
-        ) {
-            Text(
-                text = setTypeText,
-                color = setTypeColor
-            )
-        }
+      Text(text = setTypeText, color = setTypeColor)
     }
+  }
 }
 
 @Composable
 fun SetContent(
-    setTypeText: String,
-    setTypeColor: Color,
-    resultsText: String,
-    percentageText: String,
-    repetitionsText: String,
-    onPercentageTextChanged: (String) -> Unit,
-    onRepetitionsTextChanged: (String) -> Unit,
+  setTypeText: String,
+  setTypeColor: Color,
+  resultsText: String,
+  percentageText: String,
+  repetitionsText: String,
+  onPercentageTextChanged: (String) -> Unit,
+  onRepetitionsTextChanged: (String) -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.Start,
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    val textfieldModifier =
+      Modifier
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(MaterialTheme.colorScheme.secondaryContainer)
+        .align(Alignment.CenterVertically)
+        .wrapContentSize(Alignment.Center)
+        .weight(1f, fill = false)
+
+    val resultsModifier =
+      Modifier
+        .padding(4.dp)
+        .align(Alignment.CenterVertically)
+        .width(96.dp)
+        .wrapContentSize(Alignment.Center)
+        .weight(1f, fill = true)
+
+    SetTypeButton(setTypeText, setTypeColor) {}
+
+    RoundedBox(
+      textfieldModifier.width(84.dp),
     ) {
-        val textfieldModifier = Modifier
-            .padding(4.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .align(Alignment.CenterVertically)
-            .wrapContentSize(Alignment.Center)
-
-        val resultsModifier = Modifier
-            .padding(4.dp)
-            .align(Alignment.CenterVertically)
-            .width(96.dp)
-            .wrapContentSize(Alignment.Center)
-
-        SetTypeButton(setTypeText, setTypeColor) {}
-
-        RoundedBox(
-            textfieldModifier.width(72.dp)
-        ) {
-            Textfield(
-                text = percentageText,
-                onValueChange = onPercentageTextChanged
-            )
-        }
-
-        RoundedBox(
-            textfieldModifier.width(60.dp)
-        ) {
-            Textfield(
-                text = repetitionsText,
-                onValueChange = onRepetitionsTextChanged
-            )
-        }
-
-        Box(
-            modifier = resultsModifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                fontSize = 4.em,
-                text = resultsText
-            )
-        }
+      Textfield(text = percentageText, onValueChange = onPercentageTextChanged)
     }
+
+    RoundedBox(textfieldModifier.width(60.dp)) {
+      Textfield(text = repetitionsText, onValueChange = onRepetitionsTextChanged)
+    }
+
+    Box(modifier = resultsModifier, contentAlignment = Alignment.Center) {
+      Text(fontSize = 4.em, text = resultsText)
+    }
+  }
 }
 
 @Composable
 fun SetsHeaderRow() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.Start,
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    Box(
+      modifier = Modifier
+        .padding(PaddingValues(horizontal = 4.dp))
+        .width(42.dp),
+      contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .padding(0.dp)
-                .width(48.dp),
-            contentAlignment = Alignment.Center
-
-        ) {
-            Text("Set")
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(PaddingValues(horizontal = 4.dp)),
-            contentAlignment = Alignment.Center
-        ) { Text("Percent") }
-
-        Box(
-            modifier = Modifier
-                .padding(PaddingValues(horizontal = 4.dp))
-                .width(50.dp),
-            contentAlignment = Alignment.Center
-        ) { Text("Reps") }
-
-        // Blank Space
-        Box(
-            modifier = Modifier
-                .padding(PaddingValues(horizontal = 4.dp))
-                .width(60.dp),
-            contentAlignment = Alignment.Center
-        ) { /* TODO Put appropriate text here */ }
+      Text("Set")
     }
+
+    Box(
+      modifier = Modifier
+        .width(84.dp)
+        .padding(PaddingValues(horizontal = 4.dp)),
+      contentAlignment = Alignment.Center
+    ) {
+      Text("Percent (%)")
+    }
+
+    Box(
+      modifier =
+      Modifier
+        .padding(PaddingValues(horizontal = 4.dp))
+        .width(60.dp),
+      contentAlignment = Alignment.Center
+    ) {
+      Text("Reps")
+    }
+
+    // Blank Space
+    Box(
+      modifier =
+      Modifier
+        .padding(PaddingValues(horizontal = 4.dp))
+        .width(60.dp),
+      contentAlignment = Alignment.Center
+    ) { /* TODO Put appropriate text here */ }
+  }
 }
 
 @Composable
 fun DialogInput(
-    text: String,
-    onValueChange: (String) -> Unit,
-    onImeAction: () -> Unit = {},
+  text: String,
+  onValueChange: (String) -> Unit,
+  onImeAction: () -> Unit = {},
 ) {
-    Box(
-        modifier = Modifier
-//                        .padding(4.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.Center),
-        contentAlignment = Alignment.Center
-
-    ) {
-        BasicTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(PaddingValues(4.dp)),
-            textStyle = TextStyle(
-                fontSize = 5.em,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            ),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    onImeAction()
-                },
-            ),
-            value = text,
-            onValueChange = onValueChange
-        )
-    }
+  Box(
+    modifier =
+    Modifier
+      //                        .padding(4.dp)
+      .clip(RoundedCornerShape(8.dp))
+      .background(MaterialTheme.colorScheme.secondaryContainer)
+      .fillMaxWidth()
+      .wrapContentSize(Alignment.Center),
+    contentAlignment = Alignment.Center
+  ) {
+    BasicTextField(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(PaddingValues(4.dp)),
+      textStyle =
+      TextStyle(
+        fontSize = 5.em,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSecondaryContainer
+      ),
+      keyboardOptions =
+      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+      keyboardActions =
+      KeyboardActions(
+        onDone = { onImeAction() },
+      ),
+      value = text,
+      onValueChange = onValueChange
+    )
+  }
 }
 
 @Composable
 fun AddSetText() {
-    androidx.compose.material.Text("Add Set", color = MaterialTheme.colorScheme.primary)
+  androidx.compose.material.Text("Add Set", color = MaterialTheme.colorScheme.primary)
 }
