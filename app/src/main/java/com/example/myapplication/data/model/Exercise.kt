@@ -78,10 +78,10 @@ class Exercise() : RealmObject {
   var workingSetRestTimerEnabled: Boolean = true
   var warmUpSetRestTimerEnabled: Boolean = false
 
-  @Serializable(URLSerializer::class)
+//  @Serializable(URLSerializer::class)
   var mediaURI: String? = null
 
-  @Serializable(URLSerializer::class)
+    //  @Serializable(URLSerializer::class)
   var pageURI: String? = null
 }
 

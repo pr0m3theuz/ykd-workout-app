@@ -1,5 +1,6 @@
 package com.example.myapplication.components.programs
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.model.Mesocycle
@@ -121,9 +122,12 @@ constructor(
 
   fun getMicrocyclesByProgram(programID: ObjectId) /*: List<Microcycle>*/ {
     //        var microcycles = emptyList<Microcycle>()
+    Log.i("getMicrocyclesByProgram", "programID: $programID")
     viewModelScope.launch {
       programsRepository.getMicrocyclesByProgram(programID).collect() {
+
         _selectedProgramMicrocycles.value = it
+//        Log.i("getMicrocyclesByProgram", "program microcycles" + Json.encodeToString(it))
       }
     }
     //    return microcycles

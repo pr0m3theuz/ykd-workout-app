@@ -38,19 +38,19 @@ import org.mongodb.kbson.ObjectId
 
 @Serializable
 class ExerciseSets() : RealmObject {
-  @PrimaryKey
-  var _id: ObjectId = ObjectId()
+    @PrimaryKey
+    var _id: ObjectId = ObjectId()
     var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
-  var exSetsUUID: RealmUUID = RealmUUID.random()
-  val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
+    var exSetsUUID: RealmUUID = RealmUUID.random()
+    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
 
-  //  val workoutID: Long? = null // TODO May be useless
-  //  val workoutUUID: RealmUUID? = null // TODO May be useless
-  var exerciseOrder: Int = 1
-  var exercise: Exercise? = null
-  var sets: RealmList<Set> = realmListOf<Set>()
-  var notes: RealmList<ExerciseNote> = realmListOf<ExerciseNote>()
-  var datePerformed: RealmInstant? = null
+    //  val workoutID: Long? = null // TODO May be useless
+    //  val workoutUUID: RealmUUID? = null // TODO May be useless
+    var exerciseOrder: Int = 1
+    var exercise: Exercise? = null
+    var sets: RealmList<Set> = realmListOf()
+    var notes: RealmList<ExerciseNote> = realmListOf()
+    var datePerformed: RealmInstant? = null
 }
 
 /*fun ExerciseSets.addSet() {

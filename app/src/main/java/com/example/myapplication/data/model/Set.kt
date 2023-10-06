@@ -58,7 +58,7 @@ class Set() : RealmObject {
 
   //    To use in query for previous sets
   var exerciseID: ObjectId? = null
-  var dateCreated: RealmInstant = RealmInstant.now()
+    var dateCreated: RealmInstant? = RealmInstant.now()
   //    var programUUID: RealmUUID? = null
   //    var mesocycleUUID: RealmUUID? = null
   //    var microcycleUUID: RealmUUID? = null

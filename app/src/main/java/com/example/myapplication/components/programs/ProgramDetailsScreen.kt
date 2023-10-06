@@ -74,6 +74,7 @@ import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Workout
+import com.example.myapplication.utils.doubleFormatted
 import org.koin.androidx.compose.koinViewModel
 import org.mongodb.kbson.ObjectId
 
@@ -129,7 +130,12 @@ fun ProgramDetailsLayout(
     val titles = listOf("Overview", "Mesocycles", "Workouts")
 
     val programActive = programsViewModel.isProgramActive(program.uuid)
-    Log.i("ProgramDetailsLayout", "programActive: $programActive")
+//  Log.i("ProgramDetailsLayout", "program mesocycles: ${program.mesocycles.size}")
+//  Log.i("ProgramDetailsLayout", "programActive: $programActive")
+//  Log.i("ProgramDetailsLayout", "mesocycles: ${program.mesocycles}")
+//  Log.i("ProgramDetailsLayout", "microcycles: ${Json.encodeToString(program.mesocycles[0].microcycles[0])}")
+
+    val (startButtonPressed, setStartButtonPressed) = rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -140,16 +146,16 @@ fun ProgramDetailsLayout(
                         maxLines = 2,
                         overflow = TextOverflow.Visible,
                         color = onSurface,
-            style = titleMedium,
-            textAlign = TextAlign.Center,
-          )
-        },
-        navigationIcon = {
-          IconButton(
-            onClick = { navController.navigateUp() },
-          ) {
-            Icon(
-              imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        style = titleMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.navigateUp() },
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
               contentDescription = "Go to the previous screen"
             )
@@ -160,12 +166,17 @@ fun ProgramDetailsLayout(
     },
     bottomBar = { BottomNavigationBar(navController = navController) },
     floatingActionButton = {
-        if (!programActive) {
+        if (!programActive || startButtonPressed) {
             ExtendedFloatingActionButton(
                 onClick = { /*TODO*/
-                    programsViewModel.startNewProgram(program = program)
-                    Toast.makeText(context, "TODO Implement Start Program", Toast.LENGTH_SHORT)
-                        .show()
+                    if (!startButtonPressed) {
+                        programsViewModel.startNewProgram(program = program)
+
+                        //                    Toast.makeText(context, "TODO Implement Start Program",
+                        // Toast.LENGTH_SHORT)
+                        //                        .show()
+                        setStartButtonPressed(true)
+                    }
                 },
             ) {
                 Text(text = "Start Program")
@@ -180,16 +191,16 @@ fun ProgramDetailsLayout(
             .fillMaxHeight()
             .verticalScroll(scrollState)
     ) {
-      Row(
-          Modifier
-              .fillMaxWidth()
-              .padding(padding8), horizontalArrangement = Arrangement.Center) {
-        Icon(
-          imageVector = Icons.Outlined.BrokenImage,
-          contentDescription = "Missing Image",
-          tint = MaterialTheme.colorScheme.primary
-        )
-      }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(padding8), horizontalArrangement = Arrangement.Center) {
+            Icon(
+                imageVector = Icons.Outlined.BrokenImage,
+                contentDescription = "Missing Image",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
 
       TabRow(
         selectedTabIndex = selectedTabIndex,
@@ -200,32 +211,26 @@ fun ProgramDetailsLayout(
           Tab(
             selected = selectedTabIndex == index,
             onClick = { selectedTabIndex = index },
-            text = {
-              Text(
-                text = title,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-              )
-            }
+              text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
           )
         }
       }
 
-      Column(
-          Modifier
-              .padding(12.dp)
-              .fillMaxWidth()) {
-        when (selectedTabIndex) {
-          0 ->
-            OverviewTab(
-              program = program,
-              microcycles = microcycles,
-              programsViewModel = programsViewModel
-            )
+        Column(
+            Modifier
+                .padding(12.dp)
+                .fillMaxWidth()) {
+            when (selectedTabIndex) {
+                0 ->
+                    OverviewTab(
+                        program = program,
+                        microcycles = microcycles,
+                        programsViewModel = programsViewModel
+                    )
 
-          1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
-          2 ->
-            WorkoutsTab(
+                1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
+                2 ->
+                    WorkoutsTab(
               activeProgram = program.active,
               navController = navController,
               microcycles = microcycles,
@@ -253,7 +258,7 @@ fun ProgramDetailsOptionsDropdownMenu() {
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
       DropdownMenuItem(
         text = { Text("Edit Program", color = onSurface) },
-        onClick = { /* TODO Navigate to Create Edit Program Screen*/ }
+          onClick = { /* TODO Navigate to Create Edit Program Screen*/ }
       )
     }
   }
@@ -265,6 +270,7 @@ fun OverviewTab(
   microcycles: List<Microcycle>,
   programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
+//  Log.i("OverviewTab", "microcycles: $microcycles")
   Column(
     verticalArrangement = Arrangement.spacedBy(8.dp),
   ) {
@@ -313,19 +319,19 @@ fun CoachsCard(program: Program) {
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card() {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)) {
-      Row(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(bottom = 8.dp)) {
-          Text(text = "Coach Overview", style = titleSmall)
-        }
-      }
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-      ) {
-        Column() { Text(text = program.author ?: "Coach Name", style = titleSmall) }
-      }
+      Column(modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)) {
+          Row(modifier = Modifier.fillMaxWidth()) {
+              Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                  Text(text = "Coach Overview", style = titleSmall)
+              }
+          }
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+          ) {
+              Column() { Text(text = program.author ?: "Coach Name", style = titleSmall) }
+          }
       Row(
         modifier = Modifier.fillMaxWidth(),
       ) {
@@ -345,19 +351,27 @@ fun ProgramOverviewCard(program: Program) {
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card() {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)) {
-      Row(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(bottom = 8.dp)) {
-          Text(text = "Program Overview", style = titleSmall)
-        }
-      }
-      //      Body
-      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Column() {
+      Column(modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)) {
+          Row(modifier = Modifier.fillMaxWidth()) {
+              Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                  Text(text = "Program Overview", style = titleSmall)
+              }
+          }
+          //      Body
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) { Text(text = "Level", style = labelMedium) }
+              Column() {
+                  Row(
+                      modifier = Modifier.fillMaxWidth(),
+                      verticalAlignment = Alignment.CenterVertically
+                  ) {
+                      Column(modifier = Modifier.weight(1f)) {
+                          Text(
+                              text = "Level",
+                              style = labelMedium
+                          )
+                      }
             Column(modifier = Modifier.weight(1f)) {
               Text(text = program.level ?: "Description", style = bodySmall)
             }
@@ -403,19 +417,19 @@ fun ProgramDescriptionCard(program: Program) {
 
   //  TODO Add Expand/Hide Text Button
   Card() {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)) {
-      Row(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(bottom = 8.dp)) {
-          Text(text = "Program Description", style = titleSmall)
-        }
-      }
-      Row(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
-          if (expanded) {
-            Text(
-              text = program.description ?: "Description, Use Markdown Potentially",
+      Column(modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)) {
+          Row(modifier = Modifier.fillMaxWidth()) {
+              Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                  Text(text = "Program Description", style = titleSmall)
+              }
+          }
+          Row(modifier = Modifier.fillMaxWidth()) {
+              Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+                  if (expanded) {
+                      Text(
+                          text = program.description ?: "Description, Use Markdown Potentially",
               style = bodySmall,
             )
           } else {
@@ -465,21 +479,21 @@ fun WorkoutOverviewCard(
 
   if (microcycles.isNotEmpty()) {
     val workouts = microcycles[selectedTabIndex].workouts
-
+      //    Log.i("WorkoutOverviewCard", Json.encodeToString(workouts))
     Card() {
-      Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-        ) {
-          Text(text = "Workout Overview", style = titleSmall)
-        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Workout Overview", style = titleSmall)
+            }
 
-        ScrollableTabRow(
-          selectedTabIndex = selectedTabIndex,
-          edgePadding = 0.dp,
-          containerColor = Color.Transparent
+            ScrollableTabRow(
+                selectedTabIndex = selectedTabIndex,
+                edgePadding = 0.dp,
+                containerColor = Color.Transparent
         ) {
           titles.forEachIndexed { index, title ->
             Tab(
@@ -495,14 +509,14 @@ fun WorkoutOverviewCard(
                 .padding(top = 8.dp)
                 .fillMaxWidth()
                 .horizontalScroll(scrollState),
-          horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-          if (!workouts.isEmpty()) {
-            workouts.forEachIndexed { index, workout ->
-              //              Log.i("WorkoutOverviewCard", workout.toString())
-              WorkoutDayCard(index, workout, programsViewModel)
+            if (workouts.isNotEmpty()) {
+                workouts.forEachIndexed { index, workout ->
+                    //              Log.i("WorkoutOverviewCard", workout.toString())
+                    WorkoutDayCard(index, workout, programsViewModel)
+                }
             }
-          }
         }
       }
     }
@@ -528,21 +542,21 @@ fun WorkoutDayCard(
   //  Log.i("WorkoutDayCard", exercisesSets.toString())
 
   ElevatedCard() {
-    Column(modifier = Modifier
-        .width(300.dp)
-        .padding(padding)) {
-      Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        horizontalArrangement = Arrangement.Center
-      ) {
-        Text(text = "Day ${index.plus(1)}", style = labelMedium)
-      }
-      if (exercisesSets.isNotEmpty()) {
-        exercisesSets
-          .sortedBy { it.exerciseOrder }
-          .forEachIndexed { index, exerciseSets ->
+      Column(modifier = Modifier
+          .width(300.dp)
+          .padding(padding)) {
+          Row(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(bottom = 8.dp),
+              horizontalArrangement = Arrangement.Center
+          ) {
+              Text(text = "Day ${index.plus(1)}", style = labelMedium)
+          }
+          if (exercisesSets.isNotEmpty()) {
+              exercisesSets
+                  .sortedBy { it.exerciseOrder }
+                  .forEachIndexed { index, exerciseSets ->
             ExerciseOverview(
               index = index,
               //            exerciseID = entry.key,
@@ -568,9 +582,9 @@ fun ExerciseOverview(
   val exercise = exerciseSets.exercise
 
   Row(
-    modifier = Modifier
-        .fillMaxWidth()
-        .padding(bottom = 4.dp),
+      modifier = Modifier
+          .fillMaxWidth()
+          .padding(bottom = 4.dp),
   ) {
     if (exercise != null) {
       Text(text = "${index.plus(1)}. ${exercise.name}", style = labelMedium)
@@ -585,20 +599,21 @@ fun ExerciseOverview(
       textAlign = TextAlign.Center
     )
     Text(
-      text = "Intensity",
-      style = labelMedium,
-      modifier = Modifier.weight(1f),
-      textAlign = TextAlign.Center
+        text = "Target RIR",
+        style = labelMedium,
+        modifier = Modifier.weight(1f),
+        textAlign = TextAlign.Center
     )
   }
+    //  Log.i("ExerciseOverview", Json.encodeToString(exerciseSets.sets))
   exerciseSets.sets.forEach { set ->
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
       Text(
         text = set.setNumber.toString(),
         style = labelMedium,
-        modifier = Modifier
-            .weight(1f)
-            .padding(start = 8.dp)
+          modifier = Modifier
+              .weight(1f)
+              .padding(start = 8.dp)
       )
       Text(
         text = set.targetRepetitions ?: "N/A",
@@ -607,10 +622,10 @@ fun ExerciseOverview(
         textAlign = TextAlign.Center
       )
       Text(
-        text = set.targetRepetitionsInReserve.toString(),
-        style = labelMedium,
-        modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center
+          text = doubleFormatted(set.targetRepetitionsInReserve),
+          style = labelMedium,
+          modifier = Modifier.weight(1f),
+          textAlign = TextAlign.Center
       )
     }
   }
@@ -649,21 +664,21 @@ fun MicrocycleCard(
       //      TODO Figure out a way to show the most recent microcycle with completed workouts
 
       Card() {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding)) {
-          Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            Text(
-              text = "Week ${index.plus(1)} - ${microcycle.name}",
-              style = titleMedium,
-              //              overflow = TextOverflow.Ellipsis,
-              softWrap = true,
+          Column(modifier = Modifier
+              .fillMaxWidth()
+              .padding(padding)) {
+              Row(
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(bottom = 8.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+              ) {
+                  Text(
+                      text = "Week ${index.plus(1)} - ${microcycle.name}",
+                      style = titleMedium,
+                      //              overflow = TextOverflow.Ellipsis,
+                      softWrap = true,
               modifier = Modifier.weight(1f)
             )
 
@@ -766,19 +781,19 @@ fun MicrocycleCard(
                   }
 
                   val workoutRoute = "workout?workoutID=${workout._id.toHexString()}"
-                  if (workout.workoutEnded != null) {
-                    Button(
-                      enabled = true,
-                      onClick = {
-                        navController.navigate(workoutRoute) {
-                          popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                          }
-                          // Avoid multiple copies of the same destination when
-                          // reselecting the same item
-                          launchSingleTop = true
-                          // Restore state when reselecting a previously selected item
-                          restoreState = true
+                    if (workout.workoutEnded == null) {
+                        Button(
+                            enabled = activeProgram,
+                            onClick = {
+                                navController.navigate(workoutRoute) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    // Avoid multiple copies of the same destination when
+                                    // reselecting the same item
+                                    launchSingleTop = true
+                                    // Restore state when reselecting a previously selected item
+                                    restoreState = true
                         }
                       }
                     ) {
@@ -789,12 +804,12 @@ fun MicrocycleCard(
                       enabled = activeProgram,
                       onClick = {
                         // TODO Create EditWorkoutScreen
-                        // TODO Implement Navigate to Edit Workout
-                        navController.navigate(workoutRoute)
+                          // TODO Implement Navigate to Edit Workout
+                          //                        navController.navigate(workoutRoute)
                         Toast.makeText(
-                          context,
-                          "TODO: Implement View/Edit Workout",
-                          Toast.LENGTH_SHORT
+                            context,
+                            "TODO: Implement View/Edit Workout",
+                            Toast.LENGTH_SHORT
                         )
                           .show()
                       }
@@ -844,21 +859,21 @@ fun MesocycleCard(
       //      TODO Figure out a way to show the most recent microcycle with completed workouts
 
       Card() {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding)) {
-          Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            Text(
-              text = "Mesocycle ${index.plus(1)} - ${mesocycle.name}",
-              style = titleMedium,
-              //              overflow = TextOverflow.Ellipsis,
-              softWrap = true,
+          Column(modifier = Modifier
+              .fillMaxWidth()
+              .padding(padding)) {
+              Row(
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(bottom = 8.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+              ) {
+                  Text(
+                      text = "Mesocycle ${index.plus(1)} - ${mesocycle.name}",
+                      style = titleMedium,
+                      //              overflow = TextOverflow.Ellipsis,
+                      softWrap = true,
               modifier = Modifier.weight(1f)
             )
 

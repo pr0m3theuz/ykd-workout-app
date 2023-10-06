@@ -40,7 +40,6 @@ import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutNotesRepository
 import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.AlarmReceiver
-import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.newID
 import com.example.myapplication.utils.sendNotification
 import io.realm.kotlin.ext.realmListOf
@@ -300,13 +299,13 @@ class WorkoutViewModel(
     //    Log.i("startRestTimer() ", "called")
     _timerDuration = time.inWholeMilliseconds
 
-    createRestTimerNotification()
+//    createRestTimerNotification()
     createTimer(_timerDuration)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun startLastTimer() {
-    createRestTimerNotification()
+//    createRestTimerNotification()
     createTimer(_timerDuration)
   }
 
@@ -358,8 +357,8 @@ class WorkoutViewModel(
       timer.cancel()
       resetTimerState()
     }
-    notificationManager.cancelNotifications()
-    alarmManager.cancel(notifyPendingIntent)
+//    notificationManager.cancelNotifications()
+//    alarmManager.cancel(notifyPendingIntent)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
@@ -424,17 +423,23 @@ class WorkoutViewModel(
   fun getWorkoutByID(workoutID: ObjectId) {
     if (!this::initialWorkoutData.isInitialized) {
       initialWorkoutData = workoutRepository.getWorkoutByID(workoutID = workoutID) ?: initWorkout()
-      _workoutName.value = initialWorkoutData.name
-      _workoutData = initialWorkoutData
-      _workout.value = _workoutData
-      _exercisesSetsData = initialWorkoutData.exercisesSets
-      _exercisesSets.value = _exercisesSetsData.toList()
+// TODO Add logic for when copying from a template (active program) vs when copying from a previous workout
+      copyWorkoutFromWorkoutTemplate(initialWorkoutData)
+//      copyWorkoutFromPreviousWorkout(initialWorkoutData)
+
+
+//      _workoutName.value = initialWorkoutData.name
+//      _workoutData = initialWorkoutData
+//      _workout.value = _workoutData
+//      _exercisesSetsData = initialWorkoutData.exercisesSets
+//      _exercisesSets.value = _exercisesSetsData.toList()
     }
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
     val newWorkout =
       Workout().apply {
+        _id = workoutTemplate._id
         uuid = workoutTemplate.uuid
         name = workoutTemplate.name
         workoutAuthor = workoutTemplate.workoutAuthor
@@ -446,13 +451,15 @@ class WorkoutViewModel(
         //        exercisesSets =
         // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets)
         microcycleID = workoutTemplate.microcycleID
+        programID = workoutTemplate.programID
       }
-
+    _workoutName.value = newWorkout.name
     _workoutData = newWorkout
     _workout.value = _workoutData
 
     getPinnedWorkoutNotes(workoutTemplate.uuid)
     _exercisesSetsData = copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets)
+    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
   fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout) {
@@ -465,10 +472,11 @@ class WorkoutViewModel(
         workoutType = previousWorkout.workoutType
         workoutStarted = RealmInstant.now()
         day = previousWorkout.day
-        exercisesSets = copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets)
+//        exercisesSets = copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets)
         microcycleID = previousWorkout.microcycleID
       }
 
+    _workoutName.value = newWorkout.name
     _workoutData = newWorkout
     _workout.value = _workoutData
 

@@ -10,14 +10,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState.*
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -93,16 +91,16 @@ fun SetContent(
 
   val exerciseWeight = getExerciseWeight(set, weightUnit)
 
-  val weightState by
-  rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
-    mutableStateOf(ExerciseWeightState(exerciseWeight))
-  }
+//  val weightState by
+//  rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
+//    mutableStateOf(ExerciseWeightState(exerciseWeight))
+//  }
 
 //  var weightFocusState by remember { mutableStateOf(weightState.isFocusedDirty) }
 
 //  weightState.isFocusedDirty = weightFocusState
 
-  val exerciseWeightText by remember { mutableStateOf(exerciseWeight) }
+  var exerciseWeightText by remember { mutableStateOf(exerciseWeight) }
 
   var exerciseWeightFocused by remember { mutableStateOf(false) }
 
@@ -140,7 +138,7 @@ fun SetContent(
     workoutViewModel.updateSetWeight(
       exerciseSets = exerciseSets,
       setUUID = setUUID,
-      newWeight = weightState.text.toDoubleOrNull()
+      newWeight = weight.toDoubleOrNull()
     )
 //    weightFocusState = true
 //    weightState.isFocusedDirty = weightFocusState
@@ -244,22 +242,22 @@ fun SetContent(
     ) {
       ExerciseWeightTextField(
 //        modifier = Modifier.focusRequester(focusRequester),
-        weightState = weightState,
+        exerciseWeightText = exerciseWeightText,
         onWeightChange = {
-          weightState.text =
+          exerciseWeightText =
             when {
               it.isBlank() -> ""
-              else -> checkDoubleInput(it) ?: weightState.text
+              else -> checkDoubleInput(it) ?: exerciseWeightText
             }
           // TODO Select Weight Unit based on Exercise or User Settings
           // TODO set.weightKilograms = weightState.text.toDoubleOrNull()
           // TODO set.weightPounds = set.convertKgToPound()
           // TODO Do unit conversion
           if (workoutViewModel.getWeightUnit(exerciseSets) == MassUnit.POUNDS.abbreviation) {
-            set.weightPounds = weightState.text.toDoubleOrNull()
+            set.weightPounds = exerciseWeightText.toDoubleOrNull()
             set.weightKilograms = set.convertPoundToKg()
           } else {
-            set.weightKilograms = weightState.text.toDoubleOrNull()
+            set.weightKilograms = exerciseWeightText.toDoubleOrNull()
             set.weightPounds = set.convertKgToPound()
           }
         },
@@ -335,9 +333,9 @@ fun SetContent(
           setComplete = it
         )
         workoutViewModel.startSetCompletedTimer(exerciseSet = exerciseSets, setUUID = setUUID)
-        if (!workoutViewModel.isTimerRunning) {
-          openTimerScreen(it)
-        }
+//        if (!workoutViewModel.isTimerRunning) {
+//          openTimerScreen(it)
+//        }
       }
     )
   }
@@ -406,19 +404,16 @@ private fun ExerciseRepsTextField(
 @Composable
 private fun ExerciseWeightTextField(
   modifier: Modifier = Modifier,
-  weightState: TextFieldState = remember { ExerciseWeightState() },
+  exerciseWeightText: String,
   onWeightChange: (newWeight: String) -> Unit,
   onImeAction: () -> Unit = {},
 ) {
   BasicTextField(
-    value = weightState.text,
+    value = exerciseWeightText,
     onValueChange = { onWeightChange(it.take(7)) },
     modifier =
     modifier
-      .padding(PaddingValues(4.dp))
-      .onFocusChanged {
-        weightState.onFocusChange(it.isFocused)
-      },
+      .padding(PaddingValues(4.dp)),
     textStyle =
     TextStyle(
       fontSize = 5.em,
