@@ -19,19 +19,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.Set
-import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SetItem(
-    exerciseSets: ExerciseSets,
+    exerciseSets: ExerciseExerciseSets,
     index: Int,
     set: Set,
     removeSet: () -> Unit,
@@ -78,7 +76,7 @@ fun SetItem(
             animateColorAsState(
                 when (dismissState.targetValue) {
                     DismissValue.Default -> MaterialTheme.colorScheme.primary
-                    DismissValue.DismissedToStart -> Color.Red
+                    DismissValue.DismissedToStart -> MaterialTheme.colorScheme.error
                     DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
                 }, label = "Background Color"
             )
@@ -99,7 +97,7 @@ fun SetItem(
             ) {
                 Icon(
                     icon,
-                    tint = White,
+                    tint = MaterialTheme.colorScheme.onError,
                     contentDescription = "Localized description",
                     modifier = Modifier.scale(scale)
                 )

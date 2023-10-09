@@ -11,9 +11,7 @@
 package com.example.myapplication.data.model
 
 import com.example.myapplication.utils.newID
-import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.serializers.MutableRealmIntKSerializer
 import io.realm.kotlin.serializers.RealmAnyKSerializer
 import io.realm.kotlin.serializers.RealmDictionaryKSerializer
@@ -38,19 +36,40 @@ import org.mongodb.kbson.ObjectId
 
 @Serializable
 class ExerciseSets() : RealmObject {
-    @PrimaryKey
-    var _id: ObjectId = ObjectId()
-    var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
-    var exSetsUUID: RealmUUID = RealmUUID.random()
-    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
+  @PrimaryKey
+  var _id: ObjectId = ObjectId()
+  var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
+  var exSetsUUID: RealmUUID = RealmUUID.random()
+  //    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
 
-    //  val workoutID: Long? = null // TODO May be useless
-    //  val workoutUUID: RealmUUID? = null // TODO May be useless
-    var exerciseOrder: Int = 1
-    var exercise: Exercise? = null
-    var sets: RealmList<Set> = realmListOf()
-    var notes: RealmList<ExerciseNote> = realmListOf()
-    var datePerformed: RealmInstant? = null
+  var workoutID: ObjectId? = null // TODO May be useless
+
+  //  val workoutUUID: RealmUUID? = null // TODO May be useless
+  var exerciseOrder: Int = 1
+  var exerciseID: ObjectId? = null
+  var sets: RealmList<Set> = realmListOf()
+  var notes: RealmList<ExerciseNote> = realmListOf()
+  var datePerformed: RealmInstant? = null
+  var totalVolumeInPounds: Double? = 0.0
+  var totalVolumeInKilograms: Double? = 0.0
+}
+
+@Serializable
+class ExerciseExerciseSets() : RealmObject {
+  @PrimaryKey
+  var _id: ObjectId = ObjectId()
+  var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
+  var exSetsUUID: RealmUUID = RealmUUID.random()
+  //    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
+
+  var workoutID: ObjectId? = null // TODO May be useless
+
+  //  val workoutUUID: RealmUUID? = null // TODO May be useless
+  var exerciseOrder: Int = 1
+  var exercise: Exercise? = null
+  var sets: RealmList<Set> = realmListOf()
+  var notes: RealmList<ExerciseNote> = realmListOf()
+  var datePerformed: RealmInstant? = null
 }
 
 /*fun ExerciseSets.addSet() {
@@ -80,60 +99,61 @@ fun ExerciseSets.removeSet(uuid: RealmUUID) {
     sets.removeIf { it.uuid == uuid }
 }*/
 
-fun ExerciseSets.updateSetWeight(uuid: RealmUUID, newWeight: Double?, weightUnit: String) {
-    if (weightUnit == MassUnit.POUNDS.abbreviation) {
-        sets.forEach {
-            if (it.uuid == uuid) {
-                it.weightPounds = newWeight
-                it.weightKilograms = it.convertPoundToKg()
-            }
-        }
-    } else {
-        sets.forEach {
-            if (it.uuid == uuid) {
-                it.weightKilograms = newWeight
-                it.weightPounds = it.convertKgToPound()
-            }
-        }
+fun ExerciseExerciseSets.updateSetWeight(uuid: RealmUUID, newWeight: Double?, weightUnit: String) {
+  if (weightUnit == MassUnit.POUNDS.abbreviation) {
+    sets.forEach {
+      if (it.uuid == uuid) {
+        it.weightPounds = newWeight
+        it.weightKilograms = it.convertPoundToKg()
+      }
     }
+  } else {
+    sets.forEach {
+      if (it.uuid == uuid) {
+        it.weightKilograms = newWeight
+        it.weightPounds = it.convertKgToPound()
+      }
+    }
+  }
 }
 
-fun ExerciseSets.updateSetReps(uuid: RealmUUID, newReps: Int?) {
+fun ExerciseExerciseSets.updateSetReps(uuid: RealmUUID, newReps: Int?) {
   sets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
 }
 
-fun ExerciseSets.updateSetRIR(uuid: RealmUUID, newRIR: Double?) {
+fun ExerciseExerciseSets.updateSetRIR(uuid: RealmUUID, newRIR: Double?) {
   sets.forEach { if (it.uuid == uuid) it.repetitionsInReserve = newRIR }
 }
 
-fun ExerciseSets.updateSetRPE(uuid: RealmUUID, newRPE: Double?) {
+fun ExerciseExerciseSets.updateSetRPE(uuid: RealmUUID, newRPE: Double?) {
   sets.forEach { if (it.uuid == uuid) it.ratePerceivedEffort = newRPE }
 }
 
-fun ExerciseSets.setComplete(uuid: RealmUUID, setComplete: Boolean) {
+fun ExerciseExerciseSets.setComplete(uuid: RealmUUID, setComplete: Boolean) {
   sets.forEach { if (it.uuid == uuid) it.setCompleted = setComplete }
 }
 
-fun ExerciseSets.updateSetType(uuid: RealmUUID, setTypeID: Int) {
+fun ExerciseExerciseSets.updateSetType(uuid: RealmUUID, setTypeID: Int) {
   sets.forEach { if (it.uuid == uuid) it.setTypeID = setTypeID }
 }
 
-fun ExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
+fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
   for (index in warmUpSets.indices) {
     sets.add(
       index,
       //      warmUpSets[index]
       //      TODO: Check this
       Set().apply {
-          setNumber = warmUpSets[index].setNumber
-          weightPounds = warmUpSets[index].weightPounds
-          weightKilograms = warmUpSets[index].weightKilograms
-          repetitions = warmUpSets[index].repetitions
-          ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort
-          repetitionsInReserve = warmUpSets[index].repetitionsInReserve
-          setTypeID = warmUpSets[index].setTypeID
-          percentage1RM = warmUpSets[index].percentage1RM
-          progressionSchemeID = warmUpSets[index].progressionSchemeID
+        setNumber = warmUpSets[index].setNumber
+        weightPounds = warmUpSets[index].weightPounds
+        weightKilograms = warmUpSets[index].weightKilograms
+        repetitions = warmUpSets[index].repetitions
+        ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort
+        repetitionsInReserve = warmUpSets[index].repetitionsInReserve
+        setTypeID = warmUpSets[index].setTypeID
+        percentage1RM = warmUpSets[index].percentage1RM
+        exerciseID = this@addWarmUpSets.exercise?._id
+        progressionSchemeID = warmUpSets[index].progressionSchemeID
       }
     )
   }
@@ -141,25 +161,36 @@ fun ExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
 
 private const val WARM_UP_SET = 2
 
-fun ExerciseSets.totalWorkingSetVolume(weightUnit: String): Double {
-    var totalVolume = 0.0
+fun ExerciseExerciseSets.totalWorkingSetVolume(weightUnit: String): Double {
+  var totalVolume = 0.0
 
-    sets.filter { it.setTypeID != WARM_UP_SET }
-        .forEach { totalVolume += (it.setVolume(weightUnit)) }
+  sets.filter { it.setTypeID != WARM_UP_SET }.forEach { totalVolume += (it.setVolume(weightUnit)) }
 
-    return totalVolume
+  return totalVolume
 }
 
-fun ExerciseSets.totalVolume(userDefaultWeightUnit: String): Double {
-    var totalVolume = 0.0
-    val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+fun ExerciseExerciseSets.totalVolume(userDefaultWeightUnit: String): Double {
+  var totalVolume = 0.0
+  val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
 
-    sets.forEach { totalVolume += it.setVolume(weightUnit) }
+  sets.forEach { totalVolume += it.setVolume(weightUnit) }
 
-    return totalVolume
+  return totalVolume
 }
 
-fun ExerciseSets.totalRepetitions(): Int {
+fun ExerciseExerciseSets.totalVolumeInPounds(): Double {
+  var totalVolume = 0.0
+  sets.forEach { totalVolume += it.setVolume(MassUnit.POUNDS.abbreviation) }
+  return totalVolume
+}
+
+fun ExerciseExerciseSets.totalVolumeInKilograms(): Double {
+  var totalVolume = 0.0
+  sets.forEach { totalVolume += it.setVolume(MassUnit.KILOGRAMS.abbreviation) }
+  return totalVolume
+}
+
+fun ExerciseExerciseSets.totalRepetitions(): Int {
   var totalRepetitions = 0
 
   sets.forEach {
@@ -169,15 +200,15 @@ fun ExerciseSets.totalRepetitions(): Int {
   return totalRepetitions
 }
 
-fun ExerciseSets.averageWeight(userDefaultWeightUnit: String): Double {
-    val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
-    val averageWeight: Double = totalVolume(weightUnit) / totalRepetitions()
+fun ExerciseExerciseSets.averageWeight(userDefaultWeightUnit: String): Double {
+  val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+  val averageWeight: Double = totalVolume(weightUnit) / totalRepetitions()
 
-    return if (averageWeight.isNaN()) {
-        0.0
-    } else {
-        averageWeight
-    }
+  return if (averageWeight.isNaN()) {
+    0.0
+  } else {
+    averageWeight
+  }
 }
 
 /**
@@ -187,7 +218,7 @@ fun ExerciseSets.averageWeight(userDefaultWeightUnit: String): Double {
  *
  * @param workout The workout to associate the sets with.
  */
-fun ExerciseSets.resetSets(
+fun ExerciseExerciseSets.resetSets(
   /*workout: Workout*/
 ) {
   sets.forEach { set ->
@@ -198,6 +229,31 @@ fun ExerciseSets.resetSets(
     //    set.workoutUUID = workout.uuid
     set.setCompleted = false
   }
+}
+
+fun convertExerciseExerciseSetsToExerciseSets(
+  exerciseExerciseSets: List<ExerciseExerciseSets>,
+  userDefaultWeightUnit: String
+): RealmList<ExerciseSets> {
+  val exercisesSets = realmListOf<ExerciseSets>()
+  exerciseExerciseSets.forEach {
+    exercisesSets.add(
+      ExerciseSets().apply {
+        _id = it._id
+        exSetsUUID
+        workoutID
+        exerciseOrder = it.exerciseOrder
+        exerciseID = it.exercise?._id
+        sets = it.sets
+        notes = it.notes
+        datePerformed = it.datePerformed
+        totalVolumeInPounds = it.totalVolumeInPounds()
+        totalVolumeInKilograms = it.totalVolumeInKilograms()
+      }
+    )
+  }
+
+  return exercisesSets
 }
 
 /*

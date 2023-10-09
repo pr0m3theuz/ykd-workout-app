@@ -2,10 +2,10 @@ package com.example.myapplication.data.network
 
 import androidx.annotation.WorkerThread
 import com.example.myapplication.data.database.RealmDatabase
-import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.WorkoutNote
 import io.realm.kotlin.types.RealmUUID
+import org.mongodb.kbson.ObjectId
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
@@ -21,7 +21,7 @@ class ExerciseNotesRepository(private val database: RealmDatabase) {
 //        database.getExerciseNotesforWorkout(exerciseID, workoutID)
 
     fun getPinnedExerciseNotes(
-        exercise: Exercise,
+        exercise: ObjectId,
     ): List<ExerciseNote> =
         database.getPinnedExerciseNotes(exercise)
 

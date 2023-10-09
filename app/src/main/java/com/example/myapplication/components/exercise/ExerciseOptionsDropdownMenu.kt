@@ -1,12 +1,12 @@
 package com.example.myapplication.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 import com.example.myapplication.components.addExercisesList.ReplaceExerciseScreen
 import com.example.myapplication.components.exercise.EquateVolumeScreen
 import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -26,7 +26,7 @@ import kotlin.time.toDuration
 
 @Composable
 fun ExerciseOptionsDropdownMenu(
-    exerciseSets: ExerciseSets,
+    exerciseSets: ExerciseExerciseSets,
     addNotes: () -> Unit,
     removeExercise: () -> Unit,
     userDefaultWeightUnit: String,
@@ -148,7 +148,7 @@ fun ExerciseOptionsDropdownMenu(
 //          // TODO to keep or not to keep
             DropdownMenuItem(
                 text = { Text("Bar Type") },
-                trailingIcon = { Text("Olympic Bar", color = primaryColor) },
+                trailingIcon = { Text("TODO", color = primaryColor) },
                 onClick = {
                     expandedExerciseOptionsDropdownMenu = false
                     expandedBarTypeOptionsDropdownMenu = true

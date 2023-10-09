@@ -1,5 +1,6 @@
 package com.example.myapplication.components.programs
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -97,9 +98,9 @@ fun ProgramsScreen(
   val (workoutVisible, setWorkoutVisible) = rememberSaveable { mutableStateOf(false) }
 
   //  TODO Get unique list of programs
-    val programs by programsViewModel.programs.collectAsState()
-    val activePrograms by
-    programsViewModel.activePrograms.collectAsState() // TODO Get List of Active Programs
+  val programs by programsViewModel.programs.collectAsState()
+  val activePrograms by
+  programsViewModel.activePrograms.collectAsState() // TODO Get List of Active Programs
 
   fun getExpandCollapseIcon(visible: Boolean): ImageVector {
     return if (visible) {
@@ -130,12 +131,12 @@ fun ProgramsScreen(
     bottomBar = { BottomNavigationBar(navController = navController) }
   ) { contentPadding ->
     LazyColumn(
-        contentPadding = contentPadding,
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(horizontal = 12.dp),
-        //      verticalArrangement = Arrangement.spacedBy(12.dp)
+      contentPadding = contentPadding,
+      modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .padding(horizontal = 12.dp),
+      //      verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       stickyHeader { WorkoutSearchBar() }
 
@@ -161,48 +162,53 @@ fun ProgramsScreen(
         ) { page ->
           activePrograms[page].let { program ->
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 0.dp),
-                //              verticalArrangement = Arrangement.spacedBy(padding8)
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 0.dp),
+              //              verticalArrangement = Arrangement.spacedBy(padding8)
             ) {
               if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
                 // Text("Start a Program", style = titleMedium)
                 // TODO No Active Programs Card
               } else {
-                  // Text("Continue Program", style = titleMedium)
-                  val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program._id)
-                  //                  Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
+                // Text("Continue Program", style = titleMedium)
+                val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program._id)
+                //                  Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
 
-                  if (nextWorkout != null) {
-                      CurrentProgramCard(navController, program, nextWorkout)
-                  } else {
-                      Text(
-                          text =
-                          "This program has no workouts or all workouts have been completed. You can start a new program."
-                      )
-                  }
+                if (nextWorkout != null) {
+                  CurrentProgramCard(
+                    navController,
+                    program,
+                    nextWorkout,
+                    programsViewModel = programsViewModel
+                  )
+                } else {
+                  Text(
+                    text =
+                    "This program has no workouts or all workouts have been completed. You can start a new program."
+                  )
+                }
               }
             }
           }
         }
         Row(
-            Modifier
-                .height(20.dp)
-                .fillMaxWidth(),
-            //                    .align(Alignment.BottomCenter),
-            //          verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+          Modifier
+            .height(20.dp)
+            .fillMaxWidth(),
+          //                    .align(Alignment.BottomCenter),
+          //          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.Center
         ) {
           repeat(pagerState.pageCount) { iteration ->
             val primary = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
             val color =
               if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
-              Box(modifier = Modifier
-                  .padding(2.dp)
-                  .clip(CircleShape)
-                  .background(color)
-                  .size(8.dp))
+            Box(modifier = Modifier
+              .padding(2.dp)
+              .clip(CircleShape)
+              .background(color)
+              .size(8.dp))
           }
         }
       }
@@ -236,31 +242,31 @@ fun ProgramsScreen(
 
           Box {
             Row {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.FileUpload,
-                        contentDescription = "Import/Export New Program"
-                    )
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.CreateNewFolder,
-                        contentDescription = "Add New Program"
-                    )
-                }
+              IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                  imageVector = Icons.Outlined.FileUpload,
+                  contentDescription = "Import/Export New Program"
+                )
+              }
+              IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                  imageVector = Icons.Outlined.CreateNewFolder,
+                  contentDescription = "Add New Program"
+                )
+              }
             }
           }
         }
       }
 
       item {
-          Button(onClick = { /*TODO*/ }) {
-              Icon(
-                  imageVector = Icons.AutoMirrored.Outlined.Assignment,
-                  contentDescription = "Add New Program"
-              )
-              Text(text = "New Program", Modifier.padding(start = 8.dp))
-          }
+        Button(onClick = { /*TODO*/ }) {
+          Icon(
+            imageVector = Icons.AutoMirrored.Outlined.Assignment,
+            contentDescription = "Add New Program"
+          )
+          Text(text = "New Program", Modifier.padding(start = 8.dp))
+        }
       }
 
       item {
@@ -275,21 +281,21 @@ fun ProgramsScreen(
               contentDescription = "Show workouts for this program"
             )
           }
-            TextButton(
-                onClick = { setProgramVisible(!programVisible) },
-                modifier = Modifier.weight(1f),
-                enabled = true,
-                contentPadding = PaddingValues(0.dp)
-                //            style = MaterialTheme.typography.bodySmall
-            ) {
-                Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
-            }
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = "Localized Description"
-                )
-            }
+          TextButton(
+            onClick = { setProgramVisible(!programVisible) },
+            modifier = Modifier.weight(1f),
+            enabled = true,
+            contentPadding = PaddingValues(0.dp)
+            //            style = MaterialTheme.typography.bodySmall
+          ) {
+            Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
+          }
+          IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+              imageVector = Icons.Outlined.MoreVert,
+              contentDescription = "Localized Description"
+            )
+          }
         }
       }
 
@@ -327,13 +333,13 @@ fun ProgramsScreen(
               contentDescription = "Show workouts for this program"
             )
           }
-            Text(text = "Mesocycle (###)")
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = "Localized Description"
-                )
-            }
+          Text(text = "Mesocycle (###)")
+          IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+              imageVector = Icons.Outlined.MoreVert,
+              contentDescription = "Localized Description"
+            )
+          }
         }
       }
 
@@ -349,13 +355,13 @@ fun ProgramsScreen(
               contentDescription = "Show workouts"
             )
           }
-            Text(text = "Workouts (###")
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = "Localized Description"
-                )
-            }
+          Text(text = "Workouts (###")
+          IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+              imageVector = Icons.Outlined.MoreVert,
+              contentDescription = "Localized Description"
+            )
+          }
         }
       }
 
@@ -382,11 +388,11 @@ fun WorkoutSearchBar() {
   val color =
     SearchBarDefaults.colors(
       containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        inputFieldColors =
-        TextFieldDefaults.colors(
-            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
-        )
+      inputFieldColors =
+      TextFieldDefaults.colors(
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
+      )
     )
 
   SearchBar(
@@ -421,41 +427,38 @@ fun WorkoutCard() {
   val titleMedium = MaterialTheme.typography.titleMedium
 
   Card(
-      modifier =
-      Modifier
-          .padding(vertical = padding)
-          .clickable { /* TODO Navigate to Workout Details Screen */ }
+    modifier =
+    Modifier
+      .padding(vertical = padding)
+      .clickable { /* TODO Navigate to Workout Details Screen */ }
   ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.Top
     ) {
       Column() {
         Text(text = "Workout Title", style = titleMedium)
-          Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
-          Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
+        Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
+        Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
       }
-        // TODO To Keep or not to not Keep
-        Column(verticalArrangement = Arrangement.Top) {
-            IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = "Localized Description"
-                )
-            }
+      // TODO To Keep or not to not Keep
+      Column(verticalArrangement = Arrangement.Top) {
+        IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
+          Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
         }
-    }
-      Row(modifier = Modifier
-          .fillMaxWidth()
-          .padding(start = 16.dp, bottom = padding)) {
-          Column() {
-              // TODO List Exercises
-              Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
-          }
       }
+    }
+    Row(modifier = Modifier
+      .fillMaxWidth()
+      .padding(start = 16.dp, bottom = padding)) {
+      Column() {
+        // TODO List Exercises
+        Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
+      }
+    }
   }
 }
 
@@ -465,20 +468,20 @@ fun ProgramCard(navController: NavController, program: Program) {
   val titleMedium = MaterialTheme.typography.titleMedium
 
   Card(
-      modifier =
-      Modifier
-          .padding(vertical = padding)
-          .clickable {
-              /* TODO Navigate to Program Details Screen */
-              navController.navigate("programDetails/${program._id.toHexString()}")
-          }
+    modifier =
+    Modifier
+      .padding(vertical = padding)
+      .clickable {
+        /* TODO Navigate to Program Details Screen */
+        navController.navigate("programDetails/${program._id.toHexString()}")
+      }
   ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.Center,
+      verticalAlignment = Alignment.CenterVertically
     ) {
       Icon(
         imageVector = Icons.Outlined.BrokenImage,
@@ -487,58 +490,60 @@ fun ProgramCard(navController: NavController, program: Program) {
       )
     }
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, bottom = padding),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 16.dp, bottom = padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.Bottom
     ) {
       Column() {
         Text(text = program.name ?: "New Program", style = titleMedium)
         Text(text = program.author ?: "", style = MaterialTheme.typography.titleSmall)
       }
       //            TODO To Keep or not to not Keep
-        IconButton(onClick = { /* TODO */ }) {
-            Icon(
-                imageVector = Icons.Outlined.MoreVert,
-                contentDescription = "Localized Description"
-            )
-        }
+      IconButton(onClick = { /* TODO */ }) {
+        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
+      }
     }
   }
 }
 
 // @Preview
 @Composable
-fun CurrentProgramCard(navController: NavController, program: Program, workout: Workout) {
-    // TODO Get the next workout in the program
-    // TODO Add programID to Workout
-    // TODO Write query to get next workout in program
-    val padding = 8.dp
+fun CurrentProgramCard(
+  navController: NavController,
+  program: Program,
+  workout: Workout,
+  programsViewModel: ProgramsViewModel
+) {
+  // TODO Get the next workout in the program
+  // TODO Add programID to Workout
+  // TODO Write query to get next workout in program
+  val padding = 8.dp
 
-    val titleSmall = MaterialTheme.typography.titleSmall
-    val (expandMenu, setExpandMenu) = remember { mutableStateOf(false) }
+  val titleSmall = MaterialTheme.typography.titleSmall
+  val (expandMenu, setExpandMenu) = remember { mutableStateOf(false) }
 
-    val bodySmall = MaterialTheme.typography.bodySmall
-    Card(modifier = Modifier.padding(vertical = padding)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = padding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = program.name ?: "Program Name",
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.titleMedium,
-                modifier =
-                Modifier
-                    .clickable {
-                        /* TODO Navigate to Program Details Screen */
-                        navController.navigate("programDetails/${program._id.toHexString()}")
-                    }
-                    .weight(1f, fill = true)
+  val bodySmall = MaterialTheme.typography.bodySmall
+  Card(modifier = Modifier.padding(vertical = padding)) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text(
+        text = program.name ?: "Program Name",
+        overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.titleMedium,
+        modifier =
+        Modifier
+          .clickable {
+            /* TODO Navigate to Program Details Screen */
+            navController.navigate("programDetails/${program._id.toHexString()}")
+          }
+          .weight(1f, fill = true)
       )
       Box {
         IconButton(onClick = { setExpandMenu(true) }) {
@@ -546,26 +551,26 @@ fun CurrentProgramCard(navController: NavController, program: Program, workout: 
         }
 
         DropdownMenu(expanded = expandMenu, onDismissRequest = { setExpandMenu(false) }) {
-            // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
-            DropdownMenuItem(text = { Text(text = "Restart Program") }, onClick = { /*TODO*/ })
-            DropdownMenuItem(text = { Text(text = "Archive Program") }, onClick = { /*TODO*/ })
+          // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
+          DropdownMenuItem(text = { Text(text = "Restart Program") }, onClick = { /*TODO*/ })
+          DropdownMenuItem(text = { Text(text = "Archive Program") }, onClick = { /*TODO*/ })
         }
       }
     }
 
     Text(
-        text = workout.name ?: "Workout Name",
-        modifier = Modifier.padding(horizontal = 8.dp),
-        style = bodySmall
+      text = workout.name ?: "Workout Name",
+      modifier = Modifier.padding(horizontal = 8.dp),
+      style = bodySmall
     )
     Row(
-        modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = padding)
-            .padding(top = 12.dp, bottom = 2.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+      modifier =
+      Modifier
+        .fillMaxWidth()
+        .padding(horizontal = padding)
+        .padding(top = 12.dp, bottom = 2.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
     ) {
       Text(text = "Exercise", style = titleSmall, modifier = Modifier.weight(0.5f))
       Box(Modifier.weight(0.5f)) {
@@ -595,55 +600,59 @@ fun CurrentProgramCard(navController: NavController, program: Program, workout: 
       }
     }
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = padding)) {
-            Column() {
-                // TODO List Exercises
-                //        Text("Workout Summary", style = bodySmall)
-                workout.exercisesSets.forEach { exerciseSets ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(2.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = exerciseSets.exercise?.name ?: "Exercise Name",
-                            style = bodySmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(0.5f)
-                        )
-                        Box(Modifier.weight(0.5f)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceAround,
-                            ) {
-                                Text(
-                                    text = exerciseSets.sets.size.toString(),
-                                    style = bodySmall,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.weight(weight = 1f, fill = true)
-                                )
+    Row(modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = padding)) {
+      Column() {
+        // TODO List Exercises
+        //        Text("Workout Summary", style = bodySmall)
+        workout.exercisesSets.forEach { exerciseSets ->
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Log.i("getExerciseNameByID", "exercise ID: " + exerciseSets.exerciseID?.toHexString())
+            exerciseSets.exerciseID?.let {
+              Text(
+                text = programsViewModel.getExerciseNameByID(it),
+                style = bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(0.5f)
+              )
+            }
+
+            Box(Modifier.weight(0.5f)) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+              ) {
                 Text(
-                    text =
-                    "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps",
-                    style = bodySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(weight = 1f, fill = true)
+                  text = exerciseSets.sets.size.toString(),
+                  style = bodySmall,
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.weight(weight = 1f, fill = true)
                 )
                 Text(
-                    text =
-                    doubleFormatted(
-                        exerciseSets.sets
-                            .minBy { it.repetitionsInReserve ?: 10.0 }
-                            .targetRepetitionsInReserve
-                    ),
-                    style = bodySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(weight = 1f, fill = true)
+                  text =
+                  "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps",
+                  style = bodySmall,
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.weight(weight = 1f, fill = true)
+                )
+                Text(
+                  text =
+                  doubleFormatted(
+                    exerciseSets.sets
+                      .minBy { it.repetitionsInReserve ?: 10.0 }
+                      .targetRepetitionsInReserve
+                  ),
+                  style = bodySmall,
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.weight(weight = 1f, fill = true)
                 )
               }
             }
@@ -653,25 +662,25 @@ fun CurrentProgramCard(navController: NavController, program: Program, workout: 
     }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
     ) {
       Button(
         onClick = {
-            navController.navigate("workout?workoutID=${workout._id.toHexString()}") {
-                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                // Avoid multiple copies of the same destination when
-                // reselecting the same item
-                launchSingleTop = true
-                // Restore state when reselecting a previously selected item
-                restoreState = true
-            }
+          navController.navigate("workout?workoutID=${workout._id.toHexString()}") {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
         }
       ) {
-          Text(text = "Start ${workout.name}")
+        Text(text = "Start ${workout.name}")
       }
 
       IconButton(

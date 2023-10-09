@@ -47,7 +47,7 @@ class ExercisesRepository(private val database: RealmDatabase) {
     return database.getExerciseDetails(exerciseID)
   }
 
-  suspend fun getExercise(exerciseID: ObjectId): Exercise? {
+  fun getExercise(exerciseID: ObjectId?): Exercise? {
     return database.getExercise(exerciseID)
   }
 

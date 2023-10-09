@@ -1,7 +1,7 @@
 package com.example.myapplication.components.workoutDialogs.workingSets
 
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
@@ -38,15 +38,15 @@ class WorkingSetViewModel(
     //  private var workoutID: Long = 0
     //  private var workoutUUID: RealmUUID = RealmUUID.random()
 
-    fun getExerciseSets(exerciseSets: ExerciseSets) {
-        //    exerciseID = exerciseSets.exercise?.exerciseID
-        //    exerciseUUID = exerciseSets.exercise.uuid
-        //    workoutID = exerciseSets.workoutID
-        //    workoutUUID = exerciseSets.workoutUUID
-        exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-        _sets.value =
-            if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
-    }
+  fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
+    //    exerciseID = exerciseSets.exercise?.exerciseID
+    //    exerciseUUID = exerciseSets.exercise.uuid
+    //    workoutID = exerciseSets.workoutID
+    //    workoutUUID = exerciseSets.workoutUUID
+    exerciseWeightUnit = exerciseSets.exercise?.weightUnit
+    _sets.value =
+      if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
+  }
 
     fun addSet() {
         if (_sets.value.isNotEmpty()) {

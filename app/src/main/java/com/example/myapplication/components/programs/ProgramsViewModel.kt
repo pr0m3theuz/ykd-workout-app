@@ -24,6 +24,11 @@ constructor(
   //  private val setsRepository: SetsRepository,
   private val exercisesRepository: ExercisesRepository
 ) : ViewModel() {
+  fun getExerciseNameByID(exerciseID: ObjectId?): String {
+    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
+    return exercisesRepository.getExercise(exerciseID)?.name ?: "Exercise not found"
+  }
+
   private val _programs = MutableStateFlow(emptyList<Program>())
 
   //  TODO Get unique list of programs, DISTINCT (name and author and dateCreated)

@@ -1,7 +1,7 @@
 package com.example.myapplication.components.workoutDialogs.warmUpSets
 
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
@@ -30,12 +30,12 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
     _workingSetWeight.value = newWorkingWeight
   }
 
-  fun getExerciseSets(exerciseSets: ExerciseSets) {
+  fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
     exerciseWeightUnit = exerciseSets.exercise?.weightUnit
     _warmUpSets.value = initWarmUpSets()
   }
 
-  fun getWeightUnit(exerciseSets: ExerciseSets): String {
+  fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
     return if (exerciseSets.exercise?.weightUnit != null) {
       exerciseSets.exercise?.weightUnit ?: MassUnit.POUNDS.abbreviation
     } else {

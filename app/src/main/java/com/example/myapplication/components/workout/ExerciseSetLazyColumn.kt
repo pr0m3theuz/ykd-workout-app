@@ -20,7 +20,7 @@ import com.example.myapplication.components.exercise.ExerciseScreen
 import com.example.myapplication.components.exercise.SetItem
 import com.example.myapplication.components.exercise.SwipeToDismissItem
 import com.example.myapplication.components.exercise.WorkoutNoteTextField
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.WorkoutNote
 import org.koin.androidx.compose.koinViewModel
@@ -46,7 +46,7 @@ fun ExercisesSetsScreen(
 fun ExerciseSetLazyColumn(
     navController: NavController,
     workoutViewModel: WorkoutViewModel = koinViewModel(),
-    exercises: List<ExerciseSets>,
+    exercises: List<ExerciseExerciseSets>,
     workoutNotes: List<WorkoutNote>,
 ) {
     fun cancelWorkout() {

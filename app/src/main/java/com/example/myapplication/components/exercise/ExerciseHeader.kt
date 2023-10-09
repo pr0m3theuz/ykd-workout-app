@@ -48,8 +48,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
-import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.averageWeight
 import com.example.myapplication.data.model.totalRepetitions
 import com.example.myapplication.data.model.totalVolume
@@ -61,7 +61,7 @@ import java.text.DecimalFormat
 fun ExerciseScreen(
   navController: NavController,
   workoutViewModel: WorkoutViewModel = koinViewModel(),
-  _exerciseSets: ExerciseSets,
+  _exerciseSets: ExerciseExerciseSets,
 ) {
   val exerciseSet by remember { mutableStateOf(_exerciseSets) }
   //  Log.i("ExerciseScreen", "$_exerciseSets")
@@ -70,7 +70,7 @@ fun ExerciseScreen(
   ExerciseHeader(
     navController = navController,
     exerciseSets = exerciseSet,
-    removeExercise = { exerciseSets: ExerciseSets ->
+    removeExercise = { exerciseSets: ExerciseExerciseSets ->
       workoutViewModel.removeExerciseSets(exerciseSets)
     },
     //    addNote = { exerciseSets: ExerciseSets -> workoutViewModel.addExerciseNote(exerciseSets)
@@ -84,8 +84,8 @@ fun ExerciseScreen(
 @Composable
 fun ExerciseHeader(
   navController: NavController,
-  exerciseSets: ExerciseSets,
-  removeExercise: (exerciseSets: ExerciseSets) -> Unit,
+  exerciseSets: ExerciseExerciseSets,
+  removeExercise: (exerciseSets: ExerciseExerciseSets) -> Unit,
   //  addNote: (exerciseSets: ExerciseSets) -> Unit,
   //  removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit,
   workoutViewModel: WorkoutViewModel = viewModel()
@@ -99,12 +99,12 @@ fun ExerciseHeader(
 
   //    TODO fun updateExerciseNotes() updates notes when workout is completed
 
-  fun removeNote(exerciseSets: ExerciseSets, note: ExerciseNote) {
+  fun removeNote(exerciseSets: ExerciseExerciseSets, note: ExerciseNote) {
     workoutViewModel.removeExerciseNote(exerciseSets, note)
     //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
   }
 
-  fun addNote(exerciseSets: ExerciseSets) {
+  fun addNote(exerciseSets: ExerciseExerciseSets) {
     workoutViewModel.addExerciseNote(exerciseSets)
     //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
   }
@@ -168,9 +168,9 @@ fun ExerciseHeader(
 @Composable
 private fun ExerciseNotesList(
   notesVisible: Boolean,
-  exerciseSets: ExerciseSets,
+  exerciseSets: ExerciseExerciseSets,
   _pinNote: (note: ExerciseNote, pin: Boolean) -> Unit,
-  removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit
+  removeNote: (exerciseSets: ExerciseExerciseSets, note: ExerciseNote) -> Unit
 ) {
 //  Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
   var visible by remember { mutableStateOf(notesVisible) }
@@ -260,7 +260,7 @@ private fun SetContentHeader(weightUnit: String) {
 @Composable
 private fun ExerciseSetsWorkoutSummary(
   workoutViewModel: WorkoutViewModel = koinViewModel(),
-  _exerciseSets: ExerciseSets,
+  _exerciseSets: ExerciseExerciseSets,
   weightUnit: String
 ) {
   // TODO Give option to show either Total Volume or Total Working Volume

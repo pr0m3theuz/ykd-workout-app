@@ -22,7 +22,7 @@ import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetLazyColumn
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetViewModel
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
@@ -35,7 +35,7 @@ fun AddWorkingSetsScreen(
   workingSetViewModel: WorkingSetViewModel = koinViewModel(),
   workoutViewModel: WorkoutViewModel = koinViewModel(),
   openDialog: (Boolean) -> Unit,
-  exerciseSets: ExerciseSets,
+  exerciseSets: ExerciseExerciseSets,
 ) {
   workingSetViewModel.getExerciseSets(exerciseSets)
   val weightUnit = exerciseSets.exercise?.weightUnit ?: workingSetViewModel.userDefaultWeightUnit

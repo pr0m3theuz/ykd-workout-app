@@ -16,7 +16,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.doubleFormatted
@@ -28,7 +28,7 @@ fun AddWarmUpSetsScreen(
   workoutViewModel: WorkoutViewModel = koinViewModel(),
   warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
   openDialog: (Boolean) -> Unit,
-  exerciseSets: ExerciseSets,
+  exerciseSets: ExerciseExerciseSets,
 ) {
   warmUpSetsViewModel.getExerciseSets(exerciseSets)
 

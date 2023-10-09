@@ -45,6 +45,7 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
@@ -221,7 +222,7 @@ class RealmDatabase {
       ?: throw Exception("Exercise not found")
   }
 
-  suspend fun getExercise(exerciseID: ObjectId): Exercise? {
+  fun getExercise(exerciseID: ObjectId?): Exercise? {
     return realm.query<Exercise>("_id = $0", exerciseID).first().find()
   }
 
@@ -365,26 +366,56 @@ class RealmDatabase {
   }
 
   suspend fun insertWorkout(workout: Workout) {
-    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
-    val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
-    realm.write {
-      this.copyToRealm(
-        Workout().apply {
-          _id = workout._id
-          name = workout.name
-          workoutAuthor = workout.workoutAuthor
-          notes = insertedWorkoutNotes
-          workoutDuration = workout.workoutDuration
-          workoutType = workout.workoutType
-          dateCreated = workout.dateCreated
-          workoutStarted = workout.workoutStarted
-          workoutEnded = workout.workoutEnded
-          day = workout.day
-          exercisesSets = insertedExercisesSets
-          programID = workout.programID
-          microcycleID = workout.microcycleID
+    //    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
+    // val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
+
+    //    Log.i(
+    //      "insertWorkout",
+    //      "insertedExercisesSets: ${Json.encodeToString(insertedExercisesSets[0])}"
+    //    )
+
+    if (realm.query<Workout>("_id == $0", workout._id).first().find() != null) {
+      realm.write {
+        val _workout: Workout? = this.query<Workout>("_id == $0", workout._id).first().find()
+
+        if (_workout != null) {
+          _workout.name = workout.name
+          _workout.notes = workout.notes
+          _workout.dateCreated = workout.dateCreated
+          _workout.workoutStarted = workout.workoutStarted
+          _workout.workoutEnded = workout.workoutEnded
+          _workout.workoutDuration = workout.workoutDuration
+          _workout.programID = workout.programID
+          _workout.microcycleID = workout.microcycleID
+
+          // _workout.exercisesSets = insertedExercisesSets
+
+          Log.i("insertWorkout", "insertedWorkout: ${Json.encodeToString(_workout)}")
         }
-      )
+      }
+    } else {
+      realm.write {
+        //      val tempList = realmListOf<ExerciseSets>()
+        //      insertedExercisesSets.forEach { tempList.add(findLatest(it) ?: return@write) }
+
+        this.copyToRealm(
+          Workout().apply {
+            _id = workout._id
+            name = workout.name
+            workoutAuthor = workout.workoutAuthor
+            notes = workout.notes
+            workoutDuration = workout.workoutDuration
+            workoutType = workout.workoutType
+            dateCreated = workout.dateCreated
+            workoutStarted = workout.workoutStarted
+            workoutEnded = workout.workoutEnded
+            day = workout.day
+            exercisesSets = workout.exercisesSets
+            programID = workout.programID
+            microcycleID = workout.microcycleID
+          }
+        )
+      }
     }
   }
 
@@ -419,7 +450,7 @@ class RealmDatabase {
         realmWorkouts.add(newWorkout)
       }
     }
-//    Log.i("copyWorkoutsFromTemplate", "workouts: ${Json.encodeToString(workouts)}")
+    //    Log.i("copyWorkoutsFromTemplate", "workouts: ${Json.encodeToString(workouts)}")
     Log.i("copyWorkoutsFromTemplate", "workouts: ${realmWorkouts.size}")
     return realmWorkouts
   }
@@ -444,8 +475,7 @@ class RealmDatabase {
   //  Program Queries
   fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
     return realm.query<Program>(/*"startDate = null DISTINCT (uuid)"*/).find().asFlow()
-      .map { programs
-        ->
+      .map { programs ->
         programs.list.sortedByDescending { program -> program.dateCreated }
       }
   }
@@ -660,10 +690,10 @@ class RealmDatabase {
   //  }
 
   fun getPinnedExerciseNotes(
-    exercise: Exercise,
+    exerciseID: ObjectId,
     pinned: Boolean = true,
   ): List<ExerciseNote> {
-    return realm.query<ExerciseNote>("exercise = $0 AND pinned = $1", exercise._id, pinned).find()
+    return realm.query<ExerciseNote>("exercise = $0 AND pinned = $1", exerciseID, pinned).find()
   }
 
   /*  fun getPinnedExerciseNotes(
@@ -929,7 +959,7 @@ class RealmDatabase {
       */
 
       realm.write {
-        val latestExercise = findLatest(_exercise) ?: return@write
+//        val latestExercise = findLatest(_exercise) ?: return@write
         val latestSets = mutableListOf<Set>()
 
         //       setIDs.forEach { set ->
@@ -940,42 +970,72 @@ class RealmDatabase {
         val exerciseSets = copyToRealm(ExerciseSets())
         exerciseSets.apply {
           exerciseOrder = _exerciseSets.exerciseOrder
-          exercise = latestExercise
+          exerciseID = _exercise._id
           //          sets = latestSets.toRealmList()
         }
       }
     }
   }
 
-  private suspend fun insertCompletedSets(sets: RealmList<Set>): RealmList<Set> {
+  private suspend fun insertCompletedSets(
+    sets: RealmList<Set>,
+    exerciseID: ObjectId?
+  ): RealmList<Set> {
     val realmSets = realmListOf<Set>()
     sets.forEach { set ->
       if (set.setCompleted) {
         realm.write {
-          val newSet = copyToRealm(Set())
-          newSet.apply {
-            //            _id = set._id // updates existing ExerciseSets TODO Create UpdateSets
-            // Function
-            setNumber = set.setNumber
-            weightPounds = set.weightPounds
-            weightKilograms = set.weightKilograms
-            repetitions = set.repetitions
-            ratePerceivedEffort = set.ratePerceivedEffort
-            repetitionsInReserve = set.repetitionsInReserve
-            targetWeight = set.targetWeight
-            targetRepetitions = set.targetRepetitions
-            targetRatePerceivedEffort = set.targetRatePerceivedEffort
-            targetRepetitionsInReserve = set.targetRepetitionsInReserve
-            percentage1RM = set.percentage1RM
-            setCompleted = set.setCompleted
-            exerciseID = set.exerciseID
-            dateCreated = set.dateCreated
+          //          val latestExercise = findLatest(exercise ?: return@write) ?: return@write
+          val _set: Set? = this.query<Set>("_id == $0", set._id).first().find()
+
+          if (_set != null) {
+            _set.setNumber = set.setNumber
+            _set.weightPounds = set.weightPounds
+            _set.weightKilograms = set.weightKilograms
+            _set.repetitions = set.repetitions
+            _set.ratePerceivedEffort = set.ratePerceivedEffort
+            _set.repetitionsInReserve = set.repetitionsInReserve
+            _set.targetWeight = set.targetWeight
+            _set.targetRepetitions = set.targetRepetitions
+            _set.targetRatePerceivedEffort = set.targetRatePerceivedEffort
+            _set.targetRepetitionsInReserve = set.targetRepetitionsInReserve
+            _set.percentage1RM = set.percentage1RM
+            _set.setCompleted = set.setCompleted
+            _set.exerciseID = exerciseID
+            _set.dateCreated = set.dateCreated
+          } else {
+            this.copyToRealm(
+              Set().apply {
+                _id = set._id // updates existing ExerciseSets TODO Create UpdateSets
+                // Function
+                setNumber = set.setNumber
+                weightPounds = set.weightPounds
+                weightKilograms = set.weightKilograms
+                repetitions = set.repetitions
+                ratePerceivedEffort = set.ratePerceivedEffort
+                repetitionsInReserve = set.repetitionsInReserve
+                targetWeight = set.targetWeight
+                targetRepetitions = set.targetRepetitions
+                targetRatePerceivedEffort = set.targetRatePerceivedEffort
+                targetRepetitionsInReserve = set.targetRepetitionsInReserve
+                percentage1RM = set.percentage1RM
+                setCompleted = set.setCompleted
+                this.exerciseID = exerciseID
+                dateCreated = set.dateCreated
+              },
+              updatePolicy = UpdatePolicy.ALL
+            )
           }
-          realmSets.add(newSet)
+
+          realmSets.add(set)
         }
       }
     }
     return realmSets
+  }
+
+  private fun getExerciseSets(exerciseSets: ExerciseSets): ExerciseSets? {
+    return realm.query<ExerciseSets>("_id == $0", exerciseSets._id).find().firstOrNull()
   }
 
   private suspend fun insertExerciseSets(
@@ -983,50 +1043,66 @@ class RealmDatabase {
   ): RealmList<ExerciseSets> {
     val realmExerciseSets = realmListOf<ExerciseSets>()
     exercisesSets.forEach { exerciseSets ->
-      val insertedSets = insertCompletedSets(exerciseSets.sets)
+      val insertedSets =
+        insertCompletedSets(exerciseSets.sets, exerciseID = exerciseSets.exerciseID)
       val insertedNotes = insertExerciseNotes(exerciseSets.notes)
       if (exerciseSets.sets.isNotEmpty()) {
         realm.write {
-          val latestExercise = findLatest(exerciseSets.exercise ?: return@write) ?: return@write
-          val newExerciseSets =
+          val _exerciseSets: ExerciseSets? =
+            this.query<ExerciseSets>("_id == $0", exerciseSets._id).first().find()
+//          val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?: return@write
+
+          if (_exerciseSets != null) {
+            _exerciseSets.exerciseOrder = exerciseSets.exerciseOrder
+            _exerciseSets.exerciseID = exerciseSets.exerciseID
+            _exerciseSets.sets = insertedSets // exerciseSets.sets
+            _exerciseSets.notes = insertedNotes
+            _exerciseSets.datePerformed = exerciseSets.datePerformed
+          } else {
             this.copyToRealm(
               ExerciseSets().apply {
                 _id = exerciseSets._id // updates existing ExerciseSets
                 exerciseOrder = exerciseSets.exerciseOrder
-                exercise = latestExercise
+                exerciseID = exerciseSets.exerciseID
                 sets = insertedSets
                 notes = insertedNotes
                 datePerformed = exerciseSets.datePerformed
+                workoutID = exerciseSets.workoutID
               },
+              updatePolicy = UpdatePolicy.ALL
             )
+          }
 
-          realmExerciseSets.add(newExerciseSets)
+          Log.i("insertExerciseSets()", "isManaged: ${exerciseSets.isManaged()}")
+          Log.i("insertExerciseSets()", "exerciseSets: ${Json.encodeToString(exerciseSets)}")
+          realmExerciseSets.add(exerciseSets)
         }
       }
     }
+
     return realmExerciseSets
   }
 
   suspend fun copyExerciseSetsFromTemplate(
-    exerciseSets: RealmList<ExerciseSets>,
+    exercisesSets: RealmList<ExerciseSets>,
     _workoutID: ObjectId
   ): RealmList<ExerciseSets> {
 
     val realmExerciseSets = realmListOf<ExerciseSets>()
-    exerciseSets.forEach { exerciseSet ->
+    exercisesSets.forEach { exerciseSets ->
       val newExerciseSetID = ObjectId()
-      val insertedSets = copySetsFromTemplate(exerciseSet.sets, newExerciseSetID)
+      val insertedSets = copySetsFromTemplate(exerciseSets.sets, newExerciseSetID)
       realm.write {
-        val latestExercise = findLatest(exerciseSet.exercise ?: return@write) ?: return@write
+//        val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?: return@write
         val newExerciseSet =
           this.copyToRealm(
             ExerciseSets().apply {
               _id = newExerciseSetID
-              exSetsUUID = exerciseSet.exSetsUUID
-              exerciseOrder = exerciseSet.exerciseOrder
-              exercise = latestExercise
+              exSetsUUID = exerciseSets.exSetsUUID
+              exerciseOrder = exerciseSets.exerciseOrder
+              exerciseID = exerciseSets.exerciseID
               sets = insertedSets
-              datePerformed = exerciseSet.datePerformed
+              datePerformed = exerciseSets.datePerformed
             }
           )
         realmExerciseSets.add(newExerciseSet)
@@ -1077,6 +1153,7 @@ class RealmDatabase {
           val newExerciseNote =
             this.copyToRealm(
               ExerciseNote().apply {
+                _id = exerciseNote._id
                 note = exerciseNote.note
                 pinned = exerciseNote.pinned
                 dateCreated = exerciseNote.dateCreated

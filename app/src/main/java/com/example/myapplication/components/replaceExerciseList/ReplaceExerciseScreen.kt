@@ -52,7 +52,7 @@ import com.example.myapplication.components.exercisesList.ExercisesFilterMenu
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.exercisesList.SelectedFiltersLazyRow
 import com.example.myapplication.data.model.Exercise
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MuscleGroup
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -62,7 +62,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ReplaceExerciseScreen(
-  exerciseSets: ExerciseSets,
+  exerciseSets: ExerciseExerciseSets,
   setOpenDialog: (Boolean) -> Unit,
   exercisesViewModel: ExercisesViewModel = koinViewModel(),
   workoutViewModel: WorkoutViewModel = koinViewModel(),

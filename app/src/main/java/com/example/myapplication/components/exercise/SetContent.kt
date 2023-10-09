@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.em
 import com.example.myapplication.components.SetTypeOptionsMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.TimerScreen
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
@@ -44,7 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SetContent(
-  exerciseSets: ExerciseSets,
+  exerciseSets: ExerciseExerciseSets,
   setIndex: Int,
   set: Set,
   //    isSetCompleted: (Boolean) -> Unit,

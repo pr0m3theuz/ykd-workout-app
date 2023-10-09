@@ -30,7 +30,7 @@ import com.example.myapplication.components.workoutDialogs.DialogInput
 import com.example.myapplication.components.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeLazyColumn
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.totalWorkingSetVolume
 import com.example.myapplication.utils.checkDoubleInput
@@ -42,7 +42,7 @@ import org.koin.androidx.compose.koinViewModel
 fun EquateVolumeScreen(
   openDialog: (Boolean) -> Unit,
   workoutViewModel: WorkoutViewModel = koinViewModel(),
-  exerciseSets: ExerciseSets,
+  exerciseSets: ExerciseExerciseSets,
   equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
 ) {
   val weightUnit = exerciseSets.exercise?.weightUnit ?: equateVolumeViewModel.userDefaultWeightUnit

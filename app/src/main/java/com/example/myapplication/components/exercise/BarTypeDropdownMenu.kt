@@ -48,15 +48,15 @@ fun BarTypeDropdownMenu(
         onDismissRequest = { onDismiss() }
     ) {
         DropdownMenuItem(
-            text = { Text("") },
-            leadingIcon = {
-                // TODO Change IconToggleButton to Icon
-                Icon(
-                    Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Localized description"
-                )
-            },
-            onClick = { onDismiss(); onClickArrowBack() }
+          text = { Text("TODO") },
+          leadingIcon = {
+            // TODO Change IconToggleButton to Icon
+            Icon(
+              Icons.AutoMirrored.Outlined.ArrowBack,
+              contentDescription = "Localized description"
+            )
+          },
+          onClick = { onDismiss(); onClickArrowBack() }
         )
         DropdownMenuItem(
             text = { Text("Default") },

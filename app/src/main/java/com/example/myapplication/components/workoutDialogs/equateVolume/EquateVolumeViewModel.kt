@@ -1,7 +1,7 @@
 package com.example.myapplication.components.workoutDialogs.equateVolume
 
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.setVolume
@@ -15,82 +15,83 @@ import kotlin.math.roundToInt
 
 private const val WARM_UP_SET = 2
 
-class EquateVolumeViewModel(private val userRepository: UserRepository) : ViewModel() {
-    val userDefaultWeightUnit: String =
-        userRepository.getUser()?.defaultWeightUnit ?: MassUnit.POUNDS.abbreviation
+class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
+  val userDefaultWeightUnit: String =
+    userRepository.getUser()?.defaultWeightUnit ?: MassUnit.POUNDS.abbreviation
 
-    var exerciseWeightUnit: String? = null
+  private var exerciseWeightUnit: String? = null
 
-    //    TODO Implement getOneRepMax() Query
-    private var _oneRepMax = MutableStateFlow(100.0)
-    val oneRepMax: StateFlow<Double>
-        get() = _oneRepMax
+  //    TODO Implement getOneRepMax() Query
+  private var _oneRepMax = MutableStateFlow(100.0)
+  val oneRepMax: StateFlow<Double>
+    get() = _oneRepMax
 
-    private var _sets = MutableStateFlow(emptyList<Set>())
-    val sets: StateFlow<List<Set>>
-        get() = _sets
+  private var _sets = MutableStateFlow(emptyList<Set>())
+  val sets: StateFlow<List<Set>>
+    get() = _sets
 
   private var _setsPercentage = MutableStateFlow(_sets.value.associate { it.uuid to 1.0 })
   val setsPercentage: StateFlow<Map<RealmUUID, Double>>
     get() = _setsPercentage
 
-    private var _totalVolume: Double = 0.0
-    val totalVolume: Double
-        get() = _totalVolume
+  private var _totalVolume: Double = 0.0
+  val totalVolume: Double
+    get() = _totalVolume
 
-    private var _newTotalVolume = MutableStateFlow(0.0)
-    val newTotalVolume: StateFlow<Double>
-        get() = _newTotalVolume
+  private var _newTotalVolume = MutableStateFlow(0.0)
+  val newTotalVolume: StateFlow<Double>
+    get() = _newTotalVolume
 
-    private var _exerciseSets: ExerciseSets? = null
+  private var _exerciseSets: ExerciseExerciseSets? = null
 
-    //  private var exerciseID: Long = 0
-    //  private var exerciseUUID: RealmUUID = RealmUUID.random()
-    //  private var workoutID: Long = 0
-    //  private var workoutUUID: RealmUUID = RealmUUID.random()
+  //  private var exerciseID: Long = 0
+  //  private var exerciseUUID: RealmUUID = RealmUUID.random()
+  //  private var workoutID: Long = 0
+  //  private var workoutUUID: RealmUUID = RealmUUID.random()
 
-    private fun getExerciseSets(exerciseSets: ExerciseSets) {
-        _exerciseSets = exerciseSets
-        //    exerciseID = exerciseSets.exercise.exerciseID
-        //    exerciseUUID = exerciseSets.exercise.uuid
-        //    workoutID = exerciseSets.workoutID
-        //    workoutUUID = exerciseSets.workoutUUID
-        exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-        _sets.value =
-            if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
-    }
+  private fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
+    _exerciseSets = exerciseSets
+    //    exerciseID = exerciseSets.exercise.exerciseID
+    //    exerciseUUID = exerciseSets.exercise.uuid
+    //    workoutID = exerciseSets.workoutID
+    //    workoutUUID = exerciseSets.workoutUUID
+    exerciseWeightUnit = exerciseSets.exercise?.weightUnit
+    _sets.value =
+      if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
+  }
 
-  fun initialize(exerciseSets: ExerciseSets) {
+  fun initialize(exerciseSets: ExerciseExerciseSets) {
     getExerciseSets(exerciseSets)
     changeWorkingSets(exerciseSets.sets)
     setTotalVolume(calculateTotalVolume(exerciseSets.sets))
   }
 
-    fun setTotalVolume(totalVolume: Double) {
-        _totalVolume = totalVolume
-    }
+  fun setTotalVolume(totalVolume: Double) {
+    _totalVolume = totalVolume
+  }
 
-    private fun setNewTotalVolume(totalVolume: Double) {
-        _newTotalVolume.value = totalVolume
-    }
+  private fun setNewTotalVolume(totalVolume: Double) {
+    _newTotalVolume.value = totalVolume
+  }
 
-    private val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
-    fun getWorkoutSetWeight(set: Set): Double? {
-        return if (weightUnit == MassUnit.POUNDS.abbreviation) {
-            set.weightPounds
-        } else {
-            set.weightKilograms
-        }
-    }
+  private val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
 
-    fun changeWorkingSetWeight(newWorkingWeight: Double) {
-        _oneRepMax.value = newWorkingWeight
+  fun getWorkoutSetWeight(set: Set): Double? {
+    return if (weightUnit == MassUnit.POUNDS.abbreviation) {
+      set.weightPounds
+    } else {
+      set.weightKilograms
     }
+  }
 
-    fun changeWorkingSets(sets: List<Set>) {
-        _sets.value = sets.filter { it.setTypeID != WARM_UP_SET }
-        setNewTotalVolume(calculateTotalVolume(_sets.value))
-    }
+  fun changeWorkingSetWeight(newWorkingWeight: Double) {
+    _oneRepMax.value = newWorkingWeight
+  }
+
+  fun changeWorkingSets(sets: List<Set>) {
+    _sets.value = sets.filter { it.setTypeID != WARM_UP_SET }
+    setNewTotalVolume(calculateTotalVolume(_sets.value))
+  }
 
   fun addSet() {
     val temporarySets: MutableList<Set> = _sets.value.toMutableList()
@@ -98,14 +99,14 @@ class EquateVolumeViewModel(private val userRepository: UserRepository) : ViewMo
     if (_sets.value.isNotEmpty()) {
       temporarySets.add(
         Set().apply {
-            setNumber = _sets.value.last().setNumber?.plus(1)
-            weightPounds = temporarySets.last().weightPounds
-            weightKilograms = temporarySets.last().weightKilograms
-            repetitions = temporarySets.last().repetitions
-            ratePerceivedEffort = temporarySets.last().ratePerceivedEffort
-            repetitionsInReserve = temporarySets.last().repetitionsInReserve
-            setTypeID = temporarySets.last().setTypeID
-            percentage1RM = temporarySets.last().percentage1RM
+          setNumber = _sets.value.last().setNumber?.plus(1)
+          weightPounds = temporarySets.last().weightPounds
+          weightKilograms = temporarySets.last().weightKilograms
+          repetitions = temporarySets.last().repetitions
+          ratePerceivedEffort = temporarySets.last().ratePerceivedEffort
+          repetitionsInReserve = temporarySets.last().repetitionsInReserve
+          setTypeID = temporarySets.last().setTypeID
+          percentage1RM = temporarySets.last().percentage1RM
         }
       )
     } else {
@@ -173,7 +174,7 @@ class EquateVolumeViewModel(private val userRepository: UserRepository) : ViewMo
     val temporarySets = _sets.value.toMutableList()
     temporarySets.forEach {
       if (it.uuid == uuid) {
-          it.weightPounds = newWeight?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP)?.toDouble()
+        it.weightPounds = newWeight?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP)?.toDouble()
       }
     }
     _sets.value = temporarySets
@@ -209,9 +210,9 @@ class EquateVolumeViewModel(private val userRepository: UserRepository) : ViewMo
 
     val newSets = _sets.value
     newSets.forEach {
-        it.lazyListItemID = newID()
-        it.weightPounds = newWeight
-        it.repetitions = newRepetitions
+      it.lazyListItemID = newID()
+      it.weightPounds = newWeight
+      it.repetitions = newRepetitions
     }
 
     _sets.value = newSets.toList()
@@ -229,9 +230,9 @@ class EquateVolumeViewModel(private val userRepository: UserRepository) : ViewMo
 
     val newSets = sets.value
     newSets.forEach {
-        it.lazyListItemID = newID()
-        it.weightPounds = newWeight
-        it.repetitions = newRepetitions
+      it.lazyListItemID = newID()
+      it.weightPounds = newWeight
+      it.repetitions = newRepetitions
     }
 
     _sets.value = newSets.toList()
@@ -249,8 +250,9 @@ class EquateVolumeViewModel(private val userRepository: UserRepository) : ViewMo
   private fun calculateTotalVolume(temporarySets: List<Set>): Double {
     var totalVolume: Double = 0.0
 
-      temporarySets.filter { it.setTypeID != WARM_UP_SET }
-          .forEach { totalVolume += (it.setVolume(weightUnit)) }
+    temporarySets
+      .filter { it.setTypeID != WARM_UP_SET }
+      .forEach { totalVolume += (it.setVolume(weightUnit)) }
 
     return totalVolume
   }
@@ -258,9 +260,9 @@ class EquateVolumeViewModel(private val userRepository: UserRepository) : ViewMo
   private fun initSets(): MutableList<Set> {
     return MutableList(3) { index ->
       Set().apply {
-          setNumber = index
-          weightPounds = 100.00
-          repetitions = 10
+        setNumber = index
+        weightPounds = 100.00
+        repetitions = 10
         percentage1RM = 1.0
         //        exerciseID = exerciseID,
         //        exerciseUUID = exerciseUUID,

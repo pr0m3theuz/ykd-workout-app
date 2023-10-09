@@ -27,16 +27,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.WorkoutViewModel
-import com.example.myapplication.data.model.Exercise
-import com.example.myapplication.data.model.ExerciseSets
-import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.data.model.formatWorkoutDuration
@@ -45,15 +41,10 @@ import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.model.totalSets
 import com.example.myapplication.data.model.totalVolume
 import com.example.myapplication.utils.doubleFormatted
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.types.RealmInstant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 import org.mongodb.kbson.ObjectId
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +91,8 @@ fun WorkoutSummaryScreen(
         WorkoutSummaryContent(
           completedWorkout = completedWorkout!!,
           workoutsCount,
-          userDefaultWeightUnit
+          userDefaultWeightUnit,
+          workoutViewModel,
         )
       } /*else {
         navController.navigate("programs")*//* { popUpTo("programs") { inclusive = false } }*//*
@@ -115,6 +107,7 @@ fun WorkoutSummaryContent(
   completedWorkout: Workout,
   workoutsCount: Int,
   userDefaultWeightUnit: String,
+  workoutViewModel: WorkoutViewModel,
 ) {
   val totalSets = completedWorkout.totalSets()
   val totalVolume = doubleFormatted(completedWorkout.totalVolume(userDefaultWeightUnit))
@@ -244,13 +237,14 @@ fun WorkoutSummaryContent(
             Text(text = "Top Set", style = style, modifier = Modifier.weight(0.5f))
           }
           completedWorkout.exercisesSets.forEach { exerciseSets ->
+            val exercise = workoutViewModel.getExerciseByID(exerciseSets.exerciseID)
             Row(
               modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 2.dp, horizontal = 4.dp),
               verticalAlignment = Alignment.CenterVertically
             ) {
-              val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
+              val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
               val style = MaterialTheme.typography.bodyMedium
               // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
               val maxWeight = exerciseSets.sets.maxBy { it.weightPounds ?: 0.0 }
@@ -260,7 +254,7 @@ fun WorkoutSummaryContent(
 
 
               Text(
-                text = "${exerciseSets.sets.size} × ${exerciseSets.exercise?.name ?: ""}",
+                text = "${exerciseSets.sets.size} × ${exercise?.name ?: ""}",
                 style = style,
                 modifier = Modifier.weight(1f)
               )
@@ -279,6 +273,7 @@ fun WorkoutSummaryContent(
   }
 }
 
+/*
 class WorkoutDataProvider : PreviewParameterProvider<Workout> {
   @OptIn(ExperimentalTime::class)
   override val values: Sequence<Workout>
@@ -294,7 +289,7 @@ class WorkoutDataProvider : PreviewParameterProvider<Workout> {
           exercisesSets =
             realmListOf(
               ExerciseSets().apply {
-                exercise = Exercise().apply { name = "Test Exercise" }
+                exerciseID = Exercise().apply { name = "Test Exercise" }
                 sets =
                   realmListOf(
                     Set().apply {
@@ -327,7 +322,7 @@ class WorkoutDataProvider : PreviewParameterProvider<Workout> {
                   )
               },
               ExerciseSets().apply {
-                exercise = Exercise().apply { name = "Test Exercise" }
+                exerciseID = Exercise().apply { name = "Test Exercise" }
                 sets =
                   realmListOf(
                     Set().apply {
@@ -360,7 +355,7 @@ class WorkoutDataProvider : PreviewParameterProvider<Workout> {
                   )
               },
               ExerciseSets().apply {
-                exercise = Exercise().apply { name = "Test Exercise" }
+                exerciseID = Exercise().apply { name = "Test Exercise" }
                 sets =
                   realmListOf(
                     Set().apply {
@@ -396,3 +391,4 @@ class WorkoutDataProvider : PreviewParameterProvider<Workout> {
         }
       )
 }
+*/

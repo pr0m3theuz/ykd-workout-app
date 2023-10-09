@@ -42,20 +42,21 @@ class Workout() : RealmObject {
   var lazyListItemID: Long = newID()
   var uuid: RealmUUID = RealmUUID.random()
   var name: String? = null // TODO make name default = User
-    var workoutAuthor: String? = null
-    var notes: RealmList<WorkoutNote> = realmListOf()
-    var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
-    var workoutType: String? = null
-    var dateCreated: RealmInstant = RealmInstant.now()
-    var workoutStarted: RealmInstant? = null
-    var workoutEnded: RealmInstant? = null
-    var day: Int? = null
-    var exercisesSets: RealmList<ExerciseSets> = realmListOf()
+  var workoutAuthor: String? = null
+  var notes: RealmList<WorkoutNote> = realmListOf()
+  var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
+  var workoutType: String? = null
+  var dateCreated: RealmInstant = RealmInstant.now()
+  var workoutStarted: RealmInstant? = null
+  var workoutEnded: RealmInstant? = null
+  var day: Int? = null
+  var exercisesSets: RealmList<ExerciseSets> = realmListOf()
+  var totalVolumeInPounds: Double? = 0.0
+  var totalVolumeInKilograms: Double? = 0.0
+  var programID: ObjectId? = null
 
-    var programID: ObjectId? = null
-
-    //    val mesocycleID: Long? = null
-    var microcycleID: ObjectId? = null
+  //    val mesocycleID: Long? = null
+  var microcycleID: ObjectId? = null
 }
 
 @Serializable
@@ -63,24 +64,27 @@ data class Workouts(val workouts: List<Workout>)
 
 fun Workout.formatWorkoutDuration(): String {
 
-  return workoutDuration.toDuration(DurationUnit.MILLISECONDS)
-    .toComponents { hours, minutes, seconds, _ ->
-      when (hours) {
-        0L -> "$minutes" + "m"
-        else -> "$hours" + "h" + " " + minutes.toString().padStart(2, '0') + "m"
-      }
+  return workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                              minutes,
+                                                                              seconds,
+                                                                              _ ->
+    when (hours) {
+      0L -> "$minutes" + "m"
+      else -> "$hours" + "h" + " " + minutes.toString().padStart(2, '0') + "m"
     }
+  }
 }
 
 fun Workout.formatWorkoutDate(): String {
   val dateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
-//  TODO Confirm if UTC or local
+  //  TODO Confirm if UTC or local
   return if (workoutStarted != null) {
     LocalDateTime.ofEpochSecond(
       workoutStarted!!.epochSeconds,
       workoutStarted!!.nanosecondsOfSecond,
       ZoneOffset.UTC
-    ).format(dateTimeFormatter)
+    )
+      .format(dateTimeFormatter)
   } else {
     ""
   }
@@ -88,16 +92,16 @@ fun Workout.formatWorkoutDate(): String {
 
 fun Workout.totalSets(): Int {
   var totalSets: Int = 0
-  exercisesSets.forEach { exerciseSets ->
-    totalSets += exerciseSets.sets.size
-  }
+  exercisesSets.forEach { exerciseSets -> totalSets += exerciseSets.sets.size }
   return totalSets
 }
 
-fun Workout.totalVolume(userDefaultWeightUnit: String): Double {
-    var totalVolume: Double = 0.0
-    exercisesSets.forEach { exerciseSets ->
-        totalVolume += exerciseSets.totalVolume(userDefaultWeightUnit)
+fun Workout.totalVolume(userDefaultWeightUnit: String): Double? {
+  return when (userDefaultWeightUnit) {
+    MassUnit.POUNDS.abbreviation -> totalVolumeInPounds
+    MassUnit.KILOGRAMS.abbreviation -> totalVolumeInKilograms
+    else -> {
+      totalVolumeInPounds
     }
-    return totalVolume
+  }
 }
