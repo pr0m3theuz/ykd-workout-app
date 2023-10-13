@@ -366,8 +366,8 @@ class RealmDatabase {
   }
 
   suspend fun insertWorkout(workout: Workout) {
-    //    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
-    // val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
+    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
+    val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
 
     //    Log.i(
     //      "insertWorkout",
@@ -387,8 +387,7 @@ class RealmDatabase {
           _workout.workoutDuration = workout.workoutDuration
           _workout.programID = workout.programID
           _workout.microcycleID = workout.microcycleID
-
-          // _workout.exercisesSets = insertedExercisesSets
+          _workout.exercisesSets = insertedExercisesSets
 
           Log.i("insertWorkout", "insertedWorkout: ${Json.encodeToString(_workout)}")
         }

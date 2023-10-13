@@ -121,3 +121,7 @@ z
 Japp/src/main/java/com/example/myapplication/components/exercise/SetItem.kt,a/a/aa26b40d3cf9a606a0fa5b64e892408f16260549
 †
 Vapp/src/main/java/com/example/myapplication/components/exercise/BarTypeDropdownMenu.kt,8/4/8457a858903e4de317233a3d94b25e3af5a5d05d
+
+Oapp/src/main/java/com/example/myapplication/data/network/ExercisesRepository.kt,c/3/c3f0858ae9b4932e34d9ca3e98de17404adff8bc
+j
+:app/src/main/java/com/example/myapplication/utils/NewID.kt,e/1/e14653e8ebe8d8f3385f41245988a690f1945bae

@@ -74,6 +74,7 @@ import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Workout
+import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.utils.doubleFormatted
 import org.koin.androidx.compose.koinViewModel
 import org.mongodb.kbson.ObjectId
@@ -746,7 +747,7 @@ fun MicrocycleCard(
                   Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                       Text(
-                        text = "${workout.name}",
+                        text = workout.name ?: "Workout",
                         style = titleMedium,
                         softWrap = true,
                         modifier = Modifier.weight(1f),
@@ -766,11 +767,13 @@ fun MicrocycleCard(
                             shape = ShapeDefaults.ExtraSmall
                           )
                       ) {
-                        Text(
-                          text = "Date Completed",
-                          style = bodySmall,
-                          modifier = Modifier.padding(horizontal = 4.dp)
-                        )
+                        if (workout.formatWorkoutDate().isNotEmpty()) {
+                          Text(
+                            text = workout.formatWorkoutDate(),
+                            style = bodySmall,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                          )
+                        }
                       }
                     }
 

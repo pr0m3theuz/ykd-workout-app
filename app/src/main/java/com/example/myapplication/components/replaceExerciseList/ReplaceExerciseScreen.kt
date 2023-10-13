@@ -179,7 +179,7 @@ fun ReplaceExerciseScreen(
             query = query,
             onQueryChange = {
               query = it
-              filterExercises("%$it%")
+              filterExercises(it)
             },
             onSearch = { active = false },
             active = active,

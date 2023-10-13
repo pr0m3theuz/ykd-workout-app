@@ -462,6 +462,7 @@ class WorkoutViewModel(
     getPinnedWorkoutNotes(workoutTemplate.uuid)
     _exercisesSetsData =
       copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets, newWorkout._id)
+    _exercisesSetsData.sortBy { it.exerciseOrder }
     _exercisesSets.value = _exercisesSetsData.toList()
   }
 
