@@ -338,9 +338,10 @@ class RealmDatabase {
     }
   }
 
-  fun getWorkoutsCount(): Int {
-    return realm.query<Workout>("workoutEnded != null").find().count()
-  }
+//  TODO Fix this function
+fun getWorkoutsCount(): Int {
+  return realm.query<Workout>("workoutEnded != null").find().count()
+}
 
   fun getWorkoutByID(workoutID: ObjectId): Workout? {
     return realm.query<Workout>("_id = $0", workoutID).first().find()
@@ -754,7 +755,7 @@ class RealmDatabase {
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     return realm
       .query<Set>(
-        "exerciseID = $0 AND setNumber = $1 SORT (dateCreated DESC)",
+        "exerciseID = $0 AND setNumber = $1 AND setCompleted = true SORT (dateCreated DESC)",
         exerciseID,
         setNumber
       )

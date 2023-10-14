@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
@@ -187,7 +186,7 @@ private fun WorkoutNameTextField(
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
     TextStyle(
-      fontSize = 5.em,
+      fontSize = MaterialTheme.typography.titleMedium.fontSize,
       textAlign = TextAlign.Center,
       color = MaterialTheme.colorScheme.onBackground
     ),

@@ -81,7 +81,7 @@ fun Set.setTextRIR(weightUnit: String): String {
       doubleFormatted(
         repetitionsInReserve
       )
-    } RIR" else ""
+    }" else ""
   }"
 
 //  ${doubleFormatted(weightKilograms)} × $repetitions ${

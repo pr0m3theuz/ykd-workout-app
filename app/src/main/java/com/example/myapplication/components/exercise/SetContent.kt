@@ -29,8 +29,6 @@ import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
-import com.example.myapplication.data.model.convertKgToPound
-import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.model.setTextRIR
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
@@ -59,18 +57,14 @@ fun SetContent(
 
   val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
 
+  val previousSet =
+    exerciseSets.exercise?.let { exercise ->
+      set.setNumber?.let { setNumber ->
+        workoutViewModel.populatePreviousSetField(exercise._id, setNumber = setNumber)
+      }
+    }
 
-  val previousSetText by remember {
-    mutableStateOf(
-      exerciseSets.exercise?.let { exercise ->
-        set.setNumber?.let { setNumber ->
-          workoutViewModel
-            .populatePreviousSetField(exercise._id, setNumber = setNumber)
-            ?.setTextRIR(weightUnit) ?: ""
-        }
-      } ?: ""
-    )
-  }
+  val previousSetText by remember { mutableStateOf(previousSet?.setTextRIR(weightUnit) ?: "") }
 
   //    val sets = workoutViewModel.allSets.collectAsState()
   //
@@ -88,17 +82,16 @@ fun SetContent(
 
   var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
 
-
   val exerciseWeight = getExerciseWeight(set, weightUnit)
 
-//  val weightState by
-//  rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
-//    mutableStateOf(ExerciseWeightState(exerciseWeight))
-//  }
+  //  val weightState by
+  //  rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
+  //    mutableStateOf(ExerciseWeightState(exerciseWeight))
+  //  }
 
-//  var weightFocusState by remember { mutableStateOf(weightState.isFocusedDirty) }
+  //  var weightFocusState by remember { mutableStateOf(weightState.isFocusedDirty) }
 
-//  weightState.isFocusedDirty = weightFocusState
+  //  weightState.isFocusedDirty = weightFocusState
 
   var exerciseWeightText by remember { mutableStateOf(exerciseWeight) }
 
@@ -122,7 +115,7 @@ fun SetContent(
     workoutViewModel.updateSetReps(
       exerciseSets = exerciseSets,
       setUUID = setUUID,
-      newReps = repetitionsText.toIntOrNull()
+      newReps = reps.toIntOrNull()
     )
   }
 
@@ -140,8 +133,8 @@ fun SetContent(
       setUUID = setUUID,
       newWeight = weight.toDoubleOrNull()
     )
-//    weightFocusState = true
-//    weightState.isFocusedDirty = weightFocusState
+    //    weightFocusState = true
+    //    weightState.isFocusedDirty = weightFocusState
   }
 
   fun updateSetData() {
@@ -177,6 +170,16 @@ fun SetContent(
 
   if (openTimerScreen && workoutViewModel.isTimerRunning) {
     TimerScreen(openDialog = { open -> openTimerScreen(open) })
+  }
+
+  fun copyPreviousSetData() {
+    if (workoutViewModel.getWeightUnit(exerciseSets) == MassUnit.POUNDS.abbreviation) {
+      updateWeight(previousSet?.weightPounds.toString())
+    } else {
+      updateWeight(previousSet?.weightKilograms.toString())
+    }
+    updateReps(previousSet?.repetitions.toString())
+    updateRIR(previousSet?.repetitionsInReserve.toString())
   }
 
   Row(
@@ -217,8 +220,10 @@ fun SetContent(
 
     Box(/*modifier = Modifier.width(110.dp)*/) {
       TextButton(
-        onClick = { /*TODO Make Current Set = Previous Set*/ },
+        onClick = { copyPreviousSetData() },
         modifier = Modifier.width(110.dp),
+        shape = RoundedCornerShape(size = 8.dp),
+        contentPadding = PaddingValues(0.dp),
       ) {
         Text(
           text = previousSetText,
@@ -241,7 +246,7 @@ fun SetContent(
       contentAlignment = Alignment.Center
     ) {
       ExerciseWeightTextField(
-//        modifier = Modifier.focusRequester(focusRequester),
+        //        modifier = Modifier.focusRequester(focusRequester),
         exerciseWeightText = exerciseWeightText,
         onWeightChange = {
           exerciseWeightText =
@@ -253,17 +258,18 @@ fun SetContent(
           // TODO set.weightKilograms = weightState.text.toDoubleOrNull()
           // TODO set.weightPounds = set.convertKgToPound()
           // TODO Do unit conversion
-          if (workoutViewModel.getWeightUnit(exerciseSets) == MassUnit.POUNDS.abbreviation) {
-            set.weightPounds = exerciseWeightText.toDoubleOrNull()
-            set.weightKilograms = set.convertPoundToKg()
-          } else {
-            set.weightKilograms = exerciseWeightText.toDoubleOrNull()
-            set.weightPounds = set.convertKgToPound()
-          }
+          // TODO Is this redundant?
+//          if (workoutViewModel.getWeightUnit(exerciseSets) == MassUnit.POUNDS.abbreviation) {
+//            set.weightPounds = exerciseWeightText.toDoubleOrNull()
+//            set.weightKilograms = set.convertPoundToKg()
+//          } else {
+//            set.weightKilograms = exerciseWeightText.toDoubleOrNull()
+//            set.weightPounds = set.convertKgToPound()
+//          }
         },
         onImeAction = {
           updateSetData()
-//          repsFocusRequester.requestFocus()
+          //          repsFocusRequester.requestFocus()
         }
       )
     }
@@ -281,7 +287,7 @@ fun SetContent(
       contentAlignment = Alignment.Center
     ) {
       ExerciseRepsTextField(
-//        modifier = Modifier.focusRequester(repsFocusRequester),
+        //        modifier = Modifier.focusRequester(repsFocusRequester),
         repetitionsText = repetitionsText,
         onRepsChange = { reps ->
           repetitionsText = checkIntInput(reps)
@@ -289,7 +295,7 @@ fun SetContent(
         },
         onImeAction = {
           updateSetData()
-//          rirFocusRequester.requestFocus()
+          //          rirFocusRequester.requestFocus()
         }
       )
     }
@@ -307,7 +313,7 @@ fun SetContent(
       contentAlignment = Alignment.Center
     ) {
       RirTextField(
-//        modifier = Modifier.focusRequester(rirFocusRequester),
+        //        modifier = Modifier.focusRequester(rirFocusRequester),
         repetitionsInReserveText = repetitionsInReserveText,
         onRIRChange = { rir ->
           repetitionsInReserveText =
@@ -333,9 +339,9 @@ fun SetContent(
           setComplete = it
         )
         workoutViewModel.startSetCompletedTimer(exerciseSet = exerciseSets, setUUID = setUUID)
-//        if (!workoutViewModel.isTimerRunning) {
-//          openTimerScreen(it)
-//        }
+        //        if (!workoutViewModel.isTimerRunning) {
+        //          openTimerScreen(it)
+        //        }
       }
     )
   }
@@ -411,9 +417,7 @@ private fun ExerciseWeightTextField(
   BasicTextField(
     value = exerciseWeightText,
     onValueChange = { onWeightChange(it.take(7)) },
-    modifier =
-    modifier
-      .padding(PaddingValues(4.dp)),
+    modifier = modifier.padding(PaddingValues(4.dp)),
     textStyle =
     TextStyle(
       fontSize = 5.em,
@@ -448,4 +452,6 @@ private fun getRepetitions(set: Set): String =
   }
 
 private fun getExerciseWeight(set: Set, weightUnit: String): String =
-  doubleFormatted(if (weightUnit == MassUnit.POUNDS.abbreviation) set.weightPounds else set.weightKilograms)
+  doubleFormatted(
+    if (weightUnit == MassUnit.POUNDS.abbreviation) set.weightPounds else set.weightKilograms
+  )

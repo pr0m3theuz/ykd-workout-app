@@ -17,7 +17,7 @@ import com.example.myapplication.components.Screens
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercise.AddSet
 import com.example.myapplication.components.exercise.ExerciseScreen
-import com.example.myapplication.components.exercise.SetItem
+import com.example.myapplication.components.exercise.SetLazyListItem
 import com.example.myapplication.components.exercise.SwipeToDismissItem
 import com.example.myapplication.components.exercise.WorkoutNoteTextField
 import com.example.myapplication.data.model.ExerciseExerciseSets
@@ -83,12 +83,12 @@ fun ExerciseSetLazyColumn(
             )
 
             exerciseSets.sets.forEachIndexed { index: Int, set: Set ->
-                SetItem(
-                    exerciseSets = exerciseSets,
-                    index = index,
-                    set = set,
-                    removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
-                )
+              SetLazyListItem(
+                exerciseSets = exerciseSets,
+                index = index,
+                set = set,
+                removeSet = { workoutViewModel.removeSet(exerciseSets, set) }
+              )
             }
 
             AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
@@ -97,7 +97,7 @@ fun ExerciseSetLazyColumn(
         item { AddExercise() }
         item { CancelWorkout() { cancelWorkout() } }
         item { Box(modifier = Modifier
-            .height(128.dp)
-            .fillMaxWidth()) }
+          .height(128.dp)
+          .fillMaxWidth()) }
     }
 }

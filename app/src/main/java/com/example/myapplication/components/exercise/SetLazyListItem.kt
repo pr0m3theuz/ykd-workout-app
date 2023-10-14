@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SetItem(
+fun SetLazyListItem(
     exerciseSets: ExerciseExerciseSets,
     index: Int,
     set: Set,

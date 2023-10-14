@@ -134,7 +134,7 @@ fun ExerciseHeader(
             Text(
               text = it,
               color = MaterialTheme.colorScheme.primary,
-              style = MaterialTheme.typography.titleSmall,
+              style = MaterialTheme.typography.titleMedium,
             )
           }
         }
@@ -265,7 +265,7 @@ private fun ExerciseSetsWorkoutSummary(
 ) {
   // TODO Give option to show either Total Volume or Total Working Volume
   // TODO Update Values on user input, cause keyboard to
-  val textStyle = MaterialTheme.typography.bodySmall
+  val textStyle = MaterialTheme.typography.bodyMedium
 
   workoutViewModel.userDefaultWeightUnit
 
