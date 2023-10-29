@@ -169,7 +169,7 @@ fun ExerciseExerciseSets.totalWorkingSetVolume(weightUnit: String): Double {
   return totalVolume
 }
 
-fun ExerciseExerciseSets.totalVolume(userDefaultWeightUnit: String): Double {
+fun ExerciseExerciseSets.calculateTotalVolume(userDefaultWeightUnit: String): Double {
   var totalVolume = 0.0
   val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
 
@@ -202,7 +202,7 @@ fun ExerciseExerciseSets.totalRepetitions(): Int {
 
 fun ExerciseExerciseSets.averageWeight(userDefaultWeightUnit: String): Double {
   val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
-  val averageWeight: Double = totalVolume(weightUnit) / totalRepetitions()
+  val averageWeight: Double = calculateTotalVolume(weightUnit) / totalRepetitions()
 
   return if (averageWeight.isNaN()) {
     0.0

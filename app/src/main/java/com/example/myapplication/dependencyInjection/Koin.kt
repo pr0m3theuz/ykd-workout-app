@@ -2,6 +2,7 @@ package com.example.myapplication.dependencyInjection
 
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
+import com.example.myapplication.components.history.HistoryViewModel
 import com.example.myapplication.components.programs.ProgramsViewModel
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
@@ -72,7 +73,8 @@ val commonModule = module {
     viewModelOf(::WorkoutViewModel)
     viewModelOf(::EquateVolumeViewModel)
     viewModelOf(::WorkingSetViewModel)
-    viewModelOf(::WarmUpSetsViewModel)
+  viewModelOf(::WarmUpSetsViewModel)
+  viewModelOf(::HistoryViewModel)
 
     //  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
 }

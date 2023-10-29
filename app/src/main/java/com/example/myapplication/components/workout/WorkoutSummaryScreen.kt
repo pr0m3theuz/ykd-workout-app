@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -33,13 +35,13 @@ import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.WorkoutViewModel
+import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.data.model.formatWorkoutDuration
 import com.example.myapplication.data.model.setTextRIR
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.model.totalSets
-import com.example.myapplication.data.model.totalVolume
 import com.example.myapplication.utils.doubleFormatted
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -109,8 +111,7 @@ fun WorkoutSummaryContent(
   userDefaultWeightUnit: String,
   workoutViewModel: WorkoutViewModel,
 ) {
-  val totalSets = completedWorkout.totalSets()
-  val totalVolume = doubleFormatted(completedWorkout.totalVolume(userDefaultWeightUnit))
+
 
   Surface {
     Column(
@@ -140,133 +141,153 @@ fun WorkoutSummaryContent(
         //        TODO Query Workout Count
         Text(text = "You completed your ${workoutsCount + 1} workout!")
       }
+      Spacer(modifier = Modifier.height(24.dp))
+      WorkoutSummaryCard(completedWorkout, userDefaultWeightUnit) { exerciseID ->
+        workoutViewModel.getExerciseByID(exerciseID)
+      }
+    }
+  }
+}
 
-      Card(modifier = Modifier.padding(vertical = 24.dp)) {
-        Column(modifier = Modifier.padding(8.dp)) {
-          Row {
-            Text(text = "${completedWorkout.name}", style = MaterialTheme.typography.titleMedium)
-          }
+@Composable
+fun WorkoutSummaryCard(
+  completedWorkout: Workout,
+  userDefaultWeightUnit: String,
+  getExercise: (exerciseID: ObjectId?) -> Exercise?
+) {
+  val totalSets = completedWorkout.totalSets()
+  val totalVolume = doubleFormatted(
+    when (userDefaultWeightUnit) {
+      "kg" -> completedWorkout.totalVolumeInKilograms
+      else -> completedWorkout.totalVolumeInPounds
+    }
+  )
 
-          Row {
-            Text(
-              text = completedWorkout.formatWorkoutDate(),
-              style = MaterialTheme.typography.bodyMedium
-            )
-          }
+  Card(modifier = Modifier.padding(vertical = 0.dp)) {
+    Column(modifier = Modifier.padding(8.dp)) {
+      Row {
+        Text(text = "${completedWorkout.name}", style = MaterialTheme.typography.titleMedium)
+      }
 
-          Row(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceAround
-          ) {
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
-              Column {
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Center
-                ) {
-                  Icon(Icons.Filled.Timer, contentDescription = null)
-                  Text(text = "Duration")
-                }
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Center
-                ) {
-                  Text(text = completedWorkout.formatWorkoutDuration())
-                }
-              }
-            }
+      Row {
+        Text(
+          text = completedWorkout.formatWorkoutDate(),
+          style = MaterialTheme.typography.bodyMedium
+        )
+      }
 
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-              Column {
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Center
-                ) {
-                  val weightIcon = painterResource(R.drawable.weight_fill1_wght400_grad0_opsz24)
-                  //                  Image(painter = weightIcon, contentDescription = null)
-                  Icon(painter = weightIcon, contentDescription = null)
-                  Text(text = "Volume")
-                }
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Center
-                ) {
-                  // TODO Get Default Weight Unit from User Settings
-                  Text(text = "$totalVolume $userDefaultWeightUnit")
-                }
-              }
-            }
-
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-              Column {
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Center
-                ) {
-                  Icon(Icons.Filled.FormatListNumbered, contentDescription = null)
-                  Text(text = "Sets")
-                }
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Center
-                ) {
-                  Text(text = "$totalSets")
-                }
-              }
-            }
-          }
-
-          val backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
-          Row(
-            modifier =
-            Modifier
-              .fillMaxWidth()
-              .border(4.dp, backgroundColor)
-              .padding(4.dp)
-              .background(color = backgroundColor),
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            val style = MaterialTheme.typography.titleMedium
-            Text(text = "Exercise", style = style, modifier = Modifier.weight(1f))
-            Text(text = "Top Set", style = style, modifier = Modifier.weight(0.5f))
-          }
-          completedWorkout.exercisesSets.forEach { exerciseSets ->
-            val exercise = workoutViewModel.getExerciseByID(exerciseSets.exerciseID)
+      Row(
+        modifier = Modifier.padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceAround
+      ) {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
+          Column {
             Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 2.dp, horizontal = 4.dp),
-              verticalAlignment = Alignment.CenterVertically
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center
             ) {
-              val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
-              val style = MaterialTheme.typography.bodyMedium
-              // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
-              val maxWeight = exerciseSets.sets.maxBy { it.weightPounds ?: 0.0 }
-              val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
-              val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
-
-
-
-              Text(
-                text = "${exerciseSets.sets.size} × ${exercise?.name ?: ""}",
-                style = style,
-                modifier = Modifier.weight(1f)
-              )
-
-              Text(
-                // RIR
-                text = maxWeight.setTextRIR(weightUnit),
-                style = style,
-                modifier = Modifier.weight(0.5f)
-              )
+              Icon(Icons.Filled.Timer, contentDescription = null)
+              Text(text = "Duration")
+            }
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center
+            ) {
+              Text(text = completedWorkout.formatWorkoutDuration())
             }
           }
+        }
+
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+          Column {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center
+            ) {
+              val weightIcon = painterResource(R.drawable.weight_fill1_wght400_grad0_opsz24)
+              //                  Image(painter = weightIcon, contentDescription = null)
+              Icon(painter = weightIcon, contentDescription = null)
+              Text(text = "Volume")
+            }
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center
+            ) {
+              // TODO Get Default Weight Unit from User Settings
+              Text(text = "$totalVolume $userDefaultWeightUnit")
+            }
+          }
+        }
+
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+          Column {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center
+            ) {
+              Icon(Icons.Filled.FormatListNumbered, contentDescription = null)
+              Text(text = "Sets")
+            }
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center
+            ) {
+              Text(text = "$totalSets")
+            }
+          }
+        }
+      }
+
+      val backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
+      Row(
+        modifier =
+        Modifier
+          .fillMaxWidth()
+          .border(4.dp, backgroundColor)
+          .padding(4.dp)
+          .background(color = backgroundColor),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        val style = MaterialTheme.typography.titleMedium
+        Text(text = "Exercise", style = style, modifier = Modifier.weight(1f))
+        Text(text = "Top Set", style = style, modifier = Modifier.weight(0.5f))
+      }
+      completedWorkout.exercisesSets.forEach { exerciseSets ->
+        // TODO Seperate from WorkoutViewModel
+        val exercise = getExercise(exerciseSets.exerciseID)
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp, horizontal = 4.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+          val style = MaterialTheme.typography.bodyMedium
+          // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
+          val maxWeight = exerciseSets.sets.maxBy { it.weightPounds ?: 0.0 }
+          val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
+          val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
+
+
+
+          Text(
+            text = "${exerciseSets.sets.size} × ${exercise?.name ?: ""}",
+            style = style,
+            modifier = Modifier.weight(1f)
+          )
+
+          Text(
+            // RIR
+            text = maxWeight.setTextRIR(weightUnit),
+            style = style,
+            modifier = Modifier.weight(0.5f)
+          )
         }
       }
     }

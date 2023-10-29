@@ -31,6 +31,7 @@ fun ExerciseOptionsDropdownMenu(
     removeExercise: () -> Unit,
     userDefaultWeightUnit: String,
     exerciseWeightUnit: String?,
+    updateExerciseWeightUnit: (String?) -> Unit,
 ) {
     var expandedExerciseOptionsDropdownMenu by remember { mutableStateOf(false) }
     var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
@@ -166,7 +167,8 @@ fun ExerciseOptionsDropdownMenu(
             onClickArrowBack = { expandedExerciseOptionsDropdownMenu = true },
             onDismiss = { expandedWeightUnitOptionsDropdownMenu = false },
             userDefaultWeightUnit = userDefaultWeightUnit,
-            exerciseWeightUnit = exerciseWeightUnit
+            exerciseWeightUnit = exerciseWeightUnit,
+            updateExerciseWeightUnit = { weightUnit: String? -> updateExerciseWeightUnit(weightUnit) }
         )
         BarTypeDropdownMenu(
             expandMenu = { expandedBarTypeOptionsDropdownMenu },

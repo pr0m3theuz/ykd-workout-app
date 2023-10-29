@@ -39,6 +39,7 @@ class ExercisesRepository(private val database: RealmDatabase) {
   // implement anything else to ensure we're not doing long running database work
   // off the main thread.
 
+  // TODO Use function when inserting new exercises
   suspend fun insertExercise(exercise: Exercise) {
     database.insertExercise(exercise)
   }

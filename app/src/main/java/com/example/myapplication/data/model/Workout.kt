@@ -96,13 +96,14 @@ fun Workout.totalSets(): Int {
   return totalSets
 }
 
-fun Workout.totalVolume(userDefaultWeightUnit: String): Double? {
+fun Workout.calculateTotalVolume(userDefaultWeightUnit: String): Double? {
   exercisesSets.forEach { exerciseSets ->
-    totalVolumeInPounds = totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
-      ?: 0.0.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
-    totalVolumeInKilograms = totalVolumeInKilograms?.plus(
-      exerciseSets.totalVolumeInKilograms ?: 0.0
-    ) ?: 0.0.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
+    totalVolumeInPounds =
+      totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
+        ?: 0.0.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
+    totalVolumeInKilograms =
+      totalVolumeInKilograms?.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
+        ?: 0.0.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
   }
   return when (userDefaultWeightUnit) {
     MassUnit.POUNDS.abbreviation -> totalVolumeInPounds

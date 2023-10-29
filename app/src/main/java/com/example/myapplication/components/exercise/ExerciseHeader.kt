@@ -51,8 +51,8 @@ import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.averageWeight
+import com.example.myapplication.data.model.calculateTotalVolume
 import com.example.myapplication.data.model.totalRepetitions
-import com.example.myapplication.data.model.totalVolume
 import org.koin.androidx.compose.koinViewModel
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -147,7 +147,13 @@ fun ExerciseHeader(
           },
           removeExercise = { removeExercise(exerciseSets) },
           userDefaultWeightUnit = userDefaultWeightUnit,
-          exerciseWeightUnit = exerciseWeightUnit
+          exerciseWeightUnit = exerciseWeightUnit,
+          updateExerciseWeightUnit = { weightUnit ->
+            workoutViewModel.updateExerciseWeightUnit(
+              exercise = exerciseSets.exercise,
+              weightUnit = weightUnit
+            )
+          },
         )
       }
 
@@ -275,7 +281,7 @@ private fun ExerciseSetsWorkoutSummary(
   //    val exerciseSets = _exerciseSets
 //  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
 
-  val totalVolume by remember { mutableDoubleStateOf(exerciseSets.totalVolume(weightUnit)) }
+  val totalVolume by remember { mutableDoubleStateOf(exerciseSets.calculateTotalVolume(weightUnit)) }
   val totalRepetitions by remember { mutableIntStateOf(exerciseSets.totalRepetitions()) }
   val averageWeight by remember { mutableDoubleStateOf(exerciseSets.averageWeight(weightUnit)) }
 

@@ -30,6 +30,7 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.addWarmUpSets
+import com.example.myapplication.data.model.calculateTotalVolume
 import com.example.myapplication.data.model.convertExerciseExerciseSetsToExerciseSets
 import com.example.myapplication.data.model.setComplete
 import com.example.myapplication.data.model.updateSetRIR
@@ -825,10 +826,8 @@ class WorkoutViewModel(
     return when (exerciseSets.exercise?.weightUnit) {
       MassUnit.KILOGRAMS.abbreviation ->
         exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
-
       MassUnit.POUNDS.abbreviation ->
         exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightPounds
-
       else -> {
         if (userDefaultWeightUnit == MassUnit.KILOGRAMS.abbreviation) {
           exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
@@ -888,12 +887,22 @@ class WorkoutViewModel(
     updateExercisesSetsData(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
   }
 
+  fun updateExerciseWeightUnit(exercise: Exercise?, weightUnit: String?) {
+    exercise?.weightUnit = weightUnit
+    viewModelScope.launch {
+      if (exercise != null) {
+        exerciseRepository.updateExercise(exercise)
+      }
+    }
+  }
+
   fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, time: Duration) {
     if (tabRowState == 1) {
       exercise.warmUpSetRestInWholeMilliseconds = time.inWholeMilliseconds
     } else if (tabRowState == 0) {
       exercise.workingSetRestInWholeMilliseconds = time.inWholeMilliseconds
     }
+    viewModelScope.launch { exerciseRepository.updateExercise(exercise) }
   }
 
   fun enableExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, enable: Boolean) {
@@ -902,6 +911,7 @@ class WorkoutViewModel(
     } else if (tabRowState == 0) {
       exercise.workingSetRestTimerEnabled = enable
     }
+    viewModelScope.launch { exerciseRepository.updateExercise(exercise) }
   }
 
   fun checkAllSetsComplete(): Boolean {
@@ -963,6 +973,8 @@ class WorkoutViewModel(
     _workoutData.exercisesSets =
       convertExerciseExerciseSetsToExerciseSets(_exercisesSetsData, userDefaultWeightUnit)
 
+    _workoutData.calculateTotalVolume(userDefaultWeightUnit)
+
     viewModelScope.launch { workoutRepository.insertWorkout(_workoutData) }
   }
 
@@ -1005,6 +1017,9 @@ class WorkoutViewModel(
     val index = _exercisesSetsData.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
 
     _exercisesSetsData[index].exercise = newExercise
+    for (set in _exercisesSetsData[index].sets) {
+      set.exerciseID = newExercise._id
+    }
     _exercisesSetsData[index].exSetsLazyListItemID = newID()
 
     _exercisesSets.value = _exercisesSetsData

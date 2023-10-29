@@ -13,72 +13,88 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.myapplication.data.model.MassUnit
 
 @Composable
 fun WeightUnitOptionsDropdownMenu(
-    expandMenu: () -> Boolean,
-    onClickArrowBack: () -> Unit,
-    onDismiss: () -> Unit,
-    userDefaultWeightUnit: String,
-    exerciseWeightUnit: String?
+  expandMenu: () -> Boolean,
+  onClickArrowBack: () -> Unit,
+  onDismiss: () -> Unit,
+  userDefaultWeightUnit: String,
+  exerciseWeightUnit: String?,
+  updateExerciseWeightUnit: (String?) -> Unit,
 ) {
-    var (defaultChecked, setDefaultChecked) = remember { mutableStateOf(true) }
-    val (poundsChecked, setPoundsChecked) = remember { mutableStateOf(false) }
-    val (kilogramsChecked, setKilogramsChecked) = remember { mutableStateOf(false) }
+  val (defaultChecked, setDefaultChecked) = remember { mutableStateOf(true) }
+  val (poundsChecked, setPoundsChecked) = remember { mutableStateOf(false) }
+  val (kilogramsChecked, setKilogramsChecked) = remember { mutableStateOf(false) }
 
-    fun onDefaultChecked() {
-        setDefaultChecked(!defaultChecked)
-        setPoundsChecked(false)
-        setKilogramsChecked(false)
+  fun updateWeightUnit() {
+    when {
+      defaultChecked -> updateExerciseWeightUnit(null)
+      poundsChecked -> updateExerciseWeightUnit(MassUnit.POUNDS.abbreviation)
+      kilogramsChecked -> updateExerciseWeightUnit(MassUnit.KILOGRAMS.abbreviation)
     }
+  }
 
-    fun onPoundsChecked() {
-        setPoundsChecked(!poundsChecked)
-        setDefaultChecked(false)
-        setKilogramsChecked(false)
-    }
+  fun onDefaultChecked() {
+    setDefaultChecked(!defaultChecked)
+    setPoundsChecked(false)
+    setKilogramsChecked(false)
+    updateWeightUnit()
+  }
 
-    fun onKilogramsChecked() {
-        setKilogramsChecked(!kilogramsChecked)
-        setDefaultChecked(false)
-        setPoundsChecked(false)
-    }
+  fun onPoundsChecked() {
+    setPoundsChecked(!poundsChecked)
+    setDefaultChecked(false)
+    setKilogramsChecked(false)
+    updateWeightUnit()
+  }
 
-    val checkedColor = MaterialTheme.colorScheme.primary
+  fun onKilogramsChecked() {
+    setKilogramsChecked(!kilogramsChecked)
+    setDefaultChecked(false)
+    setPoundsChecked(false)
+    updateWeightUnit()
+  }
 
-    val uncheckedColor = MaterialTheme.colorScheme.outlineVariant
+  when (exerciseWeightUnit) {
+    null -> setDefaultChecked(true)
+    MassUnit.POUNDS.abbreviation -> setPoundsChecked(true)
+    MassUnit.KILOGRAMS.abbreviation -> setKilogramsChecked(true)
+  }
 
-    val kilogramsCheckColor by
-    animateColorAsState(
-        if (kilogramsChecked) {
-            checkedColor
-        } else uncheckedColor,
-        label = "kilogramsChecked"
-    )
-    val poundCheckColor by
-    animateColorAsState(
-        if (poundsChecked) checkedColor else uncheckedColor,
-        label = "poundCheckColor"
-    )
+  val checkedColor = MaterialTheme.colorScheme.primary
 
-    val defaultCheckColor by
-    animateColorAsState(
-        if (defaultChecked) checkedColor else uncheckedColor,
-        label = "poundCheckColor"
-    )
+  val uncheckedColor = MaterialTheme.colorScheme.outlineVariant
 
-    //    var expandedWeightOptionsDropdownMenu by remember { mutableStateOf( false ) }
-    //    expandedWeightOptionsDropdownMenu = expandMenu()
+  val kilogramsCheckColor by
+  animateColorAsState(
+    if (kilogramsChecked) {
+      checkedColor
+    } else uncheckedColor,
+    label = "kilogramsChecked"
+  )
+  val poundCheckColor by
+  animateColorAsState(
+    if (poundsChecked) checkedColor else uncheckedColor,
+    label = "poundCheckColor"
+  )
 
-    DropdownMenu(expanded = expandMenu(), onDismissRequest = { onDismiss() }) {
-        DropdownMenuItem(
-            text = {},
-            leadingIcon = {
-                // TODO Change IconToggleButton to Icon
-                Icon(
-                    Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Localized description"
-                )
+  val defaultCheckColor by
+  animateColorAsState(
+    if (defaultChecked) checkedColor else uncheckedColor,
+    label = "poundCheckColor"
+  )
+
+  //    var expandedWeightOptionsDropdownMenu by remember { mutableStateOf( false ) }
+  //    expandedWeightOptionsDropdownMenu = expandMenu()
+
+  DropdownMenu(expanded = expandMenu(), onDismissRequest = { onDismiss() }) {
+    DropdownMenuItem(
+      text = {},
+      leadingIcon = {
+        // TODO Change IconToggleButton to Icon
+        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Localized description")
       },
       onClick = {
         onDismiss()
@@ -86,17 +102,17 @@ fun WeightUnitOptionsDropdownMenu(
       }
     )
     DropdownMenuItem(
-        //            TODO Get from user perferences/settings
-        text = { Text("Default ($userDefaultWeightUnit) ") },
-        trailingIcon = {
-            // TODO Change
-            Icon(
-                Icons.Filled.Check,
-                contentDescription = "Localized description",
-                tint = defaultCheckColor
-            )
-        },
-        onClick = { onDefaultChecked() }
+      // TODO Get from user perferences/settings
+      text = { Text("Default ($userDefaultWeightUnit) ") },
+      trailingIcon = {
+        // TODO Change
+        Icon(
+          Icons.Filled.Check,
+          contentDescription = "Localized description",
+          tint = defaultCheckColor
+        )
+      },
+      onClick = { onDefaultChecked() }
     )
     DropdownMenuItem(
       text = { Text("Metric (kg)") },
@@ -108,19 +124,19 @@ fun WeightUnitOptionsDropdownMenu(
         )
       },
       // TODO Change weight units in exercises table
-        onClick = { onKilogramsChecked() }
+      onClick = { onKilogramsChecked() }
     )
     DropdownMenuItem(
-        text = { Text("Imperial (lbs)") },
-        trailingIcon = {
-            Icon(
-                Icons.Filled.Check,
-                contentDescription = "Localized description",
-                tint = poundCheckColor
-            )
-        },
-        // TODO Change weight units in exercises table
-        onClick = { onPoundsChecked() }
+      text = { Text("Imperial (lbs)") },
+      trailingIcon = {
+        Icon(
+          Icons.Filled.Check,
+          contentDescription = "Localized description",
+          tint = poundCheckColor
+        )
+      },
+      // TODO Change weight units in exercises table
+      onClick = { onPoundsChecked() }
     )
   }
 }

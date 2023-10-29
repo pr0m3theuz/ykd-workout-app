@@ -338,10 +338,17 @@ class RealmDatabase {
     }
   }
 
-//  TODO Fix this function
-fun getWorkoutsCount(): Int {
-  return realm.query<Workout>("workoutEnded != null").find().count()
-}
+  fun getAllCompletedWorkouts(): Flow<List<Workout>> {
+    return realm.query<Workout>("workoutEnded != null SORT(dateCreated DESC)").find().asFlow()
+      .map { workouts ->
+        workouts.list.sortedByDescending { workout -> workout.dateCreated }
+      }
+  }
+
+  //  TODO Fix this function
+  fun getWorkoutsCount(): Int {
+    return realm.query<Workout>("workoutEnded != null").find().count()
+  }
 
   fun getWorkoutByID(workoutID: ObjectId): Workout? {
     return realm.query<Workout>("_id = $0", workoutID).first().find()
@@ -470,6 +477,39 @@ fun getWorkoutsCount(): Int {
         delete(_workout)
       }
     }
+  }
+
+  fun filterWorkouts(
+    workout: String,
+    programIDs: List<String>,
+    startDate: String,
+    endDate: String
+    //        movementTypes: List<String>
+  ): Flow<List<Workout>> {
+    val muscleGroupsSize = programIDs.size.plus(1)
+    val muscleGroups = ""
+    programIDs.forEachIndexed { index, _ -> muscleGroups.plus("${index.plus(1)}, ") }
+
+    val equipment = ""
+    startDate.forEachIndexed { index, _ ->
+      equipment.plus("${muscleGroupsSize.plus(index.plus(1))}, ")
+    }
+
+    Log.i("filterWorkouts", "workout: $workout")
+    Log.i("filterWorkouts", "programIDs: $programIDs")
+    Log.i("filterWorkouts", "dateRange: $startDate")
+
+    return realm
+      .query<Workout>(
+        "name CONTAINS[c] $0 AND  programID	IN $1 AND workoutStarted BETWEEN {$2, $3} SORT(name ASC)",
+        workout,
+        programIDs,
+        startDate,
+        endDate
+      )
+      .find()
+      .asFlow()
+      .map { it.list }
   }
 
   //  Program Queries
