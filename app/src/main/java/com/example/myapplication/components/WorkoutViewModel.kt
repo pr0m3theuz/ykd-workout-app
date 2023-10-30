@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.CountDownTimer
 import android.os.Handler
@@ -228,9 +229,11 @@ class WorkoutViewModel(
         notifyPendingIntent
       )
     } else {
+      val intent: Intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+      intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
       startActivity(
         application.applicationContext,
-        Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM),
+        intent,
         null
       )
     }
@@ -308,17 +311,21 @@ class WorkoutViewModel(
     createTimer(_timerDuration)
   }
 
-  private var completedSets = mutableListOf<RealmUUID>()
+  private var completedSets = mutableListOf<Long>()
 
   @RequiresApi(Build.VERSION_CODES.S)
-  fun startSetCompletedTimer(exerciseSet: ExerciseExerciseSets, setUUID: RealmUUID) {
+  fun startSetCompletedTimer(
+    exerciseSet: ExerciseExerciseSets,
+    setUUID: RealmUUID,
+    setLazyListItemID: Long
+  ) {
     //    Log.i("startSetCompletedTimer() ", "called")
 
     val exercise = exerciseSet.exercise
     val set = exerciseSet.sets.first { it.uuid == setUUID }
-
-    if (!completedSets.contains(setUUID)) {
-      completedSets.add(setUUID)
+// Only allows new completed sets to start the timer once
+    if (!completedSets.contains(setLazyListItemID)) {
+      completedSets.add(setLazyListItemID)
       /*
        * Doesn't allow the new completed set to cancel the timer if one is already running
        */

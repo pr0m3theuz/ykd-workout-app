@@ -1,6 +1,5 @@
 package com.example.myapplication.components.programs
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -614,7 +613,7 @@ fun CurrentProgramCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
-            Log.i("getExerciseNameByID", "exercise ID: " + exerciseSets.exerciseID?.toHexString())
+//            Log.i("getExerciseNameByID", "exercise ID: " + exerciseSets.exerciseID?.toHexString())
             exerciseSets.exerciseID?.let {
               Text(
                 text = programsViewModel.getExerciseNameByID(it),

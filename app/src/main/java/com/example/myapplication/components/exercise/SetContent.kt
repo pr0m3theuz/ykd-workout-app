@@ -29,6 +29,8 @@ import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.convertKgToPound
+import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.model.setTextRIR
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
@@ -82,7 +84,6 @@ fun SetContent(
 
   var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
 
-  val exerciseWeight = getExerciseWeight(set, weightUnit)
 
   //  val weightState by
   //  rememberSaveable(stateSaver = ExerciseWeightStateSaver) {
@@ -92,10 +93,11 @@ fun SetContent(
   //  var weightFocusState by remember { mutableStateOf(weightState.isFocusedDirty) }
 
   //  weightState.isFocusedDirty = weightFocusState
+  var exerciseWeightFocused by remember { mutableStateOf(false) }
 
+  val exerciseWeight = getExerciseWeight(set, weightUnit)
   var exerciseWeightText by remember { mutableStateOf(exerciseWeight) }
 
-  var exerciseWeightFocused by remember { mutableStateOf(false) }
 
   val repetitions = getRepetitions(set)
 
@@ -254,18 +256,19 @@ fun SetContent(
               it.isBlank() -> ""
               else -> checkDoubleInput(it) ?: exerciseWeightText
             }
+
           // TODO Select Weight Unit based on Exercise or User Settings
           // TODO set.weightKilograms = weightState.text.toDoubleOrNull()
           // TODO set.weightPounds = set.convertKgToPound()
           // TODO Do unit conversion
           // TODO Is this redundant?
-//          if (workoutViewModel.getWeightUnit(exerciseSets) == MassUnit.POUNDS.abbreviation) {
-//            set.weightPounds = exerciseWeightText.toDoubleOrNull()
-//            set.weightKilograms = set.convertPoundToKg()
-//          } else {
-//            set.weightKilograms = exerciseWeightText.toDoubleOrNull()
-//            set.weightPounds = set.convertKgToPound()
-//          }
+          if (workoutViewModel.getWeightUnit(exerciseSets) == MassUnit.POUNDS.abbreviation) {
+            set.weightPounds = exerciseWeightText.toDoubleOrNull()
+            set.weightKilograms = set.convertPoundToKg()
+          } else {
+            set.weightKilograms = exerciseWeightText.toDoubleOrNull()
+            set.weightPounds = set.convertKgToPound()
+          }
         },
         onImeAction = {
           updateSetData()
@@ -338,7 +341,11 @@ fun SetContent(
           setUUID = setUUID,
           setComplete = it
         )
-        workoutViewModel.startSetCompletedTimer(exerciseSet = exerciseSets, setUUID = setUUID)
+        workoutViewModel.startSetCompletedTimer(
+          exerciseSet = exerciseSets,
+          setUUID = setUUID,
+          setLazyListItemID = set.lazyListItemID
+        )
         //        if (!workoutViewModel.isTimerRunning) {
         //          openTimerScreen(it)
         //        }

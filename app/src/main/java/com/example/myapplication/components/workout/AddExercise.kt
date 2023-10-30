@@ -11,14 +11,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import com.example.myapplication.components.addExercisesList.AddExercisesScreen
 
 @Composable
-fun AddExercise() {
+fun AddExercise(navController: NavController) {
     val (openDialog, setOpenDialog) = remember { mutableStateOf(false) }
 
     if (openDialog) {
-        AddExercisesScreen(setOpenDialog = setOpenDialog)
+        AddExercisesScreen(setOpenDialog = setOpenDialog, navController = navController)
     }
 
     Row(

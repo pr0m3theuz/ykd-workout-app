@@ -25,7 +25,7 @@ constructor(
   private val exercisesRepository: ExercisesRepository
 ) : ViewModel() {
   fun getExerciseNameByID(exerciseID: ObjectId?): String {
-    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
+//    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
     return exercisesRepository.getExercise(exerciseID)?.name ?: "Exercise not found"
   }
 

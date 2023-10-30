@@ -94,8 +94,8 @@ fun ExerciseSetLazyColumn(
             AddSet(addSet = { workoutViewModel.addSet(exerciseSets) })
         }
 
-        item { AddExercise() }
-        item { CancelWorkout() { cancelWorkout() } }
+        item { AddExercise(navController = navController) }
+      item { CancelWorkout() { cancelWorkout() } }
         item { Box(modifier = Modifier
           .height(128.dp)
           .fillMaxWidth()) }

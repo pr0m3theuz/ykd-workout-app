@@ -1160,7 +1160,8 @@ class RealmDatabase {
         val newSet =
           this.copyToRealm(
             Set().apply {
-              uuid = set.uuid
+              uuid =
+                set.uuid // TODO determine if this should be unique or can be used in a future feature
               setNumber = set.setNumber
               weightPounds = set.weightPounds
               weightKilograms = set.weightKilograms
