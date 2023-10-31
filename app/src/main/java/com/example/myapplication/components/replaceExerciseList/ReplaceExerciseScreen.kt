@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExerciseOptionsDropdownMenu
 import com.example.myapplication.components.exercisesList.ExercisesFilterMenu
@@ -66,6 +67,7 @@ fun ReplaceExerciseScreen(
   setOpenDialog: (Boolean) -> Unit,
   exercisesViewModel: ExercisesViewModel = koinViewModel(),
   workoutViewModel: WorkoutViewModel = koinViewModel(),
+  navController: NavController,
 ) {
   val exercises by
   exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -206,10 +208,11 @@ fun ReplaceExerciseScreen(
             exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
             exercises.isNotEmpty() -> {
               ExercisesLazyList(
-                exercises,
+                exercises = exercises,
                 selectedExercise = exerciseSelectedToBeAddedToWorkout.firstOrNull(),
                 selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
-                muscleGroups,
+                muscleGroups = muscleGroups,
+                navController = navController,
               )
             }
 
@@ -236,10 +239,11 @@ fun ReplaceExerciseScreen(
 
 @Composable
 private fun ExercisesLazyList(
-    exercises: List<Exercise>,
-    selectedExercise: Exercise?,
-    selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
-    muscleGroups: List<MuscleGroup>,
+  exercises: List<Exercise>,
+  selectedExercise: Exercise?,
+  selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
+  muscleGroups: List<MuscleGroup>,
+  navController: NavController,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -268,6 +272,7 @@ private fun ExercisesLazyList(
         exercise = exercise,
         selectedExercise = selectedExerciseModel,
         muscleGroupName = muscleGroupName,
+        navController = navController,
         selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
       )
     }

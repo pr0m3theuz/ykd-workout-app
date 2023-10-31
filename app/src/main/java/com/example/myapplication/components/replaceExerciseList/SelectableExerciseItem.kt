@@ -1,96 +1,95 @@
 package com.example.myapplication.components.addExercisesList
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.Exercise
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SelectableExerciseItem(
-    exercise: Exercise,
-    selectedExercise: Boolean,
-    muscleGroupName: String?,
-    selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
-    workoutViewModel: WorkoutViewModel = koinViewModel()
+  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  exercise: Exercise,
+  selectedExercise: Boolean,
+  muscleGroupName: String?,
+  navController: NavController,
+  selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
 ) {
 
-    val padding = 8.dp
+  val padding = 8.dp
 
-    val selected by remember { mutableStateOf(selectedExercise) }
+  val (selected, onSelected) = remember { mutableStateOf(false) }
 
-    val colors =
-        when (isSystemInDarkTheme()) {
-            true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
-            else -> ListItemDefaults.colors(containerColor = Color.Transparent)
-        }
+  val colors =
+    when (isSystemInDarkTheme()) {
+      true -> ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
+      else -> ListItemDefaults.colors(containerColor = Color.Transparent)
+    }
 
-    ListItem(
-        colors = colors,
+  ListItem(
+    colors = colors,
+    modifier = Modifier /*.padding(vertical = 8.dp)*/.fillMaxWidth(),
+    headlineContent = {
+      Text(
         modifier =
-        Modifier /*.padding(vertical = 8.dp)*/
-            .fillMaxWidth()
-            .selectable(
-                enabled = true,
-                role = Role.RadioButton,
-                selected = selectedExercise,
-                onClick = {
-                    selectExercise(exercise, !selectedExercise)
-                }
-            ),
-        headlineContent = {
-            Text(
-                text = exercise.name,
-                //        style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+        Modifier.clickable(
+          enabled = true,
+          onClickLabel = "See more details about ${exercise.name} ",
+          onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
+        ),
+        text = exercise.name,
+        //        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onBackground
+      )
+    },
+    supportingContent = {
+      Text(
+        text = muscleGroupName ?: "-",
+        //        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onBackground
+      )
+    },
+    trailingContent = {},
+    leadingContent = {
+      IconToggleButton(
+        checked = selected,
+        onCheckedChange = {
+          onSelected(it)
+          selectExercise(exercise, it)
         },
-        supportingContent = {
-            Text(
-                text = muscleGroupName ?: "-",
-                //        style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        },
-        trailingContent = {},
-        leadingContent = {
-            if (selectedExercise) {
-                Icon(
-                    imageVector = Icons.Filled.CheckCircle,
-                    tint = MaterialTheme.colorScheme.primary,
-                    contentDescription = "Selected"
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Outlined.Error,
-                    tint = MaterialTheme.colorScheme.error,
-                    contentDescription = "No exercise image available."
-                )
-            }
-        }
-    )
+        enabled = true,
+      ) {
+        Icon(
+          imageVector = if (selected) Icons.Filled.CheckCircle else Icons.Outlined.Error,
+          tint =
+          if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+          contentDescription = if (selected) "Selected" else "No exercise image available."
+        )
+      }
+    }
+  )
 
-    HorizontalDivider()
+  HorizontalDivider()
 
-    /*  Row(
+  /*  Row(
     modifier =
       Modifier.padding(vertical = 8.dp)
         .fillMaxWidth()

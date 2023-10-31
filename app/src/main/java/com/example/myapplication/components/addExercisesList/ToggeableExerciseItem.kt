@@ -26,8 +26,8 @@ import com.example.myapplication.data.model.Exercise
 fun ToggleableExerciseItem(
   exercise: Exercise,
   muscleGroupName: String?,
+  navController: NavController,
   selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
-  navController: NavController
 ) {
 
   val padding = 8.dp

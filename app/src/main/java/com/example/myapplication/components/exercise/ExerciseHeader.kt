@@ -154,6 +154,7 @@ fun ExerciseHeader(
               weightUnit = weightUnit
             )
           },
+          navController = navController,
         )
       }
 

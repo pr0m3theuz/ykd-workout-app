@@ -131,3 +131,5 @@ Aapp/src/main/java/com/example/myapplication/data/model/BarType.kt,e/e/eea83b8f
 Oapp/src/main/java/com/example/myapplication/components/history/HistoryScreen.kt,8/7/87d08a18c6c2131d698a10e4c41675b0a90bc127
 Ç
 Rapp/src/main/java/com/example/myapplication/components/history/HistoryViewModel.kt,6/6/66a33a836870a3fbf64aae2c7a403adec78db807
+ê
+`app/src/main/java/com/example/myapplication/components/addExercisesList/ToggeableExerciseItem.kt,c/6/c6361471b95f190ef39fadca144d4e22b0f50d8f
