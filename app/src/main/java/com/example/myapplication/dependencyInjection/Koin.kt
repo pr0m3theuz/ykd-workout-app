@@ -1,5 +1,6 @@
 package com.example.myapplication.dependencyInjection
 
+import com.example.myapplication.components.ManageWorkoutUseCase
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.history.HistoryViewModel
@@ -23,58 +24,59 @@ import org.koin.dsl.module
 
 // For Kotlin Mulitplatform
 fun initKoin(appDeclaration: KoinAppDeclaration = {}): KoinApplication {
-    return startKoin {
-        appDeclaration()
-        modules(commonModule)
-    }
+  return startKoin {
+    appDeclaration()
+    modules(commonModule)
+  }
 }
 
 val commonModule = module {
-    /*    single<Configuration> {
-        RealmConfiguration.create(
-        schema =
-        setOf(
-            Exercise::class,
-            Set::class,
-            Workout::class,
-            Program::class,
-            Mesocycle::class,
-            Microcycle::class,
-            ExerciseNote::class,
-            WorkoutNote::class,
-            ProgramNote::class,
-            MesocycleNote::class,
-            MicrocycleNote::class,
-            MuscleExercise::class,
-            MuscleRoleFunction::class,
-            Muscle::class,
-            MuscleGroup::class,
-            Equipment::class,
-            Utility::class,
-            Force::class,
-            Mechanic::class,
-            //            ProgressionScheme::class,
-        )
-    )}
-    single {
-        Realm.open(get<Configuration>())
-    }*/
+  /*    single<Configuration> {
+      RealmConfiguration.create(
+      schema =
+      setOf(
+          Exercise::class,
+          Set::class,
+          Workout::class,
+          Program::class,
+          Mesocycle::class,
+          Microcycle::class,
+          ExerciseNote::class,
+          WorkoutNote::class,
+          ProgramNote::class,
+          MesocycleNote::class,
+          MicrocycleNote::class,
+          MuscleExercise::class,
+          MuscleRoleFunction::class,
+          Muscle::class,
+          MuscleGroup::class,
+          Equipment::class,
+          Utility::class,
+          Force::class,
+          Mechanic::class,
+          //            ProgressionScheme::class,
+      )
+  )}
+  single {
+      Realm.open(get<Configuration>())
+  }*/
 
-    singleOf(::RealmDatabase)
-    singleOf(::WorkoutRepository)
-    singleOf(::ProgramsRepository)
-    singleOf(::ExercisesRepository)
-    singleOf(::ExerciseNotesRepository)
-    singleOf(::WorkoutNotesRepository)
-    singleOf(::UserRepository)
+  singleOf(::RealmDatabase)
+  singleOf(::WorkoutRepository)
+  singleOf(::ProgramsRepository)
+  singleOf(::ExercisesRepository)
+  singleOf(::ExerciseNotesRepository)
+  singleOf(::WorkoutNotesRepository)
+  singleOf(::UserRepository)
+  singleOf(::ManageWorkoutUseCase)
 
-    viewModelOf(::ProgramsViewModel)
-    viewModelOf(::ExercisesViewModel)
-    viewModelOf(::WorkoutViewModel)
-    viewModelOf(::EquateVolumeViewModel)
-    viewModelOf(::WorkingSetViewModel)
+  viewModelOf(::ProgramsViewModel)
+  viewModelOf(::ExercisesViewModel)
+  viewModelOf(::WorkoutViewModel)
+  viewModelOf(::EquateVolumeViewModel)
+  viewModelOf(::WorkingSetViewModel)
   viewModelOf(::WarmUpSetsViewModel)
   viewModelOf(::HistoryViewModel)
 
-    //  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
+  //  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
 }

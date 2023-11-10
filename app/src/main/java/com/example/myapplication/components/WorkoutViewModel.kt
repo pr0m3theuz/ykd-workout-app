@@ -65,7 +65,7 @@ import kotlin.time.toDuration
 
 private const val WARM_UP_SET = 2
 
-class WorkoutViewModel(
+class WorkoutViewModel2(
   private val application: Application,
   private val workoutRepository: WorkoutRepository,
   //  private val setsRepository: SetsRepository,
@@ -689,16 +689,16 @@ class WorkoutViewModel(
         )
       }
 
-    updateExercisesSetsData(exerciseSets, temporarySets)
+    modifySetsInExercisesSets(exerciseSets, temporarySets)
   }
 
   fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set) {
     val temporarySets = exerciseSets.sets.minusElement(set)
 
-    updateExercisesSetsData(exerciseSets, temporarySets)
+    modifySetsInExercisesSets(exerciseSets, temporarySets)
   }
 
-  private fun updateExercisesSetsData(
+  private fun modifySetsInExercisesSets(
     exerciseSets: ExerciseExerciseSets,
     temporarySets: List<Set>,
   ) {
@@ -774,20 +774,20 @@ class WorkoutViewModel(
     return setsList
   }
 
-  private fun allExerciseNotes(): MutableList<ExerciseNote> {
-    val notesList = mutableListOf<ExerciseNote>()
-    _exercisesSetsData.forEach { exerciseSet ->
-      exerciseSet.notes.forEach { note -> notesList.add(note) }
-    }
-
-    notesList.removeAll { it.note.isNullOrBlank() }
-
-    return notesList
-  }
-
-  fun getSetData(setUUID: RealmUUID): Set {
-    return allSets().first { it.uuid == setUUID }
-  }
+//  private fun allExerciseNotes(): MutableList<ExerciseNote> {
+//    val notesList = mutableListOf<ExerciseNote>()
+//    _exercisesSetsData.forEach { exerciseSet ->
+//      exerciseSet.notes.forEach { note -> notesList.add(note) }
+//    }
+//
+//    notesList.removeAll { it.note.isNullOrBlank() }
+//
+//    return notesList
+//  }
+//
+//  fun getSetData(setUUID: RealmUUID): Set {
+//    return allSets().first { it.uuid == setUUID }
+//  }
 
   fun updateSetWeight(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, newWeight: Double?) {
     val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
@@ -824,7 +824,7 @@ class WorkoutViewModel(
   fun addWarmUpSets(exerciseSets: ExerciseExerciseSets, warmUpSets: List<Set>) {
     exerciseSets.addWarmUpSets(warmUpSets)
 
-    updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+    modifySetsInExercisesSets(exerciseSets, exerciseSets.sets)
   }
 
   fun getWorkingSetWeight(exerciseSets: ExerciseExerciseSets): Double? {
@@ -871,7 +871,7 @@ class WorkoutViewModel(
 
     exerciseSets.sets.addAll(workingSets)
 
-    updateExercisesSetsData(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
+    modifySetsInExercisesSets(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
   }
 
   fun addBackOffSets(exerciseSets: ExerciseExerciseSets, backOffSets: List<Set>) {
@@ -891,7 +891,7 @@ class WorkoutViewModel(
       )
     }
 
-    updateExercisesSetsData(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
+    modifySetsInExercisesSets(exerciseSets = exerciseSets, temporarySets = exerciseSets.sets)
   }
 
   fun updateExerciseWeightUnit(exercise: Exercise?, weightUnit: String?) {

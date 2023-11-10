@@ -29,88 +29,91 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SetLazyListItem(
-    exerciseSets: ExerciseExerciseSets,
-    index: Int,
-    set: Set,
-    removeSet: () -> Unit,
+  exerciseSets: ExerciseExerciseSets,
+  index: Int,
+  set: Set,
+  removeSet: () -> Unit,
+  setContent: @Composable (/*exerciseSets: ExerciseExerciseSets, setIndex: Int, set: Set*/) -> Unit,
 ) {
-    //    Log.i("SetColumn()", "$set")
+  //    Log.i("SetColumn()", "$set")
 
-    val coroutineScope = rememberCoroutineScope()
-    val setCompletedState by remember { mutableStateOf(set.setCompleted) }
-    val openDialog = remember { mutableStateOf(true) }
+  val coroutineScope = rememberCoroutineScope()
+  val setCompletedState by remember { mutableStateOf(set.setCompleted) }
+  val openDialog = remember { mutableStateOf(true) }
 
-    val dismissState = rememberDismissState(confirmStateChange = { true })
+  val dismissState = rememberDismissState(confirmStateChange = { true })
 
-    fun deleteCompletedSet(delete: Boolean) {
-        if (delete) {
-            removeSet()
-        } else {
-            coroutineScope.launch {
-                dismissState.animateTo(targetValue = DismissValue.Default, anim = TweenSpec())
-            }
-        }
+  fun deleteCompletedSet(delete: Boolean) {
+    if (delete) {
+      removeSet()
+    } else {
+      coroutineScope.launch {
+        dismissState.animateTo(targetValue = DismissValue.Default, anim = TweenSpec())
+      }
     }
+  }
 
-    fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
-        openDialog.value = open
-    }
+  fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
+    openDialog.value = open
+  }
 
-    if (!setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
-        removeSet()
-    } else if (setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
-        ConfirmCompletedSetDeletionDialog(
-            { open -> openConfirmCompletedSetDeletionDialog(open) },
-            { delete -> deleteCompletedSet(delete) }
-        )
-    }
+  if (!setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
+    removeSet()
+  } else if (setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
+    ConfirmCompletedSetDeletionDialog(
+      { open -> openConfirmCompletedSetDeletionDialog(open) },
+      { delete -> deleteCompletedSet(delete) }
+    )
+  }
 
-    SwipeToDismiss(
-        state = dismissState,
-        directions = setOf(DismissDirection.EndToStart),
-        dismissThresholds = { dismissDirection ->
-            FractionalThreshold(if (dismissDirection == DismissDirection.EndToStart) 0.5f else 1f)
+  SwipeToDismiss(
+    state = dismissState,
+    directions = setOf(DismissDirection.EndToStart),
+    dismissThresholds = { dismissDirection ->
+      FractionalThreshold(if (dismissDirection == DismissDirection.EndToStart) 0.5f else 1f)
+    },
+    background = {
+      val color by
+      animateColorAsState(
+        when (dismissState.targetValue) {
+          DismissValue.Default -> MaterialTheme.colorScheme.primary
+          DismissValue.DismissedToStart -> MaterialTheme.colorScheme.error
+          DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
         },
-        background = {
-            val color by
-            animateColorAsState(
-                when (dismissState.targetValue) {
-                    DismissValue.Default -> MaterialTheme.colorScheme.primary
-                    DismissValue.DismissedToStart -> MaterialTheme.colorScheme.error
-                    DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
-                }, label = "Background Color"
-            )
-            val alignment = Alignment.CenterEnd
-            val icon = Icons.Filled.Delete
-            val scale by
-            animateFloatAsState(
-                if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f,
-                label = "Delete Icon Scale",
-            )
+        label = "Background Color"
+      )
+      val alignment = Alignment.CenterEnd
+      val icon = Icons.Filled.Delete
+      val scale by
+      animateFloatAsState(
+        if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f,
+        label = "Delete Icon Scale",
+      )
 
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(horizontal = 12.dp),
-                contentAlignment = alignment
-            ) {
-                Icon(
-                    icon,
-                    tint = MaterialTheme.colorScheme.onError,
-                    contentDescription = "Localized description",
-                    modifier = Modifier.scale(scale)
-                )
-            }
-        }
-    ) {
-        Card(
-            backgroundColor =
-            if (setCompletedState) MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.background,
-            shape = RoundedCornerShape(CornerSize(0f))
-        ) {
-            SetContent(exerciseSets = exerciseSets, index, set)
-        }
+      Box(
+        Modifier
+          .fillMaxSize()
+          .background(color)
+          .padding(horizontal = 12.dp),
+        contentAlignment = alignment
+      ) {
+        Icon(
+          icon,
+          tint = MaterialTheme.colorScheme.onError,
+          contentDescription = "Localized description",
+          modifier = Modifier.scale(scale)
+        )
+      }
     }
+  ) {
+    Card(
+      backgroundColor =
+      if (setCompletedState) MaterialTheme.colorScheme.primaryContainer
+      else MaterialTheme.colorScheme.background,
+      shape = RoundedCornerShape(CornerSize(0f))
+    ) {
+      setContent(/*exerciseSets, index, set*/)
+//      SetContent(exerciseSets = exerciseSets, index, set)
+    }
+  }
 }

@@ -133,3 +133,15 @@ Oapp/src/main/java/com/example/myapplication/components/history/HistoryScreen.kt
 Rapp/src/main/java/com/example/myapplication/components/history/HistoryViewModel.kt,6/6/66a33a836870a3fbf64aae2c7a403adec78db807
 ê
 `app/src/main/java/com/example/myapplication/components/addExercisesList/ToggeableExerciseItem.kt,c/6/c6361471b95f190ef39fadca144d4e22b0f50d8f
+à
+Xapp/src/main/java/com/example/myapplication/components/exercise/ReplaceExerciseDialog.kt,3/d/3d5fff128968315312688254768ea096b6258fc7
+î
+dapp/src/main/java/com/example/myapplication/components/replaceExerciseList/SelectableExerciseItem.kt,d/6/d6e78e6dee0fe6cb57c9969b5f5c0f38a0b47d25
+~
+Napp/src/main/java/com/example/myapplication/components/ManageWorkoutUseCase.kt,6/6/665801b9ff3673c70b941cae66ec5980ba698b84
+{
+Kapp/src/main/java/com/example/myapplication/components/WorkoutViewModel2.kt,7/4/747300294e69975aa9858603b1d7e31858efec7f
+Ä
+Papp/src/main/java/com/example/myapplication/components/exercise/ExerciseNotes.kt,0/e/0e7ff9275090156b1f366fc184021429cfd931b8
+Ö
+Uapp/src/main/java/com/example/myapplication/components/exercise/SetTypeOptionsMenu.kt,5/f/5fec9b3be50a23264b1093d61b54257a809ccc2e

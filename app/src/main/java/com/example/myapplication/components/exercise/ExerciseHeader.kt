@@ -43,7 +43,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
@@ -63,16 +62,32 @@ fun ExerciseScreen(
   workoutViewModel: WorkoutViewModel = koinViewModel(),
   _exerciseSets: ExerciseExerciseSets,
 ) {
-  val exerciseSet by remember { mutableStateOf(_exerciseSets) }
+  val exerciseSets by remember { mutableStateOf(_exerciseSets) }
   //  Log.i("ExerciseScreen", "$_exerciseSets")
   //  Log.i("ExerciseScreen", "$_exerciseNotes")
 
   ExerciseHeader(
     navController = navController,
-    exerciseSets = exerciseSet,
+    exerciseSets = exerciseSets,
     removeExercise = { exerciseSets: ExerciseExerciseSets ->
       workoutViewModel.removeExerciseSets(exerciseSets)
     },
+    titleButton = { modifier: Modifier ->
+      ExerciseTitleButton(
+        onClick = {
+          navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
+        },
+        modifier = modifier,
+      ) {
+        exerciseSets.exercise?.name?.let {
+          Text(
+            text = it,
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+          )
+        }
+      }
+    }
     //    addNote = { exerciseSets: ExerciseSets -> workoutViewModel.addExerciseNote(exerciseSets)
     // },
     //    removeNote = { exerciseSets: ExerciseSets, note: ExerciseNote ->
@@ -88,7 +103,8 @@ fun ExerciseHeader(
   removeExercise: (exerciseSets: ExerciseExerciseSets) -> Unit,
   //  addNote: (exerciseSets: ExerciseSets) -> Unit,
   //  removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit,
-  workoutViewModel: WorkoutViewModel = viewModel()
+  workoutViewModel: WorkoutViewModel = viewModel(),
+  titleButton: @Composable (modifier: Modifier) -> Unit,
 ) {
   val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
   val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
@@ -114,7 +130,7 @@ fun ExerciseHeader(
     workoutViewModel.pinExerciseNote(exerciseSets, note, pin)
   }
 
-//  Log.i("ExerciseHeader", "$exerciseSets.notes")
+  //  Log.i("ExerciseHeader", "$exerciseSets.notes")
   //  Log.i("ExerciseHeader", "$notes")
 
   Row(modifier = Modifier.fillMaxWidth()) {
@@ -124,20 +140,23 @@ fun ExerciseHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
       ) {
-        ExerciseTitleButton(
-          onClick = {
-            navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
-          },
-          modifier = Modifier.weight(1.0f, fill = true)
-        ) {
-          exerciseSets.exercise?.name?.let {
-            Text(
-              text = it,
-              color = MaterialTheme.colorScheme.primary,
-              style = MaterialTheme.typography.titleMedium,
-            )
-          }
-        }
+        titleButton(Modifier.weight(1.0f, fill = true))
+
+        //        ExerciseTitleButton(
+        //          onClick = {
+        //
+        // navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
+        //          },
+        //          modifier = Modifier.weight(1.0f, fill = true)
+        //        ) {
+        //          exerciseSets.exercise?.name?.let {
+        //            Text(
+        //              text = it,
+        //              color = MaterialTheme.colorScheme.primary,
+        //              style = MaterialTheme.typography.titleMedium,
+        //            )
+        //          }
+        //        }
 
         ExerciseOptionsDropdownMenu(
           exerciseSets = exerciseSets,
@@ -158,7 +177,7 @@ fun ExerciseHeader(
         )
       }
 
-//      Log.i("ExerciseHeader", "$notesVisible")
+      //      Log.i("ExerciseHeader", "$notesVisible")
       ExerciseNotesList(
         notesVisible = notesVisible,
         exerciseSets = exerciseSets,
@@ -166,7 +185,7 @@ fun ExerciseHeader(
         removeNote = { exerciseSets, note -> removeNote(exerciseSets, note) },
       )
 
-      ExerciseSetsWorkoutSummary(_exerciseSets = exerciseSets, weightUnit = weightUnit)
+      ExerciseSetsWorkoutSummary(exerciseSets = exerciseSets, weightUnit = weightUnit)
       SetContentHeader(weightUnit = weightUnit)
     }
   }
@@ -179,14 +198,14 @@ private fun ExerciseNotesList(
   _pinNote: (note: ExerciseNote, pin: Boolean) -> Unit,
   removeNote: (exerciseSets: ExerciseExerciseSets, note: ExerciseNote) -> Unit
 ) {
-//  Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
+  //  Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
   var visible by remember { mutableStateOf(notesVisible) }
 
   if (exerciseSets.notes.isEmpty()) {
     visible = false
   }
 
-//  Log.i("ExerciseNotesList", "visible: $visible")
+  //  Log.i("ExerciseNotesList", "visible: $visible")
 
   AnimatedVisibility(
     visible = notesVisible,
@@ -226,7 +245,7 @@ private fun SetContentHeader(weightUnit: String) {
     Box(
       modifier =
       Modifier
-        //                        .padding(4.dp)
+        // .padding(4.dp)
         .width(110.dp),
       contentAlignment = Alignment.Center
     ) {
@@ -266,23 +285,26 @@ private fun SetContentHeader(weightUnit: String) {
 
 @Composable
 private fun ExerciseSetsWorkoutSummary(
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
-  _exerciseSets: ExerciseExerciseSets,
+  //  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  exerciseSets: ExerciseExerciseSets,
   weightUnit: String
 ) {
   // TODO Give option to show either Total Volume or Total Working Volume
   // TODO Update Values on user input, cause keyboard to
   val textStyle = MaterialTheme.typography.bodyMedium
 
-  workoutViewModel.userDefaultWeightUnit
+  //  workoutViewModel.userDefaultWeightUnit
 
-  val exercisesSets by workoutViewModel.exercisesSets.collectAsStateWithLifecycle()
-  val exerciseSets = exercisesSets.first { it.exSetsUUID == _exerciseSets.exSetsUUID }
+  //  Only necessary if values don't update on user input/recomposition is triggered
+  //  val exercisesSets by workoutViewModel.exercisesSets.collectAsStateWithLifecycle()
+  //  val exerciseSets = exercisesSets.first { it.exSetsUUID == _exerciseSets.exSetsUUID }
 
   //    val exerciseSets = _exerciseSets
-//  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
+  //  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
 
-  val totalVolume by remember { mutableDoubleStateOf(exerciseSets.calculateTotalVolume(weightUnit)) }
+  val totalVolume by remember {
+    mutableDoubleStateOf(exerciseSets.calculateTotalVolume(weightUnit))
+  }
   val totalRepetitions by remember { mutableIntStateOf(exerciseSets.totalRepetitions()) }
   val averageWeight by remember { mutableDoubleStateOf(exerciseSets.averageWeight(weightUnit)) }
 
@@ -297,8 +319,7 @@ private fun ExerciseSetsWorkoutSummary(
   ) {
     Text(
       // TODO get default value for weight
-      text =
-      "Volume: ${df.format(totalVolume)} $weightUnit",
+      text = "Volume: ${df.format(totalVolume)} $weightUnit",
       style = textStyle
     )
     Text(text = "Reps: $totalRepetitions", style = textStyle)

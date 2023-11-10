@@ -25,6 +25,7 @@ import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScree
 import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
 import com.example.myapplication.components.exercisesList.ExercisesScreen
 import com.example.myapplication.components.history.HistoryScreen
+import com.example.myapplication.components.history.WorkoutDialog
 import com.example.myapplication.components.homeScreen.HomeScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
@@ -216,20 +217,11 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
           workoutsCount = workoutsCount
         )
       }
-      //      CompositionLocalProvider(LocalViewModelStoreOwner provides navBackStackEntry) {
-      //        Log.i("WorkoutSummary", "workoutViewModel: ${getViewModel<WorkoutViewModel>()}")
-      //      WorkoutSummaryScreen(
-      //        navController = navController,
-      //        workoutViewModel = viewModel
-      //          workoutViewModel = getViewModel<WorkoutViewModel>()
-      //        completedWorkout = completedWorkout,
-      //        workoutsCount = workoutsCount
-      //      )
-      //      }
     }
   }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
   navigation("historyScreen", route = "history") {
     composable("historyScreen") { navBackStackEntry ->
@@ -238,16 +230,15 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
       HistoryScreen(
         navController = navController,
       )
-      //      CompositionLocalProvider(LocalViewModelStoreOwner provides navBackStackEntry) {
-      //        Log.i("WorkoutSummary", "workoutViewModel: ${getViewModel<WorkoutViewModel>()}")
-      //      WorkoutSummaryScreen(
-      //        navController = navController,
-      //        workoutViewModel = viewModel
-      //          workoutViewModel = getViewModel<WorkoutViewModel>()
-      //        completedWorkout = completedWorkout,
-      //        workoutsCount = workoutsCount
-      //      )
-      //      }
+    }
+    composable(route = "history?workoutID={workoutID}") { navBackStackEntry ->
+      //        Log.i("WorkoutNavGraph", "Navigated to Workout Screen")
+      navBackStackEntry.arguments?.getString("workoutID")?.let {
+        WorkoutDialog(
+          navController = navController,
+          workoutID = it,
+        )
+      }
     }
   }
 }

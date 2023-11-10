@@ -14,6 +14,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,7 +37,7 @@ fun SelectableExerciseItem(
 
   val padding = 8.dp
 
-  val (selected, onSelected) = remember { mutableStateOf(false) }
+  val selected by remember { mutableStateOf(selectedExercise) }
 
   val colors =
     when (isSystemInDarkTheme()) {
@@ -50,11 +51,13 @@ fun SelectableExerciseItem(
     headlineContent = {
       Text(
         modifier =
-        Modifier.clickable(
-          enabled = true,
-          onClickLabel = "See more details about ${exercise.name} ",
-          onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
-        ),
+        Modifier
+          .fillMaxWidth()
+          .clickable(
+            enabled = true,
+            onClickLabel = "See more details about ${exercise.name} ",
+            onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
+          ),
         text = exercise.name,
         //        style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onBackground
@@ -70,18 +73,17 @@ fun SelectableExerciseItem(
     trailingContent = {},
     leadingContent = {
       IconToggleButton(
-        checked = selected,
+        checked = selectedExercise,
         onCheckedChange = {
-          onSelected(it)
-          selectExercise(exercise, it)
+          selectExercise(exercise, !selectedExercise)
         },
         enabled = true,
       ) {
         Icon(
-          imageVector = if (selected) Icons.Filled.CheckCircle else Icons.Outlined.Error,
+          imageVector = if (selectedExercise) Icons.Filled.CheckCircle else Icons.Outlined.Error,
           tint =
-          if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-          contentDescription = if (selected) "Selected" else "No exercise image available."
+          if (selectedExercise) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+          contentDescription = if (selectedExercise) "Selected" else "No exercise image available."
         )
       }
     }

@@ -114,7 +114,10 @@ fun ExerciseOptionsDropdownMenu(
       HorizontalDivider()
       DropdownMenuItem(
         text = { Text("Replace Exercise") },
-        onClick = { openReplaceExerciseDialog = true }
+        onClick = {
+          expandedExerciseOptionsDropdownMenu = false
+          openReplaceExerciseDialog = true
+        }
       )
       HorizontalDivider()
       DropdownMenuItem(
