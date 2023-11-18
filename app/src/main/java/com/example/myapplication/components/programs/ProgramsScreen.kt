@@ -616,7 +616,7 @@ fun CurrentProgramCard(
 //            Log.i("getExerciseNameByID", "exercise ID: " + exerciseSets.exerciseID?.toHexString())
             exerciseSets.exerciseID?.let {
               Text(
-                text = programsViewModel.getExerciseNameByID(it),
+                text = programsViewModel.getExerciseNameByID(it) ?: "Exercise not found.",
                 style = bodySmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

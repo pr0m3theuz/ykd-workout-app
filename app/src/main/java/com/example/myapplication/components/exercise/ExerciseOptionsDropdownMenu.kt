@@ -29,7 +29,7 @@ import kotlin.time.toDuration
 fun ExerciseOptionsDropdownMenu(
   exerciseSets: ExerciseExerciseSets,
   addNotes: () -> Unit,
-  removeExercise: () -> Unit,
+  removeExerciseSets: () -> Unit,
   userDefaultWeightUnit: String,
   exerciseWeightUnit: String?,
   updateExerciseWeightUnit: (String?) -> Unit,
@@ -157,7 +157,7 @@ fun ExerciseOptionsDropdownMenu(
         }
       )
       HorizontalDivider()
-      DropdownMenuItem(text = { Text("Remove Exercise") }, onClick = { removeExercise() })
+      DropdownMenuItem(text = { Text("Remove Exercise") }, onClick = { removeExerciseSets() })
     }
 
     WeightUnitOptionsDropdownMenu(

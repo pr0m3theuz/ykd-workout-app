@@ -109,6 +109,7 @@ fun Set.convertKgToPound(): Double {
 fun Set.getWeight(weightUnit: String?) {
   // TODO Check if this would work or would have to use viewModel
   // TODO take exercise.weightUnit to update weight
+  RealmUUID.random().toString()
 }
 
 @Serializable

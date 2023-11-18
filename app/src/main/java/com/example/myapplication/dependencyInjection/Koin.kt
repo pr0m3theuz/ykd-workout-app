@@ -1,5 +1,6 @@
 package com.example.myapplication.dependencyInjection
 
+import com.example.myapplication.components.ManageExercisesUseCase
 import com.example.myapplication.components.ManageWorkoutUseCase
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
@@ -69,6 +70,7 @@ val commonModule = module {
   singleOf(::WorkoutNotesRepository)
   singleOf(::UserRepository)
   singleOf(::ManageWorkoutUseCase)
+  singleOf(::ManageExercisesUseCase)
 
   viewModelOf(::ProgramsViewModel)
   viewModelOf(::ExercisesViewModel)

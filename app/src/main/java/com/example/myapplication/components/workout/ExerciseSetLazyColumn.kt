@@ -49,6 +49,18 @@ fun ExercisesSetsScreen(
       ExerciseScreen(
         navController,
         _exerciseSets = exerciseSets,
+        weightUnit = workoutViewModel.getWeightUnit(exerciseSets),
+        exerciseWeightUnit = exerciseSets.exercise?.weightUnit,
+        userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit,
+        removeExerciseSets = { workoutViewModel.removeExerciseSets(exerciseSets) },
+        addExerciseNote = { workoutViewModel.addExerciseNote(exerciseSets) },
+        removeExerciseNote = { note -> workoutViewModel.removeExerciseNote(exerciseSets, note) },
+        pinExerciseNote = { note, pinned ->
+          workoutViewModel.pinExerciseNote(exerciseSets, note, pinned)
+        },
+        updateExerciseWeightUnit = { weightUnit ->
+          workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, weightUnit)
+        },
       )
     },
     SetItem = { exerciseSets, set, index ->
@@ -73,10 +85,7 @@ fun ExercisesSetsScreen(
                 populatePreviousSetField = {
                   exerciseSets.exercise?.let { exercise ->
                     set.setNumber?.let { setNumber ->
-                      workoutViewModel.populatePreviousSetField(
-                        exercise._id,
-                        setNumber = setNumber
-                      )
+                      workoutViewModel.populatePreviousSetField(exercise._id, setNumber = setNumber)
                     }
                   }
                 },
@@ -110,10 +119,10 @@ fun ExercisesSetsScreen(
                   )
                 },
                 setComplete = { setComplete ->
-                  workoutViewModel.setComplete(
+                  workoutViewModel.completeSet(
                     exerciseSets = exerciseSets,
                     setUUID = setUUID,
-                    setComplete = setComplete
+                    completed = setComplete
                   )
                 },
                 startSetCompletedTimer = {},
@@ -137,11 +146,11 @@ fun ExercisesSetsScreen(
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun ExerciseSetLazyColumn(
-//  navController: NavController,
-//  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  //  navController: NavController,
+  //  workoutViewModel: WorkoutViewModel = koinViewModel(),
   exercises: List<ExerciseExerciseSets>,
   workoutNotes: List<WorkoutNote>,
-//  removeWorkoutNote: (WorkoutNote) -> Unit,
+  //  removeWorkoutNote: (WorkoutNote) -> Unit,
   enableCancelWorkout: Boolean,
   WorkoutNoteItem: @Composable (workoutNote: WorkoutNote) -> Unit,
   ExerciseItem: @Composable (exerciseSets: ExerciseExerciseSets) -> Unit,

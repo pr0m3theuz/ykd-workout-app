@@ -1,3 +1,4 @@
+/*
 package com.example.myapplication.components
 
 import android.app.AlarmManager
@@ -33,7 +34,7 @@ import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.addWarmUpSets
 import com.example.myapplication.data.model.calculateTotalVolume
 import com.example.myapplication.data.model.convertExerciseExerciseSetsToExerciseSets
-import com.example.myapplication.data.model.setComplete
+import com.example.myapplication.data.model.completeSet
 import com.example.myapplication.data.model.updateSetRIR
 import com.example.myapplication.data.model.updateSetRPE
 import com.example.myapplication.data.model.updateSetReps
@@ -262,7 +263,8 @@ class WorkoutViewModel2(
 
               _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-              /*              Log.i("Timer: ", timerVersion)
+              */
+/*              Log.i("Timer: ", timerVersion)
               Log.i("TimerState: ", _timerState.value.name)
 
               Log.i("onTick(): _remainingTime", "$millisUntilFinished")
@@ -270,7 +272,8 @@ class WorkoutViewModel2(
               Log.i(
                 "onTick(): _remainingTimeProgress",
                 "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-              )*/
+              )*//*
+
             }
 
             override fun onFinish() {
@@ -326,9 +329,11 @@ class WorkoutViewModel2(
 // Only allows new completed sets to start the timer once
     if (!completedSets.contains(setLazyListItemID)) {
       completedSets.add(setLazyListItemID)
-      /*
+      */
+/*
        * Doesn't allow the new completed set to cancel the timer if one is already running
-       */
+       *//*
+
       if (exercise != null && _state != TimerState.RUNNING) {
         if (exercise.warmUpSetRestTimerEnabled && (set.setTypeID == WARM_UP_SET)) {
           _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
@@ -812,7 +817,7 @@ class WorkoutViewModel2(
   }
 
   fun setComplete(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, setComplete: Boolean) {
-    exerciseSets.setComplete(setUUID, setComplete)
+    exerciseSets.completeSet(setUUID, setComplete)
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
@@ -949,27 +954,33 @@ class WorkoutViewModel2(
     //      TODO Save Exercise Notes to Database when Workout is saved
   }
 
-  /*
+  */
+/*
     private fun getPinnedExerciseNotesByExercise(
       exercise: Exercise
     ): RealmList<ExerciseNote> {  }
+  *//*
+
+
   */
+/**
+ * Saves the workout data to the database asynchronously. The function launches a coroutine in the
+ * viewModelScope to perform the database operations. It first inserts the workout data using the
+ * workoutRepository. Then, it iterates over all sets in the _workoutData and inserts each set if
+ * it is completed into the database using the setsRepository. The function does not return any
+ * value.
+ *//*
 
-  /**
-   * Saves the workout data to the database asynchronously. The function launches a coroutine in the
-   * viewModelScope to perform the database operations. It first inserts the workout data using the
-   * workoutRepository. Then, it iterates over all sets in the _workoutData and inserts each set if
-   * it is completed into the database using the setsRepository. The function does not return any
-   * value.
-   */
 
-  /**
-   * Saves the workout data to the database asynchronously. The function launches a coroutine in the
-   * viewModelScope to perform the database operations. It first inserts the workout data using the
-   * workoutRepository. Then, it iterates over all sets in the _workoutData and inserts each set if
-   * it is completed into the database using the setsRepository. The function does not return any
-   * value.
-   */
+  */
+/**
+ * Saves the workout data to the database asynchronously. The function launches a coroutine in the
+ * viewModelScope to perform the database operations. It first inserts the workout data using the
+ * workoutRepository. Then, it iterates over all sets in the _workoutData and inserts each set if
+ * it is completed into the database using the setsRepository. The function does not return any
+ * value.
+ *//*
+
   private fun saveWorkout() {
     //    TODO Implement this
     //
@@ -1061,6 +1072,7 @@ private fun initWorkout(): Workout {
   }
 }
 
+*/
 /*private fun initExercisesSets(): MutableList<ExerciseExerciseSets> {
   val exercise =
     Exercise(
@@ -1097,39 +1109,4 @@ private fun initWorkout(): Workout {
   }
 }*/
 
-abstract class CountUpTimer(private val interval: Long) {
-  //  TODO Figure out to old elapsed time to new elapsed time
-  private var base: Long = 0
-  private var oldElapsedTime: Long = 0
 
-  fun start(elapsedTime: Long) {
-    base = SystemClock.elapsedRealtime()
-    oldElapsedTime = elapsedTime
-    handler.sendMessage(handler.obtainMessage(MSG))
-  }
-
-  fun stop() {
-    handler.removeMessages(MSG)
-  }
-
-  fun reset() {
-    synchronized(this) { base = SystemClock.elapsedRealtime() }
-  }
-
-  abstract fun onTick(elapsedTime: Long)
-
-  private val handler: Handler =
-    object : Handler(Looper.getMainLooper()) {
-      override fun handleMessage(msg: Message) {
-        synchronized(this@CountUpTimer) {
-          val elapsedTime = SystemClock.elapsedRealtime() - base + oldElapsedTime
-          onTick(elapsedTime)
-          sendMessageDelayed(obtainMessage(MSG), interval)
-        }
-      }
-    }
-
-  companion object {
-    private const val MSG = 1
-  }
-}

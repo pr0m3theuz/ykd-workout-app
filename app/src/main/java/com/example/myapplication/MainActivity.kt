@@ -24,8 +24,9 @@ import com.example.myapplication.components.Screens
 import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
 import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
 import com.example.myapplication.components.exercisesList.ExercisesScreen
+import com.example.myapplication.components.history.EditWorkoutScreen
 import com.example.myapplication.components.history.HistoryScreen
-import com.example.myapplication.components.history.WorkoutDialog
+import com.example.myapplication.components.history.WorkoutOverview
 import com.example.myapplication.components.homeScreen.HomeScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
         //        val viewModelStoreOwner: ViewModelStoreOwner
         //        val workoutViewModel: WorkoutViewModel = koinViewModel()
         val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = Screens.History.route) {
+        NavHost(navController = navController, startDestination = Screens.Programs.route) {
           addExercisesGraph(navController)
           addWorkoutGraph(
             navController, /*viewModelStoreOwner*/
@@ -86,23 +87,6 @@ private fun NavGraphBuilder.addWorkoutGraph(
       )
     }
 
-    //    composable("workoutContent/{workoutID}") { navBackStackEntry ->
-    //      //      val workoutBackStackEntry = remember {
-    // navController.getBackStackEntry("workout") }
-    //      //      val workoutViewModel: WorkoutViewModel = koinViewModel()
-    //      //      CompositionLocalProvider(LocalViewModelStoreOwner provides navBackStackEntry) {
-    //      //        Log.i("WorkoutContentNavGraph", "workoutViewModel:
-    //      // ${getViewModel<WorkoutViewModel>()}")
-    //      val workoutID = navBackStackEntry.arguments?.getString("workoutID")
-    //      WorkoutContent(
-    //        navController = navController,
-    ////        workoutName = "Workout"
-    //        //        workoutViewModel = viewModel
-    //        //          workoutViewModel = getViewModel<WorkoutViewModel>()
-    //      )
-    //      //      }
-    //    }
-
     composable("workoutSummary/{workoutID}/{workoutCount}") { navBackStackEntry ->
       Log.i("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
@@ -115,16 +99,6 @@ private fun NavGraphBuilder.addWorkoutGraph(
           workoutsCount = workoutsCount
         )
       }
-      //      CompositionLocalProvider(LocalViewModelStoreOwner provides navBackStackEntry) {
-      //        Log.i("WorkoutSummary", "workoutViewModel: ${getViewModel<WorkoutViewModel>()}")
-      //      WorkoutSummaryScreen(
-      //        navController = navController,
-      //        workoutViewModel = viewModel
-      //          workoutViewModel = getViewModel<WorkoutViewModel>()
-      //        completedWorkout = completedWorkout,
-      //        workoutsCount = workoutsCount
-      //      )
-      //      }
     }
 
     composable(
@@ -226,18 +200,20 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
   navigation("historyScreen", route = "history") {
     composable("historyScreen") { navBackStackEntry ->
       Log.i("HistoryNavGraph", "Navigated to History Screen")
-
       HistoryScreen(
         navController = navController,
       )
     }
-    composable(route = "history?workoutID={workoutID}") { navBackStackEntry ->
-      //        Log.i("WorkoutNavGraph", "Navigated to Workout Screen")
+
+    composable(route = "history?overviewWorkout={workoutID}") { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("workoutID")?.let {
-        WorkoutDialog(
-          navController = navController,
-          workoutID = it,
-        )
+        WorkoutOverview(workoutID = it, navController = navController)
+      }
+    }
+
+    composable(route = "history?editWorkout={workoutID}") { navBackStackEntry ->
+      navBackStackEntry.arguments?.getString("workoutID")?.let {
+        EditWorkoutScreen(workoutID = it, navController = navController)
       }
     }
   }

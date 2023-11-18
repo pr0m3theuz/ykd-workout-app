@@ -24,9 +24,11 @@ constructor(
   //  private val setsRepository: SetsRepository,
   private val exercisesRepository: ExercisesRepository
 ) : ViewModel() {
-  fun getExerciseNameByID(exerciseID: ObjectId?): String {
+  fun getExerciseNameByID(exerciseID: ObjectId?): String? {
 //    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
-    return exercisesRepository.getExercise(exerciseID)?.name ?: "Exercise not found"
+    val exercise = exercisesRepository.getExercise(exerciseID)
+//    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exercise?.name}")
+    return exercise?.name
   }
 
   private val _programs = MutableStateFlow(emptyList<Program>())
@@ -45,7 +47,7 @@ constructor(
 
   init {
     viewModelScope.launch {
-      // programsRepository.migrateData() // Used to import data
+//      programsRepository.migrateData() // Used to import data
       programsRepository.getAllDistinctProgramTemplates().collect() { _programs.value = it }
     }
 

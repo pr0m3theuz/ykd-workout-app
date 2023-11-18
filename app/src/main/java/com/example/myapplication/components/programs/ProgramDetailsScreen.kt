@@ -532,8 +532,8 @@ fun WorkoutDayCard(
   val cardColors = CardDefaults.cardColors()
 
   val exercisesSets = workout.exercisesSets
-
-  //  Log.i("WorkoutDayCard", exercisesSets.toString())
+//  Log.i("WorkoutDayCard", "Workout: ${ Json.encodeToString(workout) }")
+//  Log.i("WorkoutDayCard ExercisesSets", "${ Json.encodeToString(exercisesSets[0]) }")
 
   ElevatedCard() {
     Column(modifier = Modifier
@@ -555,7 +555,6 @@ fun WorkoutDayCard(
               index = index,
               //            exerciseID = entry.key,
               exerciseSets = exerciseSets,
-              programsViewModel = programsViewModel
             )
             Spacer(modifier = Modifier.height(spacedByPadding))
           }
@@ -569,62 +568,64 @@ fun ExerciseOverview(
   index: Int,
   //  exerciseID: Long,
   exerciseSets: ExerciseSets,
-  programsViewModel: ProgramsViewModel,
+  programsViewModel: ProgramsViewModel = koinViewModel(),
 ) {
   val labelMedium = MaterialTheme.typography.labelMedium
 
   val exercise = exerciseSets.exerciseID
-  Log.i("ExerciseOverview", "exercise ID: " + exercise?.toHexString())
+  val exerciseName = programsViewModel.getExerciseNameByID(exerciseID = exercise)
+//  Log.i("ExerciseOverview", "exerciseSets: ${Json.encodeToString(exerciseSets)}")
+//  Log.i("ExerciseOverview", "exercise ID: $exercise")
+//  Log.i("ExerciseOverview", "exercise name: $exerciseName")
 
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(bottom = 4.dp),
-  ) {
-    if (exercise != null) {
+  exerciseName?.let {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 4.dp),
+    ) {
+      if (exercise != null) {
+        Text(text = "${index.plus(1)}. $exerciseName", style = labelMedium)
+      }
+    }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+      Text(text = "Sets", style = labelMedium, modifier = Modifier.weight(1f))
       Text(
-        text = "${index.plus(1)}. ${programsViewModel.getExerciseNameByID(exerciseID = exercise)}",
-        style = labelMedium
+        text = "Target Reps",
+        style = labelMedium,
+        modifier = Modifier.weight(1f),
+        textAlign = TextAlign.Center
+      )
+      Text(
+        text = "Target RIR",
+        style = labelMedium,
+        modifier = Modifier.weight(1f),
+        textAlign = TextAlign.Center
       )
     }
-  }
-  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-    Text(text = "Sets", style = labelMedium, modifier = Modifier.weight(1f))
-    Text(
-      text = "Target Reps",
-      style = labelMedium,
-      modifier = Modifier.weight(1f),
-      textAlign = TextAlign.Center
-    )
-    Text(
-      text = "Target RIR",
-      style = labelMedium,
-      modifier = Modifier.weight(1f),
-      textAlign = TextAlign.Center
-    )
-  }
-  //  Log.i("ExerciseOverview", Json.encodeToString(exerciseSets.sets))
-  exerciseSets.sets.forEach { set ->
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-      Text(
-        text = set.setNumber.toString(),
-        style = labelMedium,
-        modifier = Modifier
-          .weight(1f)
-          .padding(start = 8.dp)
-      )
-      Text(
-        text = set.targetRepetitions ?: "N/A",
-        style = labelMedium,
-        modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center
-      )
-      Text(
-        text = doubleFormatted(set.targetRepetitionsInReserve),
-        style = labelMedium,
-        modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center
-      )
+    //  Log.i("ExerciseOverview", Json.encodeToString(exerciseSets.sets))
+    exerciseSets.sets.sortedBy { it.setNumber }.forEach { set ->
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(
+          text = set.setNumber.toString(),
+          style = labelMedium,
+          modifier = Modifier
+            .weight(1f)
+            .padding(start = 8.dp)
+        )
+        Text(
+          text = set.targetRepetitions ?: "N/A",
+          style = labelMedium,
+          modifier = Modifier.weight(1f),
+          textAlign = TextAlign.Center
+        )
+        Text(
+          text = doubleFormatted(set.targetRepetitionsInReserve),
+          style = labelMedium,
+          modifier = Modifier.weight(1f),
+          textAlign = TextAlign.Center
+        )
+      }
     }
   }
 }
@@ -783,7 +784,7 @@ fun MicrocycleCard(
                   val workoutRoute = "workout?workoutID=${workout._id.toHexString()}"
                   if (workout.workoutEnded == null) {
                     Button(
-                      enabled = activeProgram,
+                      enabled = true, //activeProgram,
                       onClick = {
                         navController.navigate(workoutRoute) {
                           popUpTo(navController.graph.findStartDestination().id) {

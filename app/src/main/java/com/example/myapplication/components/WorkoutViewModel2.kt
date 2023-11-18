@@ -28,7 +28,7 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.addWarmUpSets
-import com.example.myapplication.data.model.setComplete
+import com.example.myapplication.data.model.completeSet
 import com.example.myapplication.data.model.updateSetRIR
 import com.example.myapplication.data.model.updateSetRPE
 import com.example.myapplication.data.model.updateSetReps
@@ -62,9 +62,9 @@ class WorkoutViewModel(
   //  private val setsRepository: SetsRepository,
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
   private val exerciseRepository: ExercisesRepository,
-//  private val workoutNotesRepository: WorkoutNotesRepository,
-//  private val exerciseNotesRepository: ExerciseNotesRepository,
-//  userRepository: UserRepository,
+  //  private val workoutNotesRepository: WorkoutNotesRepository,
+  //  private val exerciseNotesRepository: ExerciseNotesRepository,
+  //  userRepository: UserRepository,
 ) : ViewModel() {
 
   //    fun currentTimeMillis(): Long = System.currentTimeMillis()
@@ -419,14 +419,21 @@ class WorkoutViewModel(
       // TODO Add logic for when copying from a template (active program) vs when copying from a
       // previous workout
       copyWorkoutFromWorkoutTemplate(initialWorkoutData)
-      //      copyWorkoutFromPreviousWorkout(initialWorkoutData)
-
-      //      _workoutName.value = initialWorkoutData.name
-      //      _workoutData = initialWorkoutData
-      //      _workout.value = _workoutData
-      //      _exercisesSetsData = initialWorkoutData.exercisesSets
-      //      _exercisesSets.value = _exercisesSetsData.toList()
     }
+  }
+
+  fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {
+    manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { workout ->
+      _workoutName.value = workout.name
+      _workoutData = workout
+      _workout.value = _workoutData
+
+      getPinnedWorkoutNotes(workout.uuid, workout._id)
+      _exercisesSets.value =
+        loadExercisesSetsFromPreviousWorkout(workout.exercisesSets).toList()
+    }
+
+    //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
@@ -466,6 +473,13 @@ class WorkoutViewModel(
     )
   }
 
+  private fun loadExercisesSetsFromPreviousWorkout(
+    previousExercisesSets: RealmList<ExerciseSets>,
+  ): MutableList<ExerciseExerciseSets> {
+    return manageWorkoutUseCase.loadExercisesSetsFromWorkout(
+      previousExercisesSets = previousExercisesSets,
+    )
+  }
   //  private fun copySetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
   //    // TODO Think out how to get Previous Set from the last time the exercise was performed and
   // what
@@ -638,7 +652,6 @@ class WorkoutViewModel(
   //  fun getSetData(setUUID: RealmUUID): Set {
   //    return allSets().first { it.uuid == setUUID }
 
-
   private fun updateExerciseExerciseSetsData(exerciseSets: ExerciseExerciseSets) {
 
     _exercisesSets.value =
@@ -675,8 +688,8 @@ class WorkoutViewModel(
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun setComplete(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, setComplete: Boolean) {
-    exerciseSets.setComplete(setUUID, setComplete)
+  fun completeSet(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, completed: Boolean) {
+    exerciseSets.completeSet(setUUID, completed)
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
@@ -697,10 +710,8 @@ class WorkoutViewModel(
     return when (exerciseSets.exercise?.weightUnit) {
       MassUnit.KILOGRAMS.abbreviation ->
         exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
-
       MassUnit.POUNDS.abbreviation ->
         exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightPounds
-
       else -> {
         if (userDefaultWeightUnit == MassUnit.KILOGRAMS.abbreviation) {
           exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
@@ -813,13 +824,6 @@ class WorkoutViewModel(
     ): RealmList<ExerciseNote> {  }
   */
 
-  /**
-   * Saves the workout data to the database asynchronously. The function launches a coroutine in the
-   * viewModelScope to perform the database operations. It first inserts the workout data using the
-   * workoutRepository. Then, it iterates over all sets in the _workoutData and inserts each set if
-   * it is completed into the database using the setsRepository. The function does not return any
-   * value.
-   */
 
   /**
    * Saves the workout data to the database asynchronously. The function launches a coroutine in the
@@ -828,24 +832,20 @@ class WorkoutViewModel(
    * it is completed into the database using the setsRepository. The function does not return any
    * value.
    */
-  private fun saveWorkout() {
+  fun saveWorkout() {
     //    TODO Implement this
     //
-//    _workoutData.notes = _workoutNotesData.toRealmList()
+    //    _workoutData.notes = _workoutNotesData.toRealmList()
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     removeUncompletedSets()
 
-//    _workoutData.exercisesSets =
-//      convertExerciseExerciseSetsToExerciseSets(_exercisesSets.value, userDefaultWeightUnit)
-//
-//    _workoutData.calculateTotalVolume(userDefaultWeightUnit)
+    //    _workoutData.exercisesSets =
+    //      convertExerciseExerciseSetsToExerciseSets(_exercisesSets.value, userDefaultWeightUnit)
+    //
+    //    _workoutData.calculateTotalVolume(userDefaultWeightUnit)
 
     viewModelScope.launch {
-      manageWorkoutUseCase.saveWorkout(
-        _workoutData,
-        _workoutNotesData,
-        _exercisesSets.value
-      )
+      manageWorkoutUseCase.saveWorkout(_workoutData, _workoutNotesData, _exercisesSets.value)
     }
   }
 
@@ -892,7 +892,6 @@ class WorkoutViewModel(
         newExercise
       )
 
-    //    _exercisesSets.value = _exercisesSetsData
   }
 }
 
@@ -907,7 +906,6 @@ private fun initWorkout(): Workout {
         workoutStarted = RealmInstant.now()
       }
     }
-
     in 12..17 -> {
       Workout().apply {
         name = "Afternoon Workout"
@@ -915,7 +913,6 @@ private fun initWorkout(): Workout {
         workoutStarted = RealmInstant.now()
       }
     }
-
     else -> {
       Workout().apply {
         name = "Evening Workout"

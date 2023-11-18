@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.*
@@ -149,9 +150,7 @@ fun SetContent(
       SetCompleteCheckbox(
         checkedState,
         completeSet = { setComplete(it) },
-        startRestTimer = {
-          startSetCompletedTimer()
-        },
+        startRestTimer = { startSetCompletedTimer() },
         isTimerRunning = isTimerRunning
       )
     },
@@ -162,6 +161,7 @@ fun SetContent(
         boxModifier = Modifier.width(96.dp),
         textFieldBackgroundColor = textFieldBackgroundColor,
         exerciseWeightText = exerciseWeightText,
+        targetWeight = doubleFormatted(set.targetWeight),
         onWeightChange = {
           exerciseWeightText =
             when {
@@ -194,6 +194,7 @@ fun SetContent(
         textFieldBackgroundColor = textFieldBackgroundColor,
         //        modifier = Modifier.focusRequester(repsFocusRequester),
         repetitionsText = repetitionsText,
+        targetReps = set.targetRepetitions,
         onRepsChange = { reps ->
           repetitionsText = checkIntInput(reps)
           set.repetitions = repetitionsText.toIntOrNull()
@@ -201,7 +202,7 @@ fun SetContent(
         onImeAction = {
           updateSetData()
           //          rirFocusRequester.requestFocus()
-        }
+        },
       )
     },
     rirTextField = { boxModifier ->
@@ -210,6 +211,7 @@ fun SetContent(
         boxModifier = boxModifier.width(40.dp),
         textFieldBackgroundColor = textFieldBackgroundColor,
         repetitionsInReserveText = repetitionsInReserveText,
+        targetRIR = doubleFormatted(set.targetRepetitionsInReserve),
         onRIRChange = { rir ->
           repetitionsInReserveText =
             when {
@@ -381,12 +383,14 @@ private fun SetCompleteCheckbox(
   )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun RIRTextField(
   boxModifier: Modifier = Modifier,
   textFieldModifier: Modifier = Modifier,
   textFieldBackgroundColor: Color,
   repetitionsInReserveText: String,
+  targetRIR: String?,
   onRIRChange: (newRIR: String) -> Unit,
   onImeAction: () -> Unit = {},
 ) {
@@ -402,6 +406,7 @@ private fun RIRTextField(
   if (changeTextColor) {
     textColor = MaterialTheme.colorScheme.onBackground
   }
+
   Box(
     modifier =
     boxModifier
@@ -415,10 +420,10 @@ private fun RIRTextField(
     contentAlignment = Alignment.Center
   ) {
     BasicTextField(
-      modifier = textFieldModifier.padding(PaddingValues(4.dp)),
+      modifier = textFieldModifier.padding(PaddingValues(8.dp)),
       textStyle =
       TextStyle(
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         textAlign = TextAlign.Center,
         color = textColor
       ),
@@ -429,8 +434,11 @@ private fun RIRTextField(
         onDone = { onImeAction() },
       ),
       value = repetitionsInReserveText,
-      onValueChange = { onRIRChange(it.take(4)) }
+      onValueChange = { onRIRChange(it.take(4)) },
     )
+    if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isNullOrBlank()) {
+      Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
+    }
   }
 }
 
@@ -440,6 +448,7 @@ private fun ExerciseRepsTextField(
   textFieldModifier: Modifier = Modifier,
   textFieldBackgroundColor: Color,
   repetitionsText: String,
+  targetReps: String?,
   onRepsChange: (newReps: String) -> Unit,
   onImeAction: () -> Unit = {},
 ) {
@@ -456,10 +465,10 @@ private fun ExerciseRepsTextField(
     contentAlignment = Alignment.Center
   ) {
     BasicTextField(
-      modifier = textFieldModifier.padding(PaddingValues(4.dp)),
+      modifier = textFieldModifier.padding(PaddingValues(8.dp)),
       textStyle =
       TextStyle(
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onBackground
       ),
@@ -471,7 +480,11 @@ private fun ExerciseRepsTextField(
       ),
       value = repetitionsText,
       onValueChange = { onRepsChange(it.take(4)) },
+      cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
     )
+    if (!targetReps.isNullOrBlank() && repetitionsText.isNullOrBlank()) {
+      Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
+    }
   }
 }
 
@@ -482,6 +495,7 @@ private fun ExerciseWeightTextField(
   textFieldModifier: Modifier = Modifier,
   textFieldBackgroundColor: Color,
   exerciseWeightText: String,
+  targetWeight: String?,
   onWeightChange: (newWeight: String) -> Unit,
   onImeAction: () -> Unit = {},
 ) {
@@ -500,10 +514,10 @@ private fun ExerciseWeightTextField(
     BasicTextField2(
       value = exerciseWeightText,
       onValueChange = { onWeightChange(it.take(7)) },
-      modifier = textFieldModifier.padding(PaddingValues(4.dp)),
+      modifier = textFieldModifier.padding(PaddingValues(8.dp)),
       textStyle =
       TextStyle(
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onBackground
       ),
@@ -515,6 +529,9 @@ private fun ExerciseWeightTextField(
         onNext = { onImeAction() },
       ),
     )
+    if (!targetWeight.isNullOrBlank() && exerciseWeightText.isNullOrBlank()) {
+      Text(text = targetWeight, color = MaterialTheme.colorScheme.outline)
+    }
   }
 }
 

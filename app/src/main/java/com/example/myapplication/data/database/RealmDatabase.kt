@@ -803,7 +803,7 @@ class RealmDatabase {
       .find()
   }
 
-  suspend fun migratePrograms() {
+  suspend fun importPrograms() {
     val json =
       assetFileAsStream("database/programs_202308111151.json").bufferedReader().use {
         it.readText()
@@ -837,7 +837,7 @@ class RealmDatabase {
     }
   }
 
-  suspend fun migrateMesocycles() {
+  suspend fun importMesocycles() {
     val json =
       assetFileAsStream("database/mesocycles_202308111154.json").bufferedReader().use {
         it.readText()
@@ -860,7 +860,7 @@ class RealmDatabase {
     }
   }
 
-  suspend fun migrateMicrocycles() {
+  suspend fun importMicrocycles() {
     val json =
       assetFileAsStream("database/microcycles_202308111153.json").bufferedReader().use {
         it.readText()
@@ -885,7 +885,7 @@ class RealmDatabase {
     }
   }
 
-  suspend fun migrateWorkouts() {
+  suspend fun importWorkouts() {
     val json =
       assetFileAsStream("database/workouts_202308111151.json").bufferedReader().use {
         it.readText()
@@ -942,7 +942,7 @@ class RealmDatabase {
 
   suspend fun importExerciseSets() {
     val json =
-      assetFileAsStream("database/Break-In Phase Block 1 ExercisesSets copy.json")
+      assetFileAsStream("database/Break-In Phase Block 2 Day 1 ExercisesSets.json")
         .bufferedReader()
         .use { it.readText() }
 
@@ -998,7 +998,7 @@ class RealmDatabase {
       }
       */
 
-      realm.write {
+      /*realm.write {
 //        val latestExercise = findLatest(_exercise) ?: return@write
         val latestSets = mutableListOf<Set>()
 
@@ -1011,9 +1011,10 @@ class RealmDatabase {
         exerciseSets.apply {
           exerciseOrder = _exerciseSets.exerciseOrder
           exerciseID = _exercise._id
+          workoutID = _exerciseSets.workout
           //          sets = latestSets.toRealmList()
         }
-      }
+      }*/
     }
   }
 
@@ -1084,7 +1085,7 @@ class RealmDatabase {
     val realmExerciseSets = realmListOf<ExerciseSets>()
     exercisesSets.forEach { exerciseSets ->
       val insertedSets =
-        insertCompletedSets(exerciseSets.sets, exerciseID = exerciseSets.exerciseID)
+        insertCompletedSets(exerciseSets.sets, exerciseID = exerciseSets.exerciseID!!)
       val insertedNotes = insertExerciseNotes(exerciseSets.notes)
       if (exerciseSets.sets.isNotEmpty()) {
         realm.write {

@@ -129,8 +129,8 @@ fun ExerciseExerciseSets.updateSetRPE(uuid: RealmUUID, newRPE: Double?) {
   sets.forEach { if (it.uuid == uuid) it.ratePerceivedEffort = newRPE }
 }
 
-fun ExerciseExerciseSets.setComplete(uuid: RealmUUID, setComplete: Boolean) {
-  sets.forEach { if (it.uuid == uuid) it.setCompleted = setComplete }
+fun ExerciseExerciseSets.completeSet(uuid: RealmUUID, completed: Boolean) {
+  sets.forEach { if (it.uuid == uuid) it.setCompleted = completed }
 }
 
 fun ExerciseExerciseSets.updateSetType(uuid: RealmUUID, setTypeID: Int) {

@@ -27,8 +27,9 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.mongodb.kbson.ObjectId
+import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlin.time.Duration
@@ -78,13 +79,30 @@ fun Workout.formatWorkoutDuration(): String {
 fun Workout.formatWorkoutDate(): String {
   val dateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
   //  TODO Confirm if UTC or local
+  val offset = ZoneId.systemDefault().rules.getOffset(Instant.now())
   return if (workoutStarted != null) {
     LocalDateTime.ofEpochSecond(
       workoutStarted!!.epochSeconds,
       workoutStarted!!.nanosecondsOfSecond,
-      ZoneOffset.UTC
+      offset
     )
       .format(dateTimeFormatter)
+  } else {
+    ""
+  }
+}
+
+fun Workout.formatLongWorkoutStarted(): String {
+  val dayTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a")
+  val offset = ZoneId.systemDefault().rules.getOffset(Instant.now())
+  //  TODO Confirm if UTC or local
+  return if (workoutStarted != null) {
+    LocalDateTime.ofEpochSecond(
+      workoutStarted!!.epochSeconds,
+      workoutStarted!!.nanosecondsOfSecond,
+      offset
+    )
+      .format(dayTimeFormatter)
   } else {
     ""
   }

@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
+import com.example.myapplication.components.WorkoutNameDialog
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.RestTimerButton
@@ -50,9 +51,6 @@ fun WorkoutScreen(
   workoutViewModel: WorkoutViewModel = koinViewModel(),
   workoutID: String?
 ) {
-  //  Log.i("WorkoutContent", "workoutViewModel: $workoutViewModel")
-  //  val workoutViewModel = koinInject<WorkoutViewModel>()
-
   if (!workoutID.isNullOrBlank()) {
     workoutViewModel.getWorkoutByID(ObjectId.invoke(workoutID))
   } else {
@@ -114,8 +112,13 @@ fun WorkoutContent(
           WorkoutOptionsDropdownMenu(
             addWorkoutNote = { workoutViewModel.addWorkoutNote() },
             enableWorkoutNameTextfield = { setEditable(!editable) },
-            workoutName = workoutName ?: "",
-            setWorkoutName = { workoutViewModel.setWorkoutName(it) },
+            workoutNameDialog = { dismissWorkoutNameDialog ->
+              WorkoutNameDialog(
+                workoutName = workoutName ?: "",
+                dismissWorkoutNameDialog = { dismissWorkoutNameDialog() },
+                setWorkoutName = { workoutViewModel.setWorkoutName(it) }
+              )
+            }
           )
         },
       )

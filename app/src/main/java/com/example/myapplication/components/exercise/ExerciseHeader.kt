@@ -43,35 +43,41 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
-import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.averageWeight
 import com.example.myapplication.data.model.calculateTotalVolume
 import com.example.myapplication.data.model.totalRepetitions
-import org.koin.androidx.compose.koinViewModel
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
 @Composable
 fun ExerciseScreen(
   navController: NavController,
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+//  workoutViewModel: WorkoutViewModel = koinViewModel(),
   _exerciseSets: ExerciseExerciseSets,
+  weightUnit: String,
+  exerciseWeightUnit: String?,
+  userDefaultWeightUnit: String,
+  removeExerciseSets: () -> Unit,
+  addExerciseNote: () -> Unit,
+  removeExerciseNote: (note: ExerciseNote) -> Unit,
+  pinExerciseNote: (note: ExerciseNote, pinned: Boolean) -> Unit,
+  updateExerciseWeightUnit: (weightUnit: String?) -> Unit
 ) {
   val exerciseSets by remember { mutableStateOf(_exerciseSets) }
   //  Log.i("ExerciseScreen", "$_exerciseSets")
   //  Log.i("ExerciseScreen", "$_exerciseNotes")
 
+//  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
+//  val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
+//  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
+
+  val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
+
   ExerciseHeader(
-    navController = navController,
-    exerciseSets = exerciseSets,
-    removeExercise = { exerciseSets: ExerciseExerciseSets ->
-      workoutViewModel.removeExerciseSets(exerciseSets)
-    },
     titleButton = { modifier: Modifier ->
       ExerciseTitleButton(
         onClick = {
@@ -87,49 +93,48 @@ fun ExerciseScreen(
           )
         }
       }
-    }
-    //    addNote = { exerciseSets: ExerciseSets -> workoutViewModel.addExerciseNote(exerciseSets)
-    // },
-    //    removeNote = { exerciseSets: ExerciseSets, note: ExerciseNote ->
-    //      workoutViewModel.removeExerciseNote(exerciseSets, note)
-    //    }
+    },
+    exerciseOptionsMenu = {
+      ExerciseOptionsDropdownMenu(
+        exerciseSets = exerciseSets,
+        addNotes = {
+          setNotesVisible(true)
+          addExerciseNote()
+        },
+        removeExerciseSets = { removeExerciseSets() },
+        userDefaultWeightUnit = userDefaultWeightUnit,
+        exerciseWeightUnit = exerciseWeightUnit,
+        updateExerciseWeightUnit = { weightUnit ->
+          updateExerciseWeightUnit(
+            weightUnit
+          )
+        },
+        navController = navController,
+      )
+    },
+    exerciseNotesList = {
+      ExerciseNotesList(
+        notesVisible = notesVisible,
+        exerciseSets = exerciseSets,
+        _pinNote = { note, pin -> pinExerciseNote(note, pin) },
+        removeNote = { note -> removeExerciseNote(note) },
+      )
+    },
+    exerciseSetsWorkoutSummary = {
+      ExerciseSetsWorkoutSummary(exerciseSets = exerciseSets, weightUnit = weightUnit)
+    },
+    setContentHeader = { SetContentHeader(weightUnit = weightUnit) }
   )
 }
 
 @Composable
 fun ExerciseHeader(
-  navController: NavController,
-  exerciseSets: ExerciseExerciseSets,
-  removeExercise: (exerciseSets: ExerciseExerciseSets) -> Unit,
-  //  addNote: (exerciseSets: ExerciseSets) -> Unit,
-  //  removeNote: (exerciseSets: ExerciseSets, note: ExerciseNote) -> Unit,
-  workoutViewModel: WorkoutViewModel = viewModel(),
   titleButton: @Composable (modifier: Modifier) -> Unit,
+  exerciseOptionsMenu: @Composable () -> Unit,
+  exerciseNotesList: @Composable () -> Unit,
+  exerciseSetsWorkoutSummary: @Composable () -> Unit,
+  setContentHeader: @Composable () -> Unit,
 ) {
-  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
-  val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
-
-  //    TODO: Create a button that toggle the notes
-  val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
-
-  //    TODO fun updateExerciseNotes() updates notes when workout is completed
-
-  fun removeNote(exerciseSets: ExerciseExerciseSets, note: ExerciseNote) {
-    workoutViewModel.removeExerciseNote(exerciseSets, note)
-    //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
-  }
-
-  fun addNote(exerciseSets: ExerciseExerciseSets) {
-    workoutViewModel.addExerciseNote(exerciseSets)
-    //    notes = workoutViewModel.getExerciseNotesByExercise(exerciseSets)
-  }
-
-  fun pinNote(note: ExerciseNote, pin: Boolean) {
-    Log.i("ExerciseHeader.pinNote", "pin: $pin")
-    workoutViewModel.pinExerciseNote(exerciseSets, note, pin)
-  }
-
   //  Log.i("ExerciseHeader", "$exerciseSets.notes")
   //  Log.i("ExerciseHeader", "$notes")
 
@@ -142,51 +147,12 @@ fun ExerciseHeader(
       ) {
         titleButton(Modifier.weight(1.0f, fill = true))
 
-        //        ExerciseTitleButton(
-        //          onClick = {
-        //
-        // navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
-        //          },
-        //          modifier = Modifier.weight(1.0f, fill = true)
-        //        ) {
-        //          exerciseSets.exercise?.name?.let {
-        //            Text(
-        //              text = it,
-        //              color = MaterialTheme.colorScheme.primary,
-        //              style = MaterialTheme.typography.titleMedium,
-        //            )
-        //          }
-        //        }
-
-        ExerciseOptionsDropdownMenu(
-          exerciseSets = exerciseSets,
-          addNotes = {
-            setNotesVisible(true)
-            addNote(exerciseSets)
-          },
-          removeExercise = { removeExercise(exerciseSets) },
-          userDefaultWeightUnit = userDefaultWeightUnit,
-          exerciseWeightUnit = exerciseWeightUnit,
-          updateExerciseWeightUnit = { weightUnit ->
-            workoutViewModel.updateExerciseWeightUnit(
-              exercise = exerciseSets.exercise,
-              weightUnit = weightUnit
-            )
-          },
-          navController = navController,
-        )
+        exerciseOptionsMenu()
       }
 
-      //      Log.i("ExerciseHeader", "$notesVisible")
-      ExerciseNotesList(
-        notesVisible = notesVisible,
-        exerciseSets = exerciseSets,
-        _pinNote = { note, pin -> pinNote(note, pin) },
-        removeNote = { exerciseSets, note -> removeNote(exerciseSets, note) },
-      )
-
-      ExerciseSetsWorkoutSummary(exerciseSets = exerciseSets, weightUnit = weightUnit)
-      SetContentHeader(weightUnit = weightUnit)
+      exerciseNotesList()
+      exerciseSetsWorkoutSummary()
+      setContentHeader()
     }
   }
 }
@@ -196,7 +162,7 @@ private fun ExerciseNotesList(
   notesVisible: Boolean,
   exerciseSets: ExerciseExerciseSets,
   _pinNote: (note: ExerciseNote, pin: Boolean) -> Unit,
-  removeNote: (exerciseSets: ExerciseExerciseSets, note: ExerciseNote) -> Unit
+  removeNote: (note: ExerciseNote) -> Unit
 ) {
   //  Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
   var visible by remember { mutableStateOf(notesVisible) }
@@ -215,7 +181,7 @@ private fun ExerciseNotesList(
 
   exerciseSets.notes.forEach { note ->
     Log.i("ExerciseNotesList", "Note: $note")
-    SwipeToDismissItem(onDismissRequest = { removeNote(exerciseSets, note) }) {
+    SwipeToDismissItem(onDismissRequest = { removeNote(note) }) {
       ExerciseNotes(
         exerciseNote = note,
         _pinNote = { pin -> _pinNote(note, pin) },

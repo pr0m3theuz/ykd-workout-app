@@ -31,8 +31,9 @@ import androidx.compose.ui.unit.dp
 fun WorkoutOptionsDropdownMenu(
   addWorkoutNote: () -> Unit,
   enableWorkoutNameTextfield: () -> Unit,
-  workoutName: String,
-  setWorkoutName: (String) -> Unit,
+  workoutNameDialog: @Composable (dismissWorkoutNameDialog: () -> Unit) -> Unit,
+  //  workoutName: String,
+  //  setWorkoutName: (String) -> Unit,
 ) {
   var expanded by remember { mutableStateOf(false) }
 
@@ -71,38 +72,65 @@ fun WorkoutOptionsDropdownMenu(
   }
 
   if (openWorkoutNameDialog) {
-    WorkoutNameDialog(
-      workoutName = workoutName,
-      setOpenWorkoutNameDialog = { setOpenWorkoutNameDialog(false) },
-      setWorkoutName = { setWorkoutName(it) }
-    )
+    workoutNameDialog { setOpenWorkoutNameDialog(false) }
   }
+}
+
+@Composable
+fun EditWorkoutOptionsDropdownMenu(
+  editWorkout: () -> Unit,
+  deleteWorkout: () -> Unit,
+  saveWorkoutAsTemplate: () -> Unit,
+//  workoutNameDialog: @Composable (dismissWorkoutNameDialog: () -> Unit) -> Unit,
+  //  workoutName: String,
+  //  setWorkoutName: (String) -> Unit,
+) {
+  var expanded by remember { mutableStateOf(false) }
+
+  val (openWorkoutNameDialog, setOpenWorkoutNameDialog) = remember { mutableStateOf(false) }
+
+  Box {
+    IconButton(onClick = { expanded = true }) {
+      Icon(
+        Icons.Outlined.MoreVert,
+        contentDescription = "Workout Options and Settings",
+        tint = MaterialTheme.colorScheme.primary
+      )
+    }
+    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+      DropdownMenuItem(text = { Text("Edit Workout") }, onClick = { editWorkout() })
+      DropdownMenuItem(text = { Text("Save as Template") }, onClick = { saveWorkoutAsTemplate() })
+      DropdownMenuItem(text = { Text("Delete Workout") }, onClick = { deleteWorkout() })
+    }
+  }
+
+//  if (openWorkoutNameDialog) {
+//    workoutNameDialog { setOpenWorkoutNameDialog(false) }
+//  }
 }
 
 @Composable
 fun WorkoutNameDialog(
   workoutName: String,
-  setOpenWorkoutNameDialog: () -> Unit,
+  dismissWorkoutNameDialog: () -> Unit,
   setWorkoutName: (String) -> Unit,
 ) {
   var newName: String by remember { mutableStateOf(workoutName) }
 
   AlertDialog(
     shape = MaterialTheme.shapes.large,
-    onDismissRequest = { setOpenWorkoutNameDialog() },
+    onDismissRequest = { dismissWorkoutNameDialog() },
     confirmButton = {
       TextButton(
         onClick = {
           setWorkoutName(newName)
-          setOpenWorkoutNameDialog()
+          dismissWorkoutNameDialog()
         },
       ) {
         Text("Confirm")
       }
     },
-    title = {
-      Text(text = "Rename Workout", style = MaterialTheme.typography.titleMedium)
-    },
+    title = { Text(text = "Rename Workout", style = MaterialTheme.typography.titleMedium) },
     text = {
       Column {
         Row(modifier = Modifier.fillMaxWidth()) {
