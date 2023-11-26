@@ -149,3 +149,13 @@ z
 Japp/src/main/java/com/example/myapplication/data/network/SetsRepository.kt,7/f/7f5a67d4d9516dfbea453e5ed97cbd9d5f7f8dc5
 v
 Fapp/src/main/java/com/example/myapplication/components/CountUpTimer.kt,d/a/da0a8350f928e9ae1ebd0178bd9e5d46c5de13f3
+@
+build.gradle.kts,d/b/dbcff70658daf80b53ce624f6adcaa529df5ed8d
+F
+app/proguard-rules.pro,9/e/9e08934d811afe28fbc77aaa3c0d747b94348db9
+D
+app/build.gradle.kts,d/2/d2a4383452aad84a18429a5844d31330a012a9e6
+C
+settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
+G
+app/newrelic.properties,5/2/52718845109ae62fcfaf489498c57ce49a3272cb

@@ -133,7 +133,7 @@ constructor(
     viewModelScope.launch {
       programsRepository.getMicrocyclesByProgram(programID).collect() {
 
-        _selectedProgramMicrocycles.value = it
+        _selectedProgramMicrocycles.value = it.sortedBy { it.mesocycleID }
 //        Log.i("getMicrocyclesByProgram", "program microcycles" + Json.encodeToString(it))
       }
     }

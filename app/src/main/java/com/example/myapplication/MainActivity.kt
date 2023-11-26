@@ -33,13 +33,23 @@ import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.WorkoutScreen
 import com.example.myapplication.components.workout.WorkoutSummaryScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.newrelic.agent.android.NewRelic
 import kotlinx.serialization.ExperimentalSerializationApi
 
 class MainActivity : ComponentActivity() {
 
+//  private lateinit var firebaseAnalytics: FirebaseAnalytics
+
   @RequiresApi(Build.VERSION_CODES.S)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+//    firebaseAnalytics = Firebase.analytics
+
+    //New Relic
+    NewRelic.withApplicationToken(
+      "eu01xx7700dce7ae53e2b20b7cc382fcba147c93ae-NRMA"
+    ).start(this.applicationContext)
 
     setContent {
       MyApplicationTheme {

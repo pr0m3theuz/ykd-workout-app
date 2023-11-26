@@ -506,7 +506,7 @@ fun WorkoutOverviewCard(
           horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
           if (workouts.isNotEmpty()) {
-            workouts.forEachIndexed { index, workout ->
+            workouts.sortedBy { it.day }.forEachIndexed { index, workout ->
               //              Log.i("WorkoutOverviewCard", workout.toString())
               WorkoutDayCard(index, workout, programsViewModel)
             }
@@ -733,7 +733,7 @@ fun MicrocycleCard(
                 }
               }
 
-              microcycle.workouts.forEach { workout ->
+              microcycle.workouts.sortedBy { it.day }.forEach { workout ->
                 Row(
                   modifier = Modifier.fillMaxWidth(),
                   //                    .padding(bottom = 8.dp),

@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text2.BasicTextField2
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -208,7 +207,7 @@ fun SetContent(
     rirTextField = { boxModifier ->
       RIRTextField(
         //        modifier = Modifier.focusRequester(rirFocusRequester),
-        boxModifier = boxModifier.width(40.dp),
+        boxModifier = boxModifier.width(48.dp),
         textFieldBackgroundColor = textFieldBackgroundColor,
         repetitionsInReserveText = repetitionsInReserveText,
         targetRIR = doubleFormatted(set.targetRepetitionsInReserve),
@@ -427,6 +426,8 @@ private fun RIRTextField(
         textAlign = TextAlign.Center,
         color = textColor
       ),
+      singleLine = true,
+      maxLines = 1,
       keyboardOptions =
       KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
       keyboardActions =
@@ -434,7 +435,7 @@ private fun RIRTextField(
         onDone = { onImeAction() },
       ),
       value = repetitionsInReserveText,
-      onValueChange = { onRIRChange(it.take(4)) },
+      onValueChange = { onRIRChange(it.take(4).trim()) },
     )
     if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isNullOrBlank()) {
       Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
@@ -479,7 +480,9 @@ private fun ExerciseRepsTextField(
         onDone = { onImeAction() },
       ),
       value = repetitionsText,
-      onValueChange = { onRepsChange(it.take(4)) },
+      singleLine = true,
+      maxLines = 1,
+      onValueChange = { onRepsChange(it.take(4).trim()) },
       cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
     )
     if (!targetReps.isNullOrBlank() && repetitionsText.isNullOrBlank()) {
@@ -511,9 +514,9 @@ private fun ExerciseWeightTextField(
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center
   ) {
-    BasicTextField2(
+    BasicTextField(
       value = exerciseWeightText,
-      onValueChange = { onWeightChange(it.take(7)) },
+      onValueChange = { onWeightChange(it.take(6).trim()) },
       modifier = textFieldModifier.padding(PaddingValues(8.dp)),
       textStyle =
       TextStyle(
@@ -521,7 +524,8 @@ private fun ExerciseWeightTextField(
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onBackground
       ),
-      //                placeholder = { Text(exerciseSet.exerciseWeight.toString())},
+      singleLine = true,
+      maxLines = 1,
       keyboardOptions =
       KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
       keyboardActions =
@@ -556,3 +560,4 @@ private fun getExerciseWeight(set: Set, weightUnit: String): String =
   doubleFormatted(
     if (weightUnit == MassUnit.POUNDS.abbreviation) set.weightPounds else set.weightKilograms
   )
+
