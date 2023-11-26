@@ -1,0 +1,132 @@
+[
+    {
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "zeSV97gQwEWhHKwTzJruyA==",
+                "subType": "04"
+            }
+        },
+
+        "exerciseID": {
+            "$oid": "64f0de3ae93f8b251df4610f"
+        },
+        "exerciseOrder": 1,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "655d6997af9c00aa1bdb45a8"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45aa"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45ab"
+            }
+        ]
+    },
+    {
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "DEkArV7zVkOalbtxB5yzAA==",
+                "subType": "04"
+            }
+        },
+
+        "exerciseID": {
+            "$oid": "64f0de3ee93f8b251df46395"
+        },
+        "exerciseOrder": 2,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "655d6997af9c00aa1bdb45a8"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45aa"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45ab"
+            }
+        ]
+    },
+    {
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "+hrPXkd660yvhUVFRezu7Q==",
+                "subType": "04"
+            }
+        },
+
+        "exerciseID": {
+            "$oid": "64f0de3ee93f8b251df4651d"
+        },
+        "exerciseOrder": 3,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "655d6997af9c00aa1bdb45a8"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45aa"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45ab"
+            }
+        ]
+    },
+    {
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "1HKesQh06k6TpU6oPrvRlA==",
+                "subType": "04"
+            }
+        },
+
+        "exerciseID": {
+            "$oid": "64f0de3fe93f8b251df4674b"
+        },
+        "exerciseOrder": 4,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "655d6997af9c00aa1bdb45a8"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45aa"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45ab"
+            }
+        ]
+    },
+    {
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "CcQy3IAbKkChXzECr+Bo2A==",
+                "subType": "04"
+            }
+        },
+
+        "exerciseID": {
+            "$oid": "64f0de40e93f8b251df467e1"
+        },
+        "exerciseOrder": 5,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "655d6997af9c00aa1bdb45a8"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45aa"
+            },
+            {
+                "$oid": "655d699aaf9c00aa1bdb45ab"
+            }
+        ]
+    }
+]

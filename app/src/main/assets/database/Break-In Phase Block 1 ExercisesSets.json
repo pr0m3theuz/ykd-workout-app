@@ -1,0 +1,52 @@
+{
+    "identical": true,
+    "numberOfIdenticalWorkouts": 1,
+    "exercisesSets": [
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de3ee93f8b251df4654b"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": true,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": null,
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+
+       ]
+}

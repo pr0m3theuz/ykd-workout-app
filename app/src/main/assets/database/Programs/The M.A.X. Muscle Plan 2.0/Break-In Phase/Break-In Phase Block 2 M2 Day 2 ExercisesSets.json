@@ -1,0 +1,236 @@
+[
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de3fe93f8b251df465c9"
+        },
+        "exerciseOrder": 1,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de3ee93f8b251df46439"
+        },
+        "exerciseOrder": 2,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de3be93f8b251df4613f"
+        },
+        "exerciseOrder": 3,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "6552407c1e6539b5d66558ec"
+        },
+        "exerciseOrder": 4,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de3de93f8b251df46271"
+        },
+        "exerciseOrder": 5,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de40e93f8b251df467e5"
+        },
+        "exerciseOrder": 6,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de41e93f8b251df469ff"
+        },
+        "exerciseOrder": 7,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de41e93f8b251df46a73"
+        },
+        "exerciseOrder": 8,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d6655917"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655916"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655915"
+            }
+        ]
+    },
+    {
+
+        "exSetsLazyListItemID": 1687474247370722,
+        "exSetsUUID": {
+            "$binary": {
+                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                "subType": "04"
+            }
+        },
+        "exerciseID": {
+            "$oid": "64f0de3fe93f8b251df46677"
+        },
+        "exerciseOrder": 9,
+        "notes": [],
+        "sets": [
+            {
+                "$oid": "6552af671e6539b5d665591e"
+            },
+            {
+                "$oid": "6552af671e6539b5d665591f"
+            },
+            {
+                "$oid": "6552af671e6539b5d6655920"
+            }
+        ]
+    }
+]

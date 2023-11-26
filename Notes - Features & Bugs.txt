@@ -1,0 +1,30 @@
+
+1. Create Dialog to Rename Active Workout Name
+3. Implement Start Workout from Template or Previous Workout
+4. Implement Start/Pause Workout Duration Timer
+5. Fix Timer Bug when Cancelling Workout that crashes the App
+6. Implement Start Program & Start Workout from Active Program
+
+Using Exercise Names
+7. Implement Import Program Feature
+8. Implement Import Workout Feature
+
+9. Add Set Types to the Database
+10. Implement Progression Schemes, e.g. Linear Progression, Wave Progression, Double Wave Progression, etc
+11. Add Workout Summary when finished
+12. Add WarmUpSetsViewModel, EquateVolumeViewModel, and WorkingSetsViewModel to Koin
+
+13. Implement Previous Set Button, Get most recent set for an exercise & corresponding set number
+
+
+2. Add/Implement Weight Units
+14. Implement weightKilograms where weightPounds is used
+15. Implement automatic conversion between Kilograms & Pounds when entering weight
+16. Implement changing exercise's weight units
+17. Show exercise/default weight unit where necessary on the UI
+18. Update the necessary database functions
+
+19. Fix "Replace Exercise"
+20. Change "Cancel" Button Color on Dialogs
+21. Update Text Sizes
+22. Fix Rest Timer not start automatically after finishing (Inconsistent Bug)

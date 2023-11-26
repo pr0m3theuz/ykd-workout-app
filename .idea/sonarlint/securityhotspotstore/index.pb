@@ -67,8 +67,6 @@ z
 Japp/src/main/java/com/example/myapplication/components/WorkoutViewModel.kt,a/a/aa5577ed9e087adda942fec24c679fc1327fb223
 
 Oapp/src/main/java/com/example/myapplication/components/workout/WorkoutScreen.kt,d/2/d294019ad33be896d1b98deb82fb497113ed7ee0
-@
-app/build.gradle,f/4/f4a01d6a4fcb971362ec00a83903fd3902f52164
 ˜
 happ/src/main/java/com/example/myapplication/components/workoutDialogs/equateVolume/EquateVolumeDialog.kt,9/e/9e147fb62c14c81fb0d3518329f1cbdc80cfbbdc
 ˜
@@ -87,8 +85,6 @@ q
 Aapp/src/main/java/com/example/myapplication/data/model/Workout.kt,3/c/3ca2bfc0e6ea8fa93071e3e6d15220155c032f60
 A
 gradle.properties,2/a/2afbb999f001938c88fa43fc2ef52abf0f8213e4
-?
-settings.gradle,0/5/05efc8b1657769a27696d478ded1e95f38737233
 ;
 gradlew.bat,2/a/2a45a911a8f1836b0b6c5b758962572012d8f8c3
 „
@@ -97,8 +93,6 @@ Tapp/src/test/java/com/example/myapplication/components/exercise/NumberUtilsKtTe
 `app/src/test/java/com/example/myapplication/components/equateVolume/EquateVolumeViewModelTest.kt,b/b/bb5670da638919c6e67973d8e215f00b768b5312
 Œ
 \app/src/test/java/com/example/myapplication/components/warmUpSets/WarmUpSetsViewModelTest.kt,3/f/3f6af7ab97998eee5bfb8fce6b2cf99bb194298d
-<
-build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
 }
 Mapp/src/main/java/com/example/myapplication/components/exercise/SetContent.kt,0/2/02fe01f11d7b0fc8bf5343d1de2081c66713abe2
 j

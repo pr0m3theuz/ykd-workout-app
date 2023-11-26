@@ -1,0 +1,56 @@
+"id";"muscleGroupID";"name"
+Sternocleidomastoid;NeckWt;Sternocleidomastoid
+Splenius;NeckWt;Splenius
+LevatorScapulae;NeckWt;Levator Scapulae
+DeltoidAnterior;ShouldWt;Deltoid Anterior
+DeltoidLateral;ShouldWt;Deltoid Lateral
+DeltoidPosterior;ShouldWt;Deltoid Posterior
+Supraspinatus;ShouldWt;Supraspinatus
+TeresMinor;ShouldWt;Teres Minor
+TeresMajor;ShouldWt;Teres Major
+TricepsBrachii;ArmWt;Triceps Brachii
+BicepsBrachii;ArmWt;Biceps Brachii
+Brachialis;ArmWt;Brachiallis
+Brachioradialis;ForeArmWt;Brachioradialis
+WristFlexors;ForeArmWt;Wrist Flexors
+WristExtensors;ForeArmWt;Wrist Extensors
+Pronators;ForeArmWt;Pronators
+Supinators;ForeArmWt;Supinators
+BackGeneral;BackWt;General Back
+LatissimusDorsi;BackWt;Latissimus Dorsi
+TrapeziusUpper;BackWt;Trapezius Upper
+TrapeziusMiddle;BackWt;Trapezius Middle
+TrapeziusLower;BackWt;Trapezius Lower
+Rhomboids;BackWt;Rhomboids
+Infraspinatus;BackWt;Infraspinatus
+Subscapularis;BackWt;Subscapularis
+PectoralisSternal;ChestWt;Pectoralis Major, Sternal
+PectoralisClavicular;ChestWt;Pectoralis Major, Clavicular
+PectoralisMinor;ChestWt;Pectoralis Minor
+SerratusAnterior;ChestWt;Serratus Anterior
+RectusAbdominis;WaistWt;Rectus Abdominis
+TraverseAbdominus;WaistWt;Traverse Abdominis
+TransverseAbdominis;WaistWt;Transverse Abdominis
+Obliques;WaistWt;Obliques
+ErectorSpinae;WaistWt;Erector Spinae
+QuadratusLumborum;WaistWt;Quadratus Lumborum
+GluteusMaximus;HipsWt;Gluteus Maximus
+HipAbductor;HipsWt;Hip Abductor
+HipExernalRotators;HipsWt;Hip Exernal Rotators
+HipFlexors;HipsWt;Hip Flexors
+HipExternalRotator;HipsWt;Hip External Rotator
+Iliopsoas;HipsWt;Iliopsoas
+TensorFasciaeLatae;HipsWt;TensorFasciaeLatae
+Sartorius;HipsWt;Sartorius
+GluteusMedius;HipsWt;Gluteus Medius
+GluteusMinimus;HipsWt;Gluteus Minimus
+Pectineus;HipsWt;Pectineus
+Popliteus;HipsWt;Popliteus
+Gracilis;HipsWt;Gracilis
+Quadriceps;ThighWt;Quadriceps
+Hamstrings;ThighWt;Hamstrings
+Adductors;ThighWt;Hip Adductors
+Gastrocnemius;CalfWt;Gastrocnemius
+Soleus;CalfWt;Soleus
+TibialisAnterior;CalfWt;Tibialis Anterior
+Propliteus;CalfWt;Propliteus

@@ -1,0 +1,56 @@
+[
+{
+  "_id": {
+    "$oid": "655f7af66dab01935ebb1efd"
+  },
+  "exerciseWeight": null,
+  "lazyListItemID": {
+    "$numberLong": "3390631924470270"
+  },
+  "percentage1RM": 1,
+  "progressionSchemeID": 0,
+  "ratePerceivedEffort": null,
+  "repetitions": null,
+  "repetitionsInReserve": null,
+  "setCompleted": false,
+  "setNumber": 2,
+  "setTypeID": 1,
+  "targetRatePerceivedEffort": null,
+  "targetRepetitions": "6-8",
+  "targetRepetitionsInReserve": 1.5,
+  "targetWeight": null,
+  "uuid": {
+    "$binary": {
+      "base64": "DSORp3fQS+WanSbDzog5WQ==",
+      "subType": "04"
+    }
+  }
+},
+{
+  "_id": {
+    "$oid": "655f7af66dab01935ebb1efc"
+  },
+  "exerciseWeight": null,
+  "lazyListItemID": {
+    "$numberLong": "3390631924470270"
+  },
+  "percentage1RM": 1,
+  "progressionSchemeID": 0,
+  "ratePerceivedEffort": null,
+  "repetitions": null,
+  "repetitionsInReserve": null,
+  "setCompleted": false,
+  "setNumber": 3,
+  "setTypeID": 1,
+  "targetRatePerceivedEffort": null,
+  "targetRepetitions": "6-8",
+  "targetRepetitionsInReserve": 1.5,
+  "targetWeight": null,
+  "uuid": {
+    "$binary": {
+      "base64": "DSORp3fQS+WanSbDzog5WQ==",
+      "subType": "04"
+    }
+  }
+}
+]

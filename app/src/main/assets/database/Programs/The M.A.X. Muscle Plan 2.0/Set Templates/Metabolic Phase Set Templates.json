@@ -1,0 +1,218 @@
+[
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 1,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "15-20",
+    "targetRepetitionsInReserve": 3,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 2,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "15-20",
+    "targetRepetitionsInReserve": 2,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 3,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "15-20",
+    "targetRepetitionsInReserve": 1,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 1,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "20-25",
+    "targetRepetitionsInReserve": 3,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 2,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "20-25",
+    "targetRepetitionsInReserve": 2,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 3,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "20-25",
+    "targetRepetitionsInReserve": 1,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 1,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "25-30",
+    "targetRepetitionsInReserve": 3,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 2,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "25-30",
+    "targetRepetitionsInReserve": 2,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  },
+  {
+    "exerciseWeight": null,
+    "lazyListItemID": {
+      "$numberLong": "545021156860"
+    },
+    "percentage1RM": 1,
+    "progressionSchemeID": 0,
+    "ratePerceivedEffort": null,
+    "repetitions": null,
+    "repetitionsInReserve": null,
+    "setCompleted": false,
+    "setNumber": 3,
+    "setTypeID": 1,
+    "targetRatePerceivedEffort": null,
+    "targetRepetitions": "25-30",
+    "targetRepetitionsInReserve": 1,
+    "targetWeight": null,
+    "uuid": {
+      "$binary": {
+        "base64": "aLsEv8/XR5W+1J0Vq1U1Nw==",
+        "subType": "04"
+      }
+    }
+  }
+]

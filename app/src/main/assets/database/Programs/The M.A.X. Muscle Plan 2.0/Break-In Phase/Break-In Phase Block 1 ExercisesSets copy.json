@@ -1,0 +1,276 @@
+{
+    "identical": true,
+    "numberOfIdenticalWorkouts": 1,
+    "exercisesSets": [
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de3ee93f8b251df4654b"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de3ee93f8b251df463bf"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de3be93f8b251df4613f"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de3de93f8b251df462e7"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de3de93f8b251df46253"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de40e93f8b251df467e1"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de41e93f8b251df469ff"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de41e93f8b251df46a73"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exerciseObjectID": {
+                "$oid": "64f0de3fe93f8b251df46677"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "identicalSets": false,
+            "numberOfIdenticalSets": 3,
+            "sets": [
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                },
+                {
+                    "$oid": "64f0de3ee93f8b251df463bf"
+                }
+            ]
+        }
+    ]
+}

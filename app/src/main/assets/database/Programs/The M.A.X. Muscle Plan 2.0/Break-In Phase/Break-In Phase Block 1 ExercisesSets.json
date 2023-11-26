@@ -1,0 +1,429 @@
+{
+    "identical": true,
+    "numberOfIdenticalWorkouts": 1,
+    "exercisesSets": [
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de3ee93f8b251df4654b"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de3ee93f8b251df463bf"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de3be93f8b251df4613f"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de3de93f8b251df462e7"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de3de93f8b251df46253"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de40e93f8b251df467e1"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de41e93f8b251df469ff"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de41e93f8b251df46a73"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "_id": {
+                "$oid": "64d798e238de3f54d0009af1"
+            },
+            "exSetsLazyListItemID": 1687474247370722,
+            "exSetsUUID": {
+                "$binary": {
+                    "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                    "subType": "04"
+                }
+            },
+            "exercise": {
+                "$oid": "64f0de3fe93f8b251df46677"
+            },
+            "exerciseOrder": 1,
+            "notes": [],
+            "sets": {
+                "identical": true,
+                "numberOfIdenticalSets": 3,
+                "sets": [
+                    {
+                        "_id": {
+                            "$oid": "64d798e238de3f54d0009af1"
+                        },
+                        "lazyListItemID": 1687474247370722,
+                        "setNumber": 1,
+                        "exerciseWeight": null,
+                        "repetitions": null,
+                        "ratePerceivedEffort": null,
+                        "repetitionsInReserve": null,
+                        "targetWeight": "",
+                        "targetRepetitions": "15-20",
+                        "targetRatePerceivedEffort": null,
+                        "targetRepetitionsInReserve": 4.0,
+                        "percentage1RM": 1.0,
+                        "setCompleted": false,
+                        "setTypeID": 1,
+                        "uuid": {
+                            "$binary": {
+                                "base64": "MjA3N2QwZTQtZTgxMS00Z2",
+                                "subType": "04"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

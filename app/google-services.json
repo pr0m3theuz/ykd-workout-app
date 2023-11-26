@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "139588488483",
+    "project_id": "gymcats-dba1d",
+    "storage_bucket": "gymcats-dba1d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139588488483:android:24d3e1d242f85ad2d65096",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK806gGslVKpE4cgmvR1iITCL-R2N7yUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

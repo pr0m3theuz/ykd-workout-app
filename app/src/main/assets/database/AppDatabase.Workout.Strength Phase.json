@@ -1,0 +1,607 @@
+[
+{
+  "_id": {
+    "$oid": "655a3a56d814275f8d792956"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.696Z"
+  },
+  "day": 3,
+  "lazyListItemID": {
+    "$numberLong": "10785752380213583"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df2421"
+  },
+  "name": "Day 3 - Strength B1:M2",
+  "uuid": {
+    "$binary": {
+      "base64": "ce6mPrN2RUKtXDvJBN3ZSg==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3a58d814275f8d792957"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.523Z"
+  },
+  "day": 3,
+  "lazyListItemID": {
+    "$numberLong": "2386919347844576"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df2419"
+  },
+  "name": "Day 3 - Strength B1:M1",
+  "uuid": {
+    "$binary": {
+      "base64": "otyn09gLRT2JQTMKoCNiQA==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3a5ad814275f8d792958"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.544Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "44387519410878950"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df2421"
+  },
+  "name": "Day 2 - Strength B1:M2",
+  "uuid": {
+    "$binary": {
+      "base64": "jeROZ/PMSW2ALLeS/FMMIw==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3c0cd814275f8d792959"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.699Z"
+  },
+  "day": 3,
+  "lazyListItemID": {
+    "$numberLong": "3578528696691018"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241d"
+  },
+  "name": "Day 3 - Strength B1:M3",
+  "uuid": {
+    "$binary": {
+      "base64": "RTLmY5aQRsSroVnxxeyyQw==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3c25d814275f8d79295a"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.686Z"
+  },
+  "day": 3,
+  "lazyListItemID": {
+    "$numberLong": "3945557280967020"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2415"
+  },
+  "name": "Day 3 - Strength B2:M1",
+  "uuid": {
+    "$binary": {
+      "base64": "JJV4C1kyT2GjLWfxDeWq3w==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3d66d814275f8d79295b"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.519Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "7904626744403099"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241d"
+  },
+  "name": "Day 1 - Strength B1:M3",
+  "uuid": {
+    "$binary": {
+      "base64": "JqUqMF00SQ+eoSl7ZMc1dw==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3d68d814275f8d79295c"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.713Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "3959092640421453"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241b"
+  },
+  "name": "Day 1 - Strength B1:M4",
+  "uuid": {
+    "$binary": {
+      "base64": "4H4UPsVBSV6Zji4moe1UCQ==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3d69d814275f8d79295d"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.548Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "3513167441956933"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df2419"
+  },
+  "name": "Day 2 - Strength B1:M1",
+  "uuid": {
+    "$binary": {
+      "base64": "mfNcWVGrTiGFn1EvIehiyg==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3e81d814275f8d79295e"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.634Z"
+  },
+  "day": 3,
+  "lazyListItemID": {
+    "$numberLong": "6748979559548848"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2417"
+  },
+  "name": "Day 3 - Strength B2:M2",
+  "uuid": {
+    "$binary": {
+      "base64": "m6sfBpyWQKKbKT3PZwA7Zw==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3e85d814275f8d79295f"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.723Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "577037752341426809"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241b"
+  },
+  "name": "Day 2 - Strength B1:M4",
+  "uuid": {
+    "$binary": {
+      "base64": "yDNAN8uaT6GcEaYsdR8hCA==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3e9dd814275f8d792960"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.706Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "3728838464241853"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241f"
+  },
+  "name": "Day 2 - Strength B2:M3",
+  "uuid": {
+    "$binary": {
+      "base64": "OCO/slbKRPmHTQi71Nbp+w==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3ec1d814275f8d792961"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.674Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "24818828057695771"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df2421"
+  },
+  "name": "Day 1 - Strength B1:M2",
+  "uuid": {
+    "$binary": {
+      "base64": "4xGvuLVsRqOjojCOJbHm0Q==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3ecbd814275f8d792962"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.531Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "4438751941087894"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2415"
+  },
+  "name": "Day 1 - Strength B2:M1",
+  "uuid": {
+    "$binary": {
+      "base64": "4DZzcQe0S8+nlC5bVqaSnQ==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3f18d814275f8d792963"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.719Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "9195820754445048"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2413"
+  },
+  "name": "Day 2 - Strength B2:M4",
+  "uuid": {
+    "$binary": {
+      "base64": "7JXoh4zDTT2pREAmEF2/Dw==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3f9b92714aa568f42a2c"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.709Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "4808647936178556"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2417"
+  },
+  "name": "Day 1 - Strength B2:M2",
+  "uuid": {
+    "$binary": {
+      "base64": "p44TUV7vTdS02KdrsqyK9g==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3faa92714aa568f42a2d"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.693Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "4114351175339941"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df2419"
+  },
+  "name": "Day 1 - Strength B1:M1",
+  "uuid": {
+    "$binary": {
+      "base64": "ltMI2YU/TMqTyno2Rf7xrw==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a3fcc92714aa568f42a2e"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:29.835Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "3551001552870305"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2417"
+  },
+  "name": "Day 2 - Strength B2:M2",
+  "uuid": {
+    "$binary": {
+      "base64": "pbcBxYYVRkGkOqyKsSvZGg==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3fd792714aa568f42a2f"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.703Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "10304245577525477"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2415"
+  },
+  "name": "Day 2 - Strength B2:M1",
+  "uuid": {
+    "$binary": {
+      "base64": "6HgdwKfpQpeFYpMGdAWSKA==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a3fe292714aa568f42a30"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.580Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "30775346791542744"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241f"
+  },
+  "name": "Day 1 - Strength B2:M3",
+  "uuid": {
+    "$binary": {
+      "base64": "Zn6RR7OATmGV8QDJKzZ5/Q==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a400592714aa568f42a31"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.495Z"
+  },
+  "day": 2,
+  "lazyListItemID": {
+    "$numberLong": "17892643483455077"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241d"
+  },
+  "name": "Day 2 - Strength B1:M3",
+  "uuid": {
+    "$binary": {
+      "base64": "Lhijke+4RIu4F4TkxnCBCA==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+},
+{
+  "_id": {
+    "$oid": "655a400f92714aa568f42a32"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.689Z"
+  },
+  "day": 3,
+  "lazyListItemID": {
+    "$numberLong": "2458094791656769"
+  },
+  "microcycleID": {
+    "$oid": "64d974c9e9462e6a33df241f"
+  },
+  "name": "Day 3 - Strength B2:M3",
+  "uuid": {
+    "$binary": {
+      "base64": "W5MSzZ1+RQmGd5u+7NWZlA==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null
+},
+{
+  "_id": {
+    "$oid": "655a401892714aa568f42a33"
+  },
+  "dateCreated": {
+    "$date": "2023-08-15T15:09:30.716Z"
+  },
+  "day": 1,
+  "lazyListItemID": {
+    "$numberLong": "21982390565387687"
+  },
+  "microcycleID": {
+    "$oid": "64d974c8e9462e6a33df2413"
+  },
+  "name": "Day 1 - Strength B2:M4",
+  "uuid": {
+    "$binary": {
+      "base64": "ra1l1X8vRW6msO3lPhU/Sw==",
+      "subType": "04"
+    }
+  },
+  "workoutAuthor": null,
+  "workoutDuration": 0,
+  "workoutEnded": null,
+  "workoutStarted": null,
+  "workoutType": null,
+  "exercisesSets": []
+}]
