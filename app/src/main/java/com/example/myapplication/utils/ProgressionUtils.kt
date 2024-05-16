@@ -1,0 +1,129 @@
+package com.example.myapplication.utils
+
+import com.example.myapplication.data.model.ExerciseSets
+
+// TODO Update Implementations
+
+// Double Progression Feature
+fun ExerciseSets.doubleProgression(
+/*int targetRepetitionRangeMin, int targetRepetitionRangeMax, int incrementWeight*/ ) {
+  val targetRepetitionRangeMin = 12
+  val targetRepetitionRangeMax = 15
+  val incrementWeight = 5.0
+
+  val maxRepetitionsCompleted = sets.maxByOrNull { it.setCompleted }?.repetitions ?: 0
+
+  val repetitionsList = sets.map { it.repetitions }
+
+  sets.forEach { set ->
+    if (
+      set.targetWeight == set.weightPounds &&
+        set.repetitions in targetRepetitionRangeMin..targetRepetitionRangeMax &&
+        sets.all { it.setCompleted }
+    ) {
+      when {
+        set.repetitions!! < maxRepetitionsCompleted -> {
+          set.targetRepetitions = set.repetitions?.plus(1).toString()
+          return@forEach
+        }
+        repetitionsList.all {
+          it == repetitionsList[0] &&
+            it!! < targetRepetitionRangeMax &&
+            it == maxRepetitionsCompleted
+        } -> {
+          sets.first().repetitions?.plus(1).toString()
+          return@forEach
+        }
+        repetitionsList.all { it!! == targetRepetitionRangeMax } -> {
+          set.repetitions = targetRepetitionRangeMin
+          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+        }
+      }
+    } else if (
+      set.targetWeight == set.weightPounds &&
+        repetitionsList.all { it!! >= targetRepetitionRangeMax } &&
+        sets.all { it.setCompleted }
+    ) {
+      set.repetitions = targetRepetitionRangeMin
+      set.targetWeight = set.weightPounds?.plus(incrementWeight)
+    }
+    // targetWeight & repetitions does not change
+  }
+}
+
+// Wave Progression Feature
+fun ExerciseSets.waveProgression(
+/*int targetRepetitionRangeMin, int targetRepetitionRangeMax, int incrementWeight*/ ) {
+  val targetRepetitionRangeMin = 12
+  val targetRepetitionRangeMax = 15
+  val incrementWeight = 5.0
+
+  val maxRepetitionsCompleted = sets.maxByOrNull { it.setCompleted }?.repetitions ?: 0
+
+  val repetitionsList = sets.map { it.repetitions }
+
+  sets.forEach { set ->
+    if (
+      set.targetWeight == set.weightPounds &&
+        set.repetitions in targetRepetitionRangeMin..targetRepetitionRangeMax &&
+        sets.all { it.setCompleted }
+    ) {
+      when {
+        repetitionsList.all { it!! == targetRepetitionRangeMin } -> {
+          set.repetitions = targetRepetitionRangeMax
+          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+        }
+        repetitionsList.all { it == repetitionsList[0] && it == maxRepetitionsCompleted } -> {
+          set.repetitions?.minus(1).toString()
+          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+          return@forEach
+        }
+      }
+    }
+  }
+}
+
+// Dynamic Double Progression Feature
+fun ExerciseSets.dynamicDoubleProgression(
+/*int targetRepetitionRangeMin, int targetRepetitionRangeMax, int incrementWeight*/ ) {
+  val targetRepetitionRangeMin = 12
+  val targetRepetitionRangeMax = 15
+  val incrementWeight = 5.0
+
+  sets.forEach { set ->
+    if (
+      set.targetWeight == set.weightPounds &&
+        set.repetitions in targetRepetitionRangeMin..targetRepetitionRangeMax &&
+        sets.all { it.setCompleted }
+    ) {
+      when {
+        set.repetitions!! < targetRepetitionRangeMax -> {
+          set.targetRepetitions = set.repetitions?.plus(1).toString()
+        }
+        set.repetitions!! >= targetRepetitionRangeMax -> {
+          set.repetitions = targetRepetitionRangeMin
+          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+        }
+      }
+    }
+  }
+}
+
+// As Many Repetitions as Possible Progression Feature
+fun ExerciseSets.amrapProgression(/*int targetRepetitionRangeMin, int incrementWeight*/ ) {
+  val targetRepetitionRangeMin = 5
+  val incrementWeight = 5.0
+
+  sets.forEach { set ->
+    if (set.targetWeight == set.weightPounds && sets.all { it.setCompleted }) {
+      when {
+        set.repetitions!! >= targetRepetitionRangeMin.times(2) -> {
+          set.targetWeight = set.weightPounds?.plus(incrementWeight.times(2))
+        }
+        set.repetitions!! in targetRepetitionRangeMin.until(targetRepetitionRangeMin.times(2)) -> {
+          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+        }
+      }
+    }
+  }
+}

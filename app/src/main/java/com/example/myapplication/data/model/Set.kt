@@ -5,7 +5,7 @@
   RealmInstantKSerializer::class,
   RealmListKSerializer::class,
   RealmSetKSerializer::class,
-  RealmUUIDKSerializer::class
+  RealmUUIDKSerializer::class,
 )
 
 package com.example.myapplication.data.model
@@ -31,8 +31,7 @@ import org.mongodb.kbson.ObjectId
 
 @Serializable
 class Set() : RealmObject {
-  @PrimaryKey
-  var _id: ObjectId = ObjectId()
+  @PrimaryKey var _id: ObjectId = ObjectId()
   var lazyListItemID: Long = newID()
   var uuid: RealmUUID = RealmUUID.random()
   var setNumber: Int? = 0
@@ -53,21 +52,25 @@ class Set() : RealmObject {
   //    var exerciseOrder: Int = 1
   var setTypeID: Int = 1
   val exerciseSet: RealmResults<ExerciseSets> by
-  backlinks(ExerciseSets::sets) // TODO Use backlinks for ExerciseSets or not
+    backlinks(ExerciseSets::sets) // TODO Use backlinks for ExerciseSets or not
   var progressionSchemeID: Int = 0
 
   //    To use in query for previous sets
   var exerciseID: ObjectId? = null
-    var dateCreated: RealmInstant? = RealmInstant.now()
+  var dateCreated: RealmInstant? = RealmInstant.now()
   //    var programUUID: RealmUUID? = null
   //    var mesocycleUUID: RealmUUID? = null
   //    var microcycleUUID: RealmUUID? = null
 }
 
 fun Set.setVolume(weightUnit: String): Double {
-  return if (weightPounds != null && repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation) {
+  return if (
+    weightPounds != null && repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation
+  ) {
     weightPounds!!.times(repetitions!!)
-  } else if (weightKilograms != null && repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation) {
+  } else if (
+    weightKilograms != null && repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation
+  ) {
     weightKilograms!!.times(repetitions!!)
   } else {
     0.0
@@ -84,18 +87,19 @@ fun Set.setTextRIR(weightUnit: String): String {
     }" else ""
   }"
 
-//  ${doubleFormatted(weightKilograms)} × $repetitions ${
-//    if (repetitionsInReserve != null) "@ ${
-//      doubleFormatted(
-//        repetitionsInReserve
-//      )
-//    } RIR" else ""
-//  }"
+  //  ${doubleFormatted(weightKilograms)} × $repetitions ${
+  //    if (repetitionsInReserve != null) "@ ${
+  //      doubleFormatted(
+  //        repetitionsInReserve
+  //      )
+  //    } RIR" else ""
+  //  }"
 }
 
 fun Set.setTextRPE(): String {
   return "${doubleFormatted(weightPounds)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
-//  "${doubleFormatted(weightKilograms)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
+  //  "${doubleFormatted(weightKilograms)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)}
+  // RPE"
 }
 
 fun Set.convertPoundToKg(): Double {
@@ -112,5 +116,8 @@ fun Set.getWeight(weightUnit: String?) {
   RealmUUID.random().toString()
 }
 
-@Serializable
-data class Sets(val sets: List<Set>)
+fun Set.progression() {
+  repetitions in 12..15
+}
+
+@Serializable data class Sets(val sets: List<Set>)

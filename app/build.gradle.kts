@@ -5,8 +5,8 @@ plugins {
   id("io.realm.kotlin")
   id("com.google.devtools.ksp")
   id("org.jetbrains.kotlin.plugin.serialization")
-//  id("com.google.gms.google-services")
-//  id("com.google.firebase.crashlytics")
+  //  id("com.google.gms.google-services")
+  //  id("com.google.firebase.crashlytics")
   id("newrelic")
 }
 
@@ -48,9 +48,22 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
 
-    freeCompilerArgs = listOf("-Xjvm-default=all")
+    freeCompilerArgs =
+      listOf(
+        "-Xjvm-default=all",
+        "-Xjsr305=strict", // Strict interpretation of nullability annotations in jqwik API
+        "-Xemit-jvm-type-annotations", // Enable annotations on type variables
+      )
   }
   kotlin { jvmToolchain(17) }
+
+  tasks.withType<Test> {
+    useJUnitPlatform { includeEngines("jqwik") }
+    include("**/*Properties.class")
+    include("**/*Test.class")
+    include("**/*Tests.class")
+    include("**/*Examples.class")
+  }
 
   buildFeatures { compose = true }
   composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
@@ -64,19 +77,19 @@ android {
 
 dependencies {
   implementation("androidx.core:core-ktx:1.12.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-  implementation("androidx.activity:activity-compose:1.8.1")
-  implementation("androidx.compose.ui:ui:1.6.0-beta01")
-  implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
-  implementation("androidx.compose.material3:material3:1.2.0-alpha11")
-  implementation("androidx.compose.material:material:1.6.0-beta01")
-  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-  implementation("com.google.android.material:material:1.10.0")
-  implementation("androidx.compose.material:material-icons-extended:1.6.0-beta01")
-  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-  implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
-  implementation("com.google.dagger:hilt-android:2.48.1")
-  implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+  implementation("androidx.activity:activity-compose:1.8.2")
+  implementation("androidx.compose.ui:ui:1.6.2")
+  implementation("androidx.compose.ui:ui-tooling-preview:1.6.2")
+  implementation("androidx.compose.material3:material3:1.2.0")
+  implementation("androidx.compose.material:material:1.6.2")
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+  implementation("com.google.android.material:material:1.11.0")
+  implementation("androidx.compose.material:material-icons-extended:1.6.2")
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+  implementation("com.google.dagger:hilt-android:2.51")
+  implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
   //    testImplementation "junit:junit:4.13.2"
   //    testImplementation "org.robolectric:robolectric:4.10.3"
 
@@ -109,59 +122,64 @@ dependencies {
   // classpath.
   androidTestImplementation("androidx.test.espresso:espresso-idling-resource:$espressoVersion")
 
-  testImplementation("io.mockk:mockk:1.13.8")
+  testImplementation("io.mockk:mockk:1.13.10")
 
   testImplementation("junit:junit:4.13.2")
   androidTestImplementation("androidx.test.ext:junit:1.1.5")
+  testImplementation(platform("org.junit:junit-bom:5.10.2"))
+
   testImplementation("org.junit.jupiter:junit-jupiter")
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
   androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-  androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
-  debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
-  debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+  androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.2")
+  debugImplementation("androidx.compose.ui:ui-tooling:1.6.2")
+  debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.2")
+
+  testImplementation("net.jqwik:jqwik:1.8.3")
+  testImplementation("net.jqwik:jqwik-kotlin:1.8.3")
 
   // Navigation
-  implementation("androidx.navigation:navigation-compose:2.7.5")
+  implementation("androidx.navigation:navigation-compose:2.7.7")
 
   // realm
   //    implementation ("io.realm.kotlin:library-base:1.11.1") // Add to use local realm (no sync)
-  implementation("io.realm.kotlin:library-sync:1.12.0") // Add to use device sync)
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+  implementation("io.realm.kotlin:library-sync:1.13.0") // Add to use device sync)
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
   // Add to use coroutines with the SDK
 
   // Serialization
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.1")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.3")
 
   //    Koin
-  implementation("io.insert-koin:koin-core:3.5.0")
-  implementation("io.insert-koin:koin-android:3.5.0")
+  implementation("io.insert-koin:koin-core:3.5.3")
+  implementation("io.insert-koin:koin-android:3.5.3")
   //    implementation("io.insert-koin:koin-annotations:3.4.3")
   //    ksp("io.insert-koin:koin-ksp-compiler:3.4.3")
-  implementation("io.insert-koin:koin-androidx-navigation:3.5.0")
-  implementation("io.insert-koin:koin-androidx-compose:3.5.0")
+  implementation("io.insert-koin:koin-androidx-navigation:3.5.3")
+  implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
-  testImplementation("io.insert-koin:koin-test:3.5.0")
-  testImplementation("io.insert-koin:koin-test-junit5:3.5.0")
+  testImplementation("io.insert-koin:koin-test:3.5.3")
+  testImplementation("io.insert-koin:koin-test-junit5:3.5.3")
 
   // Import the Firebase BoM
-//  implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+  //  implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
 
   // When using the BoM, you don't specify versions in Firebase library dependencies
 
   // Add the dependency for the Firebase SDK for Google Analytics
-//  implementation("com.google.firebase:firebase-analytics")
+  //  implementation("com.google.firebase:firebase-analytics")
 
   // TODO: Add the dependencies for any other Firebase products you want to use
   // See https://firebase.google.com/docs/android/setup#available-libraries
   // For example, add the dependencies for Firebase Authentication and Cloud Firestore
-//  implementation("com.google.firebase:firebase-auth")
-//  implementation("com.google.firebase:firebase-firestore")
-//  implementation("com.google.firebase:firebase-crashlytics")
-//  implementation("com.google.firebase:firebase-crashlytics-ndk")
+  //  implementation("com.google.firebase:firebase-auth")
+  //  implementation("com.google.firebase:firebase-firestore")
+  //  implementation("com.google.firebase:firebase-crashlytics")
+  //  implementation("com.google.firebase:firebase-crashlytics-ndk")
 
-  implementation("com.newrelic.agent.android:android-agent:6.10.0")
+  implementation("com.newrelic.agent.android:android-agent:7.2.1")
 }
 
 /*kapt {

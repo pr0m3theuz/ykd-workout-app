@@ -4,23 +4,40 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusState.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.SetTypeOptionsMenu
@@ -122,27 +139,34 @@ fun SetContent(
   }
 
   fun copyPreviousSetData() {
-    if (getWeightUnit() == MassUnit.POUNDS.abbreviation) {
-      updateWeight(previousSet?.weightPounds.toString())
-    } else {
-      updateWeight(previousSet?.weightKilograms.toString())
+    // Only copy if all fields are empty
+    if (
+      exerciseWeightText.isEmpty() &&
+        repetitionsText.isEmpty() &&
+        repetitionsInReserveText.isEmpty()
+    ) {
+      if (getWeightUnit() == MassUnit.POUNDS.abbreviation) {
+        updateWeight(previousSet?.weightPounds.toString())
+      } else {
+        updateWeight(previousSet?.weightKilograms.toString())
+      }
+      updateReps(previousSet?.repetitions.toString())
+      updateRIR(previousSet?.repetitionsInReserve.toString())
     }
-    updateReps(previousSet?.repetitions.toString())
-    updateRIR(previousSet?.repetitionsInReserve.toString())
   }
 
   SetContentFrame(
     setTypeOptionsMenu = {
       SetType(
         updateSetType = { setTypeID -> updateSetType(setTypeID) },
-        getSetIconText = { getSetIconText(set, setIndex) }
+        getSetIconText = { getSetIconText(set, setIndex) },
       )
     },
     previousSet = {
       PreviousSet(
         Modifier.width(110.dp),
         previousSetText,
-        copyPreviousSetData = { copyPreviousSetData() }
+        copyPreviousSetData = { copyPreviousSetData() },
       )
     },
     setCompleteCheckbox = {
@@ -150,7 +174,7 @@ fun SetContent(
         checkedState,
         completeSet = { setComplete(it) },
         startRestTimer = { startSetCompletedTimer() },
-        isTimerRunning = isTimerRunning
+        isTimerRunning = isTimerRunning,
       )
     },
     weightTextField = {
@@ -184,7 +208,7 @@ fun SetContent(
         onImeAction = {
           updateSetData()
           //          repsFocusRequester.requestFocus()
-        }
+        },
       )
     },
     repsTextField = {
@@ -221,7 +245,7 @@ fun SetContent(
             }
           set.repetitionsInReserve = repetitionsInReserveText.toDoubleOrNull()
         },
-        onImeAction = { updateRIR(repetitionsInReserveText) }
+        onImeAction = { updateRIR(repetitionsInReserveText) },
       )
     },
   )
@@ -263,7 +287,7 @@ fun SetContentFrame(
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically
+    verticalAlignment = Alignment.CenterVertically,
   ) {
     setTypeOptionsMenu()
     // TODO Get Previous Set Data by Exercise, Workout, Block, Plan
@@ -281,10 +305,7 @@ fun SetContentFrame(
 }
 
 @Composable
-private fun SetType(
-  updateSetType: (setTypeID: Int) -> Unit,
-  getSetIconText: () -> String,
-) {
+private fun SetType(updateSetType: (setTypeID: Int) -> Unit, getSetIconText: () -> String) {
   var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
 
   var iconText by remember { mutableStateOf(getSetIconText()) }
@@ -304,12 +325,10 @@ private fun SetType(
   }
   Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
     Button(
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .size(32.dp),
+      modifier = Modifier.padding(horizontal = 8.dp).size(32.dp),
       shape = RoundedCornerShape(size = 8.dp),
       contentPadding = PaddingValues(0.dp),
-      onClick = { expandedSetTypeOptionsDropdownMenu = true }
+      onClick = { expandedSetTypeOptionsDropdownMenu = true },
     ) {
       Text(text = iconText, color = MaterialTheme.colorScheme.onPrimary)
     }
@@ -320,7 +339,7 @@ private fun SetType(
       onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
       updateSetType = { setTypeID -> updateSetType(setTypeID) },
       changeIconText = { changeIconText() },
-      changeIconColor = { changeIconColor() }
+      changeIconColor = { changeIconColor() },
     )
   }
 }
@@ -329,9 +348,9 @@ private fun SetType(
 private fun PreviousSet(
   boxModifier: Modifier,
   previousSetText: String,
-  copyPreviousSetData: () -> Unit
+  copyPreviousSetData: () -> Unit,
 ) {
-  Box(/*modifier = Modifier.width(110.dp)*/) {
+  Box(/*modifier = Modifier.width(110.dp)*/ ) {
     TextButton(
       onClick = { copyPreviousSetData() },
       modifier = boxModifier,
@@ -378,7 +397,7 @@ private fun SetCompleteCheckbox(
       //        if (!workoutViewModel.isTimerRunning) {
       //          openTimerScreen(it)
       //        }
-    }
+    },
   )
 }
 
@@ -408,32 +427,29 @@ private fun RIRTextField(
 
   Box(
     modifier =
-    boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //      .align(Alignment.CenterVertically)
-      //        .width(40.dp)
-      .wrapContentSize(Alignment.Center),
+      boxModifier
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(textFieldBackgroundColor)
+        //      .align(Alignment.CenterVertically)
+        //        .width(40.dp)
+        .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
-    contentAlignment = Alignment.Center
+    contentAlignment = Alignment.Center,
   ) {
     BasicTextField(
       modifier = textFieldModifier.padding(PaddingValues(8.dp)),
       textStyle =
-      TextStyle(
-        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-        textAlign = TextAlign.Center,
-        color = textColor
-      ),
+        TextStyle(
+          fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+          textAlign = TextAlign.Center,
+          color = textColor,
+        ),
       singleLine = true,
       maxLines = 1,
       keyboardOptions =
-      KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-      keyboardActions =
-      KeyboardActions(
-        onDone = { onImeAction() },
-      ),
+        KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+      keyboardActions = KeyboardActions(onDone = { onImeAction() }),
       value = repetitionsInReserveText,
       onValueChange = { onRIRChange(it.take(4).trim()) },
     )
@@ -455,30 +471,27 @@ private fun ExerciseRepsTextField(
 ) {
   Box(
     modifier =
-    boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //        .align(Alignment.CenterVertically)
-      //        .width(96.dp)
-      .wrapContentSize(Alignment.Center),
+      boxModifier
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(textFieldBackgroundColor)
+        //        .align(Alignment.CenterVertically)
+        //        .width(96.dp)
+        .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
-    contentAlignment = Alignment.Center
+    contentAlignment = Alignment.Center,
   ) {
     BasicTextField(
       modifier = textFieldModifier.padding(PaddingValues(8.dp)),
       textStyle =
-      TextStyle(
-        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onBackground
-      ),
+        TextStyle(
+          fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+          textAlign = TextAlign.Center,
+          color = MaterialTheme.colorScheme.onBackground,
+        ),
       keyboardOptions =
-      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-      keyboardActions =
-      KeyboardActions(
-        onDone = { onImeAction() },
-      ),
+        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+      keyboardActions = KeyboardActions(onDone = { onImeAction() }),
       value = repetitionsText,
       singleLine = true,
       maxLines = 1,
@@ -504,34 +517,31 @@ private fun ExerciseWeightTextField(
 ) {
   Box(
     modifier =
-    boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //      .align(Alignment.CenterVertically)
-      //      .width(96.dp)
-      .wrapContentSize(Alignment.Center),
+      boxModifier
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(textFieldBackgroundColor)
+        //      .align(Alignment.CenterVertically)
+        //      .width(96.dp)
+        .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
-    contentAlignment = Alignment.Center
+    contentAlignment = Alignment.Center,
   ) {
     BasicTextField(
       value = exerciseWeightText,
       onValueChange = { onWeightChange(it.take(6).trim()) },
       modifier = textFieldModifier.padding(PaddingValues(8.dp)),
       textStyle =
-      TextStyle(
-        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onBackground
-      ),
+        TextStyle(
+          fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+          textAlign = TextAlign.Center,
+          color = MaterialTheme.colorScheme.onBackground,
+        ),
       singleLine = true,
       maxLines = 1,
       keyboardOptions =
-      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-      keyboardActions =
-      KeyboardActions(
-        onNext = { onImeAction() },
-      ),
+        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+      keyboardActions = KeyboardActions(onNext = { onImeAction() }),
     )
     if (!targetWeight.isNullOrBlank() && exerciseWeightText.isNullOrBlank()) {
       Text(text = targetWeight, color = MaterialTheme.colorScheme.outline)
@@ -560,4 +570,3 @@ private fun getExerciseWeight(set: Set, weightUnit: String): String =
   doubleFormatted(
     if (weightUnit == MassUnit.POUNDS.abbreviation) set.weightPounds else set.weightKilograms
   )
-

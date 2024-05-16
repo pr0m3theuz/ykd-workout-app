@@ -153,3 +153,11 @@ C
 settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
 G
 app/newrelic.properties,5/2/52718845109ae62fcfaf489498c57ce49a3272cb
+K
+Notes - Features & Bugs.txt,2/b/2b93ffa2a98b7592d1da56220935ce950cb4cdb7
+u
+Eapp/src/main/java/com/example/myapplication/utils/ProgressionUtils.kt,a/c/ac8d58b06950c93eea9caeec3c7cf46854025a3d
+ƒ
+Sapp/src/test/java/com/example/myapplication/components/exercise/ProgressionTests.kt,7/4/74d8850191203573b0ed9c99a66c7a809d46b853
+X
+(gradle/wrapper/gradle-wrapper.properties,f/b/fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
