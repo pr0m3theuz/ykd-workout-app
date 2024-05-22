@@ -27,13 +27,10 @@ import com.example.myapplication.data.model.SetType
 // @Preview
 @Composable
 fun SetTypeOptionsMenu(
-  //  menuItems: List<SetType> = setTypes.toList(),
-  // selectedSetType: SetTypeModel, TODO Not if this is needed
   expandMenu: () -> Boolean,
   onDismiss: () -> Unit,
   updateSetType: (setTypeID: Int) -> Unit,
   changeIconText: (iconText: String) -> Unit,
-  changeIconColor: () -> Unit,
 ) {
 
   @Composable
@@ -245,8 +242,7 @@ fun SetTypeOptionsMenu(
           onDismiss()
           updateSetType(setType.setTypeID)
           changeIconText(setType.abbreviation ?: setType.name[0].toString())
-          changeIconColor()
-        }, // TODO Assign Set Type to Set
+        },
       )
     }
   }

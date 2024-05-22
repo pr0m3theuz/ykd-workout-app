@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -328,15 +329,21 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
     )
   }
 
-  fun getSetTypeColor(setTypeID: Int) {
-    /*TODO*/
-  }
+  val buttonBackgroundColor =
+    when (setTypeID) {
+      2 -> MaterialTheme.colorScheme.tertiary
+      7 -> MaterialTheme.colorScheme.error
+      8 -> MaterialTheme.colorScheme.error
+      else -> MaterialTheme.colorScheme.primary
+    }
 
-  var iconColor: Color = Color.White
-
-  fun changeIconColor() {
-    //    iconColor =
-  }
+  val iconColor: Color =
+    when (setTypeID) {
+      2 -> MaterialTheme.colorScheme.onSecondary
+      7 -> MaterialTheme.colorScheme.onError
+      8 -> MaterialTheme.colorScheme.onError
+      else -> MaterialTheme.colorScheme.onPrimary
+    }
 
   Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
     Button(
@@ -344,18 +351,12 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
       shape = RoundedCornerShape(size = 8.dp),
       contentPadding = PaddingValues(0.dp),
       onClick = { expandedSetTypeOptionsDropdownMenu = true },
+      colors = ButtonDefaults.buttonColors(containerColor = buttonBackgroundColor),
     ) {
-      Text(
-        text = iconText,
-        color = MaterialTheme.colorScheme.onPrimary,
-        softWrap = false,
-        maxLines = 1,
-        minLines = 1,
-      )
+      Text(text = iconText, color = iconColor, softWrap = false, maxLines = 1, minLines = 1)
     }
 
     SetTypeOptionsMenu(
-      // selectedSetType = exerciseSet.setType, TODO Not if this is needed
       expandMenu = { expandedSetTypeOptionsDropdownMenu },
       onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
       updateSetType = { setTypeID -> updateSetType(setTypeID) },
@@ -363,21 +364,20 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
         iconText = abbreviation
         Log.i("setTypeAbbreviation", "setType iconText: $iconText")
       },
-      changeIconColor = { /*changeIconColor()*/},
     )
   }
 }
 
 @Composable
 private fun PreviousSet(
-  boxModifier: Modifier,
+  modifier: Modifier,
   previousSetText: String,
   copyPreviousSetData: () -> Unit,
 ) {
   Box(/*modifier = Modifier.width(110.dp)*/ ) {
     TextButton(
       onClick = { copyPreviousSetData() },
-      modifier = boxModifier,
+      modifier = modifier,
       shape = RoundedCornerShape(size = 8.dp),
       contentPadding = PaddingValues(0.dp),
     ) {
