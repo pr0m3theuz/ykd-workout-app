@@ -153,3 +153,11 @@ C
 settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
 G
 app/newrelic.properties,5/2/52718845109ae62fcfaf489498c57ce49a3272cb
+q
+Aapp/src/main/java/com/example/myapplication/data/model/SetType.kt,6/9/691011e6b94b5ea296ca4385d121730ef244cc5d
+˜
+happ/src/main/java/com/example/myapplication/components/workoutDialogs/workingSets/WorkingSetViewModel.kt,2/9/29a0118f4b0007dfaef1dbf51dc28b45b3bfb34b
+X
+(gradle/wrapper/gradle-wrapper.properties,f/b/fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
+\
+,.idea/inspectionProfiles/Project_Default.xml,4/9/496a238a6afa168dbaf6efd37bb459331589579c
