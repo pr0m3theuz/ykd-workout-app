@@ -13,10 +13,14 @@ import android.os.SystemClock
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.example.myapplication.R
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.model.Exercise
@@ -55,6 +59,7 @@ import kotlin.time.toDuration
 
 private const val WARM_UP_SET = 2
 
+@OptIn(SavedStateHandleSaveableApi::class)
 class WorkoutViewModel(
   private val application: Application,
   private val manageWorkoutUseCase: ManageWorkoutUseCase,
@@ -65,6 +70,7 @@ class WorkoutViewModel(
   //  private val workoutNotesRepository: WorkoutNotesRepository,
   //  private val exerciseNotesRepository: ExerciseNotesRepository,
   //  userRepository: UserRepository,
+  private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
   //    fun currentTimeMillis(): Long = System.currentTimeMillis()
@@ -72,11 +78,12 @@ class WorkoutViewModel(
   private val REQUEST_CODE = 0
   private val notifyPendingIntent: PendingIntent
 
-  private var workoutDuration: Long = 0
-  private var pausedElapsedTime: Long = 0
+  private var workoutDuration: Long by savedStateHandle.saveable { mutableStateOf(0L) }
+  private var pausedElapsedTime: Long by savedStateHandle.saveable { mutableStateOf(0L) }
   private var _isWorkoutCountUpTimerPaused = MutableStateFlow<Boolean>(true)
+
   val isWorkoutCountUpTimerPaused: StateFlow<Boolean>
-    get() = _isWorkoutCountUpTimerPaused.asStateFlow()
+    get() = _isWorkoutCountUpTimerPaused
 
   private var _workoutDurationFormatted =
     workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours, minutes, seconds, _
@@ -98,15 +105,16 @@ class WorkoutViewModel(
         workoutDuration = elapsedTime
 
         _workoutDurationString.value =
-          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
-                                                                               minutes,
-                                                                               seconds,
-                                                                               _ ->
+          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents {
+            hours,
+            minutes,
+            seconds,
+            _ ->
             if (hours > 0) {
               "$hours:" +
-                      minutes.toString().padStart(2, '0') +
-                      ":" +
-                      seconds.toString().padStart(2, '0')
+                minutes.toString().padStart(2, '0') +
+                ":" +
+                seconds.toString().padStart(2, '0')
             } else {
               "$minutes:${seconds.toString().padStart(2, '0')}"
             }
@@ -128,10 +136,8 @@ class WorkoutViewModel(
 
   //  Rest Timer
   private val notificationManager =
-    ContextCompat.getSystemService(
-      application,
-      NotificationManager::class.java,
-    ) as NotificationManager
+    ContextCompat.getSystemService(application, NotificationManager::class.java)
+      as NotificationManager
 
   private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -146,11 +152,12 @@ class WorkoutViewModel(
         application,
         REQUEST_CODE,
         notifyIntent,
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
       )
   }
 
-  private var _timerDuration: Long = 60000L
+  //  private var _timerDuration: Long = 60000L
+  private var _timerDuration: Long by savedStateHandle.saveable { mutableStateOf(60000L) }
   private var _timerDurationFormatted =
     _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
       "$minutes:${
@@ -167,7 +174,8 @@ class WorkoutViewModel(
   val restTimerAdjustmentString =
     _restTimerAdjustment.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString()
 
-  private var _remainingTime: Long = 60000L
+  //  private var _remainingTime: Long = 60000L
+  private var _remainingTime: Long by savedStateHandle.saveable { mutableStateOf(60000L) }
 
   private var _remainingTimeFormatted =
     _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
@@ -216,7 +224,7 @@ class WorkoutViewModel(
       alarmManager.setExactAndAllowWhileIdle(
         AlarmManager.ELAPSED_REALTIME_WAKEUP,
         alarmTriggerTime,
-        notifyPendingIntent
+        notifyPendingIntent,
       )
     } else {
       val intent: Intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
@@ -228,46 +236,48 @@ class WorkoutViewModel(
       timer =
         object : CountDownTimer(timerDuration, 1000L) {
 
-          override fun onTick(millisUntilFinished: Long) {
-            _state = TimerState.RUNNING
-            _timerState.value = TimerState.RUNNING
-            _remainingTime = millisUntilFinished
-            _remainingTimeString.value =
-              _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                  seconds,
-                                                                                  _ ->
-                "$minutes:${seconds.toString().padStart(2, '0')}"
-              }
+            override fun onTick(millisUntilFinished: Long) {
+              _state = TimerState.RUNNING
+              _timerState.value = TimerState.RUNNING
+              _remainingTime = millisUntilFinished
+              _remainingTimeString.value =
+                _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents {
+                  minutes,
+                  seconds,
+                  _ ->
+                  "$minutes:${seconds.toString().padStart(2, '0')}"
+                }
 
-            _timerDurationString.value =
-              _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
-                                                                                  seconds,
-                                                                                  _ ->
-                "$minutes:${seconds.toString().padStart(2, '0')}"
-              }
+              _timerDurationString.value =
+                _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents {
+                  minutes,
+                  seconds,
+                  _ ->
+                  "$minutes:${seconds.toString().padStart(2, '0')}"
+                }
 
-            _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
+              _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
 
-            /*              Log.i("Timer: ", timerVersion)
-            Log.i("TimerState: ", _timerState.value.name)
+              /*              Log.i("Timer: ", timerVersion)
+              Log.i("TimerState: ", _timerState.value.name)
 
-            Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-            Log.i("onTick(): timerDuration", "$_timerDuration")
-            Log.i(
-              "onTick(): _remainingTimeProgress",
-              "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-            )*/
+              Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+              Log.i("onTick(): timerDuration", "$_timerDuration")
+              Log.i(
+                "onTick(): _remainingTimeProgress",
+                "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+              )*/
+            }
+
+            override fun onFinish() {
+              _state = TimerState.EXPIRED
+              _timerState.value = TimerState.EXPIRED
+              _timerFinished = true
+
+              //              Log.i("Timer: ", timerVersion)
+              //              Log.i("TimerState: ", _timerState.value.name)
+            }
           }
-
-          override fun onFinish() {
-            _state = TimerState.EXPIRED
-            _timerState.value = TimerState.EXPIRED
-            _timerFinished = true
-
-            //              Log.i("Timer: ", timerVersion)
-            //              Log.i("TimerState: ", _timerState.value.name)
-          }
-        }
           .start()
     }
   }
@@ -278,7 +288,7 @@ class WorkoutViewModel(
 
     notificationManager.sendNotification(
       application.getString(R.string.rest_timer_running_text),
-      application
+      application,
     )
   }
 
@@ -287,13 +297,13 @@ class WorkoutViewModel(
     //    Log.i("startRestTimer() ", "called")
     _timerDuration = time.inWholeMilliseconds
 
-    //    createRestTimerNotification()
+    createRestTimerNotification()
     createTimer(_timerDuration)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun startLastTimer() {
-    //    createRestTimerNotification()
+    createRestTimerNotification()
     createTimer(_timerDuration)
   }
 
@@ -303,7 +313,7 @@ class WorkoutViewModel(
   fun startSetCompletedTimer(
     exerciseSet: ExerciseExerciseSets,
     setUUID: RealmUUID,
-    setLazyListItemID: Long
+    setLazyListItemID: Long,
   ) {
     //    Log.i("startSetCompletedTimer() ", "called")
 
@@ -347,8 +357,8 @@ class WorkoutViewModel(
       timer.cancel()
       resetTimerState()
     }
-    //    notificationManager.cancelNotifications()
-    //    alarmManager.cancel(notifyPendingIntent)
+    // TODO Cancel Notification notificationManager.cancelNotifications()
+    alarmManager.cancel(notifyPendingIntent)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
@@ -379,7 +389,10 @@ class WorkoutViewModel(
 
   //    Workout
   private lateinit var initialWorkoutData: Workout
-  private var _workoutData: Workout = initWorkout()
+  //  private var _workoutData: Workout = initWorkout()
+
+  private var _workoutData by savedStateHandle.saveable { mutableStateOf(initWorkout()) }
+
   private var _workout = MutableStateFlow(_workoutData)
   val workout
     get() = _workout.asStateFlow()
@@ -429,8 +442,7 @@ class WorkoutViewModel(
       _workout.value = _workoutData
 
       getPinnedWorkoutNotes(workout.uuid, workout._id)
-      _exercisesSets.value =
-        loadExercisesSetsFromPreviousWorkout(workout.exercisesSets).toList()
+      _exercisesSets.value = loadExercisesSetsFromPreviousWorkout(workout.exercisesSets).toList()
     }
 
     //    _exercisesSets.value = _exercisesSetsData.toList()
@@ -465,19 +477,19 @@ class WorkoutViewModel(
 
   private fun copyExercisesSetsFromPreviousWorkout(
     previousExercisesSets: RealmList<ExerciseSets>,
-    _workoutID: ObjectId
+    _workoutID: ObjectId,
   ): MutableList<ExerciseExerciseSets> {
     return manageWorkoutUseCase.copyExercisesSetsFromPreviousWorkout(
       previousExercisesSets = previousExercisesSets,
-      _workoutID = _workoutID
+      _workoutID = _workoutID,
     )
   }
 
   private fun loadExercisesSetsFromPreviousWorkout(
-    previousExercisesSets: RealmList<ExerciseSets>,
+    previousExercisesSets: RealmList<ExerciseSets>
   ): MutableList<ExerciseExerciseSets> {
     return manageWorkoutUseCase.loadExercisesSetsFromWorkout(
-      previousExercisesSets = previousExercisesSets,
+      previousExercisesSets = previousExercisesSets
     )
   }
   //  private fun copySetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
@@ -568,7 +580,7 @@ class WorkoutViewModel(
       manageWorkoutUseCase.addMultipleEmptyExerciseSets(
         _exercisesSets.value.toMutableList(),
         exercisesSelectedToBeAddedToWorkout,
-        _workout.value._id
+        _workout.value._id,
       )
 
     //    _exercisesSetsData = temporaryExerciseExerciseSets
@@ -624,7 +636,7 @@ class WorkoutViewModel(
   fun pinExerciseNote(
     exerciseSets: ExerciseExerciseSets,
     exerciseNote: ExerciseNote,
-    pinned: Boolean
+    pinned: Boolean,
   ) {
     val index = exerciseSets.notes.indexOf(exerciseNote)
 
@@ -657,7 +669,7 @@ class WorkoutViewModel(
     _exercisesSets.value =
       manageWorkoutUseCase.updateExerciseExerciseSetsData(
         exerciseExerciseSets = exercisesSets.value.toMutableList(),
-        exerciseSets = exerciseSets
+        exerciseSets = exerciseSets,
       )
     //    _allSets.value = allSets(_exercisesSets.value).toList()
   }
@@ -824,7 +836,6 @@ class WorkoutViewModel(
     ): RealmList<ExerciseNote> {  }
   */
 
-
   /**
    * Saves the workout data to the database asynchronously. The function launches a coroutine in the
    * viewModelScope to perform the database operations. It first inserts the workout data using the
@@ -889,9 +900,8 @@ class WorkoutViewModel(
       manageWorkoutUseCase.replaceExerciseInExerciseSets(
         _exercisesSets.value.toMutableList(),
         exerciseSets,
-        newExercise
+        newExercise,
       )
-
   }
 }
 

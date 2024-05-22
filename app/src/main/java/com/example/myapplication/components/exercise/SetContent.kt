@@ -140,13 +140,20 @@ fun SetContent(
   }
 
   fun copyPreviousSetData() {
-    if (getWeightUnit() == MassUnit.POUNDS.abbreviation) {
-      updateWeight(previousSet?.weightPounds.toString())
-    } else {
-      updateWeight(previousSet?.weightKilograms.toString())
+    // Only copy if all fields are empty
+    if (
+      exerciseWeightText.isEmpty() &&
+        repetitionsText.isEmpty() &&
+        repetitionsInReserveText.isEmpty()
+    ) {
+      if (getWeightUnit() == MassUnit.POUNDS.abbreviation) {
+        updateWeight(previousSet?.weightPounds.toString())
+      } else {
+        updateWeight(previousSet?.weightKilograms.toString())
+      }
+      updateReps(previousSet?.repetitions.toString())
+      updateRIR(previousSet?.repetitionsInReserve.toString())
     }
-    updateReps(previousSet?.repetitions.toString())
-    updateRIR(previousSet?.repetitionsInReserve.toString())
   }
 
   SetContentFrame(

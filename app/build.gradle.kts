@@ -5,8 +5,8 @@ plugins {
   id("io.realm.kotlin")
   id("com.google.devtools.ksp")
   id("org.jetbrains.kotlin.plugin.serialization")
-//  id("com.google.gms.google-services")
-//  id("com.google.firebase.crashlytics")
+  //  id("com.google.gms.google-services")
+  //  id("com.google.firebase.crashlytics")
   id("newrelic")
 }
 
@@ -48,9 +48,22 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
 
-    freeCompilerArgs = listOf("-Xjvm-default=all")
+    freeCompilerArgs =
+      listOf(
+        "-Xjvm-default=all",
+        "-Xjsr305=strict", // Strict interpretation of nullability annotations in jqwik API
+        "-Xemit-jvm-type-annotations", // Enable annotations on type variables
+      )
   }
   kotlin { jvmToolchain(17) }
+
+  tasks.withType<Test> {
+    useJUnitPlatform { includeEngines("jqwik") }
+    include("**/*Properties.class")
+    include("**/*Test.class")
+    include("**/*Tests.class")
+    include("**/*Examples.class")
+  }
 
   buildFeatures { compose = true }
   composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
@@ -113,6 +126,7 @@ dependencies {
 
   testImplementation("junit:junit:4.13.2")
   androidTestImplementation("androidx.test.ext:junit:1.1.5")
+  testImplementation(platform("org.junit:junit-bom:5.10.2"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
@@ -121,6 +135,8 @@ dependencies {
   debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
   debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
 
+  testImplementation("net.jqwik:jqwik:1.8.3")
+  testImplementation("net.jqwik:jqwik-kotlin:1.8.3")
   // Navigation
   implementation("androidx.navigation:navigation-compose:2.7.5")
 
@@ -146,20 +162,20 @@ dependencies {
   testImplementation("io.insert-koin:koin-test-junit5:3.5.0")
 
   // Import the Firebase BoM
-//  implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+  //  implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
 
   // When using the BoM, you don't specify versions in Firebase library dependencies
 
   // Add the dependency for the Firebase SDK for Google Analytics
-//  implementation("com.google.firebase:firebase-analytics")
+  //  implementation("com.google.firebase:firebase-analytics")
 
   // TODO: Add the dependencies for any other Firebase products you want to use
   // See https://firebase.google.com/docs/android/setup#available-libraries
   // For example, add the dependencies for Firebase Authentication and Cloud Firestore
-//  implementation("com.google.firebase:firebase-auth")
-//  implementation("com.google.firebase:firebase-firestore")
-//  implementation("com.google.firebase:firebase-crashlytics")
-//  implementation("com.google.firebase:firebase-crashlytics-ndk")
+  //  implementation("com.google.firebase:firebase-auth")
+  //  implementation("com.google.firebase:firebase-firestore")
+  //  implementation("com.google.firebase:firebase-crashlytics")
+  //  implementation("com.google.firebase:firebase-crashlytics-ndk")
 
   implementation("com.newrelic.agent.android:android-agent:6.10.0")
 }
