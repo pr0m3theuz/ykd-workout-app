@@ -13,14 +13,12 @@ import android.os.SystemClock
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
 import com.example.myapplication.R
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.model.Exercise
@@ -39,7 +37,6 @@ import com.example.myapplication.data.model.updateSetReps
 import com.example.myapplication.data.model.updateSetType
 import com.example.myapplication.data.model.updateSetWeight
 import com.example.myapplication.data.network.ExercisesRepository
-import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.newID
 import com.example.myapplication.utils.sendNotification
@@ -58,28 +55,32 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 private const val WARM_UP_SET = 2
+const val WORKOUT_DURATION = "WORKOUT_DURATION"
+const val WORKOUT_PAUSED_ELAPSED_TIME = "WORKOUT_PAUSED_ELAPSED_TIME"
+const val TIMER_DURATION = "TIMER_DURATION"
+private const val REMAINING_TIMER_TIME = "REMAINING_TIMER_TIME"
+const val WORKOUT_DETAILS = "WORKOUT_DETAILS"
+const val WORKOUT_NOTES = "WORKOUT_NOTES"
+const val EXERCISE_EXERCISE_SETS = "EXERCISE_EXERCISE_SETS"
 
 @OptIn(SavedStateHandleSaveableApi::class)
 class WorkoutViewModel(
   private val application: Application,
   private val manageWorkoutUseCase: ManageWorkoutUseCase,
-  private val workoutRepository: WorkoutRepository,
-  //  private val setsRepository: SetsRepository,
-  //  private val exerciseSetsRepository: ExerciseSetsRepository,
   private val exerciseRepository: ExercisesRepository,
-  //  private val workoutNotesRepository: WorkoutNotesRepository,
-  //  private val exerciseNotesRepository: ExerciseNotesRepository,
-  //  userRepository: UserRepository,
   private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-  //    fun currentTimeMillis(): Long = System.currentTimeMillis()
-  //    fun elapsedTimeMillis(): Long = System.
   private val REQUEST_CODE = 0
   private val notifyPendingIntent: PendingIntent
 
-  private var workoutDuration: Long by savedStateHandle.saveable { mutableStateOf(0L) }
-  private var pausedElapsedTime: Long by savedStateHandle.saveable { mutableStateOf(0L) }
+  private var workoutDuration: Long
+    get() = savedStateHandle.get<Long>(WORKOUT_DURATION) ?: 0L
+    set(value) = savedStateHandle.set(WORKOUT_DURATION, value)
+
+  private var pausedElapsedTime: Long
+    get() = savedStateHandle.get<Long>(WORKOUT_PAUSED_ELAPSED_TIME) ?: 0L
+    set(value) = savedStateHandle.set(WORKOUT_PAUSED_ELAPSED_TIME, value)
+
   private var _isWorkoutCountUpTimerPaused = MutableStateFlow<Boolean>(true)
 
   val isWorkoutCountUpTimerPaused: StateFlow<Boolean>
@@ -157,7 +158,10 @@ class WorkoutViewModel(
   }
 
   //  private var _timerDuration: Long = 60000L
-  private var _timerDuration: Long by savedStateHandle.saveable { mutableStateOf(60000L) }
+  private var _timerDuration: Long
+    get() = savedStateHandle.get<Long>(TIMER_DURATION) ?: 60000L
+    set(value) = savedStateHandle.set(TIMER_DURATION, value)
+
   private var _timerDurationFormatted =
     _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
       "$minutes:${
@@ -175,20 +179,22 @@ class WorkoutViewModel(
     _restTimerAdjustment.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString()
 
   //  private var _remainingTime: Long = 60000L
-  private var _remainingTime: Long by savedStateHandle.saveable { mutableStateOf(60000L) }
+  private var _remainingTimerTime: Long
+    get() = savedStateHandle.get<Long>(REMAINING_TIMER_TIME) ?: 60000L
+    set(value) = savedStateHandle.set(REMAINING_TIMER_TIME, value)
 
-  private var _remainingTimeFormatted =
-    _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
+  private var _remainingTimerTimeFormatted =
+    _remainingTimerTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
       "$minutes:${
         seconds.toString().padStart(2, '0')
       }"
     }
 
-  private val _remainingTimeString = MutableStateFlow(_remainingTimeFormatted)
+  private val _remainingTimerTimeString = MutableStateFlow(_remainingTimerTimeFormatted)
   val remainingTimeString: StateFlow<String>
-    get() = _remainingTimeString.asStateFlow()
+    get() = _remainingTimerTimeString.asStateFlow()
 
-  private var timerProgress = _remainingTime.div(_timerDuration).toFloat()
+  private var timerProgress = _remainingTimerTime.div(_timerDuration).toFloat()
 
   private val _remainingTimeProgress = MutableStateFlow(timerProgress)
   val remainingTimeProgress: StateFlow<Float>
@@ -227,7 +233,7 @@ class WorkoutViewModel(
         notifyPendingIntent,
       )
     } else {
-      val intent: Intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+      val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
       intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
       startActivity(application.applicationContext, intent, null)
     }
@@ -239,9 +245,9 @@ class WorkoutViewModel(
             override fun onTick(millisUntilFinished: Long) {
               _state = TimerState.RUNNING
               _timerState.value = TimerState.RUNNING
-              _remainingTime = millisUntilFinished
-              _remainingTimeString.value =
-                _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents {
+              _remainingTimerTime = millisUntilFinished
+              _remainingTimerTimeString.value =
+                _remainingTimerTime.toDuration(DurationUnit.MILLISECONDS).toComponents {
                   minutes,
                   seconds,
                   _ ->
@@ -256,7 +262,8 @@ class WorkoutViewModel(
                   "$minutes:${seconds.toString().padStart(2, '0')}"
                 }
 
-              _remainingTimeProgress.value = _remainingTime.toFloat().div(_timerDuration.toFloat())
+              _remainingTimeProgress.value =
+                _remainingTimerTime.toFloat().div(_timerDuration.toFloat())
 
               /*              Log.i("Timer: ", timerVersion)
               Log.i("TimerState: ", _timerState.value.name)
@@ -274,8 +281,8 @@ class WorkoutViewModel(
               _timerState.value = TimerState.EXPIRED
               _timerFinished = true
 
-              //              Log.i("Timer: ", timerVersion)
-              //              Log.i("TimerState: ", _timerState.value.name)
+              /*Log.i("Timer: ", timerVersion)
+              Log.i("TimerState: ", _timerState.value.name)*/
             }
           }
           .start()
@@ -339,9 +346,10 @@ class WorkoutViewModel(
 
   private fun resetTimerState() {
     Log.i("resetTimerState() ", "called")
-    _remainingTime = 0L
-    _remainingTimeString.value =
-      _remainingTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _ ->
+    _remainingTimerTime = 0L
+    _remainingTimerTimeString.value =
+      _remainingTimerTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes, seconds, _
+        ->
         "$minutes:${
           seconds.toString().padStart(2, '0')
         }"
@@ -363,21 +371,21 @@ class WorkoutViewModel(
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun moreRestTime() {
-    _remainingTime += _restTimerAdjustment
+    _remainingTimerTime += _restTimerAdjustment
     _timerDuration += _restTimerAdjustment
     timer.cancel()
     alarmManager.cancel(notifyPendingIntent)
-    createTimer(_remainingTime)
+    createTimer(_remainingTimerTime)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun lessRestTime() {
-    _remainingTime -= _restTimerAdjustment
+    _remainingTimerTime -= _restTimerAdjustment
     _timerDuration -= _restTimerAdjustment
     timer.cancel()
     alarmManager.cancel(notifyPendingIntent)
-    if (_remainingTime < _timerDuration) {
-      createTimer(_remainingTime)
+    if (_remainingTimerTime < _timerDuration) {
+      createTimer(_remainingTimerTime)
     } else {
       resetTimerState()
     }
@@ -391,25 +399,27 @@ class WorkoutViewModel(
   private lateinit var initialWorkoutData: Workout
   //  private var _workoutData: Workout = initWorkout()
 
-  private var _workoutData by savedStateHandle.saveable { mutableStateOf(initWorkout()) }
+  private var workoutDetails: Workout
+    get() = savedStateHandle.get<Workout>(WORKOUT_DETAILS) ?: initWorkout()
+    set(value) = savedStateHandle.set(WORKOUT_DETAILS, value)
 
-  private var _workout = MutableStateFlow(_workoutData)
+  private var _workout = MutableStateFlow(workoutDetails)
   val workout
     get() = _workout.asStateFlow()
 
-  private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(_workoutData.name)
+  private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(workoutDetails.name)
   val workoutName
     get() = _workoutName.asStateFlow()
 
   fun setWorkoutName(newName: String) {
-    _workoutData.name = newName
-    _workout.value = _workoutData
+    workoutDetails.name = newName
+    _workout.value = workoutDetails
   }
 
   fun forceInitWorkoutData() {
     if (this::initialWorkoutData.isInitialized) {
-      _workoutData = initialWorkoutData
-      _workout.value = _workoutData
+      workoutDetails = initialWorkoutData
+      _workout.value = workoutDetails
       _workoutName.value = initialWorkoutData.name
     }
   }
@@ -417,8 +427,8 @@ class WorkoutViewModel(
   fun initWorkoutData() {
     if (!this::initialWorkoutData.isInitialized) {
       initialWorkoutData = initWorkout()
-      _workoutData = initialWorkoutData
-      _workout.value = _workoutData
+      workoutDetails = initialWorkoutData
+      _workout.value = workoutDetails
     }
   }
 
@@ -438,11 +448,11 @@ class WorkoutViewModel(
   fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {
     manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { workout ->
       _workoutName.value = workout.name
-      _workoutData = workout
-      _workout.value = _workoutData
+      workoutDetails = workout
+      _workout.value = workoutDetails
 
       getPinnedWorkoutNotes(workout.uuid, workout._id)
-      _exercisesSets.value = loadExercisesSetsFromPreviousWorkout(workout.exercisesSets).toList()
+      setExercisesSets(loadExercisesSetsFromPreviousWorkout(workout.exercisesSets).toList())
     }
 
     //    _exercisesSets.value = _exercisesSetsData.toList()
@@ -452,13 +462,14 @@ class WorkoutViewModel(
     val newWorkout = manageWorkoutUseCase.copyWorkoutFromWorkoutTemplate(workoutTemplate)
 
     _workoutName.value = newWorkout.name
-    _workoutData = newWorkout
-    _workout.value = _workoutData
+    workoutDetails = newWorkout
+    _workout.value = workoutDetails
 
     getPinnedWorkoutNotes(workoutTemplate.uuid, newWorkout._id)
 
-    _exercisesSets.value =
+    setExercisesSets(
       copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets, newWorkout._id).toList()
+    )
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
@@ -466,12 +477,13 @@ class WorkoutViewModel(
     val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(previousWorkout)
 
     _workoutName.value = newWorkout.name
-    _workoutData = newWorkout
-    _workout.value = _workoutData
+    workoutDetails = newWorkout
+    _workout.value = workoutDetails
 
     getPinnedWorkoutNotes(previousWorkout.uuid, newWorkout._id)
-    _exercisesSets.value =
+    setExercisesSets(
       copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets, newWorkout._id).toList()
+    )
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
@@ -492,18 +504,23 @@ class WorkoutViewModel(
       previousExercisesSets = previousExercisesSets
     )
   }
-  //  private fun copySetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
-  //    // TODO Think out how to get Previous Set from the last time the exercise was performed and
-  // what
-  //    // data structure to store them in
-  //    return manageWorkoutUseCase.copySetsFromPreviousWorkout(previousSets)
-  //  }
+
+  // TODO Think out how to get Previous Set from the last time the exercise was performed
+  //   and what data structure to store them in
+
+  /* private fun copySetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
+    return manageWorkoutUseCase.copySetsFromPreviousWorkout(previousSets)
+  }*/
 
   fun populatePreviousSetField(exerciseID: ObjectId, setNumber: Int): Set? {
     return manageWorkoutUseCase.populatePreviousSetField(exerciseID, setNumber)
   }
 
-  private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
+  //  private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
+  private var _workoutNotesData: MutableList<WorkoutNote>
+    get() = savedStateHandle.get<MutableList<WorkoutNote>>(WORKOUT_NOTES) ?: mutableListOf()
+    set(value) = savedStateHandle.set(WORKOUT_NOTES, value)
+
   private var _workoutNotes: MutableStateFlow<List<WorkoutNote>> =
     MutableStateFlow(_workoutNotesData.toList())
   val workoutNotes
@@ -552,18 +569,27 @@ class WorkoutViewModel(
 
   private fun stopWorkoutTimer() {
     workoutCountUpTimer.stop()
-    _workoutData.workoutEnded = RealmInstant.now()
-    _workoutData.workoutDuration = workoutDuration
-    _workout.value = _workoutData
+    workoutDetails.workoutEnded = RealmInstant.now()
+    workoutDetails.workoutDuration = workoutDuration
+    _workout.value = workoutDetails
     // TODO Navigate to Workout Complete Screen & Summary
   }
 
   //    ExerciseExerciseSets
   //  private var _exercisesSetsData = mutableListOf<ExerciseExerciseSets>()
 
-  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
+  //  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
+
+  private val _exercisesSets: StateFlow<List<ExerciseExerciseSets>>
+    get() =
+      savedStateHandle.getStateFlow<List<ExerciseExerciseSets>>(EXERCISE_EXERCISE_SETS, listOf())
+
+  fun setExercisesSets(exercisesSets: List<ExerciseExerciseSets>) {
+    savedStateHandle[EXERCISE_EXERCISE_SETS] = exercisesSets
+  }
+
   val exercisesSets
-    get() = _exercisesSets.asStateFlow()
+    get() = _exercisesSets
 
   //  TODO What is this used for or purpose, Workout Summary?
   //  private var _allSetsData: MutableList<Set> = allSets(_exercisesSets.value)
@@ -584,11 +610,11 @@ class WorkoutViewModel(
       )
 
     //    _exercisesSetsData = temporaryExerciseExerciseSets
-    _exercisesSets.value = temporaryExerciseExerciseSets.toList()
+    setExercisesSets(temporaryExerciseExerciseSets.toList())
   }
 
   fun removeExerciseSets(exerciseSets: ExerciseExerciseSets) {
-    _exercisesSets.value = _exercisesSets.value.filter { it != exerciseSets }.toMutableList()
+    setExercisesSets(_exercisesSets.value.filter { it != exerciseSets }.toMutableList())
     //    _exercisesSets.value = _exercisesSetsData
   }
 
@@ -666,11 +692,12 @@ class WorkoutViewModel(
 
   private fun updateExerciseExerciseSetsData(exerciseSets: ExerciseExerciseSets) {
 
-    _exercisesSets.value =
+    setExercisesSets(
       manageWorkoutUseCase.updateExerciseExerciseSetsData(
         exerciseExerciseSets = exercisesSets.value.toMutableList(),
         exerciseSets = exerciseSets,
       )
+    )
     //    _allSets.value = allSets(_exercisesSets.value).toList()
   }
 
@@ -856,7 +883,7 @@ class WorkoutViewModel(
     //    _workoutData.calculateTotalVolume(userDefaultWeightUnit)
 
     viewModelScope.launch {
-      manageWorkoutUseCase.saveWorkout(_workoutData, _workoutNotesData, _exercisesSets.value)
+      manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _exercisesSets.value)
     }
   }
 
@@ -880,9 +907,9 @@ class WorkoutViewModel(
     //    TODO navController.popBackStack( route = Programs.route, inclusive = true)
     cancelSetCompletedTimer()
     stopWorkoutTimer()
-    _workoutData = initWorkout()
+    workoutDetails = initWorkout()
     //    _exercisesSetsData = mutableListOf()
-    _exercisesSets.value = listOf()
+    setExercisesSets(listOf())
   }
 
   private fun removeUncompletedSets() {
@@ -891,17 +918,19 @@ class WorkoutViewModel(
     //    newData.forEach { it.sets.removeIf { set -> !set.setCompleted } }
     //    newData.filter { it.sets.isNotEmpty() }
     //    _exercisesSetsData = newData
-    _exercisesSets.value =
+    setExercisesSets(
       manageWorkoutUseCase.removeUncompletedSets(_exercisesSets.value.toMutableList())
+    )
   }
 
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseExerciseSets, newExercise: Exercise) {
-    _exercisesSets.value =
+    setExercisesSets(
       manageWorkoutUseCase.replaceExerciseInExerciseSets(
         _exercisesSets.value.toMutableList(),
         exerciseSets,
         newExercise,
       )
+    )
   }
 }
 

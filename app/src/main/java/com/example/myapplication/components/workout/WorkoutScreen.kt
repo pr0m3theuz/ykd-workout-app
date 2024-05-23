@@ -49,7 +49,7 @@ import org.mongodb.kbson.ObjectId
 fun WorkoutScreen(
   navController: NavController,
   workoutViewModel: WorkoutViewModel = koinViewModel(),
-  workoutID: String?
+  workoutID: String?,
 ) {
   if (!workoutID.isNullOrBlank()) {
     workoutViewModel.getWorkoutByID(ObjectId.invoke(workoutID))
@@ -75,11 +75,10 @@ fun WorkoutContent(
 
   fun navigateToWorkoutSummaryScreen() {
     //    val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
-    val thisworkoutID = workoutViewModel.workout.value._id.toHexString()
+    val thisWorkoutID = workoutViewModel.workout.value._id.toHexString()
     val workoutsCount = workoutViewModel.getWorkoutsCount()
 
-    navController.navigate("workoutSummary/$thisworkoutID/$workoutsCount")
-
+    navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount")
   }
 
   if (openFinishWorkoutDialog) {
@@ -97,13 +96,11 @@ fun WorkoutContent(
           )
         },
         navigationIcon = {
-          IconButton(
-            onClick = { navController.navigateUp() },
-          ) {
+          IconButton(onClick = { navController.navigateUp() }) {
             Icon(
               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen"
+              contentDescription = "Go to the previous screen",
             )
           }
         },
@@ -116,9 +113,9 @@ fun WorkoutContent(
               WorkoutNameDialog(
                 workoutName = workoutName ?: "",
                 dismissWorkoutNameDialog = { dismissWorkoutNameDialog() },
-                setWorkoutName = { workoutViewModel.setWorkoutName(it) }
+                setWorkoutName = { workoutViewModel.setWorkoutName(it) },
               )
-            }
+            },
           )
         },
       )
@@ -127,19 +124,15 @@ fun WorkoutContent(
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
       Row(
-        modifier = Modifier
-          .padding(start = 8.dp)
-          .fillMaxWidth(),
+        modifier = Modifier.padding(start = 8.dp).fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
       ) {
         WorkoutDuration()
         FinishWorkoutButton(navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
       }
 
-      ExercisesSetsScreen(
-        navController = navController,
-      )
+      ExercisesSetsScreen(navController = navController)
     }
   }
 }
@@ -157,42 +150,39 @@ private fun WorkoutDuration(workoutViewModel: WorkoutViewModel = koinViewModel()
     modifier = Modifier.padding(8.dp),
   ) {
     val colorAlpha by
-    animateFloatAsState(
-      targetValue =
-      if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") 0f else 1f,
-      animationSpec = infiniteRepeatable(animation = tween(1000)),
-      label = "textColorAlpha"
-    )
+      animateFloatAsState(
+        targetValue =
+          if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") 0f else 1f,
+        animationSpec = infiniteRepeatable(animation = tween(1000)),
+        label = "textColorAlpha",
+      )
     Text(
       text =
-      if (isWorkoutCountUpTimerPaused && workoutDurationString == "0:00") "Start Workout Clock"
-      else workoutDurationString,
+        if (isWorkoutCountUpTimerPaused && workoutDurationString == "0:00") "Start Workout Clock"
+        else workoutDurationString,
       style = MaterialTheme.typography.bodyLarge,
       color =
-      MaterialTheme.colorScheme.onPrimary.copy(
-        alpha =
-        if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") colorAlpha else 1f
-      )
+        MaterialTheme.colorScheme.onPrimary.copy(
+          alpha =
+            if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") colorAlpha else 1f
+        ),
     )
   }
 }
 
 @Composable
-private fun WorkoutNameTextField(
-  workoutName: String,
-  setWorkoutName: (String) -> Unit,
-) {
+private fun WorkoutNameTextField(workoutName: String, setWorkoutName: (String) -> Unit) {
   var name by remember { mutableStateOf(workoutName) }
 
   BasicTextField(
     enabled = false,
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
-    TextStyle(
-      fontSize = MaterialTheme.typography.titleMedium.fontSize,
-      textAlign = TextAlign.Center,
-      color = MaterialTheme.colorScheme.onBackground
-    ),
+      TextStyle(
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onBackground,
+      ),
     value = name,
     onValueChange = {
       name = it
