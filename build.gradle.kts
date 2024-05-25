@@ -20,6 +20,7 @@ plugins {
   //    id("com.google.devtools.ksp") version "1.9.0-1.0.13" apply false
   id("org.jetbrains.kotlin.jvm") version "1.9.10" apply false
   id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
+  //  id("org.jetbrains.kotlin.plugin.parcelize") version "1.9.10" apply true
   //  id("com.google.gms.google-services") version "4.4.0" apply false
   //  id("com.google.firebase.crashlytics") version "2.9.9" apply false
 }

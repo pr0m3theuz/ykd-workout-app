@@ -13,18 +13,21 @@ import android.os.SystemClock
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.saveable.Saver
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.example.myapplication.R
 import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.ListExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
@@ -48,6 +51,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.mongodb.kbson.ObjectId
 import java.time.LocalTime
 import kotlin.time.Duration
@@ -399,9 +403,23 @@ class WorkoutViewModel(
   private lateinit var initialWorkoutData: Workout
   //  private var _workoutData: Workout = initWorkout()
 
-  private var workoutDetails: Workout
-    get() = savedStateHandle.get<Workout>(WORKOUT_DETAILS) ?: initWorkout()
-    set(value) = savedStateHandle.set(WORKOUT_DETAILS, value)
+  /*
+    private var workoutDetails: Workout
+      get() = savedStateHandle.get<Workout>(WORKOUT_DETAILS) ?: initWorkout()
+      set(value) = savedStateHandle.set(WORKOUT_DETAILS, value)
+  */
+
+  private var workoutDetails: Workout =
+    savedStateHandle.saveable(
+      key = WORKOUT_DETAILS,
+      saver =
+        Saver(
+          save = { Json.encodeToString(Workout.serializer(), it) },
+          restore = { Json.decodeFromString(Workout.serializer(), it) },
+        ),
+    ) {
+      initWorkout()
+    }
 
   private var _workout = MutableStateFlow(workoutDetails)
   val workout
@@ -580,16 +598,35 @@ class WorkoutViewModel(
 
   //  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
 
-  private val _exercisesSets: StateFlow<List<ExerciseExerciseSets>>
-    get() =
-      savedStateHandle.getStateFlow<List<ExerciseExerciseSets>>(EXERCISE_EXERCISE_SETS, listOf())
+  private var _exercisesSets: MutableList<ExerciseExerciseSets> =
+    savedStateHandle.saveable(
+      key = EXERCISE_EXERCISE_SETS,
+      saver =
+        Saver(
+          save = {
+            Json.encodeToString(
+              ListExerciseExerciseSets.serializer(),
+              ListExerciseExerciseSets().apply { list = it.toRealmList() },
+            )
+          },
+          restore = {
+            Json.decodeFromString(ListExerciseExerciseSets.serializer(), it).list.toMutableList()
+          },
+        ),
+    ) {
+      mutableListOf()
+    }
+
+  private var _exerciseSetsFlow = MutableStateFlow(_exercisesSets.toList())
 
   fun setExercisesSets(exercisesSets: List<ExerciseExerciseSets>) {
-    savedStateHandle[EXERCISE_EXERCISE_SETS] = exercisesSets
+    _exercisesSets = exercisesSets.toMutableList()
+    _exerciseSetsFlow.value = exercisesSets
+    //    savedStateHandle[EXERCISE_EXERCISE_SETS] = exercisesSets.toMutableList()
   }
 
-  val exercisesSets
-    get() = _exercisesSets
+  val exercisesSets: StateFlow<List<ExerciseExerciseSets>>
+    get() = _exerciseSetsFlow.asStateFlow()
 
   //  TODO What is this used for or purpose, Workout Summary?
   //  private var _allSetsData: MutableList<Set> = allSets(_exercisesSets.value)
@@ -604,7 +641,7 @@ class WorkoutViewModel(
   fun addMultipleEmptyExerciseSets(exercisesSelectedToBeAddedToWorkout: List<Exercise>) {
     val temporaryExerciseExerciseSets =
       manageWorkoutUseCase.addMultipleEmptyExerciseSets(
-        _exercisesSets.value.toMutableList(),
+        _exercisesSets,
         exercisesSelectedToBeAddedToWorkout,
         _workout.value._id,
       )
@@ -614,7 +651,7 @@ class WorkoutViewModel(
   }
 
   fun removeExerciseSets(exerciseSets: ExerciseExerciseSets) {
-    setExercisesSets(_exercisesSets.value.filter { it != exerciseSets }.toMutableList())
+    setExercisesSets(_exercisesSets.filter { it != exerciseSets }.toMutableList())
     //    _exercisesSets.value = _exercisesSetsData
   }
 
@@ -694,7 +731,7 @@ class WorkoutViewModel(
 
     setExercisesSets(
       manageWorkoutUseCase.updateExerciseExerciseSetsData(
-        exerciseExerciseSets = exercisesSets.value.toMutableList(),
+        exerciseExerciseSets = _exercisesSets,
         exerciseSets = exerciseSets,
       )
     )
@@ -833,7 +870,7 @@ class WorkoutViewModel(
     var countSets: Int = 0
     var countSetsCompleted: Int = 0
 
-    _exercisesSets.value.forEach { exerciseSets ->
+    _exercisesSets.forEach { exerciseSets ->
       exerciseSets.sets.forEach { set ->
         countSets++
         if (set.setCompleted) {
@@ -883,7 +920,7 @@ class WorkoutViewModel(
     //    _workoutData.calculateTotalVolume(userDefaultWeightUnit)
 
     viewModelScope.launch {
-      manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _exercisesSets.value)
+      manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _exercisesSets)
     }
   }
 
@@ -918,18 +955,12 @@ class WorkoutViewModel(
     //    newData.forEach { it.sets.removeIf { set -> !set.setCompleted } }
     //    newData.filter { it.sets.isNotEmpty() }
     //    _exercisesSetsData = newData
-    setExercisesSets(
-      manageWorkoutUseCase.removeUncompletedSets(_exercisesSets.value.toMutableList())
-    )
+    setExercisesSets(manageWorkoutUseCase.removeUncompletedSets(_exercisesSets))
   }
 
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseExerciseSets, newExercise: Exercise) {
     setExercisesSets(
-      manageWorkoutUseCase.replaceExerciseInExerciseSets(
-        _exercisesSets.value.toMutableList(),
-        exerciseSets,
-        newExercise,
-      )
+      manageWorkoutUseCase.replaceExerciseInExerciseSets(_exercisesSets, exerciseSets, newExercise)
     )
   }
 }

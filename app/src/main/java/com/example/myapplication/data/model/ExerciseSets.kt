@@ -5,7 +5,7 @@
   RealmInstantKSerializer::class,
   RealmListKSerializer::class,
   RealmSetKSerializer::class,
-  RealmUUIDKSerializer::class
+  RealmUUIDKSerializer::class,
 )
 
 package com.example.myapplication.data.model
@@ -36,8 +36,7 @@ import org.mongodb.kbson.ObjectId
 
 @Serializable
 class ExerciseSets() : RealmObject {
-  @PrimaryKey
-  var _id: ObjectId = ObjectId()
+  @PrimaryKey var _id: ObjectId = ObjectId()
   var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
   var exSetsUUID: RealmUUID = RealmUUID.random()
   //    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
@@ -56,8 +55,7 @@ class ExerciseSets() : RealmObject {
 
 @Serializable
 class ExerciseExerciseSets() : RealmObject {
-  @PrimaryKey
-  var _id: ObjectId = ObjectId()
+  @PrimaryKey var _id: ObjectId = ObjectId()
   var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
   var exSetsUUID: RealmUUID = RealmUUID.random()
   //    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
@@ -70,6 +68,11 @@ class ExerciseExerciseSets() : RealmObject {
   var sets: RealmList<Set> = realmListOf()
   var notes: RealmList<ExerciseNote> = realmListOf()
   var datePerformed: RealmInstant? = null
+}
+
+@Serializable
+class ListExerciseExerciseSets() : RealmObject {
+  var list: RealmList<ExerciseExerciseSets> = realmListOf()
 }
 
 /*fun ExerciseSets.addSet() {
@@ -154,7 +157,7 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
         percentage1RM = warmUpSets[index].percentage1RM
         exerciseID = this@addWarmUpSets.exercise?._id
         progressionSchemeID = warmUpSets[index].progressionSchemeID
-      }
+      },
     )
   }
 }
@@ -233,7 +236,7 @@ fun ExerciseExerciseSets.resetSets(
 
 fun convertExerciseExerciseSetsToExerciseSets(
   exerciseExerciseSets: List<ExerciseExerciseSets>,
-  userDefaultWeightUnit: String
+  userDefaultWeightUnit: String,
 ): RealmList<ExerciseSets> {
   val exercisesSets = realmListOf<ExerciseSets>()
   exerciseExerciseSets.forEach {
@@ -326,7 +329,7 @@ fun ExerciseSets.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double 
 data class ExercisesSets(
   val identical: Boolean,
   val numberOfIdenticalWorkouts: Int,
-  val exercisesSets: List<SerializableExerciseSets>
+  val exercisesSets: List<SerializableExerciseSets>,
 )
 
 @Serializable

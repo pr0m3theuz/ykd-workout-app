@@ -8,6 +8,8 @@ plugins {
   //  id("com.google.gms.google-services")
   //  id("com.google.firebase.crashlytics")
   id("newrelic")
+  id("kotlin-parcelize")
+  //  id("org.jetbrains.kotlin.plugin.kotlin-parcelize")
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
