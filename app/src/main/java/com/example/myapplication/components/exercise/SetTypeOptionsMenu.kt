@@ -94,7 +94,7 @@ fun SetTypeOptionsMenu(
             // Made Simple #3", url = "https://www.youtube.com/watch?v=HDq-68SlPgQ")
           },
         darkTextColor = Color(255, 165, 61), /* Color: Orange */
-        lightTextColor = Color(127, 71, 3),
+        lightTextColor = Color(112, 66, 20),
       )
     )
 
@@ -233,7 +233,7 @@ fun SetTypeOptionsMenu(
           IconButton(onClick = { openSetTypeDescriptionDialog = true }) {
             Icon(
               Icons.Outlined.QuestionMark,
-              contentDescription = "Localized description",
+              contentDescription = "Description of ${setType.name}",
               tint = MaterialTheme.colorScheme.onSurface,
             )
           }
