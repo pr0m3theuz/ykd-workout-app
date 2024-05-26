@@ -165,3 +165,9 @@ X
 Sapp/src/test/java/com/example/myapplication/components/exercise/ProgressionTests.kt,7/4/74d8850191203573b0ed9c99a66c7a809d46b853
 u
 Eapp/src/main/java/com/example/myapplication/utils/ProgressionUtils.kt,a/c/ac8d58b06950c93eea9caeec3c7cf46854025a3d
+v
+Fapp/src/main/java/com/example/myapplication/utils/NotificationUtils.kt,9/3/937982a08e7c8ac7efd7e8f9e3062988de6c825e
+r
+Bapp/src/main/java/com/example/myapplication/utils/AlarmReceiver.kt,2/b/2bb8c44ec7e773a93e8b195b340a506d41253f8f
+m
+=app/src/main/java/com/example/myapplication/Autoregulation.kt,f/b/fb46003744df1f45d976143e801a7d63f6927f9d

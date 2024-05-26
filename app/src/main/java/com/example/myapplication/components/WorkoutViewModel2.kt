@@ -2,6 +2,7 @@ package com.example.myapplication.components
 
 import android.app.AlarmManager
 import android.app.Application
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -15,6 +16,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.saveable.Saver
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getString
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -62,7 +64,7 @@ private const val WARM_UP_SET = 2
 const val WORKOUT_DURATION = "WORKOUT_DURATION"
 const val WORKOUT_PAUSED_ELAPSED_TIME = "WORKOUT_PAUSED_ELAPSED_TIME"
 const val TIMER_DURATION = "TIMER_DURATION"
-private const val REMAINING_TIMER_TIME = "REMAINING_TIMER_TIME"
+const val REMAINING_TIMER_TIME = "REMAINING_TIMER_TIME"
 const val WORKOUT_DETAILS = "WORKOUT_DETAILS"
 const val WORKOUT_NOTES = "WORKOUT_NOTES"
 const val EXERCISE_EXERCISE_SETS = "EXERCISE_EXERCISE_SETS"
@@ -143,6 +145,13 @@ class WorkoutViewModel(
   private val notificationManager =
     ContextCompat.getSystemService(application, NotificationManager::class.java)
       as NotificationManager
+
+  private val name = getString(application, R.string.notification_channel_id)
+  private val descriptionText = getString(application, R.string.notification_channel_id)
+  private val importance = NotificationManager.IMPORTANCE_DEFAULT
+
+  private val channel =
+    NotificationChannel("rest_timer", name, importance).apply { description = descriptionText }
 
   private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -296,6 +305,8 @@ class WorkoutViewModel(
   private fun createRestTimerNotification() {
     //    Log.i("createTimer()", "called")
     //    Log.i("elapsedRealtime()", SystemClock.elapsedRealtime().toString())
+
+    notificationManager.createNotificationChannel(channel)
 
     notificationManager.sendNotification(
       application.getString(R.string.rest_timer_running_text),

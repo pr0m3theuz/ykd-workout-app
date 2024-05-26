@@ -93,7 +93,7 @@ fun ExercisesSetsScreen(
                   workoutViewModel.updateSetReps(
                     exerciseSets = exerciseSets,
                     setUUID = setUUID,
-                    newReps = reps.toIntOrNull()
+                    newReps = reps.toIntOrNull(),
                   )
                 },
                 updateSetRIR = { rir ->
@@ -107,7 +107,7 @@ fun ExercisesSetsScreen(
                   workoutViewModel.updateSetWeight(
                     exerciseSets = exerciseSets,
                     setUUID = setUUID,
-                    newWeight = weight.toDoubleOrNull()
+                    newWeight = weight.toDoubleOrNull(),
                   )
                 },
                 isTimerRunning = false,
@@ -115,21 +115,27 @@ fun ExercisesSetsScreen(
                   workoutViewModel.updateSetType(
                     exerciseSets = exerciseSets,
                     setUUID = setUUID,
-                    setTypeID = setTypeID
+                    setTypeID = setTypeID,
                   )
                 },
                 setComplete = { setComplete ->
                   workoutViewModel.completeSet(
                     exerciseSets = exerciseSets,
                     setUUID = setUUID,
-                    completed = setComplete
+                    completed = setComplete,
                   )
                 },
-                startSetCompletedTimer = {},
+                startSetCompletedTimer = {
+                  workoutViewModel.startSetCompletedTimer(
+                    exerciseSets,
+                    setUUID,
+                    setLazyListItemID = set.lazyListItemID,
+                  )
+                },
               )
-            }
+            },
           )
-        }
+        },
       )
     },
     AddSet = { exerciseSets -> AddSet(addSet = { workoutViewModel.addSet(exerciseSets) }) },
@@ -157,7 +163,7 @@ fun ExerciseSetLazyColumn(
   SetItem: @Composable (exerciseSets: ExerciseExerciseSets, set: Set, index: Int) -> Unit,
   AddSet: @Composable (exerciseSets: ExerciseExerciseSets) -> Unit,
   AddExercise: @Composable () -> Unit,
-  CancelWorkout: @Composable () -> Unit
+  CancelWorkout: @Composable () -> Unit,
 ) {
   //  fun cancelWorkout() {
   //    workoutViewModel.cancelWorkout()
@@ -190,21 +196,13 @@ fun ExerciseSetLazyColumn(
 
     item { AddExercise() }
     if (enableCancelWorkout) item { CancelWorkout() }
-    item { Box(modifier = Modifier
-      .height(128.dp)
-      .fillMaxWidth()) }
+    item { Box(modifier = Modifier.height(128.dp).fillMaxWidth()) }
   }
 }
 
 @Composable
-fun SwipeToDismissWorkoutNote(
-  workoutNote: WorkoutNote,
-  removeWorkoutNote: () -> Unit,
-) {
+fun SwipeToDismissWorkoutNote(workoutNote: WorkoutNote, removeWorkoutNote: () -> Unit) {
   SwipeToDismissItem(onDismissRequest = { removeWorkoutNote() }, dismissStateBoolean = true) {
-    WorkoutNoteTextField(
-      workoutNote = workoutNote,
-      placeholder = "Workout Note",
-    )
+    WorkoutNoteTextField(workoutNote = workoutNote, placeholder = "Workout Note")
   }
 }

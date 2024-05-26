@@ -3,6 +3,7 @@ package com.example.myapplication.components.addExercisesList
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Error
@@ -51,29 +52,31 @@ fun ToggleableExerciseItem(
         onSelected(it)
         selectExercise(exercise, it)
       }
-    )*/,
+    )*/ ,
     headlineContent = {
       Text(
-        modifier = Modifier.clickable(
-          enabled = true,
-          onClickLabel = "See more details about ${exercise.name} ",
-          onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
-        ),
+        modifier =
+          Modifier.clickable(
+            enabled = true,
+            onClickLabel = "See more details about ${exercise.name} ",
+            onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") },
+          ),
         text = exercise.name,
         //        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onBackground,
       )
     },
     supportingContent = {
       Text(
         text = muscleGroupName ?: "-",
         //        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onBackground,
       )
     },
     trailingContent = {},
     leadingContent = {
       IconToggleButton(
+        modifier = Modifier.size(40.dp),
         checked = selected,
         onCheckedChange = {
           onSelected(it)
@@ -82,13 +85,14 @@ fun ToggleableExerciseItem(
         enabled = true,
       ) {
         Icon(
+          modifier = Modifier.size(36.dp),
           imageVector = if (selected) Icons.Filled.CheckCircle else Icons.Outlined.Error,
           tint =
-          if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-          contentDescription = if (selected) "Selected" else "No exercise image available."
+            if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+          contentDescription = if (selected) "Selected" else "No exercise image available.",
         )
       }
-    }
+    },
   )
 
   HorizontalDivider()
