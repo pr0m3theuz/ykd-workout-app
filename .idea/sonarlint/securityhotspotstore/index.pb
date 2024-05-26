@@ -171,3 +171,5 @@ r
 Bapp/src/main/java/com/example/myapplication/utils/AlarmReceiver.kt,2/b/2bb8c44ec7e773a93e8b195b340a506d41253f8f
 m
 =app/src/main/java/com/example/myapplication/Autoregulation.kt,f/b/fb46003744df1f45d976143e801a7d63f6927f9d
+Å
+Qapp/src/main/java/com/example/myapplication/components/setRestTimer/TimerClock.kt,d/8/d85fdbdb1714980e86d6c93c8563e843fdcdd080

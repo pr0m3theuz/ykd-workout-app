@@ -18,18 +18,11 @@ private val FLAGS = 0
  *
  * @param context, activity context.
  */
-fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context) {
-  /*// TODO: Step 1.11 create intent
-   val contentIntent = Intent(applicationContext, MainActivity::class.java)
-
-  // TODO: Step 1.12 create PendingIntent
-  val contentPendingIntent = PendingIntent.getActivity(
-      applicationContext,
-      NOTIFICATION_ID,
-      contentIntent,
-      PendingIntent.FLAG_IMMUTABLE
-  )*/
-
+fun NotificationManager.sendNotification(
+  messageBody: String,
+  applicationContext: Context,
+  silent: Boolean,
+) {
   // TODO: Step 1.11 create intent
   val intent = MainActivity.newIntent(applicationContext)
 
@@ -61,7 +54,10 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
       .setContentTitle(resources.getString(R.string.new_timer_title))
       .setContentText(messageBody)
       .setContentIntent(pendingIntent)
-      .setAutoCancel(true)
+      .setOnlyAlertOnce(true)
+      .setAutoCancel(false)
+      .setOngoing(true)
+      .setSilent(silent)
       .setPriority(NotificationCompat.PRIORITY_HIGH)
 
   // TODO: Step 1.3 set title, text and icon to builder

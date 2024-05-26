@@ -43,6 +43,7 @@ import com.example.myapplication.data.model.updateSetType
 import com.example.myapplication.data.model.updateSetWeight
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.utils.AlarmReceiver
+import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.newID
 import com.example.myapplication.utils.sendNotification
 import io.realm.kotlin.ext.toRealmList
@@ -278,6 +279,12 @@ class WorkoutViewModel(
               _remainingTimeProgress.value =
                 _remainingTimerTime.toFloat().div(_timerDuration.toFloat())
 
+              notificationManager.sendNotification(
+                messageBody = "Remaining Time: ${_remainingTimerTimeString.value}",
+                application,
+                silent = true,
+              )
+
               /*              Log.i("Timer: ", timerVersion)
               Log.i("TimerState: ", _timerState.value.name)
 
@@ -308,23 +315,21 @@ class WorkoutViewModel(
 
     notificationManager.createNotificationChannel(channel)
 
-    notificationManager.sendNotification(
-      application.getString(R.string.rest_timer_running_text),
-      application,
-    )
+    //    notificationManager.sendNotification("Remaining Time: $", application)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun startRestTimer(time: Duration) {
     //    Log.i("startRestTimer() ", "called")
     _timerDuration = time.inWholeMilliseconds
-
+    notificationManager.cancelNotifications()
     createRestTimerNotification()
     createTimer(_timerDuration)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun startLastTimer() {
+    notificationManager.cancelNotifications()
     createRestTimerNotification()
     createTimer(_timerDuration)
   }
@@ -338,7 +343,6 @@ class WorkoutViewModel(
     setLazyListItemID: Long,
   ) {
     //    Log.i("startSetCompletedTimer() ", "called")
-
     val exercise = exerciseSet.exercise
     val set = exerciseSet.sets.first { it.uuid == setUUID }
     // Only allows new completed sets to start the timer once
@@ -350,9 +354,11 @@ class WorkoutViewModel(
       if (exercise != null && _state != TimerState.RUNNING) {
         if (exercise.warmUpSetRestTimerEnabled && (set.setTypeID == WARM_UP_SET)) {
           _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
+
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
         } else if (exercise.workingSetRestTimerEnabled && (set.setTypeID != WARM_UP_SET)) {
           _timerDuration = exercise.workingSetRestInWholeMilliseconds
+
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
         }
       }

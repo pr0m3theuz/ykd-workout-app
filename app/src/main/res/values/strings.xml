@@ -4,7 +4,7 @@
     <string name="notification_channel_name">Rest Timer</string>
     <string name="new_timer_title">Rest Timer</string>
     <string name="rest_timer_running_text">Remaining Time: </string>
-    <string name="rest_timer_ended_text">Rest Timer Finished! Start Next Set!</string>
+    <string name="rest_timer_ended_text">Rest timer finished! Start the next set!</string>
     <string name="profile">Profile</string>
     <string name="history">History</string>
     <string name="workout">Workout</string>
