@@ -1,7 +1,6 @@
 package com.example.myapplication.components.exercise
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -311,7 +310,7 @@ fun SetContentFrame(
 private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, setIndex: String) {
   var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
 
-  var iconText by remember {
+  val iconText by remember {
     mutableStateOf(
       when (setTypeID) {
         1 -> setIndex
@@ -361,8 +360,8 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
       onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
       updateSetType = { setTypeID -> updateSetType(setTypeID) },
       changeIconText = { abbreviation ->
-        iconText = abbreviation
-        Log.i("setTypeAbbreviation", "setType iconText: $iconText")
+        //        iconText = abbreviation
+        //        Log.i("setTypeAbbreviation", "setType iconText: $iconText")
       },
     )
   }

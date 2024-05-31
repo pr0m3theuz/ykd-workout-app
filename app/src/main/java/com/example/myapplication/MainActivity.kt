@@ -38,18 +38,17 @@ import kotlinx.serialization.ExperimentalSerializationApi
 
 class MainActivity : ComponentActivity() {
 
-//  private lateinit var firebaseAnalytics: FirebaseAnalytics
+  //  private lateinit var firebaseAnalytics: FirebaseAnalytics
 
   @RequiresApi(Build.VERSION_CODES.S)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-//    firebaseAnalytics = Firebase.analytics
+    //    firebaseAnalytics = Firebase.analytics
 
-    //New Relic
-    NewRelic.withApplicationToken(
-      "eu01xx7700dce7ae53e2b20b7cc382fcba147c93ae-NRMA"
-    ).start(this.applicationContext)
+    // New Relic
+    NewRelic.withApplicationToken("eu01xx7700dce7ae53e2b20b7cc382fcba147c93ae-NRMA")
+      .start(this.applicationContext)
 
     setContent {
       MyApplicationTheme {
@@ -58,9 +57,7 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = Screens.Programs.route) {
           addExercisesGraph(navController)
-          addWorkoutGraph(
-            navController, /*viewModelStoreOwner*/
-          )
+          addWorkoutGraph(navController /*viewModelStoreOwner*/)
           addWorkoutSummaryGraph(navController)
           addProgramsGraph(navController)
           addHistoryGraph(navController)
@@ -79,19 +76,21 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addWorkoutGraph(
-  navController: NavController,
+  navController: NavController
   //  viewModel: WorkoutViewModel,
   //  viewModelStoreOwner: ViewModelStoreOwner
 ) {
   navigation(
     "workoutScreen?workoutID={workoutID}",
     route = "workout?workoutID={workoutID}",
-    arguments = listOf(navArgument("workoutID") { type = NavType.StringType })
+    arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
   ) {
     composable("workoutScreen?workoutID={workoutID}") { navBackStackEntry ->
       Log.i("WorkoutNavGraph", "Navigated to Workout Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       WorkoutScreen(
+        // TODO This is an anti-pattern
+        // https://developer.android.com/guide/navigation/use-graph/navigate
         navController = navController,
         workoutID = workoutID,
       )
@@ -104,20 +103,24 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
+          // TODO This is an anti-pattern
+          // https://developer.android.com/guide/navigation/use-graph/navigate
           navController = navController,
           workoutID = workoutID,
-          workoutsCount = workoutsCount
+          workoutsCount = workoutsCount,
         )
       }
     }
 
     composable(
       "exerciseDetails/{exerciseID}",
-      arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
+      arguments = listOf(navArgument("exerciseID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
       Log.i("WorkoutNavGraph", "Navigated to Exercise Details Screen")
       navBackStackEntry.arguments?.getString("exerciseID")?.let {
         ExerciseDetailsScreen(
+          // TODO This is an anti-pattern
+          // https://developer.android.com/guide/navigation/use-graph/navigate
           navController,
           exerciseID = it,
         )
@@ -132,15 +135,19 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
 
     composable("exercisesList") {
       ExercisesLazyColumn(
-        navController = navController,
+        // TODO This is an anti-pattern
+        // https://developer.android.com/guide/navigation/use-graph/navigate
+        navController = navController
       )
     }
     composable(
       "exerciseDetails/{exerciseID}",
-      arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
+      arguments = listOf(navArgument("exerciseID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("exerciseID")?.let {
         ExerciseDetailsScreen(
+          // TODO This is an anti-pattern
+          // https://developer.android.com/guide/navigation/use-graph/navigate
           navController,
           exerciseID = it,
         )
@@ -155,10 +162,12 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 
     composable(
       "programDetails/{programID}",
-      arguments = listOf(navArgument("programID") { type = NavType.StringType })
+      arguments = listOf(navArgument("programID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("programID")?.let {
         ProgramDetailsScreen(
+          // TODO This is an anti-pattern
+          // https://developer.android.com/guide/navigation/use-graph/navigate
           navController,
           programID = it,
         )
@@ -198,7 +207,7 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
         WorkoutSummaryScreen(
           navController = navController,
           workoutID = workoutID,
-          workoutsCount = workoutsCount
+          workoutsCount = workoutsCount,
         )
       }
     }
@@ -210,9 +219,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
   navigation("historyScreen", route = "history") {
     composable("historyScreen") { navBackStackEntry ->
       Log.i("HistoryNavGraph", "Navigated to History Screen")
-      HistoryScreen(
-        navController = navController,
-      )
+      HistoryScreen(navController = navController)
     }
 
     composable(route = "history?overviewWorkout={workoutID}") { navBackStackEntry ->

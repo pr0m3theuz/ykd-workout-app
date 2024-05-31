@@ -54,7 +54,7 @@ fun WorkoutSummaryScreen(
   navController: NavController,
   workoutViewModel: WorkoutViewModel = koinViewModel(),
   workoutID: String,
-  workoutsCount: Int
+  workoutsCount: Int,
 ) {
   workoutViewModel.getCompletedWorkout(ObjectId.invoke(workoutID))
   val completedWorkout by workoutViewModel.completedWorkout.collectAsStateWithLifecycle()
@@ -63,7 +63,7 @@ fun WorkoutSummaryScreen(
   Log.i("WorkoutSummaryScreen", "workoutID: $workoutID")
   Log.i("WorkoutSummaryScreen", "completedWorkout: ${Json.encodeToString(completedWorkout)}")
 
-//  Log.i("WorkoutSummaryScreen", "workoutViewModel: $workoutViewModel")
+  //  Log.i("WorkoutSummaryScreen", "workoutViewModel: $workoutViewModel")
 
   Scaffold(
     topBar = {
@@ -73,19 +73,23 @@ fun WorkoutSummaryScreen(
           IconButton(
             onClick = {
               /*TODO Navigate to Previous Screen */
+              // TODO This is an anti-pattern
+              // https://developer.android.com/guide/navigation/use-graph/navigate
               navController.navigate("programs") { popUpTo("programs") { inclusive = false } }
-            },
+            }
           ) {
             Icon(
               imageVector = Icons.Default.Close,
               tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen"
+              contentDescription = "Go to the previous screen",
             )
           }
         },
         actions = {},
       )
     },
+    // TODO This is an anti-pattern
+    // https://developer.android.com/guide/navigation/use-graph/navigate
     bottomBar = { BottomNavigationBar(navController = navController) },
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
@@ -97,7 +101,9 @@ fun WorkoutSummaryScreen(
           workoutViewModel,
         )
       } /*else {
-        navController.navigate("programs")*//* { popUpTo("programs") { inclusive = false } }*//*
+        navController.navigate("programs")*/
+      /* { popUpTo("programs") { inclusive = false } }*/
+      /*
       }*/
     }
   }
@@ -112,31 +118,21 @@ fun WorkoutSummaryContent(
   workoutViewModel: WorkoutViewModel,
 ) {
 
-
   Surface {
     Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
+      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(24.dp),
-        horizontalArrangement = Arrangement.Center
+        modifier = Modifier.fillMaxWidth().padding(24.dp),
+        horizontalArrangement = Arrangement.Center,
       ) {
-        Text(
-          text = "You crushed it!",
-          style = MaterialTheme.typography.titleLarge,
-        )
+        Text(text = "You crushed it!", style = MaterialTheme.typography.titleLarge)
       }
 
       Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(0.dp),
-        horizontalArrangement = Arrangement.Center
+        modifier = Modifier.fillMaxWidth().padding(0.dp),
+        horizontalArrangement = Arrangement.Center,
       ) {
         //        TODO Query Workout Count
         Text(text = "You completed your ${workoutsCount + 1} workout!")
@@ -153,39 +149,38 @@ fun WorkoutSummaryContent(
 fun WorkoutSummaryCard(
   completedWorkout: Workout,
   userDefaultWeightUnit: String,
-  getExercise: (exerciseID: ObjectId?) -> Exercise?
+  getExercise: (exerciseID: ObjectId?) -> Exercise?,
 ) {
   val totalSets = completedWorkout.totalSets()
-  val totalVolume = doubleFormatted(
-    when (userDefaultWeightUnit) {
-      "kg" -> completedWorkout.totalVolumeInKilograms
-      else -> completedWorkout.totalVolumeInPounds
-    }
-  )
+  val totalVolume =
+    doubleFormatted(
+      when (userDefaultWeightUnit) {
+        "kg" -> completedWorkout.totalVolumeInKilograms
+        else -> completedWorkout.totalVolumeInPounds
+      }
+    )
 
   Card(modifier = Modifier.padding(vertical = 0.dp)) {
     Column(modifier = Modifier.padding(8.dp)) {
-      Row {
-        Text(text = "${completedWorkout.name}", style = MaterialTheme.typography.titleMedium)
-      }
+      Row { Text(text = "${completedWorkout.name}", style = MaterialTheme.typography.titleMedium) }
 
       Row {
         Text(
           text = completedWorkout.formatWorkoutDate(),
-          style = MaterialTheme.typography.bodyMedium
+          style = MaterialTheme.typography.bodyMedium,
         )
       }
 
       Row(
         modifier = Modifier.padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceAround
+        horizontalArrangement = Arrangement.SpaceAround,
       ) {
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
           Column {
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center
+              horizontalArrangement = Arrangement.Center,
             ) {
               Icon(Icons.Filled.Timer, contentDescription = null)
               Text(text = "Duration")
@@ -193,7 +188,7 @@ fun WorkoutSummaryCard(
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center
+              horizontalArrangement = Arrangement.Center,
             ) {
               Text(text = completedWorkout.formatWorkoutDuration())
             }
@@ -205,7 +200,7 @@ fun WorkoutSummaryCard(
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center
+              horizontalArrangement = Arrangement.Center,
             ) {
               val weightIcon = painterResource(R.drawable.weight_fill1_wght400_grad0_opsz24)
               //                  Image(painter = weightIcon, contentDescription = null)
@@ -215,7 +210,7 @@ fun WorkoutSummaryCard(
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center
+              horizontalArrangement = Arrangement.Center,
             ) {
               // TODO Get Default Weight Unit from User Settings
               Text(text = "$totalVolume $userDefaultWeightUnit")
@@ -228,7 +223,7 @@ fun WorkoutSummaryCard(
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center
+              horizontalArrangement = Arrangement.Center,
             ) {
               Icon(Icons.Filled.FormatListNumbered, contentDescription = null)
               Text(text = "Sets")
@@ -236,7 +231,7 @@ fun WorkoutSummaryCard(
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center
+              horizontalArrangement = Arrangement.Center,
             ) {
               Text(text = "$totalSets")
             }
@@ -247,12 +242,11 @@ fun WorkoutSummaryCard(
       val backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
       Row(
         modifier =
-        Modifier
-          .fillMaxWidth()
-          .border(4.dp, backgroundColor)
-          .padding(4.dp)
-          .background(color = backgroundColor),
-        verticalAlignment = Alignment.CenterVertically
+          Modifier.fillMaxWidth()
+            .border(4.dp, backgroundColor)
+            .padding(4.dp)
+            .background(color = backgroundColor),
+        verticalAlignment = Alignment.CenterVertically,
       ) {
         val style = MaterialTheme.typography.titleMedium
         Text(text = "Exercise", style = style, modifier = Modifier.weight(1f))
@@ -262,10 +256,8 @@ fun WorkoutSummaryCard(
         // TODO Seperate from WorkoutViewModel
         val exercise = getExercise(exerciseSets.exerciseID)
         Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp, horizontal = 4.dp),
-          verticalAlignment = Alignment.CenterVertically
+          modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp, horizontal = 4.dp),
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
           val style = MaterialTheme.typography.bodyMedium
@@ -274,19 +266,17 @@ fun WorkoutSummaryCard(
           val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
           val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
 
-
-
           Text(
             text = "${exerciseSets.sets.size} × ${exercise?.name ?: ""}",
             style = style,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
           )
 
           Text(
             // RIR
             text = maxWeight.setTextRIR(weightUnit),
             style = style,
-            modifier = Modifier.weight(0.5f)
+            modifier = Modifier.weight(0.5f),
           )
         }
       }

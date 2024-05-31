@@ -3,10 +3,19 @@ package com.example.myapplication.utils
 import com.example.myapplication.data.model.ExerciseSets
 
 // TODO Update Implementations
+// TODO figure out to implement this. most likely post workout completion,
+//  update exercise in the next workout in the program/block that is using the same progression
+// scheme
+//  Show the updated next workout based on progression scheme,
+//  Ask user to review and accept changes, otherwise keep the workout the same
+
+// TODO add way to track failures, i.e. not able to meet target reps and RIR with the target weight
+//  propose user deloads after a number of failures
+//  Add deload week dynamically, ask user to accept or reject proposed deload weeks
 
 // Double Progression Feature
 fun ExerciseSets.doubleProgression(
-/*int targetRepetitionRangeMin, int targetRepetitionRangeMax, int incrementWeight*/ ) {
+/* targetRepetitionRangeMin: Int, targetRepetitionRangeMax: Int, incrementWeight: Int*/ ) {
   val targetRepetitionRangeMin = 12
   val targetRepetitionRangeMax = 15
   val incrementWeight = 5.0
