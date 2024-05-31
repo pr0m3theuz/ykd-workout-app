@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text2.BasicTextField2
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Error
@@ -83,14 +83,9 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.S)
-@OptIn(
-  ExperimentalFoundationApi::class,
-  ExperimentalMaterial3Api::class,
-)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen(
-  navController: NavController,
-) {
+fun HistoryScreen(navController: NavController) {
   //    val selectedCategoriesMap by
   // exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
   //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
@@ -116,7 +111,7 @@ fun HistoryScreen(
             textAlign = TextAlign.Center,
             //                    modifier = Modifier.align(Alignment.CenterVertically),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
           )
         },
         navigationIcon = {
@@ -126,12 +121,12 @@ fun HistoryScreen(
               navController.navigateUp()
               Toast.makeText(context, "TODO: Navigate to Previous Screen", Toast.LENGTH_SHORT)
                 .show()
-            },
+            }
           ) {
             Icon(
               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen"
+              contentDescription = "Go to the previous screen",
             )
           }
         },
@@ -140,12 +135,12 @@ fun HistoryScreen(
           IconButton(
             onClick = { setSearchBarVisibility(!searchBarVisibility) },
             enabled = true,
-            colors = iconColors
+            colors = iconColors,
           ) {
             Icon(
               imageVector = Icons.Outlined.Search,
               tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Search Exercises"
+              contentDescription = "Search Exercises",
             )
           }
           //          TODO ExercisesFilterMenu(/*modifier =
@@ -161,10 +156,10 @@ fun HistoryScreen(
           SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             inputFieldColors =
-            TextFieldDefaults.colors(
-              unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-              unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
-            )
+              TextFieldDefaults.colors(
+                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+              ),
           )
         /*
         AnimatedVisibility(
@@ -190,12 +185,10 @@ fun HistoryScreen(
             Icon(
               Icons.Default.Search,
               contentDescription = null,
-              tint = MaterialTheme.colorScheme.onSecondaryContainer
+              tint = MaterialTheme.colorScheme.onSecondaryContainer,
             )
           },
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         ) {}
         //        }
 
@@ -224,26 +217,22 @@ fun HistoryScreen(
 
         HistoryLazyColumn(navController = navController)
       }
-    }
+    },
   )
 }
 
 @Composable
 fun NoWorkoutsPerformed() {
   Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(top = 24.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
+    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     //    LinearProgressIndicator(
     //      modifier = Modifier.semantics(mergeDescendants = true) {}.padding(10.dp),
     //    )
     Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 24.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
+      modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Text("No Workouts Performed!")
     }
@@ -254,7 +243,7 @@ fun NoWorkoutsPerformed() {
 @Composable
 fun HistoryLazyColumn(
   historyViewModel: HistoryViewModel = koinViewModel(),
-  navController: NavController
+  navController: NavController,
 ) {
 
   val workouts by historyViewModel.workouts.collectAsState()
@@ -279,7 +268,7 @@ fun HistoryLazyColumn(
         stickyHeader {
           Text(
             modifier = Modifier.padding(0.dp),
-            text = month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+            text = month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
           )
         }
 
@@ -289,19 +278,19 @@ fun HistoryLazyColumn(
         items(monthWorkouts) { workout ->
           Box(
             modifier =
-            Modifier.clickable(
-              onClick = {
-                navController.navigate("history?overviewWorkout=${workout._id.toHexString()}")
-              },
-              enabled = true,
-              interactionSource = remember { MutableInteractionSource() },
-              indication = LocalIndication.current,
-            )
+              Modifier.clickable(
+                onClick = {
+                  navController.navigate("history?overviewWorkout=${workout._id.toHexString()}")
+                },
+                enabled = true,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = LocalIndication.current,
+              )
           ) {
             WorkoutSummaryCard(
               completedWorkout = workout,
               userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
-              getExercise = { exerciseID -> historyViewModel.getExerciseByExerciseID(exerciseID) }
+              getExercise = { exerciseID -> historyViewModel.getExerciseByExerciseID(exerciseID) },
             )
           }
         }
@@ -332,7 +321,7 @@ fun WorkoutOverview(
     workout?.let { itWorkout ->
       ConfirmDeleteWorkout(
         onDismissRequest = { setOpenDeleteWorkoutDialog(false) },
-        deleteWorkout = { historyViewModel.deleteWorkout(itWorkout) }
+        deleteWorkout = { historyViewModel.deleteWorkout(itWorkout) },
       )
     }
   }
@@ -346,20 +335,15 @@ fun WorkoutOverview(
             TopAppBar(
               title = {
                 itWorkout.name?.let { workoutName ->
-                  Text(
-                    text = workoutName,
-                    style = MaterialTheme.typography.titleLarge,
-                  )
+                  Text(text = workoutName, style = MaterialTheme.typography.titleLarge)
                 }
               },
               navigationIcon = {
-                IconButton(
-                  onClick = { navController.navigateUp() },
-                ) {
+                IconButton(onClick = { navController.navigateUp() }) {
                   Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                     tint = MaterialTheme.colorScheme.onSurface,
-                    contentDescription = "Go to the previous screen"
+                    contentDescription = "Go to the previous screen",
                   )
                 }
               },
@@ -369,7 +353,7 @@ fun WorkoutOverview(
                     navController.navigate("history?editWorkout=${itWorkout._id.toHexString()}")
                   },
                   deleteWorkout = { setOpenDeleteWorkoutDialog(true) },
-                  saveWorkoutAsTemplate = { /* TODO Create Save Workout As Template Function */ },
+                  saveWorkoutAsTemplate = { /* TODO Create Save Workout As Template Function */},
                   //              workoutNameDialog = {}
                 )
               },
@@ -377,9 +361,7 @@ fun WorkoutOverview(
           },
           bottomBar = {
             Button(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+              modifier = Modifier.fillMaxWidth().padding(12.dp),
               onClick = {
                 navController.navigate("workout?workoutID=${itWorkout._id.toHexString()}") {
                   popUpTo(navController.graph.findStartDestination().id) { saveState = true }
@@ -389,7 +371,7 @@ fun WorkoutOverview(
                   // Restore state when reselecting a previously selected item
                   restoreState = true
                 }
-              }
+              },
             ) {
               Text(text = "Perform Again")
             }
@@ -398,32 +380,28 @@ fun WorkoutOverview(
         ) { contentPadding ->
           Column(
             Modifier.padding(contentPadding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
           ) {
             Column(Modifier.padding(horizontal = 12.dp)) {
               Row(
-                modifier = Modifier
-                  .padding()
-                  .fillMaxWidth(),
+                modifier = Modifier.padding().fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
               ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
                   Text(itWorkout.formatLongWorkoutStarted())
                 }
               }
               Row(
-                modifier = Modifier
-                  .padding()
-                  .fillMaxWidth(),
+                modifier = Modifier.padding().fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
               ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
                   Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                   ) {
                     Icon(Icons.Filled.Timer, contentDescription = null)
                     Text(text = itWorkout.formatWorkoutDuration())
@@ -433,13 +411,13 @@ fun WorkoutOverview(
                   Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                   ) {
                     val weightIcon = painterResource(R.drawable.weight_fill1_wght400_grad0_opsz24)
                     Icon(painter = weightIcon, contentDescription = null)
                     Text(
                       text =
-                      "${
+                        "${
                         doubleFormatted(
                           when (userDefaultWeightUnit) {
                             "kg" -> itWorkout.totalVolumeInKilograms
@@ -462,15 +440,13 @@ fun WorkoutOverview(
               }
 
               exerciseExerciseSets.forEach { exerciseSets ->
-                Box(modifier = Modifier
-                  .padding(vertical = 12.dp)
-                  .fillMaxWidth()) {
+                Box(modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth()) {
                   Column(modifier = Modifier.fillMaxWidth()) {
                     Row {
                       Text(
                         modifier = Modifier.padding(vertical = 8.dp),
                         text = exerciseSets.exercise?.name ?: "Exercise Name",
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                       )
                     }
                     exerciseSets.sets.forEach { set ->
@@ -478,7 +454,7 @@ fun WorkoutOverview(
                       Row {
                         Text(
                           text = "${set.setNumber}   ${set.setTextRIR(userDefaultWeightUnit)}",
-                          style = MaterialTheme.typography.bodyMedium
+                          style = MaterialTheme.typography.bodyMedium,
                         )
                       }
                     }
@@ -520,7 +496,7 @@ fun EditWorkoutScreen(
   if (openSaveChangesDialog) {
     ConfirmChangesToWorkout(
       onDismissRequest = { setOpenSaveChangesDialog(false) },
-      saveWorkout = { workoutViewModel.saveWorkout() }
+      saveWorkout = { workoutViewModel.saveWorkout() },
     )
   }
 
@@ -530,21 +506,19 @@ fun EditWorkoutScreen(
         TopAppBar(
           title = {
             workoutName?.let { workoutName ->
-              BasicTextField2(
+              BasicTextField(
                 value = workoutName,
                 textStyle = MaterialTheme.typography.titleLarge,
-                onValueChange = { newName -> workoutViewModel.setWorkoutName(newName) }
+                onValueChange = { newName -> workoutViewModel.setWorkoutName(newName) },
               )
             }
           },
           navigationIcon = {
-            IconButton(
-              onClick = { navController.navigateUp() },
-            ) {
+            IconButton(onClick = { navController.navigateUp() }) {
               Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                 tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = "Go to the previous screen"
+                contentDescription = "Go to the previous screen",
               )
             }
           },
@@ -552,7 +526,7 @@ fun EditWorkoutScreen(
             WorkoutOptionsDropdownMenu(
               addWorkoutNote = { workoutViewModel.addWorkoutNote() },
               enableWorkoutNameTextfield = {},
-              workoutNameDialog = {}
+              workoutNameDialog = {},
             )
           },
         )
@@ -562,32 +536,28 @@ fun EditWorkoutScreen(
           Icon(imageVector = Icons.Filled.Save, contentDescription = "Save Changes")
         }
       },
-      bottomBar = { /*BottomNavigationBar(navController = navController) */ },
+      bottomBar = { /*BottomNavigationBar(navController = navController) */},
     ) { contentPadding ->
       Column(Modifier.padding(contentPadding), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
-          modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .fillMaxWidth(),
+          modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
             Text(itWorkout.formatLongWorkoutStarted())
           }
         }
         Row(
-          modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .fillMaxWidth(),
+          modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(4.dp)
+              horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
               Icon(Icons.Filled.Timer, contentDescription = null)
               Text(text = itWorkout.formatWorkoutDuration())
@@ -646,7 +616,7 @@ fun EditWorkoutScreen(
                         set.setNumber?.let { setNumber ->
                           workoutViewModel.populatePreviousSetField(
                             exercise._id,
-                            setNumber = setNumber
+                            setNumber = setNumber,
                           )
                         }
                       }
@@ -655,7 +625,7 @@ fun EditWorkoutScreen(
                       workoutViewModel.updateSetReps(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
-                        newReps = reps.toIntOrNull()
+                        newReps = reps.toIntOrNull(),
                       )
                     },
                     updateSetRIR = { rir ->
@@ -669,7 +639,7 @@ fun EditWorkoutScreen(
                       workoutViewModel.updateSetWeight(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
-                        newWeight = weight.toDoubleOrNull()
+                        newWeight = weight.toDoubleOrNull(),
                       )
                     },
                     isTimerRunning = false,
@@ -677,19 +647,19 @@ fun EditWorkoutScreen(
                       workoutViewModel.updateSetType(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
-                        setTypeID = setTypeID
+                        setTypeID = setTypeID,
                       )
                     },
                     setComplete = { setComplete ->
                       workoutViewModel.completeSet(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
-                        completed = setComplete
+                        completed = setComplete,
                       )
                     },
                     startSetCompletedTimer = {},
                   )
-                }
+                },
               )
             },
             AddSet = { exerciseSets -> AddSet(addSet = { workoutViewModel.addSet(exerciseSets) }) },
@@ -719,7 +689,7 @@ fun ConfirmChangesToWorkout(onDismissRequest: () -> Unit, saveWorkout: () -> Uni
         Text("Save")
       }
     },
-    dismissButton = { TextButton(onClick = { onDismissRequest() }) { Text("Cancel") } }
+    dismissButton = { TextButton(onClick = { onDismissRequest() }) { Text("Cancel") } },
   )
 }
 
@@ -740,18 +710,16 @@ fun ConfirmDeleteWorkout(onDismissRequest: () -> Unit, deleteWorkout: () -> Unit
         Text("Delete")
       }
     },
-    dismissButton = { TextButton(onClick = { onDismissRequest() }) { Text("Cancel") } }
+    dismissButton = { TextButton(onClick = { onDismissRequest() }) { Text("Cancel") } },
   )
 }
 
 @Composable
 fun NoWorkoutFound() {
   Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .padding(16.dp),
+    modifier = Modifier.fillMaxSize().padding(16.dp),
     verticalArrangement = Arrangement.Center,
-    horizontalAlignment = Alignment.CenterHorizontally
+    horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Icon(imageVector = Icons.Filled.Error, contentDescription = null)
     Text(text = "No Workout Found!")

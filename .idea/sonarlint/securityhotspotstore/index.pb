@@ -173,3 +173,17 @@ m
 =app/src/main/java/com/example/myapplication/Autoregulation.kt,f/b/fb46003744df1f45d976143e801a7d63f6927f9d
 Å
 Qapp/src/main/java/com/example/myapplication/components/setRestTimer/TimerClock.kt,d/8/d85fdbdb1714980e86d6c93c8563e843fdcdd080
+Ü
+Vapp/src/main/java/com/example/myapplication/components/setRestTimer/BackspaceButton.kt,6/3/6361587110c7f1636bc284982b8f76d386b9772c
+ã
+[app/src/main/java/com/example/myapplication/components/setRestTimer/BackspaceButtonOnTap.kt,3/6/36bea874e0ea36fc9f975fccbcf20df641fa9cd6
+Ü
+Vapp/src/main/java/com/example/myapplication/components/setRestTimer/RestTimerButton.kt,0/a/0a680d9dec4e7176cadc8d501ffd2bb346f1f3d4
+å
+\app/src/main/java/com/example/myapplication/components/setRestTimer/ManualRestTimerDialog.kt,d/0/d0c24036f5cc426ce527c31995afbc7b45a5444e
+ô
+iapp/src/main/java/com/example/myapplication/components/workoutDialogs/workingSets/WorkingSetLazyColumn.kt,e/1/e14163998906a3713cd2942abd4c15dd85adf77f
+Ö
+Uapp/src/main/java/com/example/myapplication/components/setRestTimer/TimerNumberPad.kt,9/c/9c6004241e7001b691b9c2424ebe7ea17678eb94
+m
+=app/src/main/java/com/example/myapplication/ui/theme/Theme.kt,d/8/d8ca91a4890a5a2e69e781e217ce67d6242e6bee
