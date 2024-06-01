@@ -1,26 +1,40 @@
 package com.example.myapplication.components.workoutDialogs
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -28,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.example.myapplication.ui.theme.White
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
@@ -63,11 +78,7 @@ fun calculatePercentage(percentage: String): Pair<String, Double> {
  *
  * from ChatGPT
  */
-fun calculateNewSetResults(
-  weight: Double?,
-  percentage: Double?,
-  repetitionsText: String,
-): String {
+fun calculateNewSetResults(weight: Double?, percentage: Double?, repetitionsText: String): String {
   // Constants for formatting the string
   val workingWeightXRepetitions = "%s x %s"
 
@@ -84,11 +95,9 @@ fun calculateNewSetResults(
     newWorkingWeight?.minus(roundedNewWorkingWeight!!) == 0.0 -> {
       workingWeightXRepetitions.format(roundedNewWorkingWeight, repetitionsText)
     }
-
     formattedNewWorkingWeight.minus(roundedFormattedNewWorkingWeight) == 0.0 -> {
       workingWeightXRepetitions.format(roundedFormattedNewWorkingWeight, repetitionsText)
     }
-
     else -> {
       workingWeightXRepetitions.format(formattedNewWorkingWeight, repetitionsText)
     }
@@ -96,50 +105,38 @@ fun calculateNewSetResults(
 }
 
 @Composable
-fun RoundedBox(
-  modifier: Modifier,
-  content: @Composable () -> Unit,
-) {
+fun RoundedBox(modifier: Modifier, content: @Composable () -> Unit) {
   Box(modifier = modifier, propagateMinConstraints = true, contentAlignment = Alignment.Center) {
     content()
   }
 }
 
 @Composable
-fun Textfield(
-  text: String,
-  onValueChange: (String) -> Unit,
-) {
+fun Textfield(text: String, onValueChange: (String) -> Unit) {
   BasicTextField(
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
-    TextStyle(
-      fontSize = 4.em,
-      textAlign = TextAlign.Center,
-      color = MaterialTheme.colorScheme.onBackground
-    ),
+      TextStyle(
+        fontSize = 4.em,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onBackground,
+      ),
     //                placeholder = { Text(warmUpSet.exerciseWeight.toString())},
     keyboardOptions =
-    KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
     value = text,
-    onValueChange = { onValueChange(it) }
+    onValueChange = { onValueChange(it) },
   )
 }
 
 @Composable
-fun SetTypeButton(
-  setTypeText: String,
-  setTypeColor: Color,
-  onClick: () -> Unit,
-) {
+fun SetTypeButton(setTypeText: String, setTypeColor: Color, onClick: () -> Unit) {
   Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
     Button(
-      modifier = Modifier
-        .padding(8.dp)
-        .size(32.dp),
+      modifier = Modifier.padding(8.dp).size(32.dp),
       shape = RoundedCornerShape(size = 8.dp),
       contentPadding = PaddingValues(0.dp),
-      onClick = onClick
+      onClick = onClick,
     ) {
       Text(text = setTypeText, color = setTypeColor)
     }
@@ -159,11 +156,10 @@ fun SetContent(
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.Start,
-    verticalAlignment = Alignment.CenterVertically
+    verticalAlignment = Alignment.CenterVertically,
   ) {
     val textfieldModifier =
-      Modifier
-        .padding(4.dp)
+      Modifier.padding(4.dp)
         .clip(RoundedCornerShape(8.dp))
         .background(MaterialTheme.colorScheme.secondaryContainer)
         .align(Alignment.CenterVertically)
@@ -171,8 +167,7 @@ fun SetContent(
         .weight(1f, fill = false)
 
     val resultsModifier =
-      Modifier
-        .padding(4.dp)
+      Modifier.padding(4.dp)
         .align(Alignment.CenterVertically)
         .width(96.dp)
         .wrapContentSize(Alignment.Center)
@@ -180,9 +175,7 @@ fun SetContent(
 
     SetTypeButton(setTypeText, setTypeColor) {}
 
-    RoundedBox(
-      textfieldModifier.width(84.dp),
-    ) {
+    RoundedBox(textfieldModifier.width(84.dp)) {
       Textfield(text = percentageText, onValueChange = onPercentageTextChanged)
     }
 
@@ -201,81 +194,62 @@ fun SetsHeaderRow() {
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.Start,
-    verticalAlignment = Alignment.CenterVertically
+    verticalAlignment = Alignment.CenterVertically,
   ) {
     Box(
-      modifier = Modifier
-        .padding(PaddingValues(horizontal = 4.dp))
-        .width(42.dp),
+      modifier = Modifier.padding(PaddingValues(horizontal = 4.dp)).width(42.dp),
       contentAlignment = Alignment.Center,
     ) {
       Text("Set")
     }
 
     Box(
-      modifier = Modifier
-        .width(84.dp)
-        .padding(PaddingValues(horizontal = 4.dp)),
-      contentAlignment = Alignment.Center
+      modifier = Modifier.width(84.dp).padding(PaddingValues(horizontal = 4.dp)),
+      contentAlignment = Alignment.Center,
     ) {
       Text("Percent (%)")
     }
 
     Box(
-      modifier =
-      Modifier
-        .padding(PaddingValues(horizontal = 4.dp))
-        .width(60.dp),
-      contentAlignment = Alignment.Center
+      modifier = Modifier.padding(PaddingValues(horizontal = 4.dp)).width(60.dp),
+      contentAlignment = Alignment.Center,
     ) {
       Text("Reps")
     }
 
     // Blank Space
     Box(
-      modifier =
-      Modifier
-        .padding(PaddingValues(horizontal = 4.dp))
-        .width(60.dp),
-      contentAlignment = Alignment.Center
-    ) { /* TODO Put appropriate text here */ }
+      modifier = Modifier.padding(PaddingValues(horizontal = 4.dp)).width(60.dp),
+      contentAlignment = Alignment.Center,
+    ) { /* TODO Put appropriate text here */}
   }
 }
 
 @Composable
-fun DialogInput(
-  text: String,
-  onValueChange: (String) -> Unit,
-  onImeAction: () -> Unit = {},
-) {
+fun DialogInput(text: String, onValueChange: (String) -> Unit, onImeAction: () -> Unit = {}) {
   Box(
     modifier =
-    Modifier
-      //                        .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(MaterialTheme.colorScheme.secondaryContainer)
-      .fillMaxWidth()
-      .wrapContentSize(Alignment.Center),
-    contentAlignment = Alignment.Center
+      Modifier
+        //                        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(MaterialTheme.colorScheme.secondaryContainer)
+        .fillMaxWidth()
+        .wrapContentSize(Alignment.Center),
+    contentAlignment = Alignment.Center,
   ) {
     BasicTextField(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(PaddingValues(4.dp)),
+      modifier = Modifier.fillMaxWidth().padding(PaddingValues(4.dp)),
       textStyle =
-      TextStyle(
-        fontSize = 5.em,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSecondaryContainer
-      ),
+        TextStyle(
+          fontSize = 5.em,
+          textAlign = TextAlign.Center,
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
       keyboardOptions =
-      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-      keyboardActions =
-      KeyboardActions(
-        onDone = { onImeAction() },
-      ),
+        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+      keyboardActions = KeyboardActions(onDone = { onImeAction() }),
       value = text,
-      onValueChange = onValueChange
+      onValueChange = onValueChange,
     )
   }
 }
@@ -283,4 +257,65 @@ fun DialogInput(
 @Composable
 fun AddSetText() {
   androidx.compose.material.Text("Add Set", color = MaterialTheme.colorScheme.primary)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -> Unit) {
+  val threshold = 0.5f
+  val dismissState =
+    rememberSwipeToDismissBoxState(
+      positionalThreshold = { distance -> distance * threshold },
+      confirmValueChange = { swipeToDismissBoxValue ->
+        if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
+          removeSet()
+          true
+        } else {
+          false
+        }
+      },
+    )
+
+  SwipeToDismissBox(
+    state = dismissState,
+    enableDismissFromEndToStart = true,
+    enableDismissFromStartToEnd = false,
+    backgroundContent = {
+      val color by
+        animateColorAsState(
+          when (dismissState.dismissDirection) {
+            SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.primary
+            SwipeToDismissBoxValue.EndToStart -> Color.Red
+            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+          }
+        )
+
+      val alignment = Alignment.CenterEnd
+
+      val icon = Icons.Filled.Delete
+      val scale by
+        animateFloatAsState(
+          if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.8f else 1.2f
+        )
+
+      Box(
+        Modifier.fillMaxSize().background(color).padding(horizontal = 12.dp),
+        contentAlignment = alignment,
+      ) {
+        Icon(
+          icon,
+          tint = White,
+          contentDescription = "Localized description",
+          modifier = Modifier.scale(scale),
+        )
+      }
+    },
+  ) {
+    Card(
+      backgroundColor = MaterialTheme.colorScheme.background,
+      shape = RoundedCornerShape(CornerSize(0f)),
+    ) {
+      SetLayout()
+    }
+  }
 }

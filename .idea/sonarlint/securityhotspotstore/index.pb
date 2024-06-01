@@ -187,3 +187,7 @@ iapp/src/main/java/com/example/myapplication/components/workoutDialogs/workingSe
 Uapp/src/main/java/com/example/myapplication/components/setRestTimer/TimerNumberPad.kt,9/c/9c6004241e7001b691b9c2424ebe7ea17678eb94
 m
 =app/src/main/java/com/example/myapplication/ui/theme/Theme.kt,d/8/d8ca91a4890a5a2e69e781e217ce67d6242e6bee
+—
+gapp/src/main/java/com/example/myapplication/components/workoutDialogs/warmUpSets/WarmUpSetsViewModel.kt,2/d/2d8e3f38d982c95e7e1c20f246f9422c43fab904
+›
+kapp/src/main/java/com/example/myapplication/components/workoutDialogs/equateVolume/EquateVolumeViewModel.kt,3/7/3730611fe563c4d85e8de86db1afd7929ae7f630

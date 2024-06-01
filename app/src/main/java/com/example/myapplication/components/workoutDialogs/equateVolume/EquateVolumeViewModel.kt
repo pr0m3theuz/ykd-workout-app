@@ -10,6 +10,7 @@ import com.example.myapplication.utils.newID
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.math.RoundingMode
 import kotlin.math.roundToInt
 
@@ -26,11 +27,12 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
   val oneRepMax: StateFlow<Double>
     get() = _oneRepMax
 
-  private var _sets = MutableStateFlow(emptyList<Set>())
+  private var _sets = mutableListOf<Set>()
+  private val _setsFlow = MutableStateFlow(_sets.toList())
   val sets: StateFlow<List<Set>>
-    get() = _sets
+    get() = _setsFlow.asStateFlow()
 
-  private var _setsPercentage = MutableStateFlow(_sets.value.associate { it.uuid to 1.0 })
+  private var _setsPercentage = MutableStateFlow(_sets.associate { it.uuid to 1.0 })
   val setsPercentage: StateFlow<Map<RealmUUID, Double>>
     get() = _setsPercentage
 
@@ -44,20 +46,12 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
 
   private var _exerciseSets: ExerciseExerciseSets? = null
 
-  //  private var exerciseID: Long = 0
-  //  private var exerciseUUID: RealmUUID = RealmUUID.random()
-  //  private var workoutID: Long = 0
-  //  private var workoutUUID: RealmUUID = RealmUUID.random()
-
   private fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
     _exerciseSets = exerciseSets
-    //    exerciseID = exerciseSets.exercise.exerciseID
-    //    exerciseUUID = exerciseSets.exercise.uuid
-    //    workoutID = exerciseSets.workoutID
-    //    workoutUUID = exerciseSets.workoutUUID
     exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-    _sets.value =
-      if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
+    _sets = if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
+
+    _setsFlow.value = _sets.toList()
   }
 
   fun initialize(exerciseSets: ExerciseExerciseSets) {
@@ -89,17 +83,18 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
   }
 
   fun changeWorkingSets(sets: List<Set>) {
-    _sets.value = sets.filter { it.setTypeID != WARM_UP_SET }
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = sets.filter { it.setTypeID != WARM_UP_SET }.toMutableList()
+    _setsFlow.value = _sets.toList()
+    setNewTotalVolume(calculateTotalVolume(_sets))
   }
 
   fun addSet() {
-    val temporarySets: MutableList<Set> = _sets.value.toMutableList()
+    val temporarySets: MutableList<Set> = _sets.toMutableList()
 
-    if (_sets.value.isNotEmpty()) {
+    if (_sets.isNotEmpty()) {
       temporarySets.add(
         Set().apply {
-          setNumber = _sets.value.last().setNumber?.plus(1)
+          setNumber = _sets.last().setNumber?.plus(1)
           weightPounds = temporarySets.last().weightPounds
           weightKilograms = temporarySets.last().weightKilograms
           repetitions = temporarySets.last().repetitions
@@ -112,8 +107,9 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     } else {
       temporarySets.add(Set())
     }
-    _sets.value = temporarySets.toList()
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = temporarySets
+    setNewTotalVolume(calculateTotalVolume(_sets))
+    _setsFlow.value = _sets.toList()
   }
 
   /*
@@ -121,9 +117,9 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
   Here are some suggestions to improve the addSet() function:
   1. The function creates a new mutable list by converting the current list to mutable.
       Instead, it's better to directly create a new mutable list and copy all the elements from the current list.
-  2. The function accesses _sets.value multiple times, which is not optimal.
+  2. The function accesses _sets multiple times, which is not optimal.
       It's better to assign it to a local variable for better readability and performance.
-  3. Instead of using an if-else statement to check if the _sets.value list is empty or not, we can use the lastOrNull() function to get the last item in the list if it exists, otherwise return null.
+  3. Instead of using an if-else statement to check if the _sets list is empty or not, we can use the lastOrNull() function to get the last item in the list if it exists, otherwise return null.
   4. The copy() function can be simplified by using named arguments instead of positional arguments.
    */
 
@@ -134,7 +130,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
    * to the list of sets and the total volume is recalculated.
    */
   /*  fun chatgptAddSet() {
-      val currentSets = _sets.value.toMutableList()
+      val currentSets = _sets.toMutableList()
       val lastSet = currentSets.lastOrNull()
 
       val newSet =
@@ -155,37 +151,39 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
           }
 
       currentSets.add(newSet)
-      _sets.value = currentSets.toList()
+      _sets = currentSets.toList()
 
-      setNewTotalVolume(calculateTotalVolume(_sets.value))
+      setNewTotalVolume(calculateTotalVolume(_sets))
     }*/
 
   fun removeSet(id: Long) {
-    val temporarySets = _sets.value.toMutableList()
+    val temporarySets = _sets
     temporarySets.removeIf { it.lazyListItemID == id }
 
     temporarySets.forEach { it.lazyListItemID = newID() }
 
-    _sets.value = temporarySets.toList()
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = temporarySets
+    setNewTotalVolume(calculateTotalVolume(_sets))
+    _setsFlow.value = _sets.toList()
   }
 
   fun updateSetWeight(uuid: RealmUUID, newWeight: Double?) {
-    val temporarySets = _sets.value.toMutableList()
+    val temporarySets = _sets.toMutableList()
     temporarySets.forEach {
       if (it.uuid == uuid) {
         it.weightPounds = newWeight?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP)?.toDouble()
       }
     }
-    _sets.value = temporarySets
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = temporarySets
+    setNewTotalVolume(calculateTotalVolume(_sets))
+    _setsFlow.value = _sets.toList()
   }
 
   fun updateSetReps(uuid: RealmUUID, newReps: Int) {
-    val temporarySets = _sets.value.toMutableList()
+    val temporarySets = _sets.toMutableList()
     temporarySets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
-    _sets.value = temporarySets
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = temporarySets
+    setNewTotalVolume(calculateTotalVolume(_sets))
   }
 
   fun updateSetPercentage(uuid: RealmUUID, newPercentage: Double) {
@@ -193,10 +191,11 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     temporaryMap[uuid] = newPercentage
     _setsPercentage.value = temporaryMap
 
-    val temporarySets = _sets.value.toMutableList()
+    val temporarySets = _sets.toMutableList()
     temporarySets.forEach { if (it.uuid == uuid) it.percentage1RM = newPercentage }
-    _sets.value = temporarySets
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = temporarySets
+    setNewTotalVolume(calculateTotalVolume(_sets))
+    _setsFlow.value = _sets.toList()
   }
 
   fun equateVolumeByWeight(newWeight: Double?) {
@@ -208,15 +207,16 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
         0
       }
 
-    val newSets = _sets.value
+    val newSets = _sets
     newSets.forEach {
       it.lazyListItemID = newID()
       it.weightPounds = newWeight
       it.repetitions = newRepetitions
     }
 
-    _sets.value = newSets.toList()
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = newSets
+    setNewTotalVolume(calculateTotalVolume(_sets))
+    _setsFlow.value = _sets.toList()
   }
 
   fun equateVolumeByRepetitions(newRepetitions: Int?) {
@@ -235,14 +235,15 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
       it.repetitions = newRepetitions
     }
 
-    _sets.value = newSets.toList()
-    setNewTotalVolume(calculateTotalVolume(_sets.value))
+    _sets = newSets.toMutableList()
+    _setsFlow.value = _sets.toList()
+    setNewTotalVolume(calculateTotalVolume(_sets))
   }
 
   private fun numberOfWorkingSets(): Int {
     var numberOfWorkingSets: Int = 0
 
-    _sets.value.filter { it.setTypeID != WARM_UP_SET }.forEach { _ -> numberOfWorkingSets++ }
+    _sets.filter { it.setTypeID != WARM_UP_SET }.forEach { _ -> numberOfWorkingSets++ }
 
     return numberOfWorkingSets
   }

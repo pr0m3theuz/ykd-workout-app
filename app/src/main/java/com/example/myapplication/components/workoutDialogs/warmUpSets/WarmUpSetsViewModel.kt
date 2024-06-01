@@ -22,9 +22,10 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
   val workingSetWeight
     get() = _workingSetWeight.asStateFlow()
 
-  private val _warmUpSets = MutableStateFlow(mutableListOf<Set>())
+  private var _warmUpSets = mutableListOf<Set>()
+  private val _warmUpSetsFlow = MutableStateFlow(_warmUpSets.toList())
   val warmUpSets
-    get() = _warmUpSets.asStateFlow()
+    get() = _warmUpSetsFlow.asStateFlow()
 
   fun changeWorkingSetWeight(newWorkingWeight: Double) {
     _workingSetWeight.value = newWorkingWeight
@@ -32,7 +33,8 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
 
   fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
     exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-    _warmUpSets.value = initWarmUpSets()
+    _warmUpSets = initWarmUpSets()
+    _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
   fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
@@ -44,54 +46,58 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
   }
 
   fun addSet() {
-    if (_warmUpSets.value.isNotEmpty()) {
-      _warmUpSets.value.add(
+    if (_warmUpSets.isNotEmpty()) {
+      _warmUpSets.add(
         Set().apply {
-          setNumber = _warmUpSets.value.last().setNumber?.plus(1)
-          weightPounds = _warmUpSets.value.last().weightPounds
-          weightKilograms = _warmUpSets.value.last().weightKilograms
-          repetitions = _warmUpSets.value.last().repetitions
-          ratePerceivedEffort = _warmUpSets.value.last().ratePerceivedEffort
-          repetitionsInReserve = _warmUpSets.value.last().repetitionsInReserve
-          setTypeID = _warmUpSets.value.last().setTypeID
-          percentage1RM = _warmUpSets.value.last().percentage1RM
+          setNumber = _warmUpSets.last().setNumber?.plus(1)
+          weightPounds = _warmUpSets.last().weightPounds
+          weightKilograms = _warmUpSets.last().weightKilograms
+          repetitions = _warmUpSets.last().repetitions
+          ratePerceivedEffort = _warmUpSets.last().ratePerceivedEffort
+          repetitionsInReserve = _warmUpSets.last().repetitionsInReserve
+          setTypeID = _warmUpSets.last().setTypeID
+          percentage1RM = _warmUpSets.last().percentage1RM
         }
       )
     } else {
-      _warmUpSets.value.add(Set())
+      _warmUpSets.add(Set())
     }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
   fun remove(uuid: RealmUUID) {
-    for (index in _warmUpSets.value.indices) {
-      if (_warmUpSets.value[index].uuid == uuid) {
-        _warmUpSets.value.removeAt(index)
+    for (index in _warmUpSets.indices) {
+      if (_warmUpSets[index].uuid == uuid) {
+        _warmUpSets.removeAt(index)
         break
       }
     }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
   fun updateWarmUpSetWeight(uuid: RealmUUID, newWeight: Double) {
     val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
     if (weightUnit == MassUnit.POUNDS.abbreviation) {
-      _warmUpSets.value.forEach {
+      _warmUpSets.forEach {
         if (it.uuid == uuid) {
           it.weightPounds = newWeight
           it.weightKilograms = it.convertPoundToKg()
         }
       }
     } else {
-      _warmUpSets.value.forEach {
+      _warmUpSets.forEach {
         if (it.uuid == uuid) {
           it.weightKilograms = newWeight
           it.weightPounds = it.convertKgToPound()
         }
       }
     }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
   fun updateWarmUpSetReps(uuid: RealmUUID, newReps: Int) {
-    _warmUpSets.value.forEach { if (it.uuid == uuid) it.repetitions = newReps }
+    _warmUpSets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
   //  TODO Create Warm Up Sets Template
