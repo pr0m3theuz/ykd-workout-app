@@ -476,7 +476,7 @@ private fun RIRTextField(
       value = repetitionsInReserveText,
       onValueChange = { onRIRChange(it.take(4).trim()) },
     )
-    if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isNullOrBlank()) {
+    if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
       Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
     }
   }
@@ -521,7 +521,7 @@ private fun ExerciseRepsTextField(
       onValueChange = { onRepsChange(it.take(4).trim()) },
       cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
     )
-    if (!targetReps.isNullOrBlank() && repetitionsText.isNullOrBlank()) {
+    if (!targetReps.isNullOrBlank() && repetitionsText.isBlank()) {
       Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
     }
   }
@@ -566,7 +566,7 @@ private fun ExerciseWeightTextField(
         KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
       keyboardActions = KeyboardActions(onNext = { onImeAction() }),
     )
-    if (!targetWeight.isNullOrBlank() && exerciseWeightText.isNullOrBlank()) {
+    if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
       Text(text = targetWeight, color = MaterialTheme.colorScheme.outline)
     }
   }

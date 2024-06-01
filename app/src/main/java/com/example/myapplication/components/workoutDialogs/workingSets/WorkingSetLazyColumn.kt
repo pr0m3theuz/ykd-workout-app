@@ -16,17 +16,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.DismissDirection
-import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
-import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.rememberDismissState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,114 +40,116 @@ import com.example.myapplication.components.workoutDialogs.AddSetText
 import com.example.myapplication.ui.theme.White
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(
+  ExperimentalMaterialApi::class,
+  ExperimentalFoundationApi::class,
+  ExperimentalMaterial3Api::class,
+)
 // @Preview
 @Composable
 fun WorkingSetLazyColumn(
-    workingSetViewModel: WorkingSetViewModel = viewModel(),
+  workingSetViewModel: WorkingSetViewModel = viewModel(),
+  //  _workingSets: MutableList<Set>,
+  //  removeSet: (workingSet: Set) -> Unit,
+  addset: () -> Unit,
 ) {
-    val listState = rememberLazyListState()
-    // Remember a CoroutineScope to be able to launch
-    val coroutineScope = rememberCoroutineScope()
+  val listState = rememberLazyListState()
+  // Remember a CoroutineScope to be able to launch
+  val coroutineScope = rememberCoroutineScope()
 
-    val workingSets by workingSetViewModel.sets.collectAsState()
+  val workingSets by workingSetViewModel.sets.collectAsState()
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxWidth().height(235.dp)
-        //  verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        items(
-            count = workingSets.size,
-            key = { index -> workingSets[index].lazyListItemID }
-        ) { index ->
+  LazyColumn(
+    state = listState,
+    modifier = Modifier.fillMaxWidth().height(235.dp),
+    //  verticalArrangement = Arrangement.spacedBy(4.dp)
+  ) {
+    items(count = workingSets.size, key = { index -> workingSets[index].lazyListItemID }) { index ->
+      val workingSet = workingSets[index]
 
-            val workingSet = workingSets[index]
-
-//            var deletedState by remember { mutableStateOf(false) }
-            val dismissState = rememberDismissState(
-                confirmStateChange = {
-                    true
-                }
-            )
-
-            if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                workingSetViewModel.remove(workingSet.uuid)
-            }
-
-            SwipeToDismiss(
-                state = dismissState,
-                // modifier = Modifier.padding(vertical = 4.dp),
-                directions = setOf(DismissDirection.EndToStart)
-                /*    (if (!exerciseSet.setCompleted) DismissDirection.EndToStart else null)
-                ) as Set<DismissDirection>*/,
-                dismissThresholds = { dismissDirection ->
-                    FractionalThreshold(
-                        if (dismissDirection == DismissDirection.EndToStart) 0.5f else 1f
-                    )
-                },
-                background = {
-                    // val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                    val color by animateColorAsState(
-                        when (dismissState.targetValue) {
-                            DismissValue.Default -> MaterialTheme.colorScheme.primary
-                            DismissValue.DismissedToStart -> Color.Red
-                            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
-                        }
-                    )
-
-                    val alignment = Alignment.CenterEnd
-
-                    val icon = Icons.Filled.Delete
-                    val scale by animateFloatAsState(
-                        if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f
-                    )
-
-                    Box(
-                        Modifier.fillMaxSize().background(color).padding(horizontal = 12.dp),
-                        contentAlignment = alignment
-                    ) {
-                        Icon(
-                            icon,
-                            tint = White,
-                            contentDescription = "Localized description",
-                            modifier = Modifier.scale(scale)
-                        )
-                    }
-                }
-            ) {
-                Card(
-//                        modifier = Modifier.,
-//                    elevation = animateDpAsState(
-//                        if (dismissState.dismissDirection != null) 8.dp else 0.dp
-//                    ).value,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    shape = RoundedCornerShape(CornerSize(0f))
-                ) {
-                    WorkingSetLayout(
-                        setIndex = index,
-                        workingSet = workingSet,
-                    )
-                }
-            }
-        }
+      SwipeToDismissBoxItem(
+        removeSet = { workingSetViewModel.remove(workingSet) },
+        SetLayout = { WorkingSetLayout(setIndex = index, workingSet = workingSet) },
+      )
     }
+  }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TextButton(
-            onClick = {
-                workingSetViewModel.addSet()
-                coroutineScope.launch {
-                    // Animate scroll to the last item
-                    listState.animateScrollToItem(index = workingSets.size.dec())
-                }
-            }
-        ) {
-            AddSetText()
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.Center,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    TextButton(
+      onClick = {
+        addset()
+        coroutineScope.launch {
+          // Animate scroll to the last item
+          listState.animateScrollToItem(index = workingSets.size.dec())
         }
+      }
+    ) {
+      AddSetText()
     }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SwipeToDismissBoxItem(removeSet: () -> Unit, SetLayout: @Composable () -> Unit) {
+  val threshold = 0.5f
+  val dismissState =
+    rememberSwipeToDismissBoxState(
+      positionalThreshold = { distance -> distance * threshold },
+      confirmValueChange = { swipeToDismissBoxValue ->
+        if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
+          removeSet()
+          true
+        } else {
+          false
+        }
+      },
+    )
+
+  SwipeToDismissBox(
+    state = dismissState,
+    enableDismissFromEndToStart = true,
+    enableDismissFromStartToEnd = false,
+    backgroundContent = {
+      val color by
+        animateColorAsState(
+          when (dismissState.dismissDirection) {
+            SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.primary
+            SwipeToDismissBoxValue.EndToStart -> Color.Red
+            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+          }
+        )
+
+      val alignment = Alignment.CenterEnd
+
+      val icon = Icons.Filled.Delete
+      val scale by
+        animateFloatAsState(
+          if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.8f else 1.2f
+        )
+
+      Box(
+        Modifier.fillMaxSize().background(color).padding(horizontal = 12.dp),
+        contentAlignment = alignment,
+      ) {
+        Icon(
+          icon,
+          tint = White,
+          contentDescription = "Localized description",
+          modifier = Modifier.scale(scale),
+        )
+      }
+    },
+  ) {
+    Card(
+      backgroundColor = MaterialTheme.colorScheme.background,
+      shape = RoundedCornerShape(CornerSize(0f)),
+    ) {
+      SetLayout()
+    }
+  }
 }

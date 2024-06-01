@@ -89,17 +89,21 @@ fun AddWorkingSetsDialog(
                 else -> checkDoubleInput(it.take(7)) ?: workingSetWeightText
               }
             workingSetViewModel.changeWorkingSetWeight(workingSetWeightText.toDoubleOrNull() ?: 0.0)
-          }
+          },
         )
 
         SetsHeaderRow()
 
-        WorkingSetLazyColumn()
+        WorkingSetLazyColumn(
+          //          _workingSets = workingSetViewModel.sets.collectAsState().value,
+          //          removeSet = {workingSet -> workingSetViewModel.remove(workingSet)},
+          addset = { workingSetViewModel.addSet() }
+        )
 
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.Center,
-          verticalAlignment = Alignment.CenterVertically
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           TextButton(
             onClick = {
@@ -122,6 +126,6 @@ fun AddWorkingSetsDialog(
         Text("Insert Working Sets")
       }
     },
-    dismissButton = { TextButton(onClick = { openDialog(false) }) { Text("Cancel") } }
+    dismissButton = { TextButton(onClick = { openDialog(false) }) { Text("Cancel") } },
   )
 }
