@@ -191,3 +191,5 @@ m
 gapp/src/main/java/com/example/myapplication/components/workoutDialogs/warmUpSets/WarmUpSetsViewModel.kt,2/d/2d8e3f38d982c95e7e1c20f246f9422c43fab904
 ›
 kapp/src/main/java/com/example/myapplication/components/workoutDialogs/equateVolume/EquateVolumeViewModel.kt,3/7/3730611fe563c4d85e8de86db1afd7929ae7f630
+n
+>app/src/main/java/com/example/myapplication/WorkoutActivity.kt,1/2/1254c33409142185d8ec76e411a1f03386d76153

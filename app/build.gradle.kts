@@ -114,7 +114,7 @@ dependencies {
   androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
   androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion")
   androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
-  androidTestImplementation("androidx.test.espresso:espresso-accessibility:espressoVersion")
+  androidTestImplementation("androidx.test.espresso:espresso-accessibility:$espressoVersion")
   androidTestImplementation("androidx.test.espresso:espresso-web:$espressoVersion")
   androidTestImplementation("androidx.test.espresso.idling:idling-concurrent:$espressoVersion")
 

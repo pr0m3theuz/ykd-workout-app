@@ -152,11 +152,12 @@ class WorkoutViewModel(
   private val importance = NotificationManager.IMPORTANCE_DEFAULT
 
   private val channel =
-    NotificationChannel("rest_timer", name, importance).apply { description = descriptionText }
+    NotificationChannel(name, name, importance).apply { description = descriptionText }
 
   private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
   private val notifyIntent = Intent(application, AlarmReceiver::class.java)
+  //  private val notifyIntent = MainActivity.newIntent(application)
 
   val userDefaultWeightUnit: String = manageWorkoutUseCase.userDefaultWeightUnit
 
@@ -315,7 +316,8 @@ class WorkoutViewModel(
 
     notificationManager.createNotificationChannel(channel)
 
-    //    notificationManager.sendNotification("Remaining Time: $", application)
+    //    notificationManager.sendNotification("Remaining Time: ${_remainingTimerTimeString.value}",
+    // application, silent = true)
   }
 
   @RequiresApi(Build.VERSION_CODES.S)

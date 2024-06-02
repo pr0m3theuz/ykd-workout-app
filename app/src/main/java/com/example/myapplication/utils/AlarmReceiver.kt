@@ -10,14 +10,6 @@ import com.example.myapplication.R
 class AlarmReceiver : BroadcastReceiver() {
 
   override fun onReceive(context: Context, intent: Intent) {
-    // TODO: Step 1.10 [Optional] remove toast
-    //        Toast.makeText(
-    //            context,
-    //            context.getText(R.string.notification_channel_name),
-    //            Toast.LENGTH_SHORT,
-    //        ).show()
-
-    // TODO: Step 1.9 add call to sendNotification
     val notificationManager =
       ContextCompat.getSystemService(context, NotificationManager::class.java)
         as NotificationManager
@@ -28,6 +20,7 @@ class AlarmReceiver : BroadcastReceiver() {
       context.getText(R.string.rest_timer_ended_text).toString(),
       context,
       silent = false,
+      setAutoCancel = false,
     )
   }
 }
