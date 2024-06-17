@@ -47,6 +47,10 @@ class ManageWorkoutUseCase(
     return exercisesRepository.getExercise(exerciseID)
   }
 
+  fun getExerciseByName(exerciseName: String): ObjectId {
+    return exercisesRepository.getExerciseByName(exerciseName)._id
+  }
+
   fun getWorkoutByID(workoutID: ObjectId): Workout? {
     // workoutRepository.getWorkoutByID(workoutID = workoutID)
     // TODO Add logic for when copying from a template (active program) vs when copying from a

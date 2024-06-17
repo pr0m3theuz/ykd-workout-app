@@ -84,4 +84,8 @@ class ExercisesRepository(private val database: RealmDatabase) {
   ): Flow<List<Exercise>> {
     return database.filterExercises(exercise, muscleGroupIDs, equipmentIDs /*movementTypes*/)
   }
+
+  fun getExerciseByName(exerciseName: String): Exercise {
+    return database.getExerciseByName(exerciseName)
+  }
 }

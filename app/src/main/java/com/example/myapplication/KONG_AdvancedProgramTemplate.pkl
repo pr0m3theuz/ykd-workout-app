@@ -1,0 +1,2816 @@
+module com.example.myapplication.AdvancedProgramTemplate
+
+class Program {
+  name: String
+  arthur: String
+  shortDescription: String
+  description: String
+  programLength: String
+  uri: String
+  level: String
+  programEquipment: String
+  daysPerWeek: String
+  mesocycles: Listing<Mesocycle>
+}
+
+class Mesocycle {
+  name: String
+  description: String
+  order: Int
+  microcycles: Listing<Microcycle>
+}
+
+class Microcycle {
+  name: String
+  description: String
+  order: Int
+  workouts: Listing<Workout>
+  advancedWorkouts: Listing<AdvancedWorkout>
+}
+
+class Workout {
+  name: String
+  //     workoutArthur: String
+  day: Int
+  notes: Listing
+  exercisesSets: Listing<ExerciseSets>
+}
+
+class AdvancedWorkout {
+  name: String
+  //     workoutArthur: String
+  day: Int
+  notes: Listing
+  exercisesSets: Listing<ExerciseSets>
+  advancedExercisesSets: Listing<AdvancedExerciseSets>
+}
+
+class ExerciseSets {
+  name: String
+  notes: Listing
+  sets: Int // Number of sets to be performed
+  repetitions: Int
+
+  // Normal by default, Listing - length/number of elements must equal number of sets
+  setType: String = ""
+  targetRepetitionsInReserve: Int // Reps in Reserve
+  targetRatePerceivedEffort: Int // Rate of Perceived Exertion
+  percentage1RM: Float = -1.0 // Percentage of 1 Rep Max
+
+  // TODO Determine Correct Type
+  progressionSchemeID: String = ""
+  minRepetitions: Int = -1
+  maxRepetitions: Int = -1
+}
+
+class AdvancedExerciseSets {
+  name: String
+  notes: Listing
+  sets: Int = -1// Number of sets to be performed
+  repetitions: List<Int> = List(-1)
+  // Normal by default, Listing - length/number of elements must equal number of sets
+  setType: String = ""
+  targetRepetitionsInReserve: List<Int> // Reps in Reserve
+  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+
+  percentage1RM: List<Float> = List(-1.0) // Percentage of 1 Rep Max
+
+  // TODO Determine Correct Type
+  progressionSchemeID: String = ""
+  minRepetitions: Int = -1 //
+  maxRepetitions: Int = -1 //
+  setScheme: SetScheme
+}
+
+class SetScheme {
+  sets: Int = -1
+  repetitions: List<Int> = List(-1)
+  setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
+  targetRepetitionsInReserve: List<Int> // Reps in Reserve
+  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+
+  percentage1RM: List<Float> = List(-1.0)// Percentage of 1 Rep Max
+
+  progressionSchemeID: String = ""// TODO Determine Correct Type
+  minRepetitions: Int = -1//
+  maxRepetitions: Int = -1 //
+}
+
+setScheme9A: SetScheme = new {
+  sets = 5
+  repetitions = List(5, 8, 8, 8, 15)
+  targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
+  targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
+}
+
+setScheme9B: SetScheme = new {
+  sets = 4
+  repetitions = List(5, 8, 12, 15)
+  targetRatePerceivedEffort = List(7, 7, 7, 7)
+  targetRepetitionsInReserve = List(3, 3, 3, 3)
+}
+
+setScheme9C: SetScheme = new {
+  sets = 3
+  repetitions = List(8, 8, 8)
+  targetRatePerceivedEffort = List(7, 7, 7)
+  targetRepetitionsInReserve = List(3, 3, 3)
+}
+
+setScheme9D: SetScheme = new {
+  sets = 3
+  repetitions = List(12, 12, 12)
+  targetRatePerceivedEffort = List(7, 7, 7)
+  targetRepetitionsInReserve = List(3, 3, 3)
+}
+
+setScheme10A: SetScheme = new {
+  sets = 5
+  repetitions = List(5, 8, 8, 8, 15)
+  targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
+  targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
+}
+
+setScheme10B: SetScheme = new {
+  sets = 4
+  repetitions = List(5, 8, 12, 15)
+  targetRatePerceivedEffort = List(8, 8, 8, 8)
+  targetRepetitionsInReserve = List(2, 2, 2, 2)
+}
+
+setScheme10C: SetScheme = new {
+  sets = 3
+  repetitions = List(8, 8, 8)
+  targetRatePerceivedEffort = List(8, 8, 8)
+  targetRepetitionsInReserve = List(2, 2, 2)
+}
+
+setScheme10D: SetScheme = new {
+  sets = 3
+  repetitions = List(12, 12, 12)
+  targetRatePerceivedEffort = List(8, 8, 8)
+  targetRepetitionsInReserve = List(2, 2, 2)
+}
+
+setScheme11A: SetScheme = new {
+  sets = 5
+  repetitions = List(3, 6, 6, 6, 12)
+  targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
+  targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
+}
+
+setScheme12A: SetScheme = new {
+  sets = 5
+  repetitions = List(1, 6, 6, 6, 10)
+  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
+  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+}
+
+setScheme12B: SetScheme = new {
+  sets = 4
+  repetitions = List(5, 8, 12, 15)
+  targetRatePerceivedEffort = List(9, 9, 9, 9)
+  targetRepetitionsInReserve = List(1, 1, 1, 1)
+}
+
+setScheme12C: SetScheme = new {
+  sets = 3
+  repetitions = List(9, 9, 9)
+  targetRatePerceivedEffort = List(9, 9, 9)
+  targetRepetitionsInReserve = List(1, 1, 1)
+}
+
+setScheme12D: SetScheme = new {
+  sets = 3
+  repetitions = List(12, 12, 12)
+  targetRatePerceivedEffort = List(9, 9, 9)
+  targetRepetitionsInReserve = List(1, 1, 1)
+}
+
+program: Program = new {
+  name = "KONG: Savage Size in 12 Weeks"
+  arthur = "Alex Bromley"
+  shortDescription = ""
+  description = ""
+  programLength = "12 Weeks"
+  uri = "https://www.boostcamp.app/coaches/bald-omni-man/raider"
+  level = "Novice, Intermediate"
+  programEquipment = "Full Gym"
+  daysPerWeek = "5 days"
+  mesocycles {
+    new {
+      name = "Week 1-4: Volumizing Phase"
+      description = #"5-day bodybuilding split that hits each body part twice a week. You'll be hitting weak points first, like triceps before delts and chest.\n\nThis is a volumizing phase, which starts off with just a few sets per exercise with high reps in week 1, but steadily increasing load over the next 3 weeks. By the end of week 4, you'll be conditioned for high volume training."#
+      order = 1
+      microcycles {
+        new {
+          name = "Week 1"
+          description = ""
+          order = 1
+          workouts {
+            new Workout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              exercisesSets {
+                new {
+                  name = "JM Press"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "French Press"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown"
+                  sets = 2
+                  repetitions = 20
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Front Raise"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Upright Row (Barbell)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Cable Crossover"
+                  sets = 2
+                  repetitions = 20
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+              }
+            }
+            new Workout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              exercisesSets {
+                new {
+                  name = "Hamstring Curl"
+                  sets = 2
+                  repetitions = 20
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Romanian Deadlift (Barbell)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Walking Lunge (Dumbbell)"
+                  sets = 2
+                  repetitions = 12
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+              }
+            }
+            new Workout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              exercisesSets {
+                new {
+                  name = "Behind-the-Neck Push Press"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "One Arm Lateral Raise (Cable)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Single Arm Row (Dumbbell)"
+                  sets = 2
+                  repetitions = 20
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Lat Pulldown"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Bayesian Curl"
+                  notes {
+                    "Lengthened Partials"
+                  }
+                  sets = 2
+                  repetitions = 21
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+              }
+            }
+            new Workout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              exercisesSets {
+                new {
+                  name = "Leg Extension"
+                  sets = 2
+                  repetitions = 20
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Squat (Barbell)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Single Leg Pess"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Leg Curl"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+              }
+            }
+            new Workout {
+              name = "Day 5"
+              day = 1
+              notes {}
+              exercisesSets {
+                new {
+                  name = "Bicep Curl (Barbell)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Concentration Curl"
+                  sets = 2
+                  repetitions = 20
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Seated Row (Cable)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "High Row"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Dip (Weighted)"
+                  sets = 2
+                  repetitions = 15
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+                new {
+                  name = "Tricep Straight Bar Push Down (Cable)"
+                  sets = 2
+                  repetitions = 20
+                  targetRatePerceivedEffort = 7
+                  targetRepetitionsInReserve = 3
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 2"
+          description = ""
+          order = 2
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "JM Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "French Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Front Raise"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Upright Row (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Cable Crossover"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Hamstring Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Romanian Deadlift (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Walking Lunge (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Behind-the-Neck Push Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "One Arm Lateral Raise (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Single Arm Row (Dumbbell)"
+                  sets = 3
+                  repetitions = List(15, 15, 15)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Lat Pulldown"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  notes {
+                    "Lengthened Partials"
+                  }
+                  sets = 3
+                  repetitions = List(21, 21, 21)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(15, 15, 15)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Squat (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Single Leg Pess"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bicep Curl (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Concentration Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Seated Row (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "High Row"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Dip (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Tricep Straight Bar Push Down (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 3"
+          description = ""
+          order = 3
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "JM Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "French Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Front Raise"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Upright Row (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Cable Crossover"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Hamstring Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Romanian Deadlift (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Walking Lunge (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Behind-the-Neck Push Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "One Arm Lateral Raise (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Single Arm Row (Dumbbell)"
+                  sets = 3
+                  repetitions = List(15, 15, 15)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Lat Pulldown"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  notes {
+                    "Lengthened Partials"
+                  }
+                  sets = 3
+                  repetitions = List(21, 21, 21)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(15, 15, 15)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Squat (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Single Leg Pess"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bicep Curl (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Concentration Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Seated Row (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "High Row"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Dip (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Tricep Straight Bar Push Down (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 4"
+          description = ""
+          order = 4
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "JM Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "French Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Front Raise"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Upright Row (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Cable Crossover"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Hamstring Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Romanian Deadlift (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Walking Lunge (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Behind-the-Neck Push Press"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "One Arm Lateral Raise (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Single Arm Row (Dumbbell)"
+                  sets = 3
+                  repetitions = List(15, 15, 15)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Lat Pulldown"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  notes {
+                    "Lengthened Partials"
+                  }
+                  sets = 3
+                  repetitions = List(21, 21, 21)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(15, 15, 15)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Squat (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Single Leg Pess"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Leg Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bicep Curl (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Concentration Curl"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Seated Row (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "High Row"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Dip (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+                new {
+                  name = "Tricep Straight Bar Push Down (Cable)"
+                  sets = 3
+                  repetitions = List(12, 12, 12)
+                  targetRatePerceivedEffort = List(5, 7, 10)
+                  targetRepetitionsInReserve = List(5, 3, 0)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    new {
+      name = "Week 5-8: Pyramids Phase"
+      description = #"Now you'll reap the benefits of the high volume work from the previous block by focusing on compound lifts first before accessories.\n\nThe compounds will be underload variations (like close grip bench and stiff leg deadlifts), which forces you to use less weight than the competition variation. The disadvantaged positions force you to train weaknesses in your compounds.\n\nThe set and rep scheme is in a pyramid, which also forces you to use less weight by prioritizing volume and endurance work. This is a nasty muscle building combination."#
+      order = 2
+      microcycles {
+        new {
+          name = "Week 5"
+          description = ""
+          order = 5
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
+                }
+                new {
+                  name = "Shoulder Press (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Lateral Raise (Cable)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Dips"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Skull Crusher"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Stiff Leg Deadlift"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Bulgarian Split Squat (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Hamstring Curl"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bent Over Row (Barbell)"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
+                }
+                new {
+                  name = "Seated Wide-Grip Row"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Lat Pulldown (Single Arm)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Pullover (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Preacher Curl (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Close Grip)"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Chest Fly (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Overhead Extension (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "High Bar Squat (Barbell)"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
+                }
+                new {
+                  name = "Hack Squat"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Romanian Deadlift (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 6"
+          description = ""
+          order = 6
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  sets = 5
+                  repetitions = List(10, 8, 5, 3, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Shoulder Press (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Lateral Raise (Cable)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Dips"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Skull Crusher"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Stiff Leg Deadlift"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Bulgarian Split Squat (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Hamstring Curl"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bent Over Row (Barbell)"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Seated Wide-Grip Row"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Lat Pulldown (Single Arm)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Pullover (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Preacher Curl (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Close Grip)"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Chest Fly (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Overhead Extension (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "High Bar Squat (Barbell)"
+                  sets = 5
+                  repetitions = List(12, 12, 10, 8, 5)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Hack Squat"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Romanian Deadlift (Dumbbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2)
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 7"
+          description = ""
+          order = 7
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  sets = 6
+                  repetitions = List(10, 8, 8, 5, 3, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Shoulder Press (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Lateral Raise (Cable)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Dips"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Skull Crusher"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Stiff Leg Deadlift"
+                  sets = 6
+                  repetitions = List(10, 8, 8, 5, 3, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Bulgarian Split Squat (Barbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Hamstring Curl"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bent Over Row (Barbell)"
+                  sets = 6
+                  repetitions = List(10, 8, 8, 5, 3, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Seated Wide-Grip Row"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Lat Pulldown (Single Arm)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Pullover (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Preacher Curl (Barbell)"
+                  sets = 3
+                  repetitions = List(12, 10, 8)
+                  targetRatePerceivedEffort = List(7, 7, 7)
+                  targetRepetitionsInReserve = List(3, 3, 3)
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Close Grip)"
+                  sets = 6
+                  repetitions = List(10, 8, 8, 5, 3, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Chest Fly (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Overhead Extension (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "High Bar Squat (Barbell)"
+                  sets = 6
+                  repetitions = List(10, 8, 8, 5, 3, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
+                }
+                new {
+                  name = "Hack Squat"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Romanian Deadlift (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(2, 2, 2, 2)
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 8"
+          description = ""
+          order = 8
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  sets = 6
+                  repetitions = List(8, 8, 5, 5, 3, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                }
+                new {
+                  name = "Shoulder Press (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Lateral Raise (Cable)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Dips"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Skull Crusher"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Stiff Leg Deadlift"
+                  sets = 6
+                  repetitions = List(8, 8, 5, 5, 3, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Leg Extension"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(8, 8, 8, 8)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Bulgarian Split Squat (Barbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Leg Press"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Hamstring Curl"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bent Over Row (Barbell)"
+                  sets = 6
+                  repetitions = List(8, 8, 5, 5, 3, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                }
+                new {
+                  name = "Seated Wide-Grip Row"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Lat Pulldown (Single Arm)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Pullover (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Preacher Curl (Barbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Alternating Dumbbell Curl"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Bayesian Curl"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Close Grip)"
+                  sets = 6
+                  repetitions = List(8, 8, 5, 5, 3, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                }
+                new {
+                  name = "Incline Bench Press (Barbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Chest Press (Machine)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Chest Fly (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Overhead Extension (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "High Bar Squat (Barbell)"
+                  sets = 6
+                  repetitions = List(8, 8, 5, 5, 3, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                }
+                new {
+                  name = "Hack Squat"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Romanian Deadlift (Dumbbell)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  sets = 4
+                  repetitions = List(10, 8, 6, 12)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    new {
+      name = "Week 9-12: Reverse Pyramid"
+      description = #"Now that you're primed from the underload variations, in this block you'll move to overload variations, which prioritizes weight.\n\nIn this phase you'll be doing the reverse pyramid set and rep scheme, which means prioritizing heavy weights for your first set, then lower load with high reps in later sets.\n\nBy the end of this program, you'll look like you can scale the Empire State Building."#
+      order = 3
+      microcycles {
+        new {
+          name = "Week 9"
+          description = ""
+          order = 9
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Push Press (Barbell)"
+                  setScheme = setScheme9A
+                }
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Dips (Weighted)"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Skull Crusher"
+                  setScheme = setScheme9C
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  setScheme = setScheme9D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "13\" Deadlift"
+                  setScheme = setScheme9A
+                }
+                new {
+                  name = "Paused Romanian Deadlift"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  setScheme = setScheme9C
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  setScheme = setScheme9D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Pendlay Row"
+                  setScheme = setScheme9A
+                }
+                new {
+                  name = "T-Bar Row"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Behind-the-Neck Lat Pulldown"
+                  setScheme = setScheme9C
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme9C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Wide Grip)"
+                  setScheme = setScheme9A
+                }
+                new {
+                  name = "Floor Press (Barbell)"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Incline Bench Press (Dumbbell)"
+                  setScheme = setScheme9C
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Tricep Rope Push Down (Cable)"
+                  setScheme = setScheme9C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Squat"
+                  setScheme = setScheme9A
+                }
+                new {
+                  name = "Squat"
+                  setScheme = setScheme9B
+                }
+                new {
+                  name = "Single Leg Press"
+                  setScheme = setScheme9C
+                }
+                new {
+                  name = "Leg Extension"
+                  setScheme = setScheme9C
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 10"
+          description = ""
+          order = 10
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Push Press (Barbell)"
+                  setScheme = setScheme10A
+                }
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Dips (Weighted)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Skull Crusher"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  setScheme = setScheme10D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "13\" Deadlift"
+                  setScheme = setScheme10A
+                }
+                new {
+                  name = "Paused Romanian Deadlift"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  setScheme = setScheme10D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Pendlay Row"
+                  setScheme = setScheme10A
+                }
+                new {
+                  name = "T-Bar Row"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Behind-the-Neck Lat Pulldown"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme10C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Wide Grip)"
+                  setScheme = setScheme10A
+                }
+                new {
+                  name = "Floor Press (Barbell)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Incline Bench Press (Dumbbell)"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Tricep Rope Push Down (Cable)"
+                  setScheme = setScheme10C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Squat"
+                  setScheme = setScheme10A
+                }
+                new {
+                  name = "Squat"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Single Leg Press"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Leg Extension"
+                  setScheme = setScheme10C
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 11"
+          description = ""
+          order = 11
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Push Press (Barbell)"
+                  setScheme = setScheme11A
+                }
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Dips (Weighted)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Skull Crusher"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  setScheme = setScheme10D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "13\" Deadlift"
+                  setScheme = setScheme11A
+                }
+                new {
+                  name = "Paused Romanian Deadlift"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  setScheme = setScheme10D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Pendlay Row"
+                  setScheme = setScheme11A
+                }
+                new {
+                  name = "T-Bar Row"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Behind-the-Neck Lat Pulldown"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme10C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Wide Grip)"
+                  setScheme = setScheme11A
+                }
+                new {
+                  name = "Floor Press (Barbell)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Incline Bench Press (Dumbbell)"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Tricep Rope Push Down (Cable)"
+                  setScheme = setScheme10C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Squat"
+                  setScheme = setScheme11A
+                }
+                new {
+                  name = "Squat"
+                  setScheme = setScheme10B
+                }
+                new {
+                  name = "Single Leg Press"
+                  setScheme = setScheme10C
+                }
+                new {
+                  name = "Leg Extension"
+                  setScheme = setScheme10C
+                }
+              }
+            }
+          }
+        }
+        new {
+          name = "Week 12"
+          description = ""
+          order = 12
+          advancedWorkouts {
+            new AdvancedWorkout {
+              name = "Day 1"
+              day = 1
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Push Press (Barbell)"
+                  setScheme = setScheme12A
+                }
+                new {
+                  name = "Seated Military Press (Barbell)"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Dips (Weighted)"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Skull Crusher"
+                  setScheme = setScheme12C
+                }
+                new {
+                  name = "V-Handle Tricep Pushdown (Cable)"
+                  setScheme = setScheme12D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 2"
+              day = 2
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "13\" Deadlift"
+                  setScheme = setScheme12A
+                }
+                new {
+                  name = "Paused Romanian Deadlift"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Step-Up (Weighted)"
+                  setScheme = setScheme12C
+                }
+                new {
+                  name = "Back Extension (Weighted)"
+                  setScheme = setScheme12D
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 3"
+              day = 3
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Pendlay Row"
+                  setScheme = setScheme12A
+                }
+                new {
+                  name = "T-Bar Row"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Behind-the-Neck Lat Pulldown"
+                  setScheme = setScheme12C
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Bayesian Curl"
+                  setScheme = setScheme12C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 4"
+              day = 4
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Bench Press (Wide Grip)"
+                  setScheme = setScheme12A
+                }
+                new {
+                  name = "Floor Press (Barbell)"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Incline Bench Press (Dumbbell)"
+                  setScheme = setScheme12C
+                }
+                new {
+                  name = "Seated Dip (Machine)"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Tricep Rope Push Down (Cable)"
+                  setScheme = setScheme12C
+                }
+              }
+            }
+            new AdvancedWorkout {
+              name = "Day 5"
+              day = 5
+              notes {}
+              advancedExercisesSets {
+                new {
+                  name = "Squat"
+                  setScheme = setScheme12A
+                }
+                new {
+                  name = "Squat"
+                  setScheme = setScheme12B
+                }
+                new {
+                  name = "Single Leg Press"
+                  setScheme = setScheme12C
+                }
+                new {
+                  name = "Leg Extension"
+                  setScheme = setScheme12C
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

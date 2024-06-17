@@ -87,6 +87,7 @@ class RealmDatabase {
     }*/
 
   val app: App = App.create("gymcats-rmmte")
+
   //    var credentials: Credentials
 
   //    CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
@@ -130,7 +131,7 @@ class RealmDatabase {
             Mechanic::class,
             GymCatUser::class,
             // ProgressionScheme::class,)
-          )
+          ),
         )
           .initialSubscriptions { realm ->
             add(realm.query<Program>(), "programStream", updateExisting = true)
@@ -149,7 +150,7 @@ class RealmDatabase {
             add(
               realm.query<MuscleRoleFunction>(),
               "muscleRoleFunctionStream",
-              updateExisting = true
+              updateExisting = true,
             )
             add(realm.query<Muscle>(), "muscleStream", updateExisting = true)
             add(realm.query<MuscleGroup>(), "muscleGroupStream", updateExisting = true)
@@ -300,7 +301,7 @@ class RealmDatabase {
   fun filterExercises(
     exercise: String,
     muscleGroupIDs: List<String>,
-    equipmentIDs: List<String>
+    equipmentIDs: List<String>,
     //        movementTypes: List<String>
   ): Flow<List<Exercise>> {
     val muscleGroupsSize = muscleGroupIDs.size.plus(1)
@@ -321,7 +322,7 @@ class RealmDatabase {
         "name CONTAINS[c] $0 AND muscleGroupID IN $1 AND equipmentID IN $2 SORT(name ASC)",
         exercise,
         muscleGroupIDs,
-        equipmentIDs
+        equipmentIDs,
       )
       .find()
       .asFlow()
@@ -339,10 +340,11 @@ class RealmDatabase {
   }
 
   fun getAllCompletedWorkouts(): Flow<List<Workout>> {
-    return realm.query<Workout>("workoutEnded != null SORT(dateCreated DESC)").find().asFlow()
-      .map { workouts ->
-        workouts.list.sortedByDescending { workout -> workout.dateCreated }
-      }
+    return realm
+      .query<Workout>("workoutEnded != null SORT(dateCreated DESC)")
+      .find()
+      .asFlow()
+      .map { workouts -> workouts.list.sortedByDescending { workout -> workout.dateCreated } }
   }
 
   //  TODO Fix this function
@@ -429,7 +431,7 @@ class RealmDatabase {
   suspend fun copyWorkoutsFromTemplate(
     workouts: RealmList<Workout>,
     _microcycleID: ObjectId,
-    _programID: ObjectId
+    _programID: ObjectId,
   ): RealmList<Workout> {
     val realmWorkouts = realmListOf<Workout>()
     workouts.forEach { workout ->
@@ -483,7 +485,7 @@ class RealmDatabase {
     workout: String,
     programIDs: List<String>,
     startDate: String,
-    endDate: String
+    endDate: String,
     //        movementTypes: List<String>
   ): Flow<List<Workout>> {
     val muscleGroupsSize = programIDs.size.plus(1)
@@ -505,7 +507,7 @@ class RealmDatabase {
         workout,
         programIDs,
         startDate,
-        endDate
+        endDate,
       )
       .find()
       .asFlow()
@@ -599,7 +601,7 @@ class RealmDatabase {
 
   suspend fun copyMesocycleFromTemplate(
     mesocycles: RealmList<Mesocycle>,
-    _programID: ObjectId
+    _programID: ObjectId,
   ): RealmList<Mesocycle> {
 
     val realmMesocycles = realmListOf<Mesocycle>()
@@ -674,7 +676,7 @@ class RealmDatabase {
   suspend fun copyMicrocyclesFromTemplate(
     microcycles: RealmList<Microcycle>,
     _mesocycleID: ObjectId,
-    _programID: ObjectId
+    _programID: ObjectId,
   ): RealmList<Microcycle> {
 
     val realmMicrocycles = realmListOf<Microcycle>()
@@ -729,10 +731,7 @@ class RealmDatabase {
   //    return realm.query<ExerciseNote>().find().asFlow().map { it.list }
   //  }
 
-  fun getPinnedExerciseNotes(
-    exerciseID: ObjectId,
-    pinned: Boolean = true,
-  ): List<ExerciseNote> {
+  fun getPinnedExerciseNotes(exerciseID: ObjectId, pinned: Boolean = true): List<ExerciseNote> {
     return realm.query<ExerciseNote>("exercise = $0 AND pinned = $1", exerciseID, pinned).find()
   }
 
@@ -797,7 +796,7 @@ class RealmDatabase {
       .query<Set>(
         "exerciseID = $0 AND setNumber = $1 AND setCompleted = true SORT (dateCreated DESC)",
         exerciseID,
-        setNumber
+        setNumber,
       )
       .first()
       .find()
@@ -999,28 +998,28 @@ class RealmDatabase {
       */
 
       /*realm.write {
-//        val latestExercise = findLatest(_exercise) ?: return@write
-        val latestSets = mutableListOf<Set>()
+      //        val latestExercise = findLatest(_exercise) ?: return@write
+              val latestSets = mutableListOf<Set>()
 
-        //       setIDs.forEach { set ->
-        //         val latestSet = findLatest(set) ?: return@write
-        //         latestSets.add(latestSet)
-        //       }
+              //       setIDs.forEach { set ->
+              //         val latestSet = findLatest(set) ?: return@write
+              //         latestSets.add(latestSet)
+              //       }
 
-        val exerciseSets = copyToRealm(ExerciseSets())
-        exerciseSets.apply {
-          exerciseOrder = _exerciseSets.exerciseOrder
-          exerciseID = _exercise._id
-          workoutID = _exerciseSets.workout
-          //          sets = latestSets.toRealmList()
-        }
-      }*/
+              val exerciseSets = copyToRealm(ExerciseSets())
+              exerciseSets.apply {
+                exerciseOrder = _exerciseSets.exerciseOrder
+                exerciseID = _exercise._id
+                workoutID = _exerciseSets.workout
+                //          sets = latestSets.toRealmList()
+              }
+            }*/
     }
   }
 
   private suspend fun insertCompletedSets(
     sets: RealmList<Set>,
-    exerciseID: ObjectId?
+    exerciseID: ObjectId?,
   ): RealmList<Set> {
     val realmSets = realmListOf<Set>()
     sets.forEach { set ->
@@ -1064,7 +1063,7 @@ class RealmDatabase {
                 this.exerciseID = exerciseID
                 dateCreated = set.dateCreated
               },
-              updatePolicy = UpdatePolicy.ALL
+              updatePolicy = UpdatePolicy.ALL,
             )
           }
 
@@ -1091,7 +1090,8 @@ class RealmDatabase {
         realm.write {
           val _exerciseSets: ExerciseSets? =
             this.query<ExerciseSets>("_id == $0", exerciseSets._id).first().find()
-//          val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?: return@write
+          //          val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?:
+          // return@write
 
           if (_exerciseSets != null) {
             _exerciseSets.exerciseOrder = exerciseSets.exerciseOrder
@@ -1110,7 +1110,7 @@ class RealmDatabase {
                 datePerformed = exerciseSets.datePerformed
                 workoutID = exerciseSets.workoutID
               },
-              updatePolicy = UpdatePolicy.ALL
+              updatePolicy = UpdatePolicy.ALL,
             )
           }
 
@@ -1126,7 +1126,7 @@ class RealmDatabase {
 
   suspend fun copyExerciseSetsFromTemplate(
     exercisesSets: RealmList<ExerciseSets>,
-    _workoutID: ObjectId
+    _workoutID: ObjectId,
   ): RealmList<ExerciseSets> {
 
     val realmExerciseSets = realmListOf<ExerciseSets>()
@@ -1134,7 +1134,8 @@ class RealmDatabase {
       val newExerciseSetID = ObjectId()
       val insertedSets = copySetsFromTemplate(exerciseSets.sets, newExerciseSetID)
       realm.write {
-//        val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?: return@write
+        //        val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?:
+        // return@write
         val newExerciseSet =
           this.copyToRealm(
             ExerciseSets().apply {
@@ -1162,7 +1163,9 @@ class RealmDatabase {
           this.copyToRealm(
             Set().apply {
               uuid =
-                set.uuid // TODO determine if this should be unique or can be used in a future feature
+                set
+                  .uuid // TODO determine if this should be unique or can be used in a future
+              // feature
               setNumber = set.setNumber
               weightPounds = set.weightPounds
               weightKilograms = set.weightKilograms
@@ -1202,7 +1205,7 @@ class RealmDatabase {
                 exercise = exerciseNote.exercise
                 workout = exerciseNote.workout
               },
-              updatePolicy = UpdatePolicy.ALL
+              updatePolicy = UpdatePolicy.ALL,
             )
 
           realmExerciseNotes.add(newExerciseNote)
@@ -1225,12 +1228,16 @@ class RealmDatabase {
                 pinned = workoutNote.pinned
                 workout = workoutNote.workout
               },
-              updatePolicy = UpdatePolicy.ALL
+              updatePolicy = UpdatePolicy.ALL,
             )
           realmWorkoutNotes.add(newWorkoutNote)
         }
       }
     }
     return realmWorkoutNotes
+  }
+
+  fun getExerciseByName(exerciseName: String): Exercise {
+    return realm.query<Exercise>("name CONTAINS[c] $0", exerciseName).find().first()
   }
 }

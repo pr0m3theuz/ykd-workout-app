@@ -1,0 +1,2267 @@
+module com.example.myapplication.AdvancedProgramTemplate
+
+class Program {
+  name: String
+  arthur: String
+  shortDescription: String
+  description: String
+  programLength: String
+  uri: String
+  level: String
+  programEquipment: String
+  daysPerWeek: String
+  mesocycles: Listing<Mesocycle>
+}
+
+class Mesocycle {
+  name: String
+  description: String
+  order: Int
+  microcycles: Listing<Microcycle>
+}
+
+class Microcycle {
+  name: String
+  description: String
+  order: Int
+  workouts: Listing<Workout>
+  advancedWorkouts: Listing<AdvancedWorkout>
+}
+
+class Workout {
+  name: String
+  //     workoutArthur: String
+  day: Int
+  notes: Listing
+  exercisesSets: Listing<ExerciseSets>
+}
+
+class AdvancedWorkout {
+  name: String
+  //     workoutArthur: String
+  day: Int
+  notes: Listing
+  exercisesSets: Listing<ExerciseSets>
+  advancedExercisesSets: Listing<AdvancedExerciseSets>
+}
+
+class ExerciseSets {
+  name: String
+  notes: Listing
+  sets: Int // Number of sets to be performed
+  repetitions: Int
+
+  // Normal by default, Listing - length/number of elements must equal number of sets
+  setType: String = ""
+  targetRepetitionsInReserve: Int // Reps in Reserve
+  targetRatePerceivedEffort: Int // Rate of Perceived Exertion
+  percentage1RM: Float = -1.0 // Percentage of 1 Rep Max
+
+  // TODO Determine Correct Type
+  progressionSchemeID: String = ""
+  minRepetitions: Int = -1
+  maxRepetitions: Int = -1
+}
+
+class AdvancedExerciseSets {
+  name: String
+  notes: Listing
+//   sets: Int = -1// Number of sets to be performed
+//   repetitions: List<Int> = List(-1)
+  // Normal by default, Listing - length/number of elements must equal number of sets
+//   setType: String = ""
+//   targetRepetitionsInReserve: List<Int> // Reps in Reserve
+//   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+
+//   percentage1RM: List<Float> = List(-1.0) // Percentage of 1 Rep Max
+
+  // TODO Determine Correct Type
+//   progressionSchemeID: String = ""
+//   minRepetitions: Int = -1 //
+//   maxRepetitions: Int = -1 //
+  setScheme: SetScheme
+}
+
+class SetScheme {
+  sets: Int = -1
+  repetitions: List<Int>
+  setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
+  targetRepetitionsInReserve: List<Int> // Reps in Reserve
+  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+
+  percentage1RM: List<Float> // Percentage of 1 Rep Max
+
+  progressionSchemeID: String = ""// TODO Determine Correct Type
+  minRepetitions: Int? //
+  maxRepetitions: Int? //
+}
+
+setSchemeMetabolicPhaseA: SetScheme = new {
+  sets = 3
+  targetRatePerceivedEffort = List(7, 8, 9)
+  targetRepetitionsInReserve = List(3, 2, 1)
+  minRepetitions = 15
+  maxRepetitions = 20
+}
+
+setSchemeMetabolicPhaseB: SetScheme = new {
+  sets = 3
+  targetRatePerceivedEffort = List(7, 8, 9)
+  targetRepetitionsInReserve = List(3, 2, 1)
+  minRepetitions = 20
+  maxRepetitions = 25
+}
+
+setSchemeMetabolicPhaseC: SetScheme = new {
+  sets = 3
+  targetRatePerceivedEffort = List(7, 8, 9)
+  targetRepetitionsInReserve = List(3, 2, 1)
+  minRepetitions = 25
+  maxRepetitions = 30
+}
+
+setSchemeDeload: SetScheme = new {
+  sets = 3
+  targetRatePerceivedEffort = List(6, 6, 6)
+  targetRepetitionsInReserve = List(4, 4, 4)
+  minRepetitions = 15
+  maxRepetitions = 20
+}
+
+setSchemeMusclePhaseA1: SetScheme = new {
+  sets = 4
+  targetRatePerceivedEffort = List(8, 9, 9, 10)
+  targetRepetitionsInReserve = List(2, 1, 1, 0)
+  minRepetitions = 10
+  maxRepetitions = 12
+}
+
+setSchemeMusclePhaseA2: SetScheme = new {
+  sets = 3
+  targetRatePerceivedEffort = List(8, 9, 10)
+  targetRepetitionsInReserve = List(2, 1, 0)
+  minRepetitions = 10
+  maxRepetitions = 12
+}
+
+setSchemeMusclePhaseA3: SetScheme = new {
+  sets = 2
+  targetRatePerceivedEffort = List(9, 10)
+  targetRepetitionsInReserve = List(1, 0)
+  minRepetitions = 10
+  maxRepetitions = 12
+}
+
+setSchemeMusclePhaseB1: SetScheme = new {
+  sets = 4
+  targetRatePerceivedEffort = List(8, 9, 9, 10)
+  targetRepetitionsInReserve = List(2, 1, 1, 0)
+  minRepetitions = 8
+  maxRepetitions = 10
+}
+
+setSchemeMusclePhaseB2: SetScheme = new {
+  sets = 3
+  targetRatePerceivedEffort = List(8, 9, 10)
+  targetRepetitionsInReserve = List(2, 1, 0)
+  minRepetitions = 8
+  maxRepetitions = 10
+}
+
+setSchemeMusclePhaseB3: SetScheme = new {
+  sets = 2
+  targetRatePerceivedEffort = List(9, 10)
+  targetRepetitionsInReserve = List(1, 0)
+  minRepetitions = 8
+  maxRepetitions = 10
+}
+
+setSchemeMusclePhaseC1: SetScheme = new {
+  sets = 4
+  targetRatePerceivedEffort = List(8, 9, 9, 10)
+  targetRepetitionsInReserve = List(2, 1, 1, 0)
+  minRepetitions = 6
+  maxRepetitions = 8
+}
+
+setSchemeMusclePhaseC2: SetScheme = new {
+  sets = 3
+  targetRatePerceivedEffort = List(8, 9, 10)
+  targetRepetitionsInReserve = List(2, 1, 0)
+  minRepetitions = 6
+  maxRepetitions = 8
+}
+
+setSchemeMusclePhaseC3: SetScheme = new {
+  sets = 2
+  targetRatePerceivedEffort = List(9, 10)
+  targetRepetitionsInReserve = List(1, 0)
+  minRepetitions = 6
+  maxRepetitions = 8
+}
+
+
+
+mesocycles: Listing<Mesocycle> = new {
+  new {
+    name = "Metabolic Phase"
+    description = #""#
+    order = 3
+    microcycles {
+      new {
+        name = "Metabolic Phase Week 1: Microcycle 1"
+        description = ""
+        order = 1
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Metabolic B1: M1"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Dumbbell one-arm row"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMetabolicPhaseA
+              }new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Bicycle crunch"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Metabolic B1: M1"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Barbell upright row"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Cable triceps press-down"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Barbell back squat"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Cable rope kneeling crunch"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Metabolic B1: M1"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Dumbbell one-arm row"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Military press"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Skull crusher"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Walking lunge"
+                setScheme = setSchemeMetabolicPhaseC
+              }new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Roman chair side crunch"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Metabolic Phase Week 2: Microcycle 2"
+        description = ""
+        order = 2
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Metabolic B1: M2"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "cable seated row"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Military press"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "neutral-grip lat pull-down"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMetabolicPhaseA
+              }new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Metabolic B1: M2"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "barbell reverse-grip bent row"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "cross cable lat pull-down"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "skull crusher (smith machine)"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Barbell back squat"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "dumbbell stiff-legged deadlift"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Metabolic B1: M2"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Dumbbell one-arm row"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Cable upright row"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "lat pull-down"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Cable triceps press-dowr straight bar"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Walking lunge"
+                setScheme = setSchemeMetabolicPhaseC
+              }new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Metabolic Phase Week 3: Microcycle 3"
+        description = ""
+        order = 3
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Metabolic B1: M3"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "cable seated row"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Military press"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "neutral-grip lat pull-down"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMetabolicPhaseA
+              }new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMetabolicPhaseA
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Metabolic B1: M3"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "barbell reverse-grip bent row"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "cross cable lat pull-down"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "skull crusher (smith machine)"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "Barbell back squat"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+              new {
+                name = "dumbbell stiff-legged deadlift"
+                setScheme = setSchemeMetabolicPhaseB
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Metabolic B1: M3"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Dumbbell one-arm row"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Cable upright row"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "lat pull-down"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Cable triceps press-dowr straight bar"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+              new {
+                name = "Walking lunge"
+                setScheme = setSchemeMetabolicPhaseC
+              }new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMetabolicPhaseC
+              }
+            }
+          }
+
+        }
+      }
+      new {
+        name = "Metabolic Phase Week 4: Microcycle 4"
+        description = ""
+        order = 4
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Metabolic B1: M4"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline fly"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Barbell upright row"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Bulgarian squat"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Plank"
+                setScheme = setSchemeDeload
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Metabolic B1: M4"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Cable fly"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Cable seated row"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Dumbbell lateral raise"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Machine seated leg curl"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Toe press"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Side bridge"
+                setScheme = setSchemeDeload
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  new {
+    name = "Muscle Phase"
+    description = #""#
+    order = 4
+    microcycles {
+      new {
+        name = "Muscle Phase Week 1: Block 1 Microcycle 1"
+        description = ""
+        order = 1
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B1: M1"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell chest press"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Military press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine rear delt fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Skull crusher"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Machine triceps dip"
+                setScheme = setSchemeMusclePhaseA3
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B1: M1"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell back squat"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B1: M1"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable seated row"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell pullover"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Barbell curl"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable rope hammer curl"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Stability ball abdominal crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Reverse crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Russian twist"
+                setScheme = setSchemeMusclePhaseA3
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Muscle Phase Week 2: Block 1 Microcycle 2"
+        description = ""
+        order = 2
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B1: M2"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Cable upright row"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Machine rear delt fly"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Cable rope overhead triceps extension"
+                setScheme = setSchemeMusclePhaseB3
+              }
+              new {
+                name = "Cable triceps press-down"
+                setScheme = setSchemeMusclePhaseB3
+              }
+              new {
+                name = "Machine triceps dip"
+                setScheme = setSchemeMusclePhaseB3
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B1: M2"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell back squat"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseB2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B1: M2"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Cross cable lat pull-down"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Dumbbell one-arm row"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Cable straight-arm lat pull-down"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Preacher Curl"
+                setScheme = setSchemeMusclePhaseB3
+              }
+              new {
+                name = "Hanging knee raise"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Cable wood chop"
+                setScheme = setSchemeMusclePhaseB2
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Muscle Phase Week 3: Block 1 Microcycle 3"
+        description = ""
+        order = 3
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B1: M3"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable fly"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Machine shoulder press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable reverse fly"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Machine skull crusher"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable overhead triceps extension"
+                setScheme = setSchemeMusclePhaseC3
+              }
+              new {
+                name = "Cable triceps kickback"
+                setScheme = setSchemeMusclePhaseC3
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B1: M3"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Leg Pess"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Unilateral leg extension"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseC1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B1: M3"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable one-arm standing low row"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable rope hammer curl"
+                setScheme = setSchemeMusclePhaseC3
+              }
+              new {
+                name = "Machine preacher curl"
+                setScheme = setSchemeMusclePhaseC3
+              }
+              new {
+                name = "Hanging knee raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable side bend"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Side bridge"
+                setScheme = setSchemeMusclePhaseC3
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Muscle Phase Week 4: Block 1 Microcycle 4"
+        description = ""
+        order = 4
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Metabolic B1: M4"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Barbell upright row"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Skull crusher"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Bulgarian squat"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Plank"
+                setScheme = setSchemeDeload
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Metabolic B1: M4"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Cable seated row"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Military press"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Dumbbell preacher curl"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Cable triceps press-down"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Machine seated leg curl"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Toe press"
+                setScheme = setSchemeDeload
+              }
+              new {
+                name = "Side bridge"
+                setScheme = setSchemeDeload
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Muscle Phase Week 5: Block 2 Microcycle 1"
+        description = ""
+        order = 5
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B2: M1"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell chest press"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Reverse-grip lat pull-down"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMusclePhaseA1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B2: M1"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell split squat"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell rollout"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable rope kneeling twisting crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B2: M1"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine shoulder press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable reverse fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMusclePhaseA1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 4 - Muscle B2: M1"
+            day = 4
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable rope kneeling crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable wood chop"
+                setScheme = setSchemeMusclePhaseA2
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Muscle Phase Week 6: Block 2 Microcycle 2"
+        description = ""
+        order = 6
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B2: M2"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Cross cable lat pull-down"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Cable upright row"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Cable reverse fly"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Cable rope overhead triceps extension"
+                setScheme = setSchemeMusclePhaseB1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B2: M2"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell split squat"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Cable rope kneeling crunch"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Roman chair side crunch"
+                setScheme = setSchemeMusclePhaseB2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B2: M2"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Barbell reverse-grip bent row"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Machine shoulder press"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMusclePhaseB1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 4 - Muscle B2: M2"
+            day = 4
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell lunge"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseB2
+              }
+              new {
+                name = "Reverse crunch"
+                setScheme = setSchemeMusclePhaseB1
+              }
+              new {
+                name = "Russian twist"
+                setScheme = setSchemeMusclePhaseB2
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Metabolic Phase Week 7: Block 2 Microcycle 3"
+        description = ""
+        order = 7
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B2: M3"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable incline chest fly"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Reverse-grip lat pull-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable triceps press-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B2: M3"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Bulgarian squat"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Hanging knee raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B2: M3"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Machine shoulder press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMusclePhaseC1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 4 - Muscle B2: M3"
+            day = 4
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Unilateral leg extension"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable rope kneeling crunch"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable wood chop"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Metabolic Phase Week 8: Block 2 Microcycle 4"
+        description = ""
+        order = 8
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B2: M1"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell chest press"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Reverse-grip lat pull-down"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMusclePhaseA1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B2: M1"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell split squat"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell rollout"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable rope kneeling twisting crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B2: M1"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine shoulder press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable reverse fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Bayesian Curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Overhead triceps extension (Cable)"
+                setScheme = setSchemeMusclePhaseA1
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 4 - Muscle B2: M1"
+            day = 4
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable rope kneeling crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable wood chop"
+                setScheme = setSchemeMusclePhaseA2
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Muscle Phase Week 9: Block 3 Microcycle 1"
+        description = ""
+        order = 9
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B3: M1"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Lat pull-down"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable one-arm row"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Dumbbell pullover"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Stability ball abdominal crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Russian twist"
+                setScheme = setSchemeMusclePhaseA3
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B3: M1"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Barbell back squat"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable glute kickback"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B3: M1"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Military press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine rear delt fly"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable rope overhead triceps extension"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Skull crusher"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Dumbbell triceps kickback"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Preacher curl"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeMusclePhaseA3
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 4 - Muscle B3: M1"
+            day = 4
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Cross cable lat pull-down"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable one-arm row"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable straight-arm lat pull-down"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Cable rope kneeling crunch"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Hanging knee raise"
+                setScheme = setSchemeMusclePhaseA3
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 5 - Muscle B3: M1"
+            day = 5
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable glute kickback"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseA2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 6 - Muscle B3: M1"
+            day = 6
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Machine rear delt fly"
+                setScheme = setSchemeMusclePhaseA1
+              }
+              new {
+                name = "Cable triceps press-down"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Machine skull crusher"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Dumbbell triceps kickback"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeMusclePhaseA2
+              }
+              new {
+                name = "Preacher curl"
+                setScheme = setSchemeMusclePhaseA3
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeMusclePhaseA3
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Muscle Phase Week 2: Block 3 Microcycle 2"
+        description = ""
+        order = 2
+        advancedWorkouts {
+          new AdvancedWorkout {
+            name = "Day 1 - Muscle B3: M2"
+            day = 1
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Cross cable lat pull-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Reverse-grip lat pull-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "T-bar row"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Reverse crunch"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable wood chop"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 2 - Muscle B3: M2"
+            day = 2
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Unilateral leg extension"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 3 - Muscle B3: M2"
+            day = 3
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Military press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable reverse fly"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable rope overhead triceps extension"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Skull crusher"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Preacher curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 4 - Muscle B3: M2"
+            day = 4
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Neutral-grip lat pull-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable one-arm row"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable straight-arm lat pull-down"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Barbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Dumbbell incline press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Pec deck fly"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Cable rope kneeling crunch"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Hanging knee raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 5 - Muscle B3: M2"
+            day = 5
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Leg press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Dumbbell reverse lunge"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Leg extension"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Barbell stiff-legged deadlift"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Seated leg curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine seated calf raise"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine standing calf raise"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+          new AdvancedWorkout {
+            name = "Day 6 - Muscle B3: M2"
+            day = 6
+            notes {}
+            advancedExercisesSets {
+              new {
+                name = "Dumbbell shoulder press"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable lateral raise"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine rear delt fly"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Cable triceps press-down"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Machine skull crusher"
+                setScheme = setSchemeMusclePhaseC2
+              }
+              new {
+                name = "Bayesian curl"
+                setScheme = setSchemeMusclePhaseC1
+              }
+              new {
+                name = "Preacher curl"
+                setScheme = setSchemeMusclePhaseC2
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

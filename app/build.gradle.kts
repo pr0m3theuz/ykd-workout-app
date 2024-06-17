@@ -10,6 +10,7 @@ plugins {
   id("newrelic")
   id("kotlin-parcelize")
   //  id("org.jetbrains.kotlin.plugin.kotlin-parcelize")
+  id("org.pkl-lang")
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
@@ -44,11 +45,11 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
   }
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 
     freeCompilerArgs =
       listOf(
@@ -57,7 +58,7 @@ android {
         "-Xemit-jvm-type-annotations", // Enable annotations on type variables
       )
   }
-  kotlin { jvmToolchain(17) }
+  kotlin { jvmToolchain(18) }
 
   tasks.withType<Test> {
     useJUnitPlatform { includeEngines("jqwik") }
@@ -186,6 +187,7 @@ dependencies {
   //  implementation("com.google.firebase:firebase-crashlytics-ndk")
 
   implementation("com.newrelic.agent.android:android-agent:7.3.1")
+  implementation("org.pkl-lang:pkl-config-kotlin:0.25.3")
 }
 
 /*kapt {

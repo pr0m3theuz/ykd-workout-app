@@ -1,0 +1,97 @@
+module com.example.myapplication.AdvancedProgramTemplate
+
+class Program {
+  name: String
+  arthur: String
+  shortDescription: String
+  description: String
+  programLength: String
+  uri: String
+  level: String
+  programEquipment: String
+  daysPerWeek: String
+  mesocycles: Listing<Mesocycle>
+}
+
+class Mesocycle {
+  name: String
+  description: String
+  order: Int
+  microcycles: Listing<Microcycle>
+}
+
+class Microcycle {
+  name: String
+  description: String
+  order: Int
+  workouts: Listing<Workout>
+  advancedWorkouts: Listing<AdvancedWorkout>
+}
+
+class Workout {
+  name: String
+  //     workoutArthur: String
+  day: Int
+  notes: Listing
+  exercisesSets: Listing<ExerciseSets>
+}
+
+class AdvancedWorkout {
+  name: String
+  //     workoutArthur: String
+  day: Int
+  notes: Listing
+  exercisesSets: Listing<ExerciseSets>
+  advancedExercisesSets: Listing<AdvancedExerciseSets>
+}
+
+class ExerciseSets {
+  name: String
+  notes: Listing
+  sets: Int // Number of sets to be performed
+  repetitions: Int
+
+  // Normal by default, Listing - length/number of elements must equal number of sets
+  setType: String = ""
+  targetRepetitionsInReserve: Int // Reps in Reserve
+  targetRatePerceivedEffort: Int // Rate of Perceived Exertion
+  percentage1RM: Float = -1.0 // Percentage of 1 Rep Max
+
+  // TODO Determine Correct Type
+  progressionSchemeID: String = ""
+  minRepetitions: Int = -1
+  maxRepetitions: Int = -1
+}
+
+class AdvancedExerciseSets {
+  name: String
+  notes: Listing
+  sets: Int = -1// Number of sets to be performed
+  repetitions: List<Int> = List(-1)
+  // Normal by default, Listing - length/number of elements must equal number of sets
+  setType: String = ""
+  targetRepetitionsInReserve: List<Int> // Reps in Reserve
+  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+
+  percentage1RM: List<Float> = List(-1.0) // Percentage of 1 Rep Max
+
+  // TODO Determine Correct Type
+  progressionSchemeID: String = ""
+  minRepetitions: Int = -1 //
+  maxRepetitions: Int = -1 //
+  setScheme: SetScheme
+}
+
+class SetScheme {
+  sets: Int = -1
+  repetitions: List<Int> = List(-1)
+  setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
+  targetRepetitionsInReserve: List<Int> // Reps in Reserve
+  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+
+  percentage1RM: List<Float> = List(-1.0)// Percentage of 1 Rep Max
+
+  progressionSchemeID: String = ""// TODO Determine Correct Type
+  minRepetitions: Int = -1//
+  maxRepetitions: Int = -1 //
+}

@@ -67,6 +67,10 @@ class MainActivity : ComponentActivity() {
     }
   }
 
+  override fun onStop() {
+    super.onStop()
+  }
+
   companion object {
     fun newIntent(context: Context): Intent {
       return Intent(context, MainActivity::class.java)
@@ -100,6 +104,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
       Log.i("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
+
+//      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key = WORKOUT_DETAILS)
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(

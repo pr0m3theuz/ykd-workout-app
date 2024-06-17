@@ -1,0 +1,87 @@
+object AdvancedProgramTemplate {
+  data class Program(
+    val name: String,
+    val arthur: String,
+    val shortDescription: String,
+    val description: String,
+    val programLength: String,
+    val uri: String,
+    val level: String,
+    val programEquipment: String,
+    val daysPerWeek: String,
+    val mesocycles: List<Mesocycle>
+  )
+
+  data class Mesocycle(
+    val name: String,
+    val description: String,
+    val order: Long,
+    val microcycles: List<Microcycle>
+  )
+
+  data class Microcycle(
+    val name: String,
+    val description: String,
+    val order: Long,
+    val workouts: List<Workout>,
+    val advancedWorkouts: List<AdvancedWorkout>
+  )
+
+  data class Workout(
+    val name: String,
+    val day: Long,
+    val notes: List<Any?>,
+    val exercisesSets: List<ExerciseSets>
+  )
+
+  data class AdvancedWorkout(
+    val name: String,
+    val day: Long,
+    val notes: List<Any?>,
+    val exercisesSets: List<ExerciseSets>,
+    val advancedExercisesSets: List<AdvancedExerciseSets>
+  )
+
+  data class ExerciseSets(
+    val name: String,
+    val notes: List<Any?>,
+    val sets: Long,
+    val repetitions: Long,
+    val setType: String,
+    val targetRepetitionsInReserve: Long,
+    val targetRatePerceivedEffort: Long,
+    val percentage1RM: Double,
+    val progressionSchemeID: String,
+    val minRepetitions: Long,
+    val maxRepetitions: Long
+  )
+
+  data class AdvancedExerciseSets(
+    val name: String,
+    val notes: List<Any?>,
+//    val sets: Long,
+//    val repetitions: List<Long>,
+//    val setType: String,
+//    val targetRepetitionsInReserve: List<Long>,
+//    val targetRatePerceivedEffort: List<Long>,
+//    val percentage1RM: List<Double>,
+//    val progressionSchemeID: String,
+//    val minRepetitions: Long,
+//    val maxRepetitions: Long,
+    val setScheme: SetScheme
+  )
+
+  data class SetScheme(
+    val sets: Long,
+    val repetitions: List<Long?>,
+    val setType: String,
+    val targetRepetitionsInReserve: List<Long>,
+    val targetRatePerceivedEffort: List<Long>,
+    val percentage1RM: List<Double>,
+    val progressionSchemeID: String?,
+    val minRepetitions: Long?,
+    val maxRepetitions: Long?
+
+  )
+}
+
