@@ -4,11 +4,13 @@ import AdvancedProgramTemplate
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
+import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
+import kotlinx.serialization.json.Json
 import net.jqwik.api.Example
 import org.mongodb.kbson.ObjectId
 import org.pkl.config.java.ConfigEvaluator
@@ -59,8 +61,9 @@ class ImportWorkoutProgramTest() {
                     targetRepetitions =
                       "${pklExerciseSets.minRepetitions} - ${pklExerciseSets.maxRepetitions}"
                     targetRepetitionsInReserve =
-                      pklExerciseSets.targetRepetitionsInReserve.toDouble()
-                    targetRatePerceivedEffort = pklExerciseSets.targetRatePerceivedEffort.toDouble()
+                      pklExerciseSets.targetRepetitionsInReserve?.toDouble()
+                    targetRatePerceivedEffort =
+                      pklExerciseSets.targetRatePerceivedEffort?.toDouble()
                     percentage1RM = pklExerciseSets.percentage1RM
                   }
                 }
@@ -97,78 +100,78 @@ class ImportWorkoutProgramTest() {
       return ObjectId()
     }
 
-    fun createAdvancedExerciseSets(
-      pklAdvancedExercisesSets: List<AdvancedProgramTemplate.AdvancedExerciseSets>
-    ): RealmList<ExerciseSets> {
-      val exercisesSets = mutableListOf<ExerciseSets>()
-
-      pklAdvancedExercisesSets.forEachIndexed { index, pklAdvancedExerciseSets ->
-        // val _exSetsUUID: RealmUUID = RealmUUID.random()
-
-        if (
-          pklAdvancedExerciseSets.setScheme.sets.toInt() !=
-          pklAdvancedExerciseSets.setScheme.repetitions.size
-        ) {
-          // TODO return error
-          return@forEachIndexed
-        } else if (
-          pklAdvancedExerciseSets.setScheme.sets.toInt() !=
-          pklAdvancedExerciseSets.setScheme.targetRepetitionsInReserve.size
-        ) {
-          // TODO return error
-          return@forEachIndexed
-        } else if (
-          pklAdvancedExerciseSets.setScheme.sets.toInt() !=
-          pklAdvancedExerciseSets.setScheme.targetRatePerceivedEffort.size
-        ) {
-          // TODO return error
-          return@forEachIndexed
-        } else if (
-          pklAdvancedExerciseSets.setScheme.sets.toInt() !=
-          pklAdvancedExerciseSets.setScheme.percentage1RM.size
-        ) {
-          // TODO return error
-          return@forEachIndexed
-        } else if (
-          pklAdvancedExerciseSets.setScheme.sets.toInt() !=
-          pklAdvancedExerciseSets.setScheme.percentage1RM.size
-        ) {
-          // TODO return error
-          return@forEachIndexed
-        }
-
-        val exerciseSets =
-          ExerciseSets().apply {
-            // exSetsUUID = _exSetsUUID
-            exerciseOrder = index
-            exerciseID = getExerciseObjectID(pklAdvancedExerciseSets.name)
-            // TODO search database for exercise & set exerciseID
-            sets =
-              if (pklAdvancedExerciseSets.setScheme.sets > 0) {
-                val setList = mutableListOf<Set>()
-                for (set in 1..pklAdvancedExerciseSets.setScheme.sets.toInt()) {
-                  Set().apply {
-                    setNumber = set
-                    targetRepetitions =
-                      "${pklAdvancedExerciseSets.setScheme.minRepetitions} - ${pklAdvancedExerciseSets.setScheme.maxRepetitions}"
-                    targetRepetitionsInReserve =
-                      pklAdvancedExerciseSets.setScheme.targetRepetitionsInReserve[set].toDouble()
-                    targetRatePerceivedEffort =
-                      pklAdvancedExerciseSets.setScheme.targetRatePerceivedEffort[set].toDouble()
-                    percentage1RM = pklAdvancedExerciseSets.setScheme.percentage1RM[set]
-                  }
-                }
-
-                setList.toRealmList()
-              } else {
-                realmListOf<Set>()
-              }
-          }
-        exercisesSets.add(index, exerciseSets)
-      }
-
-      return exercisesSets.toRealmList()
-    }
+//    fun createAdvancedExerciseSets(
+//      pklAdvancedExercisesSets: List<AdvancedProgramTemplate.AdvancedExerciseSets>
+//    ): RealmList<ExerciseSets> {
+//      val exercisesSets = mutableListOf<ExerciseSets>()
+//
+//      pklAdvancedExercisesSets.forEachIndexed { index, pklAdvancedExerciseSets ->
+//        // val _exSetsUUID: RealmUUID = RealmUUID.random()
+//
+//        if (
+//          pklAdvancedExerciseSets.setScheme?.sets.toInt() !=
+//          pklAdvancedExerciseSets.setScheme?.repetitions.size
+//        ) {
+//          // TODO return error
+//          return@forEachIndexed
+//        } else if (
+//          pklAdvancedExerciseSets.setScheme?.sets.toInt() !=
+//          pklAdvancedExerciseSets.setScheme?.targetRepetitionsInReserve.size
+//        ) {
+//          // TODO return error
+//          return@forEachIndexed
+//        } else if (
+//          pklAdvancedExerciseSets.setScheme?.sets.toInt() !=
+//          pklAdvancedExerciseSets.setScheme?.targetRatePerceivedEffort.size
+//        ) {
+//          // TODO return error
+//          return@forEachIndexed
+//        } else if (
+//          pklAdvancedExerciseSets.setScheme?.sets.toInt() !=
+//          pklAdvancedExerciseSets.setScheme?.percentage1RM.size
+//        ) {
+//          // TODO return error
+//          return@forEachIndexed
+//        } else if (
+//          pklAdvancedExerciseSets.setScheme?.sets.toInt() !=
+//          pklAdvancedExerciseSets.setScheme?.percentage1RM.size
+//        ) {
+//          // TODO return error
+//          return@forEachIndexed
+//        }
+//
+//        val exerciseSets =
+//          ExerciseSets().apply {
+//            // exSetsUUID = _exSetsUUID
+//            exerciseOrder = index
+//            exerciseID = getExerciseObjectID(pklAdvancedExerciseSets.name)
+//            // TODO search database for exercise & set exerciseID
+//            sets =
+//              if (pklAdvancedExerciseSets.setScheme?.sets > 0) {
+//                val setList = mutableListOf<Set>()
+//                for (set in 1..pklAdvancedExerciseSets.setScheme?.sets.toInt()) {
+//                  Set().apply {
+//                    setNumber = set
+//                    targetRepetitions =
+//                      "${pklAdvancedExerciseSets.setScheme?.minRepetitions} - ${pklAdvancedExerciseSets.setScheme?.maxRepetitions}"
+//                    targetRepetitionsInReserve =
+//                      pklAdvancedExerciseSets.setScheme?.targetRepetitionsInReserve[set].toDouble()
+//                    targetRatePerceivedEffort =
+//                      pklAdvancedExerciseSets.setScheme?.targetRatePerceivedEffort[set].toDouble()
+//                    percentage1RM = pklAdvancedExerciseSets.setScheme?.percentage1RM[set]
+//                  }
+//                }
+//
+//                setList.toRealmList()
+//              } else {
+//                realmListOf<Set>()
+//              }
+//          }
+//        exercisesSets.add(index, exerciseSets)
+//      }
+//
+//      return exercisesSets.toRealmList()
+//    }
 
     fun createAdvancedWorkout(
       pklAdvancedWorkouts: List<AdvancedProgramTemplate.AdvancedWorkout>
@@ -185,7 +188,8 @@ class ImportWorkoutProgramTest() {
               if (pklAdvancedWorkout.exercisesSets.isNotEmpty()) {
                 createExerciseSets(pklAdvancedWorkout.exercisesSets)
               } else if (pklAdvancedWorkout.advancedExercisesSets.isNotEmpty()) {
-                createAdvancedExerciseSets(pklAdvancedWorkout.advancedExercisesSets)
+                realmListOf<ExerciseSets>()
+//                createAdvancedExerciseSets(pklAdvancedWorkout.advancedExercisesSets)
               } else {
                 realmListOf<ExerciseSets>()
               }
@@ -241,7 +245,7 @@ class ImportWorkoutProgramTest() {
 
     val file =
       File(
-        "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/main/java/com/example/myapplication/KONG_AdvancedProgramTemplate.pkl"
+        "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/main/java/com/example/myapplication/MAX_PLAN_AdvancedProgramTemplate.pkl"
       )
         .readText()
 
@@ -252,8 +256,76 @@ class ImportWorkoutProgramTest() {
 
     //    val mesocycles =
     try {
-      val program = config["program"].to<List<AdvancedProgramTemplate.Program>>()
-      println(program.toString())
+      val pklProgram = config["program"].to<AdvancedProgramTemplate.Program>()
+//      println(program.toString())
+      val program = importWorkoutProgram.importAdvancedWorkoutProgram(pklProgram)
+      println(Json.encodeToString(Program.serializer(), program))
+    } catch (e: Exception) {
+      println(e.message)
+      println()
+    }
+
+    try {
+      val pklMesocycles = config["mesocycles"].to<List<AdvancedProgramTemplate.Mesocycle>>()
+//      println(pklMesocycles.toString())
+      val mesocycles = importWorkoutProgram.importMesocycles(pklMesocycles)
+      mesocycles.forEach { mesocycle ->
+        println(
+          Json.encodeToString(
+            Mesocycle.serializer(),
+            mesocycle
+          )
+        )
+      }
+    } catch (e: Exception) {
+      println(e.message)
+    }
+
+    try {
+      val microcycles = config["microcycles"].to<List<AdvancedProgramTemplate.Microcycle>>()
+//      println(microcycles.toString())
+      importWorkoutProgram.importMicrocycles(microcycles)
+    } catch (e: Exception) {
+      println(e.message)
+    }
+
+    try {
+      val workouts = config["workouts"].to<List<AdvancedProgramTemplate.Workout>>()
+//      println(workouts.toString())
+      importWorkoutProgram.importWorkouts(workouts)
+    } catch (e: Exception) {
+      println(e.message)
+    }
+
+    try {
+      val advancedWorkouts = config["workouts"].to<List<AdvancedProgramTemplate.AdvancedWorkout>>()
+//      println(advancedWorkouts.toString())
+      importWorkoutProgram.importAdvancedWorkouts(advancedWorkouts)
+    } catch (e: Exception) {
+      println(e.message)
+    }
+  }
+
+  @Example
+  fun `Import KONG Program`() {
+    val importWorkoutProgram = ImportWorkoutProgram()
+
+    val file =
+      File(
+        "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/main/java/com/example/myapplication/KONG_AdvancedProgramTemplate.pkl"
+      )
+        .readText()
+
+    val config =
+      ConfigEvaluator.preconfigured().forKotlin().use { evaluator ->
+        evaluator.evaluate(ModuleSource.text(file.trimIndent()))
+      }
+
+    try {
+      val pklProgram = config["program"].to<AdvancedProgramTemplate.Program>()
+//      println(program.toString())
+      val program = importWorkoutProgram.importAdvancedWorkoutProgram(pklProgram)
+      println(Json.encodeToString(Program.serializer(), program))
     } catch (e: Exception) {
       println(e.message)
       println()
@@ -261,6 +333,7 @@ class ImportWorkoutProgramTest() {
 
     try {
       val mesocycles = config["mesocycles"].to<List<AdvancedProgramTemplate.Mesocycle>>()
+//      println(mesocycles.toString())
       importWorkoutProgram.importMesocycles(mesocycles)
     } catch (e: Exception) {
       println(e.message)

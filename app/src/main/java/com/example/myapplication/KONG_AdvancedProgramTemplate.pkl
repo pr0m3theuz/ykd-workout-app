@@ -67,17 +67,17 @@ class ExerciseSets {
 class AdvancedExerciseSets {
   name: String
   notes: Listing
-  sets: Int? // Number of sets to be performed
+  sets: Int? = null// Number of sets to be performed
   repetitions: List<Int>
-  //   Normal by default, Listing - length/number of elements must equal number of sets
+  // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
   targetRepetitionsInReserve: List<Int> // Reps in Reserve
   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
   percentage1RM: List<Float> // Percentage of 1 Rep Max
 
-  //   TODO Determine Correct Type
-  progressionSchemeID: Int? = null
+  // TODO Determine Correct Type
+  progressionSchemeID: String = ""
   minRepetitions: Int? = null //
   maxRepetitions: Int? = null//
   setScheme: SetScheme?
@@ -189,13 +189,13 @@ setScheme12D: SetScheme = new {
   targetRepetitionsInReserve = List(1, 1, 1)
 }
 
-program: Program = new {
+program: Program = new Program {
   name = "KONG: Savage Size in 12 Weeks"
   arthur = "Alex Bromley"
   shortDescription = ""
   description = ""
   programLength = "12 Weeks"
-  uri = "https://www.boostcamp.app/coaches/bald-omni-man/raider"
+  uri = "https://www.boostcamp.app/coaches/alex-bromley/12-week-hypertrophy"
   level = "Novice, Intermediate"
   programEquipment = "Full Gym"
   daysPerWeek = "5 days"

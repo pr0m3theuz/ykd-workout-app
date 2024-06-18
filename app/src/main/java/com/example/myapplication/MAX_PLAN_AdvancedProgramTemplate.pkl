@@ -67,19 +67,19 @@ class ExerciseSets {
 class AdvancedExerciseSets {
   name: String
   notes: Listing
-//   sets: Int = -1// Number of sets to be performed
-//   repetitions: List<Int> = List(-1)
+  sets: Int? = null// Number of sets to be performed
+  repetitions: List<Int>
   // Normal by default, Listing - length/number of elements must equal number of sets
-//   setType: String = ""
-//   targetRepetitionsInReserve: List<Int> // Reps in Reserve
-//   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+  setType: String = ""
+  targetRepetitionsInReserve: List<Int> // Reps in Reserve
+  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
-//   percentage1RM: List<Float> = List(-1.0) // Percentage of 1 Rep Max
+  percentage1RM: List<Float> // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-//   progressionSchemeID: String = ""
-//   minRepetitions: Int = -1 //
-//   maxRepetitions: Int = -1 //
+  progressionSchemeID: String = ""
+  minRepetitions: Int? = null //
+  maxRepetitions: Int? = null//
   setScheme: SetScheme?
 }
 

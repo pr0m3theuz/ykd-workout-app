@@ -10,13 +10,7 @@ import com.example.myapplication.data.model.Workout
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
-import kotlinx.serialization.json.Json
 import org.mongodb.kbson.ObjectId
-import org.pkl.config.java.ConfigEvaluator
-import org.pkl.config.kotlin.forKotlin
-import org.pkl.config.kotlin.to
-import org.pkl.core.ModuleSource
-import java.io.File
 
 // TODO create function to import workout program
 // TODO create function to import program with no mesocycles
@@ -59,18 +53,19 @@ constructor(
                       )
 
                     targetRepetitionsInReserve =
-                      pklExerciseSets.targetRepetitionsInReserve.toDouble()
-                    targetRatePerceivedEffort = pklExerciseSets.targetRatePerceivedEffort.toDouble()
+                      pklExerciseSets.targetRepetitionsInReserve?.toDouble()
+                    targetRatePerceivedEffort =
+                      pklExerciseSets.targetRatePerceivedEffort?.toDouble()
                     percentage1RM = pklExerciseSets.percentage1RM
                   }
-                println(
-                  "ImportWorkoutProgram.createExerciseSets: ${
-                    Json.encodeToString(
-                      Set.serializer(),
-                      set
-                    )
-                  }"
-                )
+//                println(
+//                  "ImportWorkoutProgram.createExerciseSets: ${
+//                    Json.encodeToString(
+//                      Set.serializer(),
+//                      set
+//                    )
+//                  }"
+//                )
                 setList.add(set)
               }
 
@@ -89,7 +84,7 @@ constructor(
     val workouts = mutableListOf<Workout>()
 
     pklWorkouts.forEachIndexed { index, pklWorkout ->
-      print("ImportWorkoutProgram.createWorkout: ${pklWorkout.name}")
+//      print("ImportWorkoutProgram.createWorkout: ${pklWorkout.name}")
 
       val workout =
         Workout().apply {
@@ -113,7 +108,7 @@ constructor(
       // exSetsUUID = _exSetsUUID
       // TODO search database for exercise & set exerciseID
 
-      println("ImportWorkoutProgram.createAdvancedExerciseSets ${pklAdvancedExerciseSets.name}")
+//      println("ImportWorkoutProgram.createAdvancedExerciseSets ${pklAdvancedExerciseSets.name}")
 
       if (pklAdvancedExerciseSets.setScheme != null) {
         val setScheme = pklAdvancedExerciseSets.setScheme
@@ -258,7 +253,7 @@ constructor(
     val workouts = mutableListOf<Workout>()
 
     pklAdvancedWorkouts.forEachIndexed { index, pklAdvancedWorkout ->
-      print("ImportWorkoutProgram.createAdvancedWorkout: ${pklAdvancedWorkout.name}\n")
+//      print("ImportWorkoutProgram.createAdvancedWorkout: ${pklAdvancedWorkout.name}\n")
 
       val workout =
         Workout().apply {
@@ -287,7 +282,7 @@ constructor(
     val microcycles = mutableListOf<Microcycle>()
 
     pklMicrocycles.forEachIndexed { index, pklMicrocycle ->
-      print("ImportWorkoutProgram.createMicrocyles: ${pklMicrocycle.name}\n")
+//      print("ImportWorkoutProgram.createMicrocyles: ${pklMicrocycle.name}\n")
 
       val microcycle =
         Microcycle().apply {
@@ -316,7 +311,7 @@ constructor(
   ): RealmList<Mesocycle> {
     val mesocycles = mutableListOf<Mesocycle>()
     pklMesocycles.forEachIndexed { index, pklMesocycle ->
-      println(pklMesocycle.name)
+//      println(pklMesocycle.name)
       val mesocycle =
         Mesocycle().apply {
           name = pklMesocycle.name
@@ -324,14 +319,14 @@ constructor(
           order = pklMesocycle.order.toInt()
           microcycles = createMicrocyles(pklMesocycle.microcycles)
         }
-      println(
-        "ImportWorkoutProgram.createMesocycles: ${
-          Json.encodeToString(
-            Mesocycle.serializer(),
-            mesocycle
-          )
-        }"
-      )
+//      println(
+//        "ImportWorkoutProgram.createMesocycles: ${
+//          Json.encodeToString(
+//            Mesocycle.serializer(),
+//            mesocycle
+//          )
+//        }"
+//      )
       mesocycles.add(index, mesocycle)
     }
     return mesocycles.toRealmList()
@@ -352,21 +347,8 @@ constructor(
     }
   }
 
-  fun importAdvancedWorkoutProgram() {
-    val file =
-      File(
-        "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/main/java/com/example/myapplication/MAX_PLAN_AdvancedProgramTemplate.pkl"
-      )
-        .readText()
-
-    val config =
-      ConfigEvaluator.preconfigured().forKotlin().use { evaluator ->
-        evaluator.evaluate(ModuleSource.text(file.trimIndent()))
-      }
-
-    val pklProgram = config["program"].to<AdvancedProgramTemplate.Program>()
-
-    val program = createProgram(pklProgram)
+  fun importAdvancedWorkoutProgram(pklProgram: AdvancedProgramTemplate.Program): Program {
+    return createProgram(pklProgram)
 
     //    println(program)
   }
