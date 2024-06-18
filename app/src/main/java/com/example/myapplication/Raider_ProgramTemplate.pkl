@@ -1,0 +1,2404 @@
+class Program {
+  name: String
+  arthur: String
+  shortDescription: String
+  description: String
+  programLength: Duration
+  uri: String
+  level: String
+  programEquipment: String
+  daysPerWeek: String
+  mesocycles: Listing<Mesocycle>
+}
+
+class Mesocycle {
+  name: String
+  description: String
+  order: Int
+  microcycle: Listing<Microcycle>
+}
+
+class Microcycle {
+  name: String
+  description: String
+  order: Int
+  workouts: Listing<Workout>
+}
+
+class Workout {
+  name: String
+  //     workoutArthur: String
+  day: Int
+  notes: Listing
+  exercisesSets: Listing<ExerciseSets>
+}
+
+class ExerciseSets {
+  name: String
+  notes: Listing
+  sets: Int // Number of sets to be performed
+  setType: String // Normal by default, Listing - length/number of elements must equal number of sets
+  targetRepetitionsInReserve: Int // Reps in Reserve
+  targetRatePerceivedEffort: Int // Rate of Perceived Exertion
+  percentage1RM: Float // Percentage of 1 Rep Max
+  progressionSchemeID: String // TODO Determine Correct Type
+  minRepetitions: Int //
+  maxRepetitions: Int //
+}
+
+program {
+  name = "Raider"
+  arthur = "Bald Omni-Man"
+  shortDescription = ""
+  description = ""
+  programLength = "12 weeks"
+  uri = "https://www.boostcamp.app/coaches/bald-omni-man/raider"
+  level = "Novice, Intermediate"
+  programEquipment = "Full Gym"
+  daysPerWeek = "4 days"
+  mesocycles {
+    new {
+      new {
+        name = "Week 1"
+        description = ""
+        order = 1
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 2"
+        description = ""
+        order = 2
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 3"
+        description = ""
+        order = 3
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 4"
+        description = ""
+        order = 4
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 5"
+        description = ""
+        order = 5
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 6"
+        description = ""
+        order = 6
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 7"
+        description = ""
+        order = 7
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 8"
+        description = ""
+        order = 8
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 9"
+        description = ""
+        order = 9
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 10"
+        description = ""
+        order = 10
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 11"
+        description = ""
+        order = 11
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+      new {
+        name = "Week 12"
+        description = ""
+        order = 12
+        workouts {
+          new Workout {
+            name = "Day 1 - Upper 1"
+            day = 1
+            notes {}
+            exercisesSets {
+              new {
+                name = "Barbell Bench Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Bicep Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                sets = 3
+              }
+              new {
+                name = "Push Ups"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 2 - Lower 1"
+            day = 2
+            notes {}
+            exercisesSets {
+              new {
+                name = "Deadlift (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Pull-Up"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Inverted Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Single Leg Extension"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+            }
+          }
+          new Workout {
+            name = "Day 3 - Upper 2"
+            day = 3
+            notes {}
+            exercisesSets {
+              new {
+                name = "Overhead Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 12
+              }
+              new {
+                name = "Rear Delt Fly"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 10
+                maxRepetitions = 15
+              }
+              new {
+                name = "Hammer Curl"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 8
+                maxRepetitions = 12
+              }
+              new {
+                name = "Tricep Pushdown (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Lateral Raise (Cable)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+              }
+              new {
+                name = "Seated Shoulder Press (Dumbbell)"
+                sets = 2
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 15
+                maxRepetitions = 20
+              }
+            }
+          }
+          new Workout {
+            name = "Day 4 - Lower 2"
+            day = 4
+            notes {}
+            exercisesSets {
+              new {
+                name = "Squat (Barbell)"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 9
+                maxRepetitions = 9
+              }
+              new {
+                name = "Chest Supported Row"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 12
+                maxRepetitions = 15
+              }
+              new {
+                name = "Leg Press"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 12
+              }
+              new {
+                name = "Hip Thrust"
+                sets = 3
+                targetRatePerceivedEffort = 7
+                targetRepetitionsInReserve = 3
+                minRepetitions = 6
+                maxRepetitions = 10
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

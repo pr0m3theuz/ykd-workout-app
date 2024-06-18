@@ -17,7 +17,12 @@ import org.pkl.config.kotlin.to
 import org.pkl.core.ModuleSource
 import java.io.File
 
-class ImportWorkoutProgramTest {
+// @Config(sdk = [30])
+// @RunWith(AndroidJUnit4::class)
+class ImportWorkoutProgramTest() {
+
+  //      importWorkoutProgramRepository = ImportWorkoutProgramRepository()
+
   @Example
   fun `Import Workout Program`() {
     val workoutProgram =
@@ -232,18 +237,57 @@ class ImportWorkoutProgramTest {
 
   @Example
   fun `Import Workout Mesocycles`() {
-    val workoutProgram =
+    val importWorkoutProgram = ImportWorkoutProgram()
+
+    val file =
       File(
-        "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/main/java/com/example/myapplication/MAX_PLAN_AdvancedProgramTemplate.pkl"
+        "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/main/java/com/example/myapplication/KONG_AdvancedProgramTemplate.pkl"
       )
         .readText()
 
     val config =
       ConfigEvaluator.preconfigured().forKotlin().use { evaluator ->
-        evaluator.evaluate(ModuleSource.text(workoutProgram.trimIndent()))
+        evaluator.evaluate(ModuleSource.text(file.trimIndent()))
       }
 
-    val mesocycles = config["mesocycles"].to<List<AdvancedProgramTemplate.Mesocycle>>()
-    println(mesocycles.toString())
+    //    val mesocycles =
+    try {
+      val program = config["program"].to<List<AdvancedProgramTemplate.Program>>()
+      println(program.toString())
+    } catch (e: Exception) {
+      println(e.message)
+      println()
+    }
+
+    try {
+      val mesocycles = config["mesocycles"].to<List<AdvancedProgramTemplate.Mesocycle>>()
+      importWorkoutProgram.importMesocycles(mesocycles)
+    } catch (e: Exception) {
+      println(e.message)
+    }
+
+    try {
+      val microcycles = config["microcycles"].to<List<AdvancedProgramTemplate.Microcycle>>()
+//      println(microcycles.toString())
+      importWorkoutProgram.importMicrocycles(microcycles)
+    } catch (e: Exception) {
+      println(e.message)
+    }
+
+    try {
+      val workouts = config["workouts"].to<List<AdvancedProgramTemplate.Workout>>()
+//      println(workouts.toString())
+      importWorkoutProgram.importWorkouts(workouts)
+    } catch (e: Exception) {
+      println(e.message)
+    }
+
+    try {
+      val advancedWorkouts = config["workouts"].to<List<AdvancedProgramTemplate.AdvancedWorkout>>()
+//      println(advancedWorkouts.toString())
+      importWorkoutProgram.importAdvancedWorkouts(advancedWorkouts)
+    } catch (e: Exception) {
+      println(e.message)
+    }
   }
 }

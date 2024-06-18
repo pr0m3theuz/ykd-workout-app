@@ -39,7 +39,7 @@ import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.data.model.formatWorkoutDuration
-import com.example.myapplication.data.model.setTextRIR
+import com.example.myapplication.data.model.setSummaryRIR
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.model.totalSets
 import com.example.myapplication.utils.doubleFormatted
@@ -120,18 +120,24 @@ fun WorkoutSummaryContent(
 
   Surface {
     Column(
-      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Row(
-        modifier = Modifier.fillMaxWidth().padding(24.dp),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(24.dp),
         horizontalArrangement = Arrangement.Center,
       ) {
         Text(text = "You crushed it!", style = MaterialTheme.typography.titleLarge)
       }
 
       Row(
-        modifier = Modifier.fillMaxWidth().padding(0.dp),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(0.dp),
         horizontalArrangement = Arrangement.Center,
       ) {
         //        TODO Query Workout Count
@@ -242,10 +248,11 @@ fun WorkoutSummaryCard(
       val backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
       Row(
         modifier =
-          Modifier.fillMaxWidth()
-            .border(4.dp, backgroundColor)
-            .padding(4.dp)
-            .background(color = backgroundColor),
+        Modifier
+          .fillMaxWidth()
+          .border(4.dp, backgroundColor)
+          .padding(4.dp)
+          .background(color = backgroundColor),
         verticalAlignment = Alignment.CenterVertically,
       ) {
         val style = MaterialTheme.typography.titleMedium
@@ -256,7 +263,9 @@ fun WorkoutSummaryCard(
         // TODO Seperate from WorkoutViewModel
         val exercise = getExercise(exerciseSets.exerciseID)
         Row(
-          modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp, horizontal = 4.dp),
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp, horizontal = 4.dp),
           verticalAlignment = Alignment.CenterVertically,
         ) {
           val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
@@ -274,7 +283,7 @@ fun WorkoutSummaryCard(
 
           Text(
             // RIR
-            text = maxWeight.setTextRIR(weightUnit),
+            text = maxWeight.setSummaryRIR(weightUnit),
             style = style,
             modifier = Modifier.weight(0.5f),
           )

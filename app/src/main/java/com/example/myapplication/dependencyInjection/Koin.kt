@@ -5,6 +5,7 @@ import com.example.myapplication.components.ManageWorkoutUseCase
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.history.HistoryViewModel
+import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutProgram
 import com.example.myapplication.components.programs.ProgramsViewModel
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
@@ -12,6 +13,7 @@ import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSe
 import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.network.ExerciseNotesRepository
 import com.example.myapplication.data.network.ExercisesRepository
+import com.example.myapplication.data.network.ImportWorkoutProgramRepository
 import com.example.myapplication.data.network.ProgramsRepository
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutNotesRepository
@@ -69,8 +71,11 @@ val commonModule = module {
   singleOf(::ExerciseNotesRepository)
   singleOf(::WorkoutNotesRepository)
   singleOf(::UserRepository)
+  singleOf(::ImportWorkoutProgramRepository)
   singleOf(::ManageWorkoutUseCase)
   singleOf(::ManageExercisesUseCase)
+
+  singleOf(::ImportWorkoutProgram)
 
   viewModelOf(::ProgramsViewModel)
   viewModelOf(::ExercisesViewModel)

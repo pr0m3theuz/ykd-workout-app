@@ -51,7 +51,7 @@ object AdvancedProgramTemplate {
     val targetRepetitionsInReserve: Long,
     val targetRatePerceivedEffort: Long,
     val percentage1RM: Double,
-    val progressionSchemeID: String,
+    val progressionSchemeID: Int?,
     val minRepetitions: Long,
     val maxRepetitions: Long
   )
@@ -59,26 +59,27 @@ object AdvancedProgramTemplate {
   data class AdvancedExerciseSets(
     val name: String,
     val notes: List<Any?>,
-//    val sets: Long,
-//    val repetitions: List<Long>,
-//    val setType: String,
-//    val targetRepetitionsInReserve: List<Long>,
-//    val targetRatePerceivedEffort: List<Long>,
-//    val percentage1RM: List<Double>,
-//    val progressionSchemeID: String,
-//    val minRepetitions: Long,
-//    val maxRepetitions: Long,
-    val setScheme: SetScheme
-  )
-
-  data class SetScheme(
-    val sets: Long,
-    val repetitions: List<Long?>,
+    val sets: Long?,
+    val repetitions: List<Long>,
     val setType: String,
     val targetRepetitionsInReserve: List<Long>,
     val targetRatePerceivedEffort: List<Long>,
     val percentage1RM: List<Double>,
-    val progressionSchemeID: String?,
+    val progressionSchemeID: Long?,
+    val minRepetitions: Long?,
+    val maxRepetitions: Long?,
+    val setScheme: SetScheme?
+  )
+
+  data class SetScheme(
+    val sets: Long,
+    val repetitions: List<Long>,
+    val setType: String,
+    val targetWeight: List<Double>,
+    val targetRepetitionsInReserve: List<Long>,
+    val targetRatePerceivedEffort: List<Long>,
+    val percentage1RM: List<Double>,
+    val progressionSchemeID: Long?,
     val minRepetitions: Long?,
     val maxRepetitions: Long?
 

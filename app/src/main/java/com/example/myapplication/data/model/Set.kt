@@ -5,7 +5,7 @@
   RealmInstantKSerializer::class,
   RealmListKSerializer::class,
   RealmSetKSerializer::class,
-  RealmUUIDKSerializer::class
+  RealmUUIDKSerializer::class,
 )
 
 package com.example.myapplication.data.model
@@ -41,6 +41,8 @@ class Set() : RealmObject {
   var repetitions: Int? = null
   var ratePerceivedEffort: Double? = null
   var repetitionsInReserve: Double? = null
+
+  // TODO add targetWeight Mass Unit
   var targetWeight: Double? = null
   var targetRepetitions: String? = null
   var targetRatePerceivedEffort: Double? = null
@@ -58,23 +60,27 @@ class Set() : RealmObject {
 
   //    To use in query for previous sets
   var exerciseID: ObjectId? = null
-    var dateCreated: RealmInstant? = RealmInstant.now()
+  var dateCreated: RealmInstant? = RealmInstant.now()
   //    var programUUID: RealmUUID? = null
   //    var mesocycleUUID: RealmUUID? = null
   //    var microcycleUUID: RealmUUID? = null
 }
 
 fun Set.setVolume(weightUnit: String): Double {
-  return if (weightPounds != null && repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation) {
+  return if (
+    weightPounds != null && repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation
+  ) {
     weightPounds!!.times(repetitions!!)
-  } else if (weightKilograms != null && repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation) {
+  } else if (
+    weightKilograms != null && repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation
+  ) {
     weightKilograms!!.times(repetitions!!)
   } else {
     0.0
   }
 }
 
-fun Set.setTextRIR(weightUnit: String): String {
+fun Set.setSummaryRIR(weightUnit: String): String {
 
   return "${doubleFormatted(weightPounds)} $weightUnit × $repetitions ${
     if (repetitionsInReserve != null) "@ ${
@@ -84,18 +90,19 @@ fun Set.setTextRIR(weightUnit: String): String {
     }" else ""
   }"
 
-//  ${doubleFormatted(weightKilograms)} × $repetitions ${
-//    if (repetitionsInReserve != null) "@ ${
-//      doubleFormatted(
-//        repetitionsInReserve
-//      )
-//    } RIR" else ""
-//  }"
+  //  ${doubleFormatted(weightKilograms)} × $repetitions ${
+  //    if (repetitionsInReserve != null) "@ ${
+  //      doubleFormatted(
+  //        repetitionsInReserve
+  //      )
+  //    } RIR" else ""
+  //  }"
 }
 
-fun Set.setTextRPE(): String {
+fun Set.setSummaryRPE(): String {
   return "${doubleFormatted(weightPounds)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
-//  "${doubleFormatted(weightKilograms)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
+  //  "${doubleFormatted(weightKilograms)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)}
+  // RPE"
 }
 
 fun Set.convertPoundToKg(): Double {
@@ -109,7 +116,7 @@ fun Set.convertKgToPound(): Double {
 fun Set.getWeight(weightUnit: String?) {
   // TODO Check if this would work or would have to use viewModel
   // TODO take exercise.weightUnit to update weight
-  RealmUUID.random().toString()
+//  RealmUUID.random().toString()
 }
 
 @Serializable

@@ -72,7 +72,7 @@ import com.example.myapplication.components.workout.SwipeToDismissWorkoutNote
 import com.example.myapplication.components.workout.WorkoutSummaryCard
 import com.example.myapplication.data.model.formatLongWorkoutStarted
 import com.example.myapplication.data.model.formatWorkoutDuration
-import com.example.myapplication.data.model.setTextRIR
+import com.example.myapplication.data.model.setSummaryRIR
 import com.example.myapplication.utils.doubleFormatted
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -188,7 +188,9 @@ fun HistoryScreen(navController: NavController) {
               tint = MaterialTheme.colorScheme.onSecondaryContainer,
             )
           },
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
         ) {}
         //        }
 
@@ -224,14 +226,18 @@ fun HistoryScreen(navController: NavController) {
 @Composable
 fun NoWorkoutsPerformed() {
   Column(
-    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     //    LinearProgressIndicator(
     //      modifier = Modifier.semantics(mergeDescendants = true) {}.padding(10.dp),
     //    )
     Column(
-      modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 24.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Text("No Workouts Performed!")
@@ -361,7 +367,9 @@ fun WorkoutOverview(
           },
           bottomBar = {
             Button(
-              modifier = Modifier.fillMaxWidth().padding(12.dp),
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
               onClick = {
                 navController.navigate("workout?workoutID=${itWorkout._id.toHexString()}") {
                   popUpTo(navController.graph.findStartDestination().id) { saveState = true }
@@ -384,7 +392,9 @@ fun WorkoutOverview(
           ) {
             Column(Modifier.padding(horizontal = 12.dp)) {
               Row(
-                modifier = Modifier.padding().fillMaxWidth(),
+                modifier = Modifier
+                  .padding()
+                  .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
               ) {
@@ -393,7 +403,9 @@ fun WorkoutOverview(
                 }
               }
               Row(
-                modifier = Modifier.padding().fillMaxWidth(),
+                modifier = Modifier
+                  .padding()
+                  .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
               ) {
@@ -440,7 +452,9 @@ fun WorkoutOverview(
               }
 
               exerciseExerciseSets.forEach { exerciseSets ->
-                Box(modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth()) {
+                Box(modifier = Modifier
+                  .padding(vertical = 12.dp)
+                  .fillMaxWidth()) {
                   Column(modifier = Modifier.fillMaxWidth()) {
                     Row {
                       Text(
@@ -453,7 +467,7 @@ fun WorkoutOverview(
                       // TODO Chanage Text Color based on Set Type
                       Row {
                         Text(
-                          text = "${set.setNumber}   ${set.setTextRIR(userDefaultWeightUnit)}",
+                          text = "${set.setNumber}   ${set.setSummaryRIR(userDefaultWeightUnit)}",
                           style = MaterialTheme.typography.bodyMedium,
                         )
                       }
@@ -540,7 +554,9 @@ fun EditWorkoutScreen(
     ) { contentPadding ->
       Column(Modifier.padding(contentPadding), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
-          modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
+          modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -549,7 +565,9 @@ fun EditWorkoutScreen(
           }
         }
         Row(
-          modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
+          modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -717,7 +735,9 @@ fun ConfirmDeleteWorkout(onDismissRequest: () -> Unit, deleteWorkout: () -> Unit
 @Composable
 fun NoWorkoutFound() {
   Column(
-    modifier = Modifier.fillMaxSize().padding(16.dp),
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(16.dp),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {

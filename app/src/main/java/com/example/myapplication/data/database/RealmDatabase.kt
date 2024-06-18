@@ -1240,4 +1240,63 @@ class RealmDatabase {
   fun getExerciseByName(exerciseName: String): Exercise {
     return realm.query<Exercise>("name CONTAINS[c] $0", exerciseName).find().first()
   }
+
+  suspend fun importWorkoutProgramPKL(program: Program) {
+    realm.write {
+      this.copyToRealm(
+        program
+      )
+    }
+  }
+
+  suspend fun importMesocyclesPKL(mesocycles: RealmList<Mesocycle>) {
+    mesocycles.forEach { mesocycle ->
+      realm.write {
+        this.copyToRealm(
+          mesocycle
+        )
+      }
+    }
+  }
+
+  suspend fun importMicrocyclesPKL(microcycles: RealmList<Microcycle>) {
+    microcycles.forEach { microcycle ->
+      realm.write {
+        this.copyToRealm(
+          microcycle
+        )
+      }
+    }
+  }
+
+  suspend fun importWorkoutsPKL(workouts: RealmList<Workout>) {
+    workouts.forEach { workout ->
+      realm.write {
+        this.copyToRealm(
+          workout
+        )
+      }
+    }
+  }
+
+  suspend fun importExercisesSetsPKL(exercisesSets: RealmList<ExerciseSets>) {
+    exercisesSets.forEach { exerciseSets ->
+      realm.write {
+        this.copyToRealm(
+          exerciseSets
+        )
+      }
+    }
+  }
+
+  suspend fun importSetsPKL(sets: RealmList<Set>) {
+    sets.forEach { set ->
+      realm.write {
+        this.copyToRealm(
+          set
+        )
+      }
+    }
+  }
 }
+

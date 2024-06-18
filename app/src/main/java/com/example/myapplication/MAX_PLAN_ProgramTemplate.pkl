@@ -1,4 +1,4 @@
-amends "AdvancedProgramTemplate.pkl"
+amends "file:///mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/main/java/com/example/myapplication/AdvancedProgramTemplate.pkl"
 
 setSchemeMetabolicPhaseA: SetScheme = new {
   sets = 3

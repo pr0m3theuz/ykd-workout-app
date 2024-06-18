@@ -53,14 +53,15 @@ class ExerciseSets {
 
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
-  targetRepetitionsInReserve: Int // Reps in Reserve
-  targetRatePerceivedEffort: Int // Rate of Perceived Exertion
-  percentage1RM: Float = -1.0 // Percentage of 1 Rep Max
+  targetWeight: Float? = null
+  targetRepetitionsInReserve: Int? = null // Reps in Reserve
+  targetRatePerceivedEffort: Int? = null // Rate of Perceived Exertion
+  percentage1RM: Float? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-  progressionSchemeID: String = ""
-  minRepetitions: Int = -1
-  maxRepetitions: Int = -1
+  progressionSchemeID: Int? = null
+  minRepetitions: Int? = null
+  maxRepetitions: Int? = null
 }
 
 class AdvancedExerciseSets {
@@ -79,21 +80,22 @@ class AdvancedExerciseSets {
 //   progressionSchemeID: String = ""
 //   minRepetitions: Int = -1 //
 //   maxRepetitions: Int = -1 //
-  setScheme: SetScheme
+  setScheme: SetScheme?
 }
 
 class SetScheme {
-  sets: Int = -1
+  sets: Int
   repetitions: List<Int>
   setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
+  targetWeight: List<Float>
   targetRepetitionsInReserve: List<Int> // Reps in Reserve
   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
   percentage1RM: List<Float> // Percentage of 1 Rep Max
 
-  progressionSchemeID: String = ""// TODO Determine Correct Type
-  minRepetitions: Int? //
-  maxRepetitions: Int? //
+  progressionSchemeID: Int? = null// TODO Determine Correct Type
+  minRepetitions: Int? = null//
+  maxRepetitions: Int? = null //
 }
 
 setSchemeMetabolicPhaseA: SetScheme = new {

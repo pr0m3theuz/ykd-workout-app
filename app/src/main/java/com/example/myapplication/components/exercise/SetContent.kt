@@ -49,7 +49,7 @@ import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
-import com.example.myapplication.data.model.setTextRIR
+import com.example.myapplication.data.model.setSummaryRIR
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.doubleFormatted
@@ -81,7 +81,7 @@ fun SetContent(
 
   val previousSet = populatePreviousSetField()
 
-  val previousSetText by remember { mutableStateOf(previousSet?.setTextRIR(weightUnit) ?: "") }
+  val previousSetText by remember { mutableStateOf(previousSet?.setSummaryRIR(weightUnit) ?: "") }
 
   val showKeyboard = remember { mutableStateOf(true) }
   val focusRequester = remember { FocusRequester() }
@@ -346,7 +346,9 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
 
   Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
     Button(
-      modifier = Modifier.padding(8.dp).size(32.dp),
+      modifier = Modifier
+        .padding(8.dp)
+        .size(32.dp),
       shape = RoundedCornerShape(size = 8.dp),
       contentPadding = PaddingValues(0.dp),
       onClick = { expandedSetTypeOptionsDropdownMenu = true },
@@ -450,13 +452,13 @@ private fun RIRTextField(
 
   Box(
     modifier =
-      boxModifier
-        .padding(4.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(textFieldBackgroundColor)
-        //      .align(Alignment.CenterVertically)
-        //        .width(40.dp)
-        .wrapContentSize(Alignment.Center),
+    boxModifier
+      .padding(4.dp)
+      .clip(RoundedCornerShape(8.dp))
+      .background(textFieldBackgroundColor)
+      //      .align(Alignment.CenterVertically)
+      //        .width(40.dp)
+      .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center,
   ) {
@@ -494,13 +496,13 @@ private fun ExerciseRepsTextField(
 ) {
   Box(
     modifier =
-      boxModifier
-        .padding(4.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(textFieldBackgroundColor)
-        //        .align(Alignment.CenterVertically)
-        //        .width(96.dp)
-        .wrapContentSize(Alignment.Center),
+    boxModifier
+      .padding(4.dp)
+      .clip(RoundedCornerShape(8.dp))
+      .background(textFieldBackgroundColor)
+      //        .align(Alignment.CenterVertically)
+      //        .width(96.dp)
+      .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center,
   ) {
@@ -540,13 +542,13 @@ private fun ExerciseWeightTextField(
 ) {
   Box(
     modifier =
-      boxModifier
-        .padding(4.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(textFieldBackgroundColor)
-        //      .align(Alignment.CenterVertically)
-        //      .width(96.dp)
-        .wrapContentSize(Alignment.Center),
+    boxModifier
+      .padding(4.dp)
+      .clip(RoundedCornerShape(8.dp))
+      .background(textFieldBackgroundColor)
+      //      .align(Alignment.CenterVertically)
+      //      .width(96.dp)
+      .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center,
   ) {
