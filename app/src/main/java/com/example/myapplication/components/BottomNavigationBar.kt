@@ -39,7 +39,7 @@ fun BottomNavigationBar(navController: NavController) {
       Screens.Workout,
       Screens.Programs,
       Screens.Exercise,
-      Screens.Settings
+//      Screens.Settings
     )
 
   val navBackStackEntry by navController.currentBackStackEntryAsState()

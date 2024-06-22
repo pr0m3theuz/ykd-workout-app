@@ -29,6 +29,7 @@ fun ToggleableExerciseItem(
   muscleGroupName: String?,
   navController: NavController,
   selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
+  navigateToDetailPane: (exerciseID: String) -> Unit,
 ) {
 
   val padding = 8.dp
@@ -43,27 +44,21 @@ fun ToggleableExerciseItem(
 
   ListItem(
     colors = colors,
-    modifier = Modifier /*.padding(vertical = 8.dp)*/.fillMaxWidth()
-    /*.toggleable(
-      enabled = true,
-      role = Role.Checkbox,
-      value = selected,
-      onValueChange = {
-        onSelected(it)
-        selectExercise(exercise, it)
-      }
-    )*/ ,
+    modifier = Modifier /*.padding(vertical = 8.dp)*/.fillMaxWidth(),
     headlineContent = {
       Text(
         modifier =
           Modifier.clickable(
             enabled = true,
             onClickLabel = "See more details about ${exercise.name} ",
-            onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") },
+            onClick = {
+              // navController.navigate("exerciseDetails/${exercise._id.toHexString()}")
+              navigateToDetailPane(exercise._id.toHexString())
+            },
           ),
         text = exercise.name,
         //        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onBackground,
+        color = MaterialTheme.colorScheme.primary,
       )
     },
     supportingContent = {
@@ -96,67 +91,4 @@ fun ToggleableExerciseItem(
   )
 
   HorizontalDivider()
-
-  /*  Row(
-    modifier =
-      Modifier.padding(vertical = 8.dp)
-        .fillMaxWidth()
-        .toggleable(
-          enabled = true,
-          value = selected,
-          onValueChange = {
-            onSelected(it)
-            selectExercise(exercise, it)
-          }
-        ),
-    //        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    verticalAlignment = Alignment.CenterVertically
-  ) {
-    Spacer(modifier = Modifier.width(padding))
-    Box(
-      modifier =
-        Modifier.size(width = 50.dp, height = 50.dp)
-          .background(
-            if (selected) {
-              MaterialTheme.colorScheme.surface
-            } else {
-              MaterialTheme.colorScheme.errorContainer
-            }
-          )
-    ) {
-      //            TODO Get Image from YouTube Thumbnail
-      if (selected) {
-        Icon(
-          modifier = Modifier.align(Alignment.Center).size(40.dp),
-          imageVector = Icons.Filled.CheckCircle,
-          tint = Color.Green,
-          contentDescription = "Selected"
-        )
-      } else {
-        Icon(
-          modifier = Modifier.align(Alignment.Center).size(40.dp),
-          imageVector = Icons.Outlined.Error,
-          tint = MaterialTheme.colorScheme.error,
-          contentDescription = "No exercise image available."
-        )
-      }
-    }
-
-    Spacer(modifier = Modifier.width(8.dp))
-
-    Column {
-      Text(
-        text = exercise.name,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurface
-      )
-      Text(
-        text = muscleGroupName ?: "-",
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-      )
-    }
-
-    Box(modifier = Modifier.width(padding))
-  }*/
 }

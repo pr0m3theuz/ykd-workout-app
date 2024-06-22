@@ -2,7 +2,6 @@ package com.example.myapplication.components.history
 
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
@@ -115,9 +114,9 @@ fun HistoryScreen(navController: NavController) {
           )
         },
         navigationIcon = {
-          IconButton(
+          /*IconButton(
             onClick = {
-              /*TODO Navigate to Previous Screen */
+              *//*TODO Navigate to Previous Screen *//*
               navController.navigateUp()
               Toast.makeText(context, "TODO: Navigate to Previous Screen", Toast.LENGTH_SHORT)
                 .show()
@@ -128,7 +127,7 @@ fun HistoryScreen(navController: NavController) {
               tint = MaterialTheme.colorScheme.onSurface,
               contentDescription = "Go to the previous screen",
             )
-          }
+          }*/
         },
         actions = {
           val iconColors = IconButtonDefaults.iconButtonColors()

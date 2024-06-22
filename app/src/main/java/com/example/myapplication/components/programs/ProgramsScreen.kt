@@ -24,7 +24,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
 import androidx.compose.material.icons.filled.Search
@@ -114,15 +113,15 @@ fun ProgramsScreen(
       TopAppBar(
         title = { Text(text = "Programs", style = MaterialTheme.typography.titleLarge) },
         navigationIcon = {
-          IconButton(
-            onClick = { navController.navigateUp() },
-          ) {
-            Icon(
-              imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-              tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen"
-            )
-          }
+          /* IconButton(
+             onClick = { navController.navigateUp() },
+           ) {
+             Icon(
+               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+               tint = MaterialTheme.colorScheme.onSurface,
+               contentDescription = "Go to the previous screen"
+             )
+           }*/
         },
         actions = { ProgramDetailsOptionsDropdownMenu() }
       )
@@ -277,7 +276,7 @@ fun ProgramsScreen(
           IconButton(onClick = { setProgramVisible(!programVisible) }) {
             Icon(
               imageVector = getExpandCollapseIcon(programVisible),
-              contentDescription = "Show workouts for this program"
+              contentDescription = "Show more programs"
             )
           }
           TextButton(
@@ -329,7 +328,7 @@ fun ProgramsScreen(
           IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
             Icon(
               imageVector = getExpandCollapseIcon(mesocycleVisible),
-              contentDescription = "Show workouts for this program"
+              contentDescription = "Show more mesocycles"
             )
           }
           Text(text = "Mesocycle (###)")
@@ -351,10 +350,10 @@ fun ProgramsScreen(
           IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
             Icon(
               imageVector = getExpandCollapseIcon(workoutVisible),
-              contentDescription = "Show workouts"
+              contentDescription = "Show more workouts"
             )
           }
-          Text(text = "Workouts (###")
+          Text(text = "Workouts (###)")
           IconButton(onClick = { /*TODO*/ }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,

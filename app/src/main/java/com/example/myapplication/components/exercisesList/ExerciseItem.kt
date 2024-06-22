@@ -19,7 +19,12 @@ import androidx.navigation.NavController
 import com.example.myapplication.data.model.Exercise
 
 @Composable
-fun ExerciseItem(exercise: Exercise, muscleGroupName: String?, navController: NavController) {
+fun ExerciseItem(
+  exercise: Exercise,
+  muscleGroupName: String?,
+  navController: NavController,
+  navigateToDetailPane: (exerciseID: String) -> Unit,
+) {
 
   val padding = 8.dp
 
@@ -37,20 +42,23 @@ fun ExerciseItem(exercise: Exercise, muscleGroupName: String?, navController: Na
       .clickable(
         enabled = true,
         onClickLabel = "See more details about ${exercise.name} ",
-        onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
+        onClick = {
+//            navController.navigate("exerciseDetails/${exercise._id.toHexString()}")
+          navigateToDetailPane(exercise._id.toHexString())
+        },
       ),
     headlineContent = {
       Text(
         text = exercise.name,
         //        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onBackground,
       )
     },
     supportingContent = {
       Text(
         text = muscleGroupName ?: "-",
         //        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onBackground,
       )
     },
     trailingContent = {},
@@ -60,55 +68,10 @@ fun ExerciseItem(exercise: Exercise, muscleGroupName: String?, navController: Na
         //        modifier = Modifier.size(40.dp),
         imageVector = Icons.Outlined.Error,
         tint = MaterialTheme.colorScheme.error,
-        contentDescription = "No exercise image available."
+        contentDescription = "No exercise image available.",
       )
-    }
+    },
   )
 
   HorizontalDivider()
-
-  /*Row(
-    modifier =
-      Modifier.padding(vertical = 8.dp)
-        .fillMaxWidth()
-        .clickable(
-          enabled = true,
-          onClickLabel = null,
-          onClick = { navController.navigate("exerciseDetails/${exercise.exerciseID}") }
-        ), // TODO Create Exercise Details Screen
-    //        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    verticalAlignment = Alignment.CenterVertically
-  ) {
-    Spacer(modifier = Modifier.width(padding))
-    Box(
-      modifier =
-        Modifier.size(width = 50.dp, height = 50.dp)
-          .background(MaterialTheme.colorScheme.errorContainer)
-    ) {
-      //            TODO Get Image from YouTube Thumbnail
-      Icon(
-        modifier = Modifier.align(Alignment.Center).size(40.dp),
-        imageVector = Icons.Outlined.Error,
-        tint = MaterialTheme.colorScheme.error,
-        contentDescription = "No exercise image available."
-      )
-    }
-
-    Spacer(modifier = Modifier.width(8.dp))
-
-    Column {
-      Text(
-        text = exercise.name,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurface
-      )
-      Text(
-        text = muscleGroupName ?: "-",
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-      )
-    }
-
-    Box(modifier = Modifier.width(padding))
-  }*/
 }

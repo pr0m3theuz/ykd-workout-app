@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.SetTypeOptionsMenu
 import com.example.myapplication.components.WorkoutViewModel
@@ -595,3 +597,21 @@ private fun getExerciseWeight(set: Set, weightUnit: String): String =
   doubleFormatted(
     if (weightUnit == MassUnit.POUNDS.abbreviation) set.weightPounds else set.weightKilograms
   )
+
+@Preview
+@Composable
+private fun SetContentPreview() {
+  TestTextField2()
+}
+
+@Composable
+fun TestTextField2() {
+  val state = rememberTextFieldState("")
+
+  BasicTextField(
+    state = state,
+  )
+  if (state.text.isEmpty()) {
+    Text(text = "Enter your name", color = Color.Gray)
+  }
+}

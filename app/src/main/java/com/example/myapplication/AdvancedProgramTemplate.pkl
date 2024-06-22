@@ -49,7 +49,7 @@ class ExerciseSets {
   name: String
   notes: Listing
   sets: Int // Number of sets to be performed
-  repetitions: Int
+  repetitions: Int?
 
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""

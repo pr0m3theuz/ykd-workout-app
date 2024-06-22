@@ -12,12 +12,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -96,13 +92,13 @@ fun WorkoutContent(
           )
         },
         navigationIcon = {
-          IconButton(onClick = { navController.navigateUp() }) {
+          /*IconButton(onClick = { navController.navigateUp() }) {
             Icon(
               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
               contentDescription = "Go to the previous screen",
             )
-          }
+          }*/
         },
         actions = {
           RestTimerButton()
@@ -124,7 +120,9 @@ fun WorkoutContent(
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
       Row(
-        modifier = Modifier.padding(start = 8.dp).fillMaxWidth(),
+        modifier = Modifier
+          .padding(start = 8.dp)
+          .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {

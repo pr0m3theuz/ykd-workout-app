@@ -1,7 +1,5 @@
 package com.example.myapplication.components.exercisesList
 
-import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.MoreVert
@@ -70,38 +67,13 @@ import org.koin.androidx.compose.koinViewModel
 // @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ExercisesScreen(navController: NavHostController = rememberNavController()) {
-  /*NavHost(navController = navController, startDestination = "exercisesList") {
-      composable("exercisesList") {
-          val viewModel = hiltViewModel<ExercisesViewModel>()
-          ExercisesLazyColumn(
-              navController = navController,
-              exercisesViewModel = viewModel,
-          )
-      }
-      composable(
-          "exerciseDetails/{exerciseID}",
-          arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
-      ) { navBackStackEntry ->
-          val viewModel = hiltViewModel<ExercisesViewModel>()
-          navBackStackEntry.arguments?.getString("exerciseID")?.let {
-              ExerciseDetailsScreen(
-                  navController,
-                  exercisePK = it,
-                  exercisesViewModel = viewModel,
-              )
-          }
-      }
-  }*/
 }
 
-@OptIn(
-  ExperimentalFoundationApi::class,
-  ExperimentalMaterialApi::class,
-  ExperimentalMaterial3Api::class,
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExercisesLazyColumn(
   navController: NavController,
+  navigateToDetailPane: (exerciseID: String) -> Unit,
   exercisesViewModel: ExercisesViewModel = koinViewModel(),
 ) {
   //    val selectedCategoriesMap by
@@ -138,9 +110,11 @@ fun ExercisesLazyColumn(
           )
         },
         navigationIcon = {
-          IconButton(
-            onClick = {
-              /*TODO Navigate to Previous Screen */
+          /*IconButton(
+          onClick = {
+            */
+          /*TODO Navigate to Previous Screen */
+          /*
               navController.navigateUp()
               Toast.makeText(context, "TODO: Navigate to Previous Screen", Toast.LENGTH_SHORT)
                 .show()
@@ -151,7 +125,7 @@ fun ExercisesLazyColumn(
               tint = MaterialTheme.colorScheme.onSurface,
               contentDescription = "Go to the previous screen",
             )
-          }
+          }*/
         },
         actions = {
           val iconColors = IconButtonDefaults.iconButtonColors()
@@ -172,86 +146,91 @@ fun ExercisesLazyColumn(
       )
     },
     bottomBar = { BottomNavigationBar(navController = navController) },
-    content = { contentPadding ->
-      Column(Modifier.padding(contentPadding)) {
-        val searchBarColors =
-          SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            inputFieldColors =
-              TextFieldDefaults.colors(
-                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
-              ),
+  ) { contentPadding ->
+    Column(Modifier.padding(contentPadding)) {
+      val searchBarColors =
+        SearchBarDefaults.colors(
+          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+          inputFieldColors =
+          TextFieldDefaults.colors(
+            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+          ),
+        )
+      /*
+      AnimatedVisibility(
+        visible = searchBarVisibility,
+        enter = expandVertically(),
+        exit = shrinkVertically()
+      ) {
+      */
+      SearchBar(
+        query = query,
+        onQueryChange = {
+          query = it
+          filterExercises(it)
+        },
+        onSearch = { active = false },
+        active = active,
+        colors = searchBarColors,
+        onActiveChange = { active = false },
+        placeholder = {
+          Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
+        },
+        leadingIcon = {
+          Icon(
+            Icons.Default.Search,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
           )
-        /*
-        AnimatedVisibility(
-          visible = searchBarVisibility,
-          enter = expandVertically(),
-          exit = shrinkVertically()
-        ) {
-        */
-        SearchBar(
-          query = query,
-          onQueryChange = {
-            query = it
-            filterExercises(it)
-          },
-          onSearch = { active = false },
-          active = active,
-          colors = searchBarColors,
-          onActiveChange = { active = false },
-          placeholder = {
-            Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
-          },
-          leadingIcon = {
-            Icon(
-              Icons.Default.Search,
-              contentDescription = null,
-              tint = MaterialTheme.colorScheme.onSecondaryContainer,
+        },
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 8.dp),
+      ) {}
+      //        }
+
+      SelectedFiltersLazyRow(exercisesViewModel)
+
+      when {
+        exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
+        exercises.isNotEmpty() -> {
+//          ExercisesLazyList(exercises, muscleGroups, navController, onClick)
+          ExercisesLazyList(exercises, muscleGroups) { exercise, muscleGroupName ->
+            ExerciseItem(
+              exercise = exercise,
+              muscleGroupName = muscleGroupName,
+              navController = navController,
+              navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
             )
-          },
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-        ) {}
-        //        }
-
-        SelectedFiltersLazyRow(exercisesViewModel)
-
-        when {
-          exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
-          exercises.isNotEmpty() -> {
-            ExercisesLazyList(exercises, muscleGroups, navController)
-          }
-          exercises.isEmpty() && query.isBlank() -> {
-            Column(
-              modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-              horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-              LinearProgressIndicator(
-                modifier = Modifier.semantics(mergeDescendants = true) {}.padding(10.dp)
-              )
-            }
           }
         }
 
-        /*        if (exercises.isNotEmpty()) {
-          ExercisesLazyList(
-            exercises,
-            muscleGroups,
-            getMuscleGroup = { getMuscleGroups() },
-            navController,
-          )
-        } else {
-          NoResultsFound(query = query)
-        }*/
+        exercises.isEmpty() && query.isBlank() -> {
+          Column(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(top = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+          ) {
+            LinearProgressIndicator(
+              modifier = Modifier
+                .semantics(mergeDescendants = true) {}
+                .padding(10.dp)
+            )
+          }
+        }
       }
-    },
-  )
+    }
+  }
 }
 
 @Composable
 fun NoResultsFound(query: String) {
   Column(
-    modifier = Modifier.fillMaxSize().padding(16.dp),
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(16.dp),
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
@@ -273,7 +252,9 @@ fun NoResultsFound(query: String) {
 private fun ExercisesLazyList(
   exercises: List<Exercise>,
   muscleGroups: List<MuscleGroup>,
-  navController: NavController,
+//  navController: NavController,
+//  navigateToDetailPane: (exerciseID: String) -> Unit,
+  exerciseItem: @Composable (exercise: Exercise, muscleGroupName: String?) -> Unit
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -299,11 +280,14 @@ private fun ExercisesLazyList(
       //        "${exercise.name}, ${exercise.muscleGroupID}, $muscleGroupName"
       //      )
 
-      ExerciseItem(
-        exercise = exercise,
-        muscleGroupName = muscleGroupName,
-        navController = navController,
-      )
+//      ExerciseItem(
+//        exercise = exercise,
+//        muscleGroupName = muscleGroupName,
+//        navController = navController,
+//        navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
+//      )
+
+      exerciseItem(exercise, muscleGroupName)
     }
   }
 }
@@ -381,7 +365,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
       if (exercisesViewModel.movementTypesChecked[movementType] == true) {
         FilterChip(
           selected = checked,
-          onClick = { /*TODO write setMovementChecked()*/},
+          onClick = { /*TODO write setMovementChecked()*/ },
           leadingIcon = {
             Icon(
               imageVector = Icons.Filled.Done,
@@ -413,7 +397,7 @@ fun ExerciseOptionsDropdownMenu() {
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
       DropdownMenuItem(
         text = { androidx.compose.material3.Text("Create Exercise") },
-        onClick = { /* TODO Navigate to Create Exercise Screen*/},
+        onClick = { /* TODO Navigate to Create Exercise Screen*/ },
       )
     }
   }

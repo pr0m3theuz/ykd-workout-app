@@ -12,6 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -21,9 +22,11 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myapplication.components.Screens
+import com.example.myapplication.components.addExercisesList.AddExerciseNavigableListDetailScreen
+import com.example.myapplication.components.addExercisesList.AddExercisesScreen
 import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
+import com.example.myapplication.components.exercisesList.ExerciseNavigableListDetailScreen
 import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
-import com.example.myapplication.components.exercisesList.ExercisesScreen
 import com.example.myapplication.components.history.EditWorkoutScreen
 import com.example.myapplication.components.history.HistoryScreen
 import com.example.myapplication.components.history.WorkoutOverview
@@ -78,6 +81,7 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addWorkoutGraph(
   navController: NavController
@@ -105,7 +109,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
-//      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key = WORKOUT_DETAILS)
+      //      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key =
+      // WORKOUT_DETAILS)
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
@@ -128,36 +133,47 @@ private fun NavGraphBuilder.addWorkoutGraph(
           // TODO This is an anti-pattern
           // https://developer.android.com/guide/navigation/use-graph/navigate
           navController,
+          onClick = {},
           exerciseID = it,
         )
       }
+    }
+
+    composable(
+      "AddExercise"
+    ) {
+      AddExerciseNavigableListDetailScreen(
+        navController = navController,
+        exerciseListPane = { onClick ->
+          AddExercisesScreen(
+            setOpenDialog = { /*TODO*/ },
+            navController = navController,
+            navigateToDetailPane = onClick
+          )
+        },
+        exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
+          ExerciseDetailsScreen(navController, exerciseID, onClick)
+        },
+      )
     }
   }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
   navigation("exercisesList", route = "exercises") {
-    composable("exercisesScreen") { ExercisesScreen() }
+    //    composable("exercisesScreen") { ExercisesScreen() }
 
     composable("exercisesList") {
-      ExercisesLazyColumn(
-        // TODO This is an anti-pattern
-        // https://developer.android.com/guide/navigation/use-graph/navigate
-        navController = navController
+      ExerciseNavigableListDetailScreen(
+        navController = navController,
+        exerciseListPane = { onClick ->
+          ExercisesLazyColumn(navController = navController, navigateToDetailPane = onClick)
+        },
+        exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
+          ExerciseDetailsScreen(navController, exerciseID, onClick)
+        },
       )
-    }
-    composable(
-      "exerciseDetails/{exerciseID}",
-      arguments = listOf(navArgument("exerciseID") { type = NavType.StringType }),
-    ) { navBackStackEntry ->
-      navBackStackEntry.arguments?.getString("exerciseID")?.let {
-        ExerciseDetailsScreen(
-          // TODO This is an anti-pattern
-          // https://developer.android.com/guide/navigation/use-graph/navigate
-          navController,
-          exerciseID = it,
-        )
-      }
     }
   }
 }

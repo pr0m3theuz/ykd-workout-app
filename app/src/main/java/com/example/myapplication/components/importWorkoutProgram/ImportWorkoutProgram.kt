@@ -18,18 +18,19 @@ import org.mongodb.kbson.ObjectId
 // TODO create function to import program with microcycles
 // TODO create function to add to existing program
 
-class ImportWorkoutProgram
-constructor(
+class ImportWorkoutProgram(
   //  private val manageExercisesUseCase: ManageExercisesUseCase,
   //  private val importWorkoutProgramRepository: ImportWorkoutProgramRepository,
+  private val getExerciseObjectID: (exerciseName: String) -> ObjectId?
 ) {
-  fun getExerciseObjectID(exerciseName: String): ObjectId {
-    /* return manageExercisesUseCase.getExerciseByName(exerciseName)*/
-    return ObjectId()
-  }
+  //  fun getExerciseObjectID(exerciseName: String): ObjectId {
+  //    /* return manageExercisesUseCase.getExerciseByName(exerciseName)*/
+  //    return ObjectId()
+  //  }
 
   fun createExerciseSets(
     pklExercisesSets: List<AdvancedProgramTemplate.ExerciseSets>
+    //    getExerciseObjectID: (exerciseName: String) -> ObjectId?,
   ): RealmList<ExerciseSets> {
     val exercisesSets = mutableListOf<ExerciseSets>()
 
@@ -58,14 +59,14 @@ constructor(
                       pklExerciseSets.targetRatePerceivedEffort?.toDouble()
                     percentage1RM = pklExerciseSets.percentage1RM
                   }
-//                println(
-//                  "ImportWorkoutProgram.createExerciseSets: ${
-//                    Json.encodeToString(
-//                      Set.serializer(),
-//                      set
-//                    )
-//                  }"
-//                )
+                //                println(
+                //                  "ImportWorkoutProgram.createExerciseSets: ${
+                //                    Json.encodeToString(
+                //                      Set.serializer(),
+                //                      set
+                //                    )
+                //                  }"
+                //                )
                 setList.add(set)
               }
 
@@ -84,7 +85,7 @@ constructor(
     val workouts = mutableListOf<Workout>()
 
     pklWorkouts.forEachIndexed { index, pklWorkout ->
-//      print("ImportWorkoutProgram.createWorkout: ${pklWorkout.name}")
+      //      print("ImportWorkoutProgram.createWorkout: ${pklWorkout.name}")
 
       val workout =
         Workout().apply {
@@ -108,7 +109,8 @@ constructor(
       // exSetsUUID = _exSetsUUID
       // TODO search database for exercise & set exerciseID
 
-//      println("ImportWorkoutProgram.createAdvancedExerciseSets ${pklAdvancedExerciseSets.name}")
+      //      println("ImportWorkoutProgram.createAdvancedExerciseSets
+      // ${pklAdvancedExerciseSets.name}")
 
       if (pklAdvancedExerciseSets.setScheme != null) {
         val setScheme = pklAdvancedExerciseSets.setScheme
@@ -122,24 +124,20 @@ constructor(
               // return@forEachIndexed
             }
           }
-
           setScheme.sets.toInt() != setScheme.targetRepetitionsInReserve.size -> {
             throw Exception("Target RIR List is not the same size as the number of Sets")
             // return@forEachIndexed
           }
-
           setScheme.sets.toInt() != setScheme.targetRatePerceivedEffort.size -> {
             throw Exception("Target RPE List is not the same size as the number of Sets")
             // return@forEachIndexed
           }
-
           setScheme.percentage1RM.isNotEmpty() -> {
             if (setScheme.sets.toInt() != setScheme.percentage1RM.size) {
               throw Exception("Percentage1RM List is not the same size as the number of Sets")
               // return@forEachIndexed
             }
           }
-
           else -> {
 
             val exercise = getExerciseObjectID(pklAdvancedExerciseSets.name)
@@ -168,7 +166,7 @@ constructor(
 
   private fun createSetsFromSetScheme(
     pklSetScheme: AdvancedProgramTemplate.SetScheme,
-    exercise: ObjectId,
+    exercise: ObjectId?,
   ) =
     if (pklSetScheme.sets > 0) {
       val setList = mutableListOf<Set>()
@@ -237,11 +235,9 @@ constructor(
           "${maxRepetitions}-${minRepetitions}"
         }
       }
-
       minRepetitions != null && maxRepetitions == null -> {
         "${minRepetitions}+"
       }
-
       else -> {
         null
       }
@@ -253,7 +249,7 @@ constructor(
     val workouts = mutableListOf<Workout>()
 
     pklAdvancedWorkouts.forEachIndexed { index, pklAdvancedWorkout ->
-//      print("ImportWorkoutProgram.createAdvancedWorkout: ${pklAdvancedWorkout.name}\n")
+      //      print("ImportWorkoutProgram.createAdvancedWorkout: ${pklAdvancedWorkout.name}\n")
 
       val workout =
         Workout().apply {
@@ -282,7 +278,7 @@ constructor(
     val microcycles = mutableListOf<Microcycle>()
 
     pklMicrocycles.forEachIndexed { index, pklMicrocycle ->
-//      print("ImportWorkoutProgram.createMicrocyles: ${pklMicrocycle.name}\n")
+      //      print("ImportWorkoutProgram.createMicrocyles: ${pklMicrocycle.name}\n")
 
       val microcycle =
         Microcycle().apply {
@@ -311,7 +307,7 @@ constructor(
   ): RealmList<Mesocycle> {
     val mesocycles = mutableListOf<Mesocycle>()
     pklMesocycles.forEachIndexed { index, pklMesocycle ->
-//      println(pklMesocycle.name)
+      //      println(pklMesocycle.name)
       val mesocycle =
         Mesocycle().apply {
           name = pklMesocycle.name
@@ -319,14 +315,14 @@ constructor(
           order = pklMesocycle.order.toInt()
           microcycles = createMicrocyles(pklMesocycle.microcycles)
         }
-//      println(
-//        "ImportWorkoutProgram.createMesocycles: ${
-//          Json.encodeToString(
-//            Mesocycle.serializer(),
-//            mesocycle
-//          )
-//        }"
-//      )
+      //      println(
+      //        "ImportWorkoutProgram.createMesocycles: ${
+      //          Json.encodeToString(
+      //            Mesocycle.serializer(),
+      //            mesocycle
+      //          )
+      //        }"
+      //      )
       mesocycles.add(index, mesocycle)
     }
     return mesocycles.toRealmList()
