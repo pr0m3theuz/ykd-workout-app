@@ -69,6 +69,7 @@ const val REMAINING_TIMER_TIME = "REMAINING_TIMER_TIME"
 const val WORKOUT_DETAILS = "WORKOUT_DETAILS"
 const val WORKOUT_NOTES = "WORKOUT_NOTES"
 const val EXERCISE_EXERCISE_SETS = "EXERCISE_EXERCISE_SETS"
+const val IS_WORKOUT_ACTIVE = "IS_WORKOUT_ACTIVE"
 
 @OptIn(SavedStateHandleSaveableApi::class)
 class WorkoutViewModel(
@@ -77,6 +78,10 @@ class WorkoutViewModel(
   private val exerciseRepository: ExercisesRepository,
   private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+  var isWorkoutActive: Boolean
+    get() = savedStateHandle.get<Boolean>(IS_WORKOUT_ACTIVE) ?: false
+    set(value) = savedStateHandle.set(IS_WORKOUT_ACTIVE, value)
+
   private val REQUEST_CODE = 0
   private val notifyPendingIntent: PendingIntent
 
@@ -462,10 +467,11 @@ class WorkoutViewModel(
   }
 
   fun initWorkoutData() {
-    if (!this::initialWorkoutData.isInitialized) {
+    if (!this::initialWorkoutData.isInitialized && !isWorkoutActive) {
       initialWorkoutData = initWorkout()
       workoutDetails = initialWorkoutData
       _workout.value = workoutDetails
+      isWorkoutActive = true
     }
   }
 
@@ -474,11 +480,12 @@ class WorkoutViewModel(
   }
 
   fun getWorkoutByID(workoutID: ObjectId) {
-    if (!this::initialWorkoutData.isInitialized) {
+    if (!this::initialWorkoutData.isInitialized && !isWorkoutActive) {
       initialWorkoutData = manageWorkoutUseCase.getWorkoutByID(workoutID) ?: initWorkout()
       // TODO Add logic for when copying from a template (active program) vs when copying from a
       // previous workout
       copyWorkoutFromWorkoutTemplate(initialWorkoutData)
+      isWorkoutActive = true
     }
   }
 

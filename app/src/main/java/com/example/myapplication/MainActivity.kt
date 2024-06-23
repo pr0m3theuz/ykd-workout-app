@@ -51,6 +51,8 @@ class MainActivity : ComponentActivity() {
 
     // New Relic
     NewRelic.withApplicationToken("eu01xx7700dce7ae53e2b20b7cc382fcba147c93ae-NRMA")
+      .withCrashReportingEnabled(true)
+      .withLoggingEnabled(true)
       .start(this.applicationContext)
 
     setContent {
@@ -60,7 +62,7 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = Screens.Programs.route) {
           addExercisesGraph(navController)
-          addWorkoutGraph(navController /*viewModelStoreOwner*/)
+          addWorkoutGraph(navController)
           addWorkoutSummaryGraph(navController)
           addProgramsGraph(navController)
           addHistoryGraph(navController)
@@ -68,10 +70,6 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
-  }
-
-  override fun onStop() {
-    super.onStop()
   }
 
   companion object {
@@ -109,8 +107,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
-      //      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key =
-      // WORKOUT_DETAILS)
+//      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key = WORKOUT_DETAILS)
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(

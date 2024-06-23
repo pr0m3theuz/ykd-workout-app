@@ -6,7 +6,7 @@ plugins {
   id("com.google.devtools.ksp")
   id("org.jetbrains.kotlin.plugin.serialization")
   //  id("com.google.gms.google-services")
-  //  id("com.google.firebase.crashlytics")
+//  id("com.google.firebase.crashlytics")
   id("newrelic")
   id("kotlin-parcelize")
   //  id("org.jetbrains.kotlin.plugin.kotlin-parcelize")
@@ -85,7 +85,8 @@ dependencies {
   implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta03")
   implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta03")
   implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta03")
-  implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
+  implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.0.0-alpha07")
+
 
   val composeVersion = "1.7.0-beta02"
   implementation("androidx.compose.ui:ui:$composeVersion")
@@ -172,25 +173,10 @@ dependencies {
   //    ksp("io.insert-koin:koin-ksp-compiler:3.4.3")
   implementation("io.insert-koin:koin-androidx-navigation:$koin")
   implementation("io.insert-koin:koin-androidx-compose:$koin")
+  implementation("io.insert-koin:koin-androidx-compose-navigation:$koin")
 
   testImplementation("io.insert-koin:koin-test:$koin")
   testImplementation("io.insert-koin:koin-test-junit5:$koin")
-
-  // Import the Firebase BoM
-  //  implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
-
-  // When using the BoM, you don't specify versions in Firebase library dependencies
-
-  // Add the dependency for the Firebase SDK for Google Analytics
-  //  implementation("com.google.firebase:firebase-analytics")
-
-  // TODO: Add the dependencies for any other Firebase products you want to use
-  // See https://firebase.google.com/docs/android/setup#available-libraries
-  // For example, add the dependencies for Firebase Authentication and Cloud Firestore
-  //  implementation("com.google.firebase:firebase-auth")
-  //  implementation("com.google.firebase:firebase-firestore")
-  //  implementation("com.google.firebase:firebase-crashlytics")
-  //  implementation("com.google.firebase:firebase-crashlytics-ndk")
 
   implementation("com.newrelic.agent.android:android-agent:7.3.1")
   implementation("org.pkl-lang:pkl-config-kotlin:0.25.3")

@@ -237,3 +237,5 @@ Vapp/src/main/java/com/example/myapplication/components/workout/DiscardWorkoutDi
 oapp/src/main/java/com/example/myapplication/components/addExercisesList/AddExerciseNavigableListDetailScreen.kt,4/5/45151a94d23fb42fcc2a4fc04dddcec0ffe50771
 L
 .idea/codeStyles/Project.xml,6/e/6ecd6000a7b6f4a2884412ff19f74193ed089648
+ç
+]app/src/test/java/com/example/myapplication/components/plateCalculator/plateCalculatorTest.kt,4/6/46946cfb6f401baceb972627c4dad7117a2a852a
