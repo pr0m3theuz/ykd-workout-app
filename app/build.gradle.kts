@@ -1,12 +1,13 @@
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
+  id("kotlin-android")
   //    id("kotlin-kapt")
   id("io.realm.kotlin")
   id("com.google.devtools.ksp")
   id("org.jetbrains.kotlin.plugin.serialization")
-  //  id("com.google.gms.google-services")
-//  id("com.google.firebase.crashlytics")
+  id("com.google.gms.google-services")
+  id("com.google.firebase.crashlytics")
   id("newrelic")
   id("kotlin-parcelize")
   //  id("org.jetbrains.kotlin.plugin.kotlin-parcelize")
@@ -155,7 +156,7 @@ dependencies {
   implementation("androidx.navigation:navigation-compose:2.7.7")
 
   // realm
-  //    implementation ("io.realm.kotlin:library-base:1.11.1") // Add to use local realm (no sync)
+  // implementation ("io.realm.kotlin:library-base:1.11.1") // Add to use local realm (no sync)
   implementation("io.realm.kotlin:library-sync:1.16.0") // Add to use device sync)
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
   // Add to use coroutines with the SDK
@@ -178,8 +179,24 @@ dependencies {
   testImplementation("io.insert-koin:koin-test:$koin")
   testImplementation("io.insert-koin:koin-test-junit5:$koin")
 
+  // New Relic Crash Analytics
   implementation("com.newrelic.agent.android:android-agent:7.3.1")
+
+  // Apple pkl
   implementation("org.pkl-lang:pkl-config-kotlin:0.25.3")
+
+  // Firebase
+  // Import the Firebase BoM (see: https://firebase.google.com/docs/android/learn-more#bom)
+  implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+
+  // Firebase Crashlytics
+  implementation("com.google.firebase:firebase-crashlytics")
+
+  // For an optimal experience using Crashlytics, add the Firebase SDK
+  // for Google Analytics. This is recommended, but not required.
+  implementation("com.google.firebase:firebase-analytics")
+
+  implementation("io.coil-kt:coil-compose:2.6.0")
 }
 
 /*kapt {

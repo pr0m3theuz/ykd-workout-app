@@ -229,8 +229,6 @@ Qapp/src/main/java/com/example/myapplication/components/exercise/TextFieldState.
 iapp/src/main/java/com/example/myapplication/components/exercisesList/ExerciseNavigableListDetailScreen.kt,3/4/34583986a2ad8ac78a008d1dfe119087d6a51acd
 è
 _app/src/main/java/com/example/myapplication/components/exerciseDetails/ExerciseDetailsScreen.kt,4/d/4d4c208c87a89ff630f1fcdf74140ebebb79263d
-ú
-lapp/src/main/java/com/example/myapplication/components/addExercisesList/ExerciseNavigableListDetailScreen.kt,6/9/69e9d55afecd577d9a91b3f0bffa9c3a741ec643
 Ü
 Vapp/src/main/java/com/example/myapplication/components/workout/DiscardWorkoutDialog.kt,8/c/8cfdb8752463756b29a5d6b07dc7118529541f41
 ü
@@ -239,3 +237,7 @@ L
 .idea/codeStyles/Project.xml,6/e/6ecd6000a7b6f4a2884412ff19f74193ed089648
 ç
 ]app/src/test/java/com/example/myapplication/components/plateCalculator/plateCalculatorTest.kt,4/6/46946cfb6f401baceb972627c4dad7117a2a852a
+H
+app/google-services.json,f/d/fd8d34b142d02ec743a8efefefd2c097961666e9
+
+Oapp/src/main/java/com/example/myapplication/components/homeScreen/HomeScreen.kt,e/5/e5eb721f1154876a7010d797ec102fdfdf21d2c7

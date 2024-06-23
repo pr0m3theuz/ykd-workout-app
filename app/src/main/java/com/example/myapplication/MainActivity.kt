@@ -11,8 +11,18 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -21,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil.compose.AsyncImage
 import com.example.myapplication.components.Screens
 import com.example.myapplication.components.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.components.addExercisesList.AddExercisesScreen
@@ -36,18 +47,36 @@ import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.WorkoutScreen
 import com.example.myapplication.components.workout.WorkoutSummaryScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.crashlytics
+import com.google.firebase.crashlytics.setCustomKeys
 import com.newrelic.agent.android.NewRelic
 import kotlinx.serialization.ExperimentalSerializationApi
 
 class MainActivity : ComponentActivity() {
 
-  //  private lateinit var firebaseAnalytics: FirebaseAnalytics
+  private lateinit var crashlytics: FirebaseCrashlytics
 
   @RequiresApi(Build.VERSION_CODES.S)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    //    firebaseAnalytics = Firebase.analytics
+    crashlytics = Firebase.crashlytics
+    crashlytics.log("onCreate")
+
+    // Log the onCreate event, this will also be printed in logcat
+    crashlytics.log("onCreate")
+
+    // Add some custom values and identifiers to be included in crash reports
+    crashlytics.setCustomKeys {
+      key("MeaningOfLife", 42)
+      key("LastUIAction", "Test value")
+    }
+    crashlytics.setUserId("123456789")
+
+    // Report a non-fatal exception, for demonstration purposes
+    crashlytics.recordException(Exception("Non-fatal exception: something went wrong!"))
 
     // New Relic
     NewRelic.withApplicationToken("eu01xx7700dce7ae53e2b20b7cc382fcba147c93ae-NRMA")
@@ -57,8 +86,8 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       MyApplicationTheme {
-        //        val viewModelStoreOwner: ViewModelStoreOwner
-        //        val workoutViewModel: WorkoutViewModel = koinViewModel()
+//        TestScreen()
+
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = Screens.Programs.route) {
           addExercisesGraph(navController)
@@ -70,7 +99,10 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
+
+    crashlytics.log("Activity created")
   }
+
 
   companion object {
     fun newIntent(context: Context): Intent {
@@ -107,7 +139,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
-//      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key = WORKOUT_DETAILS)
+      //      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key =
+      // WORKOUT_DETAILS)
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
@@ -136,16 +169,14 @@ private fun NavGraphBuilder.addWorkoutGraph(
       }
     }
 
-    composable(
-      "AddExercise"
-    ) {
+    composable("AddExercise") {
       AddExerciseNavigableListDetailScreen(
         navController = navController,
         exerciseListPane = { onClick ->
           AddExercisesScreen(
             setOpenDialog = { /*TODO*/ },
             navController = navController,
-            navigateToDetailPane = onClick
+            navigateToDetailPane = onClick,
           )
         },
         exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
@@ -250,6 +281,32 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
     composable(route = "history?editWorkout={workoutID}") { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("workoutID")?.let {
         EditWorkoutScreen(workoutID = it, navController = navController)
+      }
+    }
+  }
+}
+
+@Composable
+private fun TestScreen() {
+  Scaffold() { contentPadding ->
+    Column(
+      Modifier
+        .padding(contentPadding)
+        .fillMaxSize(),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      AsyncImage(
+        model = "https://i.pinimg.com/736x/de/6f/da/de6fda600cc48c291a6823e8a09bf94b.jpg",
+        contentDescription = null,
+      )
+
+      Button(
+        onClick = {
+          throw RuntimeException("Test Crash") // Force a crash
+        }
+      ) {
+        Text(text = "Test Crash")
       }
     }
   }
