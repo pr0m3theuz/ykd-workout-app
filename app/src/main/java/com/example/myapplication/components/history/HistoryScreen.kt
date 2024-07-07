@@ -385,6 +385,7 @@ fun WorkoutOverview(
             //        BottomNavigationBar(navController = navController)
           },
         ) { contentPadding ->
+          // TODO Change to LazyColumn
           Column(
             Modifier.padding(contentPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp),

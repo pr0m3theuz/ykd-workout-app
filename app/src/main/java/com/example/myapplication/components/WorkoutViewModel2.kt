@@ -46,6 +46,7 @@ import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.cancelNotifications
 import com.example.myapplication.utils.newID
 import com.example.myapplication.utils.sendNotification
+import com.google.firebase.perf.metrics.AddTrace
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
@@ -168,6 +169,8 @@ class WorkoutViewModel(
 
   init {
     //    startWorkoutTimer()
+    testSaveStateHandle()
+
     notifyPendingIntent =
       PendingIntent.getBroadcast(
         application,
@@ -175,6 +178,11 @@ class WorkoutViewModel(
         notifyIntent,
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
       )
+  }
+
+  @AddTrace(name = "savedStateHandle WORKOUT_DETAILS", enabled = true)
+  private fun testSaveStateHandle() {
+    savedStateHandle.get<String?>(WORKOUT_DETAILS)
   }
 
   //  private var _timerDuration: Long = 60000L
@@ -473,6 +481,8 @@ class WorkoutViewModel(
       _workout.value = workoutDetails
       isWorkoutActive = true
     }
+
+    testSaveStateHandle()
   }
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
@@ -487,6 +497,7 @@ class WorkoutViewModel(
       copyWorkoutFromWorkoutTemplate(initialWorkoutData)
       isWorkoutActive = true
     }
+    testSaveStateHandle()
   }
 
   fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {

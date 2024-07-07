@@ -46,11 +46,11 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
   }
   kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "19"
 
     freeCompilerArgs =
       listOf(
@@ -59,7 +59,7 @@ android {
         "-Xemit-jvm-type-annotations", // Enable annotations on type variables
       )
   }
-  kotlin { jvmToolchain(18) }
+  kotlin { jvmToolchain(19) }
 
   tasks.withType<Test> {
     useJUnitPlatform { includeEngines("jqwik") }
@@ -87,6 +87,7 @@ dependencies {
   implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta03")
   implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta03")
   implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.0.0-alpha07")
+  implementation("com.google.firebase:firebase-perf-ktx:21.0.1")
 
 
   val composeVersion = "1.7.0-beta02"

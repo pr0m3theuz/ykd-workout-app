@@ -45,18 +45,23 @@ class Set() : RealmObject {
   // TODO add targetWeight Mass Unit
   var targetWeight: Double? = null
   var targetRepetitions: String? = null
+
+  // TODO Update Realm Schema to include targetMinimumRepetitions and targetMaximumRepetitions
+  // var targetMinimumRepetitions: Int? = null // TODO for progression scheme & utils
+  // var targetMaximumRepetitions: Int? = null // TODO for progression scheme & utils
   var targetRatePerceivedEffort: Double? = null
   var targetRepetitionsInReserve: Double? = null
   var percentage1RM: Double? = 1.0
 
-  // var targetPercentage1RM: Double? = null
+  // TODO Update Realm Schema to include targetPercentage1RM
+  // var targetPercentage1RM: Double? = null // TODO for progression scheme & utils
   var setCompleted: Boolean = false
 
   //    var exerciseOrder: Int = 1
   var setTypeID: Int = 1
   val exerciseSet: RealmResults<ExerciseSets> by
   backlinks(ExerciseSets::sets) // TODO Use backlinks for ExerciseSets or not
-  var progressionSchemeID: Int = 0
+  var progressionSchemeID: Int = 0 // TODO Create ProgressionScheme class/enum and RealmObject
 
   //    To use in query for previous sets
   var exerciseID: ObjectId? = null

@@ -2,6 +2,8 @@ package com.example.myapplication.utils
 
 import com.example.myapplication.data.model.ExerciseSets
 
+// TODO Implement Linear Progression
+
 // TODO Update Implementations
 // TODO figure out to implement this. most likely post workout completion,
 //  update exercise in the next workout in the program/block that is using the same progression
@@ -13,12 +15,15 @@ import com.example.myapplication.data.model.ExerciseSets
 //  propose user deloads after a number of failures
 //  Add deload week dynamically, ask user to accept or reject proposed deload weeks
 
+// TODO Refactor so that the completed set is not updated/changed
+
 // Double Progression Feature
 fun ExerciseSets.doubleProgression(
 /* targetRepetitionRangeMin: Int, targetRepetitionRangeMax: Int, incrementWeight: Int*/ ) {
-  val targetRepetitionRangeMin = 12
-  val targetRepetitionRangeMax = 15
-  val incrementWeight = 5.0
+  val targetRepetitionRangeMin = 12 // TODO replace with set.targetMimumRepetitions
+  val targetRepetitionRangeMax = 15 // TODO replace with set.targetMaximumRepetitions
+  val incrementWeight = 5.0 // TODO add to pkl
+  val incrementPercentage1RM = 0.005 // 0.5% TODO add to pkl
 
   val maxRepetitionsCompleted = sets.maxByOrNull { it.setCompleted }?.repetitions ?: 0
 
@@ -130,6 +135,22 @@ fun ExerciseSets.amrapProgression(/*int targetRepetitionRangeMin, int incrementW
           set.targetWeight = set.weightPounds?.plus(incrementWeight.times(2))
         }
         set.repetitions!! in targetRepetitionRangeMin.until(targetRepetitionRangeMin.times(2)) -> {
+          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+        }
+      }
+    }
+  }
+}
+
+// Linear Progression Feature
+fun ExerciseSets.linearProgression(/*int targetRepetitionRangeMin, int incrementWeight*/) {
+  val targetRepetitionRangeMin = 5
+  val incrementWeight = 5.0
+
+  sets.forEach { set ->
+    if (set.targetWeight == set.weightPounds && sets.all { it.setCompleted }) {
+      when {
+        set.repetitions!! >= targetRepetitionRangeMin -> {
           set.targetWeight = set.weightPounds?.plus(incrementWeight)
         }
       }

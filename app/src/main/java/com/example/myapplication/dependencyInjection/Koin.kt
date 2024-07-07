@@ -74,7 +74,6 @@ val commonModule = module {
   singleOf(::ImportWorkoutProgramRepository)
   singleOf(::ManageWorkoutUseCase)
   singleOf(::ManageExercisesUseCase)
-
   singleOf(::ImportWorkoutProgram)
 
   viewModelOf(::ProgramsViewModel)
