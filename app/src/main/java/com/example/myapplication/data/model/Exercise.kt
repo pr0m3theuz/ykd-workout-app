@@ -21,13 +21,8 @@ import io.realm.kotlin.serializers.RealmUUIDKSerializer
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.mongodb.kbson.ObjectId
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -88,6 +83,7 @@ class Exercise() : RealmObject {
 @Serializable
 data class Exercises(val exercises: List<Exercise>)
 
+/*
 object URLSerializer : KSerializer<String> {
   override val descriptor: SerialDescriptor = String.serializer().descriptor
 
@@ -100,4 +96,4 @@ object URLSerializer : KSerializer<String> {
   override fun serialize(encoder: Encoder, value: String) {
     encoder.encodeString(value.encodeToByteArray().toHexString())
   }
-}
+}*/

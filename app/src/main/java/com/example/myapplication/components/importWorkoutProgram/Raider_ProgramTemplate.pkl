@@ -14,8 +14,8 @@ class Program {
 }
 
 class Mesocycle {
-  name: String?
-  description: String?
+  name: String
+  description: String
   order: Int
   microcycles: Listing<Microcycle>
 }
@@ -23,7 +23,7 @@ class Mesocycle {
 class Microcycle {
   name: String
   description: String
-  order: Int = 0
+  order: Int
   workouts: Listing<Workout>
   advancedWorkouts: Listing<AdvancedWorkout>
 }
@@ -49,7 +49,7 @@ class ExerciseSets {
   name: String
   notes: Listing
   sets: Int // Number of sets to be performed
-  repetitions: Int? = null
+  repetitions: Int?
 
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
@@ -75,6 +75,7 @@ class AdvancedExerciseSets {
   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
   percentage1RM: List<Float> // Percentage of 1 Rep Max
+
 
   // TODO Determine Correct Type
   progressionSchemeID: String = ""
@@ -111,6 +112,7 @@ program: Program = new Program {
   mesocycles {
     new {
       name = ""
+      description = ""
       order = 0
       microcycles {
         new {

@@ -1,6 +1,5 @@
 package com.example.myapplication.components.importWorkoutProgram
 
-import AdvancedProgramTemplate
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
@@ -286,9 +285,9 @@ class ImportWorkoutProgram(
           description = pklMicrocycle.description
           order = pklMicrocycle.order.toInt()
           workouts =
-            if (pklMicrocycle.workouts.isNotEmpty()) {
+            if (!pklMicrocycle.workouts.isNullOrEmpty()) {
               createWorkout(pklMicrocycle.workouts)
-            } else if (pklMicrocycle.advancedWorkouts.isNotEmpty()) {
+            } else if (!pklMicrocycle.advancedWorkouts.isNullOrEmpty()) {
               createAdvancedWorkout(pklMicrocycle.advancedWorkouts)
             } else {
               realmListOf<Workout>()

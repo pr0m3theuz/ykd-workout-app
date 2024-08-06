@@ -42,6 +42,7 @@ import com.example.myapplication.components.history.EditWorkoutScreen
 import com.example.myapplication.components.history.HistoryScreen
 import com.example.myapplication.components.history.WorkoutOverview
 import com.example.myapplication.components.homeScreen.HomeScreen
+import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutProgramScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.WorkoutScreen
@@ -86,7 +87,7 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       MyApplicationTheme {
-//        TestScreen()
+        TestScreen()
 
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = Screens.Programs.route) {
@@ -100,7 +101,7 @@ class MainActivity : ComponentActivity() {
       }
     }
 
-    crashlytics.log("Activity created")
+//    crashlytics.log("Activity created")
   }
 
 
@@ -223,26 +224,10 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
         )
       }
     }
-    /*composable("exercisesList") {
-        val viewModel = hiltViewModel<ExercisesViewModel>()
-        ExercisesLazyColumn(
-            navController = navController,
-            exercisesViewModel = viewModel,
-        )
+
+    composable("importWorkoutProgram") {
+      ImportWorkoutProgramScreen(navController)
     }
-    composable(
-        "exerciseDetails/{exerciseID}",
-        arguments = listOf(navArgument("exerciseID") { type = NavType.StringType })
-    ) { navBackStackEntry ->
-        val viewModel = hiltViewModel<ExercisesViewModel>()
-        navBackStackEntry.arguments?.getString("exerciseID")?.let {
-            ExerciseDetailsScreen(
-                navController,
-                exercisePK = it,
-                exercisesViewModel = viewModel,
-            )
-        }
-    }*/
   }
 }
 

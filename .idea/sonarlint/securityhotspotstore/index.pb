@@ -245,3 +245,9 @@ Oapp/src/main/java/com/example/myapplication/components/homeScreen/HomeScreen.kt
 eapp/src/main/java/com/example/myapplication/components/importWorkoutProgram/ImportWorkoutViewModel.kt,0/5/05901fb53b6895379c28108e96b794054c1833b8
 ô
 iapp/src/main/java/com/example/myapplication/components/importWorkoutProgram/ImportWorkoutProgramScreen.kt,e/d/edd050ab3eda1eed1b57e05b9268a96d7accbcba
+ì
+capp/src/main/java/com/example/myapplication/components/importWorkoutProgram/ProgramPreviewLayout.kt,2/b/2b299b61b137614831b76c4c02ccd4886a971ff2
+j
+:app/src/main/java/com/example/myapplication/RP Warm Up.txt,6/8/68fea44a2b9cd4c2a18855ac460c4f023a8c5ed9
+ù
+mapp/src/main/java/com/example/myapplication/components/importWorkoutProgram/AdvancedProgramTemplate.kt.backup,b/d/bd3c2a1cb6dfb117eaddebf334d442fef405c65c

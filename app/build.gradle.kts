@@ -11,7 +11,9 @@ plugins {
   id("newrelic")
   id("kotlin-parcelize")
   //  id("org.jetbrains.kotlin.plugin.kotlin-parcelize")
-  id("org.pkl-lang")
+//  id("org.pkl-lang")
+
+  //  id("org.jetbrains.compose")
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
@@ -46,11 +48,11 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
   }
   kotlinOptions {
-    jvmTarget = "19"
+    jvmTarget = "11"
 
     freeCompilerArgs =
       listOf(
@@ -59,7 +61,7 @@ android {
         "-Xemit-jvm-type-annotations", // Enable annotations on type variables
       )
   }
-  kotlin { jvmToolchain(19) }
+  kotlin { jvmToolchain(17) }
 
   tasks.withType<Test> {
     useJUnitPlatform { includeEngines("jqwik") }
@@ -88,7 +90,7 @@ dependencies {
   implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta03")
   implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.0.0-alpha07")
   implementation("com.google.firebase:firebase-perf-ktx:21.0.1")
-
+  androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
   val composeVersion = "1.7.0-beta02"
   implementation("androidx.compose.ui:ui:$composeVersion")
@@ -184,7 +186,7 @@ dependencies {
   implementation("com.newrelic.agent.android:android-agent:7.3.1")
 
   // Apple pkl
-  implementation("org.pkl-lang:pkl-config-kotlin:0.25.3")
+//  implementation("org.pkl-lang:pkl-config-kotlin:0.26.0")
 
   // Firebase
   // Import the Firebase BoM (see: https://firebase.google.com/docs/android/learn-more#bom)
@@ -198,6 +200,15 @@ dependencies {
   implementation("com.google.firebase:firebase-analytics")
 
   implementation("io.coil-kt:coil-compose:2.6.0")
+
+  // For Jetpack Compose.
+  implementation("com.patrykandpatrick.vico:compose:2.0.0-alpha.27")
+
+  // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
+  implementation("com.patrykandpatrick.vico:compose-m3:2.0.0-alpha.27")
+
+  // Houses the core logic for charts and other elements. Included in all other modules.
+  implementation("com.patrykandpatrick.vico:core:2.0.0-alpha.27")
 }
 
 /*kapt {

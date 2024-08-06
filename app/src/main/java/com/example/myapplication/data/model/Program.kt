@@ -31,7 +31,7 @@ import org.mongodb.kbson.ObjectId
 // TODO Add a woy to differentiate between templates and completed/current/active
 // TODO Create a data class to track progress in a program
 //  i.e. the workouts, microcycles, and mesocycles/blocks completed
-
+// TODO Add Image URI property to Program
 @Serializable
 class Program() : RealmObject {
   @PrimaryKey

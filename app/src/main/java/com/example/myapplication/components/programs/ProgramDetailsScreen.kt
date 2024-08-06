@@ -227,7 +227,7 @@ fun ProgramDetailsLayout(
             OverviewTab(
               program = program,
               microcycles = microcycles,
-              programsViewModel = programsViewModel
+//              programsViewModel = programsViewModel
             )
 
           1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
@@ -270,7 +270,7 @@ fun ProgramDetailsOptionsDropdownMenu() {
 fun OverviewTab(
   program: Program,
   microcycles: List<Microcycle>,
-  programsViewModel: ProgramsViewModel = koinViewModel()
+//  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   //  Log.i("OverviewTab", "microcycles: $microcycles")
   Column(
@@ -279,7 +279,7 @@ fun OverviewTab(
     CoachsCard(program = program)
     ProgramOverviewCard(program = program)
     ProgramDescriptionCard(program = program)
-    WorkoutOverviewCard(microcycles = microcycles, programsViewModel = programsViewModel)
+    WorkoutOverviewCard(microcycles = microcycles /*programsViewModel = programsViewModel*/)
     Spacer(modifier = Modifier.height(60.dp))
   }
 }
@@ -453,7 +453,7 @@ fun ProgramDescriptionCard(program: Program) {
 @Composable
 fun WorkoutOverviewCard(
   microcycles: List<Microcycle>,
-  programsViewModel: ProgramsViewModel = koinViewModel()
+//  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   val padding = 12.dp
   val spacedByPadding = 4.dp
@@ -508,7 +508,7 @@ fun WorkoutOverviewCard(
           if (workouts.isNotEmpty()) {
             workouts.sortedBy { it.day }.forEachIndexed { index, workout ->
               //              Log.i("WorkoutOverviewCard", workout.toString())
-              WorkoutDayCard(index, workout, programsViewModel)
+              WorkoutDayCard(index, workout /*programsViewModel*/)
             }
           }
         }
@@ -521,7 +521,7 @@ fun WorkoutOverviewCard(
 fun WorkoutDayCard(
   index: Int,
   workout: Workout,
-  programsViewModel: ProgramsViewModel = koinViewModel()
+//  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   val padding = 12.dp
   val spacedByPadding = 12.dp
