@@ -23,6 +23,15 @@ import org.mongodb.kbson.ObjectId
 
 class ExercisesViewModel constructor(private val exercisesRepository: ExercisesRepository) :
   ViewModel() {
+
+  var _expand: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val expand: StateFlow<Boolean>
+    get() = _expand.asStateFlow()
+
+  fun setExpand(value: Boolean) {
+    _expand.value = value
+  }
+
   private val _exercises: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())
   val exercises: StateFlow<List<Exercise>>
     get() = _exercises.asStateFlow()
@@ -66,12 +75,8 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     }
   }
 
-  val exeseaoeuta = {
-
-  }
-
   private suspend fun getAllExercises() {
-//    Log.i("ExercisesViewModel", "getAllExercises")
+    //    Log.i("ExercisesViewModel", "getAllExercises")
 
     return coroutineScope {
       exercisesRepository.getAllExercises().collect() { _exercises.value = it }
@@ -79,7 +84,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   }
 
   private suspend fun getEquipmentAndMuscleGroups() {
-//    Log.i("ExercisesViewModel", "getEquipmentAndMuscleGroups")
+    //    Log.i("ExercisesViewModel", "getEquipmentAndMuscleGroups")
     return coroutineScope {
       val equipments = async { exercisesRepository.getAllEquipment() }
       val muscleGroups = async { exercisesRepository.getAllMuscleGroups() }
@@ -88,12 +93,11 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   }
 
   private fun init(equipment: List<Equipment>, muscleGroup: List<MuscleGroup>) {
-//    Log.i("ExercisesViewModel", "init: _muscleGroupsChecked")
+    //    Log.i("ExercisesViewModel", "init: _muscleGroupsChecked")
 
     _equipment.value = equipment
     if (_equipmentsChecked.value.isEmpty()) {
-      _equipmentsChecked.value =
-        equipment.map { it to false }.toMutableStateMap().toMutableMap()
+      _equipmentsChecked.value = equipment.map { it to false }.toMutableStateMap().toMutableMap()
     }
 
     _muscleGroup.value = muscleGroup
@@ -102,8 +106,8 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
         muscleGroup.map { it to false }.toMutableStateMap().toMutableMap()
     }
 
-//    Log.i("ExercisesViewModel", "${_muscleGroupsChecked.value.keys.toList()}")
-//    Log.i("ExercisesViewModel", "${_equipmentsChecked.value.keys.toList()}")
+    //    Log.i("ExercisesViewModel", "${_muscleGroupsChecked.value.keys.toList()}")
+    //    Log.i("ExercisesViewModel", "${_equipmentsChecked.value.keys.toList()}")
   }
 
   fun getAllUtilities() {
@@ -204,7 +208,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
         .filterExercises(
           exercise = searchExerciseName,
           muscleGroupIDs = selectedMuscleGroups.toList(),
-          equipmentIDs = selectedEquipments.toList()
+          equipmentIDs = selectedEquipments.toList(),
           //                movementTypes = selectedMovementTypes.toList()
         )
         .collect() { _exercises.value = it }

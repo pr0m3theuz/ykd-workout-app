@@ -36,6 +36,7 @@ import com.example.myapplication.components.Screens
 import com.example.myapplication.components.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.components.addExercisesList.AddExercisesScreen
 import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
+import com.example.myapplication.components.exerciseDetails.FullScreenChart
 import com.example.myapplication.components.exercisesList.ExerciseNavigableListDetailScreen
 import com.example.myapplication.components.exercisesList.ExercisesLazyColumn
 import com.example.myapplication.components.history.EditWorkoutScreen
@@ -103,7 +104,6 @@ class MainActivity : ComponentActivity() {
 
 //    crashlytics.log("Activity created")
   }
-
 
   companion object {
     fun newIntent(context: Context): Intent {
@@ -204,6 +204,10 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
         },
       )
     }
+
+    composable("exerciseChart") {
+      FullScreenChart(navigateUp = { navController.navigateUp() })
+    }
   }
 }
 
@@ -296,3 +300,4 @@ private fun TestScreen() {
     }
   }
 }
+

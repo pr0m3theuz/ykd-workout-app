@@ -11,9 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.TabRow
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material.icons.outlined.MoreVert
@@ -28,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -108,8 +110,12 @@ private fun ExerciseDetailsLayout(
 ) {
   //    val exercise = _exercise.firstOrNull()
 
+  fun navigateToFullscreenChartScreen() {
+    navController.navigate("exerciseChart")
+  }
+
   val context = LocalContext.current
-  var state by remember { mutableIntStateOf(0) }
+  var state by remember { mutableIntStateOf(0) } // TODO store in ViewModel. position is lost when navigating back from fullscreen chart
   val titles = listOf("About", "History", "Charts", "Records")
   val onSurface = MaterialTheme.colorScheme.onSurface
 
@@ -170,7 +176,7 @@ private fun ExerciseDetailsLayout(
         when (state) {
           0 -> AboutTab(exercise.name)
           1 -> HistoryTab()
-          2 -> ChartTab()
+          2 -> ChartTab(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
           3 -> RecordsTab()
         }
       }
@@ -282,14 +288,20 @@ fun HistoryTab() {
 
 @Preview
 @Composable
-fun ChartTab() {
-  Column() {
+fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
+  val state = rememberScrollState()
+  Column(modifier = Modifier.verticalScroll(state)) {
+    Text(text = "Chart Name")
     Row() {
-      Icon(
-        imageVector = Icons.Outlined.BrokenImage,
-        contentDescription = "Missing Image",
-        tint = MaterialTheme.colorScheme.primary,
-      )
+      ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
+    }
+    Text(text = "Estimated 1RM")
+    Row() {
+      ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
+    }
+    Text(text = "Volume")
+    Row() {
+      ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
     }
   }
 }

@@ -92,7 +92,7 @@ dependencies {
   implementation("com.google.firebase:firebase-perf-ktx:21.0.1")
   androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
-  val composeVersion = "1.7.0-beta02"
+  val composeVersion = "1.7.0-beta07"
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
   implementation("androidx.compose.material:material:$composeVersion")
