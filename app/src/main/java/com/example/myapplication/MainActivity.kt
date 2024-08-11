@@ -44,6 +44,7 @@ import com.example.myapplication.components.history.HistoryScreen
 import com.example.myapplication.components.history.WorkoutOverview
 import com.example.myapplication.components.homeScreen.HomeScreen
 import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutProgramScreen
+import com.example.myapplication.components.profileScreen.ProfileScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.WorkoutScreen
@@ -97,6 +98,7 @@ class MainActivity : ComponentActivity() {
           addWorkoutSummaryGraph(navController)
           addProgramsGraph(navController)
           addHistoryGraph(navController)
+          addProfileGraph(navController)
           navigation("homeScreen", route = "home") { composable("homeScreen") { HomeScreen() } }
         }
       }
@@ -267,6 +269,16 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
       navBackStackEntry.arguments?.getString("workoutID")?.let {
         EditWorkoutScreen(workoutID = it, navController = navController)
       }
+    }
+  }
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
+  navigation("profileScreen", route = "profile") {
+    composable("profileScreen") { navBackStackEntry ->
+      Log.i("ProfileNavGraph", "Navigated to User Profile Screen")
+      ProfileScreen(navController = navController)
     }
   }
 }

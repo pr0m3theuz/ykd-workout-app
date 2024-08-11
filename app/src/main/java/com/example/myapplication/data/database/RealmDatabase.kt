@@ -37,6 +37,7 @@ import io.realm.kotlin.internal.platform.assetFileAsStream
 import io.realm.kotlin.internal.platform.runBlocking
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
+import io.realm.kotlin.mongodb.User
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
 import io.realm.kotlin.mongodb.syncSession
@@ -90,6 +91,8 @@ class RealmDatabase {
   private val password = "RpHg!Xe%beN5XNCBhvs#jj*PkN23H&ux"
   val app: App = App.create("gymcats-rmmte")
 
+  private val emailPasswordCredentials = Credentials.emailPassword(email, password)
+  lateinit var user: User
   //    var credentials: Credentials
 
   //    CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
@@ -107,8 +110,7 @@ class RealmDatabase {
       //      val user = app.login(anonymousCredentials) }
 //      app.emailPasswordAuth.registerUser(email, password)
 
-      val emailPasswordCredentials = Credentials.emailPassword(email, password)
-      app.login(emailPasswordCredentials)
+      user = app.login(emailPasswordCredentials)
     }
   }
 
@@ -184,6 +186,10 @@ class RealmDatabase {
   // User & User Settings
   fun getUser(): GymCatUser? {
     return realm.query<GymCatUser>().find().firstOrNull()
+  }
+
+  fun getCurrentUser(): User? {
+    return app.currentUser
   }
 
   // Exercise & Related Queries

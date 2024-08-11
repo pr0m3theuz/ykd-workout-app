@@ -28,6 +28,7 @@ class GymCatUser() : RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
     var name: String? = null
+    var email: String? = null
     var defaultWeightUnit: String = MassUnit.POUNDS.abbreviation // TODO have enum class??????
     var intensity: String? = Intensity.RIR.abbreviation // TODO have enum class??????
 }

@@ -7,6 +7,7 @@ import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.history.HistoryViewModel
 import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutProgram
 import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutViewModel
+import com.example.myapplication.components.profileScreen.ProfileViewModel
 import com.example.myapplication.components.programs.ProgramsViewModel
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
@@ -85,6 +86,7 @@ val commonModule = module {
   viewModelOf(::WarmUpSetsViewModel)
   viewModelOf(::HistoryViewModel)
   viewModelOf(::ImportWorkoutViewModel)
+  viewModelOf(::ProfileViewModel)
 
   //  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
 }
