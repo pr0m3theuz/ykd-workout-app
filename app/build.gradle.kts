@@ -78,6 +78,8 @@ android {
     // our test APK to build (has no effect on our AARs)
     excludes += "/META-INF/AL2.0"
     excludes += "/META-INF/LGPL2.1"
+    excludes += "META-INF/LICENSE.md"
+    excludes += "META-INF/LICENSE-notice.md"
   }
 }
 

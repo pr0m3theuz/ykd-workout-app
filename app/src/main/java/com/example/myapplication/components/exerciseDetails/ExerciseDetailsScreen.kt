@@ -33,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,17 +60,26 @@ fun ExerciseDetailsScreen(
   onClick: () -> Unit,
   exercisesViewModel: ExercisesViewModel = koinViewModel(),
 ) {
+  val tabState by exercisesViewModel.exerciseDetailsLayoutTabState.collectAsStateWithLifecycle()
+
   if (exerciseID.contentEquals("Select an exercise")) {
     NoExerciseDetailContent(exerciseID)
   } else {
     exercisesViewModel.getExerciseDetails(exerciseID)
     val exercise by exercisesViewModel.selectedExerciseDetails.collectAsStateWithLifecycle()
 
-    exercise?.let { ExerciseDetailsLayout(navController, it, onClick) }
+    exercise?.let {
+      ExerciseDetailsLayout(
+        navController,
+        it,
+        tabState,
+        setTabState = { state -> exercisesViewModel.setExerciseDetailsLayoutTabState(state) },
+        onClick,
+      )
+    }
   }
 }
 
-@Preview
 @Composable
 private fun NoExerciseDetailContent(exerciseID: String) {
   Scaffold { contentPadding ->
@@ -86,16 +94,17 @@ private fun NoExerciseDetailContent(exerciseID: String) {
       Image(
         painterResource(R.drawable.select_exercise),
         modifier = Modifier.scale(0.75f),
-        contentDescription = null
+        contentDescription = null,
       )
       Text(
-        text = "Select an exercise", color = MaterialTheme.colorScheme.onSurface,
-        style = MaterialTheme.typography.titleLarge
+        text = "Select an exercise",
+        color = MaterialTheme.colorScheme.onSurface,
+        style = MaterialTheme.typography.titleLarge,
       )
       Text(
         text = "To see more details about an exercise.",
         color = MaterialTheme.colorScheme.onSurface,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.bodyLarge,
       )
     }
   }
@@ -106,6 +115,8 @@ private fun NoExerciseDetailContent(exerciseID: String) {
 private fun ExerciseDetailsLayout(
   navController: NavController,
   exercise: Exercise,
+  tabState: Int = 0,
+  setTabState: (Int) -> Unit = {},
   navigateToListPane: () -> Unit,
 ) {
   //    val exercise = _exercise.firstOrNull()
@@ -115,7 +126,8 @@ private fun ExerciseDetailsLayout(
   }
 
   val context = LocalContext.current
-  var state by remember { mutableIntStateOf(0) } // TODO store in ViewModel. position is lost when navigating back from fullscreen chart
+  var state =
+    tabState // TODO store in ViewModel. position is lost when navigating back from fullscreen chart
   val titles = listOf("About", "History", "Charts", "Records")
   val onSurface = MaterialTheme.colorScheme.onSurface
 
@@ -163,7 +175,7 @@ private fun ExerciseDetailsLayout(
         titles.forEachIndexed { index, title ->
           Tab(
             selected = state == index,
-            onClick = { state = index },
+            onClick = { setTabState(index) },
             text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
           )
         }
@@ -286,23 +298,17 @@ fun HistoryTab() {
   }
 }
 
-@Preview
+
 @Composable
 fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
   val state = rememberScrollState()
   Column(modifier = Modifier.verticalScroll(state)) {
     Text(text = "Chart Name")
-    Row() {
-      ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
-    }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() }) }
     Text(text = "Estimated 1RM")
-    Row() {
-      ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
-    }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() }) }
     Text(text = "Volume")
-    Row() {
-      ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
-    }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() }) }
   }
 }
 

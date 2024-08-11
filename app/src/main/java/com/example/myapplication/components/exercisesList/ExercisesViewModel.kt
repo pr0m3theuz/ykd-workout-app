@@ -24,12 +24,20 @@ import org.mongodb.kbson.ObjectId
 class ExercisesViewModel constructor(private val exercisesRepository: ExercisesRepository) :
   ViewModel() {
 
-  var _expand: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  private var _expand: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val expand: StateFlow<Boolean>
     get() = _expand.asStateFlow()
 
   fun setExpand(value: Boolean) {
     _expand.value = value
+  }
+
+  private var _exerciseDetailsLayoutTabState: MutableStateFlow<Int> = MutableStateFlow(0)
+  val exerciseDetailsLayoutTabState: StateFlow<Int>
+    get() = _exerciseDetailsLayoutTabState.asStateFlow()
+
+  fun setExerciseDetailsLayoutTabState(value: Int) {
+    _exerciseDetailsLayoutTabState.value = value
   }
 
   private val _exercises: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())

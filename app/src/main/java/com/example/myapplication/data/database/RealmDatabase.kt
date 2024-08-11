@@ -86,6 +86,8 @@ class RealmDatabase {
       Realm.open(configuration)
     }*/
 
+  private val email = "glare_parmesan992@simplelogin.com"
+  private val password = "RpHg!Xe%beN5XNCBhvs#jj*PkN23H&ux"
   val app: App = App.create("gymcats-rmmte")
 
   //    var credentials: Credentials
@@ -99,7 +101,20 @@ class RealmDatabase {
     //    CoroutineScope(Dispatchers.Main).launch {
     //      app.login(Credentials.anonymous())
     //    }
-    runBlocking { app.login(Credentials.anonymous()) }
+
+    runBlocking {
+      //      val anonymousCredentials = Credentials.anonymous()
+      //      val user = app.login(anonymousCredentials) }
+//      app.emailPasswordAuth.registerUser(email, password)
+
+      val emailPasswordCredentials = Credentials.emailPassword(email, password)
+      app.login(emailPasswordCredentials)
+    }
+  }
+
+  fun registerNewUserEmail() {
+    runBlocking { // use runBlocking sparingly -- it can delay UI interactions
+    }
   }
 
   val realm: Realm by lazy {
@@ -1162,9 +1177,7 @@ class RealmDatabase {
         val newSet =
           this.copyToRealm(
             Set().apply {
-              uuid =
-                set
-                  .uuid // TODO determine if this should be unique or can be used in a future
+              uuid = set.uuid // TODO determine if this should be unique or can be used in a future
               // feature
               setNumber = set.setNumber
               weightPounds = set.weightPounds
@@ -1242,61 +1255,26 @@ class RealmDatabase {
   }
 
   suspend fun importWorkoutProgramPKL(program: Program) {
-    realm.write {
-      this.copyToRealm(
-        program
-      )
-    }
+    realm.write { this.copyToRealm(program) }
   }
 
   suspend fun importMesocyclesPKL(mesocycles: RealmList<Mesocycle>) {
-    mesocycles.forEach { mesocycle ->
-      realm.write {
-        this.copyToRealm(
-          mesocycle
-        )
-      }
-    }
+    mesocycles.forEach { mesocycle -> realm.write { this.copyToRealm(mesocycle) } }
   }
 
   suspend fun importMicrocyclesPKL(microcycles: RealmList<Microcycle>) {
-    microcycles.forEach { microcycle ->
-      realm.write {
-        this.copyToRealm(
-          microcycle
-        )
-      }
-    }
+    microcycles.forEach { microcycle -> realm.write { this.copyToRealm(microcycle) } }
   }
 
   suspend fun importWorkoutsPKL(workouts: RealmList<Workout>) {
-    workouts.forEach { workout ->
-      realm.write {
-        this.copyToRealm(
-          workout
-        )
-      }
-    }
+    workouts.forEach { workout -> realm.write { this.copyToRealm(workout) } }
   }
 
   suspend fun importExercisesSetsPKL(exercisesSets: RealmList<ExerciseSets>) {
-    exercisesSets.forEach { exerciseSets ->
-      realm.write {
-        this.copyToRealm(
-          exerciseSets
-        )
-      }
-    }
+    exercisesSets.forEach { exerciseSets -> realm.write { this.copyToRealm(exerciseSets) } }
   }
 
   suspend fun importSetsPKL(sets: RealmList<Set>) {
-    sets.forEach { set ->
-      realm.write {
-        this.copyToRealm(
-          set
-        )
-      }
-    }
+    sets.forEach { set -> realm.write { this.copyToRealm(set) } }
   }
 }
-

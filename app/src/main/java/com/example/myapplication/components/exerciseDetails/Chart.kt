@@ -4,14 +4,19 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloseFullscreen
-import androidx.compose.material.icons.filled.OpenInFull
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -26,8 +32,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisTickComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
@@ -53,7 +61,7 @@ fun ChartDemoScreen() {
       .padding(paddingValues)
       .padding(16.dp)
       .fillMaxSize()) {
-//      ChartWrapper()
+      //      ChartWrapper()
     }
   }
 }
@@ -66,16 +74,15 @@ fun ChartWrapper(navigateToFullscreenChartScreen: () -> Unit) {
     VicoChart(modifier = Modifier.height(200.dp))
     IconButton(
       modifier = Modifier.align(Alignment.TopEnd),
-      onClick = { navigateToFullscreenChartScreen() }) {
+      onClick = { navigateToFullscreenChartScreen() },
+    ) {
       Icon(
-        imageVector = Icons.Default.OpenInFull,
+        painter = painterResource(R.drawable.expand_content_24px),
         tint = MaterialTheme.colorScheme.primary,
         contentDescription = null,
       )
     }
   }
-
-
 }
 
 @Composable
@@ -88,23 +95,87 @@ fun FullScreenChart(navigateUp: () -> Unit) {
 
   /*  val activity = context.findActivity()
 
-    activity?.requestedOrientation = landscapeOrientation*/
+  activity?.requestedOrientation = landscapeOrientation*/
 
-
+//  TODO Add y axis label & units
+//  TODO Add x axis label & units
 
   Surface(modifier = Modifier.fillMaxSize()) {
-    Column(modifier = Modifier.fillMaxSize()) {
-      Text(text = "Title Here")
-      Box(modifier = Modifier.fillMaxSize()) {
-        VicoChart(modifier = Modifier.fillMaxSize())
-        IconButton(
-          modifier = Modifier.align(Alignment.TopEnd),
-          onClick = { orientation = portraitOrientation;navigateUp() }) {
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)
+    ) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        IconButton(onClick = { orientation = portraitOrientation; navigateUp() }) {
           Icon(
-            imageVector = Icons.Default.CloseFullscreen,
+            Icons.AutoMirrored.Default.ArrowBack,
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = null,
           )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+          Text(text = "Exercise", style = MaterialTheme.typography.titleMedium)
+          Text(text = "Details", style = MaterialTheme.typography.titleSmall)
+        }
+        IconButton(onClick = {
+          Toast.makeText(
+            context,
+            "TODO: Implement DropdownMenu",
+            Toast.LENGTH_SHORT
+          ).show()
+        }) {
+          Icon(
+            Icons.Default.FilterList,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = null,
+          )
+        }
+        TextButton(onClick = {
+          Toast.makeText(
+            context,
+            "TODO: Implement DropdownMenu",
+            Toast.LENGTH_SHORT
+          ).show()
+        }) {
+          Text(text = "Programs")
+        }
+        IconButton(
+          onClick = {
+            orientation = portraitOrientation
+            navigateUp()
+          }
+        ) {
+          Icon(
+            painter = painterResource(R.drawable.collapse_content_24px),
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = null,
+          )
+        }
+        IconButton(
+          onClick = {
+            Toast.makeText(context, "TODO: Implement Share", Toast.LENGTH_SHORT).show()
+          }
+        ) {
+          Icon(
+            Icons.Default.Share,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = null,
+          )
+        }
+      }
+
+
+      Box(modifier = Modifier.fillMaxSize()) {
+        VicoChart(modifier = Modifier.fillMaxSize())
+        Box(modifier = Modifier.align(Alignment.TopEnd)) {
+          Row() {
+
+          }
         }
       }
     }
@@ -121,11 +192,12 @@ fun FullScreenChart(navigateUp: () -> Unit) {
   }
 }
 
-fun Context.findActivity(): Activity? = when (this) {
-  is Activity -> this
-  is ContextWrapper -> baseContext.findActivity()
-  else -> null
-}
+fun Context.findActivity(): Activity? =
+  when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+  }
 
 @Composable
 fun VicoChart(modifier: Modifier) {

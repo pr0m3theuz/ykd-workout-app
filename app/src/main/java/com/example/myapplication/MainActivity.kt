@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
       }
     }
 
-//    crashlytics.log("Activity created")
+    //    crashlytics.log("Activity created")
   }
 
   companion object {
@@ -205,9 +205,7 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
       )
     }
 
-    composable("exerciseChart") {
-      FullScreenChart(navigateUp = { navController.navigateUp() })
-    }
+    composable("exerciseChart") { FullScreenChart(navigateUp = { navController.navigateUp() }) }
   }
 }
 
@@ -229,9 +227,7 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
       }
     }
 
-    composable("importWorkoutProgram") {
-      ImportWorkoutProgramScreen(navController)
-    }
+    composable("importWorkoutProgram") { ImportWorkoutProgramScreen(navController) }
   }
 }
 
@@ -300,4 +296,3 @@ private fun TestScreen() {
     }
   }
 }
-
