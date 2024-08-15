@@ -69,6 +69,7 @@ class Set() : RealmObject {
   //    var programUUID: RealmUUID? = null
   //    var mesocycleUUID: RealmUUID? = null
   //    var microcycleUUID: RealmUUID? = null
+  var ownerID: String = "PUBLIC"
 }
 
 fun Set.setVolume(weightUnit: String): Double {

@@ -1,21 +1,5 @@
 package com.example.myapplication.data.model
 
-/*
-TODO Remove
-enum class Equipment(val printableName: String) {
-    DUMBBELL("Dumbbell"),
-    BARBELL("Barbell"),
-    PLATE_LOADED_MACHINE("Plate Loaded"),
-    MACHINE("Machine"),
-    KETTLEBELL("Kettlebell"),
-    MEDICINEBALL("Medicine Ball"),@Entity(tableName = "programs")
-    BODY_WEIGHT("Body Weight"),
-    CARDIO("Cardio"),
-    OTHER("Other"),
-    NO_EQUIPMENT("No Equipment"),
-}
-*/
-
 enum class ExerciseEquipment(val printableName: String) {
     LEVER("Lever"),
     CABLE("Cable"),
@@ -59,25 +43,6 @@ enum class ProgressionSchemeEnum {
 //
 // }
 
-/*
-TODO Remove
-enum class MuscleGroup(val printableName: String) {
-    CORE("Core"),
-    CALVES("Calves"),
-    BACK("Back"),
-    BICEPS("Biceps"),
-    CHEST("Chest"),
-    FOREARMS("Forearms"),
-    GLUTES("Glutes"),
-    HAMSTRINGS("Hamstring"),
-    LEGS("Legs"),
-    NECK("Neck"),
-    QUADS("Quad"),
-    SHOULDERS("Shoulders"),
-    TRICEPS("Triceps"),
-    FULL_BODY("Full Body"),
-}*/
-
 enum class MovementType(val printableName: String) {
     COMPOUND("Compound"),
     ISOLATION("Isolation"),
@@ -90,10 +55,3 @@ enum class MovementType(val printableName: String) {
     OLYMPIC("Olympic"),
 }
 
-/*
-TODO Remove
-enum class ExerciseForce(val printableName: String) {
-    PUSH("Push"),
-    PULL("Pull"),
-}
-*/

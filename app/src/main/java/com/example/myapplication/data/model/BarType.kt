@@ -27,7 +27,8 @@ data class BarType(
     val id: Long = newID(),
     val name: String,
     var barWeightPounds: Double,
-    var barWeightKilograms: Double
+    var barWeightKilograms: Double,
+    var ownerID: String? = null
 )
 
 data class WeightUnit(
