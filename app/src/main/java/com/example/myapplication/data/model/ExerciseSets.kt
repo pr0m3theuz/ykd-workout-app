@@ -51,6 +51,7 @@ class ExerciseSets() : RealmObject {
   var datePerformed: RealmInstant? = null
   var totalVolumeInPounds: Double? = 0.0
   var totalVolumeInKilograms: Double? = 0.0
+  var ownerID: String? = null
 }
 
 @Serializable
