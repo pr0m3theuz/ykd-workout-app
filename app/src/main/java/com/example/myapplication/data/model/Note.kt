@@ -48,7 +48,7 @@ class ExerciseNote() : RealmObject {
   //    var mesocyclePinned: Boolean = false
   //    var microcycle: Microcycle
   //    var microcyclePinned: Boolean = false
-  var ownerID: String? = null
+  var owner_id: String? = null
 }
 
 // TODO Are the below necessary? TBD
@@ -69,7 +69,7 @@ class WorkoutNote() : RealmObject {
   //    var mesocyclePinned: Boolean = false
   //    var microcycle: Microcycle
   //    var microcyclePinned: Boolean = false
-  var ownerID: String? = null
+  var owner_id: String? = null
 }
 
 @Serializable
@@ -81,7 +81,7 @@ class ProgramNote() : RealmObject {
   var note: String? = null
   var pinned: Boolean = false
   val program: RealmResults<Program> by backlinks(Program::notes)
-  var ownerID: String? = null
+  var owner_id: String? = null
 }
 
 @Serializable
@@ -94,7 +94,7 @@ class MesocycleNote() : RealmObject {
   var pinned: Boolean = false
   var programPinned: Boolean = false
   var mesocycle: Microcycle? = null
-  var ownerID: String? = null
+  var owner_id: String? = null
 }
 
 class MicrocycleNote() : RealmObject {
@@ -111,5 +111,5 @@ class MicrocycleNote() : RealmObject {
 
   //    var mesocycleID: Long? = null
   var mesocyclePinned: Boolean = false
-  var ownerID: String? = null
+  var owner_id: String? = null
 }

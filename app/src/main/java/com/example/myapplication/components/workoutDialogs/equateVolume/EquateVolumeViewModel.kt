@@ -7,6 +7,7 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.utils.newID
+import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ private const val WARM_UP_SET = 2
 
 class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
   val userDefaultWeightUnit: String =
-    userRepository.getUser()?.defaultWeightUnit ?: MassUnit.POUNDS.abbreviation
+    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
+      ?: MassUnit.POUNDS.abbreviation
 
   private var exerciseWeightUnit: String? = null
 

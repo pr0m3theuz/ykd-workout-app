@@ -24,6 +24,7 @@ import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.newID
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmUUID
@@ -41,7 +42,8 @@ class ManageWorkoutUseCase(
   userRepository: UserRepository,
 ) {
   val userDefaultWeightUnit: String =
-    userRepository.getUser()?.defaultWeightUnit ?: MassUnit.POUNDS.abbreviation
+    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
+      ?: MassUnit.POUNDS.abbreviation
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
     return exercisesRepository.getExercise(exerciseID)

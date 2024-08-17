@@ -8,7 +8,6 @@ import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Exercises
 import com.example.myapplication.data.model.ExercisesSets
 import com.example.myapplication.data.model.Force
-import com.example.myapplication.data.model.GymCatUser
 import com.example.myapplication.data.model.Mechanic
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.MesocycleNote
@@ -106,8 +105,8 @@ class RealmDatabase {
     //    }
 
     runBlocking {
-      //      val anonymousCredentials = Credentials.anonymous()
-      //      val user = app.login(anonymousCredentials) }
+//      val anonymousCredentials = Credentials.anonymous()
+//      val user = app.login(anonymousCredentials) }
 //      app.emailPasswordAuth.registerUser(email, password)
 
       user = app.login(emailPasswordCredentials)
@@ -146,7 +145,6 @@ class RealmDatabase {
             Utility::class,
             Force::class,
             Mechanic::class,
-            GymCatUser::class,
             // ProgressionScheme::class,)
           ),
         )
@@ -175,7 +173,6 @@ class RealmDatabase {
             add(realm.query<Utility>(), "utilityStream", updateExisting = true)
             add(realm.query<Force>(), "forceStream", updateExisting = true)
             add(realm.query<Mechanic>(), "mechanicStream", updateExisting = true)
-            add(realm.query<GymCatUser>(), "userStream", updateExisting = true)
           }
           .build()
       }
@@ -184,10 +181,6 @@ class RealmDatabase {
   }
 
   // User & User Settings
-  fun getUser(): GymCatUser? {
-    return realm.query<GymCatUser>().find().firstOrNull()
-  }
-
   fun getCurrentUser(): User? {
     return app.currentUser
   }
@@ -419,7 +412,7 @@ class RealmDatabase {
           _workout.programID = workout.programID
           _workout.microcycleID = workout.microcycleID
           _workout.exercisesSets = insertedExercisesSets
-
+          _workout.owner_id = user.id
           Log.i("insertWorkout", "insertedWorkout: ${Json.encodeToString(_workout)}")
         }
       }
@@ -443,6 +436,7 @@ class RealmDatabase {
             exercisesSets = workout.exercisesSets
             programID = workout.programID
             microcycleID = workout.microcycleID
+            owner_id = user.id
           }
         )
       }
@@ -580,6 +574,7 @@ class RealmDatabase {
           programLength = program.programLength
           active = true
           mesocycles = insertedMesocycles
+//          owner_id = user.id // TODO figure out if this is needed
         }
       )
     }
@@ -643,6 +638,7 @@ class RealmDatabase {
               order = mesocycle.order
               programID = _programID
               microcycles = insertedMicrocycles
+//              owner_id = mesocycle.owner_id // TODO figure out if this is needed
             }
           )
         realmMesocycles.add(newMesocycle)
@@ -719,6 +715,7 @@ class RealmDatabase {
               programID = _programID
               mesocycleID = _mesocycleID
               workouts = insertedWorkouts
+//            owner_id = microcycle.owner_id // TODO figure out if this is needed
             }
           )
         realmMicrocycles.add(newMicrocycle)
@@ -1064,6 +1061,7 @@ class RealmDatabase {
             _set.setCompleted = set.setCompleted
             _set.exerciseID = exerciseID
             _set.dateCreated = set.dateCreated
+            _set.owner_id = user.id
           } else {
             this.copyToRealm(
               Set().apply {
@@ -1083,6 +1081,7 @@ class RealmDatabase {
                 setCompleted = set.setCompleted
                 this.exerciseID = exerciseID
                 dateCreated = set.dateCreated
+                owner_id = user.id
               },
               updatePolicy = UpdatePolicy.ALL,
             )
@@ -1130,6 +1129,7 @@ class RealmDatabase {
                 notes = insertedNotes
                 datePerformed = exerciseSets.datePerformed
                 workoutID = exerciseSets.workoutID
+                owner_id = user.id
               },
               updatePolicy = UpdatePolicy.ALL,
             )
@@ -1166,6 +1166,7 @@ class RealmDatabase {
               exerciseID = exerciseSets.exerciseID
               sets = insertedSets
               datePerformed = exerciseSets.datePerformed
+//              owner_id = user.id // TODO figure out if this is needed
             }
           )
         realmExerciseSets.add(newExerciseSet)
@@ -1200,6 +1201,7 @@ class RealmDatabase {
               setTypeID = set.setTypeID
               progressionSchemeID = set.progressionSchemeID
               exerciseID = set.exerciseID
+//              owner_id = user.id // TODO figure out if this is needed
             }
           )
         realmSets.add(newSet)
@@ -1223,6 +1225,7 @@ class RealmDatabase {
                 dateCreated = exerciseNote.dateCreated
                 exercise = exerciseNote.exercise
                 workout = exerciseNote.workout
+                owner_id = user.id
               },
               updatePolicy = UpdatePolicy.ALL,
             )
@@ -1246,6 +1249,7 @@ class RealmDatabase {
                 note = workoutNote.note
                 pinned = workoutNote.pinned
                 workout = workoutNote.workout
+                owner_id = user.id
               },
               updatePolicy = UpdatePolicy.ALL,
             )

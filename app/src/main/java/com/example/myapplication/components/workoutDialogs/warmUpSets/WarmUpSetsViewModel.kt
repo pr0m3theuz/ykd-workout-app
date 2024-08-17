@@ -7,6 +7,7 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
+import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,8 @@ import java.util.Random
 
 class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewModel() {
   val userDefaultWeightUnit: String =
-    userRepository.getUser()?.defaultWeightUnit ?: MassUnit.POUNDS.abbreviation
+    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
+      ?: MassUnit.POUNDS.abbreviation
 
   var exerciseWeightUnit: String? = null
 
