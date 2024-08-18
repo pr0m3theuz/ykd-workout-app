@@ -79,6 +79,7 @@ class Exercise() : RealmObject {
     //  @Serializable(URLSerializer::class)
   var pageURI: String? = null
   var owner_id: String = "PUBLIC"
+  var isPublic: Boolean = true
 }
 
 @Serializable

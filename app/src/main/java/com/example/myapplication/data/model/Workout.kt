@@ -62,6 +62,7 @@ class Workout() : RealmObject {
   //    val mesocycleID: Long? = null
   var microcycleID: ObjectId? = null
   var owner_id: String = "PUBLIC"
+  var isPublic: Boolean = false
 }
 
 @Parcelize

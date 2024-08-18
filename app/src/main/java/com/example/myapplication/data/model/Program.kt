@@ -54,6 +54,7 @@ class Program() : RealmObject {
   var notes: RealmList<ProgramNote> = realmListOf()
   var mesocycles: RealmList<Mesocycle> = realmListOf()
   var owner_id: String = "PUBLIC"
+  var isPublic: Boolean = false
 }
 
 @Serializable
@@ -82,6 +83,7 @@ class Mesocycle() : RealmObject {
   var programID: ObjectId? = null
   var microcycles: RealmList<Microcycle> = realmListOf()
   var owner_id: String = "PUBLIC"
+  var isPublic: Boolean = false
 }
 
 @Serializable
@@ -101,4 +103,5 @@ class Microcycle() : RealmObject {
   var mesocycleID: ObjectId? = null
   var workouts: RealmList<Workout> = realmListOf()
   var owner_id: String = "PUBLIC"
+  var isPublic: Boolean = false
 }
