@@ -8,9 +8,11 @@ import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
-import com.example.myapplication.data.model.calculateTotalVolume
+import com.example.myapplication.data.model.calculateTotalVolumeInKilograms
+import com.example.myapplication.data.model.calculateTotalVolumeInPounds
 import com.example.myapplication.data.model.completeSet
-import com.example.myapplication.data.model.convertExerciseExerciseSetsToExerciseSets
+import com.example.myapplication.data.model.totalVolumeInKilograms
+import com.example.myapplication.data.model.totalVolumeInPounds
 import com.example.myapplication.data.model.updateSetRIR
 import com.example.myapplication.data.model.updateSetRPE
 import com.example.myapplication.data.model.updateSetReps
@@ -41,8 +43,9 @@ class ManageWorkoutUseCase(
   private val exerciseNotesRepository: ExerciseNotesRepository,
   userRepository: UserRepository,
 ) {
+  val currentUser = userRepository.getCurrentUser()
   val userDefaultWeightUnit: String =
-    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
+    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
       ?: MassUnit.POUNDS.abbreviation
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
@@ -72,6 +75,8 @@ class ManageWorkoutUseCase(
         // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets)
         microcycleID = workoutTemplate.microcycleID
         programID = workoutTemplate.programID
+        owner_id = currentUser.id
+        isPublic = false
       }
 
     return newWorkout
@@ -145,6 +150,7 @@ class ManageWorkoutUseCase(
           percentage1RM = set.percentage1RM
           setTypeID = set.setTypeID
           progressionSchemeID = set.progressionSchemeID
+          owner_id = currentUser.id
         }
       newSets.add(newSet)
       if (set.exerciseID != null && set.setNumber != null) {
@@ -199,6 +205,8 @@ class ManageWorkoutUseCase(
           setCompleted = set.setCompleted
           setTypeID = set.setTypeID
           progressionSchemeID = set.progressionSchemeID
+          owner_id = currentUser.id
+          isPublic = false
         }
       newSets.add(newSet)
       if (set.exerciseID != null && set.setNumber != null) {
@@ -280,9 +288,37 @@ class ManageWorkoutUseCase(
         userDefaultWeightUnit
       )
 
-    workout.calculateTotalVolume(userDefaultWeightUnit)
+    workout.totalVolumeInPounds = workout.calculateTotalVolumeInPounds()
+    workout.totalVolumeInKilograms = workout.calculateTotalVolumeInKilograms()
 
     workoutRepository.insertWorkout(workout)
+  }
+
+  private fun convertExerciseExerciseSetsToExerciseSets(
+    exerciseExerciseSets: List<ExerciseExerciseSets>,
+    userDefaultWeightUnit: String,
+  ): RealmList<ExerciseSets> {
+    val exercisesSets = realmListOf<ExerciseSets>()
+    exerciseExerciseSets.forEach { _exerciseSets ->
+      exercisesSets.add(
+        ExerciseSets().apply {
+          _id = _exerciseSets._id
+          exSetsUUID
+          workoutID
+          exerciseOrder = _exerciseSets.exerciseOrder
+          exerciseID = _exerciseSets.exercise?._id
+          sets = _exerciseSets.sets
+          notes = _exerciseSets.notes
+          datePerformed = _exerciseSets.datePerformed
+          totalVolumeInPounds = _exerciseSets.totalVolumeInPounds()
+          totalVolumeInKilograms = _exerciseSets.totalVolumeInKilograms()
+          isPublic = false
+          owner_id = currentUser.id
+        }
+      )
+    }
+
+    return exercisesSets
   }
 
   fun getCompletedWorkout(workoutID: ObjectId): Workout? {
@@ -368,6 +404,7 @@ class ManageWorkoutUseCase(
       if (exerciseSets.sets.isNotEmpty()) {
         exerciseSets.sets +
                 Set().apply {
+                  exerciseID = exerciseSets.exercise?._id
                   setNumber = exerciseSets.sets.last().setNumber?.plus(1)
                   weightPounds = exerciseSets.sets.last().weightPounds
                   weightKilograms = exerciseSets.sets.last().weightKilograms
@@ -376,13 +413,19 @@ class ManageWorkoutUseCase(
                   repetitionsInReserve = exerciseSets.sets.last().repetitionsInReserve
                   setTypeID = exerciseSets.sets.last().setTypeID
                   percentage1RM = exerciseSets.sets.last().percentage1RM
+                  isPublic = false
+                  owner_id = currentUser.id
                 }
       } else {
         listOf(
           Set().apply {
+            exerciseID = exerciseSets.exercise?._id
             setNumber = 0
+            isPublic = false
             progressionSchemeID = Random().nextInt() // TODO Replace with
             // progressionScheme.progressionSchemeID
+            owner_id = currentUser.id
+            isPublic = false
           }
         )
       }
@@ -410,6 +453,7 @@ class ManageWorkoutUseCase(
       ExerciseNote().apply {
         exercise = exerciseSets.exercise?._id
         workout = workoutID
+        isPublic = false
       }
     )
     return exerciseSets.notes

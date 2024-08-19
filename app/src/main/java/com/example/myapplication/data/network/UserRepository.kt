@@ -4,7 +4,7 @@ import com.example.myapplication.data.database.RealmDatabase
 import io.realm.kotlin.mongodb.User
 
 class UserRepository constructor(private val database: RealmDatabase) {
-    fun getCurrentUser(): User? {
+    fun getCurrentUser(): User {
         return database.getCurrentUser()
     }
 }

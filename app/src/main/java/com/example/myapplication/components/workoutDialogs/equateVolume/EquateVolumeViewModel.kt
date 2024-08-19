@@ -18,8 +18,9 @@ import kotlin.math.roundToInt
 private const val WARM_UP_SET = 2
 
 class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
+  val currentUser = userRepository.getCurrentUser()
   val userDefaultWeightUnit: String =
-    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
+    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
       ?: MassUnit.POUNDS.abbreviation
 
   private var exerciseWeightUnit: String? = null
@@ -104,6 +105,8 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
           repetitionsInReserve = temporarySets.last().repetitionsInReserve
           setTypeID = temporarySets.last().setTypeID
           percentage1RM = temporarySets.last().percentage1RM
+          isPublic = false
+          owner_id = currentUser.id
         }
       )
     } else {

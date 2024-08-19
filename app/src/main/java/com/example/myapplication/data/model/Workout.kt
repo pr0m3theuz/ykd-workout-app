@@ -12,6 +12,7 @@ package com.example.myapplication.data.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 import com.example.myapplication.utils.newID
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.MutableRealmIntKSerializer
@@ -134,7 +135,7 @@ fun Workout.totalSets(): Int {
 fun Workout.calculateTotalVolume(userDefaultWeightUnit: String): Double? {
   exercisesSets.forEach { exerciseSets ->
     totalVolumeInPounds =
-      totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
+      this.totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
         ?: 0.0.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
     totalVolumeInKilograms =
       totalVolumeInKilograms?.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
@@ -144,7 +145,27 @@ fun Workout.calculateTotalVolume(userDefaultWeightUnit: String): Double? {
     MassUnit.POUNDS.abbreviation -> totalVolumeInPounds
     MassUnit.KILOGRAMS.abbreviation -> totalVolumeInKilograms
     else -> {
-      totalVolumeInPounds
+      this.totalVolumeInPounds
     }
   }
+}
+
+fun Workout.calculateTotalVolumeInPounds(): Double? {
+  exercisesSets.forEach { exerciseSets ->
+    totalVolumeInPounds =
+      this.totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
+        ?: 0.0.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
+  }
+  Log.i("Workout.totalVolumeInPounds", "$totalVolumeInPounds")
+  return totalVolumeInPounds
+}
+
+fun Workout.calculateTotalVolumeInKilograms(): Double? {
+  exercisesSets.forEach { exerciseSets ->
+    totalVolumeInKilograms =
+      totalVolumeInKilograms?.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
+        ?: 0.0.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
+  }
+  Log.i("Workout.totalVolumeInKilograms", "$totalVolumeInKilograms")
+  return totalVolumeInKilograms
 }

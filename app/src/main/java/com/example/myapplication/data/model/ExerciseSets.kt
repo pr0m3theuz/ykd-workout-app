@@ -69,7 +69,7 @@ class ExerciseExerciseSets() : RealmObject {
   var exercise: Exercise? = null
   var sets: RealmList<Set> = realmListOf()
   var notes: RealmList<ExerciseNote> = realmListOf()
-  var datePerformed: RealmInstant? = null
+  var datePerformed: RealmInstant? = RealmInstant.now()
 }
 
 @Serializable
@@ -236,30 +236,7 @@ fun ExerciseExerciseSets.resetSets(
   }
 }
 
-fun convertExerciseExerciseSetsToExerciseSets(
-  exerciseExerciseSets: List<ExerciseExerciseSets>,
-  userDefaultWeightUnit: String,
-): RealmList<ExerciseSets> {
-  val exercisesSets = realmListOf<ExerciseSets>()
-  exerciseExerciseSets.forEach {
-    exercisesSets.add(
-      ExerciseSets().apply {
-        _id = it._id
-        exSetsUUID
-        workoutID
-        exerciseOrder = it.exerciseOrder
-        exerciseID = it.exercise?._id
-        sets = it.sets
-        notes = it.notes
-        datePerformed = it.datePerformed
-        totalVolumeInPounds = it.totalVolumeInPounds()
-        totalVolumeInKilograms = it.totalVolumeInKilograms()
-      }
-    )
-  }
 
-  return exercisesSets
-}
 
 /*
 fun ExerciseSets.getWorkingSetWeight(): Double? {

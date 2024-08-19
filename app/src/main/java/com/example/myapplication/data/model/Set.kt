@@ -69,7 +69,7 @@ class Set() : RealmObject {
   //    var programUUID: RealmUUID? = null
   //    var mesocycleUUID: RealmUUID? = null
   //    var microcycleUUID: RealmUUID? = null
-  var owner_id: String = "PUBLIC"
+  var owner_id: String = ""
   var isPublic: Boolean = false
 }
 

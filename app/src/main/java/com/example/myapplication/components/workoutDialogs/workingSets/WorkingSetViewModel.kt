@@ -7,6 +7,7 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
+import io.realm.kotlin.mongodb.User
 import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +15,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class WorkingSetViewModel(private val userRepository: UserRepository) : ViewModel() {
+  val currentUser: User = userRepository.getCurrentUser()
+
   val userDefaultWeightUnit: String =
-    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
+    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
       ?: MassUnit.POUNDS.abbreviation
 
   var exerciseWeightUnit: String? = null
@@ -63,6 +66,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
           repetitionsInReserve = _sets.last().repetitionsInReserve
           setTypeID = _sets.last().setTypeID
           percentage1RM = _sets.last().percentage1RM
+          isPublic = false
+          owner_id = currentUser.id
         }
       )
       _setsFlow.value = _sets.toList()

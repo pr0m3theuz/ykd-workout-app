@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.Random
 
 class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewModel() {
+  val currentUser = userRepository.getCurrentUser()
   val userDefaultWeightUnit: String =
     userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
       ?: MassUnit.POUNDS.abbreviation
@@ -59,6 +60,8 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
           repetitionsInReserve = _warmUpSets.last().repetitionsInReserve
           setTypeID = _warmUpSets.last().setTypeID
           percentage1RM = _warmUpSets.last().percentage1RM
+          isPublic = false
+          owner_id = currentUser.id
         }
       )
     } else {

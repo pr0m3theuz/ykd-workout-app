@@ -266,7 +266,7 @@ fun HistoryLazyColumn(
     NoWorkoutsPerformed()
   } else {
     LazyColumn(
-      contentPadding = PaddingValues(8.dp),
+      contentPadding = PaddingValues(16.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
       groupedWorkouts.forEach() { month, monthWorkouts ->
@@ -467,7 +467,13 @@ fun WorkoutOverview(
                       // TODO Chanage Text Color based on Set Type
                       Row {
                         Text(
-                          text = "${set.setNumber}   ${set.setSummaryRIR(userDefaultWeightUnit)}",
+                          text = "${
+                            if (set.setTypeID == 1) {
+                              set.setNumber?.plus(1)
+                            } else {
+                              set.setTypeID
+                            }
+                          }   ${set.setSummaryRIR(userDefaultWeightUnit)}",
                           style = MaterialTheme.typography.bodyMedium,
                         )
                       }
