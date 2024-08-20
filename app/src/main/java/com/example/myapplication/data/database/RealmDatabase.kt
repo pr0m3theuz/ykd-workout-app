@@ -334,7 +334,7 @@ class RealmDatabase {
 
     return realm
       .query<Exercise>(
-        "is Public == true AND name CONTAINS[c] $0 AND muscleGroupID IN $1 AND equipmentID IN $2 SORT(name ASC)",
+        "isPublic == true AND name CONTAINS[c] $0 AND muscleGroupID IN $1 AND equipmentID IN $2 SORT(name ASC)",
         exercise,
         muscleGroupIDs,
         equipmentIDs,
@@ -501,7 +501,7 @@ class RealmDatabase {
     }
   }
 
-//  TODO Fix -
+  //  TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by using `MutableRealm/DynamicMutableRealm.findLatest(frozenObject)`.
   suspend fun deleteWorkout(workout: Workout) {
     workout.isManaged()
     realm.write {
@@ -533,6 +533,7 @@ class RealmDatabase {
     Log.i("filterWorkouts", "programIDs: $programIDs")
     Log.i("filterWorkouts", "dateRange: $startDate")
 
+    // TODO add isPublic or owner_id == user.id to filter workouts
     return realm
       .query<Workout>(
         "name CONTAINS[c] $0 AND programID IN $1 AND workoutStarted BETWEEN {$2, $3} SORT(name ASC)",

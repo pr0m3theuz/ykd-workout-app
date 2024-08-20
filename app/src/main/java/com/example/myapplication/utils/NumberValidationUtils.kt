@@ -2,11 +2,12 @@ package com.example.myapplication.utils
 
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 private const val DOUBLE_VALIDATION_REGEX = "^(-?\\d*)(\\.?)(\\d{0,2})(\\d*)\$"
+private const val POSITIVE_DOUBLE_VALIDATION_REGEX = "^(\\d*)(\\.?)(\\d{0,2})(\\d*)\$"
 private fun isDoubleValid(double: String): Boolean {
     return Pattern.matches(DOUBLE_VALIDATION_REGEX, double)
 }
@@ -72,6 +73,34 @@ fun checkDoubleInput(input: String): String? {
         when {
             manipulatedInput == "." -> "0." // Add leading zero
             manipulatedInput == "-" -> manipulatedInput
+            manipulatedInput.last() == '.' -> manipulatedInput // Prevent early removal of the decimal place
+            else -> {
+                val paddedInput = NumberFormat.getInstance().parse(manipulatedInput)?.toString()
+                val parsedDouble = paddedInput?.toDoubleOrNull() ?: return null
+                if (parsedDouble == 0.0) "0" else paddedInput
+            }
+        }
+    } else {
+        null
+    }
+}
+
+private val POSITIVE_DOUBLE_PATTERN = Pattern.compile(POSITIVE_DOUBLE_VALIDATION_REGEX)
+
+fun checkRIRInput(input: String): String? {
+    var manipulatedInput = input.replace(",", "")
+    manipulatedInput = manipulatedInput.replace("-", "")
+    val matcher = POSITIVE_DOUBLE_PATTERN.matcher(manipulatedInput)
+    manipulatedInput = if (manipulatedInput.count { it == '.' } <= 1 && matcher.matches()) {
+        "${matcher.group(1)}${matcher.group(2)}${matcher.group(3)}"
+    } else {
+        return null
+    }
+
+    return if (manipulatedInput.isNotBlank()) {
+        when {
+            manipulatedInput == "." -> "0." // Add leading zero
+//            manipulatedInput == "-" -> "" // Ignore dashes
             manipulatedInput.last() == '.' -> manipulatedInput // Prevent early removal of the decimal place
             else -> {
                 val paddedInput = NumberFormat.getInstance().parse(manipulatedInput)?.toString()

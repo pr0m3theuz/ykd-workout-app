@@ -54,6 +54,7 @@ import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.model.setSummaryRIR
 import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
+import com.example.myapplication.utils.checkRIRInput
 import com.example.myapplication.utils.doubleFormatted
 import org.koin.androidx.compose.koinViewModel
 
@@ -142,6 +143,7 @@ fun SetContent(
   }
 
   fun copyPreviousSetData() {
+    // TODO Show toast message that all fields are must be empty for this to work
     // Only copy if all fields are empty
     if (
       exerciseWeightText.isEmpty() &&
@@ -244,7 +246,7 @@ fun SetContent(
             when {
               rir.isBlank() -> ""
               else ->
-                checkDoubleInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }?.toString()
+                checkRIRInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }?.toString()
                   ?: repetitionsInReserveText
             }
           set.repetitionsInReserve = repetitionsInReserveText.toDoubleOrNull()
