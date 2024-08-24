@@ -393,6 +393,19 @@ class RealmDatabase {
       .firstOrNull()
   }
 
+  // TODO get the next exercise sets from the next workout in the current program
+  fun findNextWorkoutExerciseSets(exerciseID: ObjectId, programID: ObjectId): Workout? {
+    return realm
+      .query<Workout>(
+        "exerciseID = $0 && programID = $0 && owner_id == $1 && ANY @links.Workout.workoutEnded == null",
+        exerciseID,
+        programID,
+        user.id
+      )
+      .find()
+      .firstOrNull()
+  }
+
   suspend fun insertWorkout(workout: Workout) {
 //    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
 //    val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
@@ -1098,7 +1111,7 @@ class RealmDatabase {
               _set.repetitions = set.repetitions
               _set.ratePerceivedEffort = set.ratePerceivedEffort
               _set.repetitionsInReserve = set.repetitionsInReserve
-              _set.targetWeight = set.targetWeight
+              _set.targetWeightPounds = set.targetWeightPounds
               _set.targetRepetitions = set.targetRepetitions
               _set.targetRatePerceivedEffort = set.targetRatePerceivedEffort
               _set.targetRepetitionsInReserve = set.targetRepetitionsInReserve
@@ -1119,7 +1132,7 @@ class RealmDatabase {
                   repetitions = set.repetitions
                   ratePerceivedEffort = set.ratePerceivedEffort
                   repetitionsInReserve = set.repetitionsInReserve
-                  targetWeight = set.targetWeight
+                  targetWeightPounds = set.targetWeightPounds
                   targetRepetitions = set.targetRepetitions
                   targetRatePerceivedEffort = set.targetRatePerceivedEffort
                   targetRepetitionsInReserve = set.targetRepetitionsInReserve
@@ -1221,6 +1234,7 @@ class RealmDatabase {
               exerciseID = exerciseSets.exerciseID
               sets = insertedSets
               datePerformed = exerciseSets.datePerformed
+              workoutID = _workoutID
               isPublic = false
               owner_id = user.id // TODO figure out if this is needed
             }
@@ -1248,7 +1262,7 @@ class RealmDatabase {
               repetitions = set.repetitions
               ratePerceivedEffort = set.ratePerceivedEffort
               repetitionsInReserve = set.repetitionsInReserve
-              targetWeight = set.targetWeight
+              targetWeightPounds = set.targetWeightPounds
               targetRepetitions = set.targetRepetitions
               targetRatePerceivedEffort = set.targetRatePerceivedEffort
               targetRepetitionsInReserve = set.targetRepetitionsInReserve

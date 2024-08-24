@@ -190,7 +190,7 @@ fun SetContent(
         boxModifier = Modifier.width(96.dp),
         textFieldBackgroundColor = textFieldBackgroundColor,
         exerciseWeightText = exerciseWeightText,
-        targetWeight = doubleFormatted(set.targetWeight),
+        targetWeight = doubleFormatted(set.targetWeightPounds),
         onWeightChange = {
           exerciseWeightText =
             when {

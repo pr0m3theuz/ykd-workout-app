@@ -8,8 +8,7 @@ import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
-import com.example.myapplication.data.model.calculateTotalVolumeInKilograms
-import com.example.myapplication.data.model.calculateTotalVolumeInPounds
+import com.example.myapplication.data.model.calculateTotalVolume
 import com.example.myapplication.data.model.completeSet
 import com.example.myapplication.data.model.totalVolumeInKilograms
 import com.example.myapplication.data.model.totalVolumeInPounds
@@ -143,7 +142,7 @@ class ManageWorkoutUseCase(
           repetitions = set.repetitions
           ratePerceivedEffort = set.ratePerceivedEffort
           repetitionsInReserve = set.repetitionsInReserve
-          targetWeight = set.targetWeight
+          targetWeightPounds = set.targetWeightPounds
           targetRepetitions = set.targetRepetitions
           targetRatePerceivedEffort = set.targetRatePerceivedEffort
           targetRepetitionsInReserve = set.targetRepetitionsInReserve
@@ -197,7 +196,7 @@ class ManageWorkoutUseCase(
           repetitions = set.repetitions
           ratePerceivedEffort = set.ratePerceivedEffort
           repetitionsInReserve = set.repetitionsInReserve
-          targetWeight = set.targetWeight
+          targetWeightPounds = set.targetWeightPounds
           targetRepetitions = set.targetRepetitions
           targetRatePerceivedEffort = set.targetRatePerceivedEffort
           targetRepetitionsInReserve = set.targetRepetitionsInReserve
@@ -288,8 +287,9 @@ class ManageWorkoutUseCase(
         userDefaultWeightUnit
       )
 
-    workout.totalVolumeInPounds = workout.calculateTotalVolumeInPounds()
-    workout.totalVolumeInKilograms = workout.calculateTotalVolumeInKilograms()
+    workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
+//    workout.calculateTotalVolumeInPounds()
+//    workout.calculateTotalVolumeInKilograms()
 
     workoutRepository.insertWorkout(workout)
   }

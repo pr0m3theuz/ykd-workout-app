@@ -43,18 +43,21 @@ class Set() : RealmObject {
   var repetitionsInReserve: Double? = null
 
   // TODO add targetWeight Mass Unit
-  var targetWeight: Double? = null
+  var targetWeightPounds: Double? = null
+  var targetWeightKilograms: Double? = null
+  var incrementWeightPounds: Double? = null
+  var incrementWeightKilograms: Double? = null
   var targetRepetitions: String? = null
 
   // TODO Update Realm Schema to include targetMinimumRepetitions and targetMaximumRepetitions
-  // var targetMinimumRepetitions: Int? = null // TODO for progression scheme & utils
-  // var targetMaximumRepetitions: Int? = null // TODO for progression scheme & utils
+  var targetMinimumRepetitions: Int? = null // TODO for progression scheme & utils
+  var targetMaximumRepetitions: Int? = null // TODO for progression scheme & utils
   var targetRatePerceivedEffort: Double? = null
   var targetRepetitionsInReserve: Double? = null
   var percentage1RM: Double? = 1.0
 
   // TODO Update Realm Schema to include targetPercentage1RM
-  // var targetPercentage1RM: Double? = null // TODO for progression scheme & utils
+  var targetPercentage1RM: Double? = null // TODO for progression scheme & utils
   var setCompleted: Boolean = false
 
   //    var exerciseOrder: Int = 1
@@ -123,7 +126,7 @@ fun Set.convertKgToPound(): Double {
 fun Set.getWeight(weightUnit: String?) {
   // TODO Check if this would work or would have to use viewModel
   // TODO take exercise.weightUnit to update weight
-//  RealmUUID.random().toString()
+  //  RealmUUID.random().toString()
 }
 
 @Serializable

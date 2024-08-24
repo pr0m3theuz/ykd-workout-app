@@ -184,7 +184,7 @@ class ImportWorkoutProgram(
                 pklSetScheme.repetitions[index].toInt()
               } else null
 
-            targetWeight =
+            targetWeightPounds =
               if (pklSetScheme.targetWeight.isNotEmpty()) {
                 pklSetScheme.targetWeight[index]
               } else null

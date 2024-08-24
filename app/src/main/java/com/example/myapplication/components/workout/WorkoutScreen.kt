@@ -1,6 +1,7 @@
 package com.example.myapplication.components.workout
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -65,7 +66,7 @@ fun WorkoutContent(
 ) {
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
-  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
+//  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
 
   val (editable, setEditable) = remember { mutableStateOf(true) }
 
@@ -77,10 +78,68 @@ fun WorkoutContent(
     navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount")
   }
 
-  if (openFinishWorkoutDialog) {
-    FinishWorkoutButton(navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
-    openFinishWorkoutDialog = false
+//  if (openFinishWorkoutDialog) {
+//    FinishWorkoutButton(navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
+//    openFinishWorkoutDialog = false
+//  }
+
+  val openFinishWorkoutDialog = remember { mutableStateOf(false) }
+  val openPartialFinishWorkoutDialog = remember { mutableStateOf(false) }
+
+  fun closePartialFinishWorkoutDialog() {
+    openPartialFinishWorkoutDialog.value = false
   }
+
+  fun closeFinishWorkoutDialog() {
+    openFinishWorkoutDialog.value = false
+  }
+
+  fun openFinishWorkoutDialog() {
+    if (workoutViewModel.checkAllSetsComplete()) {
+      openFinishWorkoutDialog.value = true
+    } else {
+      openPartialFinishWorkoutDialog.value = true
+    }
+  }
+
+  if (openFinishWorkoutDialog.value) {
+    FinishWorkoutDialog(
+      navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() },
+      openDialog = { closeFinishWorkoutDialog() },
+      confirmFinishWorkout = { workoutViewModel.finishWorkout() }
+    )
+  }
+
+
+  if (openPartialFinishWorkoutDialog.value) {
+    PartialFinishWorkoutDialog(
+      navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() },
+      openDialog = { closePartialFinishWorkoutDialog() },
+      confirmFinishWorkout = { workoutViewModel.finishWorkout() }
+    )
+  }
+
+  val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
+  val workoutDurationString by workoutViewModel.workoutDurationString.collectAsState()
+  val isWorkoutCountUpTimerPaused by workoutViewModel.isWorkoutCountUpTimerPaused.collectAsState()
+
+  BackHandler(enabled = true) {
+    if (exercisesSets.isEmpty() && isWorkoutCountUpTimerPaused) {
+      navController.navigateUp()
+    } else {
+      openFinishWorkoutDialog()
+    }
+  }
+
+//  PredictiveBackHandler(enabled = exercisesSets.isEmpty()) { progress: Flow<BackEventCompat> ->
+//    callback.preparePop()
+//    try {
+//      progress.collect { backEvent -> callback.updateProgress(backEvent.progress) }
+//      callback.popBackStack()
+//    } catch (e: CancellationException) {
+//      callback.cancelPop()
+//    }
+//  }
 
   Scaffold(
     topBar = {

@@ -31,7 +31,7 @@ fun ExerciseSets.doubleProgression(
 
   sets.forEach { set ->
     if (
-      set.targetWeight == set.weightPounds &&
+      set.targetWeightPounds == set.weightPounds &&
         set.repetitions in targetRepetitionRangeMin..targetRepetitionRangeMax &&
         sets.all { it.setCompleted }
     ) {
@@ -50,16 +50,16 @@ fun ExerciseSets.doubleProgression(
         }
         repetitionsList.all { it!! == targetRepetitionRangeMax } -> {
           set.repetitions = targetRepetitionRangeMin
-          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+          set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
         }
       }
     } else if (
-      set.targetWeight == set.weightPounds &&
+      set.targetWeightPounds == set.weightPounds &&
         repetitionsList.all { it!! >= targetRepetitionRangeMax } &&
         sets.all { it.setCompleted }
     ) {
       set.repetitions = targetRepetitionRangeMin
-      set.targetWeight = set.weightPounds?.plus(incrementWeight)
+      set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
     }
     // targetWeight & repetitions does not change
   }
@@ -78,18 +78,18 @@ fun ExerciseSets.waveProgression(
 
   sets.forEach { set ->
     if (
-      set.targetWeight == set.weightPounds &&
+      set.targetWeightPounds == set.weightPounds &&
         set.repetitions in targetRepetitionRangeMin..targetRepetitionRangeMax &&
         sets.all { it.setCompleted }
     ) {
       when {
         repetitionsList.all { it!! == targetRepetitionRangeMin } -> {
           set.repetitions = targetRepetitionRangeMax
-          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+          set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
         }
         repetitionsList.all { it == repetitionsList[0] && it == maxRepetitionsCompleted } -> {
           set.repetitions?.minus(1).toString()
-          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+          set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
           return@forEach
         }
       }
@@ -106,7 +106,7 @@ fun ExerciseSets.dynamicDoubleProgression(
 
   sets.forEach { set ->
     if (
-      set.targetWeight == set.weightPounds &&
+      set.targetWeightPounds == set.weightPounds &&
         set.repetitions in targetRepetitionRangeMin..targetRepetitionRangeMax &&
         sets.all { it.setCompleted }
     ) {
@@ -116,7 +116,7 @@ fun ExerciseSets.dynamicDoubleProgression(
         }
         set.repetitions!! >= targetRepetitionRangeMax -> {
           set.repetitions = targetRepetitionRangeMin
-          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+          set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
         }
       }
     }
@@ -129,13 +129,13 @@ fun ExerciseSets.amrapProgression(/*int targetRepetitionRangeMin, int incrementW
   val incrementWeight = 5.0
 
   sets.forEach { set ->
-    if (set.targetWeight == set.weightPounds && sets.all { it.setCompleted }) {
+    if (set.targetWeightPounds == set.weightPounds && sets.all { it.setCompleted }) {
       when {
         set.repetitions!! >= targetRepetitionRangeMin.times(2) -> {
-          set.targetWeight = set.weightPounds?.plus(incrementWeight.times(2))
+          set.targetWeightPounds = set.weightPounds?.plus(incrementWeight.times(2))
         }
         set.repetitions!! in targetRepetitionRangeMin.until(targetRepetitionRangeMin.times(2)) -> {
-          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+          set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
         }
       }
     }
@@ -148,10 +148,10 @@ fun ExerciseSets.linearProgression(/*int targetRepetitionRangeMin, int increment
   val incrementWeight = 5.0
 
   sets.forEach { set ->
-    if (set.targetWeight == set.weightPounds && sets.all { it.setCompleted }) {
+    if (set.targetWeightPounds == set.weightPounds && sets.all { it.setCompleted }) {
       when {
         set.repetitions!! >= targetRepetitionRangeMin -> {
-          set.targetWeight = set.weightPounds?.plus(incrementWeight)
+          set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
         }
       }
     }
