@@ -6,6 +6,11 @@ import net.jqwik.api.Provide
 import net.jqwik.api.arbitraries.StringArbitrary
 import org.junit.jupiter.api.Assertions.assertEquals
 
+
+@Deprecated(
+  message = "Replace with UpdatedProgressionTests",
+  level = DeprecationLevel.WARNING
+)
 class ProgressionTests {
   @Provide
   fun stringNumber(): StringArbitrary {

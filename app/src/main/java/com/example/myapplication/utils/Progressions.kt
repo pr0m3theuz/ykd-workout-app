@@ -2,6 +2,17 @@ package com.example.myapplication.utils
 
 import com.example.myapplication.data.model.Set
 
+// TODO update the next workout
+//  add screen that asks the user to confirm the changes/progression applied to the next workout
+//  allow user to edit and confirm the next workout. Show the just completed workout next to the
+// suggested next workout.
+
+// TODO handle case when the completed sets is less than the sets to be updated in next workout.
+//  Repeat that workout's targets for that exercise. Get the original workout before saving the
+//  completed workout and use the targets from the original workout. Ask the user to confirm if they
+//  want to repeat the original workout or proceed with updating the next workout based on the
+//  completed workout
+
 enum class ProgressionType {
   LINEAR_PROGRESSION,
   DOUBLE_PROGRESSION,
@@ -34,75 +45,71 @@ fun selectProgression(
 
 fun linearProgression(sets: List<Set>, setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
 
-  runCatching {
-    var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-    var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
-    var lowestWeightKilogramsPerformed =
-      sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var lowestWeightKilogramsPerformed =
+    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-    val incrementWeightPounds = sets.mapNotNull { it.incrementWeightPounds!! }.first()
-    val incrementWeightKilograms = sets.mapNotNull { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = sets.mapNotNull { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = sets.mapNotNull { it.incrementWeightKilograms!! }.first()
 
-    var repetitionsList = sets.mapNotNull { it.repetitions!! }.toMutableList()
-    var weightPoundsList = sets.mapNotNull { it.weightPounds!! }.toMutableList()
-    var weightKilogramsList = sets.mapNotNull { it.weightKilograms!! }.toMutableList()
+  var repetitionsList = sets.mapNotNull { it.repetitions!! }.toMutableList()
+  var weightPoundsList = sets.mapNotNull { it.weightPounds!! }.toMutableList()
+  var weightKilogramsList = sets.mapNotNull { it.weightKilograms!! }.toMutableList()
 
-    var targetMinimumRepetitionsList = sets.mapNotNull { it.targetMinimumRepetitions!! }
-    var targetMaximumRepetitionsList = sets.mapNotNull { it.targetMaximumRepetitions!! }
-    var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-    var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-    var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  var targetMinimumRepetitionsList = sets.mapNotNull { it.targetMinimumRepetitions!! }
+  var targetMaximumRepetitionsList = sets.mapNotNull { it.targetMaximumRepetitions!! }
+  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
+  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
+  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
 
-    /*    var targetMinimumRepetitions =
-          if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.firstOrNull() })
-            targetMinimumRepetitionsList.first()
-          else return@runCatching
-        var targetMaximumRepetitions =
-          if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
-            targetMaximumRepetitionsList.first()
-          else return@runCatching
-    */
+  /*    var targetMinimumRepetitions =
+        if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.firstOrNull() })
+          targetMinimumRepetitionsList.first()
+        else return@runCatching
+      var targetMaximumRepetitions =
+        if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
+          targetMaximumRepetitionsList.first()
+        else return@runCatching
+  */
 
-    when {
-      repetitionsList == targetRepetitionsList &&
-              weightPoundsList == targetWeightPoundsList &&
-              weightKilogramsList == targetWeightKilogramsList -> {
-        weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
-        weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
-      }
-
-      repetitionsList.zip(targetRepetitionsList).any { (actual, target) -> actual < target } ||
-              weightPoundsList.zip(targetWeightPoundsList)
-                .any { (actual, target) -> actual < target } ||
-              weightKilogramsList.zip(targetWeightKilogramsList).any { (actual, target) ->
-                actual < target
-              } -> {
-        // If targets are missed, reset to target values
-        repetitionsList.clear()
-        repetitionsList.addAll(targetRepetitionsList)
-        weightPoundsList.clear()
-        weightPoundsList.addAll(targetWeightPoundsList)
-        weightKilogramsList.clear()
-        weightKilogramsList.addAll(targetWeightKilogramsList)
-      }
-
-      else -> {
-        // If all targets are exceeded, reset repetitions and increment weights
-        repetitionsList.clear()
-        repetitionsList.addAll(targetRepetitionsList)
-        weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
-        weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
-      }
+  when {
+    repetitionsList == targetRepetitionsList &&
+            weightPoundsList == targetWeightPoundsList &&
+            weightKilogramsList == targetWeightKilogramsList -> {
+      weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
+      weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
     }
 
-    // Update setsToUpdate with new values
-    setsToUpdate.zip(repetitionsList).forEach { (set, rep) ->
-      set.targetRepetitions = rep.toString()
+    repetitionsList.zip(targetRepetitionsList).any { (actual, target) -> actual < target } ||
+            weightPoundsList.zip(targetWeightPoundsList)
+              .any { (actual, target) -> actual < target } ||
+            weightKilogramsList.zip(targetWeightKilogramsList).any { (actual, target) ->
+              actual < target
+            } -> {
+      // If targets are missed, reset to target values
+      repetitionsList.clear()
+      repetitionsList.addAll(targetRepetitionsList)
+      weightPoundsList.clear()
+      weightPoundsList.addAll(targetWeightPoundsList)
+      weightKilogramsList.clear()
+      weightKilogramsList.addAll(targetWeightKilogramsList)
     }
-    setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-    setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
-      set.targetWeightKilograms = weight
+
+    else -> {
+      // If all targets are exceeded, reset repetitions and increment weights
+      repetitionsList.clear()
+      repetitionsList.addAll(targetRepetitionsList)
+      weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
+      weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
     }
+  }
+
+  // Update setsToUpdate with new values
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
+  setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
+    set.targetWeightKilograms = weight
   }
 
   return Result.success(setsToUpdate)
@@ -140,17 +147,12 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
       targetMaximumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-  //  if (weightPoundsList != targetWeightPoundsList && weightKilogramsList !=
-  // targetWeightKilogramsList)
-  //  {
-  //    return Result.failure(IllegalArgumentException("Actual weight performed do not match target
-  // values"))
-  //  }
+  val actualWeightsPerformedEqualTargetWeight =
+    (weightPoundsList == targetWeightPoundsList && weightKilogramsList == targetWeightKilogramsList)
 
   when {
     repetitionsList.any { it < targetMinimumRepetitions } ||
-            (weightPoundsList != targetWeightPoundsList &&
-                    weightKilogramsList != targetWeightKilogramsList) -> {
+            !actualWeightsPerformedEqualTargetWeight -> {
       // Reset to target values
       // repeat this week
       repetitionsList.clear()
@@ -161,45 +163,25 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
       weightKilogramsList.addAll(targetWeightKilogramsList)
     }
     /*    (repetitionsList == targetRepetitionsList) ||
-      // if any repetitions are below the maximum repetitions performed in the workout
-      (repetitionsList.any { it < maxRepetitionsCompleted } ||
-        // if all repetitions are at the maximum repetitions performed in the workout and below the
-        // target maximum repetitions
-        (repetitionsList.all { it == maxRepetitionsCompleted && it < targetMaximumRepetitions })) &&*/
+    // if any repetitions are below the maximum repetitions performed in the workout
+    (repetitionsList.any { it < maxRepetitionsCompleted } ||
+      // if all repetitions are at the maximum repetitions performed in the workout and below the
+      // target maximum repetitions
+      (repetitionsList.all { it == maxRepetitionsCompleted && it < targetMaximumRepetitions })) &&*/
     // If repetition is within target range, increment
     (repetitionsList.zip(targetRepetitionsList).all { (actual, target) ->
       (actual == target) && (actual < targetMaximumRepetitions)
-    }) &&
-            // if weights equal target values
-            (weightPoundsList == targetWeightPoundsList &&
-                    weightKilogramsList == targetWeightKilogramsList) -> {
+    }) && actualWeightsPerformedEqualTargetWeight -> {
+
       for (index in repetitionsList.indices) {
         repetitionsList[index]++
         break
       }
     }
-
-    // If all repetitions are at the maximum, reset to target values
-    repetitionsList.all { it >= targetMaximumRepetitions } &&
-            (weightPoundsList == targetWeightPoundsList &&
-                    weightKilogramsList == targetWeightKilogramsList) -> {
-      repetitionsList.clear()
-      repetitionsList.addAll(targetMinimumRepetitionsList)
-      weightPoundsList.clear()
-      weightPoundsList.addAll(
-        targetWeightPoundsList.map { it.plus(incrementWeightPounds) }.toMutableList()
-      )
-      weightKilogramsList.clear()
-      weightKilogramsList.addAll(
-        targetWeightKilogramsList.map { it.plus(incrementWeightKilograms) }.toMutableList()
-      )
-    }
     // If actual repetitions are above target, increment target values
     repetitionsList.zip(targetRepetitionsList).any { (actual, target) ->
       (actual >= target) && (actual < targetMaximumRepetitions)
-    } &&
-            (weightPoundsList == targetWeightPoundsList &&
-                    weightKilogramsList == targetWeightKilogramsList) -> {
+    } && actualWeightsPerformedEqualTargetWeight -> {
 
       val tempRepetitionsList = targetRepetitionsList.toMutableList()
 
@@ -214,6 +196,23 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
 
       repetitionsList.clear()
       repetitionsList.addAll(tempRepetitionsList)
+    }
+    // If all repetitions are at the maximum, reset to target values
+    repetitionsList.all { it >= targetMaximumRepetitions } &&
+            actualWeightsPerformedEqualTargetWeight -> {
+
+      repetitionsList.clear()
+      repetitionsList.addAll(targetMinimumRepetitionsList)
+
+      weightPoundsList.clear()
+      weightPoundsList.addAll(
+        targetWeightPoundsList.map { it.plus(incrementWeightPounds) }.toMutableList()
+      )
+
+      weightKilogramsList.clear()
+      weightKilogramsList.addAll(
+        targetWeightKilogramsList.map { it.plus(incrementWeightKilograms) }.toMutableList()
+      )
     }
 
     else -> {
@@ -238,44 +237,49 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
 
 fun dynamicDoubleProgression(
   sets: List<Set>,
-  setsToUpdate: MutableList<Set>,
+  _setsToUpdate: MutableList<Set>,
 ): Result<MutableList<Set>> {
+  val setsToUpdate = _setsToUpdate.toMutableList()
 
-  runCatching {
-    var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-    var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
-    var lowestWeightKilogramsPerformed =
-      sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var lowestWeightKilogramsPerformed =
+    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-    val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
-    val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
 
-    var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-    var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-    var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
+  var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
+  var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
 
-    var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-    var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
+  var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
 
-    var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-    var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-    var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
+  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
+  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
 
-    // Check if all target repetitions are the same
-    var targetMinimumRepetitions =
-      if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
-        targetMinimumRepetitionsList.first()
-      else
-        return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+  // Check if all target repetitions are the same
+  var targetMinimumRepetitions =
+    if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
+      targetMinimumRepetitionsList.first()
+    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-    var targetMaximumRepetitions =
-      if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
-        targetMaximumRepetitionsList.first()
-      else
-        return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+  var targetMaximumRepetitions =
+    if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
+      targetMaximumRepetitionsList.first()
+    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
+  val actualWeightsPerformedEqualTargetWeight =
+    (weightPoundsList == targetWeightPoundsList && weightKilogramsList == targetWeightKilogramsList)
+
+  if (repetitionsList.zip(targetRepetitionsList).all { (actual, target) -> (actual >= target) }) {
     repetitionsList.forEachIndexed { index, repetition ->
-      if (repetition > targetMinimumRepetitions) {
+      if (
+        repetition >= targetMinimumRepetitions &&
+        weightPoundsList.zip(targetWeightPoundsList).all { (actual, target) -> actual >= target }
+      ) {
         when {
           repetition < targetMaximumRepetitions -> {
             repetitionsList[index] = repetition.plus(1)
@@ -287,22 +291,20 @@ fun dynamicDoubleProgression(
             weightKilogramsList[index] = weightKilogramsList[index].plus(incrementWeightKilograms)
           }
         }
-      } else {
-        // repeat this week
-        repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-        weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-        weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
       }
     }
+  } else {
+    // repeat this week
+    repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+    weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
+    weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+  }
 
-    // Update setsToUpdate with new values
-    setsToUpdate.zip(repetitionsList).forEach { (set, rep) ->
-      set.targetRepetitions = rep.toString()
-    }
-    setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-    setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
-      set.targetWeightKilograms = weight
-    }
+  // Update setsToUpdate with new values
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
+  setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
+    set.targetWeightKilograms = weight
   }
 
   return Result.success(setsToUpdate)
