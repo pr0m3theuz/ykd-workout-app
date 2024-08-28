@@ -43,7 +43,9 @@ fun selectProgression(
      in the current microcycle/mesocycle/program and update the target weight and repetitions
 * */
 
-fun linearProgression(sets: List<Set>, setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+fun linearProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+
+  val setsToUpdate = _setsToUpdate.toMutableList()
 
   var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
   var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
@@ -310,169 +312,158 @@ fun dynamicDoubleProgression(
   return Result.success(setsToUpdate)
 }
 
-fun waveProgression(sets: List<Set>, setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+fun waveProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+  val setsToUpdate = _setsToUpdate.toMutableList()
 
-  runCatching {
-    var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-    var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
-    var lowestWeightKilogramsPerformed =
-      sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var lowestWeightKilogramsPerformed =
+    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-    val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
-    val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
 
-    var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-    var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-    var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
+  var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
+  var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
 
-    var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-    var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
+  var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
 
-    var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-    var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-    var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
+  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
+  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
 
-    // Check if all target repetitions are the same
-    var targetMinimumRepetitions =
-      if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
-        targetMinimumRepetitionsList.first()
-      else
-        return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+  // Check if all target repetitions are the same
+  var targetMinimumRepetitions =
+    if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
+      targetMinimumRepetitionsList.first()
+    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-    var targetMaximumRepetitions =
-      if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
-        targetMaximumRepetitionsList.first()
-      else
-        return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+  var targetMaximumRepetitions =
+    if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
+      targetMaximumRepetitionsList.first()
+    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-    if (
-      !(repetitionsList.all { it == repetitionsList.firstOrNull() }) ||
+  if (
+    !(repetitionsList.all { it == repetitionsList.firstOrNull() }) ||
       repetitionsList.any { it > targetMaximumRepetitions } ||
       repetitionsList.any { it < targetMinimumRepetitions }
-    ) {
-      // repeat this week
-      repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-      weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-      weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
-    } else if (
-      repetitionsList.all {
-        it == repetitionsList.firstOrNull() &&
-                it in targetMinimumRepetitions..targetMaximumRepetitions
+  ) {
+    // repeat this week
+    repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+    weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
+    weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+  } else if (
+    repetitionsList.all {
+      it == repetitionsList.firstOrNull() &&
+              it in targetMinimumRepetitions..targetMaximumRepetitions
+    }
+  ) {
+    when {
+      repetitionsList.all { it == targetMinimumRepetitions } -> {
+        repetitionsList.replaceAll { targetMaximumRepetitions }
+        weightPoundsList.replaceAll { it.minus(incrementWeightPounds) }
+        weightKilogramsList.replaceAll { it.minus(incrementWeightKilograms) }
       }
-    ) {
-      when {
-        repetitionsList.all { it == targetMinimumRepetitions } -> {
-          repetitionsList.replaceAll { targetMaximumRepetitions }
-          weightPoundsList.replaceAll { it.minus(incrementWeightPounds) }
-          weightKilogramsList.replaceAll { it.minus(incrementWeightKilograms) }
-        }
 
-        repetitionsList.all { it > targetMinimumRepetitions } -> {
-          repetitionsList.replaceAll { it.minus(1) }
-          weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
-          weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
-        }
-
-        else -> {
-          println("repeat this week")
-          repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-          weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-          weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
-        }
+      repetitionsList.all { it > targetMinimumRepetitions } -> {
+        repetitionsList.replaceAll { it.minus(1) }
+        weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
+        weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
       }
-    }
 
-    // Update setsToUpdate with new values
-    setsToUpdate.zip(repetitionsList).forEach { (set, rep) ->
-      set.targetRepetitions = rep.toString()
-    }
-    setsToUpdate.zip(weightPoundsList).forEach { (set, weight) ->
-      set.targetWeightPounds = weight
-    }
-    setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
-      set.targetWeightKilograms = weight
+      else -> {
+        println("repeat this week")
+        repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+        weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
+        weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+      }
     }
   }
-    .onFailure {}
+
+  // Update setsToUpdate with new values
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
+  setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
+    set.targetWeightKilograms = weight
+  }
+
   return Result.success(setsToUpdate)
 }
 
-fun amrapProgression(sets: List<Set>, setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+fun amrapProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
 
-  runCatching {
-    var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-    var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
-    var lowestWeightKilogramsPerformed =
-      sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+  val setsToUpdate = _setsToUpdate.toMutableList()
 
-    var targetWeightPounds = sets.map { it.targetWeightPounds!! }.first()
-    var targetWeightKilograms = sets.map { it.targetWeightKilograms!! }.first()
+  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var lowestWeightKilogramsPerformed =
+    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-    val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
-    val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
+  var targetWeightPounds = sets.map { it.targetWeightPounds!! }.first()
+  var targetWeightKilograms = sets.map { it.targetWeightKilograms!! }.first()
 
-    var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-    var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-    var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
 
-    var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-    var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
+  var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
+  var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
 
-    var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-    var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-    var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
+  var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
 
-    // Check if all target repetitions are the same
-    var targetMinimumRepetitions =
-      if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
-        targetMinimumRepetitionsList.first()
-      else
-        return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
+  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
+  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
 
-    var targetMaximumRepetitions =
-      if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
-        targetMaximumRepetitionsList.first()
-      else
-        return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+  // Check if all target repetitions are the same
+  var targetMinimumRepetitions =
+    if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
+      targetMinimumRepetitionsList.first()
+    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-    if (
-      weightPoundsList != targetWeightPoundsList && weightKilogramsList != targetWeightKilogramsList
-    ) {
-      return Result.failure(
-        IllegalArgumentException("Actual weight performed do not match target values")
-      )
-    }
+  var targetMaximumRepetitions =
+    if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
+      targetMaximumRepetitionsList.first()
+    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-    if (
-      weightPoundsList.all { it == targetWeightPounds } &&
+  if (
+    weightPoundsList != targetWeightPoundsList && weightKilogramsList != targetWeightKilogramsList
+  ) {
+    return Result.failure(
+      IllegalArgumentException("Actual weight performed do not match target values")
+    )
+  }
+
+  if (
+    weightPoundsList.all { it == targetWeightPounds } &&
       repetitionsList.all { it >= targetMinimumRepetitions }
-    ) {
-      when {
-        repetitionsList.any { it >= targetMinimumRepetitions.times(2) } -> {
-          weightPoundsList.replaceAll { it.plus(incrementWeightPounds.times(2)) }
-        }
-
-        repetitionsList.any {
-          it in targetMinimumRepetitions.until(targetMinimumRepetitions.times(2))
-        } -> {
-          weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
-        }
+  ) {
+    when {
+      repetitionsList.any { it >= targetMinimumRepetitions.times(2) } -> {
+        weightPoundsList.replaceAll { it.plus(incrementWeightPounds.times(2)) }
       }
-    } else {
-      println("repeat this week")
-      repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-      weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-      weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
-    }
 
-    // Update setsToUpdate with new values
-    setsToUpdate.zip(repetitionsList).forEach { (set, rep) ->
-      set.targetRepetitions = rep.toString()
+      repetitionsList.any {
+        it in targetMinimumRepetitions.until(targetMinimumRepetitions.times(2))
+      } -> {
+        weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
+      }
     }
-    setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-    setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
-      set.targetWeightKilograms = weight
-    }
+  } else {
+    println("repeat this week")
+    repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+    weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
+    weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+  }
+
+  // Update setsToUpdate with new values
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
+  setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
+    set.targetWeightKilograms = weight
   }
 
   return Result.success(setsToUpdate)

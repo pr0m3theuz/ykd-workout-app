@@ -1,8 +1,11 @@
 package com.example.myapplication.components.exercise
 
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.utils.amrapProgression
 import com.example.myapplication.utils.doubleProgression
 import com.example.myapplication.utils.dynamicDoubleProgression
+import com.example.myapplication.utils.linearProgression
+import com.example.myapplication.utils.waveProgression
 import kotlinx.serialization.json.Json
 import net.jqwik.api.Example
 import net.jqwik.api.ForAll
@@ -13,8 +16,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-
-class UpdatedProgressionsTests {}
 
 class DoubleProgressionTest {
 
@@ -998,7 +999,6 @@ class DynamicDoubleProgressionTest {
     val updatedSets = result.getOrNull()!!
     assertEquals(setCount, updatedSets.size)
 
-
     if (repetitionsList.all { it >= 6 }) {
       println("sets repetitions ${sets.map { it.repetitions }}")
       println("sets target repetitions ${sets.map { it.targetRepetitions }}")
@@ -1016,8 +1016,8 @@ class DynamicDoubleProgressionTest {
           set.targetWeightPounds,
         )
         assertEquals(
-          if (repetitionsList[index] == 10) _weightPounds.plus(_incrementWeightPounds)
-            .times(0.45359237)
+          if (repetitionsList[index] == 10)
+            _weightPounds.plus(_incrementWeightPounds).times(0.45359237)
           else _weightPounds.times(0.45359237),
           set.targetWeightKilograms,
         )
@@ -1035,12 +1035,406 @@ class DynamicDoubleProgressionTest {
           set.targetWeightPounds,
         )
         assertEquals(
-          if (repetitionsList[index] == 10) _weightPounds.plus(_incrementWeightPounds)
-            .times(0.45359237)
+          if (repetitionsList[index] == 10)
+            _weightPounds.plus(_incrementWeightPounds).times(0.45359237)
           else _weightPounds.times(0.45359237),
           set.targetWeightKilograms,
         )
       }
     }
+  }
+}
+
+class WaveProgressionTest {
+  @Property
+  fun `test successful wave progression`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 6, max = 9) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double,
+    @ForAll @DoubleRange(min = 2.5, max = 10.0) _incrementWeightPounds: Double,
+  ) {
+    val inputSets =
+      List(setCount) {
+        Set().apply {
+          repetitions = _repetitions
+          weightPounds = _weightPounds
+          weightKilograms = _weightPounds.times(0.45359237)
+          incrementWeightPounds = _incrementWeightPounds
+          incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+          targetMinimumRepetitions = 6
+          targetMaximumRepetitions = 10
+          targetRepetitions = _repetitions.toString()
+          targetWeightPounds = _weightPounds
+          targetWeightKilograms = _weightPounds.times(0.45359237)
+        }
+      }
+    val setsToUpdate =
+      MutableList(inputSets.size) {
+        Set().apply {
+          incrementWeightPounds = _incrementWeightPounds
+          incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+          targetMinimumRepetitions = 6
+          targetMaximumRepetitions = 10
+        }
+      }
+
+    val result = waveProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isSuccess)
+    val updatedSets = result.getOrNull()!!
+    assertEquals(setCount, updatedSets.size)
+    val updatedReps = updatedSets[0].targetRepetitions!!.toInt()
+    val updatedWeight = updatedSets[0].targetWeightPounds!!
+
+    when (_repetitions) {
+      6 -> {
+        assertEquals(10, updatedReps)
+        assertEquals(_weightPounds.minus(_incrementWeightPounds), updatedWeight, 0.01)
+      }
+
+      in 7..10 -> {
+        assertEquals(_repetitions.minus(1), updatedReps)
+        assertEquals(_weightPounds.plus(_incrementWeightPounds), updatedWeight, 0.01)
+      }
+    }
+  }
+
+  @Property
+  fun `test failure when target repetitions are not the same`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 6, max = 9) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double,
+    @ForAll @DoubleRange(min = 2.5, max = 10.0) _incrementWeightPounds: Double,
+  ) {
+    val inputSets =
+      listOf(
+        Set().apply {
+          repetitions = _repetitions
+          weightPounds = _weightPounds
+          weightKilograms = _weightPounds.times(0.45359237)
+          incrementWeightPounds = _incrementWeightPounds
+          incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+          targetMinimumRepetitions = 6
+          targetMaximumRepetitions = 10
+          targetRepetitions = _repetitions.toString()
+          targetWeightPounds = _weightPounds
+          targetWeightKilograms = _weightPounds.times(0.45359237)
+        },
+        Set().apply {
+          repetitions = _repetitions
+          weightPounds = _weightPounds
+          weightKilograms = _weightPounds.times(0.45359237)
+          incrementWeightPounds = _incrementWeightPounds
+          incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+          targetMinimumRepetitions = 7
+          targetMaximumRepetitions = 10
+          targetRepetitions = _repetitions.plus(1).toString()
+          targetWeightPounds = _weightPounds
+          targetWeightKilograms = _weightPounds.times(0.45359237)
+        },
+      )
+    val setsToUpdate = inputSets.toMutableList()
+
+    val result = waveProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isFailure)
+    assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+    assertEquals("All target repetitions must be the same", result.exceptionOrNull()?.message)
+  }
+
+  @Property
+  fun `test repetition outside target range`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 6, max = 9) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double,
+    @ForAll @DoubleRange(min = 2.5, max = 10.0) _incrementWeightPounds: Double,
+  ) {
+    val inputSets = List(setCount) {
+      Set().apply {
+        repetitions = _repetitions
+        weightPounds = _weightPounds
+        weightKilograms = _weightPounds.times(0.45359237)
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 6
+        targetMaximumRepetitions = _repetitions.minus(1)
+        targetRepetitions = _repetitions.minus(1).toString()
+        targetWeightPounds = _weightPounds
+        targetWeightKilograms = _weightPounds.times(0.45359237)
+      }
+    }
+
+    val setsToUpdate = MutableList(inputSets.size) {
+      Set().apply {
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 6
+        targetMaximumRepetitions = 10
+      }
+    }
+
+    val result = waveProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isSuccess)
+    val updatedSets = result.getOrNull()!!
+    assertEquals(setCount, updatedSets.size)
+    assertEquals(_repetitions.minus(1).toString(), updatedSets[0].targetRepetitions)
+    assertEquals(_weightPounds, updatedSets[0].targetWeightPounds)
+    assertEquals(_weightPounds.times(0.45359237), updatedSets[0].targetWeightKilograms)
+  }
+
+  @Property
+  fun `test repetitions below target range`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 4, max = 8) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double,
+    @ForAll @DoubleRange(min = 2.5, max = 10.0) _incrementWeightPounds: Double,
+  ) {
+    val inputSets = List(setCount) {
+      Set().apply {
+        repetitions = _repetitions
+        weightPounds = _weightPounds
+        weightKilograms = _weightPounds.times(0.45359237)
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = _repetitions.plus(1)
+        targetMaximumRepetitions = 10
+        targetRepetitions = _repetitions.plus(1).toString()
+        targetWeightPounds = _weightPounds
+        targetWeightKilograms = _weightPounds.times(0.45359237)
+      }
+    }
+
+    val setsToUpdate = MutableList(inputSets.size) {
+      Set().apply {
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 6
+        targetMaximumRepetitions = 10
+      }
+    }
+
+    val result = waveProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isSuccess)
+    val updatedSets = result.getOrNull()!!
+    assertEquals(setCount, updatedSets.size)
+    assertEquals(_repetitions.plus(1).toString(), updatedSets[0].targetRepetitions)
+    assertEquals(_weightPounds, updatedSets[0].targetWeightPounds)
+    assertEquals(_weightPounds.times(0.45359237), updatedSets[0].targetWeightKilograms)
+  }
+}
+
+class AmrapProgressionTest {
+  @Property
+  fun `test property-based AMRAP progression`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 5, max = 30) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double
+  ) {
+    val _incrementWeightPounds = 5.0
+
+    val inputSets = listOf(
+      Set().apply {
+        repetitions = _repetitions
+        weightPounds = _weightPounds
+        weightKilograms = _weightPounds.times(0.45359237)
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 10
+        targetMaximumRepetitions = 20
+        targetRepetitions = 10.toString()
+        targetWeightPounds = _weightPounds
+        targetWeightKilograms = _weightPounds.times(0.45359237)
+      }
+    )
+
+    val setsToUpdate = MutableList(inputSets.size) {
+      Set().apply {
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 6
+        targetMaximumRepetitions = 10
+      }
+    }
+
+    val result = amrapProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isSuccess)
+    val updatedSets = result.getOrNull()!!
+    assertEquals(1, updatedSets.size)
+
+    val updatedTargetReps = updatedSets[0].targetRepetitions!!.toInt()
+    val updatedTargetWeight = updatedSets[0].targetWeightPounds!!
+
+    when {
+      _repetitions >= 20 -> {
+        assertEquals(_repetitions, updatedTargetReps)
+        assertEquals(_weightPounds.plus(_incrementWeightPounds.times(2)), updatedTargetWeight, 0.01)
+      }
+
+      _repetitions in 10..19 -> {
+        assertEquals(_repetitions, updatedTargetReps)
+        assertEquals(_weightPounds.plus(_incrementWeightPounds), updatedTargetWeight, 0.01)
+      }
+
+      else -> {
+        assertEquals(10, updatedTargetReps)
+        assertEquals(_weightPounds, updatedTargetWeight, 0.01)
+      }
+    }
+  }
+}
+
+class LinearProgressionTest {
+
+  @Property
+  fun `test property-based linear progression`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 1, max = 10) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double,
+    @ForAll @DoubleRange(min = 1.0, max = 10.0) _incrementWeightPounds: Double
+  ) {
+    val inputSets = listOf(
+      Set().apply {
+        repetitions = _repetitions
+        weightPounds = _weightPounds
+        weightKilograms = _weightPounds.times(0.45359237)
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 10
+        targetMaximumRepetitions = 20
+        targetRepetitions = _repetitions.toString()
+        targetWeightPounds = _weightPounds
+        targetWeightKilograms = _weightPounds.times(0.45359237)
+      }
+    )
+
+    val setsToUpdate = MutableList(inputSets.size) {
+      Set().apply {
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 6
+        targetMaximumRepetitions = 10
+      }
+    }
+
+    val result = linearProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isSuccess)
+    val updatedSets = result.getOrNull()!!
+    assertEquals(1, updatedSets.size)
+
+    val updatedReps = updatedSets[0].targetRepetitions!!.toInt()
+    val updatedWeightPounds = updatedSets[0].targetWeightPounds!!
+    val updatedWeightKilograms = updatedSets[0].targetWeightKilograms!!
+
+    assertEquals(_repetitions, updatedReps)
+    assertEquals(_weightPounds.plus(_incrementWeightPounds), updatedWeightPounds, 0.01)
+    assertEquals(
+      _weightPounds.plus(_incrementWeightPounds).times(0.45359237),
+      updatedWeightKilograms,
+      0.01
+    )
+  }
+
+  @Property
+  fun `test reset to target values when targets are missed`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 1, max = 10) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double,
+    @ForAll @DoubleRange(min = 1.0, max = 10.0) _incrementWeightPounds: Double
+  ) {
+    val inputSets = listOf(
+      Set().apply {
+        repetitions = _repetitions
+        weightPounds = _weightPounds
+        weightKilograms = _weightPounds.times(0.45359237)
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 10
+        targetMaximumRepetitions = 20
+        targetRepetitions = _repetitions.toString()
+        targetWeightPounds = _weightPounds.plus(_incrementWeightPounds)
+        targetWeightKilograms = _weightPounds.plus(_incrementWeightPounds).times(0.45359237)
+      }
+    )
+
+    val setsToUpdate = MutableList(inputSets.size) {
+      Set().apply {
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 6
+        targetMaximumRepetitions = 10
+      }
+    }
+
+    val result = linearProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isSuccess)
+    val updatedSets = result.getOrNull()!!
+
+    val updatedReps = updatedSets[0].targetRepetitions!!
+    val updatedWeightPounds = updatedSets[0].targetWeightPounds!!
+    val updatedWeightKilograms = updatedSets[0].targetWeightKilograms!!
+
+    assertEquals(1, updatedSets.size)
+    assertEquals(_repetitions.toString(), updatedReps)
+    assertEquals(_weightPounds.plus(_incrementWeightPounds), updatedWeightPounds)
+    assertEquals(
+      _weightPounds.plus(_incrementWeightPounds).times(0.45359237),
+      updatedWeightKilograms,
+      0.01
+    )
+  }
+
+  @Property
+  fun `test reset repetitions and increment weights when targets are exceeded`(
+    @ForAll @IntRange(min = 1, max = 5) setCount: Int,
+    @ForAll @IntRange(min = 1, max = 10) _repetitions: Int,
+    @ForAll @DoubleRange(min = 50.0, max = 200.0) _weightPounds: Double,
+    @ForAll @DoubleRange(min = 1.0, max = 10.0) _incrementWeightPounds: Double
+  ) {
+    val inputSets = listOf(
+      Set().apply {
+        repetitions = _repetitions
+        weightPounds = _weightPounds
+        weightKilograms = _weightPounds.times(0.45359237)
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 10
+        targetMaximumRepetitions = 20
+        targetRepetitions = _repetitions.toString()
+        targetWeightPounds = _weightPounds
+        targetWeightKilograms = _weightPounds.times(0.45359237)
+      }
+    )
+
+    val setsToUpdate = MutableList(inputSets.size) {
+      Set().apply {
+        incrementWeightPounds = _incrementWeightPounds
+        incrementWeightKilograms = _incrementWeightPounds.times(0.45359237)
+        targetMinimumRepetitions = 6
+        targetMaximumRepetitions = 10
+      }
+    }
+
+    val result = linearProgression(inputSets, setsToUpdate)
+
+    assertTrue(result.isSuccess)
+    val updatedSets = result.getOrNull()!!
+
+    val updatedReps = updatedSets[0].targetRepetitions!!
+    val updatedWeightPounds = updatedSets[0].targetWeightPounds!!
+    val updatedWeightKilograms = updatedSets[0].targetWeightKilograms!!
+
+    assertEquals(1, updatedSets.size)
+    assertEquals(_repetitions.toString(), updatedReps)
+    assertEquals(_weightPounds.plus(_incrementWeightPounds), updatedWeightPounds)
+    assertEquals(
+      _weightPounds.plus(_incrementWeightPounds).times(0.45359237),
+      updatedWeightKilograms,
+      0.01
+    )
   }
 }
