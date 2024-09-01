@@ -6,16 +6,28 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Icon
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -66,6 +78,7 @@ fun SetLazyListItem(
     )
   }
 
+  // TODO Replace Fractional Threshold with Swipeable
   SwipeToDismiss(
     state = dismissState,
     directions = setOf(DismissDirection.EndToStart),
@@ -86,6 +99,7 @@ fun SetLazyListItem(
       val icon = Icons.Filled.Delete
       val scale by
       animateFloatAsState(
+        // TODO Animatiton Spec: Spring?
         if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f,
         label = "Delete Icon Scale",
       )
@@ -108,8 +122,14 @@ fun SetLazyListItem(
   ) {
     Card(
       backgroundColor =
-      if (setCompletedState) MaterialTheme.colorScheme.primaryContainer
-      else MaterialTheme.colorScheme.background,
+      if (setCompletedState) {
+        when (isSystemInDarkTheme()) {
+          true -> MaterialTheme.colorScheme.tertiaryContainer
+          false -> MaterialTheme.colorScheme.inversePrimary
+        }
+      } else {
+        MaterialTheme.colorScheme.background
+      },
       shape = RoundedCornerShape(CornerSize(0f))
     ) {
       setContent(/*exerciseSets, index, set*/)

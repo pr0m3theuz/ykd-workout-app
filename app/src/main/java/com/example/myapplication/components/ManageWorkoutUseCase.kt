@@ -173,7 +173,7 @@ class ManageWorkoutUseCase(
           workoutID = exerciseSets.workoutID
           exerciseOrder = exerciseSets.exerciseOrder
           exercise = exercisesRepository.getExercise(exerciseSets.exerciseID)
-          sets = loadSetsFromPreviousWorkout(exerciseSets.sets)
+          sets = loadSetsFromWorkout(exerciseSets.sets)
           notes = exerciseSets.notes
           datePerformed = exerciseSets.datePerformed
         }
@@ -182,7 +182,7 @@ class ManageWorkoutUseCase(
     return newExercisesSets.sortedBy { it.exerciseOrder }.toMutableList()
   }
 
-  fun loadSetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
+  fun loadSetsFromWorkout(previousSets: RealmList<Set>): RealmList<Set> {
     val newSets = realmListOf<Set>()
     val latestPreviousSets = realmListOf<Set>()
     previousSets.forEach { set ->

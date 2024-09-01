@@ -481,6 +481,7 @@ private fun RIRTextField(
       keyboardActions = KeyboardActions(onDone = { onImeAction() }),
       value = repetitionsInReserveText,
       onValueChange = { onRIRChange(it.take(4).trim()) },
+      cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
     )
     if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
       Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
@@ -571,6 +572,7 @@ private fun ExerciseWeightTextField(
       keyboardOptions =
         KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
       keyboardActions = KeyboardActions(onNext = { onImeAction() }),
+      cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
     )
     if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
       Text(text = targetWeight, color = MaterialTheme.colorScheme.outline)

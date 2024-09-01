@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Error
@@ -49,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -78,7 +81,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import org.mongodb.kbson.ObjectId
-import java.time.format.TextStyle
 import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -115,8 +117,10 @@ fun HistoryScreen(navController: NavController) {
         },
         navigationIcon = {
           /*IconButton(
-            onClick = {
-              *//*TODO Navigate to Previous Screen *//*
+          onClick = {
+            */
+          /*TODO Navigate to Previous Screen */
+          /*
               navController.navigateUp()
               Toast.makeText(context, "TODO: Navigate to Previous Screen", Toast.LENGTH_SHORT)
                 .show()
@@ -168,7 +172,7 @@ fun HistoryScreen(navController: NavController) {
         ) {
         */
         SearchBar(
-          query = "TODO" /* TODO query */,
+          query = "TODO", /* TODO query */
           onQueryChange = {
             //            query = it
             //            filterExercises(it)
@@ -273,7 +277,7 @@ fun HistoryLazyColumn(
         stickyHeader {
           Text(
             modifier = Modifier.padding(0.dp),
-            text = month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+            text = month.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault()),
           )
         }
 
@@ -311,6 +315,7 @@ fun WorkoutOverview(
   workoutID: String,
   //  getExercise: (exerciseID: ObjectId) -> Exercise?,
   navController: NavController,
+  performAgain: Boolean,
 ) {
   val userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit
 
@@ -358,36 +363,42 @@ fun WorkoutOverview(
                     navController.navigate("history?editWorkout=${itWorkout._id.toHexString()}")
                   },
                   deleteWorkout = { setOpenDeleteWorkoutDialog(true) },
-                  saveWorkoutAsTemplate = { /* TODO Create Save Workout As Template Function */},
+                  saveWorkoutAsTemplate = { /* TODO Create Save Workout As Template Function */ },
                   //              workoutNameDialog = {}
                 )
               },
             )
           },
           bottomBar = {
-            Button(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-              onClick = {
-                navController.navigate("workout?workoutID=${itWorkout._id.toHexString()}") {
-                  popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                  // Avoid multiple copies of the same destination when
-                  // reselecting the same item
-                  launchSingleTop = true
-                  // Restore state when reselecting a previously selected item
-                  restoreState = true
-                }
-              },
-            ) {
-              Text(text = "Perform Again")
+            if (performAgain) {
+              Button(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(12.dp),
+                onClick = {
+                  navController.navigate("workout?workoutID=${itWorkout._id.toHexString()}") {
+                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                    // Avoid multiple copies of the same destination when
+                    // reselecting the same item
+                    launchSingleTop = true
+                    // Restore state when reselecting a previously selected item
+                    restoreState = true
+                  }
+                },
+              ) {
+                Text(text = "Perform Again")
+              }
             }
             //        BottomNavigationBar(navController = navController)
           },
         ) { contentPadding ->
           // TODO Change to LazyColumn
+
           Column(
-            Modifier.padding(contentPadding),
+            Modifier
+              .padding(contentPadding)
+              .verticalScroll(rememberScrollState())
+              .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
           ) {
             Column(Modifier.padding(horizontal = 12.dp)) {
@@ -467,7 +478,8 @@ fun WorkoutOverview(
                       // TODO Chanage Text Color based on Set Type
                       Row {
                         Text(
-                          text = "${
+                          text =
+                          "${
                             if (set.setTypeID == 1) {
                               set.setNumber?.plus(1)
                             } else {
@@ -496,6 +508,7 @@ fun EditWorkoutScreen(
   workoutID: String,
   //  getExercise: (exerciseID: ObjectId) -> Exercise?,
   navController: NavController,
+  editable: Boolean,
   //  exerciseExerciseSets: List<ExerciseExerciseSets>
 ) {
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
@@ -527,9 +540,14 @@ fun EditWorkoutScreen(
           title = {
             workoutName?.let { workoutName ->
               BasicTextField(
+                enabled = editable,
                 value = workoutName,
-                textStyle = MaterialTheme.typography.titleLarge,
+                textStyle =
+                MaterialTheme.typography.titleLarge.merge(
+                  color = MaterialTheme.colorScheme.onSurface
+                ),
                 onValueChange = { newName -> workoutViewModel.setWorkoutName(newName) },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
               )
             }
           },
@@ -544,7 +562,7 @@ fun EditWorkoutScreen(
           },
           actions = {
             WorkoutOptionsDropdownMenu(
-              addWorkoutNote = { workoutViewModel.addWorkoutNote() },
+              addWorkoutNote = { if (editable) workoutViewModel.addWorkoutNote() },
               enableWorkoutNameTextfield = {},
               workoutNameDialog = {},
             )
@@ -552,11 +570,13 @@ fun EditWorkoutScreen(
         )
       },
       floatingActionButton = {
-        FloatingActionButton(onClick = { setOpenSaveChangesDialog(true) }) {
-          Icon(imageVector = Icons.Filled.Save, contentDescription = "Save Changes")
+        if (editable) {
+          FloatingActionButton(onClick = { setOpenSaveChangesDialog(true) }) {
+            Icon(imageVector = Icons.Filled.Save, contentDescription = "Save Changes")
+          }
         }
       },
-      bottomBar = { /*BottomNavigationBar(navController = navController) */},
+      bottomBar = { /*BottomNavigationBar(navController = navController) */ },
     ) { contentPadding ->
       Column(Modifier.padding(contentPadding), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(

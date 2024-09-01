@@ -183,6 +183,32 @@ class RealmDatabase {
 
   // User & User Settings
   fun getCurrentUser(): User {
+    val workout1: Workout? = getWorkoutByID(ObjectId("655a3a58d814275f8d792957"))
+    val workout2: Workout? = getWorkoutByID(ObjectId("655a3faa92714aa568f42a2d"))
+
+    Log.i(
+      "workout1 == workout2",
+      "${workout1!!.programID == workout2!!.programID}, ${
+        workout1.exercisesSets.zip(workout2.exercisesSets).all { (exerciseSets1, exerciseSets2) ->
+          exerciseSets1.exerciseID == exerciseSets2.exerciseID
+        }
+      }",
+    )
+
+    workout1.exercisesSets.zip(workout2.exercisesSets).forEach { (exerciseSets1, exerciseSets2) ->
+      Log.i(
+        "workout1 sets == workout2 sets",
+        "${
+          exerciseSets1.sets.zip(exerciseSets2.sets).all { (sets1, sets2) ->
+            sets1.targetMinimumRepetitions == sets2.targetMinimumRepetitions &&
+                    sets1.progressionSchemeID == sets2.progressionSchemeID &&
+                    sets1.targetMaximumRepetitions == sets2.targetMaximumRepetitions &&
+                    sets1.owner_id == sets2.owner_id
+          }
+        }",
+      )
+    }
+
     return user
   }
 
@@ -400,23 +426,28 @@ class RealmDatabase {
         "exerciseID = $0 && programID = $0 && owner_id == $1 && ANY @links.Workout.workoutEnded == null",
         exerciseID,
         programID,
-        user.id
+        user.id,
       )
       .find()
       .firstOrNull()
   }
 
+  fun findNextIdenticalWorkoutInProgram() {
+    //    return realm.query<Workout>{}
+  }
+
   suspend fun insertWorkout(workout: Workout) {
-//    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
-//    val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
+    //    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
+    //    val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
 
     //    Log.i(
     //      "insertWorkout",
     //      "insertedExercisesSets: ${Json.encodeToString(insertedExercisesSets[0])}"
     //    )
 
-    if (realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first()
-        .find() != null
+    if (
+      realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find() !=
+      null
     ) {
       realm.write {
         val _workout: Workout? =
@@ -514,7 +545,12 @@ class RealmDatabase {
     }
   }
 
-  //  TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by using `MutableRealm/DynamicMutableRealm.findLatest(frozenObject)`.
+  //  TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by
+  // using `MutableRealm/DynamicMutableRealm.findLatest(frozenObject)`.
+  /* Frozen objects cannot be deleted.
+  They must be converted to live objects first by using
+  `MutableRealm/DynamicMutableRealm.findLatest(frozenObject)`.
+  */
   suspend fun deleteWorkout(workout: Workout) {
     workout.isManaged()
     realm.write {
@@ -1173,7 +1209,8 @@ class RealmDatabase {
           realm.write {
             val _exerciseSets: ExerciseSets? =
               this.query<ExerciseSets>("_id == $0 and owner_id == $1", exerciseSets._id, user.id)
-                .first().find()
+                .first()
+                .find()
             //          val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?:
             // return@write
 

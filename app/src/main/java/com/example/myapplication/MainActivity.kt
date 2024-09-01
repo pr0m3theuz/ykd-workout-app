@@ -47,6 +47,7 @@ import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutPr
 import com.example.myapplication.components.profileScreen.ProfileScreen
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
+import com.example.myapplication.components.workout.PreviewNextWorkoutScreen
 import com.example.myapplication.components.workout.WorkoutScreen
 import com.example.myapplication.components.workout.WorkoutSummaryScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -92,6 +93,9 @@ class MainActivity : ComponentActivity() {
         TestScreen()
 
         val navController = rememberNavController()
+
+
+
         NavHost(navController = navController, startDestination = Screens.Programs.route) {
           addExercisesGraph(navController)
           addWorkoutGraph(navController)
@@ -233,8 +237,9 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
   }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController) {
-  navigation("workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
+  navigation(startDestination = "workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
     composable("workoutSummary/workoutID/workoutCount") { navBackStackEntry ->
       Log.i("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
@@ -245,6 +250,18 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
           navController = navController,
           workoutID = workoutID,
           workoutsCount = workoutsCount,
+        )
+      }
+    }
+
+    composable("previewNextWorkout/workoutID") { navBackStackEntry ->
+      val workoutID = navBackStackEntry.arguments?.getString("workoutID")
+//      val workoutID = "66cb82f4e1a3eb29e7c411e6"
+
+      if (workoutID != null) {
+        PreviewNextWorkoutScreen(
+          navController = navController,
+          workoutID = workoutID,
         )
       }
     }
@@ -261,13 +278,13 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 
     composable(route = "history?overviewWorkout={workoutID}") { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("workoutID")?.let {
-        WorkoutOverview(workoutID = it, navController = navController)
+        WorkoutOverview(workoutID = it, navController = navController, performAgain = true)
       }
     }
 
     composable(route = "history?editWorkout={workoutID}") { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("workoutID")?.let {
-        EditWorkoutScreen(workoutID = it, navController = navController)
+        EditWorkoutScreen(workoutID = it, navController = navController, editable = true)
       }
     }
   }

@@ -1,5 +1,6 @@
 package com.example.myapplication.utils
 
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
@@ -171,9 +172,13 @@ private val instance: NumberFormat = DecimalFormat.getInstance(Locale.getDefault
  * @return The formatted string representation of the input number.
  */
 fun doubleFormatted(double: Double?): String {
+
+    val df = DecimalFormat("#,###.##")
+    df.roundingMode = RoundingMode.HALF_UP
+
     return when (double) {
         null -> ""
-        double.roundToInt().toDouble() -> double.roundToInt().toString()
-        else -> double.toString()
+        double.roundToInt().toDouble() -> df.format(double.roundToInt())
+        else -> df.format(double)
     }
 }
