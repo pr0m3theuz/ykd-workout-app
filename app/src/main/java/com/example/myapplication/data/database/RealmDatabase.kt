@@ -553,11 +553,13 @@ class RealmDatabase {
   */
   suspend fun deleteWorkout(workout: Workout) {
     workout.isManaged()
-    realm.write {
-      val _workout =
-        realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find()
+
+    val _workout =
+      realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find()
+
+    realm.writeBlocking {
       if (_workout != null) {
-        delete(_workout)
+        findLatest(_workout).also { delete(_workout) }
       }
     }
   }
