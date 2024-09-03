@@ -101,11 +101,24 @@ fun WorkoutSummaryScreen(
           userDefaultWeightUnit,
           workoutViewModel,
         )
-      } /*else {
+      }
+      // TODO Handle Null Case
+      /*else {
         navController.navigate("programs")*/
       /* { popUpTo("programs") { inclusive = false } }*/
       /*
       }*/
+      if (completedWorkout?.programID != null) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.Center,
+        ) {
+          Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!._id}") }) {
+            Text(text = "Preview Your Next Workout!")
+          }
+        }
+      }
     }
   }
 }

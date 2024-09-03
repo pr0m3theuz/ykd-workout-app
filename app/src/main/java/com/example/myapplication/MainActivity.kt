@@ -94,8 +94,6 @@ class MainActivity : ComponentActivity() {
 
         val navController = rememberNavController()
 
-
-
         NavHost(navController = navController, startDestination = Screens.Programs.route) {
           addExercisesGraph(navController)
           addWorkoutGraph(navController)
@@ -191,6 +189,17 @@ private fun NavGraphBuilder.addWorkoutGraph(
         },
       )
     }
+
+    composable(
+      "previewNextWorkout/{workoutID}"
+    ) { navBackStackEntry ->
+      val workoutID = navBackStackEntry.arguments?.getString("workoutID")
+      //      val workoutID = "66cb82f4e1a3eb29e7c411e6"
+
+      if (workoutID != null) {
+        PreviewNextWorkoutScreen(navController = navController, workoutID = workoutID)
+      }
+    }
   }
 }
 
@@ -237,6 +246,7 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
   }
 }
 
+// TODO Does this get used?
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController) {
   navigation(startDestination = "workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
@@ -250,18 +260,6 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
           navController = navController,
           workoutID = workoutID,
           workoutsCount = workoutsCount,
-        )
-      }
-    }
-
-    composable("previewNextWorkout/workoutID") { navBackStackEntry ->
-      val workoutID = navBackStackEntry.arguments?.getString("workoutID")
-//      val workoutID = "66cb82f4e1a3eb29e7c411e6"
-
-      if (workoutID != null) {
-        PreviewNextWorkoutScreen(
-          navController = navController,
-          workoutID = workoutID,
         )
       }
     }
