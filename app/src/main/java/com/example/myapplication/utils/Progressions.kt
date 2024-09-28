@@ -13,14 +13,37 @@ import com.example.myapplication.data.model.Set
 //  want to repeat the original workout or proceed with updating the next workout based on the
 //  completed workout
 
-enum class ProgressionType {
-  LINEAR_PROGRESSION,
-  DOUBLE_PROGRESSION,
-  DYNAMIC_DOUBLE_PROGRESSION,
-  WAVE_PROGRESSION,
-  AMRAP_PROGRESSION,
+enum class ProgressionType(val progression: String) {
+  LINEAR_PROGRESSION("linear"),
+  DOUBLE_PROGRESSION("double"),
+  DYNAMIC_DOUBLE_PROGRESSION("dynamic double"),
+  WAVE_PROGRESSION("wave"),
+  AMRAP_PROGRESSION("amrap");
+
+  companion object {
+    fun fromProgression(progression: String): ProgressionType? =
+      entries.find { it.progression == progression }
+  }
 }
 
+/**
+ * Returns a progression function based on the given [ProgressionType].
+ *
+ * This function maps each [ProgressionType] to its corresponding progression function. It provides
+ * a type-safe way to retrieve the appropriate function for a given progression type.
+ *
+ * @param progressionType The type of progression for which to retrieve the function.
+ * @return A function of type `() -> Unit` representing the progression logic.
+ * @throws IllegalArgumentException if an unknown [ProgressionType] is provided.
+ * @sample // Direct usage with ProgressionType val linearProgressionFunc =
+ *   selectProgression(ProgressionType.LINEAR_PROGRESSION) linearProgressionFunc()
+ *
+ * // Usage with string-based lookup val progressionType = ProgressionType.fromProgression("linear")
+ * progressionType?.let { selectProgression(it) }?.invoke()
+ *
+ * @see ProgressionType
+ * @see ProgressionType.fromProgression
+ */
 fun selectProgression(
   progressionType: ProgressionType
 ): (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> {

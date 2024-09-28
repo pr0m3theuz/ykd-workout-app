@@ -64,7 +64,7 @@ class Set() : RealmObject {
   var setTypeID: Int = 1
   val exerciseSet: RealmResults<ExerciseSets> by
   backlinks(ExerciseSets::sets) // TODO Use backlinks for ExerciseSets or not
-  var progressionSchemeID: Int = 0 // TODO Create ProgressionScheme class/enum and RealmObject
+  var progressionSchemeID: Int? = null // TODO Create ProgressionScheme class/enum and RealmObject
 
   //    To use in query for previous sets
   var exerciseID: ObjectId? = null
