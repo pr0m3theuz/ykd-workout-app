@@ -109,4 +109,12 @@ class ProgramsRepository constructor(private val database: RealmDatabase) {
   fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
     return database.getNextWorkoutByProgramID(programID)
   }
+
+  fun getMicrocycleByMicrocycleID(microcycleID: ObjectId): Microcycle? {
+    return database.getMicrocycleByID(microcycleID)
+  }
+
+  fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout> {
+    return database.getWorkoutsByMicrocycleID(microcycleID)
+  }
 }

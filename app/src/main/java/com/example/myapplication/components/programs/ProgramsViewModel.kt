@@ -22,12 +22,12 @@ constructor(
   private val workoutRepository: WorkoutRepository,
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
   //  private val setsRepository: SetsRepository,
-  private val exercisesRepository: ExercisesRepository
+  private val exercisesRepository: ExercisesRepository,
 ) : ViewModel() {
   fun getExerciseNameByID(exerciseID: ObjectId?): String? {
-//    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
+    //    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
     val exercise = exercisesRepository.getExercise(exerciseID)
-//    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exercise?.name}")
+    //    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exercise?.name}")
     return exercise?.name
   }
 
@@ -47,7 +47,7 @@ constructor(
 
   init {
     viewModelScope.launch {
-//      programsRepository.migrateData() // Used to import data
+      //      programsRepository.migrateData() // Used to import data
       programsRepository.getAllDistinctProgramTemplates().collect() { _programs.value = it }
     }
 
@@ -57,33 +57,33 @@ constructor(
   }
 
   fun getProgramById(programID: ObjectId) {
-      var program: Program?
+    var program: Program?
 
-      viewModelScope.launch {
-          program = programsRepository.getProgramById(programID)
-          _selectedProgram.value = program
-      }
+    viewModelScope.launch {
+      program = programsRepository.getProgramById(programID)
+      _selectedProgram.value = program
+    }
 
-      //        return program
+    //        return program
   }
 
-    fun isProgramActive(programUUID: RealmUUID): Boolean {
-        return programsRepository.isProgramActive(programUUID)
-    }
+  fun isProgramActive(programUUID: RealmUUID): Boolean {
+    return programsRepository.isProgramActive(programUUID)
+  }
 
-    fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
-        return programsRepository.getNextWorkoutByProgramID(programID)
-    }
+  fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
+    return programsRepository.getNextWorkoutByProgramID(programID)
+  }
 
-    fun insertProgram(program: Program) {
-        viewModelScope.launch { programsRepository.insertProgram(program) }
-    }
+  fun insertProgram(program: Program) {
+    viewModelScope.launch { programsRepository.insertProgram(program) }
+  }
 
-    fun updateProgram(program: Program) {
-        viewModelScope.launch { programsRepository.updateProgram(program) }
-    }
+  fun updateProgram(program: Program) {
+    viewModelScope.launch { programsRepository.updateProgram(program) }
+  }
 
-    fun deleteProgram(program: Program) {
+  fun deleteProgram(program: Program) {
     viewModelScope.launch { programsRepository.deleteProgram(program) }
   }
 
@@ -93,7 +93,8 @@ constructor(
 
     // TODO Navigate to Workouts Tab of the Active Program
     // TODO Enable Workout Start Buttons -> Implemented
-    // TODO If workout completed, shaw "View" Workout button, navigate to EditWorkoutScreen -> Implemented
+    // TODO If workout completed, shaw "View" Workout button, navigate to EditWorkoutScreen ->
+    // Implemented
     // TODO Navigate to Workout Screen with workoutID, getWorkoutbyID() -> Implemented
   }
 
@@ -131,10 +132,18 @@ constructor(
     //        var microcycles = emptyList<Microcycle>()
     Log.i("getMicrocyclesByProgram", "programID: $programID")
     viewModelScope.launch {
-      programsRepository.getMicrocyclesByProgram(programID).collect() {
+      programsRepository.getMicrocyclesByProgram(programID).collect() { microcycleList ->
+        _selectedProgramMicrocycles.value =
+          microcycleList.sortedWith(compareBy({ it.mesocycleID }, { it.order }))
 
-        _selectedProgramMicrocycles.value = it.sortedBy { it.mesocycleID }
-//        Log.i("getMicrocyclesByProgram", "program microcycles" + Json.encodeToString(it))
+        /* val strengthPhaseMicrocycle =
+           microcycleList.firstOrNull { it.name == "Strength Phase Week 1: Block 1 Microcycle 3" }
+
+         if (strengthPhaseMicrocycle?.name == "Strength Phase Week 3: Block 1 Microcycle 3") {
+           strengthPhaseMicrocycle?.workouts?.forEach { workout ->
+             Log.i("getMicrocyclesByProgram", "${strengthPhaseMicrocycle.name}: " + workout.name)
+           }
+         }*/
       }
     }
     //    return microcycles

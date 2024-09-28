@@ -1,6 +1,5 @@
 package com.example.myapplication.components.programs
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -21,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
@@ -62,7 +62,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,6 +80,7 @@ import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
+import com.example.myapplication.data.model.Quadruple
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.utils.doubleFormatted
@@ -83,7 +91,7 @@ import org.mongodb.kbson.ObjectId
 fun ProgramDetailsScreen(
   navController: NavController,
   programsViewModel: ProgramsViewModel = koinViewModel(),
-  programID: String
+  programID: String,
 ) {
 
   programsViewModel.getProgramById(ObjectId(programID).asObjectId())
@@ -104,9 +112,28 @@ fun ProgramDetailsScreen(
       programsViewModel,
       it,
       programMesocycles,
-      programMicrocycles
+      programMicrocycles,
     )
   }
+
+  /*  programsViewModel.getMicrocycleByID()
+  programsViewModel.getWorkoutsByMicrocycleID()
+
+  val microcycle by programsViewModel.selectedMicrocycle.collectAsStateWithLifecycle(null)
+  val workouts by programsViewModel.selectedWorkouts.collectAsStateWithLifecycle()
+
+  Scaffold { padding ->
+    Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())) {
+      microcycle?.let { microcycle ->
+      Text(text = Json.encodeToString(Microcycle.serializer(), microcycle))}
+
+      workouts.forEach { workout ->
+        Text(text = workout.name ?: "No Name")
+        Text(text = Json.encodeToString(Workout.serializer(), workout))
+      }
+    }
+  }*/
+
 }
 
 // TODO Add animatedVisibility Function to expand more/less buttons
@@ -153,17 +180,15 @@ fun ProgramDetailsLayout(
           )
         },
         navigationIcon = {
-          IconButton(
-            onClick = { navController.navigateUp() },
-          ) {
+          IconButton(onClick = { navController.navigateUp() }) {
             Icon(
               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen"
+              contentDescription = "Go to the previous screen",
             )
           }
         },
-        actions = { ProgramDetailsOptionsDropdownMenu() }
+        actions = { ProgramDetailsOptionsDropdownMenu() },
       )
     },
     bottomBar = { BottomNavigationBar(navController = navController) },
@@ -179,12 +204,12 @@ fun ProgramDetailsLayout(
               //                        .show()
               setStartButtonPressed(true)
             }
-          },
+          }
         ) {
           Text(text = "Start Program")
         }
       }
-    }
+    },
   ) { contentPadding ->
     Column(
       Modifier
@@ -200,20 +225,20 @@ fun ProgramDetailsLayout(
         Icon(
           imageVector = Icons.Outlined.BrokenImage,
           contentDescription = "Missing Image",
-          tint = MaterialTheme.colorScheme.primary
+          tint = MaterialTheme.colorScheme.primary,
         )
       }
 
       TabRow(
         selectedTabIndex = selectedTabIndex,
         backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
       ) {
         titles.forEachIndexed { index, title ->
           Tab(
             selected = selectedTabIndex == index,
             onClick = { selectedTabIndex = index },
-            text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+            text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
           )
         }
       }
@@ -227,7 +252,7 @@ fun ProgramDetailsLayout(
             OverviewTab(
               program = program,
               microcycles = microcycles,
-//              programsViewModel = programsViewModel
+              //              programsViewModel = programsViewModel
             )
 
           1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
@@ -254,13 +279,13 @@ fun ProgramDetailsOptionsDropdownMenu() {
       Icon(
         Icons.Outlined.MoreVert,
         contentDescription = "Program Options and Settings",
-        tint = MaterialTheme.colorScheme.onSurface
+        tint = MaterialTheme.colorScheme.onSurface,
       )
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
       DropdownMenuItem(
         text = { Text("Edit Program", color = onSurface) },
-        onClick = { /* TODO Navigate to Create Edit Program Screen*/ }
+        onClick = { /* TODO Navigate to Create Edit Program Screen*/ },
       )
     }
   }
@@ -270,12 +295,10 @@ fun ProgramDetailsOptionsDropdownMenu() {
 fun OverviewTab(
   program: Program,
   microcycles: List<Microcycle>,
-//  programsViewModel: ProgramsViewModel = koinViewModel()
+  //  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   //  Log.i("OverviewTab", "microcycles: $microcycles")
-  Column(
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-  ) {
+  Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
     CoachsCard(program = program)
     ProgramOverviewCard(program = program)
     ProgramDescriptionCard(program = program)
@@ -285,10 +308,7 @@ fun OverviewTab(
 }
 
 @Composable
-fun MesocyclesTab(
-  activeProgram: Boolean,
-  mesocycles: List<Mesocycle>,
-) {
+fun MesocyclesTab(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
   //  TODO
   Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     MesocycleCard(activeProgram = activeProgram, mesocycles = mesocycles)
@@ -307,7 +327,7 @@ fun WorkoutsTab(
     MicrocycleCard(
       activeProgram = activeProgram,
       navController = navController,
-      microcycles = microcycles
+      microcycles = microcycles,
     )
     Spacer(modifier = Modifier.height(60.dp))
   }
@@ -321,23 +341,23 @@ fun CoachsCard(program: Program) {
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card() {
-    Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
-      Row(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(bottom = 8.dp)) {
-          Text(text = "Coach Overview", style = titleSmall)
+    SelectionContainer {
+      Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+          Column(modifier = Modifier.padding(bottom = 8.dp)) {
+            Text(text = "Coach Overview", style = titleSmall)
+          }
         }
-      }
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-      ) {
-        Column() { Text(text = program.author ?: "Coach Name", style = titleSmall) }
-      }
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-      ) {
-        Column() { Text(text = "Description", style = bodySmall) }
+        Row(modifier = Modifier.fillMaxWidth()) {
+          Column() { Text(text = program.author ?: "Coach Name", style = titleSmall) }
+        }
+        program.shortDescription?.isNotBlank().let {
+          Row(modifier = Modifier.fillMaxWidth()) {
+            Column() { Text(text = program.shortDescription ?: "", style = bodySmall) }
+          }
+        }
       }
     }
   }
@@ -407,6 +427,16 @@ fun ProgramDescriptionCard(program: Program) {
   val labelMedium = MaterialTheme.typography.labelMedium
   val bodySmall = MaterialTheme.typography.bodyMedium
 
+  val textLinkStyles =
+    TextLinkStyles(
+      style =
+      SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        fontStyle = FontStyle.Italic,
+        textDecoration = TextDecoration.Underline,
+      )
+    )
+
   val (expanded, onClick) = remember { mutableStateOf(false) }
 
   //  TODO Add Expand/Hide Text Button
@@ -419,31 +449,38 @@ fun ProgramDescriptionCard(program: Program) {
           Text(text = "Program Description", style = titleSmall)
         }
       }
+
       Row(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
-          if (expanded) {
-            Text(
-              text = program.description ?: "Description, Use Markdown Potentially",
-              style = bodySmall,
-            )
-          } else {
-            Text(
-              text = program.description ?: "Description, Use Markdown Potentially",
-              style = bodySmall,
-              maxLines = 20,
-              overflow = TextOverflow.Ellipsis
-            )
+        SelectionContainer {
+          Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+            program.description?.let { description ->
+              if (expanded) {
+                // Text(text = description, style = bodySmall)
+                Text(
+                  text = createAnnotatedLinkString(description, textLinkStyles),
+                  style = bodySmall,
+                )
+              } else {
+
+                Text(
+                  text = createAnnotatedLinkString(description, textLinkStyles),
+                  style = bodySmall,
+                  maxLines = 20,
+                  overflow = TextOverflow.Ellipsis,
+                )
+              }
+            }
           }
         }
       }
       //      TODO Hide if not needed
       TextButton(
         onClick = { onClick(!expanded) },
-        contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp)
+        contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp),
       ) {
         Text(
           text = if (expanded) "Show less" else "Show more",
-          style = MaterialTheme.typography.labelMedium
+          style = MaterialTheme.typography.labelMedium,
         )
       }
     }
@@ -452,8 +489,8 @@ fun ProgramDescriptionCard(program: Program) {
 
 @Composable
 fun WorkoutOverviewCard(
-  microcycles: List<Microcycle>,
-//  programsViewModel: ProgramsViewModel = koinViewModel()
+  microcycles: List<Microcycle>
+  //  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   val padding = 12.dp
   val spacedByPadding = 4.dp
@@ -478,22 +515,20 @@ fun WorkoutOverviewCard(
       Column(modifier = Modifier
         .fillMaxWidth()
         .padding(padding)) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
           Text(text = "Workout Overview", style = titleSmall)
         }
 
         ScrollableTabRow(
           selectedTabIndex = selectedTabIndex,
           edgePadding = 0.dp,
-          containerColor = Color.Transparent
+          containerColor = Color.Transparent,
         ) {
           titles.forEachIndexed { index, title ->
             Tab(
               selected = selectedTabIndex == index,
               onClick = { selectedTabIndex = index },
-              text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+              text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
             )
           }
         }
@@ -503,13 +538,15 @@ fun WorkoutOverviewCard(
             .padding(top = 8.dp)
             .fillMaxWidth()
             .horizontalScroll(scrollState),
-          horizontalArrangement = Arrangement.spacedBy(12.dp)
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
           if (workouts.isNotEmpty()) {
-            workouts.sortedBy { it.day }.forEachIndexed { index, workout ->
-              //              Log.i("WorkoutOverviewCard", workout.toString())
-              WorkoutDayCard(index, workout /*programsViewModel*/)
-            }
+            workouts
+              .sortedBy { it.day }
+              .forEachIndexed { index, workout ->
+                //              Log.i("WorkoutOverviewCard", workout.toString())
+                WorkoutDayCard(index, workout /*programsViewModel*/)
+              }
           }
         }
       }
@@ -521,7 +558,7 @@ fun WorkoutOverviewCard(
 fun WorkoutDayCard(
   index: Int,
   workout: Workout,
-//  programsViewModel: ProgramsViewModel = koinViewModel()
+  //  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   val padding = 12.dp
   val spacedByPadding = 12.dp
@@ -532,8 +569,8 @@ fun WorkoutDayCard(
   val cardColors = CardDefaults.cardColors()
 
   val exercisesSets = workout.exercisesSets
-//  Log.i("WorkoutDayCard", "Workout: ${ Json.encodeToString(workout) }")
-//  Log.i("WorkoutDayCard ExercisesSets", "${ Json.encodeToString(exercisesSets[0]) }")
+  //  Log.i("WorkoutDayCard", "Workout: ${ Json.encodeToString(workout) }")
+  //  Log.i("WorkoutDayCard ExercisesSets", "${ Json.encodeToString(exercisesSets[0]) }")
 
   ElevatedCard() {
     Column(modifier = Modifier
@@ -543,7 +580,7 @@ fun WorkoutDayCard(
         modifier = Modifier
           .fillMaxWidth()
           .padding(bottom = 8.dp),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
       ) {
         Text(text = "Day ${index.plus(1)}", style = labelMedium)
       }
@@ -574,16 +611,14 @@ fun ExerciseOverview(
 
   val exercise = exerciseSets.exerciseID
   val exerciseName = programsViewModel.getExerciseNameByID(exerciseID = exercise)
-//  Log.i("ExerciseOverview", "exerciseSets: ${Json.encodeToString(exerciseSets)}")
-//  Log.i("ExerciseOverview", "exercise ID: $exercise")
-//  Log.i("ExerciseOverview", "exercise name: $exerciseName")
+  //  Log.i("ExerciseOverview", "exerciseSets: ${Json.encodeToString(exerciseSets)}")
+  //  Log.i("ExerciseOverview", "exercise ID: $exercise")
+  //  Log.i("ExerciseOverview", "exercise name: $exerciseName")
 
   exerciseName?.let {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(bottom = 4.dp),
-    ) {
+    Row(modifier = Modifier
+      .fillMaxWidth()
+      .padding(bottom = 4.dp)) {
       if (exercise != null) {
         Text(text = "${index.plus(1)}. $exerciseName", style = labelMedium)
       }
@@ -594,39 +629,43 @@ fun ExerciseOverview(
         text = "Target Reps",
         style = labelMedium,
         modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
       )
       Text(
         text = "Target RIR",
         style = labelMedium,
         modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
       )
     }
     //  Log.i("ExerciseOverview", Json.encodeToString(exerciseSets.sets))
-    exerciseSets.sets.sortedBy { it.setNumber }.forEach { set ->
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(
-          text = set.setNumber.toString(),
-          style = labelMedium,
-          modifier = Modifier
-            .weight(1f)
-            .padding(start = 8.dp)
-        )
-        Text(
-          text = set.targetRepetitions ?: "N/A",
-          style = labelMedium,
-          modifier = Modifier.weight(1f),
-          textAlign = TextAlign.Center
-        )
-        Text(
-          text = doubleFormatted(set.targetRepetitionsInReserve),
-          style = labelMedium,
-          modifier = Modifier.weight(1f),
-          textAlign = TextAlign.Center
-        )
+    exerciseSets.sets
+      .sortedBy { it.setNumber }
+      .forEach { set ->
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+          Text(
+            text = set.setNumber.toString(),
+            style = labelMedium,
+            modifier = Modifier
+              .weight(1f)
+              .padding(start = 8.dp),
+          )
+          Text(
+            text =
+            "${set.targetMinimumRepetitions} - ${set.targetMaximumRepetitions}"
+              .ifBlank { set.targetRepetitions.toString() },
+            style = labelMedium,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+          )
+          Text(
+            text = doubleFormatted(set.targetRepetitionsInReserve),
+            style = labelMedium,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+          )
+        }
       }
-    }
   }
 }
 
@@ -671,20 +710,25 @@ fun MicrocycleCard(
               .fillMaxWidth()
               .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
           ) {
             Text(
-              text = "Week ${index.plus(1)} - ${microcycle.name}",
+              text =
+              if (microcycle.name == "Week ${index.plus(1)}") {
+                "Week ${index.plus(1)}"
+              } else {
+                "Week ${index.plus(1)}: ${microcycle.name}"
+              },
               style = titleMedium,
               //              overflow = TextOverflow.Ellipsis,
               softWrap = true,
-              modifier = Modifier.weight(1f)
+              modifier = Modifier.weight(1f),
             )
 
             IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
               Icon(
                 imageVector = getExpandCollapseIcon(workoutVisible),
-                contentDescription = "Show workouts"
+                contentDescription = "Show workouts",
               )
             }
           }
@@ -692,133 +736,140 @@ fun MicrocycleCard(
           AnimatedVisibility(
             visible = workoutVisible,
             enter = expandVertically(animationSpec = tween(500)),
-            exit = shrinkVertically(animationSpec = tween(500))
+            exit = shrinkVertically(animationSpec = tween(500)),
           ) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-              val (expanded, onClick) = remember { mutableStateOf(false) }
-              val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
+            SelectionContainer {
+              Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                val (expanded, onClick) = remember { mutableStateOf(false) }
+                val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
 
-              Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
-                  if (expanded) {
-                    Text(
-                      text = microcycle.description ?: "Description, Use Markdown Potentially",
-                      style = bodySmall,
-                    )
-                  } else {
-                    Text(
-                      text = microcycle.description ?: "Description, Use Markdown Potentially",
-                      style = bodySmall,
-                      maxLines = 20,
-                      overflow = TextOverflow.Ellipsis,
-                      onTextLayout = { textLayoutResult ->
-                        if (textLayoutResult.hasVisualOverflow) {
-                          unhideShowMoreButton(true)
-                        }
-                      }
-                    )
-                  }
-                }
-              }
-
-              if (showShowMoreButton) {
-                TextButton(
-                  onClick = { onClick(!expanded) },
-                  contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp)
-                ) {
-                  Text(
-                    text = if (expanded) "Show less" else "Show more",
-                    style = MaterialTheme.typography.labelMedium
-                  )
-                }
-              }
-
-              microcycle.workouts.sortedBy { it.day }.forEach { workout ->
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  //                    .padding(bottom = 8.dp),
-                  //                horizontalArrangement = Arrangement.SpaceBetween,
-                  verticalAlignment = Alignment.CenterVertically
-                ) {
-                  Checkbox(
-                    checked = workout.workoutEnded != null,
-                    onCheckedChange = {},
-                    colors = CheckboxDefaults.colors(),
-                  )
-                  Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                      Text(
-                        text = workout.name ?: "Workout",
-                        style = titleMedium,
-                        softWrap = true,
-                        modifier = Modifier.weight(1f),
-                        overflow = TextOverflow.Ellipsis
-                      )
-                    }
-                    //                  TODO Hide if workout not completed in Active Program
-                    if (workout.workoutEnded != null) {
-                      Box(
-                        contentAlignment = Alignment.Center,
-                        modifier =
-                        Modifier
-                          .padding(horizontal = 0.dp)
-                          .height(22.dp)
-                          .background(
-                            color = MaterialTheme.colorScheme.tertiaryContainer,
-                            shape = ShapeDefaults.ExtraSmall
-                          )
-                      ) {
-                        if (workout.formatWorkoutDate().isNotEmpty()) {
-                          Text(
-                            text = workout.formatWorkoutDate(),
-                            style = bodySmall,
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                          )
-                        }
-                      }
-                    }
-
-                    Text(text = "${workout.exercisesSets.size} Exercises", style = bodySmall)
-                  }
-
-                  val workoutRoute = "workout?workoutID=${workout._id.toHexString()}"
-                  if (workout.workoutEnded == null) {
-                    Button(
-                      enabled = true, //activeProgram,
-                      onClick = {
-                        navController.navigate(workoutRoute) {
-                          popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                          }
-                          // Avoid multiple copies of the same destination when
-                          // reselecting the same item
-                          launchSingleTop = true
-                          // Restore state when reselecting a previously selected item
-                          restoreState = true
-                        }
-                      }
-                    ) {
-                      Text(text = "Start")
-                    }
-                  } else {
-                    OutlinedButton(
-                      enabled = activeProgram,
-                      onClick = {
-                        // TODO Create EditWorkoutScreen
-                        // TODO Implement Navigate to Edit Workout
-                        //                        navController.navigate(workoutRoute)
-                        Toast.makeText(
-                          context,
-                          "TODO: Implement View/Edit Workout",
-                          Toast.LENGTH_SHORT
+                if (microcycle.description.isNullOrBlank()) {
+                } else {
+                  Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+                      if (expanded) {
+                        Text(
+                          text = microcycle.description ?: "Description, Use Markdown Potentially",
+                          style = bodySmall,
                         )
-                          .show()
+                      } else {
+                        Text(
+                          text = microcycle.description ?: "Description, Use Markdown Potentially",
+                          style = bodySmall,
+                          maxLines = 20,
+                          overflow = TextOverflow.Ellipsis,
+                          onTextLayout = { textLayoutResult ->
+                            if (textLayoutResult.hasVisualOverflow) {
+                              unhideShowMoreButton(true)
+                            }
+                          },
+                        )
                       }
-                    ) {
-                      Text(text = "View")
                     }
                   }
                 }
+
+                if (showShowMoreButton) {
+                  TextButton(
+                    onClick = { onClick(!expanded) },
+                    contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp),
+                  ) {
+                    Text(
+                      text = if (expanded) "Show less" else "Show more",
+                      style = MaterialTheme.typography.labelMedium,
+                    )
+                  }
+                }
+
+                microcycle.workouts
+                  .sortedBy { it.day }
+                  .forEach { workout ->
+                    Row(
+                      modifier = Modifier.fillMaxWidth(),
+                      //                    .padding(bottom = 8.dp),
+                      //                horizontalArrangement = Arrangement.SpaceBetween,
+                      verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                      Checkbox(
+                        checked = workout.workoutEnded != null,
+                        onCheckedChange = {},
+                        colors = CheckboxDefaults.colors(),
+                      )
+                      Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                          Text(
+                            text = workout.name ?: "Workout",
+                            style = titleMedium,
+                            softWrap = true,
+                            modifier = Modifier.weight(1f),
+                            overflow = TextOverflow.Ellipsis,
+                          )
+                        }
+                        //                  TODO Hide if workout not completed in Active Program
+                        if (workout.workoutEnded != null) {
+                          Box(
+                            contentAlignment = Alignment.Center,
+                            modifier =
+                            Modifier
+                              .padding(horizontal = 0.dp)
+                              .height(22.dp)
+                              .background(
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                shape = ShapeDefaults.ExtraSmall,
+                              ),
+                          ) {
+                            if (workout.formatWorkoutDate().isNotEmpty()) {
+                              Text(
+                                text = workout.formatWorkoutDate(),
+                                style = bodySmall,
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                              )
+                            }
+                          }
+                        }
+
+                        Text(text = "${workout.exercisesSets.size} Exercises", style = bodySmall)
+                      }
+
+                      val workoutRoute = "workout?workoutID=${workout._id.toHexString()}"
+                      if (workout.workoutEnded == null) {
+                        Button(
+                          enabled = true, // activeProgram,
+                          onClick = {
+                            navController.navigate(workoutRoute) {
+                              popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                              }
+                              // Avoid multiple copies of the same destination when
+                              // reselecting the same item
+                              launchSingleTop = true
+                              // Restore state when reselecting a previously selected item
+                              restoreState = true
+                            }
+                          },
+                        ) {
+                          Text(text = "Start")
+                        }
+                      } else {
+                        OutlinedButton(
+                          enabled = activeProgram,
+                          onClick = {
+                            // TODO Create EditWorkoutScreen
+                            // TODO Implement Navigate to Edit Workout
+                            //                        navController.navigate(workoutRoute)
+                            Toast.makeText(
+                              context,
+                              "TODO: Implement View/Edit Workout",
+                              Toast.LENGTH_SHORT,
+                            )
+                              .show()
+                          },
+                        ) {
+                          Text(text = "View")
+                        }
+                      }
+                    }
+                  }
               }
             }
           }
@@ -829,10 +880,7 @@ fun MicrocycleCard(
 }
 
 @Composable
-fun MesocycleCard(
-  activeProgram: Boolean,
-  mesocycles: List<Mesocycle>,
-) {
+fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
 
   val context = LocalContext.current
   val padding = 12.dp
@@ -868,20 +916,27 @@ fun MesocycleCard(
               .fillMaxWidth()
               .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
           ) {
             Text(
-              text = "Mesocycle ${index.plus(1)} - ${mesocycle.name}",
+              text =
+              "Mesocycle ${index.plus(1)}${
+                if (!mesocycle.name.isNullOrBlank()) {
+                  " - ${mesocycle.name}"
+                } else {
+                  ""
+                }
+              }",
               style = titleMedium,
               //              overflow = TextOverflow.Ellipsis,
               softWrap = true,
-              modifier = Modifier.weight(1f)
+              modifier = Modifier.weight(1f),
             )
 
             IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
               Icon(
                 imageVector = getExpandCollapseIcon(workoutVisible),
-                contentDescription = "Show mesocycle"
+                contentDescription = "Show mesocycle",
               )
             }
           }
@@ -889,108 +944,109 @@ fun MesocycleCard(
           AnimatedVisibility(
             visible = workoutVisible,
             enter = expandVertically(animationSpec = tween(500)),
-            exit = shrinkVertically(animationSpec = tween(500))
+            exit = shrinkVertically(animationSpec = tween(500)),
           ) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-              val (expanded, onClick) = remember { mutableStateOf(false) }
-              val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
-
-              Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(bottom = 8.dp)) {
-                  Text(text = "Mesocycle Description", style = titleSmall)
-                }
-              }
-
-              Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
-                  if (expanded) {
-                    Text(
-                      text = mesocycle.description ?: "Description, Use Markdown Potentially",
-                      style = bodySmall,
-                    )
-                  } else {
-                    Text(
-                      text = mesocycle.description ?: "Description, Use Markdown Potentially",
-                      style = bodySmall,
-                      maxLines = 20,
-                      overflow = TextOverflow.Ellipsis,
-                      onTextLayout = { textLayoutResult ->
-                        if (textLayoutResult.hasVisualOverflow) {
-                          unhideShowMoreButton(true)
-                        }
-                      }
-                    )
-                  }
-                }
-              }
-
-              if (showShowMoreButton) {
-                TextButton(
-                  onClick = { onClick(!expanded) },
-                  contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp)
-                ) {
-                  Text(
-                    text = if (expanded) "Show less" else "Show more",
-                    style = MaterialTheme.typography.labelMedium
-                  )
-                }
-              }
-
-              mesocycle.microcycles.forEach { microcycle ->
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  //                    .padding(bottom = 8.dp),
-                  //                horizontalArrangement = Arrangement.SpaceBetween,
-                  verticalAlignment = Alignment.CenterVertically
-                ) {
-                  var completedWorkouts: Int = 0
-
-                  microcycle.workouts.forEach { workout ->
-                    if (workout.workoutEnded != null) {
-                      completedWorkouts++
+            SelectionContainer {
+              Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                val (expanded, onClick) = remember { mutableStateOf(false) }
+                val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
+                if (mesocycle.description.isNullOrBlank()) {
+                } else {
+                  Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                      Text(text = "Mesocycle Description", style = titleSmall)
                     }
                   }
-                  Log.i(
-                    "${microcycle.name} completedWorkouts == microcycle.workouts.size",
-                    "${completedWorkouts == microcycle.workouts.size}"
-                  )
-                  Checkbox(
-                    checked = completedWorkouts == microcycle.workouts.size,
-                    onCheckedChange = {},
-                    colors = CheckboxDefaults.colors(),
-                  )
-                  Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                      Text(
-                        text = "${microcycle.name}",
-                        style = titleMedium,
-                        softWrap = true,
-                        modifier = Modifier.weight(1f),
-                        overflow = TextOverflow.Ellipsis
-                      )
-                    }
-                    //                  TODO Hide if workout not completed in Active Program
-                    if (completedWorkouts == microcycle.workouts.size) {
-                      Box(
-                        contentAlignment = Alignment.Center,
-                        modifier =
-                        Modifier
-                          .padding(horizontal = 0.dp)
-                          .height(22.dp)
-                          .background(
-                            color = MaterialTheme.colorScheme.tertiaryContainer,
-                            shape = ShapeDefaults.ExtraSmall
-                          )
-                      ) {
+
+                  Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+                      if (expanded) {
                         Text(
-                          text = "Date Completed",
+                          text = mesocycle.description ?: "Description, Use Markdown Potentially",
                           style = bodySmall,
-                          modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                      } else {
+                        Text(
+                          text = mesocycle.description ?: "Description, Use Markdown Potentially",
+                          style = bodySmall,
+                          maxLines = 20,
+                          overflow = TextOverflow.Ellipsis,
+                          onTextLayout = { textLayoutResult ->
+                            if (textLayoutResult.hasVisualOverflow) {
+                              unhideShowMoreButton(true)
+                            }
+                          },
                         )
                       }
                     }
+                  }
+                }
 
-                    Text(text = "${microcycle.workouts.size} Workouts", style = bodySmall)
+                if (showShowMoreButton) {
+                  TextButton(
+                    onClick = { onClick(!expanded) },
+                    contentPadding = PaddingValues(start = 0.dp, bottom = 0.dp),
+                  ) {
+                    Text(
+                      text = if (expanded) "Show less" else "Show more",
+                      style = MaterialTheme.typography.labelMedium,
+                    )
+                  }
+                }
+
+                mesocycle.microcycles.forEach { microcycle ->
+                  Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    //                    .padding(bottom = 8.dp),
+                    //                horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                  ) {
+                    var completedWorkouts: Int = 0
+
+                    microcycle.workouts.forEach { workout ->
+                      if (workout.workoutEnded != null) {
+                        completedWorkouts++
+                      }
+                    }
+
+                    Checkbox(
+                      checked = completedWorkouts == microcycle.workouts.size,
+                      onCheckedChange = {},
+                      colors = CheckboxDefaults.colors(),
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                          text = "${microcycle.name}",
+                          style = titleMedium,
+                          softWrap = true,
+                          modifier = Modifier.weight(1f),
+                          overflow = TextOverflow.Ellipsis,
+                        )
+                      }
+                      //                  TODO Hide if workout not completed in Active Program
+                      if (completedWorkouts == microcycle.workouts.size) {
+                        Box(
+                          contentAlignment = Alignment.Center,
+                          modifier =
+                          Modifier
+                            .padding(horizontal = 0.dp)
+                            .height(22.dp)
+                            .background(
+                              color = MaterialTheme.colorScheme.tertiaryContainer,
+                              shape = ShapeDefaults.ExtraSmall,
+                            ),
+                        ) {
+                          Text(
+                            text = "Date Completed", // TODO Add date of completion
+                            style = bodySmall,
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                          )
+                        }
+                      }
+
+                      Text(text = "${microcycle.workouts.size} Workouts", style = bodySmall)
+                    }
                   }
                 }
               }
@@ -1000,4 +1056,59 @@ fun MesocycleCard(
       }
     }
   }
+}
+
+fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): AnnotatedString {
+  val pattern = "<a href=\"(.*?)\">(.*?)</a>".toRegex()
+  var currentIndex = 0
+  var fullText = ""
+  val fullTextList = mutableListOf<String>()
+  val links = mutableListOf<Quadruple<String, String, Int, Int>>()
+
+  pattern.findAll(text).forEach { matchResult ->
+    val (url, linkText) = matchResult.destructured
+    val startIndex = matchResult.range.first
+    val endIndex = matchResult.range.last + 1
+
+    fullText += text.substring(currentIndex, startIndex) + linkText
+    fullTextList.add(text.substring(currentIndex, startIndex))
+    fullTextList.add(linkText)
+    links.add(Quadruple(url, linkText, fullText.length - linkText.length, fullText.length))
+    currentIndex = endIndex
+  }
+
+  fullText += text.substring(currentIndex)
+
+  val annotatedString = buildAnnotatedString {
+    append(fullText)
+    links.forEach { (url, linkText, startIndex, endIndex) ->
+      addLink(
+        url = LinkAnnotation.Url(url = url, styles = textLinkStyles),
+        start = startIndex,
+        end = endIndex,
+      )
+    }
+  }
+
+  //  val spannableString = SpannableString(fullText)
+
+  println("Full Text:\n\n $fullText\n\n~~~~~~~~~\n\n")
+
+  fullTextList.forEachIndexed { index, it -> println("Text $index: $it") }
+
+  links.forEach { (url, linkText, start, end) ->
+    println("URL: $url")
+    println("Link Text: $linkText")
+    println("Start: $start")
+    println("End: $end")
+    /* spannableString.setSpan(
+        URLSpan(url),
+        start,
+        end,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )*/
+  }
+
+  //  println(annotatedString)
+  return annotatedString
 }
