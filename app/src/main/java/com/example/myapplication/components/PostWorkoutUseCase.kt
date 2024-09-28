@@ -20,5 +20,7 @@ class PostWorkoutUseCase(
         return workoutRepository.getWorkoutByID(workoutID)
     }
 
-    fun getNextWorkout() {}
+    fun getNextWorkout() {
+
+    }
 }

@@ -48,18 +48,26 @@ class AdvancedWorkout {
 class ExerciseSets {
   name: String
   notes: Listing
-  sets: Int // Number of sets to be performed
-  repetitions: Int?
+  // Number of sets to be performed
+  sets: Int
+  // Target Repetitions
+  repetitions: Int? = null
 
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
-  targetWeight: Float? = null
+  
+  targetWeightPounds: Float? = null
+  targetWeightKilograms: Float? = null
+  
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
+  
   targetRepetitionsInReserve: Int? = null // Reps in Reserve
   targetRatePerceivedEffort: Int? = null // Rate of Perceived Exertion
   percentage1RM: Float? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-  progressionSchemeID: Int? = null
+  progressionSchemeID: String? = null
   minRepetitions: Int? = null
   maxRepetitions: Int? = null
 }
@@ -68,17 +76,24 @@ class AdvancedExerciseSets {
   name: String
   notes: Listing
   sets: Int? = null// Number of sets to be performed
-  repetitions: List<Int>
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
-  targetRepetitionsInReserve: List<Int> // Reps in Reserve
-  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
-  percentage1RM: List<Float> // Percentage of 1 Rep Max
+  repetitions: List<Int>? = null // Target Repetitions
 
+  targetRepetitionsInReserve: List<Int>? = null // Reps in Reserve
+  targetRatePerceivedEffort: List<Int>? = null // Rate of Perceived Exertion
+
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
+
+  targetWeightPounds: List<Float>? = null
+  targetWeightKilograms: List<Float>? = null
+
+  percentage1RM: List<Float>? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-  progressionSchemeID: String = ""
+  progressionSchemeID: String? = null
   minRepetitions: Int? = null //
   maxRepetitions: Int? = null//
   setScheme: SetScheme?
@@ -86,15 +101,22 @@ class AdvancedExerciseSets {
 
 class SetScheme {
   sets: Int
-  repetitions: List<Int>
   setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
-  targetWeight: List<Float>
+  // Target Repetitions
+  repetitions: List<Int> 
+  
+  targetWeightPounds: List<Float>
+  targetWeightKilograms: List<Float>
+  
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
+
   targetRepetitionsInReserve: List<Int> // Reps in Reserve
   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
   percentage1RM: List<Float> // Percentage of 1 Rep Max
 
-  progressionSchemeID: Int? = null// TODO Determine Correct Type
+  progressionSchemeID: String? = null// TODO Determine Correct Type
   minRepetitions: Int? = null//
   maxRepetitions: Int? = null //
 }
@@ -130,44 +152,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -177,10 +206,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -189,32 +219,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -224,48 +262,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -275,36 +320,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -325,44 +377,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -372,10 +431,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -384,32 +444,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -419,48 +487,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -470,36 +545,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -520,44 +602,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -567,10 +656,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -579,32 +669,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -614,48 +712,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -665,36 +770,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -715,44 +827,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -762,10 +881,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -774,32 +894,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -809,48 +937,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -860,36 +995,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -910,44 +1052,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -957,10 +1106,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -969,32 +1119,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1004,48 +1162,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Dumbbell Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1055,36 +1220,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1105,44 +1277,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1152,10 +1331,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -1164,32 +1344,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1199,48 +1387,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1250,36 +1445,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1300,44 +1502,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1347,10 +1556,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -1359,32 +1569,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1394,48 +1612,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1445,36 +1670,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1495,44 +1727,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1542,10 +1781,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -1554,32 +1794,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1589,48 +1837,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1640,36 +1895,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1690,44 +1952,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1737,10 +2006,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -1749,32 +2019,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12              
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1784,48 +2062,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1835,36 +2120,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1885,44 +2177,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1932,10 +2231,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -1944,32 +2244,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -1979,48 +2287,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2030,36 +2345,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2080,44 +2402,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2127,10 +2456,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -2139,32 +2469,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2174,48 +2512,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2225,36 +2570,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2275,44 +2627,51 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Bicep Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                   sets = 3
                 }
                 new {
-                  name = "Push Ups"
+                  name = "Push-up"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2322,10 +2681,11 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Deadlift (Barbell)"
+                  name = "Barbell Deadlift"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
@@ -2334,32 +2694,40 @@ program: Program = new Program {
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Inverted Row"
+                  name = "Suspended Inverted Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Single Leg Extension"
+                  name = "Lever Single Leg Leg Extension"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2369,48 +2737,55 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Overhead Press"
+                  name = "Barbell Shoulder Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 12
                 }
                 new {
-                  name = "Rear Delt Fly"
+                  name = "Cable One Arm Reverse Fly"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 10
                   minRepetitions = 10
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hammer Curl"
+                  name = "Cable Hammer Curl"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 8
                   minRepetitions = 8
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Tricep Pushdown (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Shoulder Press (Dumbbell)"
+                  name = "Lever Shoulder Press"
                   sets = 2
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 15
                   minRepetitions = 15
                   maxRepetitions = 20
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }
@@ -2420,36 +2795,43 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 9
                   minRepetitions = 9
                   maxRepetitions = 9
                 }
                 new {
-                  name = "Chest Supported Row"
+                  name = "Dumbbell Incline Row"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 12
                   minRepetitions = 12
                   maxRepetitions = 15
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 12
+                  progressionSchemeID = "dynamic double"
                 }
                 new {
-                  name = "Hip Thrust"
+                  name = "Barbell Hip Thrust"
                   sets = 3
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
+                  repetitions = 6
                   minRepetitions = 6
                   maxRepetitions = 10
+                  progressionSchemeID = "dynamic double"
                 }
               }
             }

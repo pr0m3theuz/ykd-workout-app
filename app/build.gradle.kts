@@ -171,9 +171,9 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serialization")
 
-  //    Koin
-  val koin = "3.5.6"
-  implementation("io.insert-koin:koin-core:$koin")
+    //    Koin
+    val koin = "3.5.6"
+    implementation("io.insert-koin:koin-core:$koin")
   implementation("io.insert-koin:koin-android:$koin")
   //    implementation("io.insert-koin:koin-annotations:3.4.3")
   //    ksp("io.insert-koin:koin-ksp-compiler:3.4.3")

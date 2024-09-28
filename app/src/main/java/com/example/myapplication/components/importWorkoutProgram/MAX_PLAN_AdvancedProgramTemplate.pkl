@@ -48,18 +48,23 @@ class AdvancedWorkout {
 class ExerciseSets {
   name: String
   notes: Listing
-  sets: Int // Number of sets to be performed
-  repetitions: Int?
+  // Number of sets to be performed
+  sets: Int 
+  // Target repetitions
+  repetitions: Int? = null
 
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
-  targetWeight: Float? = null
+  targetWeightPounds: Float? = null
+  targetWeightKilograms: Float? = null
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
   targetRepetitionsInReserve: Int? = null // Reps in Reserve
   targetRatePerceivedEffort: Int? = null // Rate of Perceived Exertion
   percentage1RM: Float? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-  progressionSchemeID: Int? = null
+  progressionSchemeID: String? = null
   minRepetitions: Int? = null
   maxRepetitions: Int? = null
 }
@@ -68,16 +73,22 @@ class AdvancedExerciseSets {
   name: String
   notes: Listing
   sets: Int? = null// Number of sets to be performed
-  repetitions: List<Int>
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
-  targetRepetitionsInReserve: List<Int> // Reps in Reserve
-  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+  repetitions: List<Int>? = null // Target repetitions
+  targetRepetitionsInReserve: List<Int>? = null // Reps in Reserve
+  targetRatePerceivedEffort: List<Int>? = null // Rate of Perceived Exertion
 
-  percentage1RM: List<Float> // Percentage of 1 Rep Max
+  targetWeightPounds: List<Float>? = null
+  targetWeightKilograms: List<Float>? = null
+  
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
+  
+  percentage1RM: List<Float>? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-  progressionSchemeID: String = ""
+  progressionSchemeID: String? = null
   minRepetitions: Int? = null //
   maxRepetitions: Int? = null//
   setScheme: SetScheme?
@@ -85,21 +96,29 @@ class AdvancedExerciseSets {
 
 class SetScheme {
   sets: Int
-  repetitions: List<Int>
   setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
-  targetWeight: List<Float>
+  // Target repetitions
+  repetitions: List<Int> 
+  
+  targetWeightPounds: List<Float>
+  targetWeightKilograms: List<Float>
+  
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
+  
   targetRepetitionsInReserve: List<Int> // Reps in Reserve
   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
   percentage1RM: List<Float> // Percentage of 1 Rep Max
 
-  progressionSchemeID: Int? = null// TODO Determine Correct Type
+  progressionSchemeID: String? = null// TODO Determine Correct Type
   minRepetitions: Int? = null//
   maxRepetitions: Int? = null //
 }
 
 setSchemeMetabolicPhaseA: SetScheme = new {
   sets = 3
+  repetitions = List(15, 15, 15)
   targetRatePerceivedEffort = List(7, 8, 9)
   targetRepetitionsInReserve = List(3, 2, 1)
   minRepetitions = 15
@@ -108,6 +127,7 @@ setSchemeMetabolicPhaseA: SetScheme = new {
 
 setSchemeMetabolicPhaseB: SetScheme = new {
   sets = 3
+  repetitions = List(20, 20, 20)
   targetRatePerceivedEffort = List(7, 8, 9)
   targetRepetitionsInReserve = List(3, 2, 1)
   minRepetitions = 20
@@ -116,6 +136,7 @@ setSchemeMetabolicPhaseB: SetScheme = new {
 
 setSchemeMetabolicPhaseC: SetScheme = new {
   sets = 3
+  repetitions = List(25, 25, 25)
   targetRatePerceivedEffort = List(7, 8, 9)
   targetRepetitionsInReserve = List(3, 2, 1)
   minRepetitions = 25
@@ -124,6 +145,7 @@ setSchemeMetabolicPhaseC: SetScheme = new {
 
 setSchemeDeload: SetScheme = new {
   sets = 3
+  repetitions = List(15, 15, 15)
   targetRatePerceivedEffort = List(6, 6, 6)
   targetRepetitionsInReserve = List(4, 4, 4)
   minRepetitions = 15
@@ -132,6 +154,7 @@ setSchemeDeload: SetScheme = new {
 
 setSchemeMusclePhaseA1: SetScheme = new {
   sets = 4
+  repetitions = List(10, 10, 10, 10)
   targetRatePerceivedEffort = List(8, 9, 9, 10)
   targetRepetitionsInReserve = List(2, 1, 1, 0)
   minRepetitions = 10
@@ -140,6 +163,7 @@ setSchemeMusclePhaseA1: SetScheme = new {
 
 setSchemeMusclePhaseA2: SetScheme = new {
   sets = 3
+  repetitions = List(10, 10, 10)
   targetRatePerceivedEffort = List(8, 9, 10)
   targetRepetitionsInReserve = List(2, 1, 0)
   minRepetitions = 10
@@ -148,6 +172,7 @@ setSchemeMusclePhaseA2: SetScheme = new {
 
 setSchemeMusclePhaseA3: SetScheme = new {
   sets = 2
+  repetitions = List(10, 10)
   targetRatePerceivedEffort = List(9, 10)
   targetRepetitionsInReserve = List(1, 0)
   minRepetitions = 10
@@ -156,6 +181,7 @@ setSchemeMusclePhaseA3: SetScheme = new {
 
 setSchemeMusclePhaseB1: SetScheme = new {
   sets = 4
+  repetitions = List(8, 8, 8, 8)
   targetRatePerceivedEffort = List(8, 9, 9, 10)
   targetRepetitionsInReserve = List(2, 1, 1, 0)
   minRepetitions = 8
@@ -164,6 +190,7 @@ setSchemeMusclePhaseB1: SetScheme = new {
 
 setSchemeMusclePhaseB2: SetScheme = new {
   sets = 3
+  repetitions = List(8, 8, 8)
   targetRatePerceivedEffort = List(8, 9, 10)
   targetRepetitionsInReserve = List(2, 1, 0)
   minRepetitions = 8
@@ -172,6 +199,7 @@ setSchemeMusclePhaseB2: SetScheme = new {
 
 setSchemeMusclePhaseB3: SetScheme = new {
   sets = 2
+  repetitions = List(8, 8)
   targetRatePerceivedEffort = List(9, 10)
   targetRepetitionsInReserve = List(1, 0)
   minRepetitions = 8
@@ -180,6 +208,7 @@ setSchemeMusclePhaseB3: SetScheme = new {
 
 setSchemeMusclePhaseC1: SetScheme = new {
   sets = 4
+  repetitions = List(6, 6, 6, 6)
   targetRatePerceivedEffort = List(8, 9, 9, 10)
   targetRepetitionsInReserve = List(2, 1, 1, 0)
   minRepetitions = 6
@@ -188,6 +217,7 @@ setSchemeMusclePhaseC1: SetScheme = new {
 
 setSchemeMusclePhaseC2: SetScheme = new {
   sets = 3
+  repetitions = List(6, 6, 6)
   targetRatePerceivedEffort = List(8, 9, 10)
   targetRepetitionsInReserve = List(2, 1, 0)
   minRepetitions = 6
@@ -196,6 +226,7 @@ setSchemeMusclePhaseC2: SetScheme = new {
 
 setSchemeMusclePhaseC3: SetScheme = new {
   sets = 2
+repetitions = List(6, 6)
   targetRatePerceivedEffort = List(9, 10)
   targetRepetitionsInReserve = List(1, 0)
   minRepetitions = 6
@@ -207,12 +238,12 @@ setSchemeMusclePhaseC3: SetScheme = new {
 mesocycles: Listing<Mesocycle> = new {
   new {
     name = "Metabolic Phase"
-    description = #""#
+    description = "Summary of Metabolic Protocol\n\nTraining Variable & Protocol\n\tRepetitions: 15-20\n\tSets: 3 per exercise\n\tRest interval: 30 seconds or less\n\tTempo:\n\t\tConcentric: explosive\n\t\tEccentric: 2-3 seconds\n\tFrequency: 3 days per week\n\n\nProgram Protocol\n\nThe metabolic phase of the M.A.X. Muscle Plan is a four-week, low-intensity mesocycle consisting of a single training block. It’s long enough to promote desired metabolic adaptations without compromising muscle strength and size. Three metabolic training strategies are used over the course of the mesocycle. Here is an overview of each strategy.\n\nStraight-set metabolic training. Straight-set metabolic training is similar to traditional strength training: You perform a given number of sets for an exercise, proceed to the next exercise for a given number of sets (for our purposes you perform three sets), and so on until you’ve completed the routine. Simple, right? The unique aspect of straight-set metabolic training is that repetitions are maintained in the high range (15-20 reps per set) and rest intervals are very brief (30 seconds between sets). This results in high amounts of metabolic stress that causes an intense sensation, or burn, in the working muscles. Because rest periods are short, your body won’t have sufficient time to recover. Thus, you’ll need to progressively decrease the amount of weight used in the second and third sets of an exercise to maintain the target rep range. Don’t be concerned. Remember, the goal of metabolic training is to increase your lactate threshold and promote slow-twitch fiber hypertrophy; the load is of secondary consequence.\nPaired-set training. A superset is two exercises performed in succession without rest. From a metabolic standpoint, one of the best supersetting methods is paired-set training. This technique supersets exercises that share an agonist–antagonist relationship, meaning that when one muscle contracts, the muscle on the opposing side of the body relaxes. Although paired-set training often focuses on opposing muscle groups (e.g., back and chest, biceps and triceps, quads and hamstrings), you’ll base exercising pairings on opposing joint actions such as flexion–extension and abduction–adduction. Plantarflexion (e.g., calf raises) and spinal flexion (e.g., crunches) are not paired because their antagonist movements (dorsiflexion and spinal hyperextension, respectively) have little relevance to hypertrophy-oriented routines.\nTo ensure optimal efficiency, set up exercise stations in advance so that you are able to move quickly between exercises. You’ll perform a set of the first exercise, proceed directly to the second movement as quickly as possible, rest for approximately 30 seconds, and then repeat for two additional supersets. Then move on to the next agonist–antagonist pairing and so on until you complete all paired sets.\n\nCircuit training. As opposed to straight-set training, circuit training requires that you move from one exercise to the next with minimal rest (ideally less than 10 seconds). In essence, you perform one giant set of multiple exercises for different muscle groups. To facilitate your ability to transition swiftly between movements, set up in advance a series of exercise stations that work muscles in a push–pull fashion. Start with upper-body exercises and proceed to movements for the lower body; perform abdominal exercises last in the sequence (i.e., chest, back, shoulders, biceps, triceps, quads, hamstrings, calves, abdomen). After finishing the circuit, go back to the first exercise and perform two additional circuits in the same expeditious fashion.\nYou’ll perform three sets per muscle group and follow a total-body routine that works all the major muscles during each session. The key to optimizing results is to train at maximal or near-maximal levels of effort. Take sets to the point of muscle failure, or at least close to it (equal to an RPE of 9 or 10). It’s important to feel the burn as you reach the last few reps. This burning sensation indicates that you’re accumulating metabolites. If you aren’t sufficiently pushing yourself to complete each set, the metabolic effect will be compromised.\n\nMultijoint exercises are incorporated into the routine whenever possible. Research shows that the metabolic cost of an exercise is directly related to the amount of muscle worked (Farinatt, Castinheiras, and Neto 2011). In other words, involve more muscle and you increase metabolic work. Thus, squats, rows, presses, and the like are used to work the muscles of the torso and thighs; single-joint movements are reserved for the muscles of the arms and calves.\n\nTo condition as many muscle fibers as possible, you’ll perform a greater variety of exercises during this phase than during the strength phase. Considering that you will perform sets with limited rest, this can be a challenge if you work out in a crowded gym. In this case, simply substitute a comparable exercise that targets similar muscles. Minimizing rest intervals is far and away the most important objective. If you have to sacrifice some variety to achieve greater expediency, so be it.\n\nPerform repetitions at a moderately fast tempo, particularly on the concentric portion of the movement. Aim to perform concentric lifts as explosively as possible without getting sloppy with your technique. On the other hand, perform eccentric reps somewhat slower, making sure that working muscles resist gravitational pull on the negative phase of each rep. Eccentric exercise has a significant effect on resistance training-induced metabolic stress. If weights are not lowered under control, results suffer. An eccentric cadence of approximately two to three seconds is optimal.\n\n\nProgram Specifics\n\nThe metabolic phase consists of a single training block made up of four one-week microcycles. Rest intervals between sets progressively decrease over the first three microcycles and RPE increases to generate increased metabolic stress; intensity and volume stay relatively constant. The final week is a low-volume unloading cycle that will restore and rejuvenate. Here are the particulars for each microcycle.\n\nThe first microcycle (week 1 of the mesocycle) incorporates straight-set metabolic training. Carry out the first two sets at near-maximal intensity (equal to an RPE of 9). Take the last set of each exercise to the point of concentric muscle failure. Aim for 15 to 20 reps per set. If you can’t perform at least 15 reps, lighten the weight; if you can perform more than 20 reps, increase the weight. Rest about 30 seconds between sets—just long enough to catch your breath. After finishing all three sets of an exercise, move quickly to the next exercise, taking no more than about 30 seconds between movements.\n\nThe second microcycle (week 2) incorporates reciprocal supersets. Carry out the first two sets at near-maximal intensity (equal to an RPE of 9). Take the last set of each exercise to the point of concentric muscle failure. Aim for 15 to 20 reps per set. If you can’t perform at least 15 reps, lighten the weight; if you can perform more than 20 reps, increase the weight. Take approximately 30 seconds of rest between each superset. After finishing all three sets of a superset combo, move quickly to the next superset, taking no more than 30 seconds between movements.\n\nThe third microcycle (week 3) incorporates circuit training. Take all sets to the point of concentric muscle failure. Aim for 15 to 20 reps per set. If you can’t perform at least 15 reps, lighten the weight; if you can perform more than 20 reps, increase the weight. Move from one exercise to the next as quickly as possible—keep rest to an absolute minimum. After finishing the entire circuit, repeat the process two more times, again resting as little as possible.\n\nThe fourth microcycle (week 4) is an unloading phase. You’ll train two days per week, allowing 72 hours between sessions (e.g., Monday and Thursday), and follow a total-body routine that works all the major muscle groups during each session. One exercise of three sets will be performed per muscle group. Intensity should be 15- to 20RM. Effort should equate to an RPE of about 7.\n"
     order = 3
     microcycles {
       new {
         name = "Metabolic Phase Week 1: Microcycle 1"
-        description = ""
+        description = "Carry out the first set at an RIR of 3, the second at an RIR of 2, and the final set at an RIR of 1. Rest 30 seconds between sets."
         order = 1
         advancedWorkouts {
           new AdvancedWorkout {
@@ -221,15 +252,15 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Dumbbell one-arm row"
+                name = "Dumbbell Bent-over Row"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
@@ -237,22 +268,22 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMetabolicPhaseA
               }new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Bicycle crunch"
+                name = "Wrist-to-Knee (Bicycle) Crunch"
                 setScheme = setSchemeMetabolicPhaseA
               }
             }
@@ -263,15 +294,15 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Barbell upright row"
+                name = "Cable Upright Row"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
@@ -279,23 +310,23 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Cable triceps press-down"
+                name = "Cable Bar Pushdown"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Barbell back squat"
+                name = "Barbell Full Squat"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Cable rope kneeling crunch"
+                name = "Cable Kneeling Crunch"
                 setScheme = setSchemeMetabolicPhaseB
               }
             }
@@ -306,15 +337,15 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Dumbbell one-arm row"
+                name = "Dumbbell Bent-over Row"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Military press"
+                name = "Barbell Military Press"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
@@ -322,22 +353,22 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Walking lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMetabolicPhaseC
               }new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Roman chair side crunch"
+                name = "45° Side Bend"
                 setScheme = setSchemeMetabolicPhaseC
               }
             }
@@ -346,7 +377,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Metabolic Phase Week 2: Microcycle 2"
-        description = ""
+        description = "Carry out the first set at an RIR of 3, the second at an RIR of 2, and the final set at an RIR of 1. Rest 30 seconds between supersets."
         order = 2
         advancedWorkouts {
           new AdvancedWorkout {
@@ -355,19 +386,19 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "cable seated row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Military press"
+                name = "Barbell Military Press"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "neutral-grip lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
@@ -375,14 +406,14 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMetabolicPhaseA
               }new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMetabolicPhaseA
               }
             }
@@ -393,19 +424,19 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "barbell reverse-grip bent row"
+                name = "Barbell Underhand Bent-over Row"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "cross cable lat pull-down"
+                name = "Cable One Arm Pulldown"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
@@ -413,15 +444,15 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "skull crusher (smith machine)"
+                name = "Smith Lying Triceps Extension 'Skull Crusher'"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Barbell back squat"
+                name = "Barbell Full Squat"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "dumbbell stiff-legged deadlift"
+                name = "Dumbbell Straight Leg Deadlift"
                 setScheme = setSchemeMetabolicPhaseB
               }
             }
@@ -432,19 +463,19 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Dumbbell one-arm row"
+                name = "Dumbbell Bent-over Row"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Cable upright row"
+                name = "Cable One Arm Upright Row"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
@@ -452,14 +483,14 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Cable triceps press-dowr straight bar"
+                name = "Cable Bar Pushdown"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Walking lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMetabolicPhaseC
               }new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMetabolicPhaseC
               }
             }
@@ -468,7 +499,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Metabolic Phase Week 3: Microcycle 3"
-        description = ""
+        description = "Carry out the first set at an RIR of 3, the second at an RIR of 2, and the final set at an RIR of 1. Rest as little as possible between exercises during each circuit; rest approximately one to two minutes between circuits."
         order = 3
         advancedWorkouts {
           new AdvancedWorkout {
@@ -477,19 +508,19 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "cable seated row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Military press"
+                name = "Barbell Military Press"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "neutral-grip lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
@@ -497,14 +528,14 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMetabolicPhaseA
               }
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMetabolicPhaseA
               }new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMetabolicPhaseA
               }
             }
@@ -515,19 +546,19 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "barbell reverse-grip bent row"
+                name = "Barbell Underhand Bent-over Row"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "cross cable lat pull-down"
+                name = "Cable One Arm Pulldown"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
@@ -535,15 +566,15 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "skull crusher (smith machine)"
+                name = "Smith Lying Triceps Extension 'Skull Crusher'"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "Barbell back squat"
+                name = "Barbell Full Squat"
                 setScheme = setSchemeMetabolicPhaseB
               }
               new {
-                name = "dumbbell stiff-legged deadlift"
+                name = "Dumbbell Straight Leg Deadlift"
                 setScheme = setSchemeMetabolicPhaseB
               }
             }
@@ -554,19 +585,19 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Dumbbell one-arm row"
+                name = "Dumbbell Bent-over Row"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Cable upright row"
+                name = "Cable One Arm Upright Row"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
@@ -574,14 +605,14 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Cable triceps press-dowr straight bar"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMetabolicPhaseC
               }
               new {
-                name = "Walking lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMetabolicPhaseC
               }new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMetabolicPhaseC
               }
             }
@@ -591,7 +622,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Metabolic Phase Week 4: Microcycle 4"
-        description = ""
+        description = "Perform each set at an RIR of about 4."
         order = 4
         advancedWorkouts {
           new AdvancedWorkout {
@@ -600,31 +631,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline fly"
+                name = "Cable Incline Fly"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Barbell upright row"
+                name = "Cable Upright Row"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Bulgarian squat"
+                name = "Smith Single Leg Split Squat"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Plank"
+                name = "Front Plank"
                 setScheme = setSchemeDeload
               }
             }
@@ -635,31 +666,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Cable fly"
+                name = "Cable Incline Fly"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Cable seated row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Dumbbell lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Machine seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Toe press"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Side bridge"
+                name = "Side Plank"
                 setScheme = setSchemeDeload
               }
             }
@@ -670,12 +701,12 @@ mesocycles: Listing<Mesocycle> = new {
   }
   new {
     name = "Muscle Phase"
-    description = #""#
+    description = "Summary of Muscle Protocol\n\nTraining Variable & Protocol\n\tRepetitions: 6-12\n\tSets: 2-4 per exercise\n\tRest interval: 60-90 seconds\n\tTempo:\n\tConcentric: explosive\n\tEccentric: 2-3 seconds\n\tFrequency: 3-6 days per week\n\n\nProgram Protocol\n\nThe muscle phase is a 12-week mesocycle made up of three training blocks followed by a recovery period. You’ll use moderate-intensity loads (6-12RM) with moderate rest intervals (60-90 seconds between sets). This combination elicits an optimal mix of muscle tension and metabolic stress—a formula that is essential to maximizing muscle development.\n\nYou’ll perform a total of 25 to 30 sets per session and do multiple sets for each exercise. You’ll work larger muscle groups (such as the quads, glutes, and back) with a high training volume. Conversely, the muscles of the arms and calves are the target of fewer total direct sets because they are smaller and they function as secondary muscle movers in many mulitjoint exercises.\n\nTraining frequency progressively increases over the course of the mesocycle, which culminates with a shock phase that will bring about short-term overreaching (see Table 9.1 for a schedule). Reduced-frequency unloading phases are interspersed throughout the mesocycle to ensure adequate recuperation. In general, the full effects of supercompensation will manifest one to two weeks after you complete an overreaching microcycle. This means that you should realize optimal muscle gains sometime during the active recovery microcycle.\n\n\nTable 9.1 Training Frequency Schedule\n\nTraining Schedule\n\nBlock 1\n\tMicrocycle 1-3: 3 days per week\n\t\tDays: Monday, Wednesday, Friday\n\t\tRegions targeted: Back, chest, abdomen, legs, shoulders, arms\n\tMicrocycle 4: 2 days per week (unloading)\n\t\tDays: Monday, Thursday\n\t\tRegions targeted: Total body\n\nBlock 2\n\tMicrocycle 1-3: 4 days per week\n\t\tDays: Monday, Thursday, Tuesday, Friday\n\t\tRegions targeted: Upper body, lower body\n\tMicrocycle 4: 2 days per week (unloading)\n\t\tDays: Monday, Thursday\n\t\tRegions targeted: Total body\n\nBlock 3\n\tMicrocycle 1-2: 6 days per week\n\t\tDays: Monday, Thursday, Tuesday, Friday\n\t\tRegions targeted: Back, chest, abdomen, legs, shoulders, arms\n\tActive recovery:\n\t\tDays: Wednesday, Sunday\n\t\tRegions targeted: Light aerobic exercise\n\n\nExercises rotate from one workout to the next to ensure the complete stimulation of the full spectrum of muscle fibers. I have carefully selected the exercises in the sample routines to work different areas of the target muscles in each training session. In effect, the exercises complement one another; overlap between movements is minimal. To ensure that you work each muscle to its full extent, a mix of modalities (free weights, machines, and cables) is used over the course of the mesocycle.\n\nTo increase the growth response, several special training techniques are integrated into this phase. The use of these techniques is limited to a select few sets throughout the training cycle because the fatiguing nature of these techniques increases the potential for overtraining. Here is an overview of the special techniques that you’ll use in this phase.\n\nVariety\n\nFor the muscle phase, I have endeavored to change up the exercises from one workout to the next using a multi-angled, multi-planar, multi-modality approach. As discussed previously, performing an assortment of moves helps to stimulate all of the fibers in your major muscles to elicit maximal muscle growth and symmetry. Is all this variety absolutely essential? No. My intention here was simply to show the potential for incorporating different movements into your routine, not to suggest that every workout must be different from the previous one. That said, you should strive to change the exercises on a regular basis. There is no hard and fast rule as to how often such changes should be implemented, but a good rule of thumb is to switch things up at least every few weeks. Remember, variety is the spice of muscle development!\n\nDrop Sets\n\nDrop sets, also known as strip sets or descending sets, involve performing a set to muscle failure with a given load and then immediately reducing the load and continuing to train until subsequent failure. This technique enhances muscle fiber fatigue and metabolic stress. Aim to strip off the weights as quickly as possible; resting more than a few seconds between drop sets diminishes the beneficial effects of the technique. You can perform multiple drops in the same set to elicit even greater fatigue and stress.\n\nPaired Sets\n\nRecall that we used paired-set training in the metabolic phase of the program to take advantage of the high metabolite buildup associated with supersetting. Paired-set training also can help increase muscle development—provided that intensity and rest intervals correspond to a hypertrophy range. As opposed to same-muscle supersets, reciprocal supersets do not cause much of a reduction in strength. In fact, contracting an antagonist muscle actually can increase force output during subsequent contractions of the agonist. This is presumably the result of reduced antagonist inhibition and possibly stored elastic energy in the muscle–tendon complex. As you know by now, greater muscle tension generated by the agonist means greater increases in muscle growth, particularly in the presence of high amounts of metabolic stress. To take advantage of this effect, do the following. Set up agonist–antagonist exercise stations so that you are able to move quickly between movements. Perform a set of the first exercise, proceed directly to the second movement, rest for approximately 30 seconds, and then repeat for two additional supersets. Then move on to the next agonist–antagonist pairing and so on until you have completed all paired sets.\n\nHeavy Negatives\n\nHeavy negatives involve performing eccentric contractions at a weight greater than your concentric 1RM. Studies show that including heavy negatives in a routine can magnify the growth response, likely as a result of a combination of factors, including greater inroading, muscle damage, and metabolic stress (Schoenfeld 2011). The protocol for the technique is as follows. Load the bar with a weight that is approximately 25 percent heavier than your 1RM for a given exercise. For example, if your maximum bench press is 200 pounds (90.7 kg), use 250 pounds (113.4 kg). Perform an eccentric repetition at a tempo of approximately two to three seconds, making sure to lower the weights in a controlled fashion. When you reach the bottom portion of the lift, have a spotter help you raise the weight back to the start position. Aim for three to four reps per set. Do not attempt this technique without using a spotter! If a spotter is not available, simply substitute drop sets."
     order = 4
     microcycles {
       new {
         name = "Muscle Phase Week 1: Block 1 Microcycle 1"
-        description = ""
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 1
         advancedWorkouts {
           new AdvancedWorkout {
@@ -684,39 +715,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell chest press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Military press"
+                name = "Barbell Military Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine rear delt fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Machine triceps dip"
+                name = "Cable One Arm Pushdown"
                 setScheme = setSchemeMusclePhaseA3
               }
             }
@@ -727,31 +758,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell back squat"
+                name = "Barbell Full Squat"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
             }
@@ -762,39 +793,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable seated row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell pullover"
+                name = "Cable Pullover"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Barbell curl"
+                name = "Cable Bar Curl"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable rope hammer curl"
+                name = "Cable Hammer Curl"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Stability ball abdominal crunch"
+                name = "Ball Crunch (on stability ball)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Reverse crunch"
+                name = "Lying Leg Raise (on floor)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Russian twist"
+                name = "Medicine Ball Russian Twist"
                 setScheme = setSchemeMusclePhaseA3
               }
             }
@@ -803,7 +834,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Muscle Phase Week 2: Block 1 Microcycle 2"
-        description = ""
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 2
         advancedWorkouts {
           new AdvancedWorkout {
@@ -812,39 +843,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Cable upright row"
+                name = "Cable One Arm Upright Row"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Machine rear delt fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Cable rope overhead triceps extension"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseB3
               }
               new {
-                name = "Cable triceps press-down"
+                name = "Cable Bar Pushdown"
                 setScheme = setSchemeMusclePhaseB3
               }
               new {
-                name = "Machine triceps dip"
+                name = "Cable One Arm Pushdown"
                 setScheme = setSchemeMusclePhaseB3
               }
             }
@@ -855,31 +886,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell back squat"
+                name = "Barbell Full Squat"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseB2
               }
             }
@@ -890,15 +921,15 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Cross cable lat pull-down"
+                name = "Cable One Arm Pulldown"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Dumbbell one-arm row"
+                name = "Dumbbell Bent-over Row"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Cable straight-arm lat pull-down"
+                name = "Cable Pullover"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
@@ -906,15 +937,15 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Preacher Curl"
+                name = "Cable Preacher Curl"
                 setScheme = setSchemeMusclePhaseB3
               }
               new {
-                name = "Hanging knee raise"
+                name = "Hanging Knee Raise"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Cable wood chop"
+                name = "Cable Standing Wood Chop"
                 setScheme = setSchemeMusclePhaseB2
               }
             }
@@ -923,7 +954,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Muscle Phase Week 3: Block 1 Microcycle 3"
-        description = ""
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 3
         advancedWorkouts {
           new AdvancedWorkout {
@@ -932,39 +963,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable fly"
+                name = "Cable Incline Fly"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Machine shoulder press"
+                name = "Lever Shoulder Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable reverse fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Machine skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable overhead triceps extension"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseC3
               }
               new {
-                name = "Cable triceps kickback"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseC3
               }
             }
@@ -975,31 +1006,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Leg Pess"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Unilateral leg extension"
+                name = "Lever Single Leg Leg Extension"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC1
               }
             }
@@ -1010,15 +1041,15 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable one-arm standing low row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
@@ -1026,23 +1057,23 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable rope hammer curl"
+                name = "Cable Hammer Curl"
                 setScheme = setSchemeMusclePhaseC3
               }
               new {
-                name = "Machine preacher curl"
+                name = "Cable Preacher Curl"
                 setScheme = setSchemeMusclePhaseC3
               }
               new {
-                name = "Hanging knee raise"
+                name = "Hanging Knee Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable side bend"
+                name = "Cable Side Bend"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Side bridge"
+                name = "Side Plank"
                 setScheme = setSchemeMusclePhaseC3
               }
             }
@@ -1051,7 +1082,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Muscle Phase Week 4: Block 1 Microcycle 4"
-        description = ""
+        description = "Perform all exercises at an RIR of approximately 4."
         order = 4
         advancedWorkouts {
           new AdvancedWorkout {
@@ -1060,39 +1091,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Barbell upright row"
+                name = "Cable Upright Row"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Bulgarian squat"
+                name = "Smith Single Leg Split Squat"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Plank"
+                name = "Front Plank"
                 setScheme = setSchemeDeload
               }
             }
@@ -1103,39 +1134,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Cable seated row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Military press"
+                name = "Barbell Military Press"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Dumbbell preacher curl"
+                name = "Cable Preacher Curl"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Cable triceps press-down"
+                name = "Cable Bar Pushdown"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Machine seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Toe press"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeDeload
               }
               new {
-                name = "Side bridge"
+                name = "Side Plank"
                 setScheme = setSchemeDeload
               }
             }
@@ -1144,7 +1175,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Muscle Phase Week 5: Block 2 Microcycle 1"
-        description = ""
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 5
         advancedWorkouts {
           new AdvancedWorkout {
@@ -1153,27 +1184,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell chest press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Reverse-grip lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
@@ -1181,7 +1212,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseA1
               }
             }
@@ -1192,35 +1223,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell split squat"
+                name = "Smith Single Leg Split Squat"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell rollout"
+                name = "Wheel Rollout"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable rope kneeling twisting crunch"
+                name = "Cable Kneeling Twisting Crunch"
                 setScheme = setSchemeMusclePhaseA2
               }
             }
@@ -1231,27 +1262,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine shoulder press"
+                name = "Lever Shoulder Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable reverse fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
@@ -1259,7 +1290,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseA1
               }
             }
@@ -1270,35 +1301,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable rope kneeling crunch"
+                name = "Cable Kneeling Crunch"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable wood chop"
+                name = "Cable Standing Wood Chop"
                 setScheme = setSchemeMusclePhaseA2
               }
             }
@@ -1307,7 +1338,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Muscle Phase Week 6: Block 2 Microcycle 2"
-        description = ""
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 6
         advancedWorkouts {
           new AdvancedWorkout {
@@ -1316,27 +1347,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Cross cable lat pull-down"
+                name = "Cable One Arm Pulldown"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Cable upright row"
+                name = "Cable One Arm Upright Row"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Cable reverse fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
@@ -1344,7 +1375,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Cable rope overhead triceps extension"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseB1
               }
             }
@@ -1355,35 +1386,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell split squat"
+                name = "Smith Single Leg Split Squat"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Cable rope kneeling crunch"
+                name = "Cable Kneeling Crunch"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Roman chair side crunch"
+                name = "45° Side Bend"
                 setScheme = setSchemeMusclePhaseB2
               }
             }
@@ -1394,27 +1425,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Barbell reverse-grip bent row"
+                name = "Barbell Underhand Bent-over Row"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Machine shoulder press"
+                name = "Lever Shoulder Press"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
@@ -1422,7 +1453,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseB1
               }
             }
@@ -1433,35 +1464,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell lunge"
+                name = "Smith Single Leg Split Squat"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseB2
               }
               new {
-                name = "Reverse crunch"
+                name = "Lying Leg Raise (on floor)"
                 setScheme = setSchemeMusclePhaseB1
               }
               new {
-                name = "Russian twist"
+                name = "Medicine Ball Russian Twist"
                 setScheme = setSchemeMusclePhaseB2
               }
             }
@@ -1469,8 +1500,8 @@ mesocycles: Listing<Mesocycle> = new {
         }
       }
       new {
-        name = "Metabolic Phase Week 7: Block 2 Microcycle 3"
-        description = ""
+        name = "Muscle Phase Week 7: Block 2 Microcycle 3"
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 7
         advancedWorkouts {
           new AdvancedWorkout {
@@ -1479,27 +1510,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable incline chest fly"
+                name = "Cable Incline Fly"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Reverse-grip lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
@@ -1507,7 +1538,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable triceps press-down"
+                name = "Cable Bar Pushdown"
                 setScheme = setSchemeMusclePhaseC1
               }
             }
@@ -1518,31 +1549,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Bulgarian squat"
+                name = "Smith Single Leg Split Squat"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Hanging knee raise"
+                name = "Hanging Knee Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
             }
@@ -1553,27 +1584,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Machine shoulder press"
+                name = "Lever Shoulder Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
@@ -1581,7 +1612,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseC1
               }
             }
@@ -1592,35 +1623,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Unilateral leg extension"
+                name = "Lever Single Leg Leg Extension"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable rope kneeling crunch"
+                name = "Cable Kneeling Crunch"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable wood chop"
+                name = "Cable Standing Wood Chop"
                 setScheme = setSchemeMusclePhaseC2
               }
             }
@@ -1629,7 +1660,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Metabolic Phase Week 8: Block 2 Microcycle 4"
-        description = ""
+        description = "Perform all exercises at an RIR of approximately 4."
         order = 8
         advancedWorkouts {
           new AdvancedWorkout {
@@ -1638,27 +1669,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell chest press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Reverse-grip lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
@@ -1666,7 +1697,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseA1
               }
             }
@@ -1677,35 +1708,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell split squat"
+                name = "Smith Single Leg Split Squat"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell rollout"
+                name = "Wheel Rollout"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable rope kneeling twisting crunch"
+                name = "Cable Kneeling Twisting Crunch"
                 setScheme = setSchemeMusclePhaseA2
               }
             }
@@ -1716,27 +1747,27 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine shoulder press"
+                name = "Lever Shoulder Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable reverse fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
@@ -1744,7 +1775,7 @@ mesocycles: Listing<Mesocycle> = new {
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Overhead triceps extension (Cable)"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseA1
               }
             }
@@ -1755,35 +1786,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable rope kneeling crunch"
+                name = "Cable Kneeling Crunch"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable wood chop"
+                name = "Cable Standing Wood Chop"
                 setScheme = setSchemeMusclePhaseA2
               }
             }
@@ -1792,7 +1823,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Muscle Phase Week 9: Block 3 Microcycle 1"
-        description = ""
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 9
         advancedWorkouts {
           new AdvancedWorkout {
@@ -1801,35 +1832,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable one-arm row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Dumbbell pullover"
+                name = "Cable Pullover"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable fly"
+                name = "Cable Incline Fly"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Stability ball abdominal crunch"
+                name = "Ball Crunch (on stability ball)"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Russian twist"
+                name = "Medicine Ball Russian Twist"
                 setScheme = setSchemeMusclePhaseA3
               }
             }
@@ -1840,37 +1871,37 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Barbell back squat"
+                name = "Barbell Full Squat"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable glute kickback"
+                name = "Lever Seated Hip Abduction"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
-              }
+              } 
             }
           }
           new AdvancedWorkout {
@@ -1879,39 +1910,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Military press"
+                name = "Barbell Military Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine rear delt fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable rope overhead triceps extension"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Dumbbell triceps kickback"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Preacher curl"
+                name = "Cable Preacher Curl"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeMusclePhaseA3
               }
             }
@@ -1922,35 +1953,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Cross cable lat pull-down"
+                name = "Cable One Arm Pulldown"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable one-arm row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable straight-arm lat pull-down"
+                name = "Cable Pullover"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Cable rope kneeling crunch"
+                name = "Cable Kneeling Crunch"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Hanging knee raise"
+                name = "Hanging Knee Raise"
                 setScheme = setSchemeMusclePhaseA3
               }
             }
@@ -1961,35 +1992,36 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable glute kickback"
+                name = "Lever Seated Hip Abduction"
+                notes {"Lean forward"}
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
               }
             }
@@ -2000,39 +2032,39 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Machine rear delt fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseA1
               }
               new {
-                name = "Cable triceps press-down"
+                name = "Cable Bar Pushdown"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Machine skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Dumbbell triceps kickback"
+                name = "Cable One Arm Triceps Extension (pronated grip)"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeMusclePhaseA2
               }
               new {
-                name = "Preacher curl"
+                name = "Cable Preacher Curl"
                 setScheme = setSchemeMusclePhaseA3
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeMusclePhaseA3
               }
             }
@@ -2041,7 +2073,7 @@ mesocycles: Listing<Mesocycle> = new {
       }
       new {
         name = "Muscle Phase Week 2: Block 3 Microcycle 2"
-        description = ""
+        description = "Perform initial sets at an RIR of 1 or 2, and take the last set to the point of concentric muscle failure (RIR of 0)."
         order = 2
         advancedWorkouts {
           new AdvancedWorkout {
@@ -2050,35 +2082,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Cross cable lat pull-down"
+                name = "Cable One Arm Pulldown"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Reverse-grip lat pull-down"
+                name = "Cable Pulldown"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "T-bar row"
+                name = "Lever T-bar Row (plate loaded)"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Reverse crunch"
+                name = "Lying Leg Raise (on floor)"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable wood chop"
+                name = "Cable Standing Wood Chop"
                 setScheme = setSchemeMusclePhaseC2
               }
             }
@@ -2089,31 +2121,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Unilateral leg extension"
+                name = "Lever Single Leg Leg Extension"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
             }
@@ -2124,31 +2156,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Military press"
+                name = "Barbell Military Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable reverse fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable rope overhead triceps extension"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Preacher curl"
+                name = "Cable Preacher Curl"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeMusclePhaseC2
               }
             }
@@ -2159,35 +2191,35 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Neutral-grip lat pull-down"
+                name = "Cable One Arm Pulldown"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable one-arm row"
+                name = "Cable One Arm Seated Row"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable straight-arm lat pull-down"
+                name = "Cable Pullover"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Barbell incline press"
+                name = "Barbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Dumbbell incline press"
+                name = "Dumbbell Incline Bench Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Pec deck fly"
+                name = "Lever Pec Deck Fly"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Cable rope kneeling crunch"
+                name = "Cable Kneeling Crunch"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Hanging knee raise"
+                name = "Hanging Knee Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
             }
@@ -2198,31 +2230,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Leg press"
+                name = "Sled 45° Leg Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Dumbbell reverse lunge"
+                name = "Dumbbell Rear Lunge"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Leg extension"
+                name = "Lever Leg Extension"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Barbell stiff-legged deadlift"
+                name = "Barbell Stiff Leg Deadlift"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Seated leg curl"
+                name = "Lever Seated Leg Curl"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine seated calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine standing calf raise"
+                name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseC2
               }
             }
@@ -2233,31 +2265,31 @@ mesocycles: Listing<Mesocycle> = new {
             notes {}
             advancedExercisesSets {
               new {
-                name = "Dumbbell shoulder press"
+                name = "Dumbbell Shoulder Press"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable lateral raise"
+                name = "Cable One Arm Lateral Raise"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine rear delt fly"
+                name = "Lever Seated Reverse Fly (on pec deck)"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Cable triceps press-down"
+                name = "Cable Bar Pushdown"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Machine skull crusher"
+                name = "Cable Triceps Extension"
                 setScheme = setSchemeMusclePhaseC2
               }
               new {
-                name = "Bayesian curl"
+                name = "Bayesian Curl"
                 setScheme = setSchemeMusclePhaseC1
               }
               new {
-                name = "Preacher curl"
+                name = "Cable Preacher Curl"
                 setScheme = setSchemeMusclePhaseC2
               }
             }

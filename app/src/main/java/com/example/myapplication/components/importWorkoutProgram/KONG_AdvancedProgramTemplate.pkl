@@ -48,18 +48,23 @@ class AdvancedWorkout {
 class ExerciseSets {
   name: String
   notes: Listing
-  sets: Int // Number of sets to be performed
-  repetitions: Int?
+  // Number of sets to be performed
+  sets: Int 
+  // Target repetitions
+  repetitions: Int? = null
 
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
-  targetWeight: Float? = null
+  targetWeightPounds: Float? = null
+  targetWeightKilograms: Float? = null
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
   targetRepetitionsInReserve: Int? = null // Reps in Reserve
   targetRatePerceivedEffort: Int? = null // Rate of Perceived Exertion
   percentage1RM: Float? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-  progressionSchemeID: Int? = null
+  progressionSchemeID: String? = null
   minRepetitions: Int? = null
   maxRepetitions: Int? = null
 }
@@ -68,16 +73,22 @@ class AdvancedExerciseSets {
   name: String
   notes: Listing
   sets: Int? = null// Number of sets to be performed
-  repetitions: List<Int>
   // Normal by default, Listing - length/number of elements must equal number of sets
   setType: String = ""
-  targetRepetitionsInReserve: List<Int> // Reps in Reserve
-  targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
+  repetitions: List<Int>? = null // Target repetitions
+  targetRepetitionsInReserve: List<Int>? = null // Reps in Reserve
+  targetRatePerceivedEffort: List<Int>? = null // Rate of Perceived Exertion
 
-  percentage1RM: List<Float> // Percentage of 1 Rep Max
+  targetWeightPounds: List<Float>? = null
+  targetWeightKilograms: List<Float>? = null
+  
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
+  
+  percentage1RM: List<Float>? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
-  progressionSchemeID: String = ""
+  progressionSchemeID: String? = null
   minRepetitions: Int? = null //
   maxRepetitions: Int? = null//
   setScheme: SetScheme?
@@ -85,15 +96,22 @@ class AdvancedExerciseSets {
 
 class SetScheme {
   sets: Int
-  repetitions: List<Int>
   setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
-  targetWeight: List<Float>
+  // Target repetitions
+  repetitions: List<Int> 
+  
+  targetWeightPounds: List<Float>
+  targetWeightKilograms: List<Float>
+  
+  weightIncrementPounds: Float? = null
+  weightIncrementKilograms: Float? = null
+  
   targetRepetitionsInReserve: List<Int> // Reps in Reserve
   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
   percentage1RM: List<Float> // Percentage of 1 Rep Max
 
-  progressionSchemeID: Int? = null// TODO Determine Correct Type
+  progressionSchemeID: String? = null// TODO Determine Correct Type
   minRepetitions: Int? = null//
   maxRepetitions: Int? = null //
 }
@@ -223,7 +241,7 @@ program: Program = new Program {
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Barbell Tricep Extension"
+                  name = "Barbell Triceps Extension"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
@@ -251,21 +269,21 @@ program: Program = new Program {
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Cable Crossover"
+                  name = "Cable Standing Fly"
                   sets = 2
                   repetitions = 20
                   targetRatePerceivedEffort = 7
@@ -279,35 +297,35 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 2
                   repetitions = 20
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Romanian Deadlift (Barbell)"
+                  name = "Romanian Deadlift"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Walking Lunge (Dumbbell)"
+                  name = "Dumbbell Walking Lunge"
                   sets = 2
                   repetitions = 12
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
@@ -321,28 +339,28 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Behind-the-Neck Push Press"
+                  name = "Barbell Behind Neck Press"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "One Arm Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Single Arm Row (Dumbbell)"
+                  name = "Dumbbell Bent-over Row"
                   sets = 2
                   repetitions = 20
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Lat Pulldown"
+                  name = "Cable Pulldown"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
@@ -373,35 +391,35 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 2
                   repetitions = 20
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Single Leg Pess"
+                  name = ""
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
@@ -415,49 +433,49 @@ program: Program = new Program {
               notes {}
               exercisesSets {
                 new {
-                  name = "Bicep Curl (Barbell)"
+                  name = "Barbell Curl"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Concentration Curl"
+                  name = "Bayesian Curl"
                   sets = 2
                   repetitions = 20
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Seated Row (Cable)"
+                  name = "Cable Seated Row"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "High Row"
+                  name = "Cable Seated High Row"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Dip (Weighted)"
+                  name = "Weighted Triceps Dip"
                   sets = 2
                   repetitions = 15
                   targetRatePerceivedEffort = 7
                   targetRepetitionsInReserve = 3
                 }
                 new {
-                  name = "Tricep Straight Bar Push Down (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 2
                   repetitions = 20
                   targetRatePerceivedEffort = 7
@@ -485,7 +503,7 @@ program: Program = new Program {
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Barbell Tricep Extension"
+                  name = "Barbell Triceps Extension"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -506,28 +524,28 @@ program: Program = new Program {
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Upright Row (Barbell)"
+                  name = "Barbell Upright Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Cable Crossover"
+                  name = "Cable Standing Fly"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -541,35 +559,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Romanian Deadlift (Barbell)"
+                  name = "Romanian Deadlift"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Walking Lunge (Dumbbell)"
+                  name = "Dumbbell Walking Lunge"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -583,28 +601,28 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Behind-the-Neck Push Press"
+                  name = "Barbell Behind Neck Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "One Arm Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Single Arm Row (Dumbbell)"
+                  name = "Dumbbell Bent-over Row"
                   sets = 3
                   repetitions = List(15, 15, 15)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Lat Pulldown"
+                  name = "Cable Pulldown"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -635,35 +653,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(15, 15, 15)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Single Leg Pess"
+                  name = "Lever Single Leg 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -677,49 +695,49 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bicep Curl (Barbell)"
+                  name = "Barbell Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Concentration Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Seated Row (Cable)"
+                  name = "Cable Seated Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "High Row"
+                  name = "Cable Seated High Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Dip (Weighted)"
+                  name = "Weighted Triceps Dip"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Tricep Straight Bar Push Down (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -747,7 +765,7 @@ program: Program = new Program {
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Barbell Tricep Extension"
+                  name = "Barbell Triceps Extension"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -768,28 +786,28 @@ program: Program = new Program {
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Upright Row (Barbell)"
+                  name = "Barbell Upright Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Cable Crossover"
+                  name = "Cable Standing Fly"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -803,35 +821,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Romanian Deadlift (Barbell)"
+                  name = "Romanian Deadlift"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Walking Lunge (Dumbbell)"
+                  name = "Dumbbell Walking Lunge"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -845,28 +863,28 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Behind-the-Neck Push Press"
+                  name = "Barbell Behind Neck Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "One Arm Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Single Arm Row (Dumbbell)"
+                  name = "Dumbbell Bent-over Row"
                   sets = 3
                   repetitions = List(15, 15, 15)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Lat Pulldown"
+                  name = "Cable Pulldown"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -897,35 +915,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(15, 15, 15)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Single Leg Pess"
+                  name = "Lever Single Leg 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -939,49 +957,49 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bicep Curl (Barbell)"
+                  name = "Barbell Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Concentration Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Seated Row (Cable)"
+                  name = "Cable Seated Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "High Row"
+                  name = "Cable Seated High Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Dip (Weighted)"
+                  name = "Weighted Triceps Dip"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Tricep Straight Bar Push Down (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -1009,7 +1027,7 @@ program: Program = new Program {
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Barbell Tricep Extension"
+                  name = "Barbell Triceps Extension"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -1030,28 +1048,28 @@ program: Program = new Program {
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Upright Row (Barbell)"
+                  name = "Barbell Upright Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Cable Crossover"
+                  name = "Cable Standing Fly"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -1065,35 +1083,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Romanian Deadlift (Barbell)"
+                  name = "Romanian Deadlift"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Walking Lunge (Dumbbell)"
+                  name = "Dumbbell Walking Lunge"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -1107,28 +1125,28 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Behind-the-Neck Push Press"
+                  name = "Barbell Behind Neck Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "One Arm Lateral Raise (Cable)"
+                  name = "Cable One Arm Lateral Raise"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Single Arm Row (Dumbbell)"
+                  name = "Dumbbell Bent-over Row"
                   sets = 3
                   repetitions = List(15, 15, 15)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Lat Pulldown"
+                  name = "Cable Pulldown"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -1159,35 +1177,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(15, 15, 15)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Single Leg Pess"
+                  name = "Lever Single Leg 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Leg Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -1201,49 +1219,49 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bicep Curl (Barbell)"
+                  name = "Barbell Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Concentration Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Seated Row (Cable)"
+                  name = "Cable Seated Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "High Row"
+                  name = "Cable Seated High Row"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Dip (Weighted)"
+                  name = "Weighted Triceps Dip"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
                   targetRepetitionsInReserve = List(5, 3, 0)
                 }
                 new {
-                  name = "Tricep Straight Bar Push Down (Cable)"
+                  name = "Cable Bar Pushdown"
                   sets = 3
                   repetitions = List(12, 12, 12)
                   targetRatePerceivedEffort = List(5, 7, 10)
@@ -1257,7 +1275,7 @@ program: Program = new Program {
     }
     new {
       name = "Week 5-8: Pyramids Phase"
-      description = #"Now you'll reap the benefits of the high volume work from the previous block by focusing on compound lifts first before accessories.\n\nThe compounds will be underload variations (like close grip bench and stiff leg deadlifts), which forces you to use less weight than the competition variation. The disadvantaged positions force you to train weaknesses in your compounds.\n\nThe set and rep scheme is in a pyramid, which also forces you to use less weight by prioritizing volume and endurance work. This is a nasty muscle building combination."#
+      description = #"Now you'll reap the benefits of the high volume work from the previous block by focusing on compound lifts first before accessories.\n\nThe compounds will be underload variations (like close grip bench and Barbell Stiff Leg Deadlifts), which forces you to use less weight than the competition variation. The disadvantaged positions force you to train weaknesses in your compounds.\n\nThe set and rep scheme is in a pyramid, which also forces you to use less weight by prioritizing volume and endurance work. This is a nasty muscle building combination."#
       order = 2
       microcycles {
         new {
@@ -1271,42 +1289,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
                 }
                 new {
-                  name = "Shoulder Press (Dumbbell)"
+                  name = "Dumbbell Shoulder Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable Lateral Raise"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Dips"
+                  name = "Triceps Dip"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
@@ -1320,42 +1338,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Stiff Leg Deadlift"
+                  name = "Barbell Stiff Leg Deadlift"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Bulgarian Split Squat (Barbell)"
+                  name = "Barbell Bulgarian Squat"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
@@ -1369,42 +1387,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bent Over Row (Barbell)"
+                  name = "Barbell Bent-over Row"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
                 }
                 new {
-                  name = "Seated Wide-Grip Row"
+                  name = "Cable Wide Grip Seated Row"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Lat Pulldown (Single Arm)"
+                  name = "Cable One Arm Pulldown"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Pullover (Dumbbell)"
+                  name = "Cable Pullover"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Preacher Curl (Barbell)"
+                  name = "Cable Preacher Curl"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
@@ -1425,42 +1443,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Close Grip)"
+                  name = "Barbell Bench Press"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Chest Fly (Dumbbell)"
+                  name = "Cable Standing Fly"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Overhead Extension (Dumbbell)"
+                  name = "Cable Triceps Extension"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
@@ -1474,35 +1492,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "High Bar Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(7, 7, 7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3, 3, 3)
                 }
                 new {
-                  name = "Hack Squat"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Romanian Deadlift (Dumbbell)"
+                  name = "Romanian Deadlift"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
@@ -1523,42 +1541,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   sets = 5
                   repetitions = List(10, 8, 5, 3, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Shoulder Press (Dumbbell)"
+                  name = "Dumbbell Shoulder Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable Lateral Raise"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Dips"
+                  name = "Triceps Dip"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
@@ -1572,42 +1590,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Stiff Leg Deadlift"
+                  name = "Barbell Stiff Leg Deadlift"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Bulgarian Split Squat (Barbell)"
+                  name = "Barbell Bulgarian Squat"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
@@ -1621,42 +1639,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bent Over Row (Barbell)"
+                  name = "Barbell Bent-over Row"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Seated Wide-Grip Row"
+                  name = "Cable Wide Grip Seated Row"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Lat Pulldown (Single Arm)"
+                  name = "Cable One Arm Pulldown"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Pullover (Dumbbell)"
+                  name = "Cable Pullover"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Preacher Curl (Barbell)"
+                  name = "Cable Preacher Curl"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
@@ -1677,42 +1695,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Close Grip)"
+                  name = "Barbell Bench Press"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Chest Fly (Dumbbell)"
+                  name = "Cable Standing Fly"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Overhead Extension (Dumbbell)"
+                  name = "Cable Triceps Extension"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
@@ -1726,35 +1744,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "High Bar Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 5
                   repetitions = List(12, 12, 10, 8, 5)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Hack Squat"
+                  name = "Sled 45° Leg Press"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Romanian Deadlift (Dumbbell)"
+                  name = "Romanian Deadlift"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(8, 8, 8)
@@ -1775,42 +1793,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   sets = 6
                   repetitions = List(10, 8, 8, 5, 3, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Shoulder Press (Dumbbell)"
+                  name = "Dumbbell Shoulder Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable Lateral Raise"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Dips"
+                  name = "Triceps Dip"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
@@ -1824,42 +1842,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Stiff Leg Deadlift"
+                  name = "Barbell Stiff Leg Deadlift"
                   sets = 6
                   repetitions = List(10, 8, 8, 5, 3, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Bulgarian Split Squat (Barbell)"
+                  name = "Barbell Bulgarian Squat"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
@@ -1873,42 +1891,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bent Over Row (Barbell)"
+                  name = "Barbell Bent-over Row"
                   sets = 6
                   repetitions = List(10, 8, 8, 5, 3, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Seated Wide-Grip Row"
+                  name = "Cable Wide Grip Seated Row"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Lat Pulldown (Single Arm)"
+                  name = "Cable One Arm Pulldown"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Pullover (Dumbbell)"
+                  name = "Cable Pullover"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Preacher Curl (Barbell)"
+                  name = "Cable Preacher Curl"
                   sets = 3
                   repetitions = List(12, 10, 8)
                   targetRatePerceivedEffort = List(7, 7, 7)
                   targetRepetitionsInReserve = List(3, 3, 3)
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
@@ -1929,42 +1947,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Close Grip)"
+                  name = "Barbell Bench Press"
                   sets = 6
                   repetitions = List(10, 8, 8, 5, 3, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Chest Fly (Dumbbell)"
+                  name = "Cable Standing Fly"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Overhead Extension (Dumbbell)"
+                  name = "Cable Triceps Extension"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
@@ -1978,35 +1996,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "High Bar Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 6
                   repetitions = List(10, 8, 8, 5, 3, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2, 2, 2)
                 }
                 new {
-                  name = "Hack Squat"
+                  name = "Sled 45° Leg Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Romanian Deadlift (Dumbbell)"
+                  name = "Romanian Deadlift"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(2, 2, 2, 2)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
@@ -2027,42 +2045,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   sets = 6
                   repetitions = List(8, 8, 5, 5, 3, 12)
-                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
-                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1, 1)
                 }
                 new {
-                  name = "Shoulder Press (Dumbbell)"
+                  name = "Dumbbell Shoulder Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Lateral Raise (Cable)"
+                  name = "Cable Lateral Raise"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Dips"
+                  name = "Triceps Dip"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
@@ -2076,42 +2094,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Stiff Leg Deadlift"
+                  name = "Barbell Stiff Leg Deadlift"
                   sets = 6
                   repetitions = List(8, 8, 5, 5, 3, 12)
-                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
-                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1, 1)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(8, 8, 8, 8)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Bulgarian Split Squat (Barbell)"
+                  name = "Barbell Bulgarian Squat"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Leg Press"
+                  name = "Sled 45° Leg Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Hamstring Curl"
+                  name = "Lever Seated Leg Curl"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
@@ -2125,42 +2143,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bent Over Row (Barbell)"
+                  name = "Barbell Bent-over Row"
                   sets = 6
                   repetitions = List(8, 8, 5, 5, 3, 12)
-                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
-                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1, 1)
                 }
                 new {
-                  name = "Seated Wide-Grip Row"
+                  name = "Cable Wide Grip Seated Row"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Lat Pulldown (Single Arm)"
+                  name = "Cable One Arm Pulldown"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Pullover (Dumbbell)"
+                  name = "Cable Pullover"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Preacher Curl (Barbell)"
+                  name = "Cable Preacher Curl"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Alternating Dumbbell Curl"
+                  name = "Bayesian Curl"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
@@ -2181,42 +2199,42 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Close Grip)"
+                  name = "Barbell Bench Press"
                   sets = 6
                   repetitions = List(8, 8, 5, 5, 3, 12)
-                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
-                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1, 1)
                 }
                 new {
-                  name = "Incline Bench Press (Barbell)"
+                  name = "Barbell Incline Bench Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Chest Press (Machine)"
+                  name = "Lever Chest Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Chest Fly (Dumbbell)"
+                  name = "Cable Standing Fly"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Overhead Extension (Dumbbell)"
+                  name = "Cable Triceps Extension"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
@@ -2230,35 +2248,35 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "High Bar Squat (Barbell)"
+                  name = "Barbell Full Squat"
                   sets = 6
                   repetitions = List(8, 8, 5, 5, 3, 12)
-                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9)
-                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1)
+                  targetRatePerceivedEffort = List(9, 9, 9, 9, 9, 9)
+                  targetRepetitionsInReserve = List(1, 1, 1, 1, 1, 1)
                 }
                 new {
-                  name = "Hack Squat"
+                  name = "Sled 45° Leg Press"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Romanian Deadlift (Dumbbell)"
+                  name = "Romanian Deadlift"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
                   targetRepetitionsInReserve = List(1, 1, 1, 1)
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   sets = 4
                   repetitions = List(10, 8, 6, 12)
                   targetRatePerceivedEffort = List(9, 9, 9, 9)
@@ -2286,23 +2304,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Push Press (Barbell)"
+                  name = "Barbell Shoulder Press"
                   setScheme = setScheme9A
                 }
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   setScheme = setScheme9B
                 }
                 new {
-                  name = "Dips (Weighted)"
+                  name = "Weighted Triceps Dip"
                   setScheme = setScheme9B
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   setScheme = setScheme9C
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   setScheme = setScheme9D
                 }
               }
@@ -2313,19 +2331,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "13\" Deadlift"
+                  name = "Block Pull"
                   setScheme = setScheme9A
                 }
                 new {
-                  name = "Paused Romanian Deadlift"
+                  name = "Romanian Deadlift"
                   setScheme = setScheme9B
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   setScheme = setScheme9C
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   setScheme = setScheme9D
                 }
               }
@@ -2340,11 +2358,11 @@ program: Program = new Program {
                   setScheme = setScheme9A
                 }
                 new {
-                  name = "T-Bar Row"
+                  name = "Lever T-bar Row (plate loaded)"
                   setScheme = setScheme9B
                 }
                 new {
-                  name = "Behind-the-Neck Lat Pulldown"
+                  name = "Cable Pulldown"
                   setScheme = setScheme9C
                 }
                 new {
@@ -2363,23 +2381,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Wide Grip)"
+                  name = "Barbell Wide Grip Bench Press"
                   setScheme = setScheme9A
                 }
                 new {
-                  name = "Floor Press (Barbell)"
+                  name = "Barbell Floor Press"
                   setScheme = setScheme9B
                 }
                 new {
-                  name = "Incline Bench Press (Dumbbell)"
+                  name = "Dumbbell Incline Bench Press"
                   setScheme = setScheme9C
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   setScheme = setScheme9B
                 }
                 new {
-                  name = "Tricep Rope Push Down (Cable)"
+                  name = "Cable Pushdown (with rope attachment)"
                   setScheme = setScheme9C
                 }
               }
@@ -2390,19 +2408,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Squat"
+                  name = "Barbell Full Squat"
                   setScheme = setScheme9A
                 }
                 new {
-                  name = "Squat"
+                  name = "Barbell Front Squat"
                   setScheme = setScheme9B
                 }
                 new {
-                  name = "Single Leg Press"
+                  name = "Sled Single Leg 45° Leg Press"
                   setScheme = setScheme9C
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   setScheme = setScheme9C
                 }
               }
@@ -2420,23 +2438,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Push Press (Barbell)"
+                  name = "Barbell Shoulder Press"
                   setScheme = setScheme10A
                 }
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Dips (Weighted)"
+                  name = "Weighted Triceps Dip"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   setScheme = setScheme10D
                 }
               }
@@ -2447,19 +2465,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "13\" Deadlift"
+                  name = "Block Pull"
                   setScheme = setScheme10A
                 }
                 new {
-                  name = "Paused Romanian Deadlift"
+                  name = "Romanian Deadlift"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   setScheme = setScheme10D
                 }
               }
@@ -2474,11 +2492,11 @@ program: Program = new Program {
                   setScheme = setScheme10A
                 }
                 new {
-                  name = "T-Bar Row"
+                  name = "Lever T-bar Row (plate loaded)"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Behind-the-Neck Lat Pulldown"
+                  name = "Cable Pulldown"
                   setScheme = setScheme10C
                 }
                 new {
@@ -2497,23 +2515,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Wide Grip)"
+                  name = "Barbell Wide Grip Bench Press"
                   setScheme = setScheme10A
                 }
                 new {
-                  name = "Floor Press (Barbell)"
+                  name = "Barbell Floor Press"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Incline Bench Press (Dumbbell)"
+                  name = "Dumbbell Incline Bench Press"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Tricep Rope Push Down (Cable)"
+                  name = "Cable Pushdown (with rope attachment)"
                   setScheme = setScheme10C
                 }
               }
@@ -2524,19 +2542,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Squat"
+                  name = "Barbell Full Squat"
                   setScheme = setScheme10A
                 }
                 new {
-                  name = "Squat"
+                  name = "Barbell Front Squat"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Single Leg Press"
+                  name = "Sled Single Leg 45° Leg Press"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   setScheme = setScheme10C
                 }
               }
@@ -2554,23 +2572,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Push Press (Barbell)"
+                  name = "Barbell Shoulder Press"
                   setScheme = setScheme11A
                 }
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Dips (Weighted)"
+                  name = "Weighted Triceps Dip"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   setScheme = setScheme10D
                 }
               }
@@ -2581,19 +2599,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "13\" Deadlift"
+                  name = "Block Pull"
                   setScheme = setScheme11A
                 }
                 new {
-                  name = "Paused Romanian Deadlift"
+                  name = "Romanian Deadlift"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   setScheme = setScheme10D
                 }
               }
@@ -2608,11 +2626,11 @@ program: Program = new Program {
                   setScheme = setScheme11A
                 }
                 new {
-                  name = "T-Bar Row"
+                  name = "Lever T-bar Row (plate loaded)"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Behind-the-Neck Lat Pulldown"
+                  name = "Cable Pulldown"
                   setScheme = setScheme10C
                 }
                 new {
@@ -2631,23 +2649,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Wide Grip)"
+                  name = "Barbell Wide Grip Bench Press"
                   setScheme = setScheme11A
                 }
                 new {
-                  name = "Floor Press (Barbell)"
+                  name = "Barbell Floor Press"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Incline Bench Press (Dumbbell)"
+                  name = "Dumbbell Incline Bench Press"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Tricep Rope Push Down (Cable)"
+                  name = "Cable Pushdown (with rope attachment)"
                   setScheme = setScheme10C
                 }
               }
@@ -2658,19 +2676,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Squat"
+                  name = "Barbell Full Squat"
                   setScheme = setScheme11A
                 }
                 new {
-                  name = "Squat"
+                  name = "Barbell Front Squat"
                   setScheme = setScheme10B
                 }
                 new {
-                  name = "Single Leg Press"
+                  name = "Sled Single Leg 45° Leg Press"
                   setScheme = setScheme10C
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   setScheme = setScheme10C
                 }
               }
@@ -2688,23 +2706,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Push Press (Barbell)"
+                  name = "Barbell Shoulder Press"
                   setScheme = setScheme12A
                 }
                 new {
-                  name = "Seated Military Press (Barbell)"
+                  name = "Barbell Seated Military Press"
                   setScheme = setScheme12B
                 }
                 new {
-                  name = "Dips (Weighted)"
+                  name = "Weighted Triceps Dip"
                   setScheme = setScheme12B
                 }
                 new {
-                  name = "Skull Crusher"
+                  name = "Barbell Lying Triceps Extension 'Skull Crusher'"
                   setScheme = setScheme12C
                 }
                 new {
-                  name = "Cable Pushdown (with V-bar) (Cable)"
+                  name = "Cable Pushdown (with V-bar)"
                   setScheme = setScheme12D
                 }
               }
@@ -2715,19 +2733,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "13\" Deadlift"
+                  name = "Block Pull"
                   setScheme = setScheme12A
                 }
                 new {
-                  name = "Paused Romanian Deadlift"
+                  name = "Romanian Deadlift"
                   setScheme = setScheme12B
                 }
                 new {
-                  name = "Step-Up (Weighted)"
+                  name = "Dumbbell Step-up"
                   setScheme = setScheme12C
                 }
                 new {
-                  name = "Back Extension (Weighted)"
+                  name = "Weighted 45° Back Extension (on hyperextension apparatus)"
                   setScheme = setScheme12D
                 }
               }
@@ -2742,11 +2760,11 @@ program: Program = new Program {
                   setScheme = setScheme12A
                 }
                 new {
-                  name = "T-Bar Row"
+                  name = "Lever T-bar Row (plate loaded)"
                   setScheme = setScheme12B
                 }
                 new {
-                  name = "Behind-the-Neck Lat Pulldown"
+                  name = "Cable Pulldown"
                   setScheme = setScheme12C
                 }
                 new {
@@ -2765,23 +2783,23 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Bench Press (Wide Grip)"
+                  name = "Barbell Wide Grip Bench Press"
                   setScheme = setScheme12A
                 }
                 new {
-                  name = "Floor Press (Barbell)"
+                  name = "Barbell Floor Press"
                   setScheme = setScheme12B
                 }
                 new {
-                  name = "Incline Bench Press (Dumbbell)"
+                  name = "Dumbbell Incline Bench Press"
                   setScheme = setScheme12C
                 }
                 new {
-                  name = "Seated Dip (Machine)"
+                  name = "Machine-assisted Triceps Dip"
                   setScheme = setScheme12B
                 }
                 new {
-                  name = "Tricep Rope Push Down (Cable)"
+                  name = "Cable Pushdown (with rope attachment)"
                   setScheme = setScheme12C
                 }
               }
@@ -2792,19 +2810,19 @@ program: Program = new Program {
               notes {}
               advancedExercisesSets {
                 new {
-                  name = "Squat"
+                  name = "Barbell Full Squat"
                   setScheme = setScheme12A
                 }
                 new {
-                  name = "Squat"
+                  name = "Barbell Front Squat"
                   setScheme = setScheme12B
                 }
                 new {
-                  name = "Single Leg Press"
+                  name = "Sled Single Leg 45° Leg Press"
                   setScheme = setScheme12C
                 }
                 new {
-                  name = "Leg Extension"
+                  name = "Lever Leg Extension"
                   setScheme = setScheme12C
                 }
               }
