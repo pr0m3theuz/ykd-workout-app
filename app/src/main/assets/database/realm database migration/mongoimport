@@ -1,1 +1,0 @@
-mongoimport --uri  mongodb+srv://darronxportermongodb:HiKltkywihJk1I3x@cluster0.wdhjqhs.mongodb.net/AppDatabase  --collection  Workout  --type  JSON   --file  /home/pytheon/Downloads/workouts_202308111151.json
