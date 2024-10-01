@@ -592,12 +592,13 @@ class RealmDatabase {
 //    Log.i("deleteWorkout", "_workout.isManaged: ${_workout?.isManaged()}")
 //    Log.i("deleteWorkout", "_workout.isFrozen: ${_workout?.isFrozen()}")
 
-    realm.writeBlocking {
-      if (_workout != null) {
-        findLatest(_workout).also {
-          if (it != null) {
-            Log.i("deleteWorkout", "it.isFrozen: ${it.isFrozen()}")
-            delete(it)
+      realm.writeBlocking {
+        if (_workout != null) {
+          findLatest(_workout).also {
+            if (it != null) {
+              Log.i("deleteWorkout", "it.isFrozen: ${it.isFrozen()}")
+              delete(it)
+            }
           }
         }
       }
