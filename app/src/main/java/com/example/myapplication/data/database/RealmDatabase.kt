@@ -29,6 +29,7 @@ import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.Workouts
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.isFrozen
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
@@ -546,20 +547,59 @@ class RealmDatabase {
   }
 
   //  TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by
-  // using `MutableRealm/DynamicMutableRealm.findLatest(frozenObject)`.
-  /* Frozen objects cannot be deleted.
-  They must be converted to live objects first by using
-  `MutableRealm/DynamicMutableRealm.findLatest(frozenObject)`.
-  */
   suspend fun deleteWorkout(workout: Workout) {
-    workout.isManaged()
+//    Log.i("deleteWorkout", "workout.isManaged: ${workout.isManaged()}")
+//    Log.i("deleteWorkout", "workout.isFrozen: ${workout.isFrozen()}")
 
     val _workout =
       realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find()
+    val exercisesSets =
+      realm.query<ExerciseSets>("workoutID == $0 && owner_id == $1", workout._id, user.id).find()
+    val workoutNotes =
+      realm.query<WorkoutNote>("workout == $0 && owner_id == $1", workout._id, user.id).find()
+
+    exercisesSets.forEach { exerciseSet ->
+      val sets =
+        realm.query<Set>("exerciseSet == $0 && owner_id == $1", exerciseSet._id, user.id).find()
+      realm.writeBlocking {
+        sets.forEach { set ->
+          findLatest(set).also {
+            if (it != null) {
+              Log.i("deleteWorkout", "set.isFrozen: ${it.isFrozen()}")
+              delete(it)
+            }
+          }
+        }
+        findLatest(exerciseSet).also {
+          if (it != null) {
+            Log.i("deleteWorkout", "exerciseSets.isFrozen: ${it.isFrozen()}")
+            delete(it)
+          }
+        }
+      }
+    }
+
+    workoutNotes.forEach { note ->
+      realm.writeBlocking {
+        findLatest(note).also {
+          if (it != null) {
+            Log.i("deleteWorkout", "note.isFrozen: ${it.isFrozen()}")
+            delete(it)
+          }
+        }
+      }
+
+//    Log.i("deleteWorkout", "_workout.isManaged: ${_workout?.isManaged()}")
+//    Log.i("deleteWorkout", "_workout.isFrozen: ${_workout?.isFrozen()}")
 
     realm.writeBlocking {
       if (_workout != null) {
-        findLatest(_workout).also { delete(_workout) }
+        findLatest(_workout).also {
+          if (it != null) {
+            Log.i("deleteWorkout", "it.isFrozen: ${it.isFrozen()}")
+            delete(it)
+          }
+        }
       }
     }
   }

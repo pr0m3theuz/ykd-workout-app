@@ -291,7 +291,7 @@ fun WorkoutSummaryCard(
           val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
 
           Text(
-            text = "${exerciseSets.sets.size} × ${exercise?.name ?: ""}",
+            text = "${exerciseSets.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
             style = style,
             modifier = Modifier.weight(1f),
           )
