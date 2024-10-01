@@ -220,7 +220,7 @@ program: Program = new Program {
   mesocycles {
     new {
       name = "Week 1-4: Volumizing Phase"
-      description = #"5-day bodybuilding split that hits each body part twice a week. You'll be hitting weak points first, like triceps before delts and chest.\n\nThis is a volumizing phase, which starts off with just a few sets per exercise with high reps in week 1, but steadily increasing load over the next 3 weeks. By the end of week 4, you'll be conditioned for high volume training."#
+      description = "5-day bodybuilding split that hits each body part twice a week. You'll be hitting weak points first, like triceps before delts and chest.\n\nThis is a volumizing phase, which starts off with just a few sets per exercise with high reps in week 1, but steadily increasing load over the next 3 weeks. By the end of week 4, you'll be conditioned for high volume training."
       order = 1
       microcycles {
         new {

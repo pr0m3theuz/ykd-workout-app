@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
+import com.example.myapplication.components.DiscardWorkoutDialog
+import com.example.myapplication.components.Screens
 import com.example.myapplication.components.WorkoutNameDialog
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
@@ -66,7 +68,7 @@ fun WorkoutContent(
 ) {
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
-//  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
+  //  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
 
   val (editable, setEditable) = remember { mutableStateOf(true) }
 
@@ -78,13 +80,14 @@ fun WorkoutContent(
     navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount")
   }
 
-//  if (openFinishWorkoutDialog) {
-//    FinishWorkoutButton(navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
-//    openFinishWorkoutDialog = false
-//  }
+  //  if (openFinishWorkoutDialog) {
+  //    FinishWorkoutButton(navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
+  //    openFinishWorkoutDialog = false
+  //  }
 
   val openFinishWorkoutDialog = remember { mutableStateOf(false) }
   val openPartialFinishWorkoutDialog = remember { mutableStateOf(false) }
+  val openCancelWorkoutDialog = remember { mutableStateOf(false) }
 
   fun closePartialFinishWorkoutDialog() {
     openPartialFinishWorkoutDialog.value = false
@@ -94,11 +97,16 @@ fun WorkoutContent(
     openFinishWorkoutDialog.value = false
   }
 
+  fun closeDiscardWorkoutDialog() {
+    openFinishWorkoutDialog.value = false
+  }
+
   fun openFinishWorkoutDialog() {
-    if (workoutViewModel.checkAllSetsComplete()) {
-      openFinishWorkoutDialog.value = true
-    } else {
-      openPartialFinishWorkoutDialog.value = true
+    val (countSetsCompleted, countSets) = workoutViewModel.checkAllSetsComplete()
+    when (countSetsCompleted) {
+      countSets -> openFinishWorkoutDialog.value = true
+      in 1..<countSets -> openPartialFinishWorkoutDialog.value = true
+      else -> openCancelWorkoutDialog.value = true
     }
   }
 
@@ -106,16 +114,25 @@ fun WorkoutContent(
     FinishWorkoutDialog(
       navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() },
       openDialog = { closeFinishWorkoutDialog() },
-      confirmFinishWorkout = { workoutViewModel.finishWorkout() }
+      confirmFinishWorkout = { workoutViewModel.finishWorkout() },
     )
   }
-
 
   if (openPartialFinishWorkoutDialog.value) {
     PartialFinishWorkoutDialog(
       navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() },
       openDialog = { closePartialFinishWorkoutDialog() },
-      confirmFinishWorkout = { workoutViewModel.finishWorkout() }
+      confirmFinishWorkout = { workoutViewModel.finishWorkout() },
+    )
+  }
+
+  if (openCancelWorkoutDialog.value) {
+    DiscardWorkoutDialog(
+      openDialog = { closeDiscardWorkoutDialog() },
+      cancelWorkout = {
+        workoutViewModel.cancelWorkout()
+        navController.popBackStack(Screens.Workout.route, inclusive = true)
+      },
     )
   }
 
@@ -131,15 +148,15 @@ fun WorkoutContent(
     }
   }
 
-//  PredictiveBackHandler(enabled = exercisesSets.isEmpty()) { progress: Flow<BackEventCompat> ->
-//    callback.preparePop()
-//    try {
-//      progress.collect { backEvent -> callback.updateProgress(backEvent.progress) }
-//      callback.popBackStack()
-//    } catch (e: CancellationException) {
-//      callback.cancelPop()
-//    }
-//  }
+  //  PredictiveBackHandler(enabled = exercisesSets.isEmpty()) { progress: Flow<BackEventCompat> ->
+  //    callback.preparePop()
+  //    try {
+  //      progress.collect { backEvent -> callback.updateProgress(backEvent.progress) }
+  //      callback.popBackStack()
+  //    } catch (e: CancellationException) {
+  //      callback.cancelPop()
+  //    }
+  //  }
 
   Scaffold(
     topBar = {

@@ -27,10 +27,11 @@ fun FinishWorkoutButton(
     }
 
     fun openFinishWorkoutDialog() {
-        if (workoutViewModel.checkAllSetsComplete()) {
-            openFinishWorkoutDialog.value = true
-        } else {
-            openPartialFinishWorkoutDialog.value = true
+        val (countSetsCompleted, countSets) = workoutViewModel.checkAllSetsComplete()
+        when (countSetsCompleted) {
+            countSets -> openFinishWorkoutDialog.value = true
+            in 1..<countSets -> openPartialFinishWorkoutDialog.value = true
+            else -> {}
         }
     }
 

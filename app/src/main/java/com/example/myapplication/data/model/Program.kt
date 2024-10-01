@@ -46,6 +46,8 @@ class Program() : RealmObject {
   var shortDescription: String? = null
   var description: String? = null
   var uri: String? = null
+  var imageUri: String? = null
+  var imageFont: String? = null
   var level: String? = null
   var programEquipment: String? = null
   var daysPerWeek: String? = null

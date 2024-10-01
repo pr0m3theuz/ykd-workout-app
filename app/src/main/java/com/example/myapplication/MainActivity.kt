@@ -12,17 +12,30 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -90,7 +103,7 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       MyApplicationTheme {
-        TestScreen()
+//        TestScreen()
 
         val navController = rememberNavController()
 
@@ -190,9 +203,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
       )
     }
 
-    composable(
-      "previewNextWorkout/{workoutID}"
-    ) { navBackStackEntry ->
+    composable("previewNextWorkout/{workoutID}") { navBackStackEntry ->
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       //      val workoutID = "66cb82f4e1a3eb29e7c411e6"
 
@@ -308,18 +319,47 @@ private fun TestScreen() {
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      AsyncImage(
-        model = "https://i.pinimg.com/736x/de/6f/da/de6fda600cc48c291a6823e8a09bf94b.jpg",
-        contentDescription = null,
-      )
+      val provider =
+        GoogleFont.Provider(
+          providerAuthority = "com.google.android.gms.fonts",
+          providerPackage = "com.google.android.gms",
+          certificates = R.array.com_google_android_gms_fonts_certs,
+        )
 
-      Button(
-        onClick = {
-          throw RuntimeException("Test Crash") // Force a crash
-        }
-      ) {
-        Text(text = "Test Crash")
+      val fontName = GoogleFont("East Sea Dokdo")
+
+      val fontFamily = FontFamily(Font(googleFont = fontName, fontProvider = provider))
+
+      Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(250.dp), contentAlignment = Alignment.Center) {
+        AsyncImage(
+          contentScale = ContentScale.FillWidth,
+          alignment = Alignment.TopCenter,
+          model = "https://i.pinimg.com/originals/b0/61/b6/b061b61f7fe227a9dacd5d5dd67390d3.jpg",
+          contentDescription = null,
+          colorFilter = ColorFilter.tint(Color.LightGray, BlendMode.Modulate),
+        )
+        val fontSize = MaterialTheme.typography.headlineLarge.fontSize.times(4)
+        Text(
+          text = "RAIDER",
+          style =
+          TextStyle(
+            color = Color.White,
+            fontSize = MaterialTheme.typography.headlineLarge.fontSize.times(4),
+            fontWeight = FontWeight.Bold,
+            fontFamily = fontFamily,
+          ),
+        )
       }
+
+      //      Button(
+      //        onClick = {
+      //          throw RuntimeException("Test Crash") // Force a crash
+      //        }
+      //      ) {
+      //        Text(text = "Test Crash")
+      //      }
     }
   }
 }

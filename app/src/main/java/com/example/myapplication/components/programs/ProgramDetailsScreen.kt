@@ -25,7 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.MoreVert
@@ -59,22 +58,35 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import coil.compose.AsyncImage
+import com.example.myapplication.R
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Mesocycle
@@ -115,25 +127,6 @@ fun ProgramDetailsScreen(
       programMicrocycles,
     )
   }
-
-  /*  programsViewModel.getMicrocycleByID()
-  programsViewModel.getWorkoutsByMicrocycleID()
-
-  val microcycle by programsViewModel.selectedMicrocycle.collectAsStateWithLifecycle(null)
-  val workouts by programsViewModel.selectedWorkouts.collectAsStateWithLifecycle()
-
-  Scaffold { padding ->
-    Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())) {
-      microcycle?.let { microcycle ->
-      Text(text = Json.encodeToString(Microcycle.serializer(), microcycle))}
-
-      workouts.forEach { workout ->
-        Text(text = workout.name ?: "No Name")
-        Text(text = Json.encodeToString(Workout.serializer(), workout))
-      }
-    }
-  }*/
-
 }
 
 // TODO Add animatedVisibility Function to expand more/less buttons
@@ -148,11 +141,10 @@ fun ProgramDetailsLayout(
   mesocycles: List<Mesocycle>,
   microcycles: List<Microcycle>,
 ) {
-  val padding8 = 8.dp
+
   val titleMedium = MaterialTheme.typography.titleLarge
   val onSurface = MaterialTheme.colorScheme.onSurface
 
-  val context = LocalContext.current
   val scrollState = rememberScrollState()
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val titles = listOf("Overview", "Mesocycles", "Workouts")
@@ -195,13 +187,9 @@ fun ProgramDetailsLayout(
     floatingActionButton = {
       if (!programActive || startButtonPressed) {
         ExtendedFloatingActionButton(
-          onClick = { /*TODO*/
+          onClick = {
             if (!startButtonPressed) {
               programsViewModel.startNewProgram(program = program)
-
-              //                    Toast.makeText(context, "TODO Implement Start Program",
-              // Toast.LENGTH_SHORT)
-              //                        .show()
               setStartButtonPressed(true)
             }
           }
@@ -211,6 +199,12 @@ fun ProgramDetailsLayout(
       }
     },
   ) { contentPadding ->
+    val provider = GoogleFont.Provider(
+      providerAuthority = "com.google.android.gms.fonts",
+      providerPackage = "com.google.android.gms",
+      certificates = R.array.com_google_android_gms_fonts_certs
+    )
+
     Column(
       Modifier
         .padding(contentPadding)
@@ -218,15 +212,53 @@ fun ProgramDetailsLayout(
         .fillMaxHeight()
         .verticalScroll(scrollState)
     ) {
-      Row(
-        Modifier
-          .fillMaxWidth()
-          .padding(padding8), horizontalArrangement = Arrangement.Center) {
-        Icon(
-          imageVector = Icons.Outlined.BrokenImage,
-          contentDescription = "Missing Image",
-          tint = MaterialTheme.colorScheme.primary,
-        )
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        /*      BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center,)
+              {
+                val height = constraints.maxWidth*/
+        program.imageUri?.isNotBlank().let {
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(200.dp),
+            contentAlignment = Alignment.Center
+          ) {
+            AsyncImage(
+              contentScale = ContentScale.Crop,
+              alignment = Alignment.TopCenter,
+              model = program.imageUri,
+              contentDescription = null,
+              colorFilter = ColorFilter.tint(
+                color = Color.LightGray,
+                blendMode = BlendMode.Modulate
+              ),
+            )
+            if (!program.imageFont.isNullOrBlank()) {
+              val fontName = GoogleFont(program.imageFont ?: "Montserrat")
+
+              val fontFamily = FontFamily(
+                Font(googleFont = fontName, fontProvider = provider)
+              )
+
+              Text(
+                text = program.name?.uppercase() ?: "",
+                style = TextStyle(
+                  color = Color.White,
+                  fontSize = MaterialTheme.typography.displayLarge.fontSize,
+                  fontWeight = FontWeight.Bold,
+                  fontFamily = fontFamily,
+                )
+              )
+            }
+          }
+        }
+//        }
+
+        /*        Icon(
+                  imageVector = Icons.Outlined.BrokenImage,
+                  contentDescription = "Missing Image",
+                  tint = MaterialTheme.colorScheme.primary,
+                )*/
       }
 
       TabRow(
@@ -299,8 +331,8 @@ fun OverviewTab(
 ) {
   //  Log.i("OverviewTab", "microcycles: $microcycles")
   Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-    CoachsCard(program = program)
     ProgramOverviewCard(program = program)
+//    CoachsCard(program = program)
     ProgramDescriptionCard(program = program)
     WorkoutOverviewCard(microcycles = microcycles /*programsViewModel = programsViewModel*/)
     Spacer(modifier = Modifier.height(60.dp))
@@ -336,9 +368,9 @@ fun WorkoutsTab(
 @Composable
 fun CoachsCard(program: Program) {
   val padding = 12.dp
+  val titleLarge = MaterialTheme.typography.titleLarge
   val titleMedium = MaterialTheme.typography.titleMedium
-  val titleSmall = MaterialTheme.typography.titleSmall
-  val bodySmall = MaterialTheme.typography.bodySmall
+  val bodyMedium = MaterialTheme.typography.bodyMedium
 
   Card() {
     SelectionContainer {
@@ -347,16 +379,13 @@ fun CoachsCard(program: Program) {
         .padding(padding)) {
         Row(modifier = Modifier.fillMaxWidth()) {
           Column(modifier = Modifier.padding(bottom = 8.dp)) {
-            Text(text = "Coach Overview", style = titleSmall)
+            Text(text = "Coach Overview", style = titleLarge)
           }
         }
-        Row(modifier = Modifier.fillMaxWidth()) {
-          Column() { Text(text = program.author ?: "Coach Name", style = titleSmall) }
-        }
-        program.shortDescription?.isNotBlank().let {
-          Row(modifier = Modifier.fillMaxWidth()) {
-            Column() { Text(text = program.shortDescription ?: "", style = bodySmall) }
-          }
+        Row(modifier = Modifier
+          .fillMaxWidth()
+          .padding(bottom = 8.dp)) {
+          Column() { Text(text = program.author ?: "Coach Name", style = titleMedium) }
         }
       }
     }
@@ -366,11 +395,19 @@ fun CoachsCard(program: Program) {
 @Composable
 fun ProgramOverviewCard(program: Program) {
   val padding = 12.dp
-  val spacedByPadding = 4.dp
   val titleMedium = MaterialTheme.typography.titleMedium
-  val titleSmall = MaterialTheme.typography.titleSmall
-  val labelMedium = MaterialTheme.typography.labelMedium
-  val bodySmall = MaterialTheme.typography.bodySmall
+  val labelMedium = MaterialTheme.typography.bodyMedium
+  val bodyMedium = MaterialTheme.typography.bodyMedium
+
+  val textLinkStyles =
+    TextLinkStyles(
+      style =
+      SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        fontStyle = FontStyle.Italic,
+        textDecoration = TextDecoration.Underline,
+      )
+    )
 
   Card() {
     Column(modifier = Modifier
@@ -378,39 +415,84 @@ fun ProgramOverviewCard(program: Program) {
       .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
-          Text(text = "Program Overview", style = titleSmall)
+          Text(
+            modifier = Modifier.padding(bottom = 8.dp),
+            text = "Program Overview",
+            style = titleMedium
+          )
+          val annotatedString = program.name?.length?.let {
+            buildAnnotatedString {
+              append(program.name ?: "")
+              addLink(
+                url = LinkAnnotation.Url(url = program.uri ?: "", styles = textLinkStyles),
+                start = 0,
+                end = it,
+              )
+              addStringAnnotation(tag = "URL", annotation = program.uri ?: "", start = 0, end = it)
+            }
+          }
+          if (!annotatedString.isNullOrBlank()) {
+            Text(text = annotatedString, style = bodyMedium, fontWeight = FontWeight.Bold)
+          }
+          program.author?.let { Text(text = it, style = bodyMedium) }
         }
       }
       //      Body
       Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Column() {
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) { Text(text = "Level", style = labelMedium) }
             Column(modifier = Modifier.weight(1f)) {
-              Text(text = program.level ?: "Description", style = bodySmall)
-            }
-          }
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) { Text(text = "Equipment", style = labelMedium) }
-            Column(modifier = Modifier.weight(1f)) {
-              Text(text = program.programEquipment ?: "Description", style = bodySmall)
-            }
-          }
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-              Text(text = "Days Per Week", style = labelMedium)
+              Text(
+                text = "Level",
+                style = labelMedium,
+                fontWeight = FontWeight.Bold
+              )
             }
             Column(modifier = Modifier.weight(1f)) {
-              Text(text = program.daysPerWeek ?: "Description", style = bodySmall)
+              Text(text = program.level ?: "", style = bodyMedium)
             }
           }
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-              Text(text = "Program Length", style = labelMedium)
+              Text(
+                text = "Equipment",
+                style = labelMedium,
+                fontWeight = FontWeight.Bold
+              )
             }
             Column(modifier = Modifier.weight(1f)) {
-              Text(text = program.programLength ?: "Description", style = bodySmall)
+              Text(text = program.programEquipment ?: "", style = bodyMedium)
             }
+          }
+          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+              Text(text = "Days Per Week", style = labelMedium, fontWeight = FontWeight.Bold)
+            }
+            Column(modifier = Modifier.weight(1f)) {
+              Text(text = program.daysPerWeek ?: "", style = bodyMedium)
+            }
+          }
+          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+              Text(text = "Program Length", style = labelMedium, fontWeight = FontWeight.Bold)
+            }
+            Column(modifier = Modifier.weight(1f)) {
+              Text(text = program.programLength ?: "", style = bodyMedium)
+            }
+          }
+        }
+      }
+
+      program.shortDescription?.isNotBlank().let {
+        val shortDescription = program.shortDescription ?: ""
+        Row(modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 8.dp)) {
+          Column() {
+            Text(
+              text = createAnnotatedLinkString(shortDescription, textLinkStyles),
+              style = bodyMedium
+            )
           }
         }
       }
@@ -421,11 +503,9 @@ fun ProgramOverviewCard(program: Program) {
 @Composable
 fun ProgramDescriptionCard(program: Program) {
   val padding = 12.dp
-  val spacedByPadding = 4.dp
   val titleMedium = MaterialTheme.typography.titleMedium
-  val titleSmall = MaterialTheme.typography.titleSmall
   val labelMedium = MaterialTheme.typography.labelMedium
-  val bodySmall = MaterialTheme.typography.bodyMedium
+  val bodyMedium = MaterialTheme.typography.bodyMedium
 
   val textLinkStyles =
     TextLinkStyles(
@@ -446,7 +526,7 @@ fun ProgramDescriptionCard(program: Program) {
       .padding(padding)) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
-          Text(text = "Program Description", style = titleSmall)
+          Text(text = "Program Description", style = titleMedium)
         }
       }
 
@@ -455,16 +535,16 @@ fun ProgramDescriptionCard(program: Program) {
           Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
             program.description?.let { description ->
               if (expanded) {
-                // Text(text = description, style = bodySmall)
+                // Text(text = description, style = bodyMedium)
                 Text(
                   text = createAnnotatedLinkString(description, textLinkStyles),
-                  style = bodySmall,
+                  style = bodyMedium,
                 )
               } else {
 
                 Text(
                   text = createAnnotatedLinkString(description, textLinkStyles),
-                  style = bodySmall,
+                  style = bodyMedium,
                   maxLines = 20,
                   overflow = TextOverflow.Ellipsis,
                 )
@@ -493,11 +573,10 @@ fun WorkoutOverviewCard(
   //  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
   val padding = 12.dp
-  val spacedByPadding = 4.dp
+
   val titleMedium = MaterialTheme.typography.titleMedium
-  val titleSmall = MaterialTheme.typography.titleSmall
   val labelMedium = MaterialTheme.typography.labelMedium
-  val bodySmall = MaterialTheme.typography.bodySmall
+  val bodyMedium = MaterialTheme.typography.bodyMedium
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val scrollState = rememberScrollState()
@@ -516,7 +595,7 @@ fun WorkoutOverviewCard(
         .fillMaxWidth()
         .padding(padding)) {
         Row(modifier = Modifier.fillMaxWidth()) {
-          Text(text = "Workout Overview", style = titleSmall)
+          Text(text = "Workout Overview", style = titleMedium)
         }
 
         ScrollableTabRow(
@@ -544,8 +623,7 @@ fun WorkoutOverviewCard(
             workouts
               .sortedBy { it.day }
               .forEachIndexed { index, workout ->
-                //              Log.i("WorkoutOverviewCard", workout.toString())
-                WorkoutDayCard(index, workout /*programsViewModel*/)
+                WorkoutDayCard(index, workout)
               }
           }
         }
@@ -563,14 +641,11 @@ fun WorkoutDayCard(
   val padding = 12.dp
   val spacedByPadding = 12.dp
   val titleMedium = MaterialTheme.typography.titleMedium
-  val titleSmall = MaterialTheme.typography.titleSmall
   val labelMedium = MaterialTheme.typography.labelMedium
-  val bodySmall = MaterialTheme.typography.bodySmall
+  val bodyMedium = MaterialTheme.typography.bodyMedium
   val cardColors = CardDefaults.cardColors()
 
   val exercisesSets = workout.exercisesSets
-  //  Log.i("WorkoutDayCard", "Workout: ${ Json.encodeToString(workout) }")
-  //  Log.i("WorkoutDayCard ExercisesSets", "${ Json.encodeToString(exercisesSets[0]) }")
 
   ElevatedCard() {
     Column(modifier = Modifier
@@ -590,7 +665,6 @@ fun WorkoutDayCard(
           .forEachIndexed { index, exerciseSets ->
             ExerciseOverview(
               index = index,
-              //            exerciseID = entry.key,
               exerciseSets = exerciseSets,
             )
             Spacer(modifier = Modifier.height(spacedByPadding))
@@ -603,17 +677,12 @@ fun WorkoutDayCard(
 @Composable
 fun ExerciseOverview(
   index: Int,
-  //  exerciseID: Long,
   exerciseSets: ExerciseSets,
   programsViewModel: ProgramsViewModel = koinViewModel(),
 ) {
   val labelMedium = MaterialTheme.typography.labelMedium
-
   val exercise = exerciseSets.exerciseID
   val exerciseName = programsViewModel.getExerciseNameByID(exerciseID = exercise)
-  //  Log.i("ExerciseOverview", "exerciseSets: ${Json.encodeToString(exerciseSets)}")
-  //  Log.i("ExerciseOverview", "exercise ID: $exercise")
-  //  Log.i("ExerciseOverview", "exercise name: $exerciseName")
 
   exerciseName?.let {
     Row(modifier = Modifier
@@ -638,7 +707,7 @@ fun ExerciseOverview(
         textAlign = TextAlign.Center,
       )
     }
-    //  Log.i("ExerciseOverview", Json.encodeToString(exerciseSets.sets))
+
     exerciseSets.sets
       .sortedBy { it.setNumber }
       .forEach { set ->
@@ -651,9 +720,18 @@ fun ExerciseOverview(
               .padding(start = 8.dp),
           )
           Text(
-            text =
-            "${set.targetMinimumRepetitions} - ${set.targetMaximumRepetitions}"
-              .ifBlank { set.targetRepetitions.toString() },
+            text = when {
+              set.targetMinimumRepetitions != null && set.targetMaximumRepetitions != null ->
+                "${set.targetMinimumRepetitions} - ${set.targetMaximumRepetitions}"
+
+              set.targetMinimumRepetitions != null && set.targetMaximumRepetitions == null ->
+                "${set.targetMinimumRepetitions}"
+
+              set.targetMinimumRepetitions == null && set.targetMaximumRepetitions != null ->
+                "${set.targetMaximumRepetitions}"
+
+              else -> "-"
+            },
             style = labelMedium,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center,
@@ -675,16 +753,22 @@ fun MicrocycleCard(
   navController: NavController,
   microcycles: List<Microcycle>,
 ) {
-
   val context = LocalContext.current
   val padding = 12.dp
-  val spacedByPadding = 4.dp
   val titleMedium = MaterialTheme.typography.titleMedium
-  val titleSmall = MaterialTheme.typography.titleSmall
   val labelMedium = MaterialTheme.typography.labelMedium
-  val bodySmall = MaterialTheme.typography.bodySmall
-
+  val bodyMedium = MaterialTheme.typography.bodyMedium
   val cardColors = CardDefaults.cardColors()
+
+  val textLinkStyles =
+    TextLinkStyles(
+      style =
+      SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        fontStyle = FontStyle.Italic,
+        textDecoration = TextDecoration.Underline,
+      )
+    )
 
   fun getExpandCollapseIcon(visible: Boolean): ImageVector {
     return if (visible) {
@@ -743,19 +827,19 @@ fun MicrocycleCard(
                 val (expanded, onClick) = remember { mutableStateOf(false) }
                 val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
 
-                if (microcycle.description.isNullOrBlank()) {
-                } else {
+                if (!microcycle.description.isNullOrBlank()) {
                   Row(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+                      val description = microcycle.description ?: ""
                       if (expanded) {
                         Text(
-                          text = microcycle.description ?: "Description, Use Markdown Potentially",
-                          style = bodySmall,
+                          text = createAnnotatedLinkString(description, textLinkStyles),
+                          style = bodyMedium,
                         )
                       } else {
                         Text(
-                          text = microcycle.description ?: "Description, Use Markdown Potentially",
-                          style = bodySmall,
+                          text = createAnnotatedLinkString(description, textLinkStyles),
+                          style = bodyMedium,
                           maxLines = 20,
                           overflow = TextOverflow.Ellipsis,
                           onTextLayout = { textLayoutResult ->
@@ -821,14 +905,14 @@ fun MicrocycleCard(
                             if (workout.formatWorkoutDate().isNotEmpty()) {
                               Text(
                                 text = workout.formatWorkoutDate(),
-                                style = bodySmall,
+                                style = bodyMedium,
                                 modifier = Modifier.padding(horizontal = 4.dp),
                               )
                             }
                           }
                         }
 
-                        Text(text = "${workout.exercisesSets.size} Exercises", style = bodySmall)
+                        Text(text = "${workout.exercisesSets.size} Exercises", style = bodyMedium)
                       }
 
                       val workoutRoute = "workout?workoutID=${workout._id.toHexString()}"
@@ -882,14 +966,11 @@ fun MicrocycleCard(
 @Composable
 fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
 
-  val context = LocalContext.current
-  val padding = 12.dp
-  val spacedByPadding = 4.dp
-  val titleMedium = MaterialTheme.typography.titleMedium
-  val titleSmall = MaterialTheme.typography.titleSmall
-  val labelMedium = MaterialTheme.typography.labelMedium
-  val bodySmall = MaterialTheme.typography.bodySmall
 
+  val padding = 12.dp
+  val titleMedium = MaterialTheme.typography.titleMedium
+  val labelMedium = MaterialTheme.typography.labelMedium
+  val bodyMedium = MaterialTheme.typography.bodyMedium
   val cardColors = CardDefaults.cardColors()
 
   fun getExpandCollapseIcon(visible: Boolean): ImageVector {
@@ -906,6 +987,16 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
         rememberSaveable { mutableStateOf(!activeProgram && index == 0) }
 
       //      TODO Figure out a way to show the most recent microcycle with completed workouts
+
+      val textLinkStyles =
+        TextLinkStyles(
+          style =
+          SpanStyle(
+            color = MaterialTheme.colorScheme.primary,
+            fontStyle = FontStyle.Italic,
+            textDecoration = TextDecoration.Underline,
+          )
+        )
 
       Card() {
         Column(modifier = Modifier
@@ -950,25 +1041,25 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
               Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val (expanded, onClick) = remember { mutableStateOf(false) }
                 val (showShowMoreButton, unhideShowMoreButton) = remember { mutableStateOf(false) }
-                if (mesocycle.description.isNullOrBlank()) {
-                } else {
+                if (!mesocycle.description.isNullOrBlank()) {
                   Row(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
-                      Text(text = "Mesocycle Description", style = titleSmall)
+                      Text(text = "Mesocycle Description", style = titleMedium)
                     }
                   }
 
                   Row(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
+                      val description = mesocycle.description ?: ""
                       if (expanded) {
                         Text(
-                          text = mesocycle.description ?: "Description, Use Markdown Potentially",
-                          style = bodySmall,
+                          text = createAnnotatedLinkString(description, textLinkStyles),
+                          style = bodyMedium,
                         )
                       } else {
                         Text(
-                          text = mesocycle.description ?: "Description, Use Markdown Potentially",
-                          style = bodySmall,
+                          text = createAnnotatedLinkString(description, textLinkStyles),
+                          style = bodyMedium,
                           maxLines = 20,
                           overflow = TextOverflow.Ellipsis,
                           onTextLayout = { textLayoutResult ->
@@ -1039,13 +1130,13 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
                         ) {
                           Text(
                             text = "Date Completed", // TODO Add date of completion
-                            style = bodySmall,
+                            style = bodyMedium,
                             modifier = Modifier.padding(horizontal = 4.dp),
                           )
                         }
                       }
 
-                      Text(text = "${microcycle.workouts.size} Workouts", style = bodySmall)
+                      Text(text = "${microcycle.workouts.size} Workouts", style = bodyMedium)
                     }
                   }
                 }
@@ -1059,34 +1150,156 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
 }
 
 fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): AnnotatedString {
-  val pattern = "<a href=\"(.*?)\">(.*?)</a>".toRegex()
-  var currentIndex = 0
-  var fullText = ""
+  val linkPattern = "<a href=\"(.*?)\">(.*?)</a>".toRegex()
+  val boldPattern = "<b>(.*?)</b>".toRegex()
+  val headerPattern = "<h1>(.*?)</h1>".toRegex()
+  val olPattern = "<ol>(.*?)</ol>".toRegex(RegexOption.DOT_MATCHES_ALL)
+  val ulPattern = "<ul>(.*?)</ul>".toRegex(RegexOption.DOT_MATCHES_ALL)
+  val liPattern = "<li>(.*?)</li>".toRegex()
+
+  var fullText: String
   val fullTextList = mutableListOf<String>()
   val links = mutableListOf<Quadruple<String, String, Int, Int>>()
+  val spans = mutableListOf<Quadruple<String, Any, Int, Int>>()
 
-  pattern.findAll(text).forEach { matchResult ->
-    val (url, linkText) = matchResult.destructured
-    val startIndex = matchResult.range.first
-    val endIndex = matchResult.range.last + 1
+  fun processPattern(pattern: Regex, style: SpanStyle, text: String): String {
+    var currentIndex = 0
+    var updatedText = ""
+    println("Pattern: $pattern")
+    pattern.findAll(text, currentIndex).forEach { matchResult ->
+      println("Match Result: ${matchResult.value}")
 
-    fullText += text.substring(currentIndex, startIndex) + linkText
-    fullTextList.add(text.substring(currentIndex, startIndex))
-    fullTextList.add(linkText)
-    links.add(Quadruple(url, linkText, fullText.length - linkText.length, fullText.length))
-    currentIndex = endIndex
+      val (content) = matchResult.destructured
+      println("Content: $content")
+      val startIndex = matchResult.range.first
+      val endIndex = matchResult.range.last + 1
+
+      updatedText += text.substring(currentIndex, startIndex) + content
+
+      spans.add(
+        Quadruple(
+          matchResult.groupValues[1],
+          style,
+          updatedText.length - content.length,
+          updatedText.length,
+        )
+      )
+      currentIndex = endIndex
+    }
+    updatedText += text.substring(currentIndex)
+    return updatedText
   }
 
-  fullText += text.substring(currentIndex)
+  fun processLinkPattern(pattern: Regex, text: String): String {
+    var currentIndex = 0
+    var updatedText = ""
+    linkPattern.findAll(text, currentIndex).forEach { matchResult ->
+      val (url, linkText) = matchResult.destructured
+      val startIndex = matchResult.range.first
+      val endIndex = matchResult.range.last + 1
+
+      updatedText += text.substring(currentIndex, startIndex) + linkText
+      fullTextList.add(text.substring(currentIndex, startIndex))
+      fullTextList.add(linkText)
+      links.add(Quadruple(url, linkText, updatedText.length - linkText.length, updatedText.length))
+      currentIndex = endIndex
+    }
+    updatedText += text.substring(currentIndex)
+    return updatedText
+  }
+
+  fun processList(pattern: Regex, isOrdered: Boolean, style: Any, text: String): String {
+    var currentIndex = 0
+    var updatedText = ""
+    println("Pattern: $pattern")
+    pattern.findAll(text, currentIndex).forEach { matchResult ->
+      val listContent = matchResult.groupValues[1]
+      val startIndex = matchResult.range.first
+      val endIndex = matchResult.range.last + 1
+      var listText = ""
+      updatedText += text.substring(currentIndex, startIndex) + "\n"
+
+      val listStart = updatedText.length
+
+      var itemNumber = 1
+      liPattern.findAll(listContent).forEach { liMatch ->
+        val itemContent = liMatch.groupValues[1]
+        val bulletPoint = if (isOrdered) "${itemNumber++}. " else "• "
+        listText += bulletPoint + itemContent + "\n"
+        updatedText += bulletPoint + itemContent + "\n"
+        //        println("List Full Text: $fullText")
+      }
+
+      spans.add(Quadruple(listText, style, listStart, updatedText.length))
+      currentIndex = endIndex
+    }
+    updatedText += text.substring(currentIndex)
+    return updatedText
+  }
+
+  fullText = processLinkPattern(linkPattern, text)
+  fullText = processPattern(boldPattern, SpanStyle(fontWeight = FontWeight.Bold), fullText)
+  fullText = processPattern(headerPattern, SpanStyle(fontWeight = FontWeight.Bold), fullText)
+  fullText =
+    processList(
+      olPattern,
+      true,
+      ParagraphStyle(textIndent = TextIndent(firstLine = 10.sp, restLine = 24.sp)),
+      fullText,
+    )
+  fullText =
+    processList(
+      ulPattern,
+      false,
+      ParagraphStyle(textIndent = TextIndent(firstLine = 10.sp, restLine = 18.sp)),
+      fullText,
+    )
+
+  // fullText += text.substring(currentIndex)
+
+  fun removeHtmlTags(html: String): String {
+    val tagPattern = "<[^>]+>".toRegex()
+    return html
+      .replace(tagPattern, "")
+      .replace("&amp;", "&")
+      .replace("&lt;", "<")
+      .replace("&gt;", ">")
+      .replace("&quot;", "\"")
+      .replace("&#39;", "'")
+  }
+
+  spans.forEachIndexed { index, (content, style, startIndex, endIndex) ->
+    val start = fullText.lastIndexOf(content)
+    val end = start + content.length
+
+    spans[index] = Quadruple(content, style, start, end)
+  }
+
+  links.forEachIndexed { index, (url, linkText, startIndex, endIndex) ->
+    val start = fullText.lastIndexOf(linkText)
+    val end = start + linkText.length
+
+    links[index] = Quadruple(url, linkText, start, end)
+  }
 
   val annotatedString = buildAnnotatedString {
     append(fullText)
+
+    spans.forEach { (content, style, startIndex, endIndex) ->
+      println("span content: $content")
+      when (style) {
+        is SpanStyle -> addStyle(style = style, start = startIndex, end = endIndex)
+        is ParagraphStyle -> addStyle(style = style, start = startIndex, end = endIndex)
+      }
+    }
+
     links.forEach { (url, linkText, startIndex, endIndex) ->
       addLink(
         url = LinkAnnotation.Url(url = url, styles = textLinkStyles),
         start = startIndex,
         end = endIndex,
       )
+      addStringAnnotation(tag = "URL", annotation = url, start = startIndex, end = endIndex)
     }
   }
 
@@ -1094,20 +1307,22 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
 
   println("Full Text:\n\n $fullText\n\n~~~~~~~~~\n\n")
 
-  fullTextList.forEachIndexed { index, it -> println("Text $index: $it") }
+  //  fullTextList.forEachIndexed { index, it -> println("Text $index: $it") }
 
-  links.forEach { (url, linkText, start, end) ->
-    println("URL: $url")
-    println("Link Text: $linkText")
-    println("Start: $start")
-    println("End: $end")
-    /* spannableString.setSpan(
-        URLSpan(url),
-        start,
-        end,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-    )*/
-  }
+  println("\n\n~~~~~~~~~\n\n")
+
+  //  links.forEach { (url, linkText, start, end) ->
+  //    println("URL: $url")
+  //    println("Link Text: $linkText")
+  //    println("Start: $start")
+  //    println("End: $end")
+  //    /* spannableString.setSpan(
+  //        URLSpan(url),
+  //        start,
+  //        end,
+  //        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+  //    )*/
+  //  }
 
   //  println(annotatedString)
   return annotatedString

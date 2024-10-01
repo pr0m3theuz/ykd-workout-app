@@ -903,7 +903,7 @@ class WorkoutViewModel(
     viewModelScope.launch { exerciseRepository.updateExercise(exercise) }
   }
 
-  fun checkAllSetsComplete(): Boolean {
+  fun checkAllSetsComplete(): Pair<Int, Int> {
     var countSets: Int = 0
     var countSetsCompleted: Int = 0
 
@@ -916,7 +916,7 @@ class WorkoutViewModel(
       }
     }
 
-    return countSetsCompleted == countSets && countSets > 0
+    return Pair(countSetsCompleted, countSets)
   }
 
   fun saveExerciseNote(note: ExerciseNote) {
