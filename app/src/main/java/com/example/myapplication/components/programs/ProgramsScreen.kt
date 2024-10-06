@@ -131,9 +131,9 @@ fun ProgramsScreen(
     LazyColumn(
       contentPadding = contentPadding,
       modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .padding(horizontal = 12.dp),
+          .fillMaxWidth()
+          .fillMaxHeight()
+          .padding(horizontal = 12.dp),
       //      verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       stickyHeader { WorkoutSearchBar() }
@@ -161,8 +161,8 @@ fun ProgramsScreen(
           activePrograms[page].let { program ->
             Column(
               modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 0.dp),
+                  .fillMaxWidth()
+                  .padding(vertical = 0.dp),
               //              verticalArrangement = Arrangement.spacedBy(padding8)
             ) {
               if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
@@ -191,9 +191,9 @@ fun ProgramsScreen(
           }
         }
         Row(
-          Modifier
-            .height(20.dp)
-            .fillMaxWidth(),
+            Modifier
+                .height(20.dp)
+                .fillMaxWidth(),
           //                    .align(Alignment.BottomCenter),
           //          verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Center
@@ -203,10 +203,10 @@ fun ProgramsScreen(
             val color =
               if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
             Box(modifier = Modifier
-              .padding(2.dp)
-              .clip(CircleShape)
-              .background(color)
-              .size(8.dp))
+                .padding(2.dp)
+                .clip(CircleShape)
+                .background(color)
+                .size(8.dp))
           }
         }
       }
@@ -427,13 +427,13 @@ fun WorkoutCard() {
   Card(
     modifier =
     Modifier
-      .padding(vertical = padding)
-      .clickable { /* TODO Navigate to Workout Details Screen */ }
+        .padding(vertical = padding)
+        .clickable { /* TODO Navigate to Workout Details Screen */ }
   ) {
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
+          .fillMaxWidth()
+          .padding(padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.Top
     ) {
@@ -450,8 +450,8 @@ fun WorkoutCard() {
       }
     }
     Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 16.dp, bottom = padding)) {
+        .fillMaxWidth()
+        .padding(start = 16.dp, bottom = padding)) {
       Column() {
         // TODO List Exercises
         Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
@@ -468,16 +468,16 @@ fun ProgramCard(navController: NavController, program: Program) {
   Card(
     modifier =
     Modifier
-      .padding(vertical = padding)
-      .clickable {
-        /* TODO Navigate to Program Details Screen */
-        navController.navigate("programDetails/${program._id.toHexString()}")
-      }
+        .padding(vertical = padding)
+        .clickable {
+            /* TODO Navigate to Program Details Screen */
+            navController.navigate("programDetails/${program._id.toHexString()}")
+        }
   ) {
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
+          .fillMaxWidth()
+          .padding(padding),
       horizontalArrangement = Arrangement.Center,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -489,8 +489,8 @@ fun ProgramCard(navController: NavController, program: Program) {
     }
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, bottom = padding),
+          .fillMaxWidth()
+          .padding(start = 16.dp, bottom = padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.Bottom
     ) {
@@ -526,8 +526,8 @@ fun CurrentProgramCard(
   Card(modifier = Modifier.padding(vertical = padding)) {
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = padding),
+          .fillMaxWidth()
+          .padding(start = padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -537,11 +537,11 @@ fun CurrentProgramCard(
         style = MaterialTheme.typography.titleMedium,
         modifier =
         Modifier
-          .clickable {
-            /* TODO Navigate to Program Details Screen */
-            navController.navigate("programDetails/${program._id.toHexString()}")
-          }
-          .weight(1f, fill = true)
+            .clickable {
+                /* TODO Navigate to Program Details Screen */
+                navController.navigate("programDetails/${program._id.toHexString()}")
+            }
+            .weight(1f, fill = true)
       )
       Box {
         IconButton(onClick = { setExpandMenu(true) }) {
@@ -564,9 +564,9 @@ fun CurrentProgramCard(
     Row(
       modifier =
       Modifier
-        .fillMaxWidth()
-        .padding(horizontal = padding)
-        .padding(top = 12.dp, bottom = 2.dp),
+          .fillMaxWidth()
+          .padding(horizontal = padding)
+          .padding(top = 12.dp, bottom = 2.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -599,16 +599,16 @@ fun CurrentProgramCard(
     }
 
     Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = padding)) {
+        .fillMaxWidth()
+        .padding(horizontal = padding)) {
       Column() {
         // TODO List Exercises
         //        Text("Workout Summary", style = bodySmall)
         workout.exercisesSets.forEach { exerciseSets ->
           Row(
             modifier = Modifier
-              .fillMaxWidth()
-              .padding(2.dp),
+                .fillMaxWidth()
+                .padding(2.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
@@ -636,7 +636,9 @@ fun CurrentProgramCard(
                 )
                 Text(
                   text =
-                  "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps",
+                  if (!exerciseSets.sets.maxBy {
+                          it.repetitions ?: 0
+                      }.targetRepetitions.isNullOrBlank()) "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps" else "-",
                   style = bodySmall,
                   textAlign = TextAlign.Center,
                   modifier = Modifier.weight(weight = 1f, fill = true)
@@ -661,8 +663,8 @@ fun CurrentProgramCard(
 
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
+          .fillMaxWidth()
+          .padding(padding),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {

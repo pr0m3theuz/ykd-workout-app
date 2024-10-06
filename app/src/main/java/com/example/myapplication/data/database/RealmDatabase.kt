@@ -692,6 +692,8 @@ class RealmDatabase {
           mesocycles = insertedMesocycles
           isPublic = false
           owner_id = user.id // TODO figure out if this is needed
+            imageUri = program.imageUri
+            imageFont = program.imageFont
         }
       )
     }

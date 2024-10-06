@@ -261,12 +261,12 @@ fun SetContentFrame(
     previousSet()
 
     val boxModifier: Modifier =
-      Modifier
-        .align(Alignment.CenterVertically)
-        .padding(4.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(textFieldBackgroundColor)
-        .wrapContentSize(Alignment.Center)
+        Modifier
+            .align(Alignment.CenterVertically)
+            .padding(4.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(textFieldBackgroundColor)
+            .wrapContentSize(Alignment.Center)
     val textFieldModifier: Modifier = Modifier
 
     val textStyle =
@@ -298,8 +298,17 @@ fun SetContentFrame(
         keyboardActions = KeyboardActions(onNext = { focusRequester.requestFocus() }),
         cursorBrush = cursorBrush,
       )
-      if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
-        Text(text = targetWeight, color = MaterialTheme.colorScheme.outline)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
+                Text(
+                    text = targetWeight,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
       }
     }
 
@@ -321,8 +330,14 @@ fun SetContentFrame(
         onValueChange = { onRepsChange(it.take(4).trim()) },
         cursorBrush = cursorBrush,
       )
-      if (!targetReps.isNullOrBlank() && repetitionsText.isBlank()) {
-        Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (!targetReps.isNullOrBlank() && repetitionsText.isBlank()) {
+                Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
+            }
       }
     }
 
@@ -361,10 +376,20 @@ fun SetContentFrame(
         value = repetitionsInReserveText,
         onValueChange = { onRIRChange(it.take(4).trim()) },
         cursorBrush = cursorBrush,
+          decorationBox = { innerTextField ->
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.Center
+              ) {
+                  if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
+                      Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
+                  }
+              }
+              innerTextField()
+          },
       )
-      if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
-        Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
-      }
+
     }
 
     setCompleteCheckbox(Modifier)
@@ -412,8 +437,8 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
   Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
     Button(
       modifier = Modifier
-        .padding(8.dp)
-        .size(32.dp),
+          .padding(8.dp)
+          .size(32.dp),
       shape = RoundedCornerShape(size = 8.dp),
       contentPadding = PaddingValues(0.dp),
       onClick = { expandedSetTypeOptionsDropdownMenu = true },
@@ -505,12 +530,12 @@ private fun ExerciseWeightTextField(
   Box(
     modifier =
     boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //      .align(Alignment.CenterVertically)
-      //      .width(96.dp)
-      .wrapContentSize(Alignment.Center),
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(textFieldBackgroundColor)
+        //      .align(Alignment.CenterVertically)
+        //      .width(96.dp)
+        .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center,
   ) {
@@ -550,12 +575,12 @@ private fun ExerciseRepsTextField(
   Box(
     modifier =
     boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //        .align(Alignment.CenterVertically)
-      //        .width(96.dp)
-      .wrapContentSize(Alignment.Center),
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(textFieldBackgroundColor)
+        //        .align(Alignment.CenterVertically)
+        //        .width(96.dp)
+        .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center,
   ) {
@@ -609,12 +634,12 @@ private fun RIRTextField(
   Box(
     modifier =
     boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //      .align(Alignment.CenterVertically)
-      //        .width(40.dp)
-      .wrapContentSize(Alignment.Center),
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(textFieldBackgroundColor)
+        //      .align(Alignment.CenterVertically)
+        //        .width(40.dp)
+        .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center,
   ) {

@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import com.example.myapplication.components.programs.createAnnotatedLinkString
+import com.example.myapplication.utils.createAnnotatedLinkString
 import net.jqwik.api.Example
 
 class ProgramDetailsScreenKtTest {
@@ -99,5 +99,71 @@ class ProgramDetailsScreenKtTest {
     @Example
     fun createAnnotatedLinkStringTest() {
         println("ProgramDetailsScreenKtTest: " + createAnnotatedLinkString(text, null))
+    }
+
+    val inputText = """
+    <h1>Workout Plan</h1>
+    Follow this nested list for a comprehensive workout:
+    <ol>
+        <li>Warm-up
+            <ul>
+                <li>Light cardio (5 minutes)</li>
+                <li>Dynamic stretching</li>
+            </ul>
+        </li>
+        <li>Main workout
+            <ol>
+                <li>Upper body
+                    <ul>
+                        <li>Push-ups (3 sets of 10)</li>
+                        <li>Pull-ups (3 sets of 5)</li>
+                    </ul>
+                </li>
+                <li>Lower body
+                    <ul>
+                        <li>Squats (3 sets of 12)</li>
+                        <li>Lunges (3 sets of 10 per leg)</li>
+                    </ul>
+                </li>
+            </ol>
+        </li>
+        <li>Cool-down
+            <ul>
+                <li>Light stretching</li>
+                <li>Deep breathing exercises</li>
+            </ul>
+        </li>
+    </ol>
+    Remember to stay hydrated throughout your workout!
+""".trimIndent()
+
+    @Example
+    fun `nested list`() {
+        println("nested list: " + createAnnotatedLinkString(inputText, null))
+    }
+
+    val warmUpText = """
+<ol>
+    <li>Begin with a 20RM+ weight for the first exercise and do it for around 10 reps.</li>
+    <li>Do at least 1 weight halfway between your 2ORM+ and your planned working weight for a set of ~5 reps.</li>
+    The heavier the lift, the more sets of 8,6,4, etc. you do.<ol>
+        <li>0-50lbs: 1 intermediate set</li>
+        <li>50-200: 2 intermediate sets</li>
+        <li>200-400: 3 intermediate sets</li>
+        <li>As needed for bigger weights</li>
+    </ol>
+    <li>Do the working weight or 10% higher for 2-3 reps (potentiation)</li>
+    <li>For each NEW exercise after, if same muscle, do just:</li>
+    <ol>
+        <li>The 5 rep with weight halfway between 20RM+ and working weight</li>
+        <li>The working weight itself for 2-3 reps</li>
+    </ol>
+</ol>
+<a href="https://www.youtube.com/watch?v=HDq-68SlPgQ">How to Warm Up for Muscle Growth Training | Hypertrophy Made Simple #3</a>"""
+        .trimIndent()
+
+    @Example
+    fun `warm up description`() {
+        println("nested list:\n" + createAnnotatedLinkString(warmUpText, null))
     }
 }

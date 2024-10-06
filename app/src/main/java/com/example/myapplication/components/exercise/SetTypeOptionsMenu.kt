@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.example.myapplication.data.model.SetType
+import com.example.myapplication.utils.createAnnotatedLinkString
 
 // TODO Takes an Array List of Set Types
 // TODO Figure out colors for either text or box background
@@ -142,10 +143,26 @@ fun SetTypeOptionsMenu(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetTypeDescriptionDialog(setType: SetType, onDismissRequest: () -> Unit) {
+
+  val textLinkStyles =
+    TextLinkStyles(
+      style =
+      SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        fontStyle = FontStyle.Italic,
+        textDecoration = TextDecoration.Underline,
+      )
+    )
+
   AlertDialog(
     onDismissRequest = { onDismissRequest() },
     confirmButton = { /*TODO*/ },
     title = { Text(text = setType.name) },
-    text = { Text(text = setType.description) },
+    text = {
+      Text(
+        text = createAnnotatedLinkString(setType.description, textLinkStyles),
+        style = MaterialTheme.typography.bodySmall
+      )
+    },
   )
 }

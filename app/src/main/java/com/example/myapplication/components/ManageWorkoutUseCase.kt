@@ -415,6 +415,13 @@ class ManageWorkoutUseCase(
                   percentage1RM = exerciseSets.sets.last().percentage1RM
                   isPublic = false
                   owner_id = currentUser.id
+                  targetWeightPounds = exerciseSets.sets.last().targetWeightPounds
+                  targetWeightKilograms = exerciseSets.sets.last().targetWeightKilograms
+                  targetRepetitions = exerciseSets.sets.last().targetRepetitions
+                  targetRepetitionsInReserve = exerciseSets.sets.last().targetRepetitionsInReserve
+                  targetRatePerceivedEffort = exerciseSets.sets.last().targetRatePerceivedEffort
+                  progressionSchemeID = exerciseSets.sets.last().progressionSchemeID
+
                 }
       } else {
         listOf(

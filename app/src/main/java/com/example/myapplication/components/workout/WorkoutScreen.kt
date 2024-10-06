@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.DiscardWorkoutDialog
-import com.example.myapplication.components.Screens
 import com.example.myapplication.components.WorkoutNameDialog
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
@@ -130,8 +129,9 @@ fun WorkoutContent(
     DiscardWorkoutDialog(
       openDialog = { closeDiscardWorkoutDialog() },
       cancelWorkout = {
+          closeDiscardWorkoutDialog()
         workoutViewModel.cancelWorkout()
-        navController.popBackStack(Screens.Workout.route, inclusive = true)
+          navController.navigateUp()
       },
     )
   }
@@ -197,8 +197,8 @@ fun WorkoutContent(
     Column(Modifier.padding(contentPadding)) {
       Row(
         modifier = Modifier
-          .padding(start = 8.dp)
-          .fillMaxWidth(),
+            .padding(start = 8.dp)
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {
