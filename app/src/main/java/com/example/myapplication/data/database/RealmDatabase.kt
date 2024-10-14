@@ -29,7 +29,6 @@ import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.Workouts
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.isFrozen
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
@@ -548,8 +547,8 @@ class RealmDatabase {
 
   //  TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by
   suspend fun deleteWorkout(workout: Workout) {
-//    Log.i("deleteWorkout", "workout.isManaged: ${workout.isManaged()}")
-//    Log.i("deleteWorkout", "workout.isFrozen: ${workout.isFrozen()}")
+    //    Log.i("deleteWorkout", "workout.isManaged: ${workout.isManaged()}")
+    //    Log.i("deleteWorkout", "workout.isFrozen: ${workout.isFrozen()}")
 
     val _workout =
       realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find()
@@ -559,20 +558,18 @@ class RealmDatabase {
       realm.query<WorkoutNote>("workout == $0 && owner_id == $1", workout._id, user.id).find()
 
     exercisesSets.forEach { exerciseSet ->
-      val sets =
-        realm.query<Set>("exerciseSet == $0 && owner_id == $1", exerciseSet._id, user.id).find()
       realm.writeBlocking {
-        sets.forEach { set ->
+        exerciseSet.sets.forEach { set ->
           findLatest(set).also {
             if (it != null) {
-              Log.i("deleteWorkout", "set.isFrozen: ${it.isFrozen()}")
+              Log.i("deleteWorkout", "set: ${it._id}")
               delete(it)
             }
           }
         }
         findLatest(exerciseSet).also {
           if (it != null) {
-            Log.i("deleteWorkout", "exerciseSets.isFrozen: ${it.isFrozen()}")
+            Log.i("deleteWorkout", "exerciseSets: ${it._id}")
             delete(it)
           }
         }
@@ -583,20 +580,20 @@ class RealmDatabase {
       realm.writeBlocking {
         findLatest(note).also {
           if (it != null) {
-            Log.i("deleteWorkout", "note.isFrozen: ${it.isFrozen()}")
+            Log.i("deleteWorkout", "note: ${it._id}")
             delete(it)
           }
         }
       }
 
-//    Log.i("deleteWorkout", "_workout.isManaged: ${_workout?.isManaged()}")
-//    Log.i("deleteWorkout", "_workout.isFrozen: ${_workout?.isFrozen()}")
+      //    Log.i("deleteWorkout", "_workout.isManaged: ${_workout?.isManaged()}")
+      //    Log.i("deleteWorkout", "_workout.isFrozen: ${_workout?.isFrozen()}")
 
-      realm.writeBlocking {
-        if (_workout != null) {
+      if (_workout != null) {
+        realm.writeBlocking {
           findLatest(_workout).also {
             if (it != null) {
-              Log.i("deleteWorkout", "it.isFrozen: ${it.isFrozen()}")
+              Log.i("deleteWorkout", "it.isFrozen: ${it._id}")
               delete(it)
             }
           }
@@ -692,8 +689,8 @@ class RealmDatabase {
           mesocycles = insertedMesocycles
           isPublic = false
           owner_id = user.id // TODO figure out if this is needed
-            imageUri = program.imageUri
-            imageFont = program.imageFont
+          imageUri = program.imageUri
+          imageFont = program.imageFont
         }
       )
     }
@@ -707,13 +704,88 @@ class RealmDatabase {
     _program.isManaged()
     realm.write {
       val program =
-        realm
-          .query<Program>("programID == $0 && owner_id == $1", _program._id, user.id)
-          .first()
-          .find()
+        realm.query<Program>("_id == $0 && owner_id == $1", _program._id, user.id).first().find()
       if (program != null) {
         delete(program)
       }
+    }
+  }
+
+  suspend fun deleteActiveProgram(_program: Program) {
+    // TODO write functions to delete mesocycles, microcycles, workouts, exercisesSets from active
+    // program
+    _program.isManaged()
+    val program =
+      realm
+        .query<Program>("_id == $0 && owner_id == $1 && active == true", _program._id, user.id)
+        .first()
+        .find()
+
+    val mesocycles = realm.query<Mesocycle>("programID == $0", _program._id).find()
+    val microcycles = realm.query<Microcycle>("programID == $0", _program._id).find()
+    val workouts = realm.query<Workout>("programID == $0", _program._id).find()
+
+    Log.i("deleteActiveProgram", "program id: ${program?._id}")
+    Log.i("deleteActiveProgram", "mesocycles: ${mesocycles.size}")
+    Log.i("deleteActiveProgram", "microcycles: ${microcycles.size}")
+    Log.i("deleteActiveProgram", "workouts: ${workouts.size}")
+
+    /*workouts.forEach { workout ->
+      val workoutID = workout._id
+      Log.i("deleteActiveProgram", "workout: ${workout._id}")
+      val exercisesSets =
+        realm.query<ExerciseSets>("workoutID == $0 && owner_id == $1", workoutID, user.id).find()
+      val workoutNotes =
+        realm.query<WorkoutNote>("workout == $0 && owner_id == $1", workoutID, user.id).find()
+
+      exercisesSets.forEach { exercisesSet ->
+        Log.i("deleteActiveProgram", "exerciseSet: ${exercisesSet._id}")
+
+        exercisesSet.sets.forEach { set ->
+          Log.i("deleteActiveProgram", "set: ${set._id}")
+          realm.writeBlocking {
+            findLatest(set).also {
+              if (it != null) {
+                Log.i("deleteWorkout", "set.isFrozen: ${it.isFrozen()}")
+                delete(it)
+              }
+            }
+          }
+        }
+        realm.writeBlocking {
+          findLatest(exercisesSet).also {
+            if (it != null) {
+              delete(it)
+            }
+          }
+        }
+      }
+
+      workoutNotes.forEach { note ->
+        realm.writeBlocking {
+          findLatest(note).also {
+            if (it != null) {
+              delete(it)
+            }
+          }
+        }
+
+        realm.writeBlocking {
+          findLatest(workout).also {
+            if (it != null) {
+              delete(it)
+            }
+          }
+        }
+      }
+    }*/
+
+    workouts.forEach { workout -> deleteWorkout(workout) }
+    microcycles.forEach { microcycle -> deleteMicrocycle(microcycle) }
+    mesocycles.forEach { mesocycle -> deleteMesocycle(mesocycle) }
+
+    if (program != null) {
+      realm.writeBlocking { findLatest(program).also { if (it != null) delete(it) } }
     }
   }
 
@@ -778,15 +850,11 @@ class RealmDatabase {
 
   suspend fun deleteMesocycle(_mesocycle: Mesocycle) {
     _mesocycle.isManaged()
-    realm.write {
-      val mesocycle =
-        realm
-          .query<Mesocycle>("_id == $0 && owner_id == $1", _mesocycle._id, user.id)
-          .first()
-          .find()
-      if (mesocycle != null) {
-        delete(mesocycle)
-      }
+    val mesocycle =
+      realm.query<Mesocycle>("_id == $0 && owner_id == $1", _mesocycle._id, user.id).first().find()
+
+    if (mesocycle != null) {
+      realm.writeBlocking { findLatest(mesocycle).also { if (it != null) delete(it) } }
     }
   }
 
@@ -864,14 +932,16 @@ class RealmDatabase {
 
   suspend fun deleteMicrocycle(_microcycle: Microcycle) {
     _microcycle.isManaged()
-    realm.write {
-      val microcycle =
-        realm
-          .query<Mesocycle>("_id == $0 && owner_id == $1", _microcycle._id, user.id)
-          .first()
-          .find()
-      if (microcycle != null) {
-        delete(microcycle)
+    val microcycle =
+      realm.query<Mesocycle>("_id == $0 && owner_id == $1", _microcycle._id, user.id).first().find()
+
+    if (microcycle != null) {
+      realm.writeBlocking {
+        findLatest(microcycle).also {
+          if (it != null) {
+            delete(it)
+          }
+        }
       }
     }
   }
@@ -1345,7 +1415,10 @@ class RealmDatabase {
               ratePerceivedEffort = set.ratePerceivedEffort
               repetitionsInReserve = set.repetitionsInReserve
               targetWeightPounds = set.targetWeightPounds
+              targetWeightKilograms = set.targetWeightKilograms
               targetRepetitions = set.targetRepetitions
+              targetMinimumRepetitions = set.targetMinimumRepetitions
+              targetMaximumRepetitions = set.targetMaximumRepetitions
               targetRatePerceivedEffort = set.targetRatePerceivedEffort
               targetRepetitionsInReserve = set.targetRepetitionsInReserve
               percentage1RM = set.percentage1RM

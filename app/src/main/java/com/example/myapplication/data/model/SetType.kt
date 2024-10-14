@@ -35,81 +35,6 @@ data class SetType(
               description =
               "<ol><li>Begin with a 20RM+ weight for the first exercise and do it for around 10 reps.</li><li>Do at least 1 weight halfway between your 2ORM+ and your planned working weight for a set of ~5 reps.</li>The heavier the lift, the more sets of 8, 6, 4, etc. you do.<ol><li>0-50lbs: 1 intermediate set</li><li>50-200: 2 intermediate sets</li><li>200-400: 3 intermediate sets</li><li>As needed for bigger weights</li></ol><li>Do the working weight or 10% higher for 2-3 reps (potentiation)</li><li>For each NEW exercise after, if same muscle, do just:</li><ol><li>The 5 rep with weight halfway between 20RM+ and working weight</li><li>The working weight itself for 2-3 reps</li></ol></ol>`br`" +
                       """<a href="https://www.youtube.com/watch?v=HDq-68SlPgQ">How to Warm Up for Muscle Growth Training | Hypertrophy Made Simple #3</a>"""",
-
-              /*buildAnnotatedString {
-
-
-              val urlLink = "https://www.youtube.com/watch?v=HDq-68SlPgQ"
-              val url = "How to Warm Up for Muscle Growth Training | Hypertrophy Made Simple #3"
-              //            val title = "How to warm up\n\n"
-              val str = // Option 1
-                //                        "1. You CAN choose to do easy cardio for 5-10 minutes,
-                // or\n\n" +
-                "1. Begin with a 20RM+ weight for the first exercise and do it for around 10 reps\n\n" +
-                  "2. Do at least 1 weight halfway between your 2ORM+ and your planned working weight for a set of ~5 reps"
-              // Indented text with weight ranges
-
-              val list =
-                // Indented text with weight ranges
-                "\t\t\t• The heavier the lift, the more sets of 8,6,4, etc. you do\n" +
-                  "\t\t\t• 0-50lbs: 1 intermediate set\n" +
-                  "\t\t\t• 50-200: 2 intermediate sets\n" +
-                  "\t\t\t• 200-400: 3 intermediate sets\n" +
-                  "\t\t\t• As needed for bigger weights\n"
-
-              val str3 =
-                // Option 4
-                "3. Do the working weight or 10% higher for 2-3 reps (potentiation)\n\n" +
-
-                  // Option 5 - Emphasize "NEW"
-                  "4. For each NEW exercise after, if same muscle, do just:"
-
-              val list2 =
-                "\t\ta) The 5 rep with weight halfway between 20RM+ and working weight\n" +
-                  "\t\tb) The working weight itself for 2-3 reps\n"
-
-              //            Log.i("Warm Up Set", "Warm Up Set Description: $str")
-
-              val startIndex = (str + list + str3 + list2 + url).indexOf(url)
-              val endIndex = */
-              /*title.length +*/
-              /* startIndex + url.length
-
-                //            Log.i("Warm Up Set", "Warm Up Set Start Index: $startIndex")
-                //            Log.i("Warm Up Set", "Warm Up Set End Index: $endIndex")
-                //            append(title)
-
-                append(
-                  AnnotatedString(
-                    text = str,
-                    paragraphStyle = ParagraphStyle(textIndent = TextIndent(restLine = 15.sp)),
-                  )
-                )
-                append(
-                  AnnotatedString(
-                    text = list,
-                    paragraphStyle = ParagraphStyle(textIndent = TextIndent(restLine = 32.sp)),
-                  )
-                )
-                append(
-                  AnnotatedString(
-                    text = str3,
-                    paragraphStyle = ParagraphStyle(textIndent = TextIndent(restLine = 15.sp)),
-                  )
-                )
-                append(
-                  AnnotatedString(
-                    text = list2,
-                    paragraphStyle = ParagraphStyle(textIndent = TextIndent(restLine = 32.sp)),
-                  )
-                )
-                append(url)
-                addLink(
-                  url = LinkAnnotation.Url(url = urlLink, styles = textLinkStyles),
-                  start = startIndex,
-                  end = endIndex,
-                )
-              }*/
               darkTextColor = Color(255, 165, 61), /* Color: Orange */
               lightTextColor = Color(112, 66, 20),
           )
@@ -123,25 +48,6 @@ data class SetType(
             
 <a href="https://www.youtube.com/watch?v=51TKExRtxZM">How Get The Most Muscle Growth From Dropsets</a>"""
                   .trimIndent(),
-
-              /*            {
-                val urlLink = "https://www.youtube.com/watch?v=51TKExRtxZM"
-                val url = "How Get The Most Muscle Growth From Dropsets"
-                val str =
-                  "A technique for continuing an exercise with a lower weight once the target repetitions " +
-                    "or RIR/RPE has been achieved at a higher weight with minimal rest between sets. " +
-                    "Reduce the load by 10% to 30%.\n\n" +
-                    url
-                val startIndex = str.indexOf(url)
-                val endIndex = startIndex + url.length
-                append(str)
-
-                addLink(
-                  LinkAnnotation.Url(url = urlLink, styles = textLinkStyles),
-                  startIndex,
-                  endIndex,
-                )
-              }*/
               lightTextColor = Color(0, 0, 139),
               darkTextColor = Color(0, 204, 255), /* Color: Purple */
           )
@@ -161,36 +67,6 @@ Example Myo Reps Set:<ol><li>Start by doing an activation set: Use a weight that
 <a href="https://www.youtube.com/watch?v=V71TGRQaLRs">Why Myoreps Are AWESOME</a> 
 """
                   .trimIndent(),
-
-              /*{
-                val urlLink = "https://www.youtube.com/watch?v=V71TGRQaLRs"
-                val url = "Why Myoreps Are AWESOME"
-                val str =
-                  "Myo reps is a form of “rest pause” training popularized by Borge Fagerli from Norway. " +
-                    "When performing the method you’re using a lighter weight, do a set close to failure and then take a brief pause between repetitions.\n"
-
-                val list =
-                  "Example Myo Reps Set\n" +
-                    "1. Start by doing an activation set: Use a weight that you can get between 12-15 reps with. " +
-                    "Then do as many reps as you can until you’re 1-2 repetitions away from failure.\n" +
-                    "2. After the activation set, rest 10-15 seconds\n" +
-                    "3. After the short rest do another set until you’re 1-2 reps away from failure.\n" +
-                    "4. Then rest another 10-15 seconds\n" +
-                    "5. Repeat this process until you no longer can get the same amount of reps on all " +
-                    "your “minisets”, or after you’ve reached 5 sets in total (4 minisets).\n"
-
-                val startIndex = (str + list + url).indexOf(url)
-                val endIndex = startIndex + url.length
-                append(str)
-                append(
-                  AnnotatedString(
-                    text = list,
-                    paragraphStyle = ParagraphStyle(textIndent = TextIndent(restLine = 15.sp)),
-                  )
-                )
-                append(url)
-                addLink(LinkAnnotation.Url(url = urlLink, textLinkStyles), startIndex, endIndex)
-              }*/
               lightTextColor = Color(106, 0, 232),
               darkTextColor = Color(204, 204, 255),
           )

@@ -1,5 +1,6 @@
 package com.example.myapplication.components.programs
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -60,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -85,7 +87,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProgramsScreen(
   navController: NavController,
-  programsViewModel: ProgramsViewModel = koinViewModel()
+  programsViewModel: ProgramsViewModel = koinViewModel(),
 ) {
   val padding8 = 8.dp
   val titleMedium = MaterialTheme.typography.titleMedium
@@ -114,26 +116,26 @@ fun ProgramsScreen(
         title = { Text(text = "Programs", style = MaterialTheme.typography.titleLarge) },
         navigationIcon = {
           /* IconButton(
-             onClick = { navController.navigateUp() },
-           ) {
-             Icon(
-               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-               tint = MaterialTheme.colorScheme.onSurface,
-               contentDescription = "Go to the previous screen"
-             )
-           }*/
+            onClick = { navController.navigateUp() },
+          ) {
+            Icon(
+              imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+              tint = MaterialTheme.colorScheme.onSurface,
+              contentDescription = "Go to the previous screen"
+            )
+          }*/
         },
-        actions = { ProgramDetailsOptionsDropdownMenu() }
+        actions = { ProgramDetailsOptionsDropdownMenu() },
       )
     },
-    bottomBar = { BottomNavigationBar(navController = navController) }
+    bottomBar = { BottomNavigationBar(navController = navController) },
   ) { contentPadding ->
     LazyColumn(
       contentPadding = contentPadding,
       modifier = Modifier
-          .fillMaxWidth()
-          .fillMaxHeight()
-          .padding(horizontal = 12.dp),
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .padding(horizontal = 12.dp),
       //      verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       stickyHeader { WorkoutSearchBar() }
@@ -156,29 +158,30 @@ fun ProgramsScreen(
         HorizontalPager(
           state = pagerState,
           pageSpacing = 8.dp,
-          contentPadding = PaddingValues(0.dp)
+          contentPadding = PaddingValues(0.dp),
         ) { page ->
           activePrograms[page].let { program ->
             Column(
               modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(vertical = 0.dp),
-              //              verticalArrangement = Arrangement.spacedBy(padding8)
+                .fillMaxWidth()
+                .padding(vertical = 0.dp)
+              // verticalArrangement = Arrangement.spacedBy(padding8)
             ) {
-              if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
+              if (activePrograms.isEmpty()) {
+                // TODO Change back to activeProgram == null
                 // Text("Start a Program", style = titleMedium)
                 // TODO No Active Programs Card
               } else {
                 // Text("Continue Program", style = titleMedium)
                 val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program._id)
-                //                  Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
+                // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
 
                 if (nextWorkout != null) {
                   CurrentProgramCard(
                     navController,
                     program,
                     nextWorkout,
-                    programsViewModel = programsViewModel
+                    programsViewModel = programsViewModel,
                   )
                 } else {
                   Text(
@@ -191,22 +194,22 @@ fun ProgramsScreen(
           }
         }
         Row(
-            Modifier
-                .height(20.dp)
-                .fillMaxWidth(),
+          Modifier
+            .height(20.dp)
+            .fillMaxWidth(),
           //                    .align(Alignment.BottomCenter),
           //          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Center
+          horizontalArrangement = Arrangement.Center,
         ) {
           repeat(pagerState.pageCount) { iteration ->
             val primary = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
             val color =
               if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
             Box(modifier = Modifier
-                .padding(2.dp)
-                .clip(CircleShape)
-                .background(color)
-                .size(8.dp))
+              .padding(2.dp)
+              .clip(CircleShape)
+              .background(color)
+              .size(8.dp))
           }
         }
       }
@@ -234,7 +237,7 @@ fun ProgramsScreen(
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           Text(text = "Programs", style = titleMedium)
 
@@ -243,13 +246,13 @@ fun ProgramsScreen(
               IconButton(onClick = { /*TODO*/ }) {
                 Icon(
                   imageVector = Icons.Outlined.FileUpload,
-                  contentDescription = "Import/Export New Program"
+                  contentDescription = "Import/Export New Program",
                 )
               }
               IconButton(onClick = { /*TODO*/ }) {
                 Icon(
                   imageVector = Icons.Outlined.CreateNewFolder,
-                  contentDescription = "Add New Program"
+                  contentDescription = "Add New Program",
                 )
               }
             }
@@ -261,7 +264,7 @@ fun ProgramsScreen(
         Button(onClick = { /*TODO*/ }) {
           Icon(
             imageVector = Icons.AutoMirrored.Outlined.Assignment,
-            contentDescription = "Add New Program"
+            contentDescription = "Add New Program",
           )
           Text(text = "New Program", Modifier.padding(start = 8.dp))
         }
@@ -271,19 +274,19 @@ fun ProgramsScreen(
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           IconButton(onClick = { setProgramVisible(!programVisible) }) {
             Icon(
               imageVector = getExpandCollapseIcon(programVisible),
-              contentDescription = "Show more programs"
+              contentDescription = "Show more programs",
             )
           }
           TextButton(
             onClick = { setProgramVisible(!programVisible) },
             modifier = Modifier.weight(1f),
             enabled = true,
-            contentPadding = PaddingValues(0.dp)
+            contentPadding = PaddingValues(0.dp),
             //            style = MaterialTheme.typography.bodySmall
           ) {
             Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
@@ -291,7 +294,7 @@ fun ProgramsScreen(
           IconButton(onClick = { /*TODO*/ }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
+              contentDescription = "Localized Description",
             )
           }
         }
@@ -302,7 +305,7 @@ fun ProgramsScreen(
           AnimatedVisibility(
             visible = programVisible,
             enter = expandVertically(animationSpec = tween(500)),
-            exit = shrinkVertically(animationSpec = tween(500))
+            exit = shrinkVertically(animationSpec = tween(500)),
           ) {
             ProgramCard(navController, program)
           }
@@ -312,7 +315,7 @@ fun ProgramsScreen(
           AnimatedVisibility(
             visible = programVisible,
             enter = expandVertically(animationSpec = tween(500)),
-            exit = shrinkVertically(animationSpec = tween(500))
+            exit = shrinkVertically(animationSpec = tween(500)),
           ) {
             Text("No Programs")
           }
@@ -323,19 +326,19 @@ fun ProgramsScreen(
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
             Icon(
               imageVector = getExpandCollapseIcon(mesocycleVisible),
-              contentDescription = "Show more mesocycles"
+              contentDescription = "Show more mesocycles",
             )
           }
           Text(text = "Mesocycle (###)")
           IconButton(onClick = { /*TODO*/ }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
+              contentDescription = "Localized Description",
             )
           }
         }
@@ -345,19 +348,19 @@ fun ProgramsScreen(
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
             Icon(
               imageVector = getExpandCollapseIcon(workoutVisible),
-              contentDescription = "Show more workouts"
+              contentDescription = "Show more workouts",
             )
           }
           Text(text = "Workouts (###)")
           IconButton(onClick = { /*TODO*/ }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
+              contentDescription = "Localized Description",
             )
           }
         }
@@ -367,7 +370,7 @@ fun ProgramsScreen(
         AnimatedVisibility(
           visible = workoutVisible,
           enter = expandVertically(animationSpec = tween(500)),
-          exit = shrinkVertically(animationSpec = tween(500))
+          exit = shrinkVertically(animationSpec = tween(500)),
         ) {
           WorkoutCard()
         }
@@ -389,8 +392,8 @@ fun WorkoutSearchBar() {
       inputFieldColors =
       TextFieldDefaults.colors(
         unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
-      )
+        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+      ),
     )
 
   SearchBar(
@@ -411,10 +414,10 @@ fun WorkoutSearchBar() {
       Icon(
         Icons.Default.Search,
         contentDescription = null,
-        tint = MaterialTheme.colorScheme.onSecondaryContainer
+        tint = MaterialTheme.colorScheme.onSecondaryContainer,
       )
     },
-    modifier = Modifier.fillMaxWidth()
+    modifier = Modifier.fillMaxWidth(),
   ) {}
 }
 
@@ -427,15 +430,16 @@ fun WorkoutCard() {
   Card(
     modifier =
     Modifier
-        .padding(vertical = padding)
-        .clickable { /* TODO Navigate to Workout Details Screen */ }
+      .padding(vertical = padding)
+      .clickable { /* TODO Navigate to Workout Details Screen */
+      }
   ) {
     Row(
       modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding),
+        .fillMaxWidth()
+        .padding(padding),
       horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.Top
+      verticalAlignment = Alignment.Top,
     ) {
       Column() {
         Text(text = "Workout Title", style = titleMedium)
@@ -450,8 +454,8 @@ fun WorkoutCard() {
       }
     }
     Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, bottom = padding)) {
+      .fillMaxWidth()
+      .padding(start = 16.dp, bottom = padding)) {
       Column() {
         // TODO List Exercises
         Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
@@ -468,31 +472,31 @@ fun ProgramCard(navController: NavController, program: Program) {
   Card(
     modifier =
     Modifier
-        .padding(vertical = padding)
-        .clickable {
-            /* TODO Navigate to Program Details Screen */
-            navController.navigate("programDetails/${program._id.toHexString()}")
-        }
+      .padding(vertical = padding)
+      .clickable {
+        /* TODO Navigate to Program Details Screen */
+        navController.navigate("programDetails/${program._id.toHexString()}")
+      }
   ) {
     Row(
       modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding),
+        .fillMaxWidth()
+        .padding(padding),
       horizontalArrangement = Arrangement.Center,
-      verticalAlignment = Alignment.CenterVertically
+      verticalAlignment = Alignment.CenterVertically,
     ) {
       Icon(
         imageVector = Icons.Outlined.BrokenImage,
         contentDescription = "Missing Image",
-        tint = MaterialTheme.colorScheme.primary
+        tint = MaterialTheme.colorScheme.primary,
       )
     }
     Row(
       modifier = Modifier
-          .fillMaxWidth()
-          .padding(start = 16.dp, bottom = padding),
+        .fillMaxWidth()
+        .padding(start = 16.dp, bottom = padding),
       horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.Bottom
+      verticalAlignment = Alignment.Bottom,
     ) {
       Column() {
         Text(text = program.name ?: "New Program", style = titleMedium)
@@ -512,12 +516,14 @@ fun CurrentProgramCard(
   navController: NavController,
   program: Program,
   workout: Workout,
-  programsViewModel: ProgramsViewModel
+  programsViewModel: ProgramsViewModel,
 ) {
   // TODO Get the next workout in the program
   // TODO Add programID to Workout
   // TODO Write query to get next workout in program
   val padding = 8.dp
+
+  val context = LocalContext.current
 
   val titleSmall = MaterialTheme.typography.titleSmall
   val (expandMenu, setExpandMenu) = remember { mutableStateOf(false) }
@@ -526,10 +532,10 @@ fun CurrentProgramCard(
   Card(modifier = Modifier.padding(vertical = padding)) {
     Row(
       modifier = Modifier
-          .fillMaxWidth()
-          .padding(start = padding),
+        .fillMaxWidth()
+        .padding(start = padding),
       horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+      verticalAlignment = Alignment.CenterVertically,
     ) {
       Text(
         text = program.name ?: "Program Name",
@@ -537,11 +543,11 @@ fun CurrentProgramCard(
         style = MaterialTheme.typography.titleMedium,
         modifier =
         Modifier
-            .clickable {
-                /* TODO Navigate to Program Details Screen */
-                navController.navigate("programDetails/${program._id.toHexString()}")
-            }
-            .weight(1f, fill = true)
+          .clickable {
+            /* TODO Navigate to Program Details Screen */
+            navController.navigate("programDetails/${program._id.toHexString()}")
+          }
+          .weight(1f, fill = true),
       )
       Box {
         IconButton(onClick = { setExpandMenu(true) }) {
@@ -550,8 +556,29 @@ fun CurrentProgramCard(
 
         DropdownMenu(expanded = expandMenu, onDismissRequest = { setExpandMenu(false) }) {
           // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
-          DropdownMenuItem(text = { Text(text = "Restart Program") }, onClick = { /*TODO*/ })
-          DropdownMenuItem(text = { Text(text = "Archive Program") }, onClick = { /*TODO*/ })
+          DropdownMenuItem(
+            text = { Text(text = "Restart Program") },
+            onClick = { /*TODO*/
+              Toast.makeText(context, "TODO Restart Program", Toast.LENGTH_SHORT).show()
+            },
+          )
+          DropdownMenuItem(
+            text = { Text(text = "Archive Program") },
+            onClick = { /*TODO*/
+              Toast.makeText(context, "TODO Archive Program", Toast.LENGTH_SHORT).show()
+            },
+          )
+          DropdownMenuItem(
+            text = { Text(text = "Delete Program") },
+            onClick = { /*TODO*/
+              val result = programsViewModel.deleteActiveProgram(program)
+              if (result.isSuccess) {
+                result.onSuccess { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+              } else {
+                result.onFailure { Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show() }
+              }
+            },
+          )
         }
       }
     }
@@ -559,67 +586,65 @@ fun CurrentProgramCard(
     Text(
       text = workout.name ?: "Workout Name",
       modifier = Modifier.padding(horizontal = 8.dp),
-      style = bodySmall
+      style = bodySmall,
     )
     Row(
       modifier =
       Modifier
-          .fillMaxWidth()
-          .padding(horizontal = padding)
-          .padding(top = 12.dp, bottom = 2.dp),
+        .fillMaxWidth()
+        .padding(horizontal = padding)
+        .padding(top = 12.dp, bottom = 2.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+      verticalAlignment = Alignment.CenterVertically,
     ) {
       Text(text = "Exercise", style = titleSmall, modifier = Modifier.weight(0.5f))
       Box(Modifier.weight(0.5f)) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceAround,
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
           Text(
             text = "Sets",
             style = titleSmall,
             textAlign = TextAlign.Center,
-            modifier = Modifier.weight(weight = 1f, fill = true)
+            modifier = Modifier.weight(weight = 1f, fill = true),
           )
           Text(
             text = "Top Set",
             style = titleSmall,
             textAlign = TextAlign.Center,
-            modifier = Modifier.weight(weight = 1f, fill = true)
+            modifier = Modifier.weight(weight = 1f, fill = true),
           )
           Text(
             text = "RIR",
             style = titleSmall,
             textAlign = TextAlign.Center,
-            modifier = Modifier.weight(weight = 1f, fill = true)
+            modifier = Modifier.weight(weight = 1f, fill = true),
           )
         }
       }
     }
 
     Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = padding)) {
+      .fillMaxWidth()
+      .padding(horizontal = padding)) {
       Column() {
         // TODO List Exercises
         //        Text("Workout Summary", style = bodySmall)
         workout.exercisesSets.forEach { exerciseSets ->
           Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(2.dp),
+              .fillMaxWidth()
+              .padding(2.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
           ) {
-//            Log.i("getExerciseNameByID", "exercise ID: " + exerciseSets.exerciseID?.toHexString())
+            //            Log.i("getExerciseNameByID", "exercise ID: " +
+            // exerciseSets.exerciseID?.toHexString())
             exerciseSets.exerciseID?.let {
               Text(
                 text = programsViewModel.getExerciseNameByID(it) ?: "Exercise not found.",
                 style = bodySmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(0.5f)
+                modifier = Modifier.weight(0.5f),
               )
             }
 
@@ -632,16 +657,21 @@ fun CurrentProgramCard(
                   text = exerciseSets.sets.size.toString(),
                   style = bodySmall,
                   textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true)
+                  modifier = Modifier.weight(weight = 1f, fill = true),
                 )
                 Text(
                   text =
-                  if (!exerciseSets.sets.maxBy {
-                          it.repetitions ?: 0
-                      }.targetRepetitions.isNullOrBlank()) "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps" else "-",
+                  if (
+                    !exerciseSets.sets
+                      .maxBy { it.repetitions ?: 0 }
+                      .targetRepetitions
+                      .isNullOrBlank()
+                  )
+                    "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
+                  else "-",
                   style = bodySmall,
                   textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true)
+                  modifier = Modifier.weight(weight = 1f, fill = true),
                 )
                 Text(
                   text =
@@ -652,7 +682,7 @@ fun CurrentProgramCard(
                   ),
                   style = bodySmall,
                   textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true)
+                  modifier = Modifier.weight(weight = 1f, fill = true),
                 )
               }
             }
@@ -663,10 +693,10 @@ fun CurrentProgramCard(
 
     Row(
       modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding),
+        .fillMaxWidth()
+        .padding(padding),
       horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+      verticalAlignment = Alignment.CenterVertically,
     ) {
       Button(
         onClick = {
@@ -691,7 +721,7 @@ fun CurrentProgramCard(
       ) {
         Icon(
           imageVector = Icons.AutoMirrored.Outlined.LibraryBooks,
-          contentDescription = "Localized Description"
+          contentDescription = "Localized Description",
         )
       }
     }

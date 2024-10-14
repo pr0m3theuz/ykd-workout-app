@@ -50,6 +50,11 @@ class ProgramsRepository constructor(private val database: RealmDatabase) {
     database.deleteProgram(program)
   }
 
+  suspend fun deleteActiveProgram(program: Program) {
+    database.deleteActiveProgram(program)
+  }
+
+
   fun getAllMesocycles(): Flow<List<Mesocycle>> {
     return database.getAllMesocycles()
   }

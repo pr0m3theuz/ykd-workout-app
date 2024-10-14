@@ -83,8 +83,13 @@ constructor(
     viewModelScope.launch { programsRepository.updateProgram(program) }
   }
 
-  fun deleteProgram(program: Program) {
-    viewModelScope.launch { programsRepository.deleteProgram(program) }
+  fun deleteActiveProgram(program: Program): Result<String> {
+    if (program.active) {
+      viewModelScope.launch { programsRepository.deleteActiveProgram(program) }
+      return Result.success("Program deleted successfully")
+    } else {
+      return Result.failure(Exception("Program is not active"))
+    }
   }
 
   fun startNewProgram(program: Program) {
@@ -137,13 +142,13 @@ constructor(
           microcycleList.sortedWith(compareBy({ it.mesocycleID }, { it.order }))
 
         /* val strengthPhaseMicrocycle =
-           microcycleList.firstOrNull { it.name == "Strength Phase Week 1: Block 1 Microcycle 3" }
+          microcycleList.firstOrNull { it.name == "Strength Phase Week 1: Block 1 Microcycle 3" }
 
-         if (strengthPhaseMicrocycle?.name == "Strength Phase Week 3: Block 1 Microcycle 3") {
-           strengthPhaseMicrocycle?.workouts?.forEach { workout ->
-             Log.i("getMicrocyclesByProgram", "${strengthPhaseMicrocycle.name}: " + workout.name)
-           }
-         }*/
+        if (strengthPhaseMicrocycle?.name == "Strength Phase Week 3: Block 1 Microcycle 3") {
+          strengthPhaseMicrocycle?.workouts?.forEach { workout ->
+            Log.i("getMicrocyclesByProgram", "${strengthPhaseMicrocycle.name}: " + workout.name)
+          }
+        }*/
       }
     }
     //    return microcycles
