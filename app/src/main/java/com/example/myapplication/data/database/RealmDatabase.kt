@@ -420,13 +420,40 @@ class RealmDatabase {
   }
 
   // TODO get the next exercise sets from the next workout in the current program
-  fun findNextWorkoutExerciseSets(exerciseID: ObjectId, programID: ObjectId): Workout? {
+  fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout? {
+    val results =
+      realm
+        .query<ExerciseSets>(
+          "exerciseID = $0 && ANY @links.Workout.programID = $1 && owner_id = $2 && ANY @links.Workout.workoutEnded == null",
+          exerciseSets.exerciseID,
+          programID,
+          user.id,
+        )
+        .find()
+        .toList()
+
+    var nextExerciseSets: ExerciseSets? = null
+
+    results.forEach {
+      if (it.sets.size == exerciseSets.sets.size) {
+        it.sets.zip(exerciseSets.sets).forEach { (set1, set2) ->
+          if (
+            set1.progressionSchemeID == set2.progressionSchemeID &&
+            set1.targetMinimumRepetitions == set2.targetMaximumRepetitions &&
+            set1.targetMaximumRepetitions == set2.targetMaximumRepetitions
+          ) {
+            nextExerciseSets = it
+            Log.i("findNextWorkoutExerciseSets", "found matching workout")
+          }
+        }
+      }
+    }
+
     return realm
       .query<Workout>(
-        "exerciseID = $0 && programID = $0 && owner_id == $1 && ANY @links.Workout.workoutEnded == null",
-        exerciseID,
-        programID,
-        user.id,
+        "exercisesSets.exerciseID = $0 && workoutID = $1",
+        nextExerciseSets?.exerciseID,
+        nextExerciseSets?.workoutID
       )
       .find()
       .firstOrNull()
@@ -543,6 +570,10 @@ class RealmDatabase {
       workout
       //      val latestWorkout = findLatest(workout) ?: return@write
     }
+  }
+
+  suspend fun updateSets(sets: MutableList<Set>) {
+    sets.forEach { set -> realm.write { set } }
   }
 
   //  TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by

@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
 
         val navController = rememberNavController()
 
-        NavHost(navController = navController, startDestination = Screens.Programs.route) {
+        NavHost(navController = navController, startDestination = Screens.Workout.route) {
           addExercisesGraph(navController)
           addWorkoutGraph(navController)
           addWorkoutSummaryGraph(navController)

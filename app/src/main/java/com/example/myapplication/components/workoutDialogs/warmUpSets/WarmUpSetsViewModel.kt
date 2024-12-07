@@ -7,11 +7,11 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
+import com.example.myapplication.utils.ProgressionType
 import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.Random
 
 class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewModel() {
   val currentUser = userRepository.getCurrentUser()
@@ -115,7 +115,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
         percentage1RM = 1.0
         setTypeID = 2
         progressionSchemeID =
-          Random().nextInt() // TODO Replace with progressionScheme.progressionSchemeID
+          ProgressionType.LINEAR_PROGRESSION.toString() // TODO Replace with progressionScheme.progressionSchemeID
       }
     }
   }

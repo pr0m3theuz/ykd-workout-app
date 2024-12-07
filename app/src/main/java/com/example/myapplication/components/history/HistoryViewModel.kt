@@ -43,7 +43,8 @@ class HistoryViewModel(
 
   init {
     viewModelScope.launch {
-      workoutRepository.getAllCompletedWorkouts().collect() { _workouts.value = it }
+      workoutRepository.getAllCompletedWorkouts()
+        .collect() { workouts -> _workouts.value = workouts.sortedByDescending { it.workoutEnded } }
     }
   }
 

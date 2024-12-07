@@ -1,6 +1,7 @@
 package com.example.myapplication.components.workout
 
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
@@ -76,6 +77,7 @@ fun WorkoutContent(
     val thisWorkoutID = workoutViewModel.workout.value._id.toHexString()
     val workoutsCount = workoutViewModel.getWorkoutsCount()
 
+    Log.i("navigateToWorkoutSummaryScreen()", "workoutCount: $workoutsCount")
     navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount")
   }
 
@@ -197,8 +199,8 @@ fun WorkoutContent(
     Column(Modifier.padding(contentPadding)) {
       Row(
         modifier = Modifier
-            .padding(start = 8.dp)
-            .fillMaxWidth(),
+          .padding(start = 8.dp)
+          .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {

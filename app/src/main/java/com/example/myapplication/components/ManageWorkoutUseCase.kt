@@ -30,7 +30,6 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmUUID
 import org.mongodb.kbson.ObjectId
-import java.util.Random
 import kotlin.time.Duration
 
 class ManageWorkoutUseCase(
@@ -429,7 +428,7 @@ class ManageWorkoutUseCase(
             exerciseID = exerciseSets.exercise?._id
             setNumber = 0
             isPublic = false
-            progressionSchemeID = Random().nextInt() // TODO Replace with
+            progressionSchemeID = "" // Random().nextInt() // TODO Replace with
             // progressionScheme.progressionSchemeID
             owner_id = currentUser.id
             isPublic = false

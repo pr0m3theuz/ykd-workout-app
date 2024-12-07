@@ -1,6 +1,7 @@
 package com.example.myapplication.data.network
 
 import com.example.myapplication.data.database.RealmDatabase
+import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import kotlinx.coroutines.flow.Flow
@@ -61,6 +62,14 @@ class WorkoutRepository constructor(private val database: RealmDatabase) {
 
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     return database.getPreviousSetForExercise(exerciseID, setNumber)
+  }
+
+  fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout? {
+    return database.findNextWorkoutExerciseSets(exerciseSets, programID)
+  }
+
+  suspend fun updateSets(sets: MutableList<Set>) {
+    database.updateSets(sets)
   }
 
   fun filterWorkouts(
