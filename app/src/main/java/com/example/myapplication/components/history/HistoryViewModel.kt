@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.history
 
 import android.app.Application
@@ -11,12 +13,12 @@ import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.data.network.WorkoutRepository
-import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
 
 private const val WARM_UP_SET = 2
 
@@ -43,8 +45,9 @@ class HistoryViewModel(
 
   init {
     viewModelScope.launch {
-      workoutRepository.getAllCompletedWorkouts()
-        .collect() { workouts -> _workouts.value = workouts.sortedByDescending { it.workoutEnded } }
+      workoutRepository.getAllCompletedWorkouts().collect() { workouts ->
+        _workouts.value = workouts.sortedByDescending { it.workoutEnded }
+      }
     }
   }
 
@@ -56,7 +59,7 @@ class HistoryViewModel(
     return exerciseRepository.getExercise(exerciseID)
   }
 
-  fun loadExercisesSetsFromWorkout(exercisesSets: RealmList<ExerciseSets>) {
+  fun loadExercisesSetsFromWorkout(exercisesSets: List<ExerciseSets>) {
     _exercisesSets.value = manageWorkoutUseCase.loadExercisesSetsFromWorkout(exercisesSets)
   }
 

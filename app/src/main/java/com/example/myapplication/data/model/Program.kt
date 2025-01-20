@@ -1,48 +1,44 @@
 @file:UseSerializers(
-  MutableRealmIntKSerializer::class,
-  RealmAnyKSerializer::class,
-  RealmDictionaryKSerializer::class,
-  RealmInstantKSerializer::class,
-  RealmListKSerializer::class,
-  RealmSetKSerializer::class,
-  RealmUUIDKSerializer::class,
+  //  MutableRealmIntKSerializer::class,
+  //  RealmAnyKSerializer::class,
+  //  RealmDictionaryKSerializer::class,
+  //  RealmInstantKSerializer::class,
+  //  RealmListKSerializer::class,
+  //  RealmSetKSerializer::class,
+  //  RealmUUIDKSerializer::class,
 )
+@file:OptIn(ExperimentalUuidApi::class)
 
 package com.example.myapplication.data.model
 
 import com.example.myapplication.utils.newID
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.serializers.MutableRealmIntKSerializer
-import io.realm.kotlin.serializers.RealmAnyKSerializer
-import io.realm.kotlin.serializers.RealmDictionaryKSerializer
-import io.realm.kotlin.serializers.RealmInstantKSerializer
-import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.serializers.RealmSetKSerializer
-import io.realm.kotlin.serializers.RealmUUIDKSerializer
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.RealmUUID
-import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 // TODO Add a woy to differentiate between templates and completed/current/active
 // TODO Create a data class to track progress in a program
 //  i.e. the workouts, microcycles, and mesocycles/blocks completed
 // TODO Add Image URI property to Program
 @Serializable
-class Program() : RealmObject {
-  @PrimaryKey
+class Program() {
+  @SerialName("_id")
+  @Contextual
   var _id: ObjectId = ObjectId()
   var lazyListItemID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
+  @Contextual
+  var uuid: Uuid = Uuid.random()
   var name: String? = null
   var author: String? = null
-  var dateCreated: RealmInstant = RealmInstant.now()
-  var startDate: RealmInstant? = null
-  var endDate: RealmInstant? = null
+  var dateCreated: Instant = Clock.System.now()
+  var startDate: Instant? = null
+  var endDate: Instant? = null
   var shortDescription: String? = null
   var description: String? = null
   var uri: String? = null
@@ -53,11 +49,14 @@ class Program() : RealmObject {
   var daysPerWeek: String? = null
   var programLength: String? = null
   var active: Boolean = false
-  var notes: RealmList<ProgramNote> = realmListOf()
-  var mesocycles: RealmList<Mesocycle> = realmListOf()
-  var owner_id: String = "PUBLIC"
+  var notes: List<ProgramNote> = emptyList()
+  var mesocycles: List<Mesocycle> = emptyList()
+  var ownerID: String = "PUBLIC"
   var isPublic: Boolean = false
 }
+
+@Serializable
+data class ProgramDao(val item: Program)
 
 @Serializable
 data class Programs(val programs: List<Program>)
@@ -68,42 +67,46 @@ data class Mesocycles(val mesocycles: List<Mesocycle>)
 @Serializable
 data class Microcycles(val microcycles: List<Microcycle>)
 
-@Serializable
-class Mesocycle() : RealmObject {
-  @PrimaryKey
-  var _id: ObjectId = ObjectId()
-  var lazyListItemID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
-  var name: String? = null
-  var description: String? = null
-  var dateCreated: RealmInstant = RealmInstant.now()
-  var startDate: RealmInstant? = null
-  var endDate: RealmInstant? = null
-  var order: Int = 0
-
-  //    var tags: String // TODO Should be a List<String>
-  var programID: ObjectId? = null
-  var microcycles: RealmList<Microcycle> = realmListOf()
-  var owner_id: String = "PUBLIC"
-  var isPublic: Boolean = false
-}
+data class MesocycleDao(val item: Mesocycle)
 
 @Serializable
-class Microcycle() : RealmObject {
-  @PrimaryKey
-  var _id: ObjectId = ObjectId()
-  var lazyListItemID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
-  var name: String? = null
-  var description: String? = null
-  var dateCreated: RealmInstant = RealmInstant.now()
-  var startDate: RealmInstant? = null
-  var endDate: RealmInstant? = null
-  var order: Int = 0
-  //    var tags: String // TODO Should be a List<String>
-  var programID: ObjectId? = null
-  var mesocycleID: ObjectId? = null
-  var workouts: RealmList<Workout> = realmListOf()
-  var owner_id: String = "PUBLIC"
-  var isPublic: Boolean = false
-}
+data class Mesocycle(
+  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  var lazyListItemID: Long = newID(),
+  @Contextual var uuid: Uuid = Uuid.random(),
+  var name: String? = null,
+  var description: String? = null,
+  var dateCreated: Instant = Clock.System.now(),
+  var startDate: Instant? = null,
+  var endDate: Instant? = null,
+  var order: Int = 0,
+
+  //    var tags: String // TODO Should be a List<String>,
+  @Contextual var programID: ObjectId? = null,
+  var microcycles: List<Microcycle> = emptyList(),
+  var ownerID: String = "PUBLIC",
+  var isPublic: Boolean = false,
+)
+
+data class MicrocycleDao(val item: Microcycle)
+
+@Serializable
+data class Microcycle(
+  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  var lazyListItemID: Long = newID(),
+  @Contextual var uuid: Uuid = Uuid.random(),
+  var name: String? = null,
+  var description: String? = null,
+  var dateCreated: Instant = Clock.System.now(),
+  var startDate: Instant? = null,
+  var endDate: Instant? = null,
+  var order: Int = 0,
+  //    var tags: String // TODO Should be a List<String>,
+  @Contextual var programID: ObjectId? = null,
+  @Contextual var mesocycleID: ObjectId? = null,
+  var workouts: List<Workout> = emptyList(),
+  var ownerID: String = "PUBLIC",
+  var isPublic: Boolean = false,
+)
+
+

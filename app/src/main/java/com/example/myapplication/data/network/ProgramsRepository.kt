@@ -1,15 +1,17 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.data.network
 
-import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Workout
-import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.Flow
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
-class ProgramsRepository constructor(private val database: RealmDatabase) {
+interface ProgramsRepository {
   suspend fun migrateData() {
     //        database.migrateData()
     //        database.migrateMesocycles()
@@ -18,108 +20,53 @@ class ProgramsRepository constructor(private val database: RealmDatabase) {
 //            database.importExerciseSets()
   }
 
-  fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
-    return database.getAllDistinctProgramTemplates()
-  }
+  fun getAllDistinctProgramTemplates(): Flow<List<Program>>
 
-  fun getProgramById(programID: ObjectId): Program? {
-    return database.getProgramByID(programID)
-  }
+  fun getProgramById(programID: ObjectId): Program?
 
-  fun getActivePrograms(): Flow<List<Program>> {
-    return database.getActivePrograms()
-  }
+  fun getActivePrograms(): Flow<List<Program>>
 
-  fun isProgramActive(programUUID: RealmUUID): Boolean {
-    return database.isProgramActive(programUUID)
-  }
+  fun isProgramActive(programUUID: Uuid): Boolean
 
-  suspend fun copyProgramFromTemplate(program: Program) {
-    database.copyProgramFromTemplate(program)
-  }
+  suspend fun copyProgramFromTemplate(program: Program): Boolean
 
-  suspend fun insertProgram(program: Program) {
-    database.insertProgram(program)
-  }
+  suspend fun insertProgram(program: Program): Boolean
 
-  suspend fun updateProgram(program: Program) {
-    database.updateProgram(program)
-  }
+  suspend fun updateProgram(program: Program): Boolean
 
-  suspend fun deleteProgram(program: Program) {
-    database.deleteProgram(program)
-  }
+  suspend fun deleteProgram(program: Program): Boolean
 
-  suspend fun deleteActiveProgram(program: Program) {
-    database.deleteActiveProgram(program)
-  }
+  suspend fun deleteActiveProgram(program: Program): Boolean
 
+  fun getAllMesocycles(): Flow<List<Mesocycle>>
 
-  fun getAllMesocycles(): Flow<List<Mesocycle>> {
-    return database.getAllMesocycles()
-  }
+  fun getMesocycleById(mesocycleID: ObjectId): Mesocycle?
 
-  fun getMesocycleById(mesocycleID: ObjectId): Mesocycle? {
-    return database.getMesocycleByID(mesocycleID)
-  }
+  fun getMesocyclesByProgram(programID: ObjectId): Flow<List<Mesocycle>>
 
-  fun getMesocyclesByProgram(programID: ObjectId): Flow<List<Mesocycle>> {
-    return database.getMesocyclesByProgramID(programID)
-  }
+  suspend fun insertMesocycle(mesocycle: Mesocycle): Boolean
 
-  suspend fun insertMesocycle(mesocycle: Mesocycle) {
-    database.insertMesocycle(mesocycle)
-  }
+  suspend fun updateMesocycle(mesocycle: Mesocycle): Boolean
 
-  suspend fun updateMesocycle(mesocycle: Mesocycle) {
-    database.updateMesocycle(mesocycle)
-  }
+  suspend fun deleteMesocycle(mesocycle: Mesocycle): Boolean
 
-  suspend fun deleteMesocycle(mesocycle: Mesocycle) {
-    database.deleteMesocycle(mesocycle)
-  }
+  fun getAllMicrocycles(): Flow<List<Microcycle>>
 
-  fun getAllMicrocycles(): Flow<List<Microcycle>> {
-    return database.getAllMicrocycles()
-  }
+  suspend fun getMicrocycleByID(microcycleID: ObjectId): Microcycle?
 
-  suspend fun getMicrocycleByID(microcycleID: ObjectId): Microcycle? {
-    return database.getMicrocycleByID(microcycleID)
-  }
+  fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): Flow<List<Microcycle>>
 
-  fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): Flow<List<Microcycle>> {
-    return database.getMicrocyclesByMesocycleID(mesocycleID)
-  }
-
-  fun getMicrocyclesByProgram(programID: ObjectId): Flow<List<Microcycle>> {
-    return database.getMicrocycleByProgramID(programID)
-  }
+  fun getMicrocyclesByProgram(programID: ObjectId): Flow<List<Microcycle>>
 
   //    suspend fun getMicrocyclesByProgramSorted(programID: Long): List<Microcycle> {
   //        return database.getMicrocycleByProgramSorted(programID)
   //    }
 
-  suspend fun insertMicrocycle(microcycle: Microcycle) {
-    database.insertMicrocycle(microcycle)
-  }
+  suspend fun insertMicrocycle(microcycle: Microcycle): Boolean
 
-  suspend fun updateMicrocycle(microcycle: Microcycle) {
-    database.updateMicrocycle(microcycle)
-  }
+  suspend fun updateMicrocycle(microcycle: Microcycle): Boolean
 
-  suspend fun deleteMicrocycle(microcycle: Microcycle) {
-    database.deleteMicrocycle(microcycle)
-  }
+  suspend fun deleteMicrocycle(microcycle: Microcycle): Boolean
 
-  fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
-    return database.getNextWorkoutByProgramID(programID)
-  }
-
-  fun getMicrocycleByMicrocycleID(microcycleID: ObjectId): Microcycle? {
-    return database.getMicrocycleByID(microcycleID)
-  }
-
-  fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout> {
-    return database.getWorkoutsByMicrocycleID(microcycleID)
-  }
+  fun getNextWorkoutByProgramID(programID: ObjectId): Workout?
 }

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
 
 // TODO Implement Clone Exercise Feature
 
@@ -120,17 +120,17 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
 
   fun getAllUtilities() {
     viewModelScope.launch {
-      exercisesRepository.getAllUtilities().collect() { _utility.value = it }
+      exercisesRepository.getAllUtilities()
     }
   }
 
   fun getAllForces() {
-    viewModelScope.launch { exercisesRepository.getAllForces().collect() { _force.value = it } }
+    viewModelScope.launch { exercisesRepository.getAllForces() }
   }
 
   fun getAllMechanics() {
     viewModelScope.launch {
-      exercisesRepository.getAllMechanics().collect() { _mechanic.value = it }
+      exercisesRepository.getAllMechanics()
     }
   }
 
@@ -239,7 +239,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     if (exerciseID != null) {
       viewModelScope.launch {
         _exercise.value =
-          exercisesRepository.getExerciseDetails(exerciseID = ObjectId(exerciseID).asObjectId())
+          exercisesRepository.getExerciseDetails(exerciseID = ObjectId(exerciseID))
       }
     }
   }

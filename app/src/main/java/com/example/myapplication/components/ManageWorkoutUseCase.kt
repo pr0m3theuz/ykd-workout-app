@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components
 
 import com.example.myapplication.data.model.Exercise
@@ -23,14 +25,11 @@ import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutNotesRepository
 import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.newID
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmUUID
-import org.mongodb.kbson.ObjectId
+import kotlinx.datetime.Clock
+import org.bson.types.ObjectId
 import kotlin.time.Duration
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class ManageWorkoutUseCase(
   private val workoutRepository: WorkoutRepository,
@@ -41,10 +40,15 @@ class ManageWorkoutUseCase(
   private val exerciseNotesRepository: ExerciseNotesRepository,
   userRepository: UserRepository,
 ) {
-  val currentUser = userRepository.getCurrentUser()
-  val userDefaultWeightUnit: String =
-    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
-      ?: MassUnit.POUNDS.abbreviation
+
+  // TODO rewrite
+  //  val currentUser = userRepository.getCurrentUser()
+  //  val userDefaultWeightUnit: String =
+  //    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
+  //      ?: MassUnit.POUNDS.abbreviation
+
+  private val tempOwnerId = ObjectId().toString()
+  val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
     return exercisesRepository.getExercise(exerciseID)
@@ -59,68 +63,75 @@ class ManageWorkoutUseCase(
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout): Workout {
     val newWorkout =
-      Workout().apply {
-        _id = workoutTemplate._id
-        uuid = workoutTemplate.uuid
-        name = workoutTemplate.name
-        workoutAuthor = workoutTemplate.workoutAuthor
-        //        notes = workoutTemplate.notes.filter { it.pinned }.toRealmList()
-        workoutType = workoutTemplate.workoutType
-        dateCreated = workoutTemplate.dateCreated
-        workoutStarted = RealmInstant.now()
-        day = workoutTemplate.day
-        //        exercisesSets =
-        // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets)
-        microcycleID = workoutTemplate.microcycleID
-        programID = workoutTemplate.programID
-        owner_id = currentUser.id
-        isPublic = false
-      }
+      Workout(
+        _id = workoutTemplate._id,
+        uuid = workoutTemplate.uuid,
+        name = workoutTemplate.name,
+        workoutAuthor = workoutTemplate.workoutAuthor,
+        //        notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
+        workoutType = workoutTemplate.workoutType,
+        dateCreated = workoutTemplate.dateCreated,
+        workoutStarted = Clock.System.now(),
+        day = workoutTemplate.day,
+        //        exercisesSets =,
+        // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets),
+        microcycleID = workoutTemplate.microcycleID,
+        programID = workoutTemplate.programID,
+        ownerID = tempOwnerId, // TODO Replace currentUser.id
+        isPublic = false,
+      )
 
     return newWorkout
   }
 
   fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout): Workout {
     val newWorkout =
-      Workout().apply {
-        uuid = previousWorkout.uuid
-        name = previousWorkout.name
-        workoutAuthor = previousWorkout.workoutAuthor
-        //        notes = previousWorkout.notes.filter { it.pinned }.toRealmList()
-        workoutType = previousWorkout.workoutType
-        workoutStarted = RealmInstant.now()
-        day = previousWorkout.day
-        //        exercisesSets =
-        // copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets)
-        microcycleID = previousWorkout.microcycleID
-      }
+      Workout(
+        uuid = previousWorkout.uuid,
+        name = previousWorkout.name,
+        workoutAuthor = previousWorkout.workoutAuthor,
+        //        notes = previousWorkout.notes.filter { it.pinned }.toMutableList(),
+        workoutType = previousWorkout.workoutType,
+        workoutStarted = Clock.System.now(),
+        day = previousWorkout.day,
+        //        exercisesSets =,
+        // copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets),
+        microcycleID = previousWorkout.microcycleID,
+      )
     return newWorkout
   }
 
-  fun getPinnedWorkoutNotes(workoutUUID: RealmUUID, workoutID: ObjectId): MutableList<WorkoutNote> {
+  fun getPinnedWorkoutNotes(workoutUUID: Uuid, workoutID: ObjectId): MutableList<WorkoutNote> {
     return workoutNotesRepository.getPinnedWorkoutNotes(workoutUUID).toMutableList()
   }
 
   fun copyExercisesSetsFromPreviousWorkout(
-    previousExercisesSets: RealmList<ExerciseSets>,
-    _workoutID: ObjectId
+    previousExercisesSets: List<ExerciseSets>,
+    _workoutID: ObjectId,
   ): MutableList<ExerciseExerciseSets> {
     val newExercisesSets = mutableListOf<ExerciseExerciseSets>()
     previousExercisesSets.forEach { exerciseSets ->
-      //      TODO get exercise by ID
+      // TODO get exercise by ID
+      val exerciseSetsID = ObjectId()
       val newExerciseExerciseSets =
-        ExerciseExerciseSets().apply {
-          exSetsUUID = exerciseSets.exSetsUUID
-          exerciseOrder = exerciseSets.exerciseOrder
-          exercise = exercisesRepository.getExercise(exerciseSets.exerciseID)
-          sets = copySetsFromPreviousWorkout(exerciseSets.sets)
-          notes = exerciseSets.notes.filter { it.pinned }.toRealmList()
-          workoutID = _workoutID
-        }
+        ExerciseExerciseSets(
+          _id = exerciseSetsID,
+          exerciseOrder = exerciseSets.exerciseOrder,
+          exercise = exercisesRepository.getExercise(exerciseSets.exerciseID),
+          sets = copySetsFromPreviousWorkout(exerciseSets.sets, exerciseSetsID, _workoutID),
+          notes = exerciseSets.notes.filter { it.pinned }.toMutableList(),
+          workoutID = _workoutID,
+          exerciseID = exerciseSets.exerciseID!!,
+          microcycleID = exerciseSets.microcycleID,
+          mesocycleID = exerciseSets.mesocycleID,
+          programID = exerciseSets.programID,
+          isPublic = false,
+          ownerID = exerciseSets.ownerID // TODO Replace currentUser.id
+        )
 
-      exerciseSets.exerciseID?.let {
+      exerciseSets.exerciseID.let {
         newExerciseExerciseSets.notes =
-          exerciseNotesRepository.getPinnedExerciseNotes(it).toRealmList()
+          exerciseNotesRepository.getPinnedExerciseNotes(it).toMutableList()
       }
 
       newExercisesSets.add(newExerciseExerciseSets)
@@ -128,28 +139,32 @@ class ManageWorkoutUseCase(
     return newExercisesSets.sortedBy { it.exerciseOrder }.toMutableList()
   }
 
-  fun copySetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
-    val newSets = realmListOf<Set>()
-    val latestPreviousSets = realmListOf<Set>()
+  fun copySetsFromPreviousWorkout(
+    previousSets: List<Set>,
+    exerciseSetsID: ObjectId,
+    workoutID: ObjectId
+  ): MutableList<Set> {
+    val newSets = mutableListOf<Set>()
+    val latestPreviousSets = mutableListOf<Set>()
     previousSets.forEach { set ->
       val newSet =
-        Set().apply {
-          uuid = set.uuid
-          setNumber = set.setNumber
-          weightPounds = set.weightPounds
-          weightKilograms = set.weightKilograms
-          repetitions = set.repetitions
-          ratePerceivedEffort = set.ratePerceivedEffort
-          repetitionsInReserve = set.repetitionsInReserve
-          targetWeightPounds = set.targetWeightPounds
-          targetRepetitions = set.targetRepetitions
-          targetRatePerceivedEffort = set.targetRatePerceivedEffort
-          targetRepetitionsInReserve = set.targetRepetitionsInReserve
-          percentage1RM = set.percentage1RM
-          setTypeID = set.setTypeID
-          progressionSchemeID = set.progressionSchemeID
-          owner_id = currentUser.id
-        }
+        Set(
+          uuid = set.uuid,
+          setNumber = set.setNumber,
+          weightPounds = set.weightPounds,
+          weightKilograms = set.weightKilograms,
+          repetitions = set.repetitions,
+          ratePerceivedEffort = set.ratePerceivedEffort,
+          repetitionsInReserve = set.repetitionsInReserve,
+          targetWeightPounds = set.targetWeightPounds,
+          targetRepetitions = set.targetRepetitions,
+          targetRatePerceivedEffort = set.targetRatePerceivedEffort,
+          targetRepetitionsInReserve = set.targetRepetitionsInReserve,
+          percentage1RM = set.percentage1RM,
+          setTypeID = set.setTypeID,
+          progressionSchemeID = set.progressionSchemeID,
+          ownerID = tempOwnerId, // TODO Replace currentUser.id
+        )
       newSets.add(newSet)
       if (set.exerciseID != null && set.setNumber != null) {
         val previousSet =
@@ -161,7 +176,7 @@ class ManageWorkoutUseCase(
   }
 
   fun loadExercisesSetsFromWorkout(
-    previousExercisesSets: RealmList<ExerciseSets>,
+    previousExercisesSets: List<ExerciseSets>
   ): MutableList<ExerciseExerciseSets> {
     val newExercisesSets = mutableListOf<ExerciseExerciseSets>()
     previousExercisesSets.forEach { exerciseSets ->
@@ -181,31 +196,31 @@ class ManageWorkoutUseCase(
     return newExercisesSets.sortedBy { it.exerciseOrder }.toMutableList()
   }
 
-  fun loadSetsFromWorkout(previousSets: RealmList<Set>): RealmList<Set> {
-    val newSets = realmListOf<Set>()
-    val latestPreviousSets = realmListOf<Set>()
+  fun loadSetsFromWorkout(previousSets: List<Set>): MutableList<Set> {
+    val newSets = mutableListOf<Set>()
+    val latestPreviousSets = mutableListOf<Set>()
     previousSets.forEach { set ->
       val newSet =
-        Set().apply {
-          _id = set._id
-          uuid = set.uuid
-          setNumber = set.setNumber
-          weightPounds = set.weightPounds
-          weightKilograms = set.weightKilograms
-          repetitions = set.repetitions
-          ratePerceivedEffort = set.ratePerceivedEffort
-          repetitionsInReserve = set.repetitionsInReserve
-          targetWeightPounds = set.targetWeightPounds
-          targetRepetitions = set.targetRepetitions
-          targetRatePerceivedEffort = set.targetRatePerceivedEffort
-          targetRepetitionsInReserve = set.targetRepetitionsInReserve
-          percentage1RM = set.percentage1RM
-          setCompleted = set.setCompleted
-          setTypeID = set.setTypeID
-          progressionSchemeID = set.progressionSchemeID
-          owner_id = currentUser.id
+        Set(
+          _id = set._id,
+          uuid = set.uuid,
+          setNumber = set.setNumber,
+          weightPounds = set.weightPounds,
+          weightKilograms = set.weightKilograms,
+          repetitions = set.repetitions,
+          ratePerceivedEffort = set.ratePerceivedEffort,
+          repetitionsInReserve = set.repetitionsInReserve,
+          targetWeightPounds = set.targetWeightPounds,
+          targetRepetitions = set.targetRepetitions,
+          targetRatePerceivedEffort = set.targetRatePerceivedEffort,
+          targetRepetitionsInReserve = set.targetRepetitionsInReserve,
+          percentage1RM = set.percentage1RM,
+          setCompleted = set.setCompleted,
+          setTypeID = set.setTypeID,
+          progressionSchemeID = set.progressionSchemeID,
+          ownerID = tempOwnerId, // TODO Replace currentUser.id
           isPublic = false
-        }
+        )
       newSets.add(newSet)
       if (set.exerciseID != null && set.setNumber != null) {
         val previousSet =
@@ -223,7 +238,7 @@ class ManageWorkoutUseCase(
   fun addWorkoutNote(
     workoutNotes: MutableList<WorkoutNote>,
     workoutID: ObjectId,
-    _workoutUUID: RealmUUID
+    _workoutUUID: Uuid,
   ): MutableList<WorkoutNote> {
     workoutNotes.add(
       WorkoutNote().apply {
@@ -236,7 +251,7 @@ class ManageWorkoutUseCase(
 
   fun removeWorkoutNote(
     workoutNote: WorkoutNote,
-    workoutNotes: MutableList<WorkoutNote>
+    workoutNotes: MutableList<WorkoutNote>,
   ): List<WorkoutNote> {
     return workoutNotes.filter { it != workoutNote }
   }
@@ -244,7 +259,7 @@ class ManageWorkoutUseCase(
   fun setWorkoutNote(
     _workoutNotes: MutableList<WorkoutNote>,
     workoutNote: WorkoutNote,
-    note: String
+    note: String,
   ): List<WorkoutNote> {
     val index = _workoutNotes.indexOf(workoutNote)
     _workoutNotes[index].note = note
@@ -254,7 +269,7 @@ class ManageWorkoutUseCase(
   fun pinWorkoutNote(
     _workoutNotes: MutableList<WorkoutNote>,
     workoutNote: WorkoutNote,
-    pinned: Boolean
+    pinned: Boolean,
   ): List<WorkoutNote> {
     val index = _workoutNotes.indexOf(workoutNote)
     _workoutNotes[index].pinned = pinned
@@ -263,7 +278,7 @@ class ManageWorkoutUseCase(
 
   fun updateWorkoutNotes(
     _workoutNotes: MutableList<WorkoutNote>,
-    note: WorkoutNote
+    note: WorkoutNote,
   ): List<WorkoutNote> {
     _workoutNotes.first { it == note }.lazyListID = newID()
     return _workoutNotes
@@ -275,7 +290,7 @@ class ManageWorkoutUseCase(
     exercisesSets: List<ExerciseExerciseSets>,
   ) {
     //    TODO Implement this
-    workout.notes = workoutNotes.toRealmList()
+    workout.notes = workoutNotes.toMutableList()
 
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     //    removeUncompletedSets(exercisesSets.toMutableList())
@@ -283,12 +298,12 @@ class ManageWorkoutUseCase(
     workout.exercisesSets =
       convertExerciseExerciseSetsToExerciseSets(
         exercisesSets.toMutableList(),
-        userDefaultWeightUnit
+        userDefaultWeightUnit,
       )
 
     workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
-//    workout.calculateTotalVolumeInPounds()
-//    workout.calculateTotalVolumeInKilograms()
+    //    workout.calculateTotalVolumeInPounds()
+    //    workout.calculateTotalVolumeInKilograms()
 
     workoutRepository.insertWorkout(workout)
   }
@@ -296,24 +311,24 @@ class ManageWorkoutUseCase(
   private fun convertExerciseExerciseSetsToExerciseSets(
     exerciseExerciseSets: List<ExerciseExerciseSets>,
     userDefaultWeightUnit: String,
-  ): RealmList<ExerciseSets> {
-    val exercisesSets = realmListOf<ExerciseSets>()
+  ): List<ExerciseSets> {
+    val exercisesSets = mutableListOf<ExerciseSets>()
     exerciseExerciseSets.forEach { _exerciseSets ->
       exercisesSets.add(
-        ExerciseSets().apply {
-          _id = _exerciseSets._id
-          exSetsUUID
-          workoutID
-          exerciseOrder = _exerciseSets.exerciseOrder
-          exerciseID = _exerciseSets.exercise?._id
-          sets = _exerciseSets.sets
-          notes = _exerciseSets.notes
-          datePerformed = _exerciseSets.datePerformed
-          totalVolumeInPounds = _exerciseSets.totalVolumeInPounds()
-          totalVolumeInKilograms = _exerciseSets.totalVolumeInKilograms()
-          isPublic = false
-          owner_id = currentUser.id
-        }
+        ExerciseSets(
+          _id = _exerciseSets._id,
+          exSetsUUID,
+          workoutID,
+          exerciseOrder = _exerciseSets.exerciseOrder,
+          exerciseID = _exerciseSets.exercise?._id,
+          sets = _exerciseSets.sets,
+          notes = _exerciseSets.notes,
+          datePerformed = _exerciseSets.datePerformed,
+          totalVolumeInPounds = _exerciseSets.totalVolumeInPounds(),
+          totalVolumeInKilograms = _exerciseSets.totalVolumeInKilograms(),
+          isPublic = false,
+          ownerID = tempOwnerId, // TODO Replace currentUser.id
+        )
       )
     }
 
@@ -356,7 +371,7 @@ class ManageWorkoutUseCase(
   fun replaceExerciseInExerciseSets(
     exercisesSets: MutableList<ExerciseExerciseSets>,
     exerciseSets: ExerciseExerciseSets,
-    newExercise: Exercise
+    newExercise: Exercise,
   ): List<ExerciseExerciseSets> {
     val index = exercisesSets.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
     exerciseSets.exercise = newExercise
@@ -373,7 +388,7 @@ class ManageWorkoutUseCase(
   fun addMultipleEmptyExerciseSets(
     exerciseSets: MutableList<ExerciseExerciseSets>,
     exercisesSelectedToBeAddedToWorkout: List<Exercise>,
-    _workoutID: ObjectId
+    _workoutID: ObjectId,
   ): MutableList<ExerciseExerciseSets> {
     exercisesSelectedToBeAddedToWorkout.forEach { _exercise ->
       val pinnedNotes = exerciseNotesRepository.getPinnedExerciseNotes(_exercise._id)
@@ -382,8 +397,8 @@ class ManageWorkoutUseCase(
           exerciseOrder =
             if (exerciseSets.isEmpty()) 1 else exerciseSets.last().exerciseOrder.plus(1)
           exercise = _exercise
-          notes = pinnedNotes.toRealmList()
-          datePerformed = RealmInstant.now()
+          notes = pinnedNotes.toMutableList()
+          datePerformed = Clock.System.now()
           workoutID = _workoutID
         }
       )
@@ -393,7 +408,7 @@ class ManageWorkoutUseCase(
 
   fun removeExerciseSets(
     exerciseExerciseSets: MutableList<ExerciseExerciseSets>,
-    exerciseSets: ExerciseExerciseSets
+    exerciseSets: ExerciseExerciseSets,
   ): List<ExerciseExerciseSets> {
     return exerciseExerciseSets.filter { it != exerciseSets }
   }
@@ -402,37 +417,36 @@ class ManageWorkoutUseCase(
     val temporarySets: List<Set> =
       if (exerciseSets.sets.isNotEmpty()) {
         exerciseSets.sets +
-                Set().apply {
-                  exerciseID = exerciseSets.exercise?._id
-                  setNumber = exerciseSets.sets.last().setNumber?.plus(1)
-                  weightPounds = exerciseSets.sets.last().weightPounds
-                  weightKilograms = exerciseSets.sets.last().weightKilograms
-                  repetitions = exerciseSets.sets.last().repetitions
-                  ratePerceivedEffort = exerciseSets.sets.last().ratePerceivedEffort
-                  repetitionsInReserve = exerciseSets.sets.last().repetitionsInReserve
-                  setTypeID = exerciseSets.sets.last().setTypeID
-                  percentage1RM = exerciseSets.sets.last().percentage1RM
-                  isPublic = false
-                  owner_id = currentUser.id
-                  targetWeightPounds = exerciseSets.sets.last().targetWeightPounds
-                  targetWeightKilograms = exerciseSets.sets.last().targetWeightKilograms
-                  targetRepetitions = exerciseSets.sets.last().targetRepetitions
-                  targetRepetitionsInReserve = exerciseSets.sets.last().targetRepetitionsInReserve
-                  targetRatePerceivedEffort = exerciseSets.sets.last().targetRatePerceivedEffort
-                  progressionSchemeID = exerciseSets.sets.last().progressionSchemeID
-
-                }
+                Set(
+                  exerciseID = exerciseSets.exercise?._id,
+                  setNumber = exerciseSets.sets.last().setNumber?.plus(1),
+                  weightPounds = exerciseSets.sets.last().weightPounds,
+                  weightKilograms = exerciseSets.sets.last().weightKilograms,
+                  repetitions = exerciseSets.sets.last().repetitions,
+                  ratePerceivedEffort = exerciseSets.sets.last().ratePerceivedEffort,
+                  repetitionsInReserve = exerciseSets.sets.last().repetitionsInReserve,
+                  setTypeID = exerciseSets.sets.last().setTypeID,
+                  percentage1RM = exerciseSets.sets.last().percentage1RM,
+                  isPublic = false,
+                  ownerID = tempOwnerId, // TODO Replace currentUser.id
+                  targetWeightPounds = exerciseSets.sets.last().targetWeightPounds,
+                  targetWeightKilograms = exerciseSets.sets.last().targetWeightKilograms,
+                  targetRepetitions = exerciseSets.sets.last().targetRepetitions,
+                  targetRepetitionsInReserve = exerciseSets.sets.last().targetRepetitionsInReserve,
+                  targetRatePerceivedEffort = exerciseSets.sets.last().targetRatePerceivedEffort,
+                  progressionSchemeID = exerciseSets.sets.last().progressionSchemeID,
+                )
       } else {
         listOf(
-          Set().apply {
-            exerciseID = exerciseSets.exercise?._id
-            setNumber = 0
-            isPublic = false
-            progressionSchemeID = "" // Random().nextInt() // TODO Replace with
-            // progressionScheme.progressionSchemeID
-            owner_id = currentUser.id
-            isPublic = false
-          }
+          Set(
+            exerciseID = exerciseSets.exercise?._id,
+            setNumber = 0,
+            isPublic = false,
+            progressionSchemeID = "", // Random().nextInt() // TODO Replace with,
+            // progressionScheme.progressionSchemeID,
+            ownerID = tempOwnerId, // TODO Replace currentUser.id,
+            isPublic = false,
+          )
         )
       }
     return temporarySets
@@ -445,11 +459,8 @@ class ManageWorkoutUseCase(
     //    updateExercisesSetsData(exerciseSets, temporarySets)
   }
 
-  fun updateExercisesSetsData(
-    exerciseSets: ExerciseExerciseSets,
-    temporarySets: List<Set>,
-  ) {
-    exerciseSets.sets = temporarySets.toRealmList()
+  fun updateExercisesSetsData(exerciseSets: ExerciseExerciseSets, temporarySets: List<Set>) {
+    exerciseSets.sets = temporarySets.toMutableList()
 
     //    updateExerciseExerciseSetsData(exerciseSets)
   }
@@ -470,7 +481,7 @@ class ManageWorkoutUseCase(
 
   fun removeExerciseNote(
     exerciseSets: ExerciseExerciseSets,
-    exerciseNote: ExerciseNote
+    exerciseNote: ExerciseNote,
   ): List<ExerciseNote> {
     return exerciseSets.notes.minusElement(exerciseNote)
 
@@ -481,7 +492,7 @@ class ManageWorkoutUseCase(
   fun pinExerciseNote(
     exerciseSets: ExerciseExerciseSets,
     exerciseNote: ExerciseNote,
-    pinned: Boolean
+    pinned: Boolean,
   ): List<ExerciseNote> {
     val index = exerciseSets.notes.indexOf(exerciseNote)
 
@@ -494,27 +505,27 @@ class ManageWorkoutUseCase(
     exerciseSets: ExerciseExerciseSets,
     temporaryNotes: List<ExerciseNote>,
   ) {
-    exerciseSets.notes = temporaryNotes.toRealmList()
+    exerciseSets.notes = temporaryNotes.toMutableList()
 
     //    updateExerciseExerciseSetsData(exerciseSets)
   }
 
   fun updateExerciseExerciseSetsData(
     exerciseExerciseSets: MutableList<ExerciseExerciseSets>,
-    exerciseSets: ExerciseExerciseSets
+    exerciseSets: ExerciseExerciseSets,
   ): List<ExerciseExerciseSets> {
     val index = exerciseExerciseSets.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
 
     exerciseSets.exSetsLazyListItemID = newID()
 
     exerciseExerciseSets[index] =
-      ExerciseExerciseSets().apply {
-        exSetsUUID = exerciseSets.exSetsUUID
-        exerciseOrder = exerciseSets.exerciseOrder
-        exercise = exerciseSets.exercise
-        sets = exerciseSets.sets
-        notes = exerciseSets.notes
-      }
+      ExerciseExerciseSets(
+        exSetsUUID = exerciseSets.exSetsUUID,
+        exerciseOrder = exerciseSets.exerciseOrder,
+        exercise = exerciseSets.exercise,
+        sets = exerciseSets.sets,
+        notes = exerciseSets.notes,
+      )
     // _allSets.value = allSets().toList()
     return exerciseExerciseSets.toList()
   }
@@ -530,8 +541,8 @@ class ManageWorkoutUseCase(
 
   fun updateSetWeight(
     exerciseSets: ExerciseExerciseSets,
-    setUUID: RealmUUID,
-    newWeight: Double?
+    setUUID: Uuid,
+    newWeight: Double?,
   ): ExerciseExerciseSets {
     val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
     exerciseSets.updateSetWeight(uuid = setUUID, newWeight = newWeight, weightUnit = weightUnit)
@@ -541,8 +552,8 @@ class ManageWorkoutUseCase(
 
   fun updateSetReps(
     exerciseSets: ExerciseExerciseSets,
-    setUUID: RealmUUID,
-    newReps: Int?
+    setUUID: Uuid,
+    newReps: Int?,
   ): ExerciseExerciseSets {
     exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
     return exerciseSets
@@ -551,8 +562,8 @@ class ManageWorkoutUseCase(
 
   fun updateSetRIR(
     exerciseSets: ExerciseExerciseSets,
-    setUUID: RealmUUID,
-    newRIR: Double?
+    setUUID: Uuid,
+    newRIR: Double?,
   ): ExerciseExerciseSets {
     exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
     return exerciseSets
@@ -561,8 +572,8 @@ class ManageWorkoutUseCase(
 
   fun updateSetRPE(
     exerciseSets: ExerciseExerciseSets,
-    setUUID: RealmUUID,
-    newRPE: Double?
+    setUUID: Uuid,
+    newRPE: Double?,
   ): ExerciseExerciseSets {
     exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
     return exerciseSets
@@ -571,8 +582,8 @@ class ManageWorkoutUseCase(
 
   fun setComplete(
     exerciseSets: ExerciseExerciseSets,
-    setUUID: RealmUUID,
-    setComplete: Boolean
+    setUUID: Uuid,
+    setComplete: Boolean,
   ): ExerciseExerciseSets {
     exerciseSets.completeSet(setUUID, setComplete)
     return exerciseSets
@@ -581,8 +592,8 @@ class ManageWorkoutUseCase(
 
   fun updateSetType(
     exerciseSets: ExerciseExerciseSets,
-    setUUID: RealmUUID,
-    setTypeID: Int
+    setUUID: Uuid,
+    setTypeID: Int,
   ): ExerciseExerciseSets {
     exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
     return exerciseSets
@@ -598,9 +609,7 @@ class ManageWorkoutUseCase(
   }
 }
 
-class ManageExercisesUseCase(
-  private val exercisesRepository: ExercisesRepository,
-) {
+class ManageExercisesUseCase(private val exercisesRepository: ExercisesRepository) {
   suspend fun updateExerciseWeightUnit(exercise: Exercise?, weightUnit: String?) {
     exercise?.weightUnit = weightUnit
 
@@ -627,9 +636,7 @@ class ManageExercisesUseCase(
     exercisesRepository.updateExercise(exercise)
   }
 
-  fun getExerciseByName(exerciseName: String): ObjectId {
-    return exercisesRepository.getExerciseByName(exerciseName)._id
+  fun getExerciseByName(exerciseName: String): ObjectId? {
+    return exercisesRepository.getExerciseByName(exerciseName)
   }
 }
-
-

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workout
 
 import android.util.Log
@@ -46,8 +48,9 @@ import com.example.myapplication.data.model.totalSets
 import com.example.myapplication.utils.doubleFormatted
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
-import org.mongodb.kbson.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +60,7 @@ fun WorkoutSummaryScreen(
   workoutID: String,
   workoutsCount: Int,
 ) {
-  workoutViewModel.getCompletedWorkout(ObjectId.invoke(workoutID))
+  workoutViewModel.getCompletedWorkout(ObjectId(workoutID))
   val completedWorkout by workoutViewModel.completedWorkout.collectAsStateWithLifecycle()
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
@@ -114,7 +117,7 @@ fun WorkoutSummaryScreen(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Center,
         ) {
-          Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!._id}") }) {
+          Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!._id.toHexString()}") }) {
             Text(text = "Preview Your Next Workout!")
           }
         }
@@ -316,9 +319,9 @@ class WorkoutDataProvider : PreviewParameterProvider<Workout> {
       sequenceOf(
         Workout().apply {
           name = "Test Workout"
-          dateCreated = RealmInstant.now()
-          workoutStarted = RealmInstant.now()
-          workoutEnded = RealmInstant.now()
+          dateCreated = Clock.System.now()
+          workoutStarted = Clock.System.now()
+          workoutEnded = Clock.System.now()
           workoutDuration =
             Duration.convert(69.0, DurationUnit.MINUTES, DurationUnit.MILLISECONDS).toLong()
           exercisesSets =

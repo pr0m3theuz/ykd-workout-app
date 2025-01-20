@@ -1,7 +1,3 @@
-// buildscript {
-//    ext["compose_version"] = "1.5.3"
-// }
-
 buildscript {
 
 //   The following section is needed only if pluginManagement is not used in settings.gradle
@@ -11,22 +7,23 @@ buildscript {
     google()
   }
 
-  dependencies { classpath("com.newrelic.agent.android:agent-gradle-plugin:7.0.0") }
+  dependencies { classpath("com.newrelic.agent.android:agent-gradle-plugin:7.6.2") }
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-  id("com.android.application") version "8.5.1" apply false
-  id("com.android.library") version "8.5.1" apply false
-  id("org.jetbrains.kotlin.android") version "1.9.10" apply false
-  id("io.realm.kotlin") version "1.16.0" apply false
-  id("com.google.devtools.ksp") version "1.9.10-1.0.13" apply false
+  id("com.android.application") version "8.5.2" apply false
+  id("com.android.library") version "8.5.2" apply false
+  id("org.jetbrains.kotlin.android") version "2.0.20" apply false
+//  id("io.realm.kotlin") version "2.3.0" apply false
+  id("com.google.devtools.ksp") version "2.0.20-1.0.25" apply false
   //    id("com.google.devtools.ksp") version "1.9.0-1.0.13" apply false
-  id("org.jetbrains.kotlin.jvm") version "1.9.10" apply false
-  id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
+  id("org.jetbrains.kotlin.jvm") version "2.0.20" apply false
+  id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
   //  id("org.jetbrains.kotlin.plugin.parcelize") version "1.9.10" apply true
   id("com.google.gms.google-services") version "4.4.2" apply false
   id("com.google.firebase.crashlytics") version "3.0.2" apply false
 //  id("org.pkl-lang") version ("0.26.0")
 //  id("org.jetbrains.compose").apply(false)
+  id("org.jetbrains.kotlin.plugin.compose") version "2.0.20"
 }

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workoutDialogs.equateVolume
 
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import com.example.myapplication.components.workoutDialogs.getFormattedPercentag
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkIntInput
 import org.koin.androidx.compose.koinViewModel
+import kotlin.uuid.ExperimentalUuidApi
 
 @Composable
 fun EquateVolumeLayout(

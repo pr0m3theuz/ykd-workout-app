@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workoutDialogs.warmUpSets
 
 import androidx.lifecycle.ViewModel
@@ -8,16 +10,24 @@ import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.utils.ProgressionType
-import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
-import io.realm.kotlin.types.RealmUUID
+
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewModel() {
-  val currentUser = userRepository.getCurrentUser()
-  val userDefaultWeightUnit: String =
-    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
-      ?: MassUnit.POUNDS.abbreviation
+// TODO REWRITE THIS
+//  val currentUser = userRepository.getCurrentUser()
+//  val userDefaultWeightUnit: String =
+//    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
+//      ?: MassUnit.POUNDS.abbreviation
+
+  private val tempOwnerId = ObjectId().toString()
+  val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
+
 
   var exerciseWeightUnit: String? = null
 
@@ -61,7 +71,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
           setTypeID = _warmUpSets.last().setTypeID
           percentage1RM = _warmUpSets.last().percentage1RM
           isPublic = false
-          owner_id = currentUser.id
+          ownerID = tempOwnerId // TODO currentUser.id
         }
       )
     } else {
@@ -70,7 +80,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
-  fun remove(uuid: RealmUUID) {
+  fun remove(uuid: Uuid) {
     for (index in _warmUpSets.indices) {
       if (_warmUpSets[index].uuid == uuid) {
         _warmUpSets.removeAt(index)
@@ -80,7 +90,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
-  fun updateWarmUpSetWeight(uuid: RealmUUID, newWeight: Double) {
+  fun updateWarmUpSetWeight(uuid: Uuid, newWeight: Double) {
     val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
     if (weightUnit == MassUnit.POUNDS.abbreviation) {
       _warmUpSets.forEach {
@@ -100,7 +110,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
-  fun updateWarmUpSetReps(uuid: RealmUUID, newReps: Int) {
+  fun updateWarmUpSetReps(uuid: Uuid, newReps: Int) {
     _warmUpSets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }

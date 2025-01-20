@@ -18,19 +18,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.BottomNavigationBar
-import io.realm.kotlin.annotations.ExperimentalRealmSerializerApi
-import io.realm.kotlin.mongodb.ext.profileAsBsonDocument
+import org.bson.types.ObjectId
+
+
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalRealmSerializerApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
   navController: NavController,
   profileViewModel: ProfileViewModel = koinViewModel(),
 ) {
-  val user = profileViewModel.currentUser
-  val userEmail = user?.profileAsBsonDocument()!!["email"]?.asString()?.value ?: "anon@anon.anon"
 
+  // TODO REWRITE THIS
+//  val user = profileViewModel.currentUser
+//  val userEmail = user?.profileAsBsonDocument()!!["email"]?.asString()?.value ?: "anon@anon.anon"
+
+  val user = ObjectId().toString()
+  val userEmail = "TEMP@anon.anon"
 
   Scaffold(
     topBar = {
@@ -51,7 +56,7 @@ fun ProfileScreen(
         .padding(horizontal = 16.dp)) {
         Row() {
           Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
-          Text(text = user.id ?: "Anonymous User")
+          Text(text = user /*?: "Anonymous User"*/)
         }
         Text(text = userEmail)
       }

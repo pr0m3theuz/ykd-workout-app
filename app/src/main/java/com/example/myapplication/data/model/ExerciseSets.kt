@@ -1,32 +1,26 @@
 @file:UseSerializers(
-  MutableRealmIntKSerializer::class,
-  RealmAnyKSerializer::class,
-  RealmDictionaryKSerializer::class,
-  RealmInstantKSerializer::class,
-  RealmListKSerializer::class,
-  RealmSetKSerializer::class,
-  RealmUUIDKSerializer::class,
+  //  MutableRealmIntKSerializer::class,
+  //  RealmAnyKSerializer::class,
+  //  RealmDictionaryKSerializer::class,
+  //  RealmInstantKSerializer::class,
+  //  RealmListKSerializer::class,
+  //  RealmSetKSerializer::class,
+  //  RealmUUIDKSerializer::class,
 )
+@file:OptIn(ExperimentalUuidApi::class)
 
 package com.example.myapplication.data.model
 
 import com.example.myapplication.utils.newID
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.serializers.MutableRealmIntKSerializer
-import io.realm.kotlin.serializers.RealmAnyKSerializer
-import io.realm.kotlin.serializers.RealmDictionaryKSerializer
-import io.realm.kotlin.serializers.RealmInstantKSerializer
-import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.serializers.RealmSetKSerializer
-import io.realm.kotlin.serializers.RealmUUIDKSerializer
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.RealmUUID
-import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /*
  TODO:
@@ -34,47 +28,50 @@ import org.mongodb.kbson.ObjectId
     @Query(SELECT * FROM sets WHERE exerciseID:=exerciseID) return WorkoutSets
 */
 
+@ExperimentalUuidApi
 @Serializable
-class ExerciseSets() : RealmObject {
-  @PrimaryKey var _id: ObjectId = ObjectId()
-  var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
-  var exSetsUUID: RealmUUID = RealmUUID.random()
-  //    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
+data class ExerciseSets(
+  @SerialName("_id") @Contextual val _id: ObjectId = ObjectId(),
+  val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+  @Contextual val exSetsUUID: Uuid = Uuid.random(),
+  @Contextual val workoutID: ObjectId, // External Primary Key
+  @Contextual val microcycleID: ObjectId?,
+  @Contextual val mesocycleID: ObjectId?,
+  @Contextual val programID: ObjectId?,
+  val exerciseOrder: Int = 1,
+  @Contextual val exerciseID: ObjectId? = null,
+  val sets: MutableList<Set> = mutableListOf(),
+  val notes: MutableList<ExerciseNote> = mutableListOf(),
+  val datePerformed: Instant? = null,
+  val totalVolumeInPounds: Double? = 0.0,
+  val totalVolumeInKilograms: Double? = 0.0,
+  val ownerID: String? = null,
+  val isPublic: Boolean = false,
+)
 
-  var workoutID: ObjectId? = null // TODO May be useless
-
-  //  val workoutUUID: RealmUUID? = null // TODO May be useless
-  var exerciseOrder: Int = 1
-  var exerciseID: ObjectId? = null
-  var sets: RealmList<Set> = realmListOf()
-  var notes: RealmList<ExerciseNote> = realmListOf()
-  var datePerformed: RealmInstant? = null
-  var totalVolumeInPounds: Double? = 0.0
-  var totalVolumeInKilograms: Double? = 0.0
-  var owner_id: String? = null
-  var isPublic: Boolean = false
-}
+@OptIn(ExperimentalUuidApi::class)
+@Serializable
+data class ExerciseExerciseSets(
+  @SerialName("_id") @Contextual val _id: ObjectId = ObjectId(),
+  var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+  @Contextual var exSetsUUID: Uuid = Uuid.random(),
+  @Contextual var workoutID: ObjectId?, // TODO May be useless
+  @Contextual var microcycleID: ObjectId?,
+  @Contextual var mesocycleID: ObjectId?,
+  @Contextual var programID: ObjectId?,
+  @Contextual var exerciseID: ObjectId,
+  val ownerID: String?,
+  val isPublic: Boolean = false,
+  var exerciseOrder: Int = 1,
+  var exercise: Exercise? = null,
+  var sets: MutableList<Set> = mutableListOf(),
+  var notes: MutableList<ExerciseNote> = mutableListOf(),
+  var datePerformed: Instant? = Clock.System.now(),
+)
 
 @Serializable
-class ExerciseExerciseSets() : RealmObject {
-  @PrimaryKey var _id: ObjectId = ObjectId()
-  var exSetsLazyListItemID: Long = newID() // Used for LazyColumn
-  var exSetsUUID: RealmUUID = RealmUUID.random()
-  //    val workout: RealmResults<Workout> by backlinks(Workout::exercisesSets)
-
-  var workoutID: ObjectId? = null // TODO May be useless
-
-  //  val workoutUUID: RealmUUID? = null // TODO May be useless
-  var exerciseOrder: Int = 1
-  var exercise: Exercise? = null
-  var sets: RealmList<Set> = realmListOf()
-  var notes: RealmList<ExerciseNote> = realmListOf()
-  var datePerformed: RealmInstant? = RealmInstant.now()
-}
-
-@Serializable
-class ListExerciseExerciseSets() : RealmObject {
-  var list: RealmList<ExerciseExerciseSets> = realmListOf()
+class ListExerciseExerciseSets() {
+  var list: List<ExerciseExerciseSets> = emptyList()
 }
 
 /*fun ExerciseSets.addSet() {
@@ -104,7 +101,8 @@ fun ExerciseSets.removeSet(uuid: RealmUUID) {
     sets.removeIf { it.uuid == uuid }
 }*/
 
-fun ExerciseExerciseSets.updateSetWeight(uuid: RealmUUID, newWeight: Double?, weightUnit: String) {
+@OptIn(ExperimentalUuidApi::class)
+fun ExerciseExerciseSets.updateSetWeight(uuid: Uuid, newWeight: Double?, weightUnit: String) {
   if (weightUnit == MassUnit.POUNDS.abbreviation) {
     sets.forEach {
       if (it.uuid == uuid) {
@@ -122,23 +120,28 @@ fun ExerciseExerciseSets.updateSetWeight(uuid: RealmUUID, newWeight: Double?, we
   }
 }
 
-fun ExerciseExerciseSets.updateSetReps(uuid: RealmUUID, newReps: Int?) {
+@OptIn(ExperimentalUuidApi::class)
+fun ExerciseExerciseSets.updateSetReps(uuid: Uuid, newReps: Int?) {
   sets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
 }
 
-fun ExerciseExerciseSets.updateSetRIR(uuid: RealmUUID, newRIR: Double?) {
+@OptIn(ExperimentalUuidApi::class)
+fun ExerciseExerciseSets.updateSetRIR(uuid: Uuid, newRIR: Double?) {
   sets.forEach { if (it.uuid == uuid) it.repetitionsInReserve = newRIR }
 }
 
-fun ExerciseExerciseSets.updateSetRPE(uuid: RealmUUID, newRPE: Double?) {
+@OptIn(ExperimentalUuidApi::class)
+fun ExerciseExerciseSets.updateSetRPE(uuid: Uuid, newRPE: Double?) {
   sets.forEach { if (it.uuid == uuid) it.ratePerceivedEffort = newRPE }
 }
 
-fun ExerciseExerciseSets.completeSet(uuid: RealmUUID, completed: Boolean) {
+@OptIn(ExperimentalUuidApi::class)
+fun ExerciseExerciseSets.completeSet(uuid: Uuid, completed: Boolean) {
   sets.forEach { if (it.uuid == uuid) it.setCompleted = completed }
 }
 
-fun ExerciseExerciseSets.updateSetType(uuid: RealmUUID, setTypeID: Int) {
+@OptIn(ExperimentalUuidApi::class)
+fun ExerciseExerciseSets.updateSetType(uuid: Uuid, setTypeID: Int) {
   sets.forEach { if (it.uuid == uuid) it.setTypeID = setTypeID }
 }
 
@@ -148,18 +151,22 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
       index,
       //      warmUpSets[index]
       //      TODO: Check this
-      Set().apply {
-        setNumber = warmUpSets[index].setNumber
-        weightPounds = warmUpSets[index].weightPounds
-        weightKilograms = warmUpSets[index].weightKilograms
-        repetitions = warmUpSets[index].repetitions
-        ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort
-        repetitionsInReserve = warmUpSets[index].repetitionsInReserve
-        setTypeID = warmUpSets[index].setTypeID
-        percentage1RM = warmUpSets[index].percentage1RM
-        exerciseID = this@addWarmUpSets.exercise?._id
-        progressionSchemeID = warmUpSets[index].progressionSchemeID
-      },
+      Set(
+        setNumber = warmUpSets[index].setNumber,
+        weightPounds = warmUpSets[index].weightPounds,
+        weightKilograms = warmUpSets[index].weightKilograms,
+        repetitions = warmUpSets[index].repetitions,
+        ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort,
+        repetitionsInReserve = warmUpSets[index].repetitionsInReserve,
+        setTypeID = warmUpSets[index].setTypeID,
+        percentage1RM = warmUpSets[index].percentage1RM,
+        exerciseID = this@addWarmUpSets.exercise?._id,
+        progressionSchemeID = warmUpSets[index].progressionSchemeID,
+        workoutID = this@addWarmUpSets.workoutID.toString(),
+        exerciseSetsID = this@addWarmUpSets._id.toString(),
+        ownerID = this@addWarmUpSets.ownerID.toString(),
+        isPublic = this@addWarmUpSets.isPublic,
+      ),
     )
   }
 }
@@ -223,20 +230,43 @@ fun ExerciseExerciseSets.averageWeight(userDefaultWeightUnit: String): Double {
  *
  * @param workout The workout to associate the sets with.
  */
+@OptIn(ExperimentalUuidApi::class)
 fun ExerciseExerciseSets.resetSets(
   /*workout: Workout*/
 ) {
   sets.forEach { set ->
     set._id = ObjectId()
     set.lazyListItemID = newID()
-    set.uuid = RealmUUID.random()
+    set.uuid = Uuid.random()
     //    set.workoutID = workout.workoutID
     //    set.workoutUUID = workout.uuid
     set.setCompleted = false
   }
 }
 
+@Serializable
+data class ExercisesSets(
+  val identical: Boolean,
+  val numberOfIdenticalWorkouts: Int,
+  val exercisesSets: List<SerializableExerciseSets>,
+)
 
+@Serializable
+data class SerializableExerciseSets(
+  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+  @Contextual var exSetsUUID: Uuid = Uuid.random(),
+  @Contextual val workout: ObjectId = ObjectId(),
+  //  val workoutID: Long? = null // TODO May be useless
+  //  val workoutUUID: Uuid? = null // TODO May be useless
+  var exerciseOrder: Int,
+  @Contextual var exerciseObjectID: ObjectId,
+  //  var sets: List<Set> = listOf(),
+  var sets: List<String> = listOf(), // List<ObjectId> = listOf(),
+  var notes: List<ExerciseNote> = listOf(),
+  val identicalSets: Boolean,
+  val numberOfIdenticalSets: Int,
+)
 
 /*
 fun ExerciseSets.getWorkingSetWeight(): Double? {
@@ -253,7 +283,7 @@ fun ExerciseSets.addWorkingSets(workingSets: List<SetModel>) {
 
 fun ExerciseSets.addBackOffSets(backOffSets: List<SetModel>) {
     for (index in backOffSets.indices) {
-        sets.add(backOffSets[index].copy(lazyListItemID = newID(), RealmUUID = RealmUUID.random()))
+        sets.add(backOffSets[index].copy(lazyListItemID = newID(), Uuid = Uuid.random()))
     }
 }*/
 
@@ -303,27 +333,3 @@ fun ExerciseSets.equateWorkingSetVolumeByRepetitions(repetitions: Int?): Double 
     }
     return newWeight
 }*/
-
-@Serializable
-data class ExercisesSets(
-  val identical: Boolean,
-  val numberOfIdenticalWorkouts: Int,
-  val exercisesSets: List<SerializableExerciseSets>,
-)
-
-@Serializable
-data class SerializableExerciseSets(
-  @PrimaryKey var _id: ObjectId = ObjectId(),
-  var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
-  var exSetsUUID: RealmUUID = RealmUUID.random(),
-  val workout: ObjectId = ObjectId(),
-  //  val workoutID: Long? = null // TODO May be useless
-  //  val workoutUUID: RealmUUID? = null // TODO May be useless
-  var exerciseOrder: Int,
-  var exerciseObjectID: ObjectId,
-  //  var sets: List<Set> = listOf(),
-  var sets: List<ObjectId> = listOf(),
-  var notes: List<ExerciseNote> = listOf(),
-  val identicalSets: Boolean,
-  val numberOfIdenticalSets: Int,
-)

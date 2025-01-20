@@ -1,5 +1,5 @@
 package com.example.myapplication.components.exerciseDetails
-
+/*
 import android.text.Layout
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -127,5 +127,5 @@ internal fun rememberMarker(
     }
   }
 }
-
+*/
 

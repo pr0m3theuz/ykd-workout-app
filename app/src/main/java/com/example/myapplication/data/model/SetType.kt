@@ -2,12 +2,12 @@ package com.example.myapplication.data.model
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextLinkStyles
-import io.realm.kotlin.types.annotations.PrimaryKey
+
 
 // TODO To Implement in Realm
 // TODO Create screen to edit/create set type
 data class SetType(
-  @PrimaryKey val setTypeID: Int,
+  val setTypeID: Int,
   val name: String,
   val description: String,
   var uri: String? = null,

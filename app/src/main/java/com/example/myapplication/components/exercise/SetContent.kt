@@ -261,12 +261,12 @@ fun SetContentFrame(
     previousSet()
 
     val boxModifier: Modifier =
-        Modifier
-            .align(Alignment.CenterVertically)
-            .padding(4.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(textFieldBackgroundColor)
-            .wrapContentSize(Alignment.Center)
+      Modifier
+        .align(Alignment.CenterVertically)
+        .padding(4.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(textFieldBackgroundColor)
+        .wrapContentSize(Alignment.Center)
     val textFieldModifier: Modifier = Modifier
 
     val textStyle =
@@ -437,8 +437,8 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
   Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
     Button(
       modifier = Modifier
-          .padding(8.dp)
-          .size(32.dp),
+        .padding(8.dp)
+        .size(32.dp),
       shape = RoundedCornerShape(size = 8.dp),
       contentPadding = PaddingValues(0.dp),
       onClick = { expandedSetTypeOptionsDropdownMenu = true },
@@ -490,7 +490,7 @@ private fun SetCompleteCheckbox(
   isTimerRunning: Boolean,
   //  workoutViewModel: WorkoutViewModel,
   //  exerciseSets: ExerciseExerciseSets,
-  //  setUUID: RealmUUID,
+  //  setUUID: Uuid,
   //  set: Set,
 ) {
   var openTimerScreen by remember { mutableStateOf(false) }
@@ -530,12 +530,12 @@ private fun ExerciseWeightTextField(
   Box(
     modifier =
     boxModifier
-        .padding(4.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(textFieldBackgroundColor)
-        //      .align(Alignment.CenterVertically)
-        //      .width(96.dp)
-        .wrapContentSize(Alignment.Center),
+      .padding(4.dp)
+      .clip(RoundedCornerShape(8.dp))
+      .background(textFieldBackgroundColor)
+      //      .align(Alignment.CenterVertically)
+      //      .width(96.dp)
+      .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
     contentAlignment = Alignment.Center,
   ) {

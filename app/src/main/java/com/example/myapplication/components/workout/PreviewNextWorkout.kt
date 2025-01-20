@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workout
 
 import android.os.Build
@@ -47,8 +49,9 @@ import com.example.myapplication.components.exercise.SetLazyListItem
 import com.example.myapplication.components.history.ConfirmChangesToWorkout
 import com.example.myapplication.components.history.NoWorkoutFound
 import com.example.myapplication.components.history.WorkoutOverview
+import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
-import org.mongodb.kbson.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Call conditionally
 
@@ -140,7 +143,7 @@ fun EditNextWorkoutScreen(
     val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
     if (!workoutID.isNullOrBlank()) {
-        workoutViewModel.loadWorkoutFromPreviousWorkout(ObjectId.invoke(workoutID))
+      workoutViewModel.loadWorkoutFromPreviousWorkout(ObjectId(workoutID))
     } else {
         NoWorkoutFound()
     }

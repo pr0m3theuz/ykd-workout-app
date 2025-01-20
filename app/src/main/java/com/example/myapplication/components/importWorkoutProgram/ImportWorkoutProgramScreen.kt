@@ -28,7 +28,7 @@ import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Workout
-import io.realm.kotlin.types.RealmList
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,10 +77,10 @@ fun ImportWorkoutProgramScreen(navController: NavController) {
   }
 
   var importedProgram: Program? = null
-  var importedPrograms: RealmList<Program>? = null
-  var importedMesocycles: RealmList<Mesocycle>? = null
-  var importedMicrocycles: RealmList<Microcycle>? = null
-  var importedWorkouts: RealmList<Workout>? = null
+  var importedPrograms: List<Program>? = null
+  var importedMesocycles: List<Mesocycle>? = null
+  var importedMicrocycles: List<Microcycle>? = null
+  var importedWorkouts: List<Workout>? = null
 
   var openProgramPreview by remember { mutableStateOf(false) }
 
@@ -152,26 +152,26 @@ fun ImportWorkoutProgramScreen(navController: NavController) {
           importedProgram = importedData as Program
         }
 
-        is RealmList<*> -> {
-          when (val firstItem = (importedData as RealmList<*>).firstOrNull()) {
+        is List<*> -> {
+          when (val firstItem = (importedData as List<*>).firstOrNull()) {
             is Program -> {
               Text("Imported Program: ${firstItem.name ?: "No Program Name"}")
-              importedPrograms = importedData as RealmList<Program>
+              importedPrograms = importedData as List<Program>
             }
 
             is Mesocycle -> {
               Text("Imported Mesocycles: ${firstItem.name ?: "No Mesocycle Name"}")
-              importedMesocycles = importedData as RealmList<Mesocycle>
+              importedMesocycles = importedData as List<Mesocycle>
             }
 
             is Microcycle -> {
               Text("Imported Microcycles: ${firstItem.name ?: "No Microcycle Name"}")
-              importedMicrocycles = importedData as RealmList<Microcycle>
+              importedMicrocycles = importedData as List<Microcycle>
             }
 
             is Workout -> {
               Text("Imported Workouts: ${firstItem.name ?: "No Workout Name"}")
-              importedWorkouts = importedData as RealmList<Workout>
+              importedWorkouts = importedData as List<Workout>
             }
 
             null -> Text("Imported empty list")

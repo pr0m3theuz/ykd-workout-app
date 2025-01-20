@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.utils
 
 import com.example.myapplication.data.model.ExerciseSets
+import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Implement Linear Progression
 

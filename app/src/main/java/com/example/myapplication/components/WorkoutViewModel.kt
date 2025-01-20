@@ -48,11 +48,11 @@ import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.newID
 import com.example.myapplication.utils.sendNotification
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmUUID
+
+
+
+
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -319,7 +319,7 @@ class WorkoutViewModel2(
   @RequiresApi(Build.VERSION_CODES.S)
   fun startSetCompletedTimer(
     exerciseSet: ExerciseExerciseSets,
-    setUUID: RealmUUID,
+    setUUID: Uuid,
     setLazyListItemID: Long
   ) {
     //    Log.i("startSetCompletedTimer() ", "called")
@@ -458,10 +458,10 @@ class WorkoutViewModel2(
         uuid = workoutTemplate.uuid
         name = workoutTemplate.name
         workoutAuthor = workoutTemplate.workoutAuthor
-        //        notes = workoutTemplate.notes.filter { it.pinned }.toRealmList()
+        //        notes = workoutTemplate.notes.filter { it.pinned }.toMutableList()
         workoutType = workoutTemplate.workoutType
         dateCreated = workoutTemplate.dateCreated
-        workoutStarted = RealmInstant.now()
+        workoutStarted = Clock.System.now()
         day = workoutTemplate.day
         //        exercisesSets =
         // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets)
@@ -485,9 +485,9 @@ class WorkoutViewModel2(
         uuid = previousWorkout.uuid
         name = previousWorkout.name
         workoutAuthor = previousWorkout.workoutAuthor
-        //        notes = previousWorkout.notes.filter { it.pinned }.toRealmList()
+        //        notes = previousWorkout.notes.filter { it.pinned }.toMutableList()
         workoutType = previousWorkout.workoutType
-        workoutStarted = RealmInstant.now()
+        workoutStarted = Clock.System.now()
         day = previousWorkout.day
         //        exercisesSets =
         // copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets)
@@ -504,7 +504,7 @@ class WorkoutViewModel2(
   }
 
   private fun copyExercisesSetsFromPreviousWorkout(
-    previousExercisesSets: RealmList<ExerciseSets>,
+    previousExercisesSets: List<ExerciseSets>,
     _workoutID: ObjectId
   ): MutableList<ExerciseExerciseSets> {
     val newExercisesSets = mutableListOf<ExerciseExerciseSets>()
@@ -516,13 +516,13 @@ class WorkoutViewModel2(
           exerciseOrder = exerciseSets.exerciseOrder
           exercise = exerciseRepository.getExercise(exerciseSets.exerciseID)
           sets = copySetsFromPreviousWorkout(exerciseSets.sets)
-          notes = exerciseSets.notes.filter { it.pinned }.toRealmList()
+          notes = exerciseSets.notes.filter { it.pinned }.toMutableList()
           workoutID = _workoutID
         }
 
       if (exerciseSets.exerciseID != null) {
         newExerciseExerciseSets.notes =
-          exerciseNotesRepository.getPinnedExerciseNotes(exerciseSets.exerciseID!!).toRealmList()
+          exerciseNotesRepository.getPinnedExerciseNotes(exerciseSets.exerciseID!!).toMutableList()
       }
 
       newExercisesSets.add(newExerciseExerciseSets)
@@ -531,7 +531,7 @@ class WorkoutViewModel2(
     return newExercisesSets
   }
 
-  private fun copySetsFromPreviousWorkout(previousSets: RealmList<Set>): RealmList<Set> {
+  private fun copySetsFromPreviousWorkout(previousSets: List<Set>): List<Set> {
     // TODO Think out how to get Previous Set from the last time the exercise was performed and what
     // data structure to store them in
 
@@ -621,7 +621,7 @@ class WorkoutViewModel2(
 
   private fun stopWorkoutTimer() {
     workoutCountUpTimer.stop()
-    _workoutData.workoutEnded = RealmInstant.now()
+    _workoutData.workoutEnded = Clock.System.now()
     _workoutData.workoutDuration = workoutDuration
     _workout.value = _workoutData
     // TODO Navigate to Workout Complete Screen & Summary
@@ -654,8 +654,8 @@ class WorkoutViewModel2(
             if (temporaryExerciseExerciseSets.isEmpty()) 1
             else temporaryExerciseExerciseSets.last().exerciseOrder.plus(1)
           exercise = _exercise
-          notes = pinnedNotes.toRealmList()
-          datePerformed = RealmInstant.now()
+          notes = pinnedNotes.toMutableList()
+          datePerformed = Clock.System.now()
           workoutID = _workout.value._id
         }
       )
@@ -707,7 +707,7 @@ class WorkoutViewModel2(
     exerciseSets: ExerciseExerciseSets,
     temporarySets: List<Set>,
   ) {
-    exerciseSets.sets = temporarySets.toRealmList()
+    exerciseSets.sets = temporarySets.toMutableList()
 
     updateExerciseExerciseSetsData(exerciseSets)
   }
@@ -748,7 +748,7 @@ class WorkoutViewModel2(
     exerciseSets: ExerciseExerciseSets,
     temporaryNotes: List<ExerciseNote>,
   ) {
-    exerciseSets.notes = temporaryNotes.toRealmList()
+    exerciseSets.notes = temporaryNotes.toMutableList()
 
     updateExerciseExerciseSetsData(exerciseSets)
   }
@@ -794,34 +794,34 @@ class WorkoutViewModel2(
 //    return allSets().first { it.uuid == setUUID }
 //  }
 
-  fun updateSetWeight(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, newWeight: Double?) {
+  fun updateSetWeight(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newWeight: Double?) {
     val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
     exerciseSets.updateSetWeight(uuid = setUUID, newWeight = newWeight, weightUnit = weightUnit)
 
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun updateSetReps(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, newReps: Int?) {
+  fun updateSetReps(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newReps: Int?) {
     exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun updateSetRIR(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, newRIR: Double?) {
+  fun updateSetRIR(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newRIR: Double?) {
     exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun updateSetRPE(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, newRPE: Double?) {
+  fun updateSetRPE(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newRPE: Double?) {
     exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun setComplete(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, setComplete: Boolean) {
+  fun setComplete(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, setComplete: Boolean) {
     exerciseSets.completeSet(setUUID, setComplete)
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun updateSetType(exerciseSets: ExerciseExerciseSets, setUUID: RealmUUID, setTypeID: Int) {
+  fun updateSetType(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, setTypeID: Int) {
     exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
     updateExerciseExerciseSetsData(exerciseSets)
   }
@@ -958,7 +958,7 @@ class WorkoutViewModel2(
 /*
     private fun getPinnedExerciseNotesByExercise(
       exercise: Exercise
-    ): RealmList<ExerciseNote> {  }
+    ): List<ExerciseNote> {  }
   *//*
 
 
@@ -984,7 +984,7 @@ class WorkoutViewModel2(
   private fun saveWorkout() {
     //    TODO Implement this
     //
-    _workoutData.notes = _workoutNotesData.toRealmList()
+    _workoutData.notes = _workoutNotesData.toMutableList()
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     removeUncompletedSets()
 
@@ -1051,22 +1051,22 @@ private fun initWorkout(): Workout {
     in 0..11 -> {
       Workout().apply {
         name = "Morning Workout"
-        dateCreated = RealmInstant.now()
-        workoutStarted = RealmInstant.now()
+        dateCreated = Clock.System.now()
+        workoutStarted = Clock.System.now()
       }
     }
     in 12..17 -> {
       Workout().apply {
         name = "Afternoon Workout"
-        dateCreated = RealmInstant.now()
-        workoutStarted = RealmInstant.now()
+        dateCreated = Clock.System.now()
+        workoutStarted = Clock.System.now()
       }
     }
     else -> {
       Workout().apply {
         name = "Evening Workout"
-        dateCreated = RealmInstant.now()
-        workoutStarted = RealmInstant.now()
+        dateCreated = Clock.System.now()
+        workoutStarted = Clock.System.now()
       }
     }
   }
@@ -1082,7 +1082,7 @@ private fun initWorkout(): Workout {
       muscleGroupID = "null"
     )
 
-  val workoutUUID = RealmUUID.random()
+  val workoutUUID = Uuid.random()
   val workoutID = fakeULID()
 
   return MutableList(1) {

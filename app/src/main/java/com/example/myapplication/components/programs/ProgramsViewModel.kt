@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.programs
 
 import android.util.Log
@@ -10,11 +12,12 @@ import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.data.network.ProgramsRepository
 import com.example.myapplication.data.network.WorkoutRepository
-import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class ProgramsViewModel
 constructor(
@@ -67,7 +70,7 @@ constructor(
     //        return program
   }
 
-  fun isProgramActive(programUUID: RealmUUID): Boolean {
+  fun isProgramActive(programUUID: Uuid): Boolean {
     return programsRepository.isProgramActive(programUUID)
   }
 

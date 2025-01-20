@@ -1,20 +1,21 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.data.network
 
-import com.example.myapplication.data.database.RealmDatabase
+import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
+import com.example.myapplication.data.model.WorkoutNote
 import kotlinx.coroutines.flow.Flow
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
-class WorkoutRepository constructor(private val database: RealmDatabase) {
-  fun getWorkoutByID(workoutID: ObjectId): Workout? {
-    return database.getWorkoutByID(workoutID)
-  }
+interface WorkoutRepository {
+  fun getWorkoutByID(workoutID: ObjectId): Workout?
 
-  fun getWorkoutsCount(): Int {
-    return database.getWorkoutsCount()
-  }
+  fun getWorkoutsCount(): Int
 
   /*    suspend fun getWorkoutByMicrocycleUUID(microcycleUUID: UUID): List<Workout> {
       return workoutsDao.getWorkoutsByMicrocycleUUID(microcycleUUID)
@@ -28,57 +29,75 @@ class WorkoutRepository constructor(private val database: RealmDatabase) {
       return workoutsDao.getWorkoutsByProgramUUID(programUUID)
   }*/
 
-  fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout> {
-    return database.getWorkoutsByMicrocycleID(microcycleID)
-  }
+  fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout>
 
-  fun getWorkoutByMesocycleID(mesocycleID: ObjectId): Flow<List<Workout>> {
-    return database.getWorkoutsByMesocycleID(mesocycleID)
-  }
+  fun getWorkoutsByMesocycleID(mesocycleID: ObjectId): List<Workout>
 
-  fun getWorkoutByProgramID(programID: ObjectId): Flow<List<Workout>> {
-    return database.getWorkoutsByProgramID(programID)
-  }
+  fun getWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>>
 
-  suspend fun insertWorkout(workout: Workout) {
-    database.insertWorkout(workout)
-  }
+  suspend fun insertWorkout(workout: Workout): Boolean
 
-  suspend fun updateWorkout(workout: Workout) {
-    database.updateWorkout(workout)
-  }
+  suspend fun updateWorkout(workout: Workout): Boolean
 
-  suspend fun deleteWorkout(workout: Workout) {
-    database.deleteWorkout(workout)
-  }
+  suspend fun deleteWorkout(workout: Workout): Boolean
 
-  fun getAllWorkouts(): Flow<List<Workout>> {
-    return database.getAllWorkouts()
-  }
+  fun getAllWorkoutTemplates(): Flow<List<Workout>>
 
-  fun getAllCompletedWorkouts(): Flow<List<Workout>> {
-    return database.getAllCompletedWorkouts()
-  }
+  fun getAllCompletedWorkouts(): Flow<List<Workout>>
 
-  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
-    return database.getPreviousSetForExercise(exerciseID, setNumber)
-  }
+  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set?
 
-  fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout? {
-    return database.findNextWorkoutExerciseSets(exerciseSets, programID)
-  }
+  fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout?
 
-  suspend fun updateSets(sets: MutableList<Set>) {
-    database.updateSets(sets)
-  }
+  suspend fun updateSets(sets: MutableList<Set>)
 
   fun filterWorkouts(
     workout: String,
     programIDs: List<String>,
     startDate: String,
-    endDate: String
+    endDate: String,
     //        movementTypes: List<String>
-  ): Flow<List<Workout>> {
-    return database.filterWorkouts(workout, programIDs, startDate, endDate)
-  }
+  ): Flow<List<Workout>>
+}
+
+interface CurrentWorkoutRepository {
+  fun getWorkoutByID(workoutID: ObjectId): Workout?
+
+  fun getWorkoutsCount(): Int
+
+  fun getExerciseNotes(): Flow<List<ExerciseNote>>
+
+  fun getPinnedExerciseNotes(exerciseID: ObjectId, pinned: Boolean = true): List<ExerciseNote>
+
+  suspend fun insertExerciseNote(exerciseNote: ExerciseNote)
+
+  suspend fun updateExerciseNote(exerciseNote: ExerciseNote)
+
+  fun getPinnedWorkoutNotes(
+    workoutUUID: Uuid,
+    pinned: Boolean = true,
+    programPinned: Boolean = false,
+    mesocyclePinned: Boolean = false,
+    microcyclePinned: Boolean = false,
+  ): List<WorkoutNote>
+
+  suspend fun insertWorkoutNote(workoutNote: WorkoutNote)
+
+  suspend fun updateWorkoutNote(workoutNote: WorkoutNote)
+
+  suspend fun insertWorkout(workout: Workout): Boolean
+
+  suspend fun updateWorkout(workout: Workout): Boolean
+
+  suspend fun deleteWorkout(workout: Workout): Boolean
+
+  fun getAllWorkoutTemplates(): Flow<List<Workout>>
+
+  fun getAllCompletedWorkouts(): Flow<List<Workout>>
+
+  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set?
+
+  fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout?
+
+  suspend fun updateSets(sets: MutableList<Set>)
 }

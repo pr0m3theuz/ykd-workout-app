@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components
 
 import com.example.myapplication.data.model.MassUnit
@@ -8,19 +10,22 @@ import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutRepository
 import com.example.myapplication.utils.ProgressionType
 import com.example.myapplication.utils.selectProgression
-import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
 
 class PostWorkoutUseCase(
     private val workoutRepository: WorkoutRepository,
     private val programRepository: ProgramsRepository,
     private val userRepository: UserRepository,
 ) {
-    val currentUser = userRepository.getCurrentUser()
-    val userDefaultWeightUnit: String =
-        userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
-            ?: MassUnit.POUNDS.abbreviation
+    // TODO rewrite
+    //  val currentUser = userRepository.getCurrentUser()
+    //  val userDefaultWeightUnit: String =
+    //    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
+    //      ?: MassUnit.POUNDS.abbreviation
+
+    private val tempOwnerId = ObjectId().toString()
+    val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
     fun getCompletedWorkout(workoutID: ObjectId): Workout? {
         return workoutRepository.getWorkoutByID(workoutID)
@@ -29,6 +34,7 @@ class PostWorkoutUseCase(
     suspend fun updateNextWorkoout(workout: Workout) {
         workoutRepository.updateWorkout(workout)
     }
+
 
     fun getNextWorkout(workout: Workout, updateSets: (MutableList<Set>) -> Unit): Workout? {
         // TODO get next exercise set in program with the same min, max reps, and progression type
@@ -70,7 +76,7 @@ class PostWorkoutUseCase(
                         // TODO update matching exerciseSets in workoutToUpdate
                         if (updatedSets.isNotEmpty()) {
                             workoutToUpdate!!.exercisesSets.firstOrNull { it.exerciseID == exerciseSetsToUpdate.exerciseID }?.sets =
-                                updatedSets.toRealmList()
+                                updatedSets.toMutableList()
                         }
 
                     }

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workoutDialogs.workingSets
 
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import com.example.myapplication.components.workoutDialogs.calculatePercentage
 import com.example.myapplication.components.workoutDialogs.getFormattedPercentageText
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.utils.checkIntInput
+import kotlin.uuid.ExperimentalUuidApi
 
 @Composable
 fun WorkingSetLayout(

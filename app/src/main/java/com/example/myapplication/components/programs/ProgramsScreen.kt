@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.programs
 
 import android.widget.Toast
@@ -72,6 +74,7 @@ import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.utils.doubleFormatted
 import org.koin.androidx.compose.koinViewModel
+import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Add a placeholder card if there is no active program
 // TODO Add FAB

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workoutDialogs.workingSets
 
 import androidx.lifecycle.ViewModel
@@ -7,19 +9,25 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
-import io.realm.kotlin.mongodb.User
-import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
-import io.realm.kotlin.types.RealmUUID
+
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class WorkingSetViewModel(private val userRepository: UserRepository) : ViewModel() {
-  val currentUser: User = userRepository.getCurrentUser()
+//  TODO REWRITE THIS
+//  val currentUser: User = userRepository.getCurrentUser()
+//
+//  val userDefaultWeightUnit: String =
+//    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
+//      ?: MassUnit.POUNDS.abbreviation
 
-  val userDefaultWeightUnit: String =
-    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
-      ?: MassUnit.POUNDS.abbreviation
+  private val tempOwnerId = ObjectId().toString()
+  val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   var exerciseWeightUnit: String? = null
   private var _oneRepMax: Double = 100.0
@@ -40,9 +48,9 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
   }
 
   //  private var exerciseID: Long = 0
-  //  private var exerciseUUID: RealmUUID = RealmUUID.random()
+  //  private var exerciseUUID: Uuid = Uuid.random()
   //  private var workoutID: Long = 0
-  //  private var workoutUUID: RealmUUID = RealmUUID.random()
+  //  private var workoutUUID: Uuid = Uuid.random()
 
   fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
     //    exerciseID = exerciseSets.exercise?.exerciseID
@@ -67,7 +75,7 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
           setTypeID = _sets.last().setTypeID
           percentage1RM = _sets.last().percentage1RM
           isPublic = false
-          owner_id = currentUser.id
+          ownerID = tempOwnerId
         }
       )
       _setsFlow.value = _sets.toList()
@@ -82,7 +90,7 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
     _setsFlow.value = _sets.toList()
   }
 
-  fun updateSetWeight(uuid: RealmUUID, newWeight: Double?) {
+  fun updateSetWeight(uuid: Uuid, newWeight: Double?) {
     val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
     if (weightUnit == MassUnit.POUNDS.abbreviation) {
       _sets.forEach {
@@ -101,11 +109,11 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
     }
   }
 
-  fun updateSetReps(uuid: RealmUUID, newReps: Int) {
+  fun updateSetReps(uuid: Uuid, newReps: Int) {
     _sets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
   }
 
-  fun updateSetPercentage(uuid: RealmUUID, newPercentage: Double) {
+  fun updateSetPercentage(uuid: Uuid, newPercentage: Double) {
     _sets.forEach { if (it.uuid == uuid) it.percentage1RM = newPercentage }
   }
 

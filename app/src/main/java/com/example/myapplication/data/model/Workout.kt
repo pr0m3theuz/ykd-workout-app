@@ -1,12 +1,13 @@
 @file:UseSerializers(
-  MutableRealmIntKSerializer::class,
-  RealmAnyKSerializer::class,
-  RealmDictionaryKSerializer::class,
-  RealmInstantKSerializer::class,
-  RealmListKSerializer::class,
-  RealmSetKSerializer::class,
-  RealmUUIDKSerializer::class,
+  //  MutableRealmIntKSerializer::class,
+  //  RealmAnyKSerializer::class,
+  //  RealmDictionaryKSerializer::class,
+  //  RealmInstantKSerializer::class,
+  //  RealmListKSerializer::class,
+  //  RealmSetKSerializer::class,
+  //  RealmUUIDKSerializer::class,
 )
+@file:OptIn(ExperimentalUuidApi::class)
 
 package com.example.myapplication.data.model
 
@@ -14,24 +15,14 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.Log
 import com.example.myapplication.utils.newID
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.serializers.MutableRealmIntKSerializer
-import io.realm.kotlin.serializers.RealmAnyKSerializer
-import io.realm.kotlin.serializers.RealmDictionaryKSerializer
-import io.realm.kotlin.serializers.RealmInstantKSerializer
-import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.serializers.RealmSetKSerializer
-import io.realm.kotlin.serializers.RealmUUIDKSerializer
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.RealmUUID
-import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.datetime.Clock
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -40,31 +31,36 @@ import java.time.format.FormatStyle
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Serializable
-class Workout() : RealmObject {
-  @PrimaryKey var _id: ObjectId = ObjectId()
-  var lazyListItemID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
-  var name: String? = null // TODO make name default = User
-  var workoutAuthor: String? = null
-  var notes: RealmList<WorkoutNote> = realmListOf()
-  var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds
-  var workoutType: String? = null
-  var dateCreated: RealmInstant = RealmInstant.now()
-  var workoutStarted: RealmInstant? = null
-  var workoutEnded: RealmInstant? = null
-  var day: Int? = null
-  var exercisesSets: RealmList<ExerciseSets> = realmListOf()
-  var totalVolumeInPounds: Double? = 0.0
-  var totalVolumeInKilograms: Double? = 0.0
-  var programID: ObjectId? = null
+data class WorkoutDao(var item: Workout)
 
-  //    val mesocycleID: Long? = null
-  var microcycleID: ObjectId? = null
-  var owner_id: String = ""
-  var isPublic: Boolean = false
-}
+@Serializable
+data class Workout(
+  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  var lazyListItemID: Long = newID(),
+  @Contextual var uuid: Uuid = Uuid.random(),
+  var name: String, // TODO make name default = User
+  var workoutAuthor: String? = null,
+  var notes: List<WorkoutNote> = emptyList(),
+  var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds,
+  var workoutType: String? = null,
+  var dateCreated: kotlinx.datetime.Instant = Clock.System.now(), // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var workoutStarted: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var workoutEnded: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var day: Int? = null,
+  var exercisesSets: List<ExerciseSets> = emptyList(),
+  var totalVolumeInPounds: Double? = 0.0,
+  var totalVolumeInKilograms: Double? = 0.0,
+  var order: Int? = null, // For sorting workouts in a program
+  @Contextual var programID: ObjectId? = null,
+  @Contextual val mesocycleID: Long? = null,
+  @Contextual var microcycleID: ObjectId? = null,
+  var ownerID: String = "",
+  var isPublic: Boolean = false,
+)
 
 @Parcelize
 class WorkoutParcel(var workout: String) : Parcelable {

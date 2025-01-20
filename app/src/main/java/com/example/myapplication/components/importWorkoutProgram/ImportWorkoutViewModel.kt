@@ -68,7 +68,7 @@ class ImportWorkoutViewModel(
 //    }
 //  }
 //
-//  fun importMesocycles(file: String): RealmList<Mesocycle>? {
+//  fun importMesocycles(file: String): List<Mesocycle>? {
 //    val config =
 //      ConfigEvaluator.preconfigured().forKotlin().use { evaluator ->
 //        evaluator.evaluate(ModuleSource.text(file.trimIndent()))
@@ -76,7 +76,7 @@ class ImportWorkoutViewModel(
 //
 //    return try {
 //      val pklMesocycles = config["mesocycles"].to<List<AdvancedProgramTemplate.Mesocycle>>()
-//      val mesocycles: RealmList<Mesocycle> = importWorkoutProgram.importMesocycles(pklMesocycles)
+//      val mesocycles: List<Mesocycle> = importWorkoutProgram.importMesocycles(pklMesocycles)
 //      println(Json.encodeToString(Mesocycle.serializer(), mesocycles.first()))
 //      mesocycles
 //    } catch (e: Exception) {
@@ -84,7 +84,7 @@ class ImportWorkoutViewModel(
 //    }
 //  }
 //
-//  fun importMicrocycles(file: String): RealmList<Microcycle>? {
+//  fun importMicrocycles(file: String): List<Microcycle>? {
 //    val config =
 //      ConfigEvaluator.preconfigured().forKotlin().use { evaluator ->
 //        evaluator.evaluate(ModuleSource.text(file.trimIndent()))
@@ -92,7 +92,7 @@ class ImportWorkoutViewModel(
 //
 //    return try {
 //      val pklMicrocycle = config["microcycles"].to<List<AdvancedProgramTemplate.Microcycle>>()
-//      val microcycles: RealmList<Microcycle> = importWorkoutProgram.importMicrocycles(pklMicrocycle)
+//      val microcycles: List<Microcycle> = importWorkoutProgram.importMicrocycles(pklMicrocycle)
 //      println(Json.encodeToString(Microcycle.serializer(), microcycles.first()))
 //      microcycles
 //    } catch (e: Exception) {
@@ -100,7 +100,7 @@ class ImportWorkoutViewModel(
 //    }
 //  }
 //
-//  fun importWorkouts(file: String): RealmList<Workout>? {
+//  fun importWorkouts(file: String): List<Workout>? {
 //    val config =
 //      ConfigEvaluator.preconfigured().forKotlin().use { evaluator ->
 //        evaluator.evaluate(ModuleSource.text(file.trimIndent()))
@@ -108,7 +108,7 @@ class ImportWorkoutViewModel(
 //
 //    return try {
 //      val pklWorkouts = config["workouts"].to<List<AdvancedProgramTemplate.Workout>>()
-//      val workouts: RealmList<Workout> = importWorkoutProgram.importWorkouts(pklWorkouts)
+//      val workouts: List<Workout> = importWorkoutProgram.importWorkouts(pklWorkouts)
 //      println(Json.encodeToString(Workout.serializer(), workouts.first()))
 //      workouts
 //    } catch (e: Exception) {
@@ -116,7 +116,7 @@ class ImportWorkoutViewModel(
 //    }
 //  }
 //
-//  fun importAdvancedWorkouts(file: String): RealmList<Workout>? {
+//  fun importAdvancedWorkouts(file: String): List<Workout>? {
 //    val config =
 //      ConfigEvaluator.preconfigured().forKotlin().use { evaluator ->
 //        evaluator.evaluate(ModuleSource.text(file.trimIndent()))
@@ -125,7 +125,7 @@ class ImportWorkoutViewModel(
 //    return try {
 //      val pklAdvancedWorkouts =
 //        config["workouts"].to<List<AdvancedProgramTemplate.AdvancedWorkout>>()
-//      val advancedWorkouts: RealmList<Workout> =
+//      val advancedWorkouts: List<Workout> =
 //        importWorkoutProgram.importAdvancedWorkouts(pklAdvancedWorkouts)
 //      println(Json.encodeToString(Workout.serializer(), advancedWorkouts.first()))
 //      advancedWorkouts

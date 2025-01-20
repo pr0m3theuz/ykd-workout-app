@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.programs
 
 import android.widget.Toast
@@ -92,8 +94,9 @@ import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.utils.createAnnotatedLinkString
 import com.example.myapplication.utils.doubleFormatted
+import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
-import org.mongodb.kbson.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
 
 @Composable
 fun ProgramDetailsScreen(
@@ -102,9 +105,9 @@ fun ProgramDetailsScreen(
   programID: String,
 ) {
 
-  programsViewModel.getProgramById(ObjectId(programID).asObjectId())
-  programsViewModel.getMesocyclesByProgram(ObjectId(programID).asObjectId())
-  programsViewModel.getMicrocyclesByProgram(ObjectId(programID).asObjectId())
+  programsViewModel.getProgramById(ObjectId(programID))
+  programsViewModel.getMesocyclesByProgram(ObjectId(programID))
+  programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
 
   val program by programsViewModel.selectedProgram.collectAsStateWithLifecycle(null)
 

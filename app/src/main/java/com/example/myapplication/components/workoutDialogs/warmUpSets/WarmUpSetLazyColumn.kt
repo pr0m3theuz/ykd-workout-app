@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components
 
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +22,7 @@ import com.example.myapplication.components.workoutDialogs.SwipeToDismissBoxList
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalMaterialApi::class)
 // @Preview
@@ -33,7 +36,9 @@ fun WarmUpSetLazyColumn(warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel
 
   LazyColumn(
     state = listState,
-    modifier = Modifier.fillMaxWidth().height(235.dp),
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(235.dp),
     //  verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
     items(count = warmUpSets.size, key = { index -> warmUpSets[index].lazyListItemID }) { index ->

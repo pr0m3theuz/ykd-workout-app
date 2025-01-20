@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workout
 
 import android.os.Build
@@ -25,6 +27,7 @@ import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.WorkoutNote
 import org.koin.androidx.compose.koinViewModel
+import kotlin.uuid.ExperimentalUuidApi
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -196,7 +199,9 @@ fun ExerciseSetLazyColumn(
 
     item { AddExercise() }
     if (enableCancelWorkout) item { CancelWorkout() }
-    item { Box(modifier = Modifier.height(128.dp).fillMaxWidth()) }
+    item { Box(modifier = Modifier
+      .height(128.dp)
+      .fillMaxWidth()) }
   }
 }
 

@@ -63,6 +63,8 @@ import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.PreviewNextWorkoutScreen
 import com.example.myapplication.components.workout.WorkoutScreen
 import com.example.myapplication.components.workout.WorkoutSummaryScreen
+import com.example.myapplication.data.services.AuthenticationService
+import com.example.myapplication.data.services.ReplicatorService
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -70,6 +72,8 @@ import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.crashlytics.setCustomKeys
 import com.newrelic.agent.android.NewRelic
 import kotlinx.serialization.ExperimentalSerializationApi
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -101,11 +105,25 @@ class MainActivity : ComponentActivity() {
       .withLoggingEnabled(true)
       .start(this.applicationContext)
 
+
+
     setContent {
+
+      val authService: AuthenticationService by inject()
+      //      val userProfileRepository: KeyValueRepository by inject()
+      val replicatorService: ReplicatorService by inject()
+      val mainViewModel = getViewModel<MainViewModel>()
+
+      val uname = "glare_parmesan992@simplelogin.com"
+      val pwd = "RpHg!Xe%beN5XNCBhvs#jj*PkN23H&ux"
+      authService.authenticatedUser(username = uname, password = pwd)
+
       MyApplicationTheme {
-//        TestScreen()
+        //        TestScreen()
 
         val navController = rememberNavController()
+
+        MainView(mainViewModel.startDatabase, mainViewModel.closeDatabase)
 
         NavHost(navController = navController, startDestination = Screens.Workout.route) {
           addExercisesGraph(navController)

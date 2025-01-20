@@ -1,6 +1,5 @@
 package com.example.myapplication.data.network
 
-import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.model.Equipment
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.Force
@@ -9,83 +8,59 @@ import com.example.myapplication.data.model.MuscleGroup
 import com.example.myapplication.data.model.MuscleRoleFunction
 import com.example.myapplication.data.model.Utility
 import kotlinx.coroutines.flow.Flow
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
 
-class ExercisesRepository(private val database: RealmDatabase) {
+interface ExercisesRepository {
   // Room executes all queries on a separate thread.
   // Observed Flow will notify the observer when the data has changed.
-  fun getAllExercises(): Flow<List<Exercise>> = database.getAllExercises()
+  fun getAllExercises(): Flow<List<Exercise>>
 
-  fun getAllEquipment(): List<Equipment> = database.getAllEquipment()
+  fun getAllEquipment(): List<Equipment>
 
-  fun getAllMuscleGroups(): List<MuscleGroup> = database.getAllMuscleGroups()
+  fun getAllMuscleGroups(): List<MuscleGroup>
 
-  fun getAllUtilities(): Flow<List<Utility>> = database.getAllUtilities()
+  fun getAllUtilities(): List<Utility>
 
-  fun getAllForces(): Flow<List<Force>> = database.getAllForces()
+  fun getAllForces(): List<Force>
 
-  fun getAllMechanics(): Flow<List<Mechanic>> = database.getAllMechanics()
+  fun getAllMechanics(): List<Mechanic>
 
-  fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> =
-    database.getAllMuscleRolesFunctions()
+  fun getAllMuscleRolesFunctions(): List<MuscleRoleFunction>
 
-  fun getMuscleGroupNameByID(muscleGroupID: String): String =
-    database.getMuscleGroupNameByID(muscleGroupID)
+  fun getMuscleGroupNameByID(muscleGroupID: String): String
 
   // By default Room runs suspend queries off the main thread, therefore, we don't need to
   // implement anything else to ensure we're not doing long running database work
   // off the main thread.
 
   // TODO Use function when inserting new exercises
-  suspend fun insertExercise(exercise: Exercise) {
-    database.insertExercise(exercise)
-  }
+  suspend fun insertExercise(exercise: Exercise)
 
-  fun getExerciseDetails(exerciseID: ObjectId): Exercise {
-    return database.getExerciseDetails(exerciseID)
-  }
+  fun getExerciseDetails(exerciseID: ObjectId): Exercise?
 
-  fun getExercise(exerciseID: ObjectId?): Exercise? {
-    return database.getExercise(exerciseID)
-  }
+  fun getExercise(exerciseID: ObjectId?): Exercise?
 
-  suspend fun updateExercise(exercise: Exercise) {
-    database.updateExercise(exercise)
-  }
+  suspend fun updateExercise(exercise: Exercise): Boolean
 
-  suspend fun updateWeightUnitsforExercise(exerciseID: ObjectId, weightUnit: String) {
-    database.updateWeightUnitsForExercise(exerciseID, weightUnit)
-  }
+  suspend fun updateWeightUnitsForExercise(exerciseID: ObjectId, weightUnit: String)
 
-  suspend fun updateWorkingSetRestTimerforExercise(exerciseID: ObjectId, restDuration: Long) {
-    database.updateWorkingSetRestTimerForExercise(exerciseID, restDuration)
-  }
+  suspend fun updateWorkingSetRestTimerForExercise(exerciseID: ObjectId, restDuration: Long)
 
-  suspend fun updateWarmUpSetRestTimerforExercise(exerciseID: ObjectId, restDuration: Long) {
-    database.updateWarmUpSetRestTimerForExercise(exerciseID, restDuration)
-  }
+  suspend fun updateWarmUpSetRestTimerForExercise(exerciseID: ObjectId, restDuration: Long)
 
-  suspend fun enableWorkingSetRestTimerforExercise(exerciseID: ObjectId, enable: Boolean) {
-    database.enableWorkingSetRestTimerForExercise(exerciseID, enable)
-  }
+  suspend fun enableWorkingSetRestTimerForExercise(exerciseID: ObjectId, enable: Boolean)
 
-  suspend fun enableWarmUpSetRestTimerforExercise(exerciseID: ObjectId, enable: Boolean) {
-    database.enableWarmUpSetRestTimerForExercise(exerciseID, enable)
-  }
+  suspend fun enableWarmUpSetRestTimerForExercise(exerciseID: ObjectId, enable: Boolean)
 
   fun filterExercises(
     exercise: String,
     muscleGroupIDs: List<String>,
     equipmentIDs: List<String>
     //        movementTypes: List<String>
-  ): Flow<List<Exercise>> {
-    return database.filterExercises(exercise, muscleGroupIDs, equipmentIDs /*movementTypes*/)
-  }
+  ): Flow<List<Exercise>>
 
-  fun getExerciseByName(exerciseName: String): Exercise {
-    return database.getExerciseByName(exerciseName)
-  }
+  fun getExerciseByName(exerciseName: String): ObjectId?
 }

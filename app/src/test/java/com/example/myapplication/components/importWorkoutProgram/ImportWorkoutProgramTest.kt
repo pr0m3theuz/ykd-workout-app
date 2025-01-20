@@ -6,9 +6,9 @@ package com.example.myapplication.components.importWorkoutProgram
 //import com.example.myapplication.data.model.Program
 //import com.example.myapplication.data.model.Set
 //import com.example.myapplication.data.model.Workout
-//import io.realm.kotlin.ext.realmListOf
-//import io.realm.kotlin.ext.toRealmList
-//import io.realm.kotlin.types.RealmList
+//
+//
+//
 //import kotlinx.serialization.json.Json
 //import net.jqwik.api.Example
 //import org.mongodb.kbson.ObjectId
@@ -41,11 +41,11 @@ package com.example.myapplication.components.importWorkoutProgram
 //
 //    fun createExerciseSets(
 //      pklExercisesSets: List<AdvancedProgramTemplate.ExerciseSets>
-//    ): RealmList<ExerciseSets> {
+//    ): List<ExerciseSets> {
 //      val exercisesSets = mutableListOf<ExerciseSets>()
 //
 //      pklExercisesSets.forEachIndexed { index, pklExerciseSets ->
-//        //        val _exSetsUUID: RealmUUID = RealmUUID.random()
+//        //        val _exSetsUUID: Uuid = Uuid.random()
 //        val exerciseSets =
 //          ExerciseSets().apply {
 //            //          exSetsUUID = _exSetsUUID
@@ -67,7 +67,7 @@ package com.example.myapplication.components.importWorkoutProgram
 //                  }
 //                }
 //
-//                setList.toRealmList()
+//                setList.toMutableList()
 //              } else {
 //                realmListOf<Set>()
 //              }
@@ -75,24 +75,24 @@ package com.example.myapplication.components.importWorkoutProgram
 //        exercisesSets.add(index, exerciseSets)
 //      }
 //
-//      return exercisesSets.toRealmList()
+//      return exercisesSets.toMutableList()
 //    }
 //
-//    fun createWorkout(pklWorkouts: List<AdvancedProgramTemplate.Workout>): RealmList<Workout> {
+//    fun createWorkout(pklWorkouts: List<AdvancedProgramTemplate.Workout>): List<Workout> {
 //      val workouts = mutableListOf<Workout>()
 //
 //      pklWorkouts.forEachIndexed { index, pklWorkout ->
 //        val workout =
 //          Workout().apply {
 //            name = pklWorkout.name
-//            notes = realmListOf()
+//            notes =  emptyList()
 //            day = pklWorkout.day.toInt()
 //            exercisesSets = createExerciseSets(pklWorkout.exercisesSets)
 //          }
 //        workouts.add(index, workout)
 //      }
 //
-//      return workouts.toRealmList()
+//      return workouts.toMutableList()
 //    }
 //
 //    fun getExerciseObjectID(exerciseName: String): ObjectId {
@@ -101,11 +101,11 @@ package com.example.myapplication.components.importWorkoutProgram
 //
 ////    fun createAdvancedExerciseSets(
 ////      pklAdvancedExercisesSets: List<AdvancedProgramTemplate.AdvancedExerciseSets>
-////    ): RealmList<ExerciseSets> {
+////    ): List<ExerciseSets> {
 ////      val exercisesSets = mutableListOf<ExerciseSets>()
 ////
 ////      pklAdvancedExercisesSets.forEachIndexed { index, pklAdvancedExerciseSets ->
-////        // val _exSetsUUID: RealmUUID = RealmUUID.random()
+////        // val _exSetsUUID: Uuid = Uuid.random()
 ////
 ////        if (
 ////          pklAdvancedExerciseSets.setScheme?.sets.toInt() !=
@@ -161,7 +161,7 @@ package com.example.myapplication.components.importWorkoutProgram
 ////                  }
 ////                }
 ////
-////                setList.toRealmList()
+////                setList.toMutableList()
 ////              } else {
 ////                realmListOf<Set>()
 ////              }
@@ -169,19 +169,19 @@ package com.example.myapplication.components.importWorkoutProgram
 ////        exercisesSets.add(index, exerciseSets)
 ////      }
 ////
-////      return exercisesSets.toRealmList()
+////      return exercisesSets.toMutableList()
 ////    }
 //
 //    fun createAdvancedWorkout(
 //      pklAdvancedWorkouts: List<AdvancedProgramTemplate.AdvancedWorkout>
-//    ): RealmList<Workout> {
+//    ): List<Workout> {
 //      val workouts = mutableListOf<Workout>()
 //
 //      pklAdvancedWorkouts.forEachIndexed { index, pklAdvancedWorkout ->
 //        val workout =
 //          Workout().apply {
 //            name = pklAdvancedWorkout.name
-//            notes = realmListOf()
+//            notes =  emptyList()
 //            day = pklAdvancedWorkout.day.toInt()
 //            exercisesSets =
 //              if (pklAdvancedWorkout.exercisesSets.isNotEmpty()) {
@@ -196,12 +196,12 @@ package com.example.myapplication.components.importWorkoutProgram
 //        workouts.add(index, workout)
 //      }
 //
-//      return workouts.toRealmList()
+//      return workouts.toMutableList()
 //    }
 //
 //    fun createMicrocyles(
 //      pklMicrocycles: List<AdvancedProgramTemplate.Microcycle>
-//    ): RealmList<Microcycle> {
+//    ): List<Microcycle> {
 //      val microcycles = mutableListOf<Microcycle>()
 //
 //      pklMicrocycles.forEachIndexed { index, pklMicrocycle ->
@@ -223,7 +223,7 @@ package com.example.myapplication.components.importWorkoutProgram
 //        microcycles.add(index, microcycle)
 //      }
 //
-//      return microcycles.toRealmList()
+//      return microcycles.toMutableList()
 //    }
 //
 //    //    println(mesocycles.toString())

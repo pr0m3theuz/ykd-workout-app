@@ -1,16 +1,19 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.data.network
 
 import androidx.annotation.WorkerThread
-import com.example.myapplication.data.database.RealmDatabase
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.WorkoutNote
-import io.realm.kotlin.types.RealmUUID
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
 
-class ExerciseNotesRepository(private val database: RealmDatabase) {
+interface ExerciseNotesRepository {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
@@ -62,7 +65,7 @@ class ExerciseNotesRepository(private val database: RealmDatabase) {
 //    }
 }
 
-class WorkoutNotesRepository(private val database: RealmDatabase) {
+interface WorkoutNotesRepository {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
@@ -70,7 +73,7 @@ class WorkoutNotesRepository(private val database: RealmDatabase) {
 //        database.getWorkoutNotes(workoutID)
 
     fun getPinnedWorkoutNotes(
-        workoutUUID: RealmUUID,
+      workoutUUID: Uuid,
     ): List<WorkoutNote> =
         database.getPinnedWorkoutNotes(workoutUUID)
 

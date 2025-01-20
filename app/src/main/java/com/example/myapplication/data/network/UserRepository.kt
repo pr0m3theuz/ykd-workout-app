@@ -1,10 +1,8 @@
 package com.example.myapplication.data.network
 
-import com.example.myapplication.data.database.RealmDatabase
-import io.realm.kotlin.mongodb.User
 
-class UserRepository constructor(private val database: RealmDatabase) {
-    fun getCurrentUser(): User {
-        return database.getCurrentUser()
-    }
+interface UserRepository {
+//    fun getCurrentUser(): User {
+//        return database.getCurrentUser()
+//    }
 }

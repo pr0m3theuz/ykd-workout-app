@@ -38,8 +38,8 @@ import com.example.myapplication.components.WorkoutNameDialog
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.RestTimerButton
+import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
-import org.mongodb.kbson.ObjectId
 
 // TODO Takes a Workout Object
 
@@ -51,7 +51,7 @@ fun WorkoutScreen(
   workoutID: String?,
 ) {
   if (!workoutID.isNullOrBlank()) {
-    workoutViewModel.getWorkoutByID(ObjectId.invoke(workoutID))
+    workoutViewModel.getWorkoutByID(ObjectId(workoutID))
   } else {
     workoutViewModel.initWorkoutData()
   }

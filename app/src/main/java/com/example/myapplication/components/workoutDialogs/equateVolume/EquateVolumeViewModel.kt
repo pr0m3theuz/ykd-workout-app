@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.components.workoutDialogs.equateVolume
 
 import androidx.lifecycle.ViewModel
@@ -7,21 +9,28 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.utils.newID
-import io.realm.kotlin.mongodb.ext.customDataAsBsonDocument
-import io.realm.kotlin.types.RealmUUID
+
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.bson.types.ObjectId
 import java.math.RoundingMode
 import kotlin.math.roundToInt
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 private const val WARM_UP_SET = 2
 
 class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
-  val currentUser = userRepository.getCurrentUser()
-  val userDefaultWeightUnit: String =
-    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
-      ?: MassUnit.POUNDS.abbreviation
+
+  //  TODO REWRITE THIS
+//  val currentUser = userRepository.getCurrentUser()
+//  val userDefaultWeightUnit: String =
+//    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
+//      ?: MassUnit.POUNDS.abbreviation
+  private val tempOwnerId = ObjectId().toString()
+  val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   private var exerciseWeightUnit: String? = null
 
@@ -36,7 +45,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     get() = _setsFlow.asStateFlow()
 
   private var _setsPercentage = MutableStateFlow(_sets.associate { it.uuid to 1.0 })
-  val setsPercentage: StateFlow<Map<RealmUUID, Double>>
+  val setsPercentage: StateFlow<Map<Uuid, Double>>
     get() = _setsPercentage
 
   private var _totalVolume: Double = 0.0
@@ -106,7 +115,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
           setTypeID = temporarySets.last().setTypeID
           percentage1RM = temporarySets.last().percentage1RM
           isPublic = false
-          owner_id = currentUser.id
+          ownerID = tempOwnerId // TODO currentUser.id
         }
       )
     } else {
@@ -141,7 +150,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
       val newSet =
         lastSet?.copy(
           lazyListItemID = newID(),
-          RealmUUID = RealmUUID.random(),
+          Uuid = Uuid.random(),
           setNumber = lastSet.setNumber?.plus(1),
   //        exerciseID = exerciseID,
   //        workoutID = workoutID
@@ -172,7 +181,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     _setsFlow.value = _sets.toList()
   }
 
-  fun updateSetWeight(uuid: RealmUUID, newWeight: Double?) {
+  fun updateSetWeight(uuid: Uuid, newWeight: Double?) {
     val temporarySets = _sets.toMutableList()
     temporarySets.forEach {
       if (it.uuid == uuid) {
@@ -184,14 +193,14 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     _setsFlow.value = _sets.toList()
   }
 
-  fun updateSetReps(uuid: RealmUUID, newReps: Int) {
+  fun updateSetReps(uuid: Uuid, newReps: Int) {
     val temporarySets = _sets.toMutableList()
     temporarySets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
     _sets = temporarySets
     setNewTotalVolume(calculateTotalVolume(_sets))
   }
 
-  fun updateSetPercentage(uuid: RealmUUID, newPercentage: Double) {
+  fun updateSetPercentage(uuid: Uuid, newPercentage: Double) {
     val temporaryMap = _setsPercentage.value.toMutableMap()
     temporaryMap[uuid] = newPercentage
     _setsPercentage.value = temporaryMap

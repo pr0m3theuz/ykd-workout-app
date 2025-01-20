@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.data.database
 
 import android.util.Log
@@ -5,55 +7,27 @@ import com.example.myapplication.data.model.Equipment
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
-import com.example.myapplication.data.model.Exercises
-import com.example.myapplication.data.model.ExercisesSets
 import com.example.myapplication.data.model.Force
 import com.example.myapplication.data.model.Mechanic
 import com.example.myapplication.data.model.Mesocycle
-import com.example.myapplication.data.model.MesocycleNote
-import com.example.myapplication.data.model.Mesocycles
 import com.example.myapplication.data.model.Microcycle
-import com.example.myapplication.data.model.MicrocycleNote
-import com.example.myapplication.data.model.Microcycles
-import com.example.myapplication.data.model.Muscle
-import com.example.myapplication.data.model.MuscleExercise
 import com.example.myapplication.data.model.MuscleGroup
 import com.example.myapplication.data.model.MuscleRoleFunction
 import com.example.myapplication.data.model.Program
-import com.example.myapplication.data.model.ProgramNote
-import com.example.myapplication.data.model.Programs
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Utility
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
-import com.example.myapplication.data.model.Workouts
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.isManaged
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.internal.platform.assetFileAsStream
-import io.realm.kotlin.internal.platform.runBlocking
-import io.realm.kotlin.mongodb.App
-import io.realm.kotlin.mongodb.Credentials
-import io.realm.kotlin.mongodb.User
-import io.realm.kotlin.mongodb.subscriptions
-import io.realm.kotlin.mongodb.sync.SyncConfiguration
-import io.realm.kotlin.mongodb.syncSession
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.json.JSONArray
-import org.json.JSONObject
-import org.mongodb.kbson.ObjectId
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.runBlocking
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class RealmDatabase {
 
-  /*  val realm: Realm by lazy {
+    val realm: Realm by lazy {
       val configuration =
         RealmConfiguration.Builder(
             schema =
@@ -78,77 +52,78 @@ class RealmDatabase {
                 Utility::class,
                 Force::class,
                 Mechanic::class,
-                //            ProgressionScheme::class,
+                            ProgressionScheme::class,
               )
           )
-  //        .initialRealmFile("./database/default.realm")
+          .initialRealmFile("./database/default.realm")
           .build()
       Realm.open(configuration)
-    }*/
+    }
 
   private val email = "glare_parmesan992@simplelogin.com"
   private val password = "RpHg!Xe%beN5XNCBhvs#jj*PkN23H&ux"
-  val app: App = App.create("gymcats-rmmte")
 
-  private val emailPasswordCredentials = Credentials.emailPassword(email, password)
-  lateinit var user: User
+    val app: App = App.create("gymcats-rmmte")
 
-  //    var credentials: Credentials
+    private val emailPasswordCredentials = Credentials.emailPassword(email, password)
+    lateinit var user: User
 
-  //    CoroutineScope(Dispatchers.Main).launch { // use runBlocking sparingly -- it can delay UI
-  //   interactions
-  //      val user = app.login(Credentials.anonymous())
-  //    }
+      var credentials: Credentials
+
+      CoroutineScope(Dispatchers.Main).launch {  use runBlocking sparingly -- it can delay UI
+     interactions
+        val user = app.login(Credentials.anonymous())
+      }
 
   init {
-    //    CoroutineScope(Dispatchers.Main).launch {
-    //      app.login(Credentials.anonymous())
-    //    }
+        CoroutineScope(Dispatchers.Main).launch {
+          app.login(Credentials.anonymous())
+        }
 
     runBlocking {
-      //      val anonymousCredentials = Credentials.anonymous()
-      //      val user = app.login(anonymousCredentials) }
-      //      app.emailPasswordAuth.registerUser(email, password)
+            val anonymousCredentials = Credentials.anonymous()
+            val user = app.login(anonymousCredentials) }
+            app.emailPasswordAuth.registerUser(email, password)
 
-      user = app.login(emailPasswordCredentials)
+            user = app.login(emailPasswordCredentials)
     }
   }
 
   fun registerNewUserEmail() {
-    runBlocking { // use runBlocking sparingly -- it can delay UI interactions
+    runBlocking {  use runBlocking sparingly -- it can delay UI interactions
     }
   }
 
-  val realm: Realm by lazy {
+    val realm: Realm by lazy {
     val config =
       app.currentUser?.let {
         SyncConfiguration.Builder(
-          user = it,
-          schema =
-          setOf(
-            Exercise::class,
-            ExerciseSets::class,
-            Set::class,
-            Workout::class,
-            Program::class,
-            Mesocycle::class,
-            Microcycle::class,
-            ExerciseNote::class,
-            WorkoutNote::class,
-            ProgramNote::class,
-            MesocycleNote::class,
-            MicrocycleNote::class,
-            MuscleExercise::class,
-            MuscleRoleFunction::class,
-            Muscle::class,
-            MuscleGroup::class,
-            Equipment::class,
-            Utility::class,
-            Force::class,
-            Mechanic::class,
-            // ProgressionScheme::class,)
-          ),
-        )
+            user = it,
+            schema =
+              setOf(
+                Exercise::class,
+                ExerciseSets::class,
+                Set::class,
+                Workout::class,
+                Program::class,
+                Mesocycle::class,
+                Microcycle::class,
+                ExerciseNote::class,
+                WorkoutNote::class,
+                ProgramNote::class,
+                MesocycleNote::class,
+                MicrocycleNote::class,
+                MuscleExercise::class,
+                MuscleRoleFunction::class,
+                Muscle::class,
+                MuscleGroup::class,
+                Equipment::class,
+                Utility::class,
+                Force::class,
+                Mechanic::class,
+                 ProgressionScheme::class,)
+              ),
+          )
           .initialSubscriptions { realm ->
             add(realm.query<Program>(), "programStream", updateExisting = true)
             add(realm.query<ProgramNote>(), "programNote", updateExisting = true)
@@ -181,7 +156,7 @@ class RealmDatabase {
     Realm.open(config!!)
   }
 
-  // User & User Settings
+   User & User Settings
   fun getCurrentUser(): User {
     val workout1: Workout? = getWorkoutByID(ObjectId("655a3a58d814275f8d792957"))
     val workout2: Workout? = getWorkoutByID(ObjectId("655a3faa92714aa568f42a2d"))
@@ -203,7 +178,7 @@ class RealmDatabase {
             sets1.targetMinimumRepetitions == sets2.targetMinimumRepetitions &&
                     sets1.progressionSchemeID == sets2.progressionSchemeID &&
                     sets1.targetMaximumRepetitions == sets2.targetMaximumRepetitions &&
-                    sets1.owner_id == sets2.owner_id
+                    sets1.ownerID == sets2.ownerID
           }
         }",
       )
@@ -212,79 +187,90 @@ class RealmDatabase {
     return user
   }
 
-  // Exercise & Related Queries
+   Exercise & Related Queries
   fun getAllExercises(): Flow<List<Exercise>> {
     return realm.query<Exercise>("isPublic == true").find().asFlow().map { exercises ->
       exercises.list.sortedBy { exercise -> exercise.name }
     }
+    return emptyFlow()
   }
 
   fun getAllEquipment(): List<Equipment> {
-    return realm.query<Equipment>().find().toList().sortedBy { equipment -> equipment.name }
+        return realm.query<Equipment>().find().toList().sortedBy { equipment -> equipment.name }
+    return emptyList()
   }
 
   fun getAllMuscleGroups(): List<MuscleGroup> {
-    return realm.query<MuscleGroup>().find().toList().sortedBy { muscleGroup -> muscleGroup.name }
+        return realm.query<MuscleGroup>().find().toList().sortedBy { muscleGroup ->
+     muscleGroup.name }
+    return emptyList()
   }
 
   fun getAllUtilities(): Flow<List<Utility>> {
-    return realm.query<Utility>().find().asFlow().map { utilities ->
+        return realm.query<Utility>().find().asFlow().map { utilities ->
       utilities.list.sortedBy { utility -> utility.name }
     }
+    return emptyFlow()
   }
 
   fun getAllForces(): Flow<List<Force>> {
     return realm.query<Force>().find().asFlow().map { forces ->
       forces.list.sortedBy { force -> force.name }
     }
+    return emptyFlow()
   }
 
   fun getAllMechanics(): Flow<List<Mechanic>> {
     return realm.query<Mechanic>().find().asFlow().map { mechanics ->
       mechanics.list.sortedBy { mechanic -> mechanic.name }
     }
+    return emptyFlow()
   }
 
   fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> {
-    return realm.query<MuscleRoleFunction>().find().asFlow().map { functions ->
-      functions.list.sortedBy { function -> function.roleFunction }
-    }
+        return realm.query<MuscleRoleFunction>().find().asFlow().map { functions ->
+          functions.list.sortedBy { function -> function.roleFunction }
+        }
+    return emptyFlow()
   }
 
   fun getMuscleGroupNameByID(muscleGroupID: String): String {
-    return realm
-      .query<MuscleGroup>("muscleGroupID == $0 SORT(name ASC)", muscleGroupID)
-      .first()
-      .find()
-      ?.name ?: throw Exception("Muscle Group not found")
+     return realm
+    .query<MuscleGroup>("muscleGroupID == $0 SORT(name ASC)", muscleGroupID)
+    .first()
+    .find()
+    ?.name ?: throw Exception("Muscle Group not found")
+    return ""
   }
 
   fun getExerciseDetails(exerciseID: ObjectId): Exercise {
     return realm.query<Exercise>("_id == $0", exerciseID).first().find()
       ?: throw Exception("Exercise not found")
+    return Exercise()
   }
 
   fun getExercise(exerciseID: ObjectId?): Exercise? {
-    return realm.query<Exercise>("_id == $0", exerciseID).first().find()
+        return realm.query<Exercise>("_id == $0", exerciseID).first().find()
+    return null
   }
 
   suspend fun insertExercise(exercise: Exercise) {
-    realm.write {
+     realm.write {
       this.copyToRealm(
         exercise
-        //        Exercise(
-        //          name = exercise.name,
-        //          equipmentID = exercise.equipmentID,
-        //          muscleGroupID = exercise.muscleGroupID,
-        //          utilityID = exercise.utilityID,
-        //          mechanicsID = exercise.mechanicsID,
-        //          force = exercise.force,
-        //          functionID = exercise.functionID,
-        //          intensityID = exercise.intensityID,
-        //          weightUnit = exercise.weightUnit,
-        //          mediaURI = exercise.mediaURI,
-        //          pageURI = exercise.pageURI
-        //        )
+                Exercise(
+                  name = exercise.name,
+                  equipmentID = exercise.equipmentID,
+                  muscleGroupID = exercise.muscleGroupID,
+                  utilityID = exercise.utilityID,
+                  mechanicsID = exercise.mechanicsID,
+                  force = exercise.force,
+                  functionID = exercise.functionID,
+                  intensityID = exercise.intensityID,
+                  weightUnit = exercise.weightUnit,
+                  mediaURI = exercise.mediaURI,
+                  pageURI = exercise.pageURI
+                )
       )
     }
   }
@@ -292,48 +278,48 @@ class RealmDatabase {
   suspend fun updateExercise(exercise: Exercise) {
     realm.write {
       exercise
-      //      this.copyToRealm(
-      //        Exercise(name = exercise.name,
-      //          equipmentID = exercise.equipmentID,
-      //          muscleGroupID = exercise.muscleGroupID,
-      //          utilityID = exercise.utilityID,
-      //          mechanicsID = exercise.mechanicsID,
-      //          force = exercise.force,
-      //          functionID = exercise.functionID,
-      //          intensityID = exercise.intensityID,
-      //          weightUnit = exercise.weightUnit,
-      //          mediaURI = exercise.mediaURI,
-      //          pageURI = exercise.pageURI
-      //        )
-      //      )
+            this.copyToRealm(
+              Exercise(name = exercise.name,
+                equipmentID = exercise.equipmentID,
+                muscleGroupID = exercise.muscleGroupID,
+                utilityID = exercise.utilityID,
+                mechanicsID = exercise.mechanicsID,
+                force = exercise.force,
+                functionID = exercise.functionID,
+                intensityID = exercise.intensityID,
+                weightUnit = exercise.weightUnit,
+                mediaURI = exercise.mediaURI,
+                pageURI = exercise.pageURI
+              )
+            )
     }
   }
 
-  //  TODO Update Function to Update Database
+    // TODO Update Function to Update Database
   suspend fun updateWeightUnitsForExercise(exerciseID: ObjectId, weightUnit: String) {
     val exercise = getExercise(exerciseID)
     exercise?.weightUnit = weightUnit
   }
 
-  //  TODO Update Function to Update Database
+    // TODO Update Function to Update Database
   suspend fun updateWorkingSetRestTimerForExercise(exerciseID: ObjectId, restDuration: Long) {
     val exercise = getExercise(exerciseID)
     exercise?.workingSetRestInWholeMilliseconds = restDuration
   }
 
-  //  TODO Update Function to Update Database
+    // TODO Update Function to Update Database
   suspend fun updateWarmUpSetRestTimerForExercise(exerciseID: ObjectId, restDuration: Long) {
     val exercise = getExercise(exerciseID)
     exercise?.warmUpSetRestInWholeMilliseconds = restDuration
   }
 
-  //  TODO Update Function to Update Database
+    // TODO Update Function to Update Database
   suspend fun enableWorkingSetRestTimerForExercise(exerciseID: ObjectId, enable: Boolean) {
     val exercise = getExercise(exerciseID)
     exercise?.workingSetRestTimerEnabled = enable
   }
 
-  //  TODO Update Function to Update Database
+    // TODO Update Function to Update Database
   suspend fun enableWarmUpSetRestTimerForExercise(exerciseID: ObjectId, enable: Boolean) {
     val exercise = getExercise(exerciseID)
     exercise?.warmUpSetRestTimerEnabled = enable
@@ -343,7 +329,7 @@ class RealmDatabase {
     exercise: String,
     muscleGroupIDs: List<String>,
     equipmentIDs: List<String>,
-    //        movementTypes: List<String>
+            movementTypes: List<String>
   ): Flow<List<Exercise>> {
     val muscleGroupsSize = muscleGroupIDs.size.plus(1)
     val muscleGroups = ""
@@ -359,72 +345,83 @@ class RealmDatabase {
     Log.i("filterExercises", "equipment: $equipmentIDs")
 
     return realm
-      .query<Exercise>(
-        "isPublic == true AND name CONTAINS[c] $0 AND muscleGroupID IN $1 AND equipmentID IN $2 SORT(name ASC)",
-        exercise,
-        muscleGroupIDs,
-        equipmentIDs,
-      )
-      .find()
-      .asFlow()
-      .map { it.list }
+    .query<Exercise>(
+      "isPublic == true AND name CONTAINS[c] $0 AND muscleGroupID IN $1 AND equipmentID IN $2 SORT(name ASC)",
+      exercise,
+      muscleGroupIDs,
+      equipmentIDs,
+    )
+    .find()
+    .asFlow()
+    .map { it.list }
+
   }
 
-  // ExerciseSets Queries
+   ExerciseSets Queries
 
-  // Workout Queries
+   Workout Queries
 
-  // TODO Test if isPublic == true || owner_id == user.id works
+   // TODO Test if isPublic == true || ownerID == user.id works
   fun getAllWorkouts(): Flow<List<Workout>> {
-    return realm
-      .query<Workout>("SORT(dateCreated DESC) && isPublic == true || owner_id == $0", user.id)
-      .find()
-      .asFlow()
-      .map { workouts -> workouts.list.sortedByDescending { workout -> workout.dateCreated } }
+        return realm
+          .query<Workout>("SORT(dateCreated DESC) && isPublic == true || ownerID == $0", user.id)
+          .find()
+          .asFlow()
+          .map { workouts -> workouts.list.sortedByDescending { workout -> workout.dateCreated } }
+    return emptyFlow()
   }
 
   fun getAllCompletedWorkouts(): Flow<List<Workout>> {
-    return realm
-      .query<Workout>("owner_id == $0 AND workoutEnded != null SORT(dateCreated DESC)", user.id)
-      .find()
-      .asFlow()
-      .map { workouts -> workouts.list.sortedByDescending { workout -> workout.dateCreated } }
+        return realm
+    .query<Workout>("ownerID == $0 AND workoutEnded != null SORT(dateCreated DESC)", user.id)
+    .find()
+    .asFlow()
+    .map { workouts -> workouts.list.sortedByDescending { workout -> workout.dateCreated } }
+    return emptyFlow()
   }
 
-  //  TODO Fix this function
+    // TODO Fix this function
   fun getWorkoutsCount(): Int {
-    return realm.query<Workout>("owner_id == $0 AND workoutEnded != null", user.id).find().count()
+        return realm.query<Workout>("ownerID == $0 AND workoutEnded != null",
+     user.id).find().count()
+    return 0
   }
 
   fun getWorkoutByID(workoutID: ObjectId): Workout? {
-    return realm.query<Workout>("_id = $0", workoutID).first().find()
+        return realm.query<Workout>("_id = $0", workoutID).first().find()
+    return null
   }
 
   fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout> {
-    return realm.query<Workout>("microcycleID = $0 SORT(day ASC)", microcycleID).find()
+        return realm.query<Workout>("microcycleID = $0 SORT(day ASC)", microcycleID).find()
+    return emptyList()
   }
 
   fun getWorkoutsByMesocycleID(mesocycleID: ObjectId): Flow<List<Workout>> {
-    return realm.query<Workout>("mesocycleID = $0", mesocycleID).find().asFlow().map { it.list }
+        return realm.query<Workout>("mesocycleID = $0", mesocycleID).find().asFlow().map { it.list
+     }
+    return emptyFlow()
   }
 
   fun getWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>> {
-    return realm.query<Workout>("programID = $0", programID).find().asFlow().map { it.list }
+        return realm.query<Workout>("programID = $0", programID).find().asFlow().map { it.list }
+    return emptyFlow()
   }
 
   fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
-    return realm
-      .query<Workout>("programID = $0 && workoutEnded == null", programID)
-      .find()
-      .firstOrNull()
+        return realm
+    .query<Workout>("programID = $0 && workoutEnded == null", programID)
+    .find()
+    .firstOrNull()
+    return null
   }
 
-  // TODO get the next exercise sets from the next workout in the current program
+   // TODO get the next exercise sets from the next workout in the current program
   fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout? {
     val results =
       realm
         .query<ExerciseSets>(
-          "exerciseID = $0 && ANY @links.Workout.programID = $1 && owner_id = $2 && ANY @links.Workout.workoutEnded == null",
+          "exerciseID = $0 && ANY @links.Workout.programID = $1 && ownerID = $2 && ANY @links.Workout.workoutEnded == null",
           exerciseSets.exerciseID,
           programID,
           user.id,
@@ -439,8 +436,8 @@ class RealmDatabase {
         it.sets.zip(exerciseSets.sets).forEach { (set1, set2) ->
           if (
             set1.progressionSchemeID == set2.progressionSchemeID &&
-            set1.targetMinimumRepetitions == set2.targetMaximumRepetitions &&
-            set1.targetMaximumRepetitions == set2.targetMaximumRepetitions
+              set1.targetMinimumRepetitions == set2.targetMaximumRepetitions &&
+              set1.targetMaximumRepetitions == set2.targetMaximumRepetitions
           ) {
             nextExerciseSets = it
             Log.i("findNextWorkoutExerciseSets", "found matching workout")
@@ -450,35 +447,36 @@ class RealmDatabase {
     }
 
     return realm
-      .query<Workout>(
-        "exercisesSets.exerciseID = $0 && workoutID = $1",
-        nextExerciseSets?.exerciseID,
-        nextExerciseSets?.workoutID
-      )
-      .find()
-      .firstOrNull()
+    .query<Workout>(
+      "exercisesSets.exerciseID = $0 && workoutID = $1",
+      nextExerciseSets?.exerciseID,
+      nextExerciseSets?.workoutID,
+    )
+    .find()
+    .firstOrNull()
+    return null
   }
 
   fun findNextIdenticalWorkoutInProgram() {
-    //    return realm.query<Workout>{}
+        return realm.query<Workout>{}
   }
 
   suspend fun insertWorkout(workout: Workout) {
-    //    val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
-    //    val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
+        val insertedExercisesSets = insertExerciseSets(workout.exercisesSets)
+        val insertedWorkoutNotes = insertWorkoutNotes(workout.notes)
 
-    //    Log.i(
-    //      "insertWorkout",
-    //      "insertedExercisesSets: ${Json.encodeToString(insertedExercisesSets[0])}"
-    //    )
+        Log.i(
+          "insertWorkout",
+          "insertedExercisesSets: ${Json.encodeToString(insertedExercisesSets[0])}"
+        )
 
     if (
-      realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find() !=
-      null
+      realm.query<Workout>("_id == $0 && ownerID == $1", workout._id, user.id).first().find() !=
+        null
     ) {
       realm.write {
         val _workout: Workout? =
-          this.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find()
+          this.query<Workout>("_id == $0 && ownerID == $1", workout._id, user.id).first().find()
 
         if (_workout != null) {
           _workout.name = workout.name
@@ -493,14 +491,14 @@ class RealmDatabase {
           _workout.totalVolumeInPounds = workout.totalVolumeInPounds
           _workout.totalVolumeInKilograms = workout.totalVolumeInKilograms
           _workout.isPublic = false
-          _workout.owner_id = user.id
+          _workout.ownerID = user.id
           Log.i("insertWorkout", "insertedWorkout: ${Json.encodeToString(_workout)}")
         }
       }
     } else {
       realm.write {
-        //      val tempList = realmListOf<ExerciseSets>()
-        //      insertedExercisesSets.forEach { tempList.add(findLatest(it) ?: return@write) }
+              val tempList = mutableListOf<ExerciseSets>()
+              insertedExercisesSets.forEach { tempList.add(findLatest(it) ?: return@write) }
         Log.i("insertWorkout", "insertedWorkout: ${Json.encodeToString(workout)}")
         this.copyToRealm(
           Workout().apply {
@@ -519,7 +517,7 @@ class RealmDatabase {
             exercisesSets = workout.exercisesSets
             programID = workout.programID
             microcycleID = workout.microcycleID
-            owner_id = user.id
+            ownerID = user.id
             isPublic = false
           }
         )
@@ -528,11 +526,11 @@ class RealmDatabase {
   }
 
   suspend fun copyWorkoutsFromTemplate(
-    workouts: RealmList<Workout>,
+    workouts: List<Workout>,
     _microcycleID: ObjectId,
     _programID: ObjectId,
-  ): RealmList<Workout> {
-    val realmWorkouts = realmListOf<Workout>()
+  ): List<Workout> {
+    val realmWorkouts = mutableListOf<Workout>()
     workouts.forEach { workout ->
       val newWorkoutID = ObjectId()
       val insertedExerciseSets = copyExerciseSetsFromTemplate(workout.exercisesSets, newWorkoutID)
@@ -544,7 +542,7 @@ class RealmDatabase {
               uuid = workout.uuid
               name = workout.name
               workoutAuthor = workout.workoutAuthor
-              notes = realmListOf()
+              notes = emptyList()
               workoutDuration = workout.workoutDuration
               workoutType = workout.workoutType
               dateCreated = workout.dateCreated
@@ -553,40 +551,41 @@ class RealmDatabase {
               day = workout.day
               exercisesSets = insertedExerciseSets
               isPublic = false
-              owner_id = user.id // TODO figure out if this is needed
+              ownerID = user.id  // TODO figure out if this is needed
             }
           )
 
         realmWorkouts.add(newWorkout)
       }
     }
-    //    Log.i("copyWorkoutsFromTemplate", "workouts: ${Json.encodeToString(workouts)}")
+        Log.i("copyWorkoutsFromTemplate", "workouts: ${Json.encodeToString(workouts)}")
     Log.i("copyWorkoutsFromTemplate", "workouts: ${realmWorkouts.size}")
     return realmWorkouts
+    return emptyList()
   }
 
   suspend fun updateWorkout(workout: Workout) {
     realm.write {
       workout
-      //      val latestWorkout = findLatest(workout) ?: return@write
+            val latestWorkout = findLatest(workout) ?: return@write
     }
   }
 
   suspend fun updateSets(sets: MutableList<Set>) {
-    sets.forEach { set -> realm.write { set } }
+        sets.forEach { set -> realm.write { set } }
   }
 
-  //  TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by
+    // TODO Fix - Frozen objects cannot be deleted. They must be converted to live objects first by
   suspend fun deleteWorkout(workout: Workout) {
-    //    Log.i("deleteWorkout", "workout.isManaged: ${workout.isManaged()}")
-    //    Log.i("deleteWorkout", "workout.isFrozen: ${workout.isFrozen()}")
+        Log.i("deleteWorkout", "workout.isManaged: ${workout.isManaged()}")
+        Log.i("deleteWorkout", "workout.isFrozen: ${workout.isFrozen()}")
 
     val _workout =
-      realm.query<Workout>("_id == $0 && owner_id == $1", workout._id, user.id).first().find()
+      realm.query<Workout>("_id == $0 && ownerID == $1", workout._id, user.id).first().find()
     val exercisesSets =
-      realm.query<ExerciseSets>("workoutID == $0 && owner_id == $1", workout._id, user.id).find()
+      realm.query<ExerciseSets>("workoutID == $0 && ownerID == $1", workout._id, user.id).find()
     val workoutNotes =
-      realm.query<WorkoutNote>("workout == $0 && owner_id == $1", workout._id, user.id).find()
+      realm.query<WorkoutNote>("workout == $0 && ownerID == $1", workout._id, user.id).find()
 
     exercisesSets.forEach { exerciseSet ->
       realm.writeBlocking {
@@ -617,8 +616,8 @@ class RealmDatabase {
         }
       }
 
-      //    Log.i("deleteWorkout", "_workout.isManaged: ${_workout?.isManaged()}")
-      //    Log.i("deleteWorkout", "_workout.isFrozen: ${_workout?.isFrozen()}")
+          Log.i("deleteWorkout", "_workout.isManaged: ${_workout?.isManaged()}")
+          Log.i("deleteWorkout", "_workout.isFrozen: ${_workout?.isFrozen()}")
 
       if (_workout != null) {
         realm.writeBlocking {
@@ -638,63 +637,70 @@ class RealmDatabase {
     programIDs: List<String>,
     startDate: String,
     endDate: String,
-    //        movementTypes: List<String>
+            movementTypes: List<String>
   ): Flow<List<Workout>> {
-    //    val muscleGroupsSize = programIDs.size.plus(1)
-    //    val muscleGroups = ""
-    //    programIDs.forEachIndexed { index, _ -> muscleGroups.plus("${index.plus(1)}, ") }
-    //
-    //    val equipment = ""
-    //    startDate.forEachIndexed { index, _ ->
-    //      equipment.plus("${muscleGroupsSize.plus(index.plus(1))}, ")
-    //    }
+        val muscleGroupsSize = programIDs.size.plus(1)
+        val muscleGroups = ""
+        programIDs.forEachIndexed { index, _ -> muscleGroups.plus("${index.plus(1)}, ") }
+
+        val equipment = ""
+        startDate.forEachIndexed { index, _ ->
+          equipment.plus("${muscleGroupsSize.plus(index.plus(1))}, ")
+        }
 
     Log.i("filterWorkouts", "workout: $workout")
     Log.i("filterWorkouts", "programIDs: $programIDs")
     Log.i("filterWorkouts", "dateRange: $startDate")
 
-    // TODO add isPublic or owner_id == user.id to filter workouts
-    return realm
-      .query<Workout>(
-        "name CONTAINS[c] $0 AND programID IN $1 AND workoutStarted BETWEEN {$2, $3} SORT(name ASC)",
-        workout,
-        programIDs,
-        startDate,
-        endDate,
-      )
-      .find()
-      .asFlow()
-      .map { it.list }
+     // TODO add isPublic or ownerID == user.id to filter workouts
+        return realm
+    .query<Workout>(
+      "name CONTAINS[c] $0 AND programID IN $1 AND workoutStarted BETWEEN {$2, $3} SORT(name ASC)",
+      workout,
+      programIDs,
+      startDate,
+      endDate,
+    )
+    .find()
+    .asFlow()
+    .map { it.list }
+    return emptyFlow()
   }
 
-  //  Program Queries
+// Program Queries
   fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
-    return realm
-      .query<Program>("isPublic == true" /*"startDate = null DISTINCT (uuid)"*/)
-      .find()
-      .asFlow()
-      .map { programs -> programs.list.sortedByDescending { program -> program.dateCreated } }
+        return realm
+    .query<Program>("isPublic == true"
+    "startDate = null DISTINCT (uuid)"
+    )
+    .find()
+    .asFlow()
+    .map { programs -> programs.list.sortedByDescending { program -> program.dateCreated } }
+    return emptyFlow()
   }
 
   fun getProgramByID(programID: ObjectId): Program? {
     return realm.query<Program>("_id = $0", programID).first().find()
+  return null
   }
 
   fun getActivePrograms(): Flow<List<Program>> {
-    return realm.query<Program>("active = true && owner_id == $0", user.id).find().asFlow().map {
+    return realm.query<Program>("active = true && ownerID == $0", user.id).find().asFlow().map {
       it.list
     }
+  return emptyFlow()
   }
 
-  fun isProgramActive(programUUID: RealmUUID): Boolean {
+  fun isProgramActive(programUUID: Uuid): Boolean {
     return realm
-      .query<Program>("uuid = $0 && active = true && owner_id == $1", programUUID, user.id)
-      .find()
-      .isNotEmpty()
+    .query<Program>("uuid = $0 && active = true && ownerID == $1", programUUID, user.id)
+    .find()
+    .isNotEmpty()
+    return false
   }
 
   suspend fun insertProgram(program: Program) {
-    realm.write { this.copyToRealm(program) }
+        realm.write { this.copyToRealm(program) }
   }
 
   suspend fun copyProgramFromTemplate(program: Program) {
@@ -708,7 +714,7 @@ class RealmDatabase {
           name = program.name
           author = program.author
           dateCreated = program.dateCreated
-          startDate = RealmInstant.now()
+          startDate = Clock.System.now()
           shortDescription = program.shortDescription
           description = program.description
           uri = program.uri
@@ -719,7 +725,7 @@ class RealmDatabase {
           active = true
           mesocycles = insertedMesocycles
           isPublic = false
-          owner_id = user.id // TODO figure out if this is needed
+          ownerID = user.id  // TODO figure out if this is needed
           imageUri = program.imageUri
           imageFont = program.imageFont
         }
@@ -728,14 +734,14 @@ class RealmDatabase {
   }
 
   suspend fun updateProgram(program: Program) {
-    realm.write { program }
+        realm.write { program }
   }
 
   suspend fun deleteProgram(_program: Program) {
     _program.isManaged()
     realm.write {
       val program =
-        realm.query<Program>("_id == $0 && owner_id == $1", _program._id, user.id).first().find()
+        realm.query<Program>("_id == $0 && ownerID == $1", _program._id, user.id).first().find()
       if (program != null) {
         delete(program)
       }
@@ -743,12 +749,12 @@ class RealmDatabase {
   }
 
   suspend fun deleteActiveProgram(_program: Program) {
-    // TODO write functions to delete mesocycles, microcycles, workouts, exercisesSets from active
-    // program
+     // TODO write functions to delete mesocycles, microcycles, workouts, exercisesSets from active
+     program
     _program.isManaged()
     val program =
       realm
-        .query<Program>("_id == $0 && owner_id == $1 && active == true", _program._id, user.id)
+        .query<Program>("_id == $0 && ownerID == $1 && active == true", _program._id, user.id)
         .first()
         .find()
 
@@ -761,13 +767,14 @@ class RealmDatabase {
     Log.i("deleteActiveProgram", "microcycles: ${microcycles.size}")
     Log.i("deleteActiveProgram", "workouts: ${workouts.size}")
 
-    /*workouts.forEach { workout ->
+
+    workouts.forEach { workout ->
       val workoutID = workout._id
       Log.i("deleteActiveProgram", "workout: ${workout._id}")
       val exercisesSets =
-        realm.query<ExerciseSets>("workoutID == $0 && owner_id == $1", workoutID, user.id).find()
+        realm.query<ExerciseSets>("workoutID == $0 && ownerID == $1", workoutID, user.id).find()
       val workoutNotes =
-        realm.query<WorkoutNote>("workout == $0 && owner_id == $1", workoutID, user.id).find()
+        realm.query<WorkoutNote>("workout == $0 && ownerID == $1", workoutID, user.id).find()
 
       exercisesSets.forEach { exercisesSet ->
         Log.i("deleteActiveProgram", "exerciseSet: ${exercisesSet._id}")
@@ -809,7 +816,8 @@ class RealmDatabase {
           }
         }
       }
-    }*/
+    }
+
 
     workouts.forEach { workout -> deleteWorkout(workout) }
     microcycles.forEach { microcycle -> deleteMicrocycle(microcycle) }
@@ -820,33 +828,36 @@ class RealmDatabase {
     }
   }
 
-  //  Mesocycle Queries
+    Mesocycle Queries
   fun getAllMesocycles(): Flow<List<Mesocycle>> {
     return realm.query<Mesocycle>().find().asFlow().map { mesocycles ->
       mesocycles.list.sortedByDescending { mesocycle -> mesocycle.dateCreated }
     }
+  return emptyFlow()
   }
 
   fun getMesocycleByID(mesocycleID: ObjectId): Mesocycle? {
-    return realm.query<Mesocycle>("_id = $0", mesocycleID).first().find()
+     return realm.query<Mesocycle>("_id = $0", mesocycleID).first().find()
+  return null
   }
 
   fun getMesocyclesByProgramID(programID: ObjectId): Flow<List<Mesocycle>> {
     return realm.query<Mesocycle>("programID = $0 SORT(order ASC)", programID).find().asFlow().map {
       it.list
     }
+    return emptyFlow()
   }
 
   suspend fun insertMesocycle(mesocycle: Mesocycle) {
-    realm.write { this.copyToRealm(mesocycle) }
+     realm.write { this.copyToRealm(mesocycle) }
   }
 
   suspend fun copyMesocycleFromTemplate(
-    mesocycles: RealmList<Mesocycle>,
+    mesocycles: List<Mesocycle>,
     _programID: ObjectId,
-  ): RealmList<Mesocycle> {
+  ): List<Mesocycle> {
 
-    val realmMesocycles = realmListOf<Mesocycle>()
+    val realmMesocycles = mutableListOf<Mesocycle>()
     mesocycles.forEach { mesocycle ->
       val newMesocycleID = ObjectId()
       val insertedMicrocycles =
@@ -860,12 +871,12 @@ class RealmDatabase {
               name = mesocycle.name
               description = mesocycle.description
               dateCreated = mesocycle.dateCreated
-              //            startDate = RealmInstant.now()
+                          startDate = Clock.System.now()
               order = mesocycle.order
               programID = _programID
               microcycles = insertedMicrocycles
               isPublic = false
-              owner_id = user.id // TODO figure out if this is needed
+              ownerID = user.id  // TODO figure out if this is needed
             }
           )
         realmMesocycles.add(newMesocycle)
@@ -876,58 +887,63 @@ class RealmDatabase {
   }
 
   suspend fun updateMesocycle(mesocycle: Mesocycle) {
-    realm.write { mesocycle }
+     realm.write { mesocycle }
   }
 
   suspend fun deleteMesocycle(_mesocycle: Mesocycle) {
     _mesocycle.isManaged()
     val mesocycle =
-      realm.query<Mesocycle>("_id == $0 && owner_id == $1", _mesocycle._id, user.id).first().find()
+      realm.query<Mesocycle>("_id == $0 && ownerID == $1", _mesocycle._id, user.id).first().find()
 
     if (mesocycle != null) {
       realm.writeBlocking { findLatest(mesocycle).also { if (it != null) delete(it) } }
     }
   }
 
-  //  Microcycle Queries
+    Microcycle Queries
 
   fun getAllMicrocycles(): Flow<List<Microcycle>> {
     return realm
-      .query<Microcycle>("isPublic = true || owner_id == $0", user.id)
-      .find()
-      .asFlow()
-      .map { microcycles ->
-        microcycles.list.sortedByDescending { microcycle -> microcycle.dateCreated }
-      }
+    .query<Microcycle>("isPublic = true || ownerID == $0", user.id)
+    .find()
+    .asFlow()
+    .map { microcycles ->
+      microcycles.list.sortedByDescending { microcycle -> microcycle.dateCreated }
+    }
+    return emptyFlow()
   }
 
   fun getMicrocycleByID(microcycleID: ObjectId): Microcycle? {
-    return realm.query<Microcycle>("_id = $0", microcycleID).first().find()
+     return realm.query<Microcycle>("_id = $0", microcycleID).first().find()
+    return null
   }
 
   fun getMicrocyclesByMesocycleID(mesocycleID: ObjectId): Flow<List<Microcycle>> {
-    return realm.query<Microcycle>("mesocycleID = $0", mesocycleID).find().asFlow().map { it.list }
+     return realm.query<Microcycle>("mesocycleID = $0", mesocycleID).find().asFlow().map { it.list
+     }
+    return emptyFlow()
   }
 
   fun getMicrocycleByProgramID(programID: ObjectId): Flow<List<Microcycle>> {
-    return realm
+     return realm
       .query<Microcycle>("programID = $0 SORT(name ASC, order ASC)", programID)
       .find()
       .asFlow()
       .map { it.list }
+    return emptyFlow()
   }
 
   suspend fun insertMicrocycle(microcycle: Microcycle) {
-    realm.write { this.copyToRealm(microcycle) }
+     realm.write { this.copyToRealm(microcycle) }
   }
 
   suspend fun copyMicrocyclesFromTemplate(
-    microcycles: RealmList<Microcycle>,
+    microcycles: List<Microcycle>,
     _mesocycleID: ObjectId,
     _programID: ObjectId,
-  ): RealmList<Microcycle> {
+  ): List<Microcycle> {
 
-    val realmMicrocycles = realmListOf<Microcycle>()
+    val realmMicrocycles = mutableListOf<Microcycle>()
     microcycles.forEach { microcycle ->
       val newMicrocycleID = ObjectId()
       val insertedWorkouts =
@@ -941,13 +957,13 @@ class RealmDatabase {
               name = microcycle.name
               description = microcycle.description
               dateCreated = microcycle.dateCreated
-              //            startDate = RealmInstant.now()
+                          startDate = Clock.System.now()
               order = microcycle.order
               programID = _programID
               mesocycleID = _mesocycleID
               workouts = insertedWorkouts
               isPublic = false
-              owner_id = user.id // TODO figure out if this is needed
+              ownerID = user.id  // TODO figure out if this is needed
             }
           )
         realmMicrocycles.add(newMicrocycle)
@@ -958,13 +974,13 @@ class RealmDatabase {
   }
 
   suspend fun updateMicrocycle(microcycle: Microcycle) {
-    realm.write { microcycle }
+     realm.write { microcycle }
   }
 
   suspend fun deleteMicrocycle(_microcycle: Microcycle) {
     _microcycle.isManaged()
     val microcycle =
-      realm.query<Mesocycle>("_id == $0 && owner_id == $1", _microcycle._id, user.id).first().find()
+      realm.query<Mesocycle>("_id == $0 && ownerID == $1", _microcycle._id, user.id).first().find()
 
     if (microcycle != null) {
       realm.writeBlocking {
@@ -978,84 +994,88 @@ class RealmDatabase {
   }
 
   suspend fun getSetsByID(setID: ObjectId): Set? {
-    return realm.query<Set>("_id = $0", setID).first().find()
+     return realm.query<Set>("_id = $0", setID).first().find()
+    return null
   }
 
-  //  Notes Queries
-  //  TODO Get Pinned Notes, Store Seperately?
-  //  fun getExerciseNotes(): Flow<List<ExerciseNote>> {
-  //    return realm.query<ExerciseNote>().find().asFlow().map { it.list }
-  //  }
+    Notes Queries
+    // TODO Get Pinned Notes, Store Seperately?
+    fun getExerciseNotes(): Flow<List<ExerciseNote>> {
+      return realm.query<ExerciseNote>().find().asFlow().map { it.list }
+    }
 
   fun getPinnedExerciseNotes(exerciseID: ObjectId, pinned: Boolean = true): List<ExerciseNote> {
-    return realm.query<ExerciseNote>("exercise = $0 AND pinned = $1", exerciseID, pinned).find()
+     return realm.query<ExerciseNote>("exercise = $0 AND pinned = $1", exerciseID, pinned).find()
+    return emptyList()
   }
 
-  /*  fun getPinnedExerciseNotes(
-    exerciseID: ObjectId,
-    pinned: Boolean = true,
-    programPinned: Boolean = false,
-    mesocyclePinned: Boolean = false,
-    microcyclePinned: Boolean = false,
+  fun getPinnedExerciseNotes(
+  exerciseID: ObjectId,
+  pinned: Boolean = true,
+  programPinned: Boolean = false,
+  mesocyclePinned: Boolean = false,
+  microcyclePinned: Boolean = false,
   ): Flow<List<ExerciseNote>> {
-    return realm
-      .query<ExerciseNote>(
-        "exerciseID = $0 AND pinned = $1 AND programPinned = $2 AND mesocyclePinned = $3 AND microcyclePinned = $4",
-        exerciseID,
-        pinned,
-        programPinned,
-        mesocyclePinned,
-        microcyclePinned
-      )
-      .find()
-      .asFlow()
-      .map { it.list }
-  }*/
+  return realm
+    .query<ExerciseNote>(
+      "exerciseID = $0 AND pinned = $1 AND programPinned = $2 AND mesocyclePinned = $3 AND microcyclePinned = $4",
+      exerciseID,
+      pinned,
+      programPinned,
+      mesocyclePinned,
+      microcyclePinned
+    )
+    .find()
+    .asFlow()
+    .map { it.list }
+  }
 
   suspend fun insertExerciseNote(exerciseNote: ExerciseNote) {
-    realm.write { this.copyToRealm(exerciseNote) }
+     realm.write { this.copyToRealm(exerciseNote) }
   }
 
   suspend fun updateExerciseNote(exerciseNote: ExerciseNote) {
-    realm.write { exerciseNote }
+     realm.write { exerciseNote }
   }
 
   fun getPinnedWorkoutNotes(
-    workoutUUID: RealmUUID,
+    workoutUUID: Uuid,
     pinned: Boolean = true,
-    //    programPinned: Boolean = false,
-    //    mesocyclePinned: Boolean = false,
-    //    microcyclePinned: Boolean = false,
+        programPinned: Boolean = false,
+        mesocyclePinned: Boolean = false,
+        microcyclePinned: Boolean = false,
   ): List<WorkoutNote> {
     return realm
-      .query<WorkoutNote>(
-        "uuid = $0 AND pinned = $1",
-        workoutUUID,
-        pinned,
-        //        programPinned,
-        //        mesocyclePinned,
-        //        microcyclePinned
-      )
-      .find()
+    .query<WorkoutNote>(
+      "uuid = $0 AND pinned = $1",
+      workoutUUID,
+      pinned,
+              programPinned,
+              mesocyclePinned,
+              microcyclePinned
+    )
+    .find()
+    return emptyList()
   }
 
   suspend fun insertWorkoutNote(workoutNote: WorkoutNote) {
-    realm.write { this.copyToRealm(workoutNote) }
+     realm.write { this.copyToRealm(workoutNote) }
   }
 
   suspend fun updateWorkoutNote(workoutNote: WorkoutNote) {
-    realm.write { workoutNote }
+     realm.write { workoutNote }
   }
 
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     return realm
-      .query<Set>(
-        "exerciseID = $0 AND setNumber = $1 AND setCompleted = true SORT (dateCreated DESC)",
-        exerciseID,
-        setNumber,
-      )
-      .first()
-      .find()
+    .query<Set>(
+      "exerciseID = $0 AND setNumber = $1 AND setCompleted = true SORT (dateCreated DESC)",
+      exerciseID,
+      setNumber,
+    )
+    .first()
+    .find()
+    return null
   }
 
   suspend fun importPrograms() {
@@ -1212,79 +1232,76 @@ class RealmDatabase {
       val identicalSets = _exerciseSets.identicalSets
       val numberOfIdenticalSets = _exerciseSets.numberOfIdenticalSets
       val _sets = _exerciseSets.sets
-      /*
-            val setIDs = mutableListOf<Set>()
 
-            for (setID in _sets) {
-              setIDs.add(getSetsByID(setID) ?: return)
-            }
-      */
+          val setIDs = mutableListOf<Set>()
 
-      /*
-      if (_sets.isNotEmpty() && identicalSets && _sets.size == 1) {
-        _sets.forEach { set ->
-          for (i in 1..numberOfIdenticalSets) {
-            realmSets.add(
-              Set().apply {
-                setNumber = i
-                exerciseWeight = set.exerciseWeight
-                targetWeight = set.targetWeight
-                targetRepetitions = set.targetRepetitions
-                targetRatePerceivedEffort = set.targetRatePerceivedEffort
-                targetRepetitionsInReserve = set.targetRepetitionsInReserve
-                percentage1RM = set.percentage1RM
-              }
-            )
+          for (setID in _sets) {
+            setIDs.add(getSetsByID(setID) ?: return)
           }
-        }
-      } else if (_sets.isNotEmpty() && !identicalSets) {
-        var count = 0
-        _sets.forEach { set ->
-          count++
+
+
+
+    if (_sets.isNotEmpty() && identicalSets && _sets.size == 1) {
+      _sets.forEach { set ->
+        for (i in 1..numberOfIdenticalSets) {
           realmSets.add(
             Set().apply {
-              setNumber = count
+              setNumber = i
               exerciseWeight = set.exerciseWeight
+              targetWeight = set.targetWeight
               targetRepetitions = set.targetRepetitions
+              targetRatePerceivedEffort = set.targetRatePerceivedEffort
+              targetRepetitionsInReserve = set.targetRepetitionsInReserve
               percentage1RM = set.percentage1RM
             }
           )
         }
       }
-      */
+    } else if (_sets.isNotEmpty() && !identicalSets) {
+      var count = 0
+      _sets.forEach { set ->
+        count++
+        realmSets.add(
+          Set().apply {
+            setNumber = count
+            exerciseWeight = set.exerciseWeight
+            targetRepetitions = set.targetRepetitions
+            percentage1RM = set.percentage1RM
+          }
+        )
+      }
+    }
 
-      /*realm.write {
-      //        val latestExercise = findLatest(_exercise) ?: return@write
+
+    realm.write {
+              val latestExercise = findLatest(_exercise) ?: return@write
               val latestSets = mutableListOf<Set>()
 
-              //       setIDs.forEach { set ->
-              //         val latestSet = findLatest(set) ?: return@write
-              //         latestSets.add(latestSet)
-              //       }
+                     setIDs.forEach { set ->
+                       val latestSet = findLatest(set) ?: return@write
+                       latestSets.add(latestSet)
+                     }
 
               val exerciseSets = copyToRealm(ExerciseSets())
               exerciseSets.apply {
                 exerciseOrder = _exerciseSets.exerciseOrder
                 exerciseID = _exercise._id
                 workoutID = _exerciseSets.workout
-                //          sets = latestSets.toRealmList()
+                          sets = latestSets.toMutableList()
               }
-            }*/
+            }
     }
   }
 
-  private suspend fun insertCompletedSets(
-    sets: RealmList<Set>,
-    exerciseID: ObjectId?,
-  ): RealmList<Set> {
-    val realmSets = realmListOf<Set>()
+  private suspend fun insertCompletedSets(sets: List<Set>, exerciseID: ObjectId?): List<Set> {
+    val realmSets = mutableListOf<Set>()
     runCatching {
       sets.forEach { set ->
         if (set.setCompleted) {
           realm.write {
-            //          val latestExercise = findLatest(exercise ?: return@write) ?: return@write
+                      val latestExercise = findLatest(exercise ?: return@write) ?: return@write
             val _set: Set? =
-              this.query<Set>("_id == $0 AND owner_id == $1", set._id, user.id).first().find()
+              this.query<Set>("_id == $0 AND ownerID == $1", set._id, user.id).first().find()
 
             if (_set != null) {
               _set.setNumber = set.setNumber
@@ -1301,13 +1318,13 @@ class RealmDatabase {
               _set.setCompleted = set.setCompleted
               _set.exerciseID = exerciseID
               _set.dateCreated = set.dateCreated
-              _set.owner_id = user.id
+              _set.ownerID = user.id
               _set.isPublic = false
             } else {
               this.copyToRealm(
                 Set().apply {
-                  _id = set._id // updates existing ExerciseSets TODO Create UpdateSets
-                  // Function
+                  _id = set._id  updates existing ExerciseSets // TODO Create UpdateSets
+                   Function
                   setNumber = set.setNumber
                   weightPounds = set.weightPounds
                   weightKilograms = set.weightKilograms
@@ -1322,7 +1339,7 @@ class RealmDatabase {
                   setCompleted = set.setCompleted
                   this.exerciseID = exerciseID
                   dateCreated = set.dateCreated
-                  owner_id = user.id
+                  ownerID = user.id
                   isPublic = false
                 },
                 updatePolicy = UpdatePolicy.ALL,
@@ -1339,13 +1356,12 @@ class RealmDatabase {
   }
 
   private fun getExerciseSets(exerciseSets: ExerciseSets): ExerciseSets? {
-    return realm.query<ExerciseSets>("_id == $0", exerciseSets._id).find().firstOrNull()
+     return realm.query<ExerciseSets>("_id == $0", exerciseSets._id).find().firstOrNull()
+    return null
   }
 
-  private suspend fun insertExerciseSets(
-    exercisesSets: RealmList<ExerciseSets>
-  ): RealmList<ExerciseSets> {
-    val realmExerciseSets = realmListOf<ExerciseSets>()
+  private suspend fun insertExerciseSets(exercisesSets: List<ExerciseSets>): List<ExerciseSets> {
+    val realmExerciseSets = mutableListOf<ExerciseSets>()
     exercisesSets.forEach { exerciseSets ->
       val insertedSets =
         insertCompletedSets(exerciseSets.sets, exerciseID = exerciseSets.exerciseID!!)
@@ -1354,31 +1370,31 @@ class RealmDatabase {
         if (exerciseSets.sets.isNotEmpty()) {
           realm.write {
             val _exerciseSets: ExerciseSets? =
-              this.query<ExerciseSets>("_id == $0 and owner_id == $1", exerciseSets._id, user.id)
+              this.query<ExerciseSets>("_id == $0 and ownerID == $1", exerciseSets._id, user.id)
                 .first()
                 .find()
-            //          val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?:
-            // return@write
+                      val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?:
+             return@write
 
             if (_exerciseSets != null) {
               _exerciseSets.exerciseOrder = exerciseSets.exerciseOrder
               _exerciseSets.exerciseID = exerciseSets.exerciseID
-              _exerciseSets.sets = insertedSets // exerciseSets.sets
+              _exerciseSets.sets = insertedSets  exerciseSets.sets
               _exerciseSets.notes = insertedNotes
               _exerciseSets.datePerformed = exerciseSets.datePerformed
               _exerciseSets.isPublic = false
-              _exerciseSets.owner_id = user.id
+              _exerciseSets.ownerID = user.id
             } else {
               this.copyToRealm(
                 ExerciseSets().apply {
-                  _id = exerciseSets._id // updates existing ExerciseSets
+                  _id = exerciseSets._id  updates existing ExerciseSets
                   exerciseOrder = exerciseSets.exerciseOrder
                   exerciseID = exerciseSets.exerciseID
                   sets = insertedSets
                   notes = insertedNotes
                   datePerformed = exerciseSets.datePerformed
                   workoutID = exerciseSets.workoutID
-                  owner_id = user.id
+                  ownerID = user.id
                   isPublic = false
                 },
                 updatePolicy = UpdatePolicy.ALL,
@@ -1397,17 +1413,17 @@ class RealmDatabase {
   }
 
   suspend fun copyExerciseSetsFromTemplate(
-    exercisesSets: RealmList<ExerciseSets>,
+    exercisesSets: List<ExerciseSets>,
     _workoutID: ObjectId,
-  ): RealmList<ExerciseSets> {
+  ): List<ExerciseSets> {
 
-    val realmExerciseSets = realmListOf<ExerciseSets>()
+    val realmExerciseSets = mutableListOf<ExerciseSets>()
     exercisesSets.forEach { exerciseSets ->
       val newExerciseSetID = ObjectId()
       val insertedSets = copySetsFromTemplate(exerciseSets.sets, newExerciseSetID)
       realm.write {
-        //        val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?:
-        // return@write
+                val latestExercise = findLatest(exerciseSets.exerciseID ?: return@write) ?:
+         return@write
         val newExerciseSet =
           this.copyToRealm(
             ExerciseSets().apply {
@@ -1415,11 +1431,11 @@ class RealmDatabase {
               exSetsUUID = exerciseSets.exSetsUUID
               exerciseOrder = exerciseSets.exerciseOrder
               exerciseID = exerciseSets.exerciseID
-              sets = insertedSets
+              sets = insertedSets.toMutableList()
               datePerformed = exerciseSets.datePerformed
               workoutID = _workoutID
               isPublic = false
-              owner_id = user.id // TODO figure out if this is needed
+              ownerID = user.id  // TODO figure out if this is needed
             }
           )
         realmExerciseSets.add(newExerciseSet)
@@ -1429,16 +1445,16 @@ class RealmDatabase {
     return realmExerciseSets
   }
 
-  suspend fun copySetsFromTemplate(sets: RealmList<Set>, _exerciseSetID: ObjectId): RealmList<Set> {
+  suspend fun copySetsFromTemplate(sets: List<Set>, _exerciseSetID: ObjectId): List<Set> {
 
-    val realmSets = realmListOf<Set>()
+    val realmSets = mutableListOf<Set>()
     sets.forEach { set ->
       realm.write {
         val newSet =
           this.copyToRealm(
             Set().apply {
-              uuid = set.uuid // TODO determine if this should be unique or can be used in a future
-              // feature
+              uuid = set.uuid  // TODO determine if this should be unique or can be used in a future
+               feature
               setNumber = set.setNumber
               weightPounds = set.weightPounds
               weightKilograms = set.weightKilograms
@@ -1458,7 +1474,7 @@ class RealmDatabase {
               progressionSchemeID = set.progressionSchemeID
               exerciseID = set.exerciseID
               isPublic = false
-              owner_id = user.id // TODO figure out if this is needed
+              ownerID = user.id  // TODO figure out if this is needed
             }
           )
         realmSets.add(newSet)
@@ -1468,8 +1484,8 @@ class RealmDatabase {
     return realmSets
   }
 
-  private suspend fun insertExerciseNotes(notes: RealmList<ExerciseNote>): RealmList<ExerciseNote> {
-    val realmExerciseNotes = realmListOf<ExerciseNote>()
+  private suspend fun insertExerciseNotes(notes: List<ExerciseNote>): List<ExerciseNote> {
+    val realmExerciseNotes = mutableListOf<ExerciseNote>()
     runCatching {
       notes.forEach { exerciseNote ->
         if (exerciseNote.note?.isNotBlank() == true) {
@@ -1484,7 +1500,7 @@ class RealmDatabase {
                   exercise = exerciseNote.exercise
                   workout = exerciseNote.workout
                   isPublic = false
-                  owner_id = user.id
+                  ownerID = user.id
                 },
                 updatePolicy = UpdatePolicy.ALL,
               )
@@ -1498,8 +1514,8 @@ class RealmDatabase {
     return realmExerciseNotes
   }
 
-  private suspend fun insertWorkoutNotes(notes: RealmList<WorkoutNote>): RealmList<WorkoutNote> {
-    val realmWorkoutNotes = realmListOf<WorkoutNote>()
+  private suspend fun insertWorkoutNotes(notes: List<WorkoutNote>): List<WorkoutNote> {
+    val realmWorkoutNotes = mutableListOf<WorkoutNote>()
     runCatching {
       notes.forEach { workoutNote ->
         if (workoutNote.note?.isNotEmpty() == true) {
@@ -1512,7 +1528,7 @@ class RealmDatabase {
                   pinned = workoutNote.pinned
                   workout = workoutNote.workout
                   isPublic = false
-                  owner_id = user.id
+                  ownerID = user.id
                 },
                 updatePolicy = UpdatePolicy.ALL,
               )
@@ -1523,33 +1539,35 @@ class RealmDatabase {
     }
 
     return realmWorkoutNotes
+    return emptyList()
   }
 
   fun getExerciseByName(exerciseName: String): Exercise {
-    return realm.query<Exercise>("name CONTAINS[c] $0", exerciseName).find().first()
+     return realm.query<Exercise>("name CONTAINS[c] $0", exerciseName).find().first()
+    return Exercise()
   }
 
   suspend fun importWorkoutProgramPKL(program: Program) {
-    realm.write { this.copyToRealm(program) }
+     realm.write { this.copyToRealm(program) }
   }
 
-  suspend fun importMesocyclesPKL(mesocycles: RealmList<Mesocycle>) {
-    mesocycles.forEach { mesocycle -> realm.write { this.copyToRealm(mesocycle) } }
+  suspend fun importMesocyclesPKL(mesocycles: List<Mesocycle>) {
+     mesocycles.forEach { mesocycle -> realm.write { this.copyToRealm(mesocycle) } }
   }
 
-  suspend fun importMicrocyclesPKL(microcycles: RealmList<Microcycle>) {
-    microcycles.forEach { microcycle -> realm.write { this.copyToRealm(microcycle) } }
+  suspend fun importMicrocyclesPKL(microcycles: List<Microcycle>) {
+     microcycles.forEach { microcycle -> realm.write { this.copyToRealm(microcycle) } }
   }
 
-  suspend fun importWorkoutsPKL(workouts: RealmList<Workout>) {
-    workouts.forEach { workout -> realm.write { this.copyToRealm(workout) } }
+  suspend fun importWorkoutsPKL(workouts: List<Workout>) {
+     workouts.forEach { workout -> realm.write { this.copyToRealm(workout) } }
   }
 
-  suspend fun importExercisesSetsPKL(exercisesSets: RealmList<ExerciseSets>) {
-    exercisesSets.forEach { exerciseSets -> realm.write { this.copyToRealm(exerciseSets) } }
+  suspend fun importExercisesSetsPKL(exercisesSets: List<ExerciseSets>) {
+     exercisesSets.forEach { exerciseSets -> realm.write { this.copyToRealm(exerciseSets) } }
   }
 
-  suspend fun importSetsPKL(sets: RealmList<Set>) {
-    sets.forEach { set -> realm.write { this.copyToRealm(set) } }
+  suspend fun importSetsPKL(sets: List<Set>) {
+     sets.forEach { set -> realm.write { this.copyToRealm(set) } }
   }
 }

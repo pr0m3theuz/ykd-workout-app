@@ -1,19 +1,42 @@
 package com.example.myapplication.data.model
 
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
-import org.mongodb.kbson.ObjectId
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.bson.types.ObjectId
 
-class MuscleExercise() : RealmObject {
-  @PrimaryKey
-  var _id: ObjectId = ObjectId()
-  var exerciseID: String? = null
+@Serializable
+data class MuscleExerciseDao(var item: MuscleExercise)
 
-  //  var exrxExerciseID: String? = null
-  var muscleID: String? = null
-  var muscleGroupID: String? = null
-  var roleFunction: String? = null
-}
+@Serializable
+data class MuscleRoleFunctionDao(var item: MuscleRoleFunction)
+
+@Serializable
+data class MuscleDao(var item: Muscle)
+
+@Serializable
+data class MuscleGroupDao(var item: MuscleGroup)
+
+@Serializable
+data class EquipmentDao(var item: Equipment)
+
+@Serializable
+data class UtilityDao(var item: Utility)
+
+@Serializable
+data class ForceDao(var item: Force)
+
+@Serializable
+data class MechanicDao(var item: Mechanic)
+
+@Serializable
+data class MuscleExercise(
+    @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+    var exerciseID: String,
+    var muscleID: String,
+    var muscleGroupID: String,
+    var roleFunction: String
+)
 
 /**
  * Represents a muscle's role or function in an exercise. This class is used to store information
@@ -35,49 +58,49 @@ class MuscleExercise() : RealmObject {
  * - Oblique Stabilizer: Muscles that provide stability and support to the oblique abdominal
  *   muscles.
  */
-class MuscleRoleFunction() : RealmObject {
-  @PrimaryKey
-  var _id: String? = null
-  var roleFunction: String? = null
-  var description: String? = null
-}
+@Serializable
+data class MuscleRoleFunction(
+    @SerialName("_id") @Contextual var _id: String,
+    var roleFunction: String,
+    var description: String
+)
 
-class Muscle() : RealmObject {
-  @PrimaryKey
-  var _id: String? = null
-  var muscleGroupID: String? = null
-  var name: String? = null
-}
+@Serializable
+data class Muscle(
+    @SerialName("_id") @Contextual var _id: String,
+    var muscleGroupID: String,
+    var name: String
+)
 
-class MuscleGroup() : RealmObject {
-  @PrimaryKey
-  var _id: String? = null
-  var name: String? = null
-  var exrxName: String? = null
-}
+@Serializable
+data class MuscleGroup(
+    @SerialName("_id") @Contextual var _id: String,
+    var name: String,
+    var exrxName: String
+)
 
-class Equipment() : RealmObject {
-  @PrimaryKey
-  var _id: String? = null
-  var exrxID: String? = null
-  var name: String? = null
-  var exrxName: String? = null
-  var description: String? = null
-}
+@Serializable
+data class Equipment(
+    @SerialName("_id") @Contextual var _id: String,
+    var exrxID: String,
+    var name: String,
+    var exrxName: String,
+    var description: String
+)
 
-class Utility() : RealmObject {
-  @PrimaryKey
-  var _id: String? = null
-  var name: String? = null
-  var description: String? = null
-}
+@Serializable
+data class Utility(
+    @SerialName("_id") @Contextual var _id: String,
+    var name: String,
+    var description: String
+)
 
-class Force() : RealmObject {
-  @PrimaryKey
-  var _id: String? = null
-  var name: String? = null
-  var description: String? = null
-}
+@Serializable
+data class Force(
+    @SerialName("_id") @Contextual var _id: String,
+    var name: String,
+    var description: String
+)
 
 /**
  * Represents the biomechanics of an exercise. This class is used to store information related to
@@ -87,9 +110,9 @@ class Force() : RealmObject {
  * @param name A descriptive name for the exercise mechanics.
  * @param description Additional information or details about the exercise mechanics (optional).
  */
-class Mechanic() : RealmObject {
-  @PrimaryKey
-  var _id: String? = null
-  var name: String? = null
-  var description: String? = null
-}
+@Serializable
+data class Mechanic(
+    @SerialName("_id") @Contextual var _id: String,
+    var name: String,
+    var description: String
+)

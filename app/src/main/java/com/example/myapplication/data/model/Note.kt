@@ -1,45 +1,43 @@
 @file:UseSerializers(
-  MutableRealmIntKSerializer::class,
-  RealmAnyKSerializer::class,
-  RealmDictionaryKSerializer::class,
-  RealmInstantKSerializer::class,
-  RealmListKSerializer::class,
-  RealmSetKSerializer::class,
-  RealmUUIDKSerializer::class,
+//  MutableRealmIntKSerializer::class,
+//  RealmAnyKSerializer::class,
+//  RealmDictionaryKSerializer::class,
+//  RealmInstantKSerializer::class,
+//  RealmListKSerializer::class,
+//  RealmSetKSerializer::class,
+//  RealmUUIDKSerializer::class,
 )
+@file:OptIn(ExperimentalUuidApi::class)
 
 package com.example.myapplication.data.model
 
 import com.example.myapplication.utils.fakeULID
 import com.example.myapplication.utils.newID
-import io.realm.kotlin.ext.backlinks
-import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.serializers.MutableRealmIntKSerializer
-import io.realm.kotlin.serializers.RealmAnyKSerializer
-import io.realm.kotlin.serializers.RealmDictionaryKSerializer
-import io.realm.kotlin.serializers.RealmInstantKSerializer
-import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.serializers.RealmSetKSerializer
-import io.realm.kotlin.serializers.RealmUUIDKSerializer
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.RealmUUID
-import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.mongodb.kbson.ObjectId
+import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 // TODO Switch to use UUIDs instead of IDs
 @Serializable
-class ExerciseNote() : RealmObject {
-  @PrimaryKey
+class ExerciseNote() {
+  @SerialName("_id")
+  @Contextual
   var _id: ObjectId = ObjectId()
   var id: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
+  @Contextual
+  var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
-  var dateCreated: RealmInstant = RealmInstant.now()
+  var dateCreated: Instant = Clock.System.now()
+  @Contextual
   var exercise: ObjectId? = null
+  @Contextual
   var workout: ObjectId? = null
 
   //    var program: Program
@@ -48,73 +46,82 @@ class ExerciseNote() : RealmObject {
   //    var mesocyclePinned: Boolean = false
   //    var microcycle: Microcycle
   //    var microcyclePinned: Boolean = false
-  var owner_id: String? = null
+  var ownerID: String? = null
   var isPublic: Boolean = false
 }
 
 // TODO Are the below necessary? TBD
 @Serializable
-class WorkoutNote() : RealmObject {
-  @PrimaryKey
+class WorkoutNote() {
+  @SerialName("_id")
+  @Contextual
   var _id: ObjectId = ObjectId()
   var lazyListID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
+  @Contextual
+  var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
+  @Contextual
   var workout: ObjectId? = null
-  var workoutUUID: RealmUUID? = null
-
+  @Contextual
+  var workoutUUID: Uuid? = null
   //    var program: Program
   //    var programPinned: Boolean = false
   //    var mesocycle: Mesocycle
   //    var mesocyclePinned: Boolean = false
   //    var microcycle: Microcycle
   //    var microcyclePinned: Boolean = false
-  var owner_id: String? = null
+  var ownerID: String? = null
   var isPublic: Boolean = false
 }
 
 @Serializable
-class ProgramNote() : RealmObject {
-  @PrimaryKey
+class ProgramNote() {
+  @SerialName("_id")
+  @Contextual
   var _id: ObjectId = ObjectId()
   var lazyListID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
+  @Contextual
+  var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
-  val program: RealmResults<Program> by backlinks(Program::notes)
-  var owner_id: String? = null
+  @Contextual
+  val program: ObjectId? = null // TODO
+  var ownerID: String? = null
   var isPublic: Boolean = false
 }
 
 @Serializable
-class MesocycleNote() : RealmObject {
-  @PrimaryKey
+class MesocycleNote() {
+  @SerialName("_id")
+  @Contextual
   var _id: Long = fakeULID()
   var lazyListID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
+  @Contextual
+  var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
   var programPinned: Boolean = false
-  var mesocycle: Microcycle? = null
-  var owner_id: String? = null
+  var mesocycle: Mesocycle? = null
+  var ownerID: String? = null
   var isPublic: Boolean = false
 }
 
-class MicrocycleNote() : RealmObject {
-  @PrimaryKey
+class MicrocycleNote() {
+  @SerialName("_id")
+  @Contextual
   var _id: Long = fakeULID()
   var lazyListID: Long = newID()
-  var uuid: RealmUUID = RealmUUID.random()
+  var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
   var microcycle: Microcycle? = null
 
-  //    var programID: Long? = null
+  // var programID: Long? = null
   var programPinned: Boolean = false
 
-  //    var mesocycleID: Long? = null
+  // var mesocycleID: Long? = null
   var mesocyclePinned: Boolean = false
-  var owner_id: String? = null
+  var ownerID: String? = null
   var isPublic: Boolean = false
 }
