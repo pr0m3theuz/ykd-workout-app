@@ -25,8 +25,7 @@ interface ExerciseNotesRepository {
 
     fun getPinnedExerciseNotes(
         exercise: ObjectId,
-    ): List<ExerciseNote> =
-        database.getPinnedExerciseNotes(exercise)
+    ): List<ExerciseNote>
 
 //    fun getExerciseNotesforMicrocycle(
 //        exerciseID: Long,
@@ -50,9 +49,7 @@ interface ExerciseNotesRepository {
     // off the main thread.
 
     @WorkerThread
-    suspend fun insertExerciseNote(exerciseNote: ExerciseNote) {
-        database.insertExerciseNote(exerciseNote)
-    }
+    suspend fun insertExerciseNote(exerciseNote: ExerciseNote)
 
 //    @WorkerThread
 //    fun updateInsertExerciseNote(exerciseNote: ExerciseNote) {
@@ -74,8 +71,7 @@ interface WorkoutNotesRepository {
 
     fun getPinnedWorkoutNotes(
       workoutUUID: Uuid,
-    ): List<WorkoutNote> =
-        database.getPinnedWorkoutNotes(workoutUUID)
+    ): List<WorkoutNote>
 
 //    fun getWorkoutNotesforMicrocycle(
 //        workoutID: Long,

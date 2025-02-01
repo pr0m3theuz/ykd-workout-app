@@ -36,7 +36,7 @@ class ReplicatorServiceDb(
       ReplicatorConfig(
         username = loggedInUser.username,
         password = loggedInUser.password,
-        endpointUrl = "ws://192.168.1.98:4984/projects",
+        endpointUrl = "ws://192.168.1.98:4984/sample_mflix",
         replicatorType = "PUSH AND PULL",
         heartBeat = 60L,
         continuous = true,

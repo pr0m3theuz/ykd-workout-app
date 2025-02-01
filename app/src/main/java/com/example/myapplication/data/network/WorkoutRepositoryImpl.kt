@@ -14,10 +14,13 @@ import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.couchbase.lite.queryChangeFlow
 import com.example.myapplication.data.database.DatabaseManager
+import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutDao
+import com.example.myapplication.data.model.WorkoutNote
+import com.example.myapplication.data.model.WorkoutNoteDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -27,6 +30,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 private const val DATABASE_IS_NULL = "Workout Repository: Database does not exist."
 
@@ -239,6 +243,81 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     return flow {}
   }
 
+  override suspend fun insertWorkoutNote(workoutNote: WorkoutNote) {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun updateWorkoutNote(workoutNote: WorkoutNote) {
+    TODO("Not yet implemented")
+  }
+
+  override fun getPinnedWorkoutNotes(
+    workoutUUID: Uuid,
+    pinned: Boolean,
+    programPinned: Boolean,
+    mesocyclePinned: Boolean,
+    microcyclePinned: Boolean
+  ): Flow<List<WorkoutNote>> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("Workout")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      // TODO add ownerID, get current user
+      val query =
+        QueryBuilder.select(SelectResult.property("notes"))
+          .from(DataSource.collection(collection))
+          .where(
+            Expression.property("uuid").equalTo(Expression.string(workoutUUID.toString()))
+              .and(Expression.property("notes.pinned").equalTo(Expression.booleanValue(pinned)))
+          )
+          .orderBy(Ordering.property("dateCreated").descending())
+
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToWorkoutNote(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute()
+      return flow
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return flow {}
+  }
+
+  private fun mapQueryChangeToWorkoutNote(queryChange: QueryChange): List<WorkoutNote> {
+    val notes = mutableListOf<WorkoutNote>() // 1
+    queryChange.results?.let { results -> // 2
+      results.forEach { result -> // 3
+        val json = result.toJSON() // 4
+        val note = Json.decodeFromString<WorkoutNoteDao>(json).item // 5
+        notes.add(note) // 6
+      }
+    }
+    return notes // 7
+  }
+
+  override suspend fun insertExerciseNote(exerciseNote: ExerciseNote) {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun updateExerciseNote(exerciseNote: ExerciseNote) {
+    TODO("Not yet implemented")
+  }
+
+  override fun getPinnedExerciseNotes(exerciseID: ObjectId, pinned: Boolean): List<ExerciseNote> {
+    TODO("Not yet implemented")
+  }
+
+  override fun getExerciseNotes(): Flow<List<ExerciseNote>> {
+    TODO("Not yet implemented")
+  }
+
   override fun getAllCompletedWorkouts(): Flow<List<Workout>> {
 
     try {
@@ -273,6 +352,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
   override fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     // Implement logic to retrieve previous set based on exerciseID and setNumber
     // This might require querying Sets and filtering
+    TODO("Implement logic to retrieve previous set")
     return null
   }
 

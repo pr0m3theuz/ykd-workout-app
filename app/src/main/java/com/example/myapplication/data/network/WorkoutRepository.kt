@@ -29,6 +29,26 @@ interface WorkoutRepository {
       return workoutsDao.getWorkoutsByProgramUUID(programUUID)
   }*/
 
+  fun getExerciseNotes(): Flow<List<ExerciseNote>>
+
+  fun getPinnedExerciseNotes(exerciseID: ObjectId, pinned: Boolean = true): List<ExerciseNote>
+
+  suspend fun insertExerciseNote(exerciseNote: ExerciseNote)
+
+  suspend fun updateExerciseNote(exerciseNote: ExerciseNote)
+
+  fun getPinnedWorkoutNotes(
+    workoutUUID: Uuid,
+    pinned: Boolean = true,
+    programPinned: Boolean = false,
+    mesocyclePinned: Boolean = false,
+    microcyclePinned: Boolean = false,
+  ): Flow<List<WorkoutNote>>
+
+  suspend fun insertWorkoutNote(workoutNote: WorkoutNote)
+
+  suspend fun updateWorkoutNote(workoutNote: WorkoutNote)
+
   fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout>
 
   fun getWorkoutsByMesocycleID(mesocycleID: ObjectId): List<Workout>

@@ -39,13 +39,13 @@ data class ExerciseSets(
   @Contextual val mesocycleID: ObjectId?,
   @Contextual val programID: ObjectId?,
   val exerciseOrder: Int = 1,
-  @Contextual val exerciseID: ObjectId? = null,
-  val sets: MutableList<Set> = mutableListOf(),
+  @Contextual val exerciseID: ObjectId,
+  var sets: MutableList<Set> = mutableListOf(),
   val notes: MutableList<ExerciseNote> = mutableListOf(),
   val datePerformed: Instant? = null,
   val totalVolumeInPounds: Double? = 0.0,
   val totalVolumeInKilograms: Double? = 0.0,
-  val ownerID: String? = null,
+  val ownerID: String,
   val isPublic: Boolean = false,
 )
 
@@ -55,18 +55,18 @@ data class ExerciseExerciseSets(
   @SerialName("_id") @Contextual val _id: ObjectId = ObjectId(),
   var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
   @Contextual var exSetsUUID: Uuid = Uuid.random(),
-  @Contextual var workoutID: ObjectId?, // TODO May be useless
-  @Contextual var microcycleID: ObjectId?,
-  @Contextual var mesocycleID: ObjectId?,
-  @Contextual var programID: ObjectId?,
-  @Contextual var exerciseID: ObjectId,
-  val ownerID: String?,
+  val ownerID: String,
   val isPublic: Boolean = false,
   var exerciseOrder: Int = 1,
-  var exercise: Exercise? = null,
+  var exercise: Exercise,
   var sets: MutableList<Set> = mutableListOf(),
   var notes: MutableList<ExerciseNote> = mutableListOf(),
   var datePerformed: Instant? = Clock.System.now(),
+//  @Contextual var exerciseID: ObjectId,
+  @Contextual var workoutID: ObjectId, // TODO May be useless
+  @Contextual var microcycleID: ObjectId?,
+  @Contextual var mesocycleID: ObjectId?,
+  @Contextual var programID: ObjectId?,
 )
 
 @Serializable
@@ -160,7 +160,7 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
         repetitionsInReserve = warmUpSets[index].repetitionsInReserve,
         setTypeID = warmUpSets[index].setTypeID,
         percentage1RM = warmUpSets[index].percentage1RM,
-        exerciseID = this@addWarmUpSets.exercise?._id,
+        exerciseID = this@addWarmUpSets.exercise._id,
         progressionSchemeID = warmUpSets[index].progressionSchemeID,
         workoutID = this@addWarmUpSets.workoutID.toString(),
         exerciseSetsID = this@addWarmUpSets._id.toString(),

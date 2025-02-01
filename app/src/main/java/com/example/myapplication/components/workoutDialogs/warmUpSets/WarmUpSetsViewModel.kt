@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.SetType
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
@@ -28,7 +29,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
   private val tempOwnerId = ObjectId().toString()
   val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
-
+  private var _exerciseSets: ExerciseExerciseSets? = null
   var exerciseWeightUnit: String? = null
 
   private var _workingSetWeight = MutableStateFlow(100.0)
@@ -45,37 +46,52 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
   }
 
   fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
-    exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-    _warmUpSets = initWarmUpSets()
+    _exerciseSets = exerciseSets
+    exerciseWeightUnit = exerciseSets.exercise.weightUnit
+    _warmUpSets = initWarmUpSets(exerciseSets)
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
   fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
-    return if (exerciseSets.exercise?.weightUnit != null) {
-      exerciseSets.exercise?.weightUnit ?: MassUnit.POUNDS.abbreviation
+    return if (exerciseSets.exercise.weightUnit != null) {
+      exerciseSets.exercise.weightUnit ?: MassUnit.POUNDS.abbreviation
     } else {
       userDefaultWeightUnit
     }
   }
 
   fun addSet() {
+
+    requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
+
     if (_warmUpSets.isNotEmpty()) {
       _warmUpSets.add(
-        Set().apply {
-          setNumber = _warmUpSets.last().setNumber?.plus(1)
-          weightPounds = _warmUpSets.last().weightPounds
-          weightKilograms = _warmUpSets.last().weightKilograms
-          repetitions = _warmUpSets.last().repetitions
-          ratePerceivedEffort = _warmUpSets.last().ratePerceivedEffort
-          repetitionsInReserve = _warmUpSets.last().repetitionsInReserve
-          setTypeID = _warmUpSets.last().setTypeID
-          percentage1RM = _warmUpSets.last().percentage1RM
-          isPublic = false
-          ownerID = tempOwnerId // TODO currentUser.id
-        }
+        Set(
+          setNumber = _warmUpSets.last().setNumber?.plus(1),
+          weightPounds = _warmUpSets.last().weightPounds,
+          weightKilograms = _warmUpSets.last().weightKilograms,
+          repetitions = _warmUpSets.last().repetitions,
+          ratePerceivedEffort = _warmUpSets.last().ratePerceivedEffort,
+          repetitionsInReserve = _warmUpSets.last().repetitionsInReserve,
+          setTypeID = _warmUpSets.last().setTypeID,
+          percentage1RM = _warmUpSets.last().percentage1RM,
+          isPublic = false,
+          exerciseID = _exerciseSets!!.exercise._id,
+          exerciseSetsID = _exerciseSets!!._id.toString(),
+          workoutID = _exerciseSets!!.workoutID.toString(),
+          ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
+        )
       )
     } else {
-      _warmUpSets.add(Set())
+      _warmUpSets.add(
+        Set(
+          setTypeID = SetType.warmUpSet.setTypeID, // TODO make type warm up
+          exerciseID = _exerciseSets!!.exercise._id,
+          exerciseSetsID = _exerciseSets!!._id.toString(),
+          workoutID = _exerciseSets!!.workoutID.toString(),
+          ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
+        )
+      )
     }
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
@@ -116,17 +132,21 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
   }
 
   //  TODO Create Warm Up Sets Template
-  private fun initWarmUpSets(): MutableList<Set> {
+  private fun initWarmUpSets(exerciseSets: ExerciseExerciseSets): MutableList<Set> {
     return MutableList(3) { index ->
-      Set().apply {
-        setNumber = index
-        weightPounds = 100.00
-        repetitions = 10
-        percentage1RM = 1.0
-        setTypeID = 2
+      Set(
+        setNumber = index,
+        weightPounds = 100.00,
+        repetitions = 10,
+        percentage1RM = 1.0,
+        setTypeID = SetType.warmUpSet.setTypeID,
         progressionSchemeID =
-          ProgressionType.LINEAR_PROGRESSION.toString() // TODO Replace with progressionScheme.progressionSchemeID
-      }
+        ProgressionType.LINEAR_PROGRESSION.toString(), // TODO Replace with progressionScheme.progressionSchemeID
+        exerciseID = exerciseSets.exercise._id,
+        exerciseSetsID = exerciseSets._id.toString(),
+        workoutID = exerciseSets.workoutID.toString(),
+        ownerID = exerciseSets.ownerID, // TODO currentUser.id,
+      )
     }
   }
 }

@@ -40,6 +40,7 @@ fun BottomNavigationBar(navController: NavController) {
       Screens.Programs,
       Screens.Exercise,
 //      Screens.Settings
+      Screens.Replicator
     )
 
   val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -115,4 +116,7 @@ sealed class Screens(
     Screens("exercises", "exercises", R.string.exercises, MyIconPack.ExerciseFilled)
 
   object Settings : Screens("settings", "settings", R.string.settings, Icons.Filled.Settings)
+
+  object Replicator :
+    Screens("replicator", "replicator", R.string.replicator, Icons.Filled.Settings)
 }

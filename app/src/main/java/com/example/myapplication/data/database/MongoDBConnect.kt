@@ -17,7 +17,7 @@ suspend fun setupDatabaseConnection(
   } else {
     // Not a good practice only for demo purpose.
 //        "mongodb+srv://<username>:<password>@cluster0.sq3aiau.mongodb.net/?retryWrites=true&w=majority"
-    "mongodb+srv://postgres.srphxakyzxfoelpkrplw:p5xgn5KUkaXJzxPzxP62cqsQjT6bYuLU@192.168.1.195:27017/ferretdb?authMechanism=PLAIN"
+    "mongodb+srv://postgres.srphxakyzxfoelpkrplw:p5xgn5KUkaXJzxPzxP62cqsQjT6bYuLU@192.168.1.98:27017/ferretdb?authMechanism=PLAIN"
 
   }
 

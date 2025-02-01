@@ -50,6 +50,8 @@ class ExerciseNote() {
   var isPublic: Boolean = false
 }
 
+data class WorkoutNoteDao(val item: WorkoutNote)
+
 // TODO Are the below necessary? TBD
 @Serializable
 class WorkoutNote() {

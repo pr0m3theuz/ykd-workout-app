@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class)
 
 package com.example.myapplication.components
 
@@ -113,20 +113,24 @@ class ManageWorkoutUseCase(
     previousExercisesSets.forEach { exerciseSets ->
       // TODO get exercise by ID
       val exerciseSetsID = ObjectId()
+
+      val exercise = exercisesRepository.getExercise(exerciseSets.exerciseID)
+      requireNotNull(exercise) { "Exercise not found." }
+
       val newExerciseExerciseSets =
         ExerciseExerciseSets(
           _id = exerciseSetsID,
           exerciseOrder = exerciseSets.exerciseOrder,
-          exercise = exercisesRepository.getExercise(exerciseSets.exerciseID),
+          exercise = exercise,
           sets = copySetsFromPreviousWorkout(exerciseSets.sets, exerciseSetsID, _workoutID),
           notes = exerciseSets.notes.filter { it.pinned }.toMutableList(),
           workoutID = _workoutID,
-          exerciseID = exerciseSets.exerciseID!!,
+//          exerciseID = exerciseSets.exerciseID,
           microcycleID = exerciseSets.microcycleID,
           mesocycleID = exerciseSets.mesocycleID,
           programID = exerciseSets.programID,
           isPublic = false,
-          ownerID = exerciseSets.ownerID // TODO Replace currentUser.id
+          ownerID = exerciseSets.ownerID, // TODO Replace currentUser.id
         )
 
       exerciseSets.exerciseID.let {
@@ -141,8 +145,8 @@ class ManageWorkoutUseCase(
 
   fun copySetsFromPreviousWorkout(
     previousSets: List<Set>,
-    exerciseSetsID: ObjectId,
-    workoutID: ObjectId
+    currentExerciseSetsID: ObjectId,
+    currentWorkoutID: ObjectId,
   ): MutableList<Set> {
     val newSets = mutableListOf<Set>()
     val latestPreviousSets = mutableListOf<Set>()
@@ -163,6 +167,9 @@ class ManageWorkoutUseCase(
           percentage1RM = set.percentage1RM,
           setTypeID = set.setTypeID,
           progressionSchemeID = set.progressionSchemeID,
+          exerciseSetsID = currentExerciseSetsID.toString(),
+          workoutID = currentWorkoutID.toString(),
+          exerciseID = set.exerciseID,
           ownerID = tempOwnerId, // TODO Replace currentUser.id
         )
       newSets.add(newSet)
@@ -180,17 +187,27 @@ class ManageWorkoutUseCase(
   ): MutableList<ExerciseExerciseSets> {
     val newExercisesSets = mutableListOf<ExerciseExerciseSets>()
     previousExercisesSets.forEach { exerciseSets ->
+      val exercise = exercisesRepository.getExercise(exerciseSets.exerciseID)
+
+      requireNotNull(exercise) { "Exercise not found." }
+
       val newExerciseExerciseSets =
-        ExerciseExerciseSets().apply {
-          _id = exerciseSets._id
-          exSetsUUID = exerciseSets.exSetsUUID
-          workoutID = exerciseSets.workoutID
-          exerciseOrder = exerciseSets.exerciseOrder
-          exercise = exercisesRepository.getExercise(exerciseSets.exerciseID)
-          sets = loadSetsFromWorkout(exerciseSets.sets)
-          notes = exerciseSets.notes
-          datePerformed = exerciseSets.datePerformed
-        }
+        ExerciseExerciseSets(
+          _id = exerciseSets._id,
+          exSetsUUID = exerciseSets.exSetsUUID,
+          workoutID = exerciseSets.workoutID,
+          exerciseOrder = exerciseSets.exerciseOrder,
+          //          exerciseID = exerciseSets.exerciseID,
+          exercise = exercise,
+          sets = loadSetsFromWorkout(exerciseSets.sets),
+          notes = exerciseSets.notes,
+          datePerformed = exerciseSets.datePerformed,
+          microcycleID = exerciseSets.microcycleID,
+          mesocycleID = exerciseSets.mesocycleID,
+          programID = exerciseSets.programID,
+          ownerID = exerciseSets.ownerID,
+        )
+
       newExercisesSets.add(newExerciseExerciseSets)
     }
     return newExercisesSets.sortedBy { it.exerciseOrder }.toMutableList()
@@ -218,13 +235,16 @@ class ManageWorkoutUseCase(
           setCompleted = set.setCompleted,
           setTypeID = set.setTypeID,
           progressionSchemeID = set.progressionSchemeID,
+          workoutID = set.workoutID,
+          exerciseSetsID = set.exerciseSetsID,
+          exerciseID = set.exerciseID,
           ownerID = tempOwnerId, // TODO Replace currentUser.id
-          isPublic = false
+          isPublic = false,
         )
       newSets.add(newSet)
-      if (set.exerciseID != null && set.setNumber != null) {
+      if (set.setNumber != null) {
         val previousSet =
-          workoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
+          workoutRepository.getPreviousSetForExercise(set.exerciseID, set.setNumber!!)
         previousSet?.let { latestPreviousSets.add(it) }
       }
     }
@@ -317,16 +337,19 @@ class ManageWorkoutUseCase(
       exercisesSets.add(
         ExerciseSets(
           _id = _exerciseSets._id,
-          exSetsUUID,
-          workoutID,
+          exSetsUUID = _exerciseSets.exSetsUUID,
+          workoutID = _exerciseSets.workoutID,
           exerciseOrder = _exerciseSets.exerciseOrder,
-          exerciseID = _exerciseSets.exercise?._id,
+          exerciseID = _exerciseSets.exercise._id,
           sets = _exerciseSets.sets,
           notes = _exerciseSets.notes,
           datePerformed = _exerciseSets.datePerformed,
           totalVolumeInPounds = _exerciseSets.totalVolumeInPounds(),
           totalVolumeInKilograms = _exerciseSets.totalVolumeInKilograms(),
           isPublic = false,
+          microcycleID = _exerciseSets.microcycleID,
+          mesocycleID = _exerciseSets.mesocycleID,
+          programID = _exerciseSets.programID,
           ownerID = tempOwnerId, // TODO Replace currentUser.id
         )
       )
@@ -393,14 +416,19 @@ class ManageWorkoutUseCase(
     exercisesSelectedToBeAddedToWorkout.forEach { _exercise ->
       val pinnedNotes = exerciseNotesRepository.getPinnedExerciseNotes(_exercise._id)
       exerciseSets.add(
-        ExerciseExerciseSets().apply {
+        ExerciseExerciseSets(
           exerciseOrder =
-            if (exerciseSets.isEmpty()) 1 else exerciseSets.last().exerciseOrder.plus(1)
-          exercise = _exercise
-          notes = pinnedNotes.toMutableList()
-          datePerformed = Clock.System.now()
-          workoutID = _workoutID
-        }
+          if (exerciseSets.isEmpty()) 1 else exerciseSets.last().exerciseOrder.plus(1),
+          exercise = _exercise,
+          notes = pinnedNotes.toMutableList(),
+          datePerformed = Clock.System.now(),
+          workoutID = _workoutID,
+          microcycleID = null, // TODO get details from workout
+          mesocycleID = null, // TODO get details from workout
+          programID = null, // TODO get details from workout
+          ownerID = tempOwnerId, // TODO Replace currentUser.id
+          isPublic = false,
+        )
       )
     }
     return exerciseSets
@@ -418,7 +446,7 @@ class ManageWorkoutUseCase(
       if (exerciseSets.sets.isNotEmpty()) {
         exerciseSets.sets +
                 Set(
-                  exerciseID = exerciseSets.exercise?._id,
+                  exerciseID = exerciseSets.exercise._id,
                   setNumber = exerciseSets.sets.last().setNumber?.plus(1),
                   weightPounds = exerciseSets.sets.last().weightPounds,
                   weightKilograms = exerciseSets.sets.last().weightKilograms,
@@ -435,17 +463,20 @@ class ManageWorkoutUseCase(
                   targetRepetitionsInReserve = exerciseSets.sets.last().targetRepetitionsInReserve,
                   targetRatePerceivedEffort = exerciseSets.sets.last().targetRatePerceivedEffort,
                   progressionSchemeID = exerciseSets.sets.last().progressionSchemeID,
+                  workoutID = exerciseSets.sets.last().workoutID,
+                  exerciseSetsID = exerciseSets.sets.last().exerciseSetsID,
                 )
       } else {
         listOf(
           Set(
-            exerciseID = exerciseSets.exercise?._id,
+            exerciseID = exerciseSets.exercise._id,
+            workoutID = exerciseSets.workoutID.toString(),
+            exerciseSetsID = exerciseSets._id.toString(),
             setNumber = 0,
             isPublic = false,
             progressionSchemeID = "", // Random().nextInt() // TODO Replace with,
             // progressionScheme.progressionSchemeID,
             ownerID = tempOwnerId, // TODO Replace currentUser.id,
-            isPublic = false,
           )
         )
       }
@@ -468,7 +499,7 @@ class ManageWorkoutUseCase(
   fun addExerciseNote(exerciseSets: ExerciseExerciseSets, workoutID: ObjectId): List<ExerciseNote> {
     exerciseSets.notes.add(
       ExerciseNote().apply {
-        exercise = exerciseSets.exercise?._id
+        exercise = exerciseSets.exercise._id
         workout = workoutID
         isPublic = false
       }
@@ -525,6 +556,12 @@ class ManageWorkoutUseCase(
         exercise = exerciseSets.exercise,
         sets = exerciseSets.sets,
         notes = exerciseSets.notes,
+        workoutID = exerciseSets.workoutID,
+        //        exerciseID = exerciseSets.exerciseID,
+        microcycleID = exerciseSets.microcycleID,
+        mesocycleID = exerciseSets.mesocycleID,
+        programID = exerciseSets.programID,
+        ownerID = exerciseSets.ownerID,
       )
     // _allSets.value = allSets().toList()
     return exerciseExerciseSets.toList()

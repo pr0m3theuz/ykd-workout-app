@@ -60,8 +60,10 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
 
   private fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
     _exerciseSets = exerciseSets
-    exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-    _sets = if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
+    exerciseWeightUnit = exerciseSets.exercise.weightUnit
+    _sets = if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets(
+      exerciseSets
+    )
 
     _setsFlow.value = _sets.toList()
   }
@@ -103,23 +105,35 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
   fun addSet() {
     val temporarySets: MutableList<Set> = _sets.toMutableList()
 
+    requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
+
     if (_sets.isNotEmpty()) {
       temporarySets.add(
-        Set().apply {
-          setNumber = _sets.last().setNumber?.plus(1)
-          weightPounds = temporarySets.last().weightPounds
-          weightKilograms = temporarySets.last().weightKilograms
-          repetitions = temporarySets.last().repetitions
-          ratePerceivedEffort = temporarySets.last().ratePerceivedEffort
-          repetitionsInReserve = temporarySets.last().repetitionsInReserve
-          setTypeID = temporarySets.last().setTypeID
-          percentage1RM = temporarySets.last().percentage1RM
-          isPublic = false
-          ownerID = tempOwnerId // TODO currentUser.id
-        }
+        Set(
+          setNumber = _sets.last().setNumber?.plus(1),
+          weightPounds = temporarySets.last().weightPounds,
+          weightKilograms = temporarySets.last().weightKilograms,
+          repetitions = temporarySets.last().repetitions,
+          ratePerceivedEffort = temporarySets.last().ratePerceivedEffort,
+          repetitionsInReserve = temporarySets.last().repetitionsInReserve,
+          setTypeID = temporarySets.last().setTypeID,
+          percentage1RM = temporarySets.last().percentage1RM,
+          exerciseID = temporarySets.last().exerciseID,
+          exerciseSetsID = temporarySets.last().exerciseSetsID,
+          workoutID = temporarySets.last().workoutID,
+          isPublic = false,
+          ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
+        )
       )
     } else {
-      temporarySets.add(Set())
+      temporarySets.add(
+        Set(
+          exerciseID = _exerciseSets!!.exercise._id,
+          exerciseSetsID = _exerciseSets!!._id.toString(),
+          workoutID = _exerciseSets!!.workoutID.toString(),
+          ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
+        )
+      )
     }
     _sets = temporarySets
     setNewTotalVolume(calculateTotalVolume(_sets))
@@ -272,18 +286,23 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     return totalVolume
   }
 
-  private fun initSets(): MutableList<Set> {
+  private fun initSets(exerciseSets: ExerciseExerciseSets): MutableList<Set> {
     return MutableList(3) { index ->
-      Set().apply {
-        setNumber = index
-        weightPounds = 100.00
-        repetitions = 10
-        percentage1RM = 1.0
+      Set(
+        setNumber = index,
+        weightPounds = 100.00,
+        repetitions = 10,
+        percentage1RM = 1.0,
+        exerciseID = exerciseSets.exercise._id,
+        exerciseSetsID = exerciseSets._id.toString(),
+        workoutID = exerciseSets.workoutID.toString(),
+        ownerID = exerciseSets.ownerID, // TODO currentUser.id,
         //        exerciseID = exerciseID,
         //        exerciseUUID = exerciseUUID,
         //        workoutID = workoutID,
         //        workoutUUID = workoutUUID,
-      }
+      )
     }
   }
 }
+

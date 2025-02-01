@@ -860,16 +860,20 @@ class WorkoutViewModel(
   fun addBackOffSets(exerciseSets: ExerciseExerciseSets, backOffSets: List<Set>) {
     for (index in backOffSets.indices) {
       exerciseSets.sets.add(
-        Set().apply {
-          setNumber = exerciseSets.sets.last().setNumber?.plus(1)
-          weightPounds = backOffSets[index].weightPounds
-          weightKilograms = backOffSets[index].weightKilograms
-          repetitions = backOffSets[index].repetitions
-          ratePerceivedEffort = backOffSets[index].ratePerceivedEffort
-          repetitionsInReserve = backOffSets[index].repetitionsInReserve
-          setTypeID = backOffSets[index].setTypeID
-          percentage1RM = backOffSets[index].percentage1RM
-        }
+        Set(
+          setNumber = exerciseSets.sets.last().setNumber?.plus(1),
+          weightPounds = backOffSets[index].weightPounds,
+          weightKilograms = backOffSets[index].weightKilograms,
+          repetitions = backOffSets[index].repetitions,
+          ratePerceivedEffort = backOffSets[index].ratePerceivedEffort,
+          repetitionsInReserve = backOffSets[index].repetitionsInReserve,
+          setTypeID = backOffSets[index].setTypeID,
+          percentage1RM = backOffSets[index].percentage1RM,
+          exerciseID = exerciseSets.exercise._id,
+          exerciseSetsID = exerciseSets._id.toString(),
+          workoutID = exerciseSets.workoutID.toString(),
+          ownerID = exerciseSets.ownerID,
+        )
         //        backOffSets[index].copy(lazyListItemID = newID())
       )
     }
@@ -1008,25 +1012,25 @@ private fun initWorkout(): Workout {
 
   return when (currentTime.hour) {
     in 0..11 -> {
-      Workout().apply {
-        name = "Morning Workout"
-        dateCreated = Clock.System.now()
-        workoutStarted = Clock.System.now()
-      }
+      Workout(
+        name = "Morning Workout",
+        dateCreated = Clock.System.now(),
+        workoutStarted = Clock.System.now(),
+      )
     }
     in 12..17 -> {
-      Workout().apply {
-        name = "Afternoon Workout"
-        dateCreated = Clock.System.now()
-        workoutStarted = Clock.System.now()
-      }
+      Workout(
+        name = "Afternoon Workout",
+        dateCreated = Clock.System.now(),
+        workoutStarted = Clock.System.now(),
+      )
     }
     else -> {
-      Workout().apply {
-        name = "Evening Workout"
-        dateCreated = Clock.System.now()
-        workoutStarted = Clock.System.now()
-      }
+      Workout(
+        name = "Evening Workout",
+        dateCreated = Clock.System.now(),
+        workoutStarted = Clock.System.now(),
+      )
     }
   }
 }

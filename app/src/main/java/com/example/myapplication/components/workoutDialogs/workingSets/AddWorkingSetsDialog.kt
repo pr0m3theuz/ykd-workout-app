@@ -38,7 +38,7 @@ fun AddWorkingSetsScreen(
   exerciseSets: ExerciseExerciseSets,
 ) {
   workingSetViewModel.getExerciseSets(exerciseSets)
-  val weightUnit = exerciseSets.exercise?.weightUnit ?: workingSetViewModel.userDefaultWeightUnit
+  val weightUnit = exerciseSets.exercise.weightUnit ?: workingSetViewModel.userDefaultWeightUnit
 
   /* TODO Get User's One Rep Max or Estimated One Rep Max*/
   workingSetViewModel.changeWorkingSetWeight(

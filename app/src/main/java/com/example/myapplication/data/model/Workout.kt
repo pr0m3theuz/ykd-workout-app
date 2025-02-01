@@ -19,9 +19,15 @@ import kotlinx.datetime.Clock
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import org.bson.types.ObjectId
 import java.time.Instant
 import java.time.LocalDateTime
@@ -34,14 +40,42 @@ import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+
+object ObjectIdSerializer : KSerializer<ObjectId> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("app.ObjectId", PrimitiveKind.STRING)
+
+  override fun deserialize(decoder: Decoder): ObjectId {
+    return ObjectId(decoder.decodeString())
+  }
+
+  override fun serialize(encoder: Encoder, value: ObjectId) {
+    encoder.encodeString(value.toHexString())
+  }
+}
+
+object UuidSerializer : KSerializer<Uuid> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("app.Uuid", PrimitiveKind.STRING)
+
+  override fun deserialize(decoder: Decoder): Uuid {
+    return Uuid.parseHex(decoder.decodeString())
+  }
+
+  override fun serialize(encoder: Encoder, value: Uuid) {
+    encoder.encodeString(value.toHexString())
+  }
+}
+
 @Serializable
 data class WorkoutDao(var item: Workout)
 
 @Serializable
 data class Workout(
-  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  @SerialName("_id")
+  @Serializable(ObjectIdSerializer::class) var _id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
-  @Contextual var uuid: Uuid = Uuid.random(),
+  @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String, // TODO make name default = User
   var workoutAuthor: String? = null,
   var notes: List<WorkoutNote> = emptyList(),
@@ -56,7 +90,7 @@ data class Workout(
   var totalVolumeInKilograms: Double? = 0.0,
   var order: Int? = null, // For sorting workouts in a program
   @Contextual var programID: ObjectId? = null,
-  @Contextual val mesocycleID: Long? = null,
+  @Contextual val mesocycleID: ObjectId? = null,
   @Contextual var microcycleID: ObjectId? = null,
   var ownerID: String = "",
   var isPublic: Boolean = false,

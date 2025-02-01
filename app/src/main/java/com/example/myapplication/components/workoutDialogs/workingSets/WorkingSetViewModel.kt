@@ -29,6 +29,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
   private val tempOwnerId = ObjectId().toString()
   val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
+  private var _exerciseSets: ExerciseExerciseSets? = null
+
   var exerciseWeightUnit: String? = null
   private var _oneRepMax: Double = 100.0
   val oneRepMax: Double
@@ -57,30 +59,45 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
     //    exerciseUUID = exerciseSets.exercise.uuid
     //    workoutID = exerciseSets.workoutID
     //    workoutUUID = exerciseSets.workoutUUID
-    exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-    _sets = if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets()
+    _exerciseSets = exerciseSets
+    exerciseWeightUnit = exerciseSets.exercise.weightUnit
+    _sets = if (exerciseSets.sets.isNotEmpty()) exerciseSets.sets.toMutableList() else initSets(
+      exerciseSets
+    )
     _setsFlow.value = _sets.toList()
   }
 
   fun addSet() {
+    requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
+
     if (_sets.isNotEmpty()) {
       _sets.add(
-        Set().apply {
-          setNumber = _sets.last().setNumber?.plus(1)
-          weightPounds = _sets.last().weightPounds
-          weightKilograms = _sets.last().weightKilograms
-          repetitions = _sets.last().repetitions
-          ratePerceivedEffort = _sets.last().ratePerceivedEffort
-          repetitionsInReserve = _sets.last().repetitionsInReserve
-          setTypeID = _sets.last().setTypeID
-          percentage1RM = _sets.last().percentage1RM
-          isPublic = false
-          ownerID = tempOwnerId
-        }
+        Set(
+          setNumber = _sets.last().setNumber?.plus(1),
+          weightPounds = _sets.last().weightPounds,
+          weightKilograms = _sets.last().weightKilograms,
+          repetitions = _sets.last().repetitions,
+          ratePerceivedEffort = _sets.last().ratePerceivedEffort,
+          repetitionsInReserve = _sets.last().repetitionsInReserve,
+          setTypeID = _sets.last().setTypeID,
+          percentage1RM = _sets.last().percentage1RM,
+          isPublic = false,
+          ownerID = _exerciseSets!!.ownerID,
+          exerciseID = _exerciseSets!!.exercise._id,
+          exerciseSetsID = _exerciseSets!!._id.toString(),
+          workoutID = _exerciseSets!!.workoutID.toString(),
+        )
       )
       _setsFlow.value = _sets.toList()
     } else {
-      _sets.add(Set())
+      _sets.add(
+        Set(
+          exerciseID = _exerciseSets!!.exercise._id,
+          exerciseSetsID = _exerciseSets!!._id.toString(),
+          workoutID = _exerciseSets!!.workoutID.toString(),
+          ownerID = _exerciseSets!!.ownerID,
+        )
+      )
       _setsFlow.value = _sets.toList()
     }
   }
@@ -117,18 +134,23 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
     _sets.forEach { if (it.uuid == uuid) it.percentage1RM = newPercentage }
   }
 
-  private fun initSets(): MutableList<Set> {
+  private fun initSets(exerciseSets: ExerciseExerciseSets): MutableList<Set> {
     return MutableList(3) { index ->
-      Set().apply {
-        setNumber = index
-        weightPounds = 100.00
-        repetitions = 10
-        percentage1RM = 1.0
+      Set(
+        exerciseID = exerciseSets.exercise._id,
+        exerciseSetsID = exerciseSets._id.toString(),
+        workoutID = exerciseSets.workoutID.toString(),
+        setNumber = index,
+        ownerID = exerciseSets.ownerID,
+        weightPounds = 100.00,
+        repetitions = 10,
+        percentage1RM = 1.0,
         //        exerciseID = exerciseID,
         //        exerciseUUID = exerciseUUID,
         //        workoutID = workoutID,
         //        workoutUUID = workoutUUID,
-      }
+      )
+
     }
   }
 }

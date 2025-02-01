@@ -57,12 +57,12 @@ data class Set(
   @Contextual val exerciseSet: ObjectId? = null, // TODO Use backlinks for ExerciseSets or not
   var progressionSchemeID: String? = null, // TODO Create ProgressionScheme class/enum and RealmObject
   //    To use in query for previous sets
-  @Contextual var exerciseID: ObjectId? = null,
+  @Contextual var exerciseID: ObjectId,
   var dateCreated: Instant? = Clock.System.now(),
   //    var programUUID: Uuid? = null
   //    var mesocycleUUID: Uuid? = null
   //    var microcycleUUID: Uuid? = null
-  var ownerID: String = "",
+  var ownerID: String,
   var isPublic: Boolean = false
 )
 

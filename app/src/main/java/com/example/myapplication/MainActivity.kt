@@ -45,6 +45,8 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.example.myapplication.components.ReplicatorView
+import com.example.myapplication.components.ReplicatorViewModel
 import com.example.myapplication.components.Screens
 import com.example.myapplication.components.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.components.addExercisesList.AddExercisesScreen
@@ -73,6 +75,7 @@ import com.google.firebase.crashlytics.setCustomKeys
 import com.newrelic.agent.android.NewRelic
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {
@@ -125,13 +128,14 @@ class MainActivity : ComponentActivity() {
 
         MainView(mainViewModel.startDatabase, mainViewModel.closeDatabase)
 
-        NavHost(navController = navController, startDestination = Screens.Workout.route) {
+        NavHost(navController = navController, startDestination = Screens.Replicator.route) {
           addExercisesGraph(navController)
           addWorkoutGraph(navController)
           addWorkoutSummaryGraph(navController)
           addProgramsGraph(navController)
           addHistoryGraph(navController)
           addProfileGraph(navController)
+          addReplicatorGraph(navController)
           navigation("homeScreen", route = "home") { composable("homeScreen") { HomeScreen() } }
         }
       }
@@ -323,6 +327,23 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
     composable("profileScreen") { navBackStackEntry ->
       Log.i("ProfileNavGraph", "Navigated to User Profile Screen")
       ProfileScreen(navController = navController)
+    }
+  }
+}
+
+//val scaffoldState: ScaffoldState = rememberScaffoldState()
+
+private fun NavGraphBuilder.addReplicatorGraph(navController: NavController) {
+  navigation("replicatorScreen", route = "replicator") {
+    composable("replicatorScreen") {
+      Log.i("ReplicatorNavGraph", "Navigated to Replicator Screen")
+      ReplicatorView(
+        navController,
+        viewModel = koinViewModel<ReplicatorViewModel>(),
+//        openDrawer = TODO(),
+//        replicatorConfigNav = TODO(),
+//        scaffoldState = TODO()
+      )
     }
   }
 }

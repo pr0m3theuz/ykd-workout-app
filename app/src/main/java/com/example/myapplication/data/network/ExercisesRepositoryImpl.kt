@@ -43,7 +43,7 @@ private const val DATABASE_IS_NULL = "Exercise Repository: Database does not exi
 private const val COLLECTION_IS_NULL =
   "Exercise Repository: Exercise Collection does not exist in the Database."
 
-class ExercisesRepositoryDb(private val databaseManager: DatabaseManager) : ExercisesRepository {
+class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : ExercisesRepository {
   // Room executes all queries on a separate thread.
   // Observed Flow will notify the observer when the data has changed.
   val db: Database? = databaseManager.database
