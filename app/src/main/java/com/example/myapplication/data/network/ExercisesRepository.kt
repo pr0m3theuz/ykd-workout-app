@@ -18,17 +18,17 @@ interface ExercisesRepository {
   // Observed Flow will notify the observer when the data has changed.
   fun getAllExercises(): Flow<List<Exercise>>
 
-  fun getAllEquipment(): List<Equipment>
+  fun getAllEquipment(): Flow<List<Equipment>>
 
-  fun getAllMuscleGroups(): List<MuscleGroup>
+  fun getAllMuscleGroups(): Flow<List<MuscleGroup>>
 
-  fun getAllUtilities(): List<Utility>
+  fun getAllUtilities(): Flow<List<Utility>>
 
-  fun getAllForces(): List<Force>
+  fun getAllForces(): Flow<List<Force>>
 
-  fun getAllMechanics(): List<Mechanic>
+  fun getAllMechanics(): Flow<List<Mechanic>>
 
-  fun getAllMuscleRolesFunctions(): List<MuscleRoleFunction>
+  fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>>
 
   fun getMuscleGroupNameByID(muscleGroupID: String): String
 

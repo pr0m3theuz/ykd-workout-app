@@ -44,12 +44,14 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
   // TODO Decide if I should create a repository for user data
   val userDatabase: Database? = databaseManager.userDatabase
 
+  private val withUnknownKeys = Json { ignoreUnknownKeys = true }
+
   private fun mapQueryChangeToWorkout(queryChange: QueryChange): List<Workout> {
     val workouts = mutableListOf<Workout>() // 1
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val workout = Json.decodeFromString<WorkoutDao>(json).Workout // 5
+        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout // 5
         workouts.add(workout) // 6
       }
     }
@@ -72,7 +74,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      val workout = result?.let { Json.decodeFromString<Workout>(it) }
+      val workout = result?.let { withUnknownKeys.decodeFromString<Workout>(it) }
 
       return workout
     } catch (e: Exception) {
@@ -119,7 +121,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       query.execute().allResults().forEach { item ->
         val json = item.toJSON()
-        val workout = Json.decodeFromString<WorkoutDao>(json).Workout
+        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
         workouts.add(workout)
       }
     } catch (e: Exception) {
@@ -295,7 +297,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val note = Json.decodeFromString<WorkoutNoteDao>(json).item // 5
+        val note = withUnknownKeys.decodeFromString<WorkoutNoteDao>(json).item // 5
         notes.add(note) // 6
       }
     }

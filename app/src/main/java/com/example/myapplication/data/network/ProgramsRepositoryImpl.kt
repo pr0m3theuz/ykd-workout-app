@@ -44,6 +44,8 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
   // TODO Decide if I should create a repository for user data
   val userDatabase: Database? = databaseManager.userDatabase
 
+  private val withUnknownKeys = Json { ignoreUnknownKeys = true }
+
   override fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -78,7 +80,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val program = Json.decodeFromString<ProgramDao>(json).Program // 5
+        val program = withUnknownKeys.decodeFromString<ProgramDao>(json).Program // 5
         programs.add(program) // 6
       }
     }
@@ -90,7 +92,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val mesocycle = Json.decodeFromString<MesocycleDao>(json).Mesocycle // 5
+        val mesocycle = withUnknownKeys.decodeFromString<MesocycleDao>(json).Mesocycle // 5
         mesocycles.add(mesocycle) // 6
       }
     }
@@ -102,7 +104,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val microcycle = Json.decodeFromString<MicrocycleDao>(json).Microcycle // 5
+        val microcycle = withUnknownKeys.decodeFromString<MicrocycleDao>(json).Microcycle // 5
         microcycles.add(microcycle) // 6
       }
     }
@@ -124,7 +126,8 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      val program = result?.let { Json.decodeFromString<ProgramDao>(result.toString()).Program }
+      val program =
+        result?.let { withUnknownKeys.decodeFromString<ProgramDao>(result.toString()).Program }
       return program
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
@@ -185,7 +188,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { Json.decodeFromString<Boolean>(result.toString()) } ?: false
+      return result?.let { withUnknownKeys.decodeFromString<Boolean>(result.toString()) } ?: false
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -341,7 +344,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { Json.decodeFromString<MesocycleDao>(result.toString()).Mesocycle }
+      return result?.let { withUnknownKeys.decodeFromString<MesocycleDao>(result.toString()).Mesocycle }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -481,7 +484,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { Json.decodeFromString<MicrocycleDao>(result.toString()).Microcycle }
+      return result?.let { withUnknownKeys.decodeFromString<MicrocycleDao>(result.toString()).Microcycle }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -628,7 +631,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      val workout = result?.let { Json.decodeFromString<Workout>(it) }
+      val workout = result?.let { withUnknownKeys.decodeFromString<Workout>(it) }
 
       return workout
     } catch (e: Exception) {

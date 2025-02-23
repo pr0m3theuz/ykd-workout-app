@@ -12,7 +12,6 @@ import com.example.myapplication.data.model.MovementType
 import com.example.myapplication.data.model.MuscleGroup
 import com.example.myapplication.data.model.Utility
 import com.example.myapplication.data.network.ExercisesRepository
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,14 +72,27 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   val equipmentsChecked
     get() = _equipmentsChecked.asStateFlow()
 
-  val movementTypes = MovementType.values().sortedBy { it.name }
+  val movementTypes = MovementType.entries.sortedBy { it.name }
 
   val movementTypesChecked = movementTypes.map { it to false }.toMutableStateMap()
 
   init {
     viewModelScope.launch {
-      getEquipmentAndMuscleGroups()
+//      getEquipment()
+//      getMuscleGroups()
       getAllExercises()
+    }
+
+    viewModelScope.launch {
+      getEquipment()
+    }
+
+    viewModelScope.launch {
+      getMuscleGroups()
+    }
+
+    viewModelScope.launch {
+      init(equipment.value, muscleGroup.value)
     }
   }
 
@@ -90,17 +102,28 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     return coroutineScope {
       exercisesRepository.getAllExercises().collect { list ->
         _exercises.value = list
-        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
+//        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
       }
     }
   }
 
-  private suspend fun getEquipmentAndMuscleGroups() {
-    //    Log.i("ExercisesViewModel", "getEquipmentAndMuscleGroups")
+  private suspend fun getEquipment() {
+    Log.i("ExercisesViewModel", "getEquipment")
     return coroutineScope {
-      val equipments = async { exercisesRepository.getAllEquipment() }
-      val muscleGroups = async { exercisesRepository.getAllMuscleGroups() }
-      init(equipments.await(), muscleGroups.await())
+      exercisesRepository.getAllEquipment().collect {
+        _equipment.value = it
+        Log.i("ExercisesViewModel.getEquipment()", it.toString())
+      }
+    }
+  }
+
+  private suspend fun getMuscleGroups() {
+    Log.i("ExercisesViewModel", "getMuscleGroups")
+    return coroutineScope {
+      exercisesRepository.getAllMuscleGroups().collect {
+        _muscleGroup.value = it
+        Log.i("ExercisesViewModel.getMuscleGroups()", it.toString())
+      }
     }
   }
 
@@ -176,14 +199,14 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
       .filterValues { it }
       .keys
       .sortedBy { it.name }
-      .forEach { muscleGroup -> muscleGroup.id?.let { selectedMuscleGroups.add(it) } }
+      .forEach { muscleGroup -> muscleGroup.id.let { selectedMuscleGroups.add(it) } }
 
     val selectedEquipments = mutableListOf<String>()
     _equipmentsChecked.value
       .filterValues { it }
       .keys
       .sortedBy { it.name }
-      .forEach { equipment -> equipment.id?.let { selectedEquipments.add(it) } }
+      .forEach { equipment -> equipment.id.let { selectedEquipments.add(it) } }
 
     val selectedMovementTypes = mutableListOf<String>()
     movementTypesChecked
@@ -197,7 +220,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
         .filterValues { !it }
         .keys
         .sortedBy { it.name }
-        .forEach { muscleGroup -> muscleGroup.id?.let { selectedMuscleGroups.add(it) } }
+        .forEach { muscleGroup -> muscleGroup.id.let { selectedMuscleGroups.add(it) } }
     }
 
     if (selectedEquipments.isEmpty()) {
@@ -205,7 +228,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
         .filterValues { !it }
         .keys
         .sortedBy { it.name }
-        .forEach { equipment -> equipment.id?.let { selectedEquipments.add(it) } }
+        .forEach { equipment -> equipment.id.let { selectedEquipments.add(it) } }
     }
 
     /*

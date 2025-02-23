@@ -91,7 +91,92 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
     return exercises // 7
   }
 
-  override fun getAllEquipment(): List<Equipment> {
+  private fun mapQueryChangeToEquipment(queryChange: QueryChange): List<Equipment> {
+    val equipments = mutableListOf<Equipment>()
+
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val equipment = withUnknownKeys.decodeFromString<EquipmentDao>(json).Equipment
+        equipments.add(equipment)
+      }
+    }
+    Log.i("ExercisesRepositoryImpl.mapQueryChangeToEquipment()", equipments.toString())
+    return equipments
+  }
+
+  private fun mapQueryChangeToMuscleGroups(queryChange: QueryChange): List<MuscleGroup> {
+    val muscleGroups = mutableListOf<MuscleGroup>()
+
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val muscleGroup = withUnknownKeys.decodeFromString<MuscleGroupDao>(json).MuscleGroup
+        muscleGroups.add(muscleGroup)
+      }
+    }
+    Log.i("ExercisesRepositoryImpl.mapQueryChangeToMuscleGroups()", muscleGroups.toString())
+    return muscleGroups
+  }
+
+  // Version for Utilities
+  private fun mapQueryChangeToUtilities(queryChange: QueryChange): List<Utility> {
+    val utilities = mutableListOf<Utility>()
+
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val utility = withUnknownKeys.decodeFromString<UtilityDao>(json).Utility
+        utilities.add(utility)
+      }
+    }
+    return utilities
+  }
+
+  // Version for Forces
+  private fun mapQueryChangeToForces(queryChange: QueryChange): List<Force> {
+    val forces = mutableListOf<Force>()
+
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val force = withUnknownKeys.decodeFromString<ForceDao>(json).Force
+        forces.add(force)
+      }
+    }
+    return forces
+  }
+
+  // Version for Mechanics
+  private fun mapQueryChangeToMechanics(queryChange: QueryChange): List<Mechanic> {
+    val mechanics = mutableListOf<Mechanic>()
+
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val mechanic = withUnknownKeys.decodeFromString<MechanicDao>(json).Mechanic
+        mechanics.add(mechanic)
+      }
+    }
+    return mechanics
+  }
+
+  // Version for MuscleRoleFunctions
+  private fun mapQueryChangeToMuscleRoleFunctions(queryChange: QueryChange): List<MuscleRoleFunction> {
+    val muscleRoleFunctions = mutableListOf<MuscleRoleFunction>()
+
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val muscleRoleFunction =
+          withUnknownKeys.decodeFromString<MuscleRoleFunctionDao>(json).MuscleRoleFunction
+        muscleRoleFunctions.add(muscleRoleFunction)
+      }
+    }
+    return muscleRoleFunctions
+  }
+
+  override fun getAllEquipment(): Flow<List<Equipment>> {
     val equipmentList = mutableListOf<Equipment>()
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -103,23 +188,27 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.all())
+//          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       // loop through results and add to list
-      query.execute().allResults().forEach { item -> // <5>
-        val json = item.toJSON()
-        val equipment = withUnknownKeys.decodeFromString<EquipmentDao>(json).Equipment
-        equipmentList.add(equipment)
-      }
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToEquipment(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute() // <4>
+      return flow // <5>
+
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
 
-    return equipmentList.toList()
+    return flow {}
   }
 
-  override fun getAllMuscleGroups(): List<MuscleGroup> {
+  override fun getAllMuscleGroups(): Flow<List<MuscleGroup>> {
     val muscleGroups = mutableListOf<MuscleGroup>()
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -131,129 +220,139 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.all())
+//          .where(Expression.all())
+          .orderBy(Ordering.property("name").ascending())
+
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToMuscleGroups(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute() // <4>
+      return flow // <5>
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return flow {}
+  }
+
+  override fun getAllUtilities(): Flow<List<Utility>> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("Utility")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val query =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection))
+//              .where(Expression.all())
+          .orderBy(Ordering.property("name").ascending())
+
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToUtilities(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute() // <4>
+      return flow // <5>
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return flow {}
+  }
+
+  override fun getAllForces(): Flow<List<Force>> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("Force")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val query =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection))
+//          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       // loop through results and add to list
-      query.execute().allResults().forEach { item -> // <5>
-        val json = item.toJSON()
-        val muscleGroup = withUnknownKeys.decodeFromString<MuscleGroupDao>(json).MuscleGroup
-        muscleGroups.add(muscleGroup)
-      }
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToForces(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute() // <4>
+      return flow // <5>
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
 
-    return muscleGroups.toList()
+    return flow {}
   }
 
-  override fun getAllUtilities(): List<Utility> {
-    val utilities = mutableListOf<Utility>()
+  override fun getAllMechanics(): Flow<List<Mechanic>> {
     try {
-      db?.let { database ->
-        val collection = database.getCollection("Utility")
-        collection?.let {
-          val query =
-            QueryBuilder.select(SelectResult.all())
-              .from(DataSource.collection(it))
-              .where(Expression.all())
-              .orderBy(Ordering.property("name").ascending())
+      requireNotNull(db) { DATABASE_IS_NULL }
 
-          // loop through results and add to list
-          query.execute().allResults().forEach { item -> // <5>
-            val json = item.toJSON()
-            val utility = withUnknownKeys.decodeFromString<UtilityDao>(json).Utility
-            utilities.add(utility)
-          }
-        }
-      }
+      val collection = db.getCollection("Mechanic")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      Mechanic
+      val query =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection))
+//          .where(Expression.all())
+          .orderBy(Ordering.property("name").ascending())
+
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToMechanics(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute() // <4>
+      return flow // <5>
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
 
-    return utilities.toList()
+    return flow {}
   }
 
-  override fun getAllForces(): List<Force> {
-    val forces = mutableListOf<Force>()
+  override fun getAllMuscleRolesFunctions(): Flow<List<MuscleRoleFunction>> {
     try {
-      db?.let { database ->
-        val collection = database.getCollection("Force")
-        collection?.let {
-          val query =
-            QueryBuilder.select(SelectResult.all())
-              .from(DataSource.collection(it))
-              .where(Expression.all())
-              .orderBy(Ordering.property("name").ascending())
+      requireNotNull(db) { DATABASE_IS_NULL }
 
-          // loop through results and add to list
-          query.execute().allResults().forEach { item -> // <5>
-            val json = item.toJSON()
-            val force = withUnknownKeys.decodeFromString<ForceDao>(json).Force
-            forces.add(force)
-          }
-        }
-      }
+      val collection = db.getCollection("MuscleRoleFunction")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val query =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection))
+//          .where(Expression.all())
+          .orderBy(Ordering.property("name").ascending())
+
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToMuscleRoleFunctions(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute() // <4>
+      return flow // <5>
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
 
-    return forces.toList()
-  }
-
-  override fun getAllMechanics(): List<Mechanic> {
-    val mechanics = mutableListOf<Mechanic>()
-    try {
-      db?.let { database ->
-        val collection = database.getCollection("Mechanic")
-        collection?.let {
-          val query =
-            QueryBuilder.select(SelectResult.all())
-              .from(DataSource.collection(it))
-              .where(Expression.all())
-              .orderBy(Ordering.property("name").ascending())
-
-          // loop through results and add to list
-          query.execute().allResults().forEach { item -> // <5>
-            val json = item.toJSON()
-            val mechanic = withUnknownKeys.decodeFromString<MechanicDao>(json).Mechanic
-            mechanics.add(mechanic)
-          }
-        }
-      }
-    } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
-    }
-
-    return mechanics.toList()
-  }
-
-  override fun getAllMuscleRolesFunctions(): List<MuscleRoleFunction> {
-    val muscleRoleFunctions = mutableListOf<MuscleRoleFunction>()
-    try {
-      db?.let { database ->
-        val collection = database.getCollection("Mechanic")
-        collection?.let {
-          val query =
-            QueryBuilder.select(SelectResult.all())
-              .from(DataSource.collection(it))
-              .where(Expression.all())
-              .orderBy(Ordering.property("name").ascending())
-
-          // loop through results and add to list
-          query.execute().allResults().forEach { item -> // <5>
-            val json = item.toJSON()
-            val muscleRoleFunction =
-              withUnknownKeys.decodeFromString<MuscleRoleFunctionDao>(json).MuscleRoleFunction
-            muscleRoleFunctions.add(muscleRoleFunction)
-          }
-        }
-      }
-    } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
-    }
-
-    return muscleRoleFunctions.toList()
+    return flow {}
   }
 
   override fun getMuscleGroupNameByID(muscleGroupID: String): String {
@@ -281,9 +380,9 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
     return result
   }
 
-  // By default Room runs suspend queries off the main thread, therefore, we don't need to
-  // implement anything else to ensure we're not doing long running database work
-  // off the main thread.
+// By default Room runs suspend queries off the main thread, therefore, we don't need to
+// implement anything else to ensure we're not doing long running database work
+// off the main thread.
 
   // TODO Use function when inserting new exercises
   override suspend fun insertExercise(exercise: Exercise) {

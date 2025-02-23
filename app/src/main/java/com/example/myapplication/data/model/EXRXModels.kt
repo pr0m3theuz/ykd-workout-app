@@ -35,7 +35,7 @@ data class MuscleExercise(
     var muscleID: String,
     var muscleGroupID: String,
     var roleFunction: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
 
 /**
@@ -63,7 +63,7 @@ data class MuscleRoleFunction(
     @SerialName("id") var id: String,
     var roleFunction: String,
     var description: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
 
 @Serializable
@@ -71,7 +71,7 @@ data class Muscle(
     @SerialName("id") var id: String,
     var muscleGroupID: String,
     var name: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
 
 @Serializable
@@ -79,7 +79,7 @@ data class MuscleGroup(
     @SerialName("id") var id: String,
     var name: String,
     var exrxName: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
 
 @Serializable
@@ -89,7 +89,7 @@ data class Equipment(
     var name: String,
     var exrxName: String,
     var description: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
 
 @Serializable
@@ -97,7 +97,7 @@ data class Utility(
     @SerialName("id") var id: String,
     var name: String,
     var description: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
 
 @Serializable
@@ -105,7 +105,7 @@ data class Force(
     @SerialName("id") var id: String,
     var name: String,
     var description: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
 
 /**
@@ -121,5 +121,5 @@ data class Mechanic(
     @SerialName("id") var id: String,
     var name: String,
     var description: String,
-    var type: String? = null,
+//    var type: String? = null,
 )
