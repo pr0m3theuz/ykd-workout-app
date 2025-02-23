@@ -83,8 +83,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
           percentage1RM = _sets.last().percentage1RM,
           isPublic = false,
           ownerID = _exerciseSets!!.ownerID,
-          exerciseID = _exerciseSets!!.exercise._id,
-          exerciseSetsID = _exerciseSets!!._id.toString(),
+          exerciseID = _exerciseSets!!.exercise.id,
+          exerciseSetsID = _exerciseSets!!.id.toString(),
           workoutID = _exerciseSets!!.workoutID.toString(),
         )
       )
@@ -92,8 +92,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
     } else {
       _sets.add(
         Set(
-          exerciseID = _exerciseSets!!.exercise._id,
-          exerciseSetsID = _exerciseSets!!._id.toString(),
+          exerciseID = _exerciseSets!!.exercise.id,
+          exerciseSetsID = _exerciseSets!!.id.toString(),
           workoutID = _exerciseSets!!.workoutID.toString(),
           ownerID = _exerciseSets!!.ownerID,
         )
@@ -137,8 +137,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
   private fun initSets(exerciseSets: ExerciseExerciseSets): MutableList<Set> {
     return MutableList(3) { index ->
       Set(
-        exerciseID = exerciseSets.exercise._id,
-        exerciseSetsID = exerciseSets._id.toString(),
+        exerciseID = exerciseSets.exercise.id,
+        exerciseSetsID = exerciseSets.id.toString(),
         workoutID = exerciseSets.workoutID.toString(),
         setNumber = index,
         ownerID = exerciseSets.ownerID,

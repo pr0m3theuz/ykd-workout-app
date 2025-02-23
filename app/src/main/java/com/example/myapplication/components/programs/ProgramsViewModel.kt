@@ -173,13 +173,13 @@ constructor(
     //        val workouts = emptyList<Workout>()
     viewModelScope.launch {
       _selectedProgramWorkouts.value[microcycle] =
-        workoutRepository.getWorkoutsByMicrocycleID(microcycle._id)
+        workoutRepository.getWorkoutsByMicrocycleID(microcycle.id)
     }
     //        return workouts
   }
 
   fun getProgramData() {
-    _selectedProgram.value?.let { getMicrocyclesByProgram(it._id) }
+    _selectedProgram.value?.let { getMicrocyclesByProgram(it.id) }
 
     _selectedProgramMicrocycles.value.forEach { getWorkoutsByMicrocycle(it) }
   }

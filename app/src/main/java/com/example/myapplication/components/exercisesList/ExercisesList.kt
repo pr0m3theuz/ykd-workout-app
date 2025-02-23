@@ -274,7 +274,7 @@ private fun ExercisesLazyList(
     items(count = exercises.size, key = { index: Int -> exercises[index].lazyListItemID }) { index
       ->
       val exercise: Exercise = exercises[index]
-      val muscleGroupName: String? = muscleGroups.find { it._id == exercise.muscleGroupID }?.name
+      val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
       //      Log.i(
       //        "ExercisesLazyList.exercise",
       //        "${exercise.name}, ${exercise.muscleGroupID}, $muscleGroupName"

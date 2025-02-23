@@ -56,7 +56,7 @@ fun SelectableExerciseItem(
           .clickable(
             enabled = true,
             onClickLabel = "See more details about ${exercise.name} ",
-            onClick = { navController.navigate("exerciseDetails/${exercise._id.toHexString()}") }
+            onClick = { navController.navigate("exerciseDetails/${exercise.id.toHexString()}") }
           ),
         text = exercise.name,
         //        style = MaterialTheme.typography.titleMedium,

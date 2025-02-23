@@ -47,6 +47,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
   // Room executes all queries on a separate thread.
   // Observed Flow will notify the observer when the data has changed.
   val db: Database? = databaseManager.database
+  private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 
   override fun getAllExercises(): Flow<List<Exercise>> {
     try {
@@ -59,7 +60,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.all())
+//          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       val flow =
@@ -79,10 +80,11 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
 
   private fun mapQueryChangeToExercise(queryChange: QueryChange): List<Exercise> {
     val exercises = mutableListOf<Exercise>() // 1
+
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val exercise = Json.decodeFromString<ExerciseDao>(json).item // 5
+        val exercise = withUnknownKeys.decodeFromString<ExerciseDao>(json).Exercise // 5
         exercises.add(exercise) // 6
       }
     }
@@ -107,7 +109,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
       // loop through results and add to list
       query.execute().allResults().forEach { item -> // <5>
         val json = item.toJSON()
-        val equipment = Json.decodeFromString<EquipmentDao>(json).item
+        val equipment = withUnknownKeys.decodeFromString<EquipmentDao>(json).Equipment
         equipmentList.add(equipment)
       }
     } catch (e: Exception) {
@@ -135,7 +137,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
       // loop through results and add to list
       query.execute().allResults().forEach { item -> // <5>
         val json = item.toJSON()
-        val muscleGroup = Json.decodeFromString<MuscleGroupDao>(json).item
+        val muscleGroup = withUnknownKeys.decodeFromString<MuscleGroupDao>(json).MuscleGroup
         muscleGroups.add(muscleGroup)
       }
     } catch (e: Exception) {
@@ -160,7 +162,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
           // loop through results and add to list
           query.execute().allResults().forEach { item -> // <5>
             val json = item.toJSON()
-            val utility = Json.decodeFromString<UtilityDao>(json).item
+            val utility = withUnknownKeys.decodeFromString<UtilityDao>(json).Utility
             utilities.add(utility)
           }
         }
@@ -187,7 +189,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
           // loop through results and add to list
           query.execute().allResults().forEach { item -> // <5>
             val json = item.toJSON()
-            val force = Json.decodeFromString<ForceDao>(json).item
+            val force = withUnknownKeys.decodeFromString<ForceDao>(json).Force
             forces.add(force)
           }
         }
@@ -214,7 +216,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
           // loop through results and add to list
           query.execute().allResults().forEach { item -> // <5>
             val json = item.toJSON()
-            val mechanic = Json.decodeFromString<MechanicDao>(json).item
+            val mechanic = withUnknownKeys.decodeFromString<MechanicDao>(json).Mechanic
             mechanics.add(mechanic)
           }
         }
@@ -241,7 +243,8 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
           // loop through results and add to list
           query.execute().allResults().forEach { item -> // <5>
             val json = item.toJSON()
-            val muscleRoleFunction = Json.decodeFromString<MuscleRoleFunctionDao>(json).item
+            val muscleRoleFunction =
+              withUnknownKeys.decodeFromString<MuscleRoleFunctionDao>(json).MuscleRoleFunction
             muscleRoleFunctions.add(muscleRoleFunction)
           }
         }
@@ -316,7 +319,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
       mutableDoc.setBoolean("warmUpSetRestTimerEnabled", exercise.warmUpSetRestTimerEnabled)
       mutableDoc.setString("mediaURI", exercise.mediaURI)
       mutableDoc.setString("pageURI", exercise.pageURI)
-      mutableDoc.setString("ownerID", exercise.ownerID)
+      mutableDoc.setString("owner_id", exercise.owner_id)
       mutableDoc.setBoolean("isPublic", exercise.isPublic)
 
       collection.save(mutableDoc)
@@ -342,7 +345,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
 
           val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-          val exercise = result?.let { Json.decodeFromString<ExerciseDao>(it).item }
+          val exercise = result?.let { withUnknownKeys.decodeFromString<ExerciseDao>(it).Exercise }
           return exercise
         }
       }
@@ -370,7 +373,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
 
           val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-          val exercise = result?.let { Json.decodeFromString<ExerciseDao>(it).item }
+          val exercise = result?.let { withUnknownKeys.decodeFromString<ExerciseDao>(it).Exercise }
           return exercise
         }
       }
@@ -417,7 +420,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
       }*/
 
       val json = Json.encodeToString(exercise)
-      val document = MutableDocument(exercise._id.toString(), json)
+      val document = MutableDocument(exercise.id.toString(), json)
 
       collection.save(document)
 
@@ -582,8 +585,8 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
 
           val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-          val exercise = result?.let { Json.decodeFromString<ExerciseDao>(it).item }
-          return exercise?._id
+          val exercise = result?.let { withUnknownKeys.decodeFromString<ExerciseDao>(it).Exercise }
+          return exercise?.id
         }
       }
     } catch (e: Exception) {

@@ -25,8 +25,8 @@ import kotlin.uuid.Uuid
 
 @Serializable
 data class Set(
-  @SerialName("_id") @Contextual
-  var _id: ObjectId = ObjectId(),
+  @SerialName("id") @Contextual
+  var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
   @Contextual var uuid: Uuid = Uuid.random(),
   var setNumber: Int? = 0,

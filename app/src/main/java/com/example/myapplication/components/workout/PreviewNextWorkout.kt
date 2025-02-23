@@ -285,7 +285,7 @@ fun EditNextWorkoutScreen(
                                             exerciseSets.exercise?.let { exercise ->
                                                 set.setNumber?.let { setNumber ->
                                                     workoutViewModel.populatePreviousSetField(
-                                                        exercise._id,
+                                                      exercise.id,
                                                         setNumber = setNumber,
                                                     )
                                                 }

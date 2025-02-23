@@ -26,10 +26,10 @@ import kotlin.uuid.Uuid
 // TODO Switch to use UUIDs instead of IDs
 @Serializable
 class ExerciseNote() {
-  @SerialName("_id")
+  @SerialName("id")
   @Contextual
-  var _id: ObjectId = ObjectId()
-  var id: Long = newID()
+  var id: ObjectId = ObjectId()
+  var lazyListID: Long = newID()
   @Contextual
   var uuid: Uuid = Uuid.random()
   var note: String? = null
@@ -55,9 +55,9 @@ data class WorkoutNoteDao(val item: WorkoutNote)
 // TODO Are the below necessary? TBD
 @Serializable
 class WorkoutNote() {
-  @SerialName("_id")
+  @SerialName("id")
   @Contextual
-  var _id: ObjectId = ObjectId()
+  var id: ObjectId = ObjectId()
   var lazyListID: Long = newID()
   @Contextual
   var uuid: Uuid = Uuid.random()
@@ -79,9 +79,9 @@ class WorkoutNote() {
 
 @Serializable
 class ProgramNote() {
-  @SerialName("_id")
+  @SerialName("id")
   @Contextual
-  var _id: ObjectId = ObjectId()
+  var id: ObjectId = ObjectId()
   var lazyListID: Long = newID()
   @Contextual
   var uuid: Uuid = Uuid.random()
@@ -95,9 +95,9 @@ class ProgramNote() {
 
 @Serializable
 class MesocycleNote() {
-  @SerialName("_id")
+  @SerialName("id")
   @Contextual
-  var _id: Long = fakeULID()
+  var id: Long = fakeULID()
   var lazyListID: Long = newID()
   @Contextual
   var uuid: Uuid = Uuid.random()
@@ -110,9 +110,9 @@ class MesocycleNote() {
 }
 
 class MicrocycleNote() {
-  @SerialName("_id")
+  @SerialName("id")
   @Contextual
-  var _id: Long = fakeULID()
+  var id: Long = fakeULID()
   var lazyListID: Long = newID()
   var uuid: Uuid = Uuid.random()
   var note: String? = null

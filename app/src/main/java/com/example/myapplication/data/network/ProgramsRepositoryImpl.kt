@@ -78,7 +78,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val program = Json.decodeFromString<ProgramDao>(json).item // 5
+        val program = Json.decodeFromString<ProgramDao>(json).Program // 5
         programs.add(program) // 6
       }
     }
@@ -90,7 +90,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val mesocycle = Json.decodeFromString<MesocycleDao>(json).item // 5
+        val mesocycle = Json.decodeFromString<MesocycleDao>(json).Mesocycle // 5
         mesocycles.add(mesocycle) // 6
       }
     }
@@ -102,7 +102,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val microcycle = Json.decodeFromString<MicrocycleDao>(json).item // 5
+        val microcycle = Json.decodeFromString<MicrocycleDao>(json).Microcycle // 5
         microcycles.add(microcycle) // 6
       }
     }
@@ -124,7 +124,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      val program = result?.let { Json.decodeFromString<ProgramDao>(result.toString()).item }
+      val program = result?.let { Json.decodeFromString<ProgramDao>(result.toString()).Program }
       return program
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
@@ -209,7 +209,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(program)
-      val document = MutableDocument(program._id.toString(), json)
+      val document = MutableDocument(program.id.toString(), json)
 
       collection.save(document)
       return true
@@ -229,7 +229,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(program)
-      val document = MutableDocument(program._id.toString(), json)
+      val document = MutableDocument(program.id.toString(), json)
 
       collection.save(document)
       return true
@@ -248,7 +248,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val document = collection.getDocument(program._id.toString())
+      val document = collection.getDocument(program.id.toString())
       requireNotNull(document) { "Program Repository: Program does not exist!" }
 
       collection.delete(document)
@@ -273,7 +273,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
           .from(DataSource.collection(collection))
           .where(
             Expression.property("_id")
-              .equalTo(Expression.string(program._id.toString()))
+              .equalTo(Expression.string(program.id.toString()))
               .and(Expression.property("ownerID").equalTo(Expression.string("USER ID")))
               .and(Expression.property("active").equalTo(Expression.booleanValue(true)))
           ).limit(Expression.intValue(1))
@@ -341,7 +341,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { Json.decodeFromString<MesocycleDao>(result.toString()).item }
+      return result?.let { Json.decodeFromString<MesocycleDao>(result.toString()).Mesocycle }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -390,7 +390,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(mesocycle)
-      val document = MutableDocument(mesocycle._id.toString(), json)
+      val document = MutableDocument(mesocycle.id.toString(), json)
 
       collection.save(document)
       return true
@@ -409,7 +409,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(mesocycle)
-      val document = MutableDocument(mesocycle._id.toString(), json)
+      val document = MutableDocument(mesocycle.id.toString(), json)
 
       collection.save(document)
       return true
@@ -426,7 +426,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       val collection = db.getCollection("Mesocycle")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
-      val document = collection.getDocument(mesocycle._id.toString())
+      val document = collection.getDocument(mesocycle.id.toString())
       requireNotNull(document) { "Workout Repository: Workout does not exist!" }
 
       collection.delete(document)
@@ -481,7 +481,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { Json.decodeFromString<MicrocycleDao>(result.toString()).item }
+      return result?.let { Json.decodeFromString<MicrocycleDao>(result.toString()).Microcycle }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -562,7 +562,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(microcycle)
-      val document = MutableDocument(microcycle._id.toString(), json)
+      val document = MutableDocument(microcycle.id.toString(), json)
 
       collection.save(document)
       return true
@@ -581,7 +581,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(microcycle)
-      val document = MutableDocument(microcycle._id.toString(), json)
+      val document = MutableDocument(microcycle.id.toString(), json)
 
       collection.save(document)
       return true
@@ -598,7 +598,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       val collection = db.getCollection("Microcycle")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
-      val document = collection.getDocument(microcycle._id.toString())
+      val document = collection.getDocument(microcycle.id.toString())
       requireNotNull(document) { "Workout Repository: Workout does not exist!" }
 
       collection.delete(document)

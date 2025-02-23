@@ -74,7 +74,7 @@ fun WorkoutContent(
 
   fun navigateToWorkoutSummaryScreen() {
     //    val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
-    val thisWorkoutID = workoutViewModel.workout.value._id.toHexString()
+    val thisWorkoutID = workoutViewModel.workout.value.id.toHexString()
     val workoutsCount = workoutViewModel.getWorkoutsCount()
 
     Log.i("navigateToWorkoutSummaryScreen()", "workoutCount: $workoutsCount")

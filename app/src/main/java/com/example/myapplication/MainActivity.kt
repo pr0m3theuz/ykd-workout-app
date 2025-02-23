@@ -45,8 +45,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import com.example.myapplication.components.ReplicatorView
-import com.example.myapplication.components.ReplicatorViewModel
 import com.example.myapplication.components.Screens
 import com.example.myapplication.components.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.components.addExercisesList.AddExercisesScreen
@@ -60,6 +58,9 @@ import com.example.myapplication.components.history.WorkoutOverview
 import com.example.myapplication.components.homeScreen.HomeScreen
 import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutProgramScreen
 import com.example.myapplication.components.profileScreen.ProfileScreen
+import com.example.myapplication.components.profileScreen.ReplicatorConfigView
+import com.example.myapplication.components.profileScreen.ReplicatorView
+import com.example.myapplication.components.profileScreen.ReplicatorViewModel
 import com.example.myapplication.components.programs.ProgramDetailsScreen
 import com.example.myapplication.components.programs.ProgramsScreen
 import com.example.myapplication.components.workout.PreviewNextWorkoutScreen
@@ -120,6 +121,8 @@ class MainActivity : ComponentActivity() {
       val uname = "glare_parmesan992@simplelogin.com"
       val pwd = "RpHg!Xe%beN5XNCBhvs#jj*PkN23H&ux"
       authService.authenticatedUser(username = uname, password = pwd)
+
+      replicatorService.updateAuthentication(isReset = false)
 
       MyApplicationTheme {
         //        TestScreen()
@@ -301,7 +304,7 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
 
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
-  navigation("historyScreen", route = "history") {
+  navigation("historyScreen", route = Screens.History.baseRoute) {
     composable("historyScreen") { navBackStackEntry ->
       Log.i("HistoryNavGraph", "Navigated to History Screen")
       HistoryScreen(navController = navController)
@@ -323,7 +326,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
-  navigation("profileScreen", route = "profile") {
+  navigation("profileScreen", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
       Log.i("ProfileNavGraph", "Navigated to User Profile Screen")
       ProfileScreen(navController = navController)
@@ -334,14 +337,22 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
 //val scaffoldState: ScaffoldState = rememberScaffoldState()
 
 private fun NavGraphBuilder.addReplicatorGraph(navController: NavController) {
-  navigation("replicatorScreen", route = "replicator") {
+  navigation("replicatorScreen", route = Screens.Replicator.baseRoute) {
     composable("replicatorScreen") {
       Log.i("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
         navController,
         viewModel = koinViewModel<ReplicatorViewModel>(),
 //        openDrawer = TODO(),
-//        replicatorConfigNav = TODO(),
+        replicatorConfigNav = { navController.navigate("configScreen") },
+//        scaffoldState = TODO()
+      )
+    }
+
+    composable("configScreen") {
+      ReplicatorConfigView(
+        viewModel = koinViewModel<ReplicatorViewModel>(),
+        navigateUp = { navController.popBackStack() },
 //        scaffoldState = TODO()
       )
     }

@@ -43,7 +43,7 @@ import kotlin.uuid.Uuid
 
 object ObjectIdSerializer : KSerializer<ObjectId> {
   override val descriptor: SerialDescriptor =
-    PrimitiveSerialDescriptor("app.ObjectId", PrimitiveKind.STRING)
+    PrimitiveSerialDescriptor("org.bson.types.ObjectId", PrimitiveKind.STRING)
 
   override fun deserialize(decoder: Decoder): ObjectId {
     return ObjectId(decoder.decodeString())
@@ -68,12 +68,12 @@ object UuidSerializer : KSerializer<Uuid> {
 }
 
 @Serializable
-data class WorkoutDao(var item: Workout)
+data class WorkoutDao(var Workout: Workout)
 
 @Serializable
 data class Workout(
-  @SerialName("_id")
-  @Serializable(ObjectIdSerializer::class) var _id: ObjectId = ObjectId(),
+  @SerialName("id")
+  @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String, // TODO make name default = User
@@ -94,6 +94,7 @@ data class Workout(
   @Contextual var microcycleID: ObjectId? = null,
   var ownerID: String = "",
   var isPublic: Boolean = false,
+//  var type: String? = null,
 )
 
 @Parcelize

@@ -53,7 +53,7 @@ fun ToggleableExerciseItem(
             onClickLabel = "See more details about ${exercise.name} ",
             onClick = {
               // navController.navigate("exerciseDetails/${exercise._id.toHexString()}")
-              navigateToDetailPane(exercise._id.toHexString())
+              navigateToDetailPane(exercise.id.toHexString())
             },
           ),
         text = exercise.name,

@@ -128,8 +128,8 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     } else {
       temporarySets.add(
         Set(
-          exerciseID = _exerciseSets!!.exercise._id,
-          exerciseSetsID = _exerciseSets!!._id.toString(),
+          exerciseID = _exerciseSets!!.exercise.id,
+          exerciseSetsID = _exerciseSets!!.id.toString(),
           workoutID = _exerciseSets!!.workoutID.toString(),
           ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
         )
@@ -293,8 +293,8 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
         weightPounds = 100.00,
         repetitions = 10,
         percentage1RM = 1.0,
-        exerciseID = exerciseSets.exercise._id,
-        exerciseSetsID = exerciseSets._id.toString(),
+        exerciseID = exerciseSets.exercise.id,
+        exerciseSetsID = exerciseSets.id.toString(),
         workoutID = exerciseSets.workoutID.toString(),
         ownerID = exerciseSets.ownerID, // TODO currentUser.id,
         //        exerciseID = exerciseID,

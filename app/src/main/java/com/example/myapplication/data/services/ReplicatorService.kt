@@ -4,16 +4,18 @@ import androidx.compose.runtime.MutableState
 import com.couchbase.lite.ReplicatorChange
 import com.example.myapplication.data.replicator.ReplicatorConfig
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface ReplicatorService {
   val replicationConfig: MutableState<ReplicatorConfig>
-  val replicationStatus: MutableState<String>
+  val replicationStatus: StateFlow<String>
   var isReplicationStarted: Boolean
   val replicationTypes: List<String>
-  val canStartReplication: MutableState<Boolean>
+  val canStartReplication: StateFlow<Boolean>
 
   fun updateReplicationConfig(replicationConfig: ReplicatorConfig)
   fun calculateReplicationStatus()
+  fun updateReplicationStatus(status: String)
 
   fun startReplication()
   fun stopReplication()

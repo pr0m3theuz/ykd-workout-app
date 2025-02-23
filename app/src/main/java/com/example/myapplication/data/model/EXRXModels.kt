@@ -1,41 +1,41 @@
 package com.example.myapplication.data.model
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 
 @Serializable
-data class MuscleExerciseDao(var item: MuscleExercise)
+data class MuscleExerciseDao(var MuscleExercise: MuscleExercise)
 
 @Serializable
-data class MuscleRoleFunctionDao(var item: MuscleRoleFunction)
+data class MuscleRoleFunctionDao(var MuscleRoleFunction: MuscleRoleFunction)
 
 @Serializable
-data class MuscleDao(var item: Muscle)
+data class MuscleDao(var Muscle: Muscle)
 
 @Serializable
-data class MuscleGroupDao(var item: MuscleGroup)
+data class MuscleGroupDao(var MuscleGroup: MuscleGroup)
 
 @Serializable
-data class EquipmentDao(var item: Equipment)
+data class EquipmentDao(var Equipment: Equipment)
 
 @Serializable
-data class UtilityDao(var item: Utility)
+data class UtilityDao(var Utility: Utility)
 
 @Serializable
-data class ForceDao(var item: Force)
+data class ForceDao(var Force: Force)
 
 @Serializable
-data class MechanicDao(var item: Mechanic)
+data class MechanicDao(var Mechanic: Mechanic)
 
 @Serializable
 data class MuscleExercise(
-    @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+    @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
     var exerciseID: String,
     var muscleID: String,
     var muscleGroupID: String,
-    var roleFunction: String
+    var roleFunction: String,
+    var type: String? = null,
 )
 
 /**
@@ -60,46 +60,52 @@ data class MuscleExercise(
  */
 @Serializable
 data class MuscleRoleFunction(
-    @SerialName("_id") @Contextual var _id: String,
+    @SerialName("id") var id: String,
     var roleFunction: String,
-    var description: String
+    var description: String,
+    var type: String? = null,
 )
 
 @Serializable
 data class Muscle(
-    @SerialName("_id") @Contextual var _id: String,
+    @SerialName("id") var id: String,
     var muscleGroupID: String,
-    var name: String
+    var name: String,
+    var type: String? = null,
 )
 
 @Serializable
 data class MuscleGroup(
-    @SerialName("_id") @Contextual var _id: String,
+    @SerialName("id") var id: String,
     var name: String,
-    var exrxName: String
+    var exrxName: String,
+    var type: String? = null,
 )
 
 @Serializable
 data class Equipment(
-    @SerialName("_id") @Contextual var _id: String,
+    @SerialName("id") var id: String,
     var exrxID: String,
     var name: String,
     var exrxName: String,
-    var description: String
+    var description: String,
+    var type: String? = null,
 )
 
 @Serializable
 data class Utility(
-    @SerialName("_id") @Contextual var _id: String,
+    @SerialName("id") var id: String,
     var name: String,
-    var description: String
+    var description: String,
+    var type: String? = null,
 )
 
 @Serializable
 data class Force(
-    @SerialName("_id") @Contextual var _id: String,
+    @SerialName("id") var id: String,
     var name: String,
-    var description: String
+    var description: String,
+    var type: String? = null,
 )
 
 /**
@@ -112,7 +118,8 @@ data class Force(
  */
 @Serializable
 data class Mechanic(
-    @SerialName("_id") @Contextual var _id: String,
+    @SerialName("id") var id: String,
     var name: String,
-    var description: String
+    var description: String,
+    var type: String? = null,
 )

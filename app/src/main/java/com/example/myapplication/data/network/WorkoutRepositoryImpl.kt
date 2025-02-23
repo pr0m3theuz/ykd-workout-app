@@ -49,7 +49,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val workout = Json.decodeFromString<WorkoutDao>(json).item // 5
+        val workout = Json.decodeFromString<WorkoutDao>(json).Workout // 5
         workouts.add(workout) // 6
       }
     }
@@ -119,7 +119,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       query.execute().allResults().forEach { item ->
         val json = item.toJSON()
-        val workout = Json.decodeFromString<WorkoutDao>(json).item
+        val workout = Json.decodeFromString<WorkoutDao>(json).Workout
         workouts.add(workout)
       }
     } catch (e: Exception) {
@@ -163,7 +163,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(workout)
-      val document = MutableDocument(workout._id.toString(), json)
+      val document = MutableDocument(workout.id.toString(), json)
 
       collection.save(document)
       return true
@@ -180,11 +180,11 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val mutableDoc = collection.getDocument(workout._id.toString())?.toMutable() // Not Necessary
+      val mutableDoc = collection.getDocument(workout.id.toString())?.toMutable() // Not Necessary
       requireNotNull(mutableDoc) { "Workout Repository: Workout does not exist!" }
 
       val json = Json.encodeToString(workout)
-      val document = MutableDocument(workout._id.toString(), json)
+      val document = MutableDocument(workout.id.toString(), json)
 
       collection.save(document)
 
@@ -202,7 +202,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val document = collection.getDocument(workout._id.toString())
+      val document = collection.getDocument(workout.id.toString())
       requireNotNull(document) { "Workout Repository: Workout does not exist!" }
 
       collection.delete(document)

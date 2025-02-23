@@ -6,11 +6,12 @@ package com.example.myapplication.dependencyInjection
 import com.example.myapplication.MainViewModel
 import com.example.myapplication.components.ManageExercisesUseCase
 import com.example.myapplication.components.ManageWorkoutUseCase
-import com.example.myapplication.components.ReplicatorViewModel
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercisesList.ExercisesViewModel
 import com.example.myapplication.components.history.HistoryViewModel
 import com.example.myapplication.components.profileScreen.ProfileViewModel
+import com.example.myapplication.components.profileScreen.ReplicatorConfigViewModel
+import com.example.myapplication.components.profileScreen.ReplicatorViewModel
 import com.example.myapplication.components.programs.ProgramsViewModel
 import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVolumeViewModel
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
@@ -109,6 +110,7 @@ val commonModule = module {
   viewModel { HistoryViewModel(get(), get(), get(), get(), get()) }
   viewModel { ProfileViewModel(get()) }
   viewModel { ReplicatorViewModel(get()) }
+  viewModel { ReplicatorConfigViewModel(get()) }
 
 
 //  viewModelOf(::ProgramsViewModel)

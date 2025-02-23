@@ -27,36 +27,38 @@ import kotlin.uuid.Uuid
 //  i.e. the workouts, microcycles, and mesocycles/blocks completed
 // TODO Add Image URI property to Program
 @Serializable
-class Program() {
-  @SerialName("_id")
+data class Program(
+  @SerialName("id")
   @Contextual
-  var _id: ObjectId = ObjectId()
-  var lazyListItemID: Long = newID()
+  var id: ObjectId = ObjectId(),
+  var lazyListItemID: Long = newID(),
+
   @Contextual
-  var uuid: Uuid = Uuid.random()
-  var name: String? = null
-  var author: String? = null
-  var dateCreated: Instant = Clock.System.now()
-  var startDate: Instant? = null
-  var endDate: Instant? = null
-  var shortDescription: String? = null
-  var description: String? = null
-  var uri: String? = null
-  var imageUri: String? = null
-  var imageFont: String? = null
-  var level: String? = null
-  var programEquipment: String? = null
-  var daysPerWeek: String? = null
-  var programLength: String? = null
-  var active: Boolean = false
-  var notes: List<ProgramNote> = emptyList()
-  var mesocycles: List<Mesocycle> = emptyList()
-  var ownerID: String = "PUBLIC"
-  var isPublic: Boolean = false
-}
+  var uuid: Uuid = Uuid.random(),
+  var name: String? = null,
+  var author: String? = null,
+  var dateCreated: Instant = Clock.System.now(),
+  var startDate: Instant? = null,
+  var endDate: Instant? = null,
+  var shortDescription: String? = null,
+  var description: String? = null,
+  var uri: String? = null,
+  var imageUri: String? = null,
+  var imageFont: String? = null,
+  var level: String? = null,
+  var programEquipment: String? = null,
+  var daysPerWeek: String? = null,
+  var programLength: String? = null,
+  var active: Boolean = false,
+  var notes: List<ProgramNote> = emptyList(),
+  var mesocycles: List<Mesocycle> = emptyList(),
+  var ownerID: String = "PUBLIC",
+  var isPublic: Boolean = false,
+//  var type: String? = null,
+)
 
 @Serializable
-data class ProgramDao(val item: Program)
+data class ProgramDao(val Program: Program)
 
 @Serializable
 data class Programs(val programs: List<Program>)
@@ -67,11 +69,11 @@ data class Mesocycles(val mesocycles: List<Mesocycle>)
 @Serializable
 data class Microcycles(val microcycles: List<Microcycle>)
 
-data class MesocycleDao(val item: Mesocycle)
+data class MesocycleDao(val Mesocycle: Mesocycle)
 
 @Serializable
 data class Mesocycle(
-  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
   @Contextual var uuid: Uuid = Uuid.random(),
   var name: String? = null,
@@ -80,19 +82,19 @@ data class Mesocycle(
   var startDate: Instant? = null,
   var endDate: Instant? = null,
   var order: Int = 0,
-
   //    var tags: String // TODO Should be a List<String>,
   @Contextual var programID: ObjectId? = null,
   var microcycles: List<Microcycle> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
+//  var type: String? = null,
 )
 
-data class MicrocycleDao(val item: Microcycle)
+data class MicrocycleDao(val Microcycle: Microcycle)
 
 @Serializable
 data class Microcycle(
-  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
   @Contextual var uuid: Uuid = Uuid.random(),
   var name: String? = null,
@@ -107,6 +109,7 @@ data class Microcycle(
   var workouts: List<Workout> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
+//  var type: String? = null,
 )
 
 

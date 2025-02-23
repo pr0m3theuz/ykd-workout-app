@@ -81,11 +81,11 @@ fun ExerciseScreen(
     titleButton = { modifier: Modifier ->
       ExerciseTitleButton(
         onClick = {
-          navController.navigate("exerciseDetails/${exerciseSets.exercise?._id?.toHexString()}")
+          navController.navigate("exerciseDetails/${exerciseSets.exercise.id.toHexString()}")
         },
         modifier = modifier,
       ) {
-        exerciseSets.exercise?.name?.let {
+        exerciseSets.exercise.name.let {
           Text(
             text = it,
             color = MaterialTheme.colorScheme.primary,

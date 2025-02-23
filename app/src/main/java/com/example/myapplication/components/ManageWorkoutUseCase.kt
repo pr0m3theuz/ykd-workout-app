@@ -64,7 +64,7 @@ class ManageWorkoutUseCase(
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout): Workout {
     val newWorkout =
       Workout(
-        _id = workoutTemplate._id,
+        id = workoutTemplate.id,
         uuid = workoutTemplate.uuid,
         name = workoutTemplate.name,
         workoutAuthor = workoutTemplate.workoutAuthor,
@@ -119,7 +119,7 @@ class ManageWorkoutUseCase(
 
       val newExerciseExerciseSets =
         ExerciseExerciseSets(
-          _id = exerciseSetsID,
+          id = exerciseSetsID,
           exerciseOrder = exerciseSets.exerciseOrder,
           exercise = exercise,
           sets = copySetsFromPreviousWorkout(exerciseSets.sets, exerciseSetsID, _workoutID),
@@ -173,7 +173,7 @@ class ManageWorkoutUseCase(
           ownerID = tempOwnerId, // TODO Replace currentUser.id
         )
       newSets.add(newSet)
-      if (set.exerciseID != null && set.setNumber != null) {
+      if (set.setNumber != null) {
         val previousSet =
           workoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
         previousSet?.let { latestPreviousSets.add(it) }
@@ -193,7 +193,7 @@ class ManageWorkoutUseCase(
 
       val newExerciseExerciseSets =
         ExerciseExerciseSets(
-          _id = exerciseSets._id,
+          id = exerciseSets.id,
           exSetsUUID = exerciseSets.exSetsUUID,
           workoutID = exerciseSets.workoutID,
           exerciseOrder = exerciseSets.exerciseOrder,
@@ -219,7 +219,7 @@ class ManageWorkoutUseCase(
     previousSets.forEach { set ->
       val newSet =
         Set(
-          _id = set._id,
+          id = set.id,
           uuid = set.uuid,
           setNumber = set.setNumber,
           weightPounds = set.weightPounds,
@@ -336,11 +336,11 @@ class ManageWorkoutUseCase(
     exerciseExerciseSets.forEach { _exerciseSets ->
       exercisesSets.add(
         ExerciseSets(
-          _id = _exerciseSets._id,
+          id = _exerciseSets.id,
           exSetsUUID = _exerciseSets.exSetsUUID,
           workoutID = _exerciseSets.workoutID,
           exerciseOrder = _exerciseSets.exerciseOrder,
-          exerciseID = _exerciseSets.exercise._id,
+          exerciseID = _exerciseSets.exercise.id,
           sets = _exerciseSets.sets,
           notes = _exerciseSets.notes,
           datePerformed = _exerciseSets.datePerformed,
@@ -399,7 +399,7 @@ class ManageWorkoutUseCase(
     val index = exercisesSets.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
     exerciseSets.exercise = newExercise
     for (set in exerciseSets.sets) {
-      set.exerciseID = newExercise._id
+      set.exerciseID = newExercise.id
     }
     exerciseSets.exSetsLazyListItemID = newID()
 
@@ -414,7 +414,7 @@ class ManageWorkoutUseCase(
     _workoutID: ObjectId,
   ): MutableList<ExerciseExerciseSets> {
     exercisesSelectedToBeAddedToWorkout.forEach { _exercise ->
-      val pinnedNotes = exerciseNotesRepository.getPinnedExerciseNotes(_exercise._id)
+      val pinnedNotes = exerciseNotesRepository.getPinnedExerciseNotes(_exercise.id)
       exerciseSets.add(
         ExerciseExerciseSets(
           exerciseOrder =
@@ -446,7 +446,7 @@ class ManageWorkoutUseCase(
       if (exerciseSets.sets.isNotEmpty()) {
         exerciseSets.sets +
                 Set(
-                  exerciseID = exerciseSets.exercise._id,
+                  exerciseID = exerciseSets.exercise.id,
                   setNumber = exerciseSets.sets.last().setNumber?.plus(1),
                   weightPounds = exerciseSets.sets.last().weightPounds,
                   weightKilograms = exerciseSets.sets.last().weightKilograms,
@@ -469,9 +469,9 @@ class ManageWorkoutUseCase(
       } else {
         listOf(
           Set(
-            exerciseID = exerciseSets.exercise._id,
+            exerciseID = exerciseSets.exercise.id,
             workoutID = exerciseSets.workoutID.toString(),
-            exerciseSetsID = exerciseSets._id.toString(),
+            exerciseSetsID = exerciseSets.id.toString(),
             setNumber = 0,
             isPublic = false,
             progressionSchemeID = "", // Random().nextInt() // TODO Replace with,
@@ -499,7 +499,7 @@ class ManageWorkoutUseCase(
   fun addExerciseNote(exerciseSets: ExerciseExerciseSets, workoutID: ObjectId): List<ExerciseNote> {
     exerciseSets.notes.add(
       ExerciseNote().apply {
-        exercise = exerciseSets.exercise._id
+        exercise = exerciseSets.exercise.id
         workout = workoutID
         isPublic = false
       }

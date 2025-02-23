@@ -1,14 +1,11 @@
 package com.example.myapplication
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.couchbase.lite.ReplicatorActivityLevel
 import com.couchbase.lite.ReplicatorChange
 import com.example.myapplication.data.database.DatabaseManager
 import com.example.myapplication.data.services.AuthenticationService
-import com.example.myapplication.data.services.ReplicationStatus
 import com.example.myapplication.data.services.ReplicatorService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +29,7 @@ class MainViewModel(
     viewModelScope.launch(Dispatchers.IO) {
       databaseManager.initializeDatabases(/*authService.getCurrentUser()*/)
 
-      when (replicationStatus.value) {
+      /*when (replicationStatus.value) {
         ReplicationStatus.STOPPED, ReplicationStatus.IDlE, "" -> {
 
           Log.i(REPLICATOR_STATUS, "INFORMATION:: Starting Replication...")
@@ -48,27 +45,27 @@ class MainViewModel(
 
                 when (replicatorChange.status.activityLevel) {
                   ReplicatorActivityLevel.OFFLINE -> {
-                    replicationStatus.value = ReplicationStatus.OFFLINE
+                    replicatorService.updateReplicationStatus(ReplicationStatus.OFFLINE)
                     Log.i(REPLICATOR_STATUS, "INFORMATION:: returned Status OFFLINE...")
                   }
 
                   ReplicatorActivityLevel.IDLE -> {
-                    replicationStatus.value = ReplicationStatus.IDlE
+                    replicatorService.updateReplicationStatus(ReplicationStatus.IDlE)
                     Log.i(REPLICATOR_STATUS, "INFORMATION:: returned Status IDLE...")
                   }
 
                   ReplicatorActivityLevel.STOPPED -> {
-                    replicationStatus.value = ReplicationStatus.STOPPED
+                    replicatorService.updateReplicationStatus(ReplicationStatus.STOPPED)
                     Log.i(REPLICATOR_STATUS, "INFORMATION:: returned Status STOPPED...")
                   }
 
                   ReplicatorActivityLevel.BUSY -> {
-                    replicationStatus.value = ReplicationStatus.BUSY
+                    replicatorService.updateReplicationStatus(ReplicationStatus.BUSY)
                     Log.i(REPLICATOR_STATUS, "INFORMATION:: returned Status BUSY...")
                   }
 
                   ReplicatorActivityLevel.CONNECTING -> {
-                    replicationStatus.value = ReplicationStatus.CONNECTING
+                    replicatorService.updateReplicationStatus(ReplicationStatus.CONNECTING)
                     Log.i(REPLICATOR_STATUS, "INFORMATION:: returned Status CONNECTING...")
                   }
                 }
@@ -93,7 +90,7 @@ class MainViewModel(
           Log.i(REPLICATOR_STATUS, "INFORMATION:: Stopping replication...")
           replicatorService.stopReplication()
         }
-      }
+      }*/
     }
   }
 

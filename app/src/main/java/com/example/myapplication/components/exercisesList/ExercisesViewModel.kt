@@ -1,5 +1,6 @@
 package com.example.myapplication.components.exercisesList
 
+import android.util.Log
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -87,7 +88,10 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     //    Log.i("ExercisesViewModel", "getAllExercises")
 
     return coroutineScope {
-      exercisesRepository.getAllExercises().collect() { _exercises.value = it }
+      exercisesRepository.getAllExercises().collect { list ->
+        _exercises.value = list
+        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
+      }
     }
   }
 
@@ -172,14 +176,14 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
       .filterValues { it }
       .keys
       .sortedBy { it.name }
-      .forEach { muscleGroup -> muscleGroup._id?.let { selectedMuscleGroups.add(it) } }
+      .forEach { muscleGroup -> muscleGroup.id?.let { selectedMuscleGroups.add(it) } }
 
     val selectedEquipments = mutableListOf<String>()
     _equipmentsChecked.value
       .filterValues { it }
       .keys
       .sortedBy { it.name }
-      .forEach { equipment -> equipment._id?.let { selectedEquipments.add(it) } }
+      .forEach { equipment -> equipment.id?.let { selectedEquipments.add(it) } }
 
     val selectedMovementTypes = mutableListOf<String>()
     movementTypesChecked
@@ -193,7 +197,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
         .filterValues { !it }
         .keys
         .sortedBy { it.name }
-        .forEach { muscleGroup -> muscleGroup._id?.let { selectedMuscleGroups.add(it) } }
+        .forEach { muscleGroup -> muscleGroup.id?.let { selectedMuscleGroups.add(it) } }
     }
 
     if (selectedEquipments.isEmpty()) {
@@ -201,7 +205,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
         .filterValues { !it }
         .keys
         .sortedBy { it.name }
-        .forEach { equipment -> equipment._id?.let { selectedEquipments.add(it) } }
+        .forEach { equipment -> equipment.id?.let { selectedEquipments.add(it) } }
     }
 
     /*

@@ -176,7 +176,7 @@ fun ProgramsScreen(
                 // TODO No Active Programs Card
               } else {
                 // Text("Continue Program", style = titleMedium)
-                val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program._id)
+                val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program.id)
                 // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
 
                 if (nextWorkout != null) {
@@ -478,7 +478,7 @@ fun ProgramCard(navController: NavController, program: Program) {
       .padding(vertical = padding)
       .clickable {
         /* TODO Navigate to Program Details Screen */
-        navController.navigate("programDetails/${program._id.toHexString()}")
+        navController.navigate("programDetails/${program.id.toHexString()}")
       }
   ) {
     Row(
@@ -548,7 +548,7 @@ fun CurrentProgramCard(
         Modifier
           .clickable {
             /* TODO Navigate to Program Details Screen */
-            navController.navigate("programDetails/${program._id.toHexString()}")
+            navController.navigate("programDetails/${program.id.toHexString()}")
           }
           .weight(1f, fill = true),
       )
@@ -703,7 +703,7 @@ fun CurrentProgramCard(
     ) {
       Button(
         onClick = {
-          navController.navigate("workout?workoutID=${workout._id.toHexString()}") {
+          navController.navigate("workout?workoutID=${workout.id.toHexString()}") {
             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
             // Avoid multiple copies of the same destination when
             // reselecting the same item
@@ -719,7 +719,7 @@ fun CurrentProgramCard(
       IconButton(
         onClick = { /*TODO*/
           // TODO Navigate to Program's Workout Tab
-          navController.navigate("programDetails/${program._id.toHexString()}")
+          navController.navigate("programDetails/${program.id.toHexString()}")
         }
       ) {
         Icon(

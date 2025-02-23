@@ -292,7 +292,7 @@ fun HistoryLazyColumn(
             modifier =
               Modifier.clickable(
                 onClick = {
-                  navController.navigate("history?overviewWorkout=${workout._id.toHexString()}")
+                  navController.navigate("history?overviewWorkout=${workout.id.toHexString()}")
                 },
                 enabled = true,
                 interactionSource = remember { MutableInteractionSource() },
@@ -366,7 +366,7 @@ fun WorkoutOverview(
               actions = {
                 EditWorkoutOptionsDropdownMenu(
                   editWorkout = {
-                    navController.navigate("history?editWorkout=${itWorkout._id.toHexString()}")
+                    navController.navigate("history?editWorkout=${itWorkout.id.toHexString()}")
                   },
                   deleteWorkout = { setOpenDeleteWorkoutDialog(true) },
                   saveWorkoutAsTemplate = { /* TODO Create Save Workout As Template Function */ },
@@ -382,7 +382,7 @@ fun WorkoutOverview(
                   .fillMaxWidth()
                   .padding(12.dp),
                 onClick = {
-                  navController.navigate("workout?workoutID=${itWorkout._id.toHexString()}") {
+                  navController.navigate("workout?workoutID=${itWorkout.id.toHexString()}") {
                     popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                     // Avoid multiple copies of the same destination when
                     // reselecting the same item
@@ -598,8 +598,8 @@ fun EditWorkoutScreen(
         }
         Row(
           modifier = Modifier
-              .padding(horizontal = 8.dp)
-              .fillMaxWidth(),
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -665,7 +665,7 @@ fun EditWorkoutScreen(
                       exerciseSets.exercise?.let { exercise ->
                         set.setNumber?.let { setNumber ->
                           workoutViewModel.populatePreviousSetField(
-                            exercise._id,
+                            exercise.id,
                             setNumber = setNumber,
                           )
                         }
@@ -768,8 +768,8 @@ fun ConfirmDeleteWorkout(onDismissRequest: () -> Unit, deleteWorkout: () -> Unit
 fun NoWorkoutFound() {
   Column(
     modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
+      .fillMaxSize()
+      .padding(16.dp),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {

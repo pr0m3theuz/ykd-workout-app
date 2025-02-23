@@ -17,7 +17,7 @@ class DatabaseManager(private val context: Context) {
   // persist currently active workout
   var currentActiveWorkoutDatabase: Database? = null
 
-  private val databaseName = "sample_mflix"// "database"
+  private val databaseName = "workouts" // "database"
   private val userWorkoutsDatabaseName = "userDatabase"
   private val currentActiveWorkoutDatabaseName = "currentActiveWorkoutsDatabase"
 
@@ -37,6 +37,43 @@ class DatabaseManager(private val context: Context) {
       // calculate database name based on current logged in users team name
 
       database = Database(databaseName, dbConfig)
+
+      requireNotNull(database) { "DatabaseManager: Database was not created!" }
+
+      val collections = listOf(
+        "Equipment",
+        "Exercise",
+        "ExerciseNote",
+//        "ExerciseSets",
+        "Force",
+        "Mechanic",
+        "Mesocycle",
+        "MesocycleNote",
+        "Microcycle",
+        "MicrocycleNote",
+        "Muscle",
+        "MuscleExercise",
+        "MuscleGroup",
+        "MuscleRoleFunction",
+        "Program",
+        "ProgramNote",
+//        "Set",
+        "Users",
+        "Utility",
+        "Workout",
+        "WorkoutNote"
+      )
+
+      collections.forEach { collection ->
+        database!!.createCollection(collection, "_default")
+      }
+
+      database!!.scopes.forEach { scope ->
+//        Log.i("Scope", "${scope.name}")
+        scope.collections.forEach {
+          Log.i("Scope.Collection", "${scope.name}: ${it.name}")
+        }
+      }
 
 //    create user scope
       userDatabase = Database(userWorkoutsDatabaseName, dbConfig)

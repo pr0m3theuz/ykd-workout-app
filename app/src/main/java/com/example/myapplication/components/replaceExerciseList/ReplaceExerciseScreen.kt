@@ -266,7 +266,7 @@ private fun ExercisesLazyList(
       ->
         var selectedExerciseModel by remember { mutableStateOf(false) }
         val exercise: Exercise = exercises[index]
-        val muscleGroupName: String? = muscleGroups.find { it._id == exercise.muscleGroupID }?.name
+      val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
       selectedExerciseModel = selectedExercise == exercise
       SelectableExerciseItem(
         exercise = exercise,

@@ -367,7 +367,7 @@ class WorkoutViewModel(
       /*
        * Doesn't allow the new completed set to cancel the timer if one is already running
        */
-      if (exercise != null && _state != TimerState.RUNNING) {
+      if (_state != TimerState.RUNNING) {
         if (exercise.warmUpSetRestTimerEnabled && (set.setTypeID == WARM_UP_SET)) {
           _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
 
@@ -507,7 +507,7 @@ class WorkoutViewModel(
       workoutDetails = workout
       _workout.value = workoutDetails
 
-      getPinnedWorkoutNotes(workout.uuid, workout._id)
+      getPinnedWorkoutNotes(workout.uuid, workout.id)
       setExercisesSets(loadExercisesSetsFromPreviousWorkout(workout.exercisesSets).toList())
     }
 
@@ -521,10 +521,10 @@ class WorkoutViewModel(
     workoutDetails = newWorkout
     _workout.value = workoutDetails
 
-    getPinnedWorkoutNotes(workoutTemplate.uuid, newWorkout._id)
+    getPinnedWorkoutNotes(workoutTemplate.uuid, newWorkout.id)
 
     setExercisesSets(
-      copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets, newWorkout._id).toList()
+      copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets, newWorkout.id).toList()
     )
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
@@ -536,9 +536,9 @@ class WorkoutViewModel(
     workoutDetails = newWorkout
     _workout.value = workoutDetails
 
-    getPinnedWorkoutNotes(previousWorkout.uuid, newWorkout._id)
+    getPinnedWorkoutNotes(previousWorkout.uuid, newWorkout.id)
     setExercisesSets(
-      copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets, newWorkout._id).toList()
+      copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets, newWorkout.id).toList()
     )
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
@@ -589,7 +589,7 @@ class WorkoutViewModel(
   fun addWorkoutNote() {
     _workoutNotesData.add(
       WorkoutNote().apply {
-        workout = _workout.value._id
+        workout = _workout.value.id
         workoutUUID = _workout.value.uuid
         //        workoutID = _workout.value.workoutID,
         //        programID = _workout.value.programID,
@@ -681,7 +681,7 @@ class WorkoutViewModel(
       manageWorkoutUseCase.addMultipleEmptyExerciseSets(
         _exercisesSets,
         exercisesSelectedToBeAddedToWorkout,
-        _workout.value._id,
+        _workout.value.id,
       )
 
     //    _exercisesSetsData = temporaryExerciseExerciseSets
@@ -717,8 +717,8 @@ class WorkoutViewModel(
   fun addExerciseNote(exerciseSets: ExerciseExerciseSets) {
     exerciseSets.notes.add(
       ExerciseNote().apply {
-        exercise = exerciseSets.exercise?._id
-        workout = _workout.value._id
+        exercise = exerciseSets.exercise?.id
+        workout = _workout.value.id
       }
     )
 
@@ -869,8 +869,8 @@ class WorkoutViewModel(
           repetitionsInReserve = backOffSets[index].repetitionsInReserve,
           setTypeID = backOffSets[index].setTypeID,
           percentage1RM = backOffSets[index].percentage1RM,
-          exerciseID = exerciseSets.exercise._id,
-          exerciseSetsID = exerciseSets._id.toString(),
+          exerciseID = exerciseSets.exercise.id,
+          exerciseSetsID = exerciseSets.id.toString(),
           workoutID = exerciseSets.workoutID.toString(),
           ownerID = exerciseSets.ownerID,
         )

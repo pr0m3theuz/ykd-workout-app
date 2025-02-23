@@ -117,7 +117,7 @@ fun WorkoutSummaryScreen(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Center,
         ) {
-          Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!._id.toHexString()}") }) {
+          Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!.id.toHexString()}") }) {
             Text(text = "Preview Your Next Workout!")
           }
         }

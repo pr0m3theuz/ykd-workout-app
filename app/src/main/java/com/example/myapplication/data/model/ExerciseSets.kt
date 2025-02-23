@@ -31,7 +31,7 @@ import kotlin.uuid.Uuid
 @ExperimentalUuidApi
 @Serializable
 data class ExerciseSets(
-  @SerialName("_id") @Contextual val _id: ObjectId = ObjectId(),
+  @SerialName("id") @Contextual val id: ObjectId = ObjectId(),
   val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
   @Contextual val exSetsUUID: Uuid = Uuid.random(),
   @Contextual val workoutID: ObjectId, // External Primary Key
@@ -52,7 +52,7 @@ data class ExerciseSets(
 @OptIn(ExperimentalUuidApi::class)
 @Serializable
 data class ExerciseExerciseSets(
-  @SerialName("_id") @Contextual val _id: ObjectId = ObjectId(),
+  @SerialName("id") @Contextual val id: ObjectId = ObjectId(),
   var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
   @Contextual var exSetsUUID: Uuid = Uuid.random(),
   val ownerID: String,
@@ -160,10 +160,10 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
         repetitionsInReserve = warmUpSets[index].repetitionsInReserve,
         setTypeID = warmUpSets[index].setTypeID,
         percentage1RM = warmUpSets[index].percentage1RM,
-        exerciseID = this@addWarmUpSets.exercise._id,
+        exerciseID = this@addWarmUpSets.exercise.id,
         progressionSchemeID = warmUpSets[index].progressionSchemeID,
         workoutID = this@addWarmUpSets.workoutID.toString(),
-        exerciseSetsID = this@addWarmUpSets._id.toString(),
+        exerciseSetsID = this@addWarmUpSets.id.toString(),
         ownerID = this@addWarmUpSets.ownerID.toString(),
         isPublic = this@addWarmUpSets.isPublic,
       ),
@@ -183,7 +183,7 @@ fun ExerciseExerciseSets.totalWorkingSetVolume(weightUnit: String): Double {
 
 fun ExerciseExerciseSets.calculateTotalVolume(userDefaultWeightUnit: String): Double {
   var totalVolume = 0.0
-  val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+  val weightUnit = exercise.weightUnit ?: userDefaultWeightUnit
 
   sets.forEach { totalVolume += it.setVolume(weightUnit) }
 
@@ -213,7 +213,7 @@ fun ExerciseExerciseSets.totalRepetitions(): Int {
 }
 
 fun ExerciseExerciseSets.averageWeight(userDefaultWeightUnit: String): Double {
-  val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+  val weightUnit = exercise.weightUnit ?: userDefaultWeightUnit
   val averageWeight: Double = calculateTotalVolume(weightUnit) / totalRepetitions()
 
   return if (averageWeight.isNaN()) {
@@ -235,7 +235,7 @@ fun ExerciseExerciseSets.resetSets(
   /*workout: Workout*/
 ) {
   sets.forEach { set ->
-    set._id = ObjectId()
+    set.id = ObjectId()
     set.lazyListItemID = newID()
     set.uuid = Uuid.random()
     //    set.workoutID = workout.workoutID
@@ -253,7 +253,7 @@ data class ExercisesSets(
 
 @Serializable
 data class SerializableExerciseSets(
-  @SerialName("_id") @Contextual var _id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
   @Contextual var exSetsUUID: Uuid = Uuid.random(),
   @Contextual val workout: ObjectId = ObjectId(),

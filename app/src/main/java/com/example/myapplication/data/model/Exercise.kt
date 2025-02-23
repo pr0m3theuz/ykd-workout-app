@@ -12,7 +12,6 @@ package com.example.myapplication.data.model
 
 import androidx.annotation.Keep
 import com.example.myapplication.utils.newID
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -28,16 +27,16 @@ import kotlin.uuid.Uuid
 data class Exercises(val exercises: List<Exercise>)
 
 @Serializable
-data class ExerciseDao(var item: Exercise)
+data class ExerciseDao(var Exercise: Exercise)
 
 @Keep
 @Serializable
 data class Exercise(
-  @SerialName("_id")
-  @Contextual var _id: ObjectId = ObjectId(),
+  @SerialName("id")
+  @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
   @OptIn(ExperimentalUuidApi::class)
-  @Contextual var uuid: Uuid = Uuid.random(),
+  @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String,
 
   //    val exerciseCategory: String? = null // TODO Remove Assignment // TODO This is too vague
@@ -60,7 +59,7 @@ data class Exercise(
   var force: String? = null,
   var functionID: String? = null,
   var intensityID: String? = null,
-
+//  var type: String? = null,
   //    TODO To remove & refactor
   //    var notes: String? = null // TODO Create Note Object that takes a string and a boolean for
   // pinned status
@@ -83,7 +82,7 @@ data class Exercise(
 
     //  @Serializable(URLSerializer::class)
   var pageURI: String? = null,
-  var ownerID: String = "PUBLIC",
+  var owner_id: String = "PUBLIC",
   var isPublic: Boolean = true,
 ) {
   fun toJson(): String {

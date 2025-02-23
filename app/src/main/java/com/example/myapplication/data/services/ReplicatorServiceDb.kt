@@ -6,9 +6,10 @@ import com.couchbase.lite.BasicAuthenticator
 import com.couchbase.lite.Replicator
 import com.couchbase.lite.ReplicatorActivityLevel
 import com.couchbase.lite.ReplicatorChange
-import com.couchbase.lite.ReplicatorConfiguration
+import com.couchbase.lite.ReplicatorConfigurationFactory
 import com.couchbase.lite.ReplicatorType
 import com.couchbase.lite.URLEndpoint
+import com.couchbase.lite.newConfig
 import com.couchbase.lite.replicatorChangesFlow
 import com.example.myapplication.data.database.DatabaseManager
 import com.example.myapplication.data.replicator.ReplicatorConfig
@@ -16,7 +17,11 @@ import com.example.myapplication.data.replicator.ReplicatorManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.net.URI
+
+private const val DATABASE_IS_NULL = "ReplicatorServiceDb: Database does not exist."
 
 @InternalCoroutinesApi
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -36,19 +41,27 @@ class ReplicatorServiceDb(
       ReplicatorConfig(
         username = loggedInUser.username,
         password = loggedInUser.password,
-        endpointUrl = "ws://192.168.1.98:4984/sample_mflix",
+        endpointUrl = "ws://192.168.1.98:4984/workouts",
         replicatorType = "PUSH AND PULL",
         heartBeat = 60L,
         continuous = true,
         selfSignedCert = true,
       )
     )
+  private var _replicationStatus = MutableStateFlow("")
 
-  override val replicationStatus = mutableStateOf("")
+  override val replicationStatus
+    get() = _replicationStatus.asStateFlow()
+
   override val replicationTypes = listOf("PUSH AND PULL", "PUSH", "PULL")
-  override val canStartReplication = mutableStateOf(false)
+
+  private var _canStartReplication = MutableStateFlow(false)
+
+  override val canStartReplication
+    get() = _canStartReplication.asStateFlow()
 
   override fun updateAuthentication(isReset: Boolean) {
+    Log.i("updateReplicationConfig()", "called")
     loggedInUser = authenticationService.getCurrentUser()
     if (isReset) {
       replicationConfig.value.username = ""
@@ -61,6 +74,8 @@ class ReplicatorServiceDb(
   }
 
   override fun updateReplicationConfig(replicationConfig: ReplicatorConfig) {
+    Log.i("updateReplicationConfig()", "called")
+    updateAuthentication(false)
     if (
       replicatorManager?.replicatorConfiguration == null ||
       (replicatorManager?.replicator?.status?.activityLevel == ReplicatorActivityLevel.STOPPED ||
@@ -68,29 +83,113 @@ class ReplicatorServiceDb(
               replicatorManager?.replicator?.status?.activityLevel == ReplicatorActivityLevel.OFFLINE)
     ) {
       replicatorManager?.let { replicatorResources ->
-        val urlEndPoint = URLEndpoint(URI(replicationConfig.endpointUrl)) // 1
-        replicatorResources.replicatorConfiguration = ReplicatorConfiguration(urlEndPoint) // 2
-        replicatorResources.replicatorConfiguration?.let { replicatorConfiguration -> // 3
-          replicatorConfiguration.isContinuous = replicationConfig.continuous // 4
+        val urlEndPoint = URLEndpoint(URI(replicationConfig.endpointUrl))
 
-          when (replicationConfig.replicatorType) { // 5
-            "PULL" -> replicatorConfiguration.type = ReplicatorType.PULL // 5
-            "PUSH" -> replicatorConfiguration.type = ReplicatorType.PUSH // 5
-            else -> replicatorConfiguration.type = ReplicatorType.PUSH_AND_PULL // 5
-          }
-          val authenticator =
-            BasicAuthenticator(
-              // 6
-              replicationConfig.username, // 6
-              replicationConfig.password.toCharArray(), // 6
-            )
-          replicatorConfiguration.setAuthenticator(authenticator) // 6
-          replicatorResources.replicator = // 7
-            Replicator(replicatorManager?.replicatorConfiguration!!) // 7
+        _canStartReplication.value = true
+
+        val replicationType = when (replicationConfig.replicatorType) {
+          "PULL" -> ReplicatorType.PULL
+          "PUSH" -> ReplicatorType.PUSH
+          else -> ReplicatorType.PUSH_AND_PULL
         }
 
-        canStartReplication.value = true // 8
-        this.replicationConfig.value = replicationConfig // 9
+        val authenticator =
+          BasicAuthenticator(replicationConfig.username, replicationConfig.password.toCharArray())
+
+        requireNotNull(databaseManager.database) { DATABASE_IS_NULL }
+
+        Log.i("Database Collections", databaseManager.database!!.collections.toString())
+
+        val collections = mapOf(databaseManager.database!!.collections to null)
+
+//        val collections = mapOf(
+//          databaseManager.database!!.getCollection("Equipment") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Exercise") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("ExerciseNote") to CollectionConfiguration(),
+////        databaseManager.database!!.getCollection("ExerciseSets") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Force") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Mechanic") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Mesocycle") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("MesocycleNote") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Microcycle") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("MicrocycleNote") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Muscle") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("MuscleExercise") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("MuscleGroup") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("MuscleRoleFunction") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Program") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("ProgramNote") to CollectionConfiguration(),
+////        databaseManager.database!!.getCollection("Set") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Users") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Utility") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("Workout") to CollectionConfiguration(),
+//          databaseManager.database!!.getCollection("WorkoutNote") to CollectionConfiguration()
+//        )
+
+//        Log.i("Collections Map", collections.toString())
+
+        replicatorResources.replicatorConfiguration = ReplicatorConfigurationFactory.newConfig(
+          target = urlEndPoint,
+          collections = collections,
+          type = replicationType,
+          continuous = replicationConfig.continuous,
+          authenticator = authenticator
+        )
+
+//        val collectionsList = listOf(
+//          "Equipment",
+//          "Exercise",
+//          "ExerciseNote",
+////        "ExerciseSets",
+//          "Force",
+//          "Mechanic",
+//          "Mesocycle",
+//          "MesocycleNote",
+//          "Microcycle",
+//          "MicrocycleNote",
+//          "Muscle",
+//          "MuscleExercise",
+//          "MuscleGroup",
+//          "MuscleRoleFunction",
+//          "Program",
+//          "ProgramNote",
+////        "Set",
+//          "Users",
+//          "Utility",
+//          "Workout",
+//          "WorkoutNote"
+//        )
+
+//        collectionsList.forEach { collectionName ->
+//          val collection = databaseManager.database!!.getCollection(collectionName)
+//
+//          collection?.let {
+//          replicatorResources.replicatorConfiguration!!.addCollection(it, null)
+//
+//          }
+//        }
+
+        replicatorResources.replicatorConfiguration?.let { _ ->
+          replicatorResources.replicator = Replicator(
+            ReplicatorConfigurationFactory.newConfig(
+              target = urlEndPoint,
+              collections = collections,
+              type = replicationType,
+              continuous = replicationConfig.continuous,
+              authenticator = authenticator,
+//            headers = , // default is null
+//            pinnedServerCertificate = , // default is null
+//            maxAttempts = , // Default is 10
+//            maxAttemptWaitTime = , // default is 300
+//            heartbeat = replicationConfig.heartBeat.toInt() // Default is 300
+//            acceptOnlySelfSignedServerCertificate = true // not used at all
+//            enableAutoPurge = (), // Default is true
+//            acceptParentDomainCookies = () // default is false
+            )
+          )
+        }
+
+        this.replicationConfig.value = replicationConfig // TODO Confirm if this works
       }
     } else {
       throw Exception("Error: can't update Replicator Config because replication is running")
@@ -99,22 +198,26 @@ class ReplicatorServiceDb(
 
   override fun calculateReplicationStatus() {
     if (replicatorManager?.replicatorConfiguration == null) {
-      replicationStatus.value = "${ReplicationStatus.NOCONFIG}, use Cog toolbar icon to set config"
+      _replicationStatus.value = "${ReplicationStatus.NOCONFIG}, use Cog toolbar icon to set config"
     } else if (replicatorManager?.replicator == null) {
-      replicationStatus.value =
+      _replicationStatus.value =
         "${ReplicationStatus.UNINITIALIZED}, use Cog toolbar icon to set config and replicator.  THIS SHOULD NEVER BE THE STATE"
     } else {
       replicatorManager?.replicator?.let {
         when (it.status.activityLevel) {
-          ReplicatorActivityLevel.OFFLINE -> replicationStatus.value = ReplicationStatus.OFFLINE
-          ReplicatorActivityLevel.IDLE -> replicationStatus.value = ReplicationStatus.IDlE
-          ReplicatorActivityLevel.STOPPED -> replicationStatus.value = ReplicationStatus.STOPPED
-          ReplicatorActivityLevel.BUSY -> replicationStatus.value = ReplicationStatus.BUSY
+          ReplicatorActivityLevel.OFFLINE -> _replicationStatus.value = ReplicationStatus.OFFLINE
+          ReplicatorActivityLevel.IDLE -> _replicationStatus.value = ReplicationStatus.IDlE
+          ReplicatorActivityLevel.STOPPED -> _replicationStatus.value = ReplicationStatus.STOPPED
+          ReplicatorActivityLevel.BUSY -> _replicationStatus.value = ReplicationStatus.BUSY
           ReplicatorActivityLevel.CONNECTING ->
-            replicationStatus.value = ReplicationStatus.CONNECTING
+            _replicationStatus.value = ReplicationStatus.CONNECTING
         }
       }
     }
+  }
+
+  override fun updateReplicationStatus(status: String) {
+    _replicationStatus.value = status
   }
 
   override fun startReplication() {

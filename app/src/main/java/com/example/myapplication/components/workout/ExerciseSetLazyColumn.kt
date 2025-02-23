@@ -88,7 +88,7 @@ fun ExercisesSetsScreen(
                 populatePreviousSetField = {
                   exerciseSets.exercise?.let { exercise ->
                     set.setNumber?.let { setNumber ->
-                      workoutViewModel.populatePreviousSetField(exercise._id, setNumber = setNumber)
+                      workoutViewModel.populatePreviousSetField(exercise.id, setNumber = setNumber)
                     }
                   }
                 },

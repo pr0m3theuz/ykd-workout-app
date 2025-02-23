@@ -12,7 +12,7 @@ class AuthenticationServiceImpl() : AuthenticationService {
   private var _user: User? = null
 
   override fun getCurrentUser(): User {
-    return _user ?: User(name = "DEMO", username = "DEMO", email = "demo@localhost", password = "")
+    return _user ?: User(name = "user", username = "user", email = "", password = "password")
   }
 
   override fun authenticatedUser(username: String, password: String): Boolean {
