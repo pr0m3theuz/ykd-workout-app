@@ -51,6 +51,7 @@ import com.example.myapplication.components.setRestTimer.TimerScreen
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.SetType
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.model.setSummaryRIR
@@ -76,7 +77,7 @@ fun SetContent(
   updateSetRIR: (rir: String) -> Unit,
   updateSetWeight: (weight: String) -> Unit,
   isTimerRunning: Boolean,
-  updateSetType: (setTypeID: Int) -> Unit,
+  updateSetType: (setType: SetType) -> Unit,
   setComplete: (Boolean) -> Unit,
   startSetCompletedTimer: () -> Unit,
 ) {
@@ -152,10 +153,10 @@ fun SetContent(
 
   SetContentFrame(
     setTypeOptionsMenu = {
-      SetType(
-        updateSetType = { setTypeID -> updateSetType(setTypeID) },
+      SetTypeComposable(
+        updateSetType = { setType -> updateSetType(setType) },
         setIndex = setIndex.inc().toString(),
-        setTypeID = set.setTypeID,
+        setType = set.setTypeID,
       )
     },
     previousSet = {
@@ -397,20 +398,24 @@ fun SetContentFrame(
 }
 
 @Composable
-private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, setIndex: String) {
+private fun SetTypeComposable(
+  updateSetType: (setType: SetType) -> Unit,
+  setType: SetType,
+  setIndex: String
+) {
   var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
 
   val iconText by remember {
     mutableStateOf(
-      when (setTypeID) {
-        1 -> setIndex
-        2 -> "W"
-        3 -> "D"
-        4 -> "M"
-        5 -> "MM"
-        6 -> "G"
-        7 -> "A"
-        8 -> "F"
+      when (setType) {
+        SetType.normalSet -> setIndex
+        SetType.warmUpSet -> "W"
+        SetType.dropSet -> "D"
+        SetType.myoRepSet -> "M"
+        SetType.myoRepMatchSet -> "MM"
+        SetType.giantSet -> "G"
+        SetType.amrapSet -> "A"
+        SetType.failureSet -> "F"
         else -> {
           setIndex
         }
@@ -419,18 +424,18 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
   }
 
   val buttonBackgroundColor =
-    when (setTypeID) {
-      2 -> MaterialTheme.colorScheme.tertiary
-      7 -> MaterialTheme.colorScheme.error
-      8 -> MaterialTheme.colorScheme.error
+    when (setType) {
+      SetType.warmUpSet -> MaterialTheme.colorScheme.tertiary
+      SetType.amrapSet -> MaterialTheme.colorScheme.error
+      SetType.failureSet -> MaterialTheme.colorScheme.error
       else -> MaterialTheme.colorScheme.primary
     }
 
   val iconColor: Color =
-    when (setTypeID) {
-      2 -> MaterialTheme.colorScheme.onSecondary
-      7 -> MaterialTheme.colorScheme.onError
-      8 -> MaterialTheme.colorScheme.onError
+    when (setType) {
+      SetType.warmUpSet -> MaterialTheme.colorScheme.onSecondary
+      SetType.amrapSet -> MaterialTheme.colorScheme.onError
+      SetType.failureSet -> MaterialTheme.colorScheme.onError
       else -> MaterialTheme.colorScheme.onPrimary
     }
 
@@ -450,7 +455,7 @@ private fun SetType(updateSetType: (setTypeID: Int) -> Unit, setTypeID: Int, set
     SetTypeOptionsMenu(
       expandMenu = { expandedSetTypeOptionsDropdownMenu },
       onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
-      updateSetType = { setTypeID -> updateSetType(setTypeID) },
+      updateSetType = { setTypeID -> updateSetType(setType) },
       changeIconText = { abbreviation ->
         //        iconText = abbreviation
         //        Log.i("setTypeAbbreviation", "setType iconText: $iconText")
@@ -575,10 +580,10 @@ private fun ExerciseRepsTextField(
   Box(
     modifier =
     boxModifier
-        .padding(4.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(textFieldBackgroundColor)
-        //        .align(Alignment.CenterVertically)
+      .padding(4.dp)
+      .clip(RoundedCornerShape(8.dp))
+      .background(textFieldBackgroundColor)
+      //        .align(Alignment.CenterVertically)
         //        .width(96.dp)
         .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
@@ -634,10 +639,10 @@ private fun RIRTextField(
   Box(
     modifier =
     boxModifier
-        .padding(4.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(textFieldBackgroundColor)
-        //      .align(Alignment.CenterVertically)
+      .padding(4.dp)
+      .clip(RoundedCornerShape(8.dp))
+      .background(textFieldBackgroundColor)
+      //      .align(Alignment.CenterVertically)
         //        .width(40.dp)
         .wrapContentSize(Alignment.Center),
     propagateMinConstraints = true,
@@ -667,7 +672,7 @@ private fun RIRTextField(
 }
 
 private fun getSetIconText(set: Set, setIndex: Int, setTypeAbbreviation: String): String =
-  if (set.setTypeID == 1) {
+  if (set.setTypeID == com.example.myapplication.data.model.SetType.normalSet) {
     setIndex.inc().toString()
   } else {
     setTypeAbbreviation

@@ -1,5 +1,6 @@
 package com.example.myapplication.utils
 
+import android.util.Log
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.ParagraphStyle
@@ -37,12 +38,15 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
     fun processPattern(pattern: Regex, style: SpanStyle, text: String): String {
         var currentIndex = 0
         var updatedText = ""
-        println("Pattern: $pattern")
+      Log.i("createAnnotatedLinkString.processPattern Pattern", "Pattern: $pattern")
         pattern.findAll(text, currentIndex).forEach { matchResult ->
-            println("Match Result: ${matchResult.value}")
+          Log.i(
+            "createAnnotatedLinkString.processPattern Match",
+            "Match Result: ${matchResult.value}"
+          )
 
             val (content) = matchResult.destructured
-            println("Content: $content")
+          Log.i("createAnnotatedLinkString.processPattern Content", "Content: $content")
             val startIndex = matchResult.range.first
             val endIndex = matchResult.range.last + 1
 
@@ -90,7 +94,7 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
     fun processList(pattern: Regex, isOrdered: Boolean, style: Any, text: String): String {
         var currentIndex = 0
         var updatedText = ""
-        println("Pattern: $pattern")
+      Log.i("createAnnotatedLinkString Pattern", "Pattern: $pattern")
         pattern.findAll(text, currentIndex).forEach { matchResult ->
             val listContent = matchResult.groupValues[1]
             val startIndex = matchResult.range.first
@@ -301,11 +305,11 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
 
     //  val spannableString = SpannableString(fullText)
 
-    println("Full Text:\n\n $fullText\n\n~~~~~~~~~\n\n")
+  Log.i("createAnnotatedLinkString Full Text", "Full Text:\n\n $fullText\n\n~~~~~~~~~\n\n")
 
     //  fullTextList.forEachIndexed { index, it -> println("Text $index: $it") }
 
-    println("\n\n~~~~~~~~~\n\n")
+  Log.i("createAnnotatedLinkString", "\n\n~~~~~~~~~\n\n")
 
     //  links.forEach { (url, linkText, start, end) ->
     //    println("URL: $url")
@@ -320,6 +324,6 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
     //    )*/
     //  }
 
-    println(annotatedString)
+  Log.i("createAnnotatedLinkString annotatedString Result", annotatedString.toString())
     return annotatedString
 }

@@ -8,6 +8,7 @@ import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.SetType
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.calculateTotalVolume
@@ -167,8 +168,8 @@ class ManageWorkoutUseCase(
           percentage1RM = set.percentage1RM,
           setTypeID = set.setTypeID,
           progressionSchemeID = set.progressionSchemeID,
-          exerciseSetsID = currentExerciseSetsID.toString(),
-          workoutID = currentWorkoutID.toString(),
+          exerciseSetsID = currentExerciseSetsID,
+          workoutID = currentWorkoutID,
           exerciseID = set.exerciseID,
           ownerID = tempOwnerId, // TODO Replace currentUser.id
         )
@@ -470,11 +471,11 @@ class ManageWorkoutUseCase(
         listOf(
           Set(
             exerciseID = exerciseSets.exercise.id,
-            workoutID = exerciseSets.workoutID.toString(),
-            exerciseSetsID = exerciseSets.id.toString(),
+            workoutID = exerciseSets.workoutID,
+            exerciseSetsID = exerciseSets.id,
             setNumber = 0,
             isPublic = false,
-            progressionSchemeID = "", // Random().nextInt() // TODO Replace with,
+            progressionSchemeID = null, // Random().nextInt() // TODO Replace with,
             // progressionScheme.progressionSchemeID,
             ownerID = tempOwnerId, // TODO Replace currentUser.id,
           )
@@ -630,16 +631,16 @@ class ManageWorkoutUseCase(
   fun updateSetType(
     exerciseSets: ExerciseExerciseSets,
     setUUID: Uuid,
-    setTypeID: Int,
+    setType: SetType,
   ): ExerciseExerciseSets {
-    exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
+    exerciseSets.updateSetType(uuid = setUUID, setType = setType)
     return exerciseSets
     //    updateExerciseExerciseSetsData(exerciseSets)
   }
 
   fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
-    return if (exerciseSets.exercise?.weightUnit != null) {
-      exerciseSets.exercise?.weightUnit ?: MassUnit.POUNDS.abbreviation
+    return if (exerciseSets.exercise.weightUnit != null) {
+      exerciseSets.exercise.weightUnit ?: MassUnit.POUNDS.abbreviation
     } else {
       userDefaultWeightUnit
     }

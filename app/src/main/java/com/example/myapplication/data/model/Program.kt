@@ -14,7 +14,6 @@ package com.example.myapplication.data.model
 import com.example.myapplication.utils.newID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -29,11 +28,11 @@ import kotlin.uuid.Uuid
 @Serializable
 data class Program(
   @SerialName("id")
-  @Contextual
+  @Serializable(with = ObjectIdSerializer::class)
   var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
 
-  @Contextual
+  @Serializable(UuidSerializer::class)
   var uuid: Uuid = Uuid.random(),
   var name: String? = null,
   var author: String? = null,
@@ -69,13 +68,14 @@ data class Mesocycles(val mesocycles: List<Mesocycle>)
 @Serializable
 data class Microcycles(val microcycles: List<Microcycle>)
 
+@Serializable
 data class MesocycleDao(val Mesocycle: Mesocycle)
 
 @Serializable
 data class Mesocycle(
   @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
-  @Contextual var uuid: Uuid = Uuid.random(),
+  @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String? = null,
   var description: String? = null,
   var dateCreated: Instant = Clock.System.now(),
@@ -83,20 +83,21 @@ data class Mesocycle(
   var endDate: Instant? = null,
   var order: Int = 0,
   //    var tags: String // TODO Should be a List<String>,
-  @Contextual var programID: ObjectId? = null,
+  @Serializable(with = ObjectIdSerializer::class) var programID: ObjectId? = null,
   var microcycles: List<Microcycle> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
 //  var type: String? = null,
 )
 
+@Serializable
 data class MicrocycleDao(val Microcycle: Microcycle)
 
 @Serializable
 data class Microcycle(
   @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
-  @Contextual var uuid: Uuid = Uuid.random(),
+  @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String? = null,
   var description: String? = null,
   var dateCreated: Instant = Clock.System.now(),
@@ -104,8 +105,8 @@ data class Microcycle(
   var endDate: Instant? = null,
   var order: Int = 0,
   //    var tags: String // TODO Should be a List<String>,
-  @Contextual var programID: ObjectId? = null,
-  @Contextual var mesocycleID: ObjectId? = null,
+  @Serializable(with = ObjectIdSerializer::class) var programID: ObjectId? = null,
+  @Serializable(with = ObjectIdSerializer::class) var mesocycleID: ObjectId? = null,
   var workouts: List<Workout> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,

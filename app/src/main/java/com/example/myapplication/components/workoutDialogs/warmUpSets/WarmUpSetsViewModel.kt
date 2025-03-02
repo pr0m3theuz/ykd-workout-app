@@ -77,18 +77,18 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
           percentage1RM = _warmUpSets.last().percentage1RM,
           isPublic = false,
           exerciseID = _exerciseSets!!.exercise.id,
-          exerciseSetsID = _exerciseSets!!.id.toString(),
-          workoutID = _exerciseSets!!.workoutID.toString(),
+          exerciseSetsID = _exerciseSets!!.id,
+          workoutID = _exerciseSets!!.workoutID,
           ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
         )
       )
     } else {
       _warmUpSets.add(
         Set(
-          setTypeID = SetType.warmUpSet.setTypeID, // TODO make type warm up
+          setTypeID = SetType.warmUpSet, // TODO make type warm up
           exerciseID = _exerciseSets!!.exercise.id,
-          exerciseSetsID = _exerciseSets!!.id.toString(),
-          workoutID = _exerciseSets!!.workoutID.toString(),
+          exerciseSetsID = _exerciseSets!!.id,
+          workoutID = _exerciseSets!!.workoutID,
           ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
         )
       )
@@ -139,12 +139,12 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
         weightPounds = 100.00,
         repetitions = 10,
         percentage1RM = 1.0,
-        setTypeID = SetType.warmUpSet.setTypeID,
+        setTypeID = SetType.warmUpSet,
         progressionSchemeID =
-        ProgressionType.LINEAR_PROGRESSION.toString(), // TODO Replace with progressionScheme.progressionSchemeID
+        ProgressionType.LINEAR_PROGRESSION, // TODO Replace with progressionScheme.progressionSchemeID
         exerciseID = exerciseSets.exercise.id,
-        exerciseSetsID = exerciseSets.id.toString(),
-        workoutID = exerciseSets.workoutID.toString(),
+        exerciseSetsID = exerciseSets.id,
+        workoutID = exerciseSets.workoutID,
         ownerID = exerciseSets.ownerID, // TODO currentUser.id,
       )
     }

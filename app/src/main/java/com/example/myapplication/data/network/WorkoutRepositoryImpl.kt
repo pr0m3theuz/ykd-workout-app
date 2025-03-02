@@ -68,7 +68,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       val queryBuilder =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
-          .where(Expression.property("_id").equalTo(Expression.string(workoutID.toString())))
+          .where(Expression.property("id").equalTo(Expression.string(workoutID.toString())))
           .orderBy(Ordering.property("name").ascending())
           .limit(Expression.intValue(1))
 

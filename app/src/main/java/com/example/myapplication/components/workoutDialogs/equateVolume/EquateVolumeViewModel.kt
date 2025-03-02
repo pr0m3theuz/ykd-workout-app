@@ -2,15 +2,15 @@
 
 package com.example.myapplication.components.workoutDialogs.equateVolume
 
+
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.SetType
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.utils.newID
-
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,10 +20,9 @@ import kotlin.math.roundToInt
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-private const val WARM_UP_SET = 2
 
 class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
-
+  private val WARM_UP_SET = SetType.warmUpSet
   //  TODO REWRITE THIS
 //  val currentUser = userRepository.getCurrentUser()
 //  val userDefaultWeightUnit: String =
@@ -129,8 +128,8 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
       temporarySets.add(
         Set(
           exerciseID = _exerciseSets!!.exercise.id,
-          exerciseSetsID = _exerciseSets!!.id.toString(),
-          workoutID = _exerciseSets!!.workoutID.toString(),
+          exerciseSetsID = _exerciseSets!!.id,
+          workoutID = _exerciseSets!!.workoutID,
           ownerID = _exerciseSets!!.ownerID, // TODO currentUser.id,
         )
       )
@@ -294,8 +293,8 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
         repetitions = 10,
         percentage1RM = 1.0,
         exerciseID = exerciseSets.exercise.id,
-        exerciseSetsID = exerciseSets.id.toString(),
-        workoutID = exerciseSets.workoutID.toString(),
+        exerciseSetsID = exerciseSets.id,
+        workoutID = exerciseSets.workoutID,
         ownerID = exerciseSets.ownerID, // TODO currentUser.id,
         //        exerciseID = exerciseID,
         //        exerciseUUID = exerciseUUID,

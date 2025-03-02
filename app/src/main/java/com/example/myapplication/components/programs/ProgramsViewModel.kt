@@ -144,17 +144,12 @@ constructor(
         _selectedProgramMicrocycles.value =
           microcycleList.sortedWith(compareBy({ it.mesocycleID }, { it.order }))
 
-        /* val strengthPhaseMicrocycle =
-          microcycleList.firstOrNull { it.name == "Strength Phase Week 1: Block 1 Microcycle 3" }
 
-        if (strengthPhaseMicrocycle?.name == "Strength Phase Week 3: Block 1 Microcycle 3") {
-          strengthPhaseMicrocycle?.workouts?.forEach { workout ->
-            Log.i("getMicrocyclesByProgram", "${strengthPhaseMicrocycle.name}: " + workout.name)
-          }
-        }*/
+        _selectedProgramMicrocycles.value.forEach { microcycle ->
+          microcycle.workouts = workoutRepository.getWorkoutsByMicrocycleID(microcycle.id)
+        }
       }
     }
-    //    return microcycles
   }
 
   fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): List<Microcycle> {
@@ -175,7 +170,6 @@ constructor(
       _selectedProgramWorkouts.value[microcycle] =
         workoutRepository.getWorkoutsByMicrocycleID(microcycle.id)
     }
-    //        return workouts
   }
 
   fun getProgramData() {

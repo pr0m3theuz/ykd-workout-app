@@ -68,6 +68,7 @@ fun selectProgression(
 
 fun linearProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
 
+  ProgressionType.DYNAMIC_DOUBLE_PROGRESSION.ordinal
   val setsToUpdate = _setsToUpdate.toMutableList()
 
   var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0

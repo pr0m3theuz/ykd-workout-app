@@ -8,7 +8,6 @@ import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.network.ProgramsRepository
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutRepository
-import com.example.myapplication.utils.ProgressionType
 import com.example.myapplication.utils.selectProgression
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -59,8 +58,8 @@ class PostWorkoutUseCase(
 
                     exerciseSets.sets.forEach { set ->
                         set.progressionSchemeID?.let {
-                            ProgressionType.fromProgression(it)
-                                ?.let { progressionType ->
+//                            ProgressionType.fromProgression(it)?.let {
+                                progressionType ->
                                     val progressionFunction: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
                                         selectProgression(progressionType)
 
@@ -71,7 +70,7 @@ class PostWorkoutUseCase(
                                         exerciseSetsToUpdate.sets
                                     ).getOrNull() ?: mutableListOf<Set>()
 
-                                }
+//                                }
                         }
                         // TODO update matching exerciseSets in workoutToUpdate
                         if (updatedSets.isNotEmpty()) {

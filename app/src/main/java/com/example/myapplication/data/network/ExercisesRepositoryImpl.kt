@@ -438,7 +438,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
           val queryBuilder =
             QueryBuilder.select(SelectResult.all())
               .from(DataSource.collection(it)) // Replace with your database instance
-              .where(Expression.property("_id").equalTo(Expression.string(exerciseID.toString())))
+              .where(Expression.property("id").equalTo(Expression.string(exerciseID.toString())))
               .orderBy(Ordering.property("name").ascending())
               .limit(Expression.intValue(1))
 
@@ -466,7 +466,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
           val queryBuilder =
             QueryBuilder.select(SelectResult.all())
               .from(DataSource.collection(it)) // Replace with your database instance
-              .where(Expression.property("_id").equalTo(Expression.string(exerciseID.toString())))
+              .where(Expression.property("id").equalTo(Expression.string(exerciseID.toString())))
               .orderBy(Ordering.property("name").ascending())
               .limit(Expression.intValue(1))
 

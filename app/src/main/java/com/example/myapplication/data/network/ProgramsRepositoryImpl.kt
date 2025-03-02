@@ -57,7 +57,6 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       val query =
         QueryBuilder.selectDistinct(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       val flow =
@@ -122,7 +121,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       val queryBuilder =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.property("_id").equalTo(Expression.string(programID.toString())))
+          .where(Expression.property("id").equalTo(Expression.string(programID.toString())))
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
@@ -275,13 +274,13 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
           .where(
-            Expression.property("_id")
+            Expression.property("id")
               .equalTo(Expression.string(program.id.toString()))
               .and(Expression.property("ownerID").equalTo(Expression.string("USER ID")))
               .and(Expression.property("active").equalTo(Expression.booleanValue(true)))
           ).limit(Expression.intValue(1))
 
-      val result = query.execute().allResults().firstOrNull()?.getString("_id")
+      val result = query.execute().allResults().firstOrNull()?.getString("id")
 
       val document = result?.let { collection.getDocument(it) }
       requireNotNull(document) { "Program Repository: Program does not exist!" }
@@ -340,7 +339,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       val query =
         QueryBuilder.selectDistinct(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.property("_id").equalTo(Expression.string(mesocycleID.toString())))
+          .where(Expression.property("id").equalTo(Expression.string(mesocycleID.toString())))
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
@@ -480,7 +479,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
       val query =
         QueryBuilder.selectDistinct(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.property("_id").equalTo(Expression.string(microcycleID.toString())))
+          .where(Expression.property("id").equalTo(Expression.string(microcycleID.toString())))
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 

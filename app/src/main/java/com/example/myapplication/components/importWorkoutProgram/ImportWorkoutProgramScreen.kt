@@ -85,7 +85,8 @@ fun ImportWorkoutProgramScreen(navController: NavController) {
   var openProgramPreview by remember { mutableStateOf(false) }
 
   if (openProgramPreview) {
-    if (importedProgram != null) {
+    requireNotNull(importedProgram) { "ImportWorkoutProgramScreen(): Program must not be null!" }
+
       val microcycles = importedProgram.mesocycles.flatMap { it.microcycles }
 
       ProgramPreviewScreen(
@@ -94,7 +95,7 @@ fun ImportWorkoutProgramScreen(navController: NavController) {
         microcycles = microcycles,
         navController = navController,
       )
-    }
+
   }
 
   Scaffold(

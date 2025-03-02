@@ -1,3 +1,4 @@
+
 @file:UseSerializers(
   /*  MutableRealmIntKSerializer::class,
     RealmAnyKSerializer::class,
@@ -11,24 +12,55 @@
 
 package com.example.myapplication.data.model
 
+import com.example.myapplication.utils.ProgressionType
 import com.example.myapplication.utils.doubleFormatted
 import com.example.myapplication.utils.newID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+object ProgressionTypeSerializer : KSerializer<ProgressionType> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("com.example.MyApplication.ProgressionType", PrimitiveKind.INT)
+
+  override fun deserialize(decoder: Decoder): ProgressionType {
+    return ProgressionType.entries[(decoder.decodeInt())]
+  }
+
+  override fun serialize(encoder: Encoder, value: ProgressionType) {
+    encoder.encodeInt(value.ordinal)
+  }
+}
+
+object SetTypeSerializer : KSerializer<SetType> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("com.example.MyApplication.ProgressionType", PrimitiveKind.INT)
+
+  override fun deserialize(decoder: Decoder): SetType {
+    return SetType.getSetType(decoder.decodeInt())
+  }
+
+  override fun serialize(encoder: Encoder, value: SetType) {
+    encoder.encodeInt(value.setTypeID)
+  }
+}
+
 @Serializable
 data class Set(
-  @SerialName("id") @Contextual
-  var id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newID(),
-  @Contextual var uuid: Uuid = Uuid.random(),
+  @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var setNumber: Int? = 0,
   var weightPounds: Double? = null,
   var weightKilograms: Double? = null,
@@ -50,14 +82,14 @@ data class Set(
   // TODO Update Realm Schema to include targetPercentage1RM
   var targetPercentage1RM: Double? = null, // TODO for progression scheme & utils
   var setCompleted: Boolean = false,
-  var workoutID: String,
-  var exerciseSetsID: String,
+  @Serializable(ObjectIdSerializer::class) var workoutID: ObjectId,
+  @Serializable(ObjectIdSerializer::class) var exerciseID: ObjectId,
+  @Serializable(ObjectIdSerializer::class) var exerciseSetsID: ObjectId,
   //    var exerciseOrder: Int = 1
-  var setTypeID: Int = 1,
-  @Contextual val exerciseSet: ObjectId? = null, // TODO Use backlinks for ExerciseSets or not
-  var progressionSchemeID: String? = null, // TODO Create ProgressionScheme class/enum and RealmObject
+  @Serializable(SetTypeSerializer::class) var setTypeID: SetType = SetType.normalSet,
+  //  @Serializable(ObjectIdSerializer::class) val exerciseSet: ObjectId, // TODO Use backlinks for ExerciseSets or not
+  @Serializable(ProgressionTypeSerializer::class) var progressionSchemeID: ProgressionType? = null, // TODO Create ProgressionScheme class/enum and RealmObject
   //    To use in query for previous sets
-  @Contextual var exerciseID: ObjectId,
   var dateCreated: Instant? = Clock.System.now(),
   //    var programUUID: Uuid? = null
   //    var mesocycleUUID: Uuid? = null

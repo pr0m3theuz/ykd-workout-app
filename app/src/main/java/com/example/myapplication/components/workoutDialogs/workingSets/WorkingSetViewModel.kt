@@ -2,6 +2,7 @@
 
 package com.example.myapplication.components.workoutDialogs.workingSets
 
+
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
@@ -9,12 +10,9 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
-
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -26,12 +24,12 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
 //    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
 //      ?: MassUnit.POUNDS.abbreviation
 
-  private val tempOwnerId = ObjectId().toString()
+  //  private val tempOwnerId = ObjectId()
   val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   private var _exerciseSets: ExerciseExerciseSets? = null
 
-  var exerciseWeightUnit: String? = null
+  private var exerciseWeightUnit: String? = null
   private var _oneRepMax: Double = 100.0
   val oneRepMax: Double
     get() = _oneRepMax
@@ -84,8 +82,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
           isPublic = false,
           ownerID = _exerciseSets!!.ownerID,
           exerciseID = _exerciseSets!!.exercise.id,
-          exerciseSetsID = _exerciseSets!!.id.toString(),
-          workoutID = _exerciseSets!!.workoutID.toString(),
+          exerciseSetsID = _exerciseSets!!.id,
+          workoutID = _exerciseSets!!.workoutID,
         )
       )
       _setsFlow.value = _sets.toList()
@@ -93,8 +91,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
       _sets.add(
         Set(
           exerciseID = _exerciseSets!!.exercise.id,
-          exerciseSetsID = _exerciseSets!!.id.toString(),
-          workoutID = _exerciseSets!!.workoutID.toString(),
+          exerciseSetsID = _exerciseSets!!.id,
+          workoutID = _exerciseSets!!.workoutID,
           ownerID = _exerciseSets!!.ownerID,
         )
       )
@@ -138,8 +136,8 @@ class WorkingSetViewModel(private val userRepository: UserRepository) : ViewMode
     return MutableList(3) { index ->
       Set(
         exerciseID = exerciseSets.exercise.id,
-        exerciseSetsID = exerciseSets.id.toString(),
-        workoutID = exerciseSets.workoutID.toString(),
+        exerciseSetsID = exerciseSets.id,
+        workoutID = exerciseSets.workoutID,
         setNumber = index,
         ownerID = exerciseSets.ownerID,
         weightPounds = 100.00,

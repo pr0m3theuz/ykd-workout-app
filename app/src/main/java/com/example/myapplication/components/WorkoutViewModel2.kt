@@ -34,6 +34,7 @@ import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.ListExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.SetType
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.addWarmUpSets
@@ -63,7 +64,7 @@ import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-private const val WARM_UP_SET = 2
+
 const val WORKOUT_DURATION = "WORKOUT_DURATION"
 const val WORKOUT_PAUSED_ELAPSED_TIME = "WORKOUT_PAUSED_ELAPSED_TIME"
 const val TIMER_DURATION = "TIMER_DURATION"
@@ -80,6 +81,8 @@ class WorkoutViewModel(
   private val exerciseRepository: ExercisesRepository,
   private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+  private val WARM_UP_SET = SetType.warmUpSet
+
   var isWorkoutActive: Boolean
     get() = savedStateHandle.get<Boolean>(IS_WORKOUT_ACTIVE) ?: false
     set(value) = savedStateHandle.set(IS_WORKOUT_ACTIVE, value)
@@ -807,8 +810,8 @@ class WorkoutViewModel(
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun updateSetType(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, setTypeID: Int) {
-    exerciseSets.updateSetType(uuid = setUUID, setTypeID = setTypeID)
+  fun updateSetType(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, setType: SetType) {
+    exerciseSets.updateSetType(uuid = setUUID, setType = setType)
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
@@ -870,8 +873,8 @@ class WorkoutViewModel(
           setTypeID = backOffSets[index].setTypeID,
           percentage1RM = backOffSets[index].percentage1RM,
           exerciseID = exerciseSets.exercise.id,
-          exerciseSetsID = exerciseSets.id.toString(),
-          workoutID = exerciseSets.workoutID.toString(),
+          exerciseSetsID = exerciseSets.id,
+          workoutID = exerciseSets.workoutID,
           ownerID = exerciseSets.ownerID,
         )
         //        backOffSets[index].copy(lazyListItemID = newID())

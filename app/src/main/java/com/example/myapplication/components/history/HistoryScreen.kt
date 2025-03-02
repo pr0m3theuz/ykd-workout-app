@@ -74,6 +74,7 @@ import com.example.myapplication.components.workout.AddExercise
 import com.example.myapplication.components.workout.ExerciseSetLazyColumn
 import com.example.myapplication.components.workout.SwipeToDismissWorkoutNote
 import com.example.myapplication.components.workout.WorkoutSummaryCard
+import com.example.myapplication.data.model.SetType
 import com.example.myapplication.data.model.formatLongWorkoutStarted
 import com.example.myapplication.data.model.formatWorkoutDuration
 import com.example.myapplication.data.model.setSummaryRIR
@@ -486,7 +487,7 @@ fun WorkoutOverview(
                         Text(
                           text =
                           "${
-                            if (set.setTypeID == 1) {
+                            if (set.setTypeID == SetType.normalSet) {
                               set.setNumber?.plus(1)
                             } else {
                               set.setTypeID
@@ -693,11 +694,11 @@ fun EditWorkoutScreen(
                       )
                     },
                     isTimerRunning = false,
-                    updateSetType = { setTypeID ->
+                    updateSetType = { setType ->
                       workoutViewModel.updateSetType(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
-                        setTypeID = setTypeID,
+                        setType = setType,
                       )
                     },
                     setComplete = { setComplete ->

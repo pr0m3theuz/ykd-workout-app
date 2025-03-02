@@ -112,7 +112,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     return coroutineScope {
       exercisesRepository.getAllEquipment().collect {
         _equipment.value = it
-        Log.i("ExercisesViewModel.getEquipment()", it.toString())
+//        Log.i("ExercisesViewModel.getEquipment()", it.toString())
       }
     }
   }
@@ -122,7 +122,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     return coroutineScope {
       exercisesRepository.getAllMuscleGroups().collect {
         _muscleGroup.value = it
-        Log.i("ExercisesViewModel.getMuscleGroups()", it.toString())
+//        Log.i("ExercisesViewModel.getMuscleGroups()", it.toString())
       }
     }
   }

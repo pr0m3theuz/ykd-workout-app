@@ -68,12 +68,12 @@ class DatabaseManager(private val context: Context) {
         database!!.createCollection(collection, "_default")
       }
 
-      database!!.scopes.forEach { scope ->
-//        Log.i("Scope", "${scope.name}")
-        scope.collections.forEach {
-          Log.i("Scope.Collection", "${scope.name}: ${it.name}")
-        }
-      }
+//      database!!.scopes.forEach { scope ->
+////        Log.i("Scope", "${scope.name}")
+//        scope.collections.forEach {
+//          Log.i("Scope.Collection", "${scope.name}: ${it.name}")
+//        }
+//      }
 
 //    create user scope
       userDatabase = Database(userWorkoutsDatabaseName, dbConfig)

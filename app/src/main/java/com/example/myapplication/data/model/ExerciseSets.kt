@@ -28,18 +28,21 @@ import kotlin.uuid.Uuid
     @Query(SELECT * FROM sets WHERE exerciseID:=exerciseID) return WorkoutSets
 */
 
+@Serializable
+data class ExerciseSetsDao(val ExerciseSets: ExerciseSets)
+
 @ExperimentalUuidApi
 @Serializable
 data class ExerciseSets(
-  @SerialName("id") @Contextual val id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) val id: ObjectId = ObjectId(),
   val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
-  @Contextual val exSetsUUID: Uuid = Uuid.random(),
-  @Contextual val workoutID: ObjectId, // External Primary Key
-  @Contextual val microcycleID: ObjectId?,
-  @Contextual val mesocycleID: ObjectId?,
-  @Contextual val programID: ObjectId?,
+  @Serializable(with = UuidSerializer::class) val exSetsUUID: Uuid = Uuid.random(),
+  @Serializable(with = ObjectIdSerializer::class) val workoutID: ObjectId, // External Primary Key
+  @Serializable(with = ObjectIdSerializer::class) val microcycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) val mesocycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) val programID: ObjectId?,
   val exerciseOrder: Int = 1,
-  @Contextual val exerciseID: ObjectId,
+  @Serializable(with = ObjectIdSerializer::class) val exerciseID: ObjectId,
   var sets: MutableList<Set> = mutableListOf(),
   val notes: MutableList<ExerciseNote> = mutableListOf(),
   val datePerformed: Instant? = null,
@@ -52,9 +55,9 @@ data class ExerciseSets(
 @OptIn(ExperimentalUuidApi::class)
 @Serializable
 data class ExerciseExerciseSets(
-  @SerialName("id") @Contextual val id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(ObjectIdSerializer::class) val id: ObjectId = ObjectId(),
   var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
-  @Contextual var exSetsUUID: Uuid = Uuid.random(),
+  @Serializable(UuidSerializer::class) var exSetsUUID: Uuid = Uuid.random(),
   val ownerID: String,
   val isPublic: Boolean = false,
   var exerciseOrder: Int = 1,
@@ -63,10 +66,10 @@ data class ExerciseExerciseSets(
   var notes: MutableList<ExerciseNote> = mutableListOf(),
   var datePerformed: Instant? = Clock.System.now(),
 //  @Contextual var exerciseID: ObjectId,
-  @Contextual var workoutID: ObjectId, // TODO May be useless
-  @Contextual var microcycleID: ObjectId?,
-  @Contextual var mesocycleID: ObjectId?,
-  @Contextual var programID: ObjectId?,
+  @Serializable(ObjectIdSerializer::class) var workoutID: ObjectId, // TODO May be useless
+  @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId?,
+  @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId?,
+  @Serializable(ObjectIdSerializer::class) var programID: ObjectId?,
 )
 
 @Serializable
@@ -141,8 +144,8 @@ fun ExerciseExerciseSets.completeSet(uuid: Uuid, completed: Boolean) {
 }
 
 @OptIn(ExperimentalUuidApi::class)
-fun ExerciseExerciseSets.updateSetType(uuid: Uuid, setTypeID: Int) {
-  sets.forEach { if (it.uuid == uuid) it.setTypeID = setTypeID }
+fun ExerciseExerciseSets.updateSetType(uuid: Uuid, setType: SetType) {
+  sets.forEach { if (it.uuid == uuid) it.setTypeID = setType }
 }
 
 fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
@@ -162,8 +165,8 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
         percentage1RM = warmUpSets[index].percentage1RM,
         exerciseID = this@addWarmUpSets.exercise.id,
         progressionSchemeID = warmUpSets[index].progressionSchemeID,
-        workoutID = this@addWarmUpSets.workoutID.toString(),
-        exerciseSetsID = this@addWarmUpSets.id.toString(),
+        workoutID = this@addWarmUpSets.workoutID,
+        exerciseSetsID = this@addWarmUpSets.id,
         ownerID = this@addWarmUpSets.ownerID.toString(),
         isPublic = this@addWarmUpSets.isPublic,
       ),
@@ -171,7 +174,7 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
   }
 }
 
-private const val WARM_UP_SET = 2
+private val WARM_UP_SET = SetType.warmUpSet
 
 fun ExerciseExerciseSets.totalWorkingSetVolume(weightUnit: String): Double {
   var totalVolume = 0.0

@@ -114,11 +114,11 @@ fun ExercisesSetsScreen(
                   )
                 },
                 isTimerRunning = false,
-                updateSetType = { setTypeID ->
+                updateSetType = { setType ->
                   workoutViewModel.updateSetType(
                     exerciseSets = exerciseSets,
                     setUUID = setUUID,
-                    setTypeID = setTypeID,
+                    setType = setType,
                   )
                 },
                 setComplete = { setComplete ->

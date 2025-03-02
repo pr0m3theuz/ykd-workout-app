@@ -16,6 +16,20 @@ data class SetType(
   var abbreviation: String? = null,
 ) {
   companion object {
+    fun getSetType(setTypeID: Int): SetType {
+      return when (setTypeID) {
+        1 -> normalSet
+        2 -> warmUpSet
+        3 -> dropSet
+        4 -> myoRepSet
+        5 -> myoRepMatchSet
+        6 -> giantSet
+        7 -> amrapSet
+        8 -> failureSet
+        else -> normalSet
+      }
+    }
+
     var textLinkStyles: TextLinkStyles? = null
 
       val normalSet =

@@ -18,7 +18,6 @@ import com.example.myapplication.utils.newID
 import kotlinx.datetime.Clock
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -89,9 +88,9 @@ data class Workout(
   var totalVolumeInPounds: Double? = 0.0,
   var totalVolumeInKilograms: Double? = 0.0,
   var order: Int? = null, // For sorting workouts in a program
-  @Contextual var programID: ObjectId? = null,
-  @Contextual val mesocycleID: ObjectId? = null,
-  @Contextual var microcycleID: ObjectId? = null,
+  @Serializable(ObjectIdSerializer::class) var programID: ObjectId? = null,
+  @Serializable(ObjectIdSerializer::class) val mesocycleID: ObjectId? = null,
+  @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId? = null,
   var ownerID: String = "",
   var isPublic: Boolean = false,
 //  var type: String? = null,
