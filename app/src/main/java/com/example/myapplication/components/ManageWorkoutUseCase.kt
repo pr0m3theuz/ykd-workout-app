@@ -22,6 +22,7 @@ import com.example.myapplication.data.model.updateSetType
 import com.example.myapplication.data.model.updateSetWeight
 import com.example.myapplication.data.network.ExerciseNotesRepository
 import com.example.myapplication.data.network.ExercisesRepository
+import com.example.myapplication.data.network.InProgressWorkoutRepository
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutNotesRepository
 import com.example.myapplication.data.network.WorkoutRepository
@@ -39,6 +40,7 @@ class ManageWorkoutUseCase(
   private val exercisesRepository: ExercisesRepository,
   private val workoutNotesRepository: WorkoutNotesRepository,
   private val exerciseNotesRepository: ExerciseNotesRepository,
+  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
   userRepository: UserRepository,
 ) {
 
@@ -243,9 +245,11 @@ class ManageWorkoutUseCase(
           isPublic = false,
         )
       newSets.add(newSet)
-      if (set.setNumber != null) {
+      requireNotNull(set.setNumber) { "Set number cannot be null." }
+      requireNotNull(set.exerciseID) { "Exercise ID cannot be null." }
+      if (set.setNumber != null && set.exerciseID != null) {
         val previousSet =
-          workoutRepository.getPreviousSetForExercise(set.exerciseID, set.setNumber!!)
+          workoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
         previousSet?.let { latestPreviousSets.add(it) }
       }
     }
@@ -328,6 +332,25 @@ class ManageWorkoutUseCase(
 
     workoutRepository.insertWorkout(workout)
   }
+
+  suspend fun saveInProgressWorkout(
+    workout: Workout,
+    workoutNotes: List<WorkoutNote>,
+    exercisesSets: List<ExerciseExerciseSets>,
+  ) {
+    workout.notes = workoutNotes.toMutableList()
+
+    workout.exercisesSets =
+      convertExerciseExerciseSetsToExerciseSets(
+        exercisesSets.toMutableList(),
+        userDefaultWeightUnit,
+      )
+
+    workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
+
+    inProgressWorkoutRepository.saveInProgressWorkout(workout)
+  }
+
 
   private fun convertExerciseExerciseSetsToExerciseSets(
     exerciseExerciseSets: List<ExerciseExerciseSets>,

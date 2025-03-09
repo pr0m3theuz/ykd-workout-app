@@ -57,10 +57,10 @@ class DatabaseManager(private val context: Context) {
         "MuscleRoleFunction",
         "Program",
         "ProgramNote",
-//        "Set",
+//        "Set", // TODO Add Completed Sets Collection
         "Users",
         "Utility",
-        "Workout",
+        "Workout", // TODO Add Completed Workouts Collection
         "WorkoutNote"
       )
 
@@ -78,6 +78,12 @@ class DatabaseManager(private val context: Context) {
 //    create user scope
       userDatabase = Database(userWorkoutsDatabaseName, dbConfig)
       currentActiveWorkoutDatabase = Database(currentActiveWorkoutDatabaseName, dbConfig)
+
+      requireNotNull(userDatabase) { "DatabaseManager: User Database was not created!" }
+      requireNotNull(currentActiveWorkoutDatabase) { "DatabaseManager: Current Active Database was not created!" }
+
+      currentActiveWorkoutDatabase!!.createCollection("ActiveWorkout", "_default")
+      currentActiveWorkoutDatabase!!.createCollection("CurrentProgram", "_default")
 
       // setup the Database
       //            setupUserDatabase(dbConfig)

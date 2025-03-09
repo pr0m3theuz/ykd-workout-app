@@ -8,7 +8,9 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,9 +23,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -114,7 +116,7 @@ fun ProgramDetailsScreen(
   val programMesocycles by programsViewModel.selectedProgramMesocycles.collectAsStateWithLifecycle()
 
   val programMicrocycles by
-    programsViewModel.selectedProgramMicrocycles.collectAsStateWithLifecycle()
+  programsViewModel.selectedProgramMicrocycles.collectAsStateWithLifecycle()
   //  val mesocycles by programsViewModel.get
 
   program?.let {
@@ -130,7 +132,7 @@ fun ProgramDetailsScreen(
 
 // TODO Add animatedVisibility Function to expand more/less buttons
 // TODO Add Floating Action Button to Start Program
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 // @Preview
 @Composable
 fun ProgramDetailsLayout(
@@ -205,94 +207,105 @@ fun ProgramDetailsLayout(
         certificates = R.array.com_google_android_gms_fonts_certs,
       )
 
-    Column(
+    LazyColumn(
       Modifier
         .padding(contentPadding)
         .fillMaxWidth()
         .fillMaxHeight()
-        .verticalScroll(scrollState)
+//        .verticalScroll(scrollState)
     ) {
-      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        /*      BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center,)
-        {
-          val height = constraints.maxWidth*/
-        program.imageUri?.isNotBlank().let {
-          Box(
-            modifier = Modifier
-              .fillMaxWidth()
-              .height(200.dp),
-            contentAlignment = Alignment.Center,
-          ) {
-            AsyncImage(
-              contentScale = ContentScale.Crop,
-              alignment = Alignment.TopCenter,
-              model = program.imageUri,
-              contentDescription = null,
-              colorFilter =
-              ColorFilter.tint(color = Color.LightGray, blendMode = BlendMode.Modulate),
-            )
-            if (!program.imageFont.isNullOrBlank()) {
-              val fontName = GoogleFont(program.imageFont ?: "Montserrat")
+      item {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+          /*      BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center,)
+          {
+            val height = constraints.maxWidth*/
 
-              val fontFamily = FontFamily(Font(googleFont = fontName, fontProvider = provider))
-
-              Text(
-                text = program.name?.uppercase() ?: "",
-                style =
-                TextStyle(
-                  color = Color.White,
-                  fontSize = MaterialTheme.typography.displayLarge.fontSize,
-                  fontWeight = FontWeight.Bold,
-                  fontFamily = fontFamily,
-                ),
+          program.imageUri?.isNotBlank().let {
+            Box(
+              modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.1f)
+                .clickable(onClick = {}),
+              contentAlignment = Alignment.Center,
+            ) {
+              AsyncImage(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
+                model = program.imageUri,
+                contentDescription = null,
+                colorFilter =
+                ColorFilter.tint(color = Color.LightGray, blendMode = BlendMode.Modulate),
               )
+              if (!program.imageFont.isNullOrBlank()) {
+                val fontName = GoogleFont(program.imageFont ?: "Montserrat")
+
+                val fontFamily = FontFamily(Font(googleFont = fontName, fontProvider = provider))
+
+                Text(
+                  text = program.name?.uppercase() ?: "",
+                  style =
+                  TextStyle(
+                    color = Color.White,
+                    fontSize = MaterialTheme.typography.displayLarge.fontSize,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = fontFamily,
+                  ),
+                )
+              }
             }
           }
-        }
-        //        }
+          //        }
 
-        /*        Icon(
-          imageVector = Icons.Outlined.BrokenImage,
-          contentDescription = "Missing Image",
-          tint = MaterialTheme.colorScheme.primary,
-        )*/
-      }
-
-      TabRow(
-        selectedTabIndex = selectedTabIndex,
-        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-      ) {
-        titles.forEachIndexed { index, title ->
-          Tab(
-            selected = selectedTabIndex == index,
-            onClick = { selectedTabIndex = index },
-            text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
-          )
+          /*        Icon(
+            imageVector = Icons.Outlined.BrokenImage,
+            contentDescription = "Missing Image",
+            tint = MaterialTheme.colorScheme.primary,
+          )*/
         }
       }
 
-      Column(
-        Modifier
-          .padding(12.dp)
-          .fillMaxWidth()) {
-        when (selectedTabIndex) {
-          0 ->
-            OverviewTab(
-              program = program,
-              microcycles = microcycles,
-              //              programsViewModel = programsViewModel
+      stickyHeader {
+        TabRow(
+          selectedTabIndex = selectedTabIndex,
+          backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+          contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ) {
+          titles.forEachIndexed { index, title ->
+            Tab(
+              selected = selectedTabIndex == index,
+              onClick = { selectedTabIndex = index },
+              text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
             )
-
-          1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
-          2 ->
-            WorkoutsTab(
-              activeProgram = program.active,
-              navController = navController,
-              microcycles = microcycles,
-            )
+          }
         }
       }
+
+      item {
+        Column(
+          Modifier
+            .padding(12.dp)
+            .fillMaxWidth()
+        ) {
+          when (selectedTabIndex) {
+            0 ->
+              OverviewTab(
+                program = program,
+                microcycles = microcycles,
+                //              programsViewModel = programsViewModel
+              )
+
+            1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
+            2 ->
+              WorkoutsTab(
+                activeProgram = program.active,
+                navController = navController,
+                microcycles = microcycles,
+              )
+          }
+        }
+      }
+
+
     }
   }
 }
@@ -371,17 +384,21 @@ fun CoachsCard(program: Program) {
 
   Card() {
     SelectionContainer {
-      Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)
+      ) {
         Row(modifier = Modifier.fillMaxWidth()) {
           Column(modifier = Modifier.padding(bottom = 8.dp)) {
             Text(text = "Coach Overview", style = titleLarge)
           }
         }
-        Row(modifier = Modifier
-          .fillMaxWidth()
-          .padding(bottom = 8.dp)) {
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+        ) {
           Column() { Text(text = program.author ?: "Coach Name", style = titleMedium) }
         }
       }
@@ -407,9 +424,11 @@ fun ProgramOverviewCard(program: Program) {
     )
 
   Card() {
-    Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)
+    ) {
       SelectionContainer {
         Row(modifier = Modifier.fillMaxWidth()) {
           Column(modifier = Modifier.padding(bottom = 8.dp)) {
@@ -497,9 +516,11 @@ fun ProgramOverviewCard(program: Program) {
       SelectionContainer {
         program.shortDescription?.isNotBlank().let {
           val shortDescription = program.shortDescription ?: ""
-          Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(top = 8.dp)
+          ) {
             Column() {
               Text(
                 text = createAnnotatedLinkString(shortDescription, textLinkStyles),
@@ -534,9 +555,11 @@ fun ProgramDescriptionCard(program: Program) {
 
   //  TODO Add Expand/Hide Text Button
   Card() {
-    Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(padding)) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)
+    ) {
       Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(bottom = 8.dp)) {
           Text(text = "Program Description", style = titleMedium)
@@ -604,9 +627,11 @@ fun WorkoutOverviewCard(
     val workouts = microcycles[selectedTabIndex].workouts
     //    Log.i("WorkoutOverviewCard", Json.encodeToString(workouts))
     Card() {
-      Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding)) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(padding)
+      ) {
         Row(modifier = Modifier.fillMaxWidth()) {
           Text(text = "Workout Overview", style = titleMedium)
         }
@@ -659,9 +684,11 @@ fun WorkoutDayCard(
   val exercisesSets = workout.exercisesSets
 
   ElevatedCard() {
-    Column(modifier = Modifier
-      .width(300.dp)
-      .padding(padding)) {
+    Column(
+      modifier = Modifier
+        .width(300.dp)
+        .padding(padding)
+    ) {
       Row(
         modifier = Modifier
           .fillMaxWidth()
@@ -693,9 +720,11 @@ fun ExerciseOverview(
   val exerciseName = programsViewModel.getExerciseNameByID(exerciseID = exercise)
 
   exerciseName?.let {
-    Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(bottom = 4.dp)) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 4.dp)
+    ) {
       if (exercise != null) {
         Text(text = "${index.plus(1)}. $exerciseName", style = labelMedium)
       }
@@ -796,9 +825,11 @@ fun MicrocycleCard(
 
 
       Card() {
-        Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)) {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)
+        ) {
           Row(
             modifier = Modifier
               .fillMaxWidth()
@@ -1011,9 +1042,11 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
         )
 
       Card() {
-        Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding)) {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding)
+        ) {
           Row(
             modifier = Modifier
               .fillMaxWidth()

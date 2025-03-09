@@ -146,7 +146,8 @@ constructor(
 
 
         _selectedProgramMicrocycles.value.forEach { microcycle ->
-          microcycle.workouts = workoutRepository.getWorkoutsByMicrocycleID(microcycle.id)
+          microcycle.workouts =
+            workoutRepository.getWorkoutsByMicrocycleID(microcycle, microcycle.id)
         }
       }
     }
@@ -168,7 +169,7 @@ constructor(
     //        val workouts = emptyList<Workout>()
     viewModelScope.launch {
       _selectedProgramWorkouts.value[microcycle] =
-        workoutRepository.getWorkoutsByMicrocycleID(microcycle.id)
+        workoutRepository.getWorkoutsByMicrocycleID(microcycle, microcycle.id)
     }
   }
 

@@ -16,6 +16,7 @@ import com.couchbase.lite.queryChangeFlow
 import com.example.myapplication.data.database.DatabaseManager
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutDao
@@ -104,7 +105,10 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     return 0
   }
 
-  override fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout> {
+  override fun getWorkoutsByMicrocycleID(
+    microcycle: Microcycle,
+    microcycleID: ObjectId
+  ): List<Workout> {
     val workouts = mutableListOf<Workout>()
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -124,6 +128,21 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
         val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
         workouts.add(workout)
       }
+
+//      val countWorkoutsQuery =
+//        QueryBuilder.select(SelectResult.expression(Function.count(Expression.all())))
+//          .from(DataSource.collection(collection)).where(
+//            Expression.property("microcycleID").equalTo(Expression.string(microcycleID.toString()))
+//          )
+//      countWorkoutsQuery.execute().use { resultSets ->
+//        resultSets.forEach {
+//          Log.i(
+//            "WorkoutRepositoryImpl.getWorkoutsByMicrocycleID()",
+//            "Microcycle ID: ${microcycle.name}, Workout Count: ${it.getInt("count")}"
+//          )
+//        }
+//      }
+
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }

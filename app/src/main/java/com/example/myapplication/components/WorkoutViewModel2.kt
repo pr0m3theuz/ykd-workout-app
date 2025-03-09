@@ -123,16 +123,15 @@ class WorkoutViewModel(
         workoutDuration = elapsedTime
 
         _workoutDurationString.value =
-          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents {
-            hours,
-            minutes,
-            seconds,
-            _ ->
+          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                               minutes,
+                                                                               seconds,
+                                                                               _ ->
             if (hours > 0) {
               "$hours:" +
-                minutes.toString().padStart(2, '0') +
-                ":" +
-                seconds.toString().padStart(2, '0')
+                      minutes.toString().padStart(2, '0') +
+                      ":" +
+                      seconds.toString().padStart(2, '0')
             } else {
               "$minutes:${seconds.toString().padStart(2, '0')}"
             }
@@ -155,7 +154,7 @@ class WorkoutViewModel(
   //  Rest Timer
   private val notificationManager =
     ContextCompat.getSystemService(application, NotificationManager::class.java)
-      as NotificationManager
+            as NotificationManager
 
   private val name = getString(application, R.string.notification_channel_id)
   private val descriptionText = getString(application, R.string.notification_channel_id)
@@ -182,6 +181,25 @@ class WorkoutViewModel(
         notifyIntent,
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
       )
+
+    viewModelScope.launch {
+      _workout.collect { workout ->
+        _workoutNotes.collect { workoutNotes ->
+          _exerciseSetsFlow.collect { exercisesSets ->
+            runCatching {
+              manageWorkoutUseCase.saveInProgressWorkout(
+                workout = workout,
+                workoutNotes = workoutNotes,
+                exercisesSets = exercisesSets.toList(),
+              )
+            }.onFailure {
+              // Handle error, e.g., log error, show error message
+              Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
+            }
+          }
+        }
+      }
+    }
   }
 
   @AddTrace(name = "savedStateHandle WORKOUT_DETAILS", enabled = true)
@@ -274,55 +292,53 @@ class WorkoutViewModel(
       timer =
         object : CountDownTimer(timerDuration, 1000L) {
 
-            override fun onTick(millisUntilFinished: Long) {
-              _state = TimerState.RUNNING
-              _timerState.value = TimerState.RUNNING
-              _remainingTimerTime = millisUntilFinished
-              _remainingTimerTimeString.value =
-                _remainingTimerTime.toDuration(DurationUnit.MILLISECONDS).toComponents {
-                  minutes,
-                  seconds,
-                  _ ->
-                  "$minutes:${seconds.toString().padStart(2, '0')}"
-                }
+          override fun onTick(millisUntilFinished: Long) {
+            _state = TimerState.RUNNING
+            _timerState.value = TimerState.RUNNING
+            _remainingTimerTime = millisUntilFinished
+            _remainingTimerTimeString.value =
+              _remainingTimerTime.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                       seconds,
+                                                                                       _ ->
+                "$minutes:${seconds.toString().padStart(2, '0')}"
+              }
 
-              _timerDurationString.value =
-                _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents {
-                  minutes,
-                  seconds,
-                  _ ->
-                  "$minutes:${seconds.toString().padStart(2, '0')}"
-                }
+            _timerDurationString.value =
+              _timerDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { minutes,
+                                                                                  seconds,
+                                                                                  _ ->
+                "$minutes:${seconds.toString().padStart(2, '0')}"
+              }
 
-              _remainingTimeProgress.value =
-                _remainingTimerTime.toFloat().div(_timerDuration.toFloat())
+            _remainingTimeProgress.value =
+              _remainingTimerTime.toFloat().div(_timerDuration.toFloat())
 
-              notificationManager.sendNotification(
-                messageBody = "Remaining Time: ${_remainingTimerTimeString.value}",
-                application,
-                silent = true,
-              )
+            notificationManager.sendNotification(
+              messageBody = "Remaining Time: ${_remainingTimerTimeString.value}",
+              application,
+              silent = true,
+            )
 
-              /*              Log.i("Timer: ", timerVersion)
-              Log.i("TimerState: ", _timerState.value.name)
+            /*              Log.i("Timer: ", timerVersion)
+            Log.i("TimerState: ", _timerState.value.name)
 
-              Log.i("onTick(): _remainingTime", "$millisUntilFinished")
-              Log.i("onTick(): timerDuration", "$_timerDuration")
-              Log.i(
-                "onTick(): _remainingTimeProgress",
-                "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
-              )*/
-            }
-
-            override fun onFinish() {
-              _state = TimerState.EXPIRED
-              _timerState.value = TimerState.EXPIRED
-              _timerFinished = true
-
-              /*Log.i("Timer: ", timerVersion)
-              Log.i("TimerState: ", _timerState.value.name)*/
-            }
+            Log.i("onTick(): _remainingTime", "$millisUntilFinished")
+            Log.i("onTick(): timerDuration", "$_timerDuration")
+            Log.i(
+              "onTick(): _remainingTimeProgress",
+              "${_remainingTime.toFloat().div(_timerDuration.toFloat())}",
+            )*/
           }
+
+          override fun onFinish() {
+            _state = TimerState.EXPIRED
+            _timerState.value = TimerState.EXPIRED
+            _timerFinished = true
+
+            /*Log.i("Timer: ", timerVersion)
+            Log.i("TimerState: ", _timerState.value.name)*/
+          }
+        }
           .start()
     }
   }
@@ -449,10 +465,10 @@ class WorkoutViewModel(
     savedStateHandle.saveable(
       key = WORKOUT_DETAILS,
       saver =
-        Saver(
-          save = { Json.encodeToString(Workout.serializer(), it) },
-          restore = { Json.decodeFromString(Workout.serializer(), it) },
-        ),
+      Saver(
+        save = { Json.encodeToString(Workout.serializer(), it) },
+        restore = { Json.decodeFromString(Workout.serializer(), it) },
+      ),
     ) {
       initWorkout()
     }
@@ -643,17 +659,17 @@ class WorkoutViewModel(
     savedStateHandle.saveable(
       key = EXERCISE_EXERCISE_SETS,
       saver =
-        Saver(
-          save = {
-            Json.encodeToString(
-              ListExerciseExerciseSets.serializer(),
-              ListExerciseExerciseSets().apply { list = it.toMutableList() },
-            )
-          },
-          restore = {
-            Json.decodeFromString(ListExerciseExerciseSets.serializer(), it).list.toMutableList()
-          },
-        ),
+      Saver(
+        save = {
+          Json.encodeToString(
+            ListExerciseExerciseSets.serializer(),
+            ListExerciseExerciseSets().apply { list = it.toMutableList() },
+          )
+        },
+        restore = {
+          Json.decodeFromString(ListExerciseExerciseSets.serializer(), it).list.toMutableList()
+        },
+      ),
     ) {
       mutableListOf()
     }
@@ -827,8 +843,10 @@ class WorkoutViewModel(
     return when (exerciseSets.exercise?.weightUnit) {
       MassUnit.KILOGRAMS.abbreviation ->
         exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
+
       MassUnit.POUNDS.abbreviation ->
         exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightPounds
+
       else -> {
         if (userDefaultWeightUnit == MassUnit.KILOGRAMS.abbreviation) {
           exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
@@ -1021,6 +1039,7 @@ private fun initWorkout(): Workout {
         workoutStarted = Clock.System.now(),
       )
     }
+
     in 12..17 -> {
       Workout(
         name = "Afternoon Workout",
@@ -1028,6 +1047,7 @@ private fun initWorkout(): Workout {
         workoutStarted = Clock.System.now(),
       )
     }
+
     else -> {
       Workout(
         name = "Evening Workout",

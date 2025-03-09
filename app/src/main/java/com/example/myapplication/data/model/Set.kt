@@ -83,7 +83,7 @@ data class Set(
   var targetPercentage1RM: Double? = null, // TODO for progression scheme & utils
   var setCompleted: Boolean = false,
   @Serializable(ObjectIdSerializer::class) var workoutID: ObjectId,
-  @Serializable(ObjectIdSerializer::class) var exerciseID: ObjectId,
+  @Serializable(ObjectIdSerializer::class) var exerciseID: ObjectId? = null,
   @Serializable(ObjectIdSerializer::class) var exerciseSetsID: ObjectId,
   //    var exerciseOrder: Int = 1
   @Serializable(SetTypeSerializer::class) var setTypeID: SetType = SetType.normalSet,

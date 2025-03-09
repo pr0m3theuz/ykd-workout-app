@@ -4,6 +4,7 @@ package com.example.myapplication.data.network
 
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutNote
@@ -49,7 +50,7 @@ interface WorkoutRepository {
 
   suspend fun updateWorkoutNote(workoutNote: WorkoutNote)
 
-  fun getWorkoutsByMicrocycleID(microcycleID: ObjectId): List<Workout>
+  fun getWorkoutsByMicrocycleID(microcycle: Microcycle, microcycleID: ObjectId): List<Workout>
 
   fun getWorkoutsByMesocycleID(mesocycleID: ObjectId): List<Workout>
 

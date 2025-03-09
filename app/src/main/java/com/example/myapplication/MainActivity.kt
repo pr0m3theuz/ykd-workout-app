@@ -329,8 +329,26 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
   navigation("profileScreen", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
       Log.i("ProfileNavGraph", "Navigated to User Profile Screen")
-      ProfileScreen(navController = navController)
+      ProfileScreen(navController = navController,
+        navigateToReplicatorScreen = { navController.navigate("replicatorScreen") })
     }
+
+    composable("replicatorScreen") {
+//      Log.i("ReplicatorNavGraph", "Navigated to Replicator Screen")
+      ReplicatorView(
+        navController,
+        viewModel = koinViewModel<ReplicatorViewModel>(),
+        replicatorConfigNav = { navController.navigate("configScreen") },
+      )
+    }
+
+    composable("configScreen") {
+      ReplicatorConfigView(
+        viewModel = koinViewModel<ReplicatorViewModel>(),
+        navigateUp = { navController.popBackStack() },
+      )
+    }
+
   }
 }
 

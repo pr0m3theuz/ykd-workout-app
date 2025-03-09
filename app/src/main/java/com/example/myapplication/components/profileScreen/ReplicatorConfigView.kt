@@ -63,7 +63,7 @@ fun ReplicatorConfigView(
       ReplicatorConfigOptions(
         serverUrl = viewModel.serverUrlState.value,
         onServerUrlChanged = viewModel.onServerUrlChanged,
-        heartBeat = viewModel.heartBeatState.value.toString(),
+        heartBeat = viewModel.heartBeatState.longValue.toString(),
         onHeartBeatChanged = viewModel.onHeartBeatChanged,
         isContinuous = viewModel.continuousState.value,
         onContinuousChanged = viewModel.onContinuousChanged,

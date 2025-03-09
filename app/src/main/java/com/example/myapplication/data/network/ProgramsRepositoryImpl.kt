@@ -65,8 +65,8 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
           .map { queryChange -> mapQueryChangeToProgram(queryChange) }
           .flowOn(Dispatchers.IO)
 
-      query.execute() // <4>
-      return flow // <5>
+      query.execute()
+      return flow
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }

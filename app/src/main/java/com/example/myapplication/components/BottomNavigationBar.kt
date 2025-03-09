@@ -1,6 +1,18 @@
 package com.example.myapplication.components
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.ExperimentalAnimationSpecApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -18,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -27,6 +40,7 @@ import com.example.myapplication.R
 import com.example.myapplication.myiconpack.ExerciseFilled
 import com.example.myapplication.myiconpack.MyIconPack
 
+@OptIn(ExperimentalAnimationSpecApi::class)
 @Composable
 fun BottomNavigationBar(navController: NavController) {
   //    var selectedItem by remember { mutableIntStateOf(0) }
@@ -50,28 +64,55 @@ fun BottomNavigationBar(navController: NavController) {
   NavigationBar {
     items.forEach { item ->
 //      Log.i("BottomNavigationBar", "item.route: ${item.route}")
+      val isSelected =
+        currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) ?: false } ==
+                true
+
+      val animatedColor by animateColorAsState(
+        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+        label = "colorAnimation",
+        animationSpec = tween(500, easing = LinearEasing)
+      )
+
       NavigationBarItem(
         icon = {
-          Icon(
-            item.icon,
-            contentDescription = stringResource(item.resourceId),
-            modifier = Modifier.size(24.dp)
-          )
+          when {
+            item.baseRoute == "Profile" -> ProfileIcon(isSelected)
+            else ->
+              Icon(
+                item.icon,
+                contentDescription = stringResource(item.resourceId),
+                modifier = Modifier
+                  .size(24.dp),
+                tint = animatedColor
+              )
+          }
         },
         label = {
-          Text(
-            stringResource(item.resourceId),
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            style = MaterialTheme.typography.labelSmall
-          )
+          AnimatedVisibility(
+            visible = isSelected,
+            enter = slideInVertically(
+              animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessLow,
+                visibilityThreshold = IntOffset.VisibilityThreshold
+              ),
+              initialOffsetY = { 100 }
+            ) + fadeIn(),
+            exit = slideOutVertically() + fadeOut()
+          ) {
+            Text(
+              stringResource(item.resourceId),
+              color = animatedColor,
+              style = MaterialTheme.typography.labelSmall
+            )
+          }
         },
-        selected =
-        currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) ?: false } ==
-                true,
+        selected = false, // isSelected,
         onClick = {
           if (
-              currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) == true } !=
-              true
+            currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) == true } !=
+            true
           ) {
             navController.navigate(item.route) {
               // Pop up to the start destination of the graph to
