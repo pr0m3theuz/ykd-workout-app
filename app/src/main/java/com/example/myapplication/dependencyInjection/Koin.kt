@@ -21,6 +21,8 @@ import com.example.myapplication.data.network.ExerciseNotesRepository
 import com.example.myapplication.data.network.ExerciseNotesRepositoryImpl
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.data.network.ExercisesRepositoryImpl
+import com.example.myapplication.data.network.InProgressWorkoutRepository
+import com.example.myapplication.data.network.InProgressWorkoutRepositoryImpl
 import com.example.myapplication.data.network.ProgramsRepository
 import com.example.myapplication.data.network.ProgramsRepositoryImpl
 import com.example.myapplication.data.network.UserRepository
@@ -94,6 +96,7 @@ val commonModule = module {
   singleOf(::WorkoutNotesRepositoryImpl) bind WorkoutNotesRepository::class
   singleOf(::UserRepositoryImpl) bind UserRepository::class
   singleOf(::ReplicatorServiceDb) bind ReplicatorService::class
+  singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
 //  singleOf(::ImportWorkoutProgramRepository)
 
   singleOf(::ManageWorkoutUseCase)

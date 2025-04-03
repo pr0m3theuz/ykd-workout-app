@@ -2,10 +2,14 @@ package com.example.myapplication.components.addExercisesList
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
@@ -22,7 +26,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarDefaults.colors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -54,6 +58,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 // TODO Create Advanced Search Options & Exercise Creation & Editing Screens
+// TODO if at least 2 exercises are selected, show a second FAB to create a superset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,7 +97,11 @@ fun AddExercisesScreen(
     }
   }
 
+//  TODO EDGE TO EDGE isn't working
   Scaffold(
+    modifier = Modifier
+      .imePadding()
+      .windowInsetsPadding(WindowInsets.systemBars),
     topBar = {
       TopAppBar(
         title = {
@@ -141,6 +150,7 @@ fun AddExercisesScreen(
     bottomBar = {},
     floatingActionButton = {
       FloatingActionButton(
+        modifier = Modifier.imePadding(),
         onClick = {
           workoutViewModel.addMultipleEmptyExerciseSets(
             exercisesSelectedToBeAddedToWorkout.toList()
@@ -160,16 +170,14 @@ fun AddExercisesScreen(
     },
     content = { contentPadding ->
       Column(Modifier.padding(contentPadding)) {
+        TextFieldDefaults.colors(
+          unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+          unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+        )
         val searchBarColors =
-          SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            inputFieldColors =
-              TextFieldDefaults.colors(
-                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
-              ),
-          )
+          colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
 
+// TODO DEPRECATION
         SearchBar(
           query = query,
           onQueryChange = {

@@ -176,6 +176,10 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     // Similar to getWorkoutByMesocycleID, but using programID
   }
 
+  // TODO Save Completed Workouts and Completed Sets to CompletedWorkout & CompletedSet Collections
+  // TODO CompletedWorkout & CompletedSet Collections to Sync Gateway & Database
+  // TODO Create update functions for Completed Workouts & Workout Templates
+  // TODO Do the same for Programs
   override suspend fun insertWorkout(workout: Workout): Boolean {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }

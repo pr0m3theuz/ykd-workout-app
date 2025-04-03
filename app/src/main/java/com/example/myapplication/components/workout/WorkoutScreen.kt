@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
@@ -37,6 +38,7 @@ import com.example.myapplication.components.DiscardWorkoutDialog
 import com.example.myapplication.components.WorkoutNameDialog
 import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
+import com.example.myapplication.components.exercise.ExercisesSetsScreen
 import com.example.myapplication.components.setRestTimer.RestTimerButton
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
@@ -138,7 +140,7 @@ fun WorkoutContent(
     )
   }
 
-  val exercisesSets by workoutViewModel.exercisesSets.collectAsState(emptyList())
+  val exercisesSets by workoutViewModel.workoutComponents.collectAsState(emptyList())
   val workoutDurationString by workoutViewModel.workoutDurationString.collectAsState()
   val isWorkoutCountUpTimerPaused by workoutViewModel.isWorkoutCountUpTimerPaused.collectAsState()
 
@@ -161,6 +163,7 @@ fun WorkoutContent(
   //  }
 
   Scaffold(
+    modifier = Modifier.imePadding(),
     topBar = {
       TopAppBar(
         title = {

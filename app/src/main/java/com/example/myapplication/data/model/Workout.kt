@@ -13,8 +13,7 @@ package com.example.myapplication.data.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.util.Log
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.datetime.Clock
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
@@ -73,7 +72,7 @@ data class WorkoutDao(var Workout: Workout)
 data class Workout(
   @SerialName("id")
   @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
-  var lazyListItemID: Long = newID(),
+  var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String, // TODO make name default = User
   var workoutAuthor: String? = null,
@@ -84,7 +83,7 @@ data class Workout(
   var workoutStarted: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var workoutEnded: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var day: Int? = null,
-  var exercisesSets: List<ExerciseSets> = emptyList(),
+  var exercisesSets: List<WorkoutItem> = emptyList(),
   var totalVolumeInPounds: Double? = 0.0,
   var totalVolumeInKilograms: Double? = 0.0,
   var order: Int? = null, // For sorting workouts in a program
@@ -108,15 +107,14 @@ class WorkoutParcel(var workout: String) : Parcelable {
   }
 }
 
-@Serializable data class Workouts(val workouts: List<Workout>)
+@Serializable
+data class Workouts(val workouts: List<Workout>)
 
 fun Workout.formatWorkoutDuration(): String {
-
-  return workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents {
-    hours,
-    minutes,
-    seconds,
-    _ ->
+  return workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                              minutes,
+                                                                              seconds,
+                                                                              _ ->
     when (hours) {
       0L -> "$minutes" + "m"
       else -> "$hours" + "h" + " " + minutes.toString().padStart(2, '0') + "m"
@@ -130,10 +128,10 @@ fun Workout.formatWorkoutDate(): String {
   val offset = ZoneId.systemDefault().rules.getOffset(Instant.now())
   return if (workoutStarted != null) {
     LocalDateTime.ofEpochSecond(
-        workoutStarted!!.epochSeconds,
-        workoutStarted!!.nanosecondsOfSecond,
-        offset,
-      )
+      workoutStarted!!.epochSeconds,
+      workoutStarted!!.nanosecondsOfSecond,
+      offset,
+    )
       .format(dateTimeFormatter)
   } else {
     ""
@@ -146,10 +144,10 @@ fun Workout.formatLongWorkoutStarted(): String {
   //  TODO Confirm if UTC or local
   return if (workoutStarted != null) {
     LocalDateTime.ofEpochSecond(
-        workoutStarted!!.epochSeconds,
-        workoutStarted!!.nanosecondsOfSecond,
-        offset,
-      )
+      workoutStarted!!.epochSeconds,
+      workoutStarted!!.nanosecondsOfSecond,
+      offset,
+    )
       .format(dayTimeFormatter)
   } else {
     ""
@@ -158,18 +156,48 @@ fun Workout.formatLongWorkoutStarted(): String {
 
 fun Workout.totalSets(): Int {
   var totalSets: Int = 0
-  exercisesSets.forEach { exerciseSets -> totalSets += exerciseSets.sets.size }
+  exercisesSets.forEach { workoutItem ->
+    when (workoutItem) {
+      is ExerciseSets -> {
+        totalSets += workoutItem.sets.size
+      }
+
+      is Superset -> {
+        workoutItem.exercisesSets.forEach { exerciseSets ->
+          totalSets += exerciseSets.sets.size
+        }
+      }
+    }
+  }
+
+
   return totalSets
 }
 
 fun Workout.calculateTotalVolume(userDefaultWeightUnit: String): Double? {
-  exercisesSets.forEach { exerciseSets ->
-    totalVolumeInPounds =
-      this.totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
-        ?: 0.0.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
-    totalVolumeInKilograms =
-      totalVolumeInKilograms?.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
-        ?: 0.0.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
+  exercisesSets.forEach { workoutItem ->
+    when (workoutItem) {
+      is ExerciseSets -> {
+        totalVolumeInPounds =
+          this.totalVolumeInPounds?.plus(workoutItem.totalVolumeInPounds ?: 0.0)
+            ?: 0.0.plus(workoutItem.totalVolumeInPounds ?: 0.0)
+        totalVolumeInKilograms =
+          totalVolumeInKilograms?.plus(workoutItem.totalVolumeInKilograms ?: 0.0)
+            ?: 0.0.plus(workoutItem.totalVolumeInKilograms ?: 0.0)
+      }
+
+      is Superset -> {
+        workoutItem.exercisesSets.forEach { exerciseSets ->
+          totalVolumeInPounds =
+            this.totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
+              ?: 0.0.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
+          totalVolumeInKilograms =
+            totalVolumeInKilograms?.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
+              ?: 0.0.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
+        }
+      }
+    }
+
   }
   return when (userDefaultWeightUnit) {
     MassUnit.POUNDS.abbreviation -> totalVolumeInPounds
@@ -180,6 +208,7 @@ fun Workout.calculateTotalVolume(userDefaultWeightUnit: String): Double? {
   }
 }
 
+/* Note: Decide on whether to keep or delete
 fun Workout.calculateTotalVolumeInPounds(): Double? {
   exercisesSets.forEach { exerciseSets ->
     totalVolumeInPounds =
@@ -198,4 +227,4 @@ fun Workout.calculateTotalVolumeInKilograms(): Double? {
   }
   Log.i("Workout.totalVolumeInKilograms", "$totalVolumeInKilograms")
   return totalVolumeInKilograms
-}
+}*/

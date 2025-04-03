@@ -24,6 +24,8 @@ import com.example.myapplication.data.model.MuscleGroup
 import com.example.myapplication.data.model.MuscleGroupDao
 import com.example.myapplication.data.model.MuscleRoleFunction
 import com.example.myapplication.data.model.MuscleRoleFunctionDao
+import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.SetDao
 import com.example.myapplication.data.model.Utility
 import com.example.myapplication.data.model.UtilityDao
 import kotlinx.coroutines.Dispatchers
@@ -611,6 +613,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
     }
   }
 
+  // TODO Test
   override fun filterExercises(
     exercise: String,
     muscleGroupIDs: List<String>,
@@ -693,5 +696,49 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
     }
 
     return null
+  }
+
+  private fun mapQueryChangeToSet(queryChange: QueryChange): List<Set> {
+    val sets = mutableListOf<Set>()
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val set = withUnknownKeys.decodeFromString<SetDao>(json).Set
+        sets.add(set)
+      }
+    }
+    return sets
+  }
+
+  override fun getCompletedSetsByExercise(exercise: Exercise): Flow<List<Set>> {
+    try {
+//      TODO("Not yet implemented")
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("CompletedSets")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val query =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection)) // Replace with your database instance
+          .where(
+            Expression.property("exerciseID").equalTo(Expression.string(exercise.id.toString()))
+          )
+      // .orderBy(Ordering.property("dateCreated").ascending()) TODO Sort by date. Would this work?
+
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange: QueryChange -> mapQueryChangeToSet(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute()
+
+      return flow
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return flow {}
   }
 }

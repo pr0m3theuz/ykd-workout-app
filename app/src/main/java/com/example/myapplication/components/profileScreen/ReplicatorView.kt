@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -47,6 +48,7 @@ fun ReplicatorView(
 //  Log.i("ReplicatorView.viewModel.replicatorService",viewModel.)
   // A surface container using the 'background' color from the theme
   Scaffold(
+    modifier = Modifier.imePadding(),
     topBar = {
       TopAppBar(
         title = {

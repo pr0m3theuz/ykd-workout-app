@@ -1,5 +1,6 @@
 package com.example.myapplication.components.addExercisesList
 
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -8,6 +9,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @ExperimentalMaterial3AdaptiveApi
@@ -21,6 +23,7 @@ fun AddExerciseNavigableListDetailScreen(
 
   Surface(color = MaterialTheme.colorScheme.background) {
     NavigableListDetailPaneScaffold(
+      modifier = Modifier.imePadding(),
       navigator = scaffoldNavigator,
       listPane = {
         AnimatedPane() {

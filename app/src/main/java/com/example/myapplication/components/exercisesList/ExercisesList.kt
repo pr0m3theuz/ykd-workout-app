@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +31,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarDefaults.colors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -96,6 +97,7 @@ fun ExercisesLazyColumn(
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
   Scaffold(
+    modifier = Modifier.imePadding(),
     topBar = {
       TopAppBar(
         title = {
@@ -148,15 +150,12 @@ fun ExercisesLazyColumn(
     bottomBar = { BottomNavigationBar(navController = navController) },
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
+      TextFieldDefaults.colors(
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+      )
       val searchBarColors =
-        SearchBarDefaults.colors(
-          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-          inputFieldColors =
-          TextFieldDefaults.colors(
-            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
-          ),
-        )
+        colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
       /*
       AnimatedVisibility(
         visible = searchBarVisibility,
@@ -172,7 +171,7 @@ fun ExercisesLazyColumn(
         },
         onSearch = { active = false },
         active = active,
-        colors = searchBarColors,
+//        colors = searchBarColors,
         onActiveChange = { active = false },
         placeholder = {
           Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)

@@ -143,10 +143,10 @@ fun ProgramPreviewScreen(
               // programsViewModel = programsViewModel,
             )
 
-          1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
+          1 -> MesocyclesTab(activeProgram = program.isActive, mesocycles = mesocycles)
           2 ->
             WorkoutsTab(
-              activeProgram = program.active,
+              activeProgram = program.isActive,
               navController = navController,
               microcycles = microcycles,
             )

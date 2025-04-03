@@ -14,7 +14,7 @@ package com.example.myapplication.data.model
 
 import com.example.myapplication.utils.ProgressionType
 import com.example.myapplication.utils.doubleFormatted
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -57,9 +57,12 @@ object SetTypeSerializer : KSerializer<SetType> {
 }
 
 @Serializable
+data class SetDao(var Set: Set)
+
+@Serializable
 data class Set(
   @SerialName("id") @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
-  var lazyListItemID: Long = newID(),
+  var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var setNumber: Int? = 0,
   var weightPounds: Double? = null,
@@ -94,6 +97,9 @@ data class Set(
   //    var programUUID: Uuid? = null
   //    var mesocycleUUID: Uuid? = null
   //    var microcycleUUID: Uuid? = null
+  // TODO Copies Strong App - Allows different rest intervals between sets
+//  var setRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+//  var setRestTimerEnabled: Boolean = false,
   var ownerID: String,
   var isPublic: Boolean = false
 )

@@ -8,7 +8,7 @@ import kotlin.random.nextUInt
 
 val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
 
-fun newID(): Long {
+fun newLazyListItemID(): Long {
     return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 999))
 }
 

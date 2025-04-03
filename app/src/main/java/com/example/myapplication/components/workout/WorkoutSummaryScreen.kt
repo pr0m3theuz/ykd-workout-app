@@ -39,12 +39,15 @@ import com.example.myapplication.R
 import com.example.myapplication.components.BottomNavigationBar
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.Exercise
+import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Superset
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.data.model.formatWorkoutDuration
 import com.example.myapplication.data.model.setSummaryRIR
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.model.totalSets
+import com.example.myapplication.ui.theme.IBMColorBlindPalette
 import com.example.myapplication.utils.doubleFormatted
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -277,35 +280,74 @@ fun WorkoutSummaryCard(
         Text(text = "Exercise", style = style, modifier = Modifier.weight(1f))
         Text(text = "Top Set", style = style, modifier = Modifier.weight(0.5f))
       }
-      completedWorkout.exercisesSets.forEach { exerciseSets ->
+      completedWorkout.exercisesSets.forEach { workoutItem ->
         // TODO Seperate from WorkoutViewModel
-        val exercise = getExercise(exerciseSets.exerciseID)
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp, horizontal = 4.dp),
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
-          val style = MaterialTheme.typography.bodyMedium
-          // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
-          val maxWeight = exerciseSets.sets.maxBy { it.weightPounds ?: 0.0 }
-          val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
-          val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
+        when (workoutItem) {
+          is ExerciseSets -> {
+            val exercise = getExercise(workoutItem.exerciseID)
+            Row(
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 2.dp, horizontal = 4.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+              val style = MaterialTheme.typography.bodyMedium
+              // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
+              val maxWeight = workoutItem.sets.maxBy { it.weightPounds ?: 0.0 }
+              val maxRIR = workoutItem.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
+              val maxVolume = workoutItem.sets.maxBy { it.setVolume(weightUnit) }
 
-          Text(
-            text = "${exerciseSets.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
-            style = style,
-            modifier = Modifier.weight(1f),
-          )
+              Text(
+                text = "${workoutItem.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
+                style = style,
+                modifier = Modifier.weight(1f),
+              )
 
-          Text(
-            // RIR
-            text = maxWeight.setSummaryRIR(weightUnit),
-            style = style,
-            modifier = Modifier.weight(0.5f),
-          )
+              Text(
+                // RIR
+                text = maxWeight.setSummaryRIR(weightUnit),
+                style = style,
+                modifier = Modifier.weight(0.5f),
+              )
+            }
+          }
+
+          is Superset -> {
+            val backgroundColor = IBMColorBlindPalette.random()
+
+            workoutItem.exercisesSets.forEach { exerciseSets ->
+              val exercise = getExercise(exerciseSets.exerciseID)
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(vertical = 2.dp, horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+                val style = MaterialTheme.typography.bodyMedium
+                // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
+                val maxWeight = exerciseSets.sets.maxBy { it.weightPounds ?: 0.0 }
+                val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
+                val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
+
+                Text(
+                  text = "${exerciseSets.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
+                  style = style,
+                  modifier = Modifier.weight(1f),
+                )
+
+                Text(
+                  // RIR
+                  text = maxWeight.setSummaryRIR(weightUnit),
+                  style = style,
+                  modifier = Modifier.weight(0.5f),
+                )
+              }
+            }
+          }
         }
+
       }
     }
   }

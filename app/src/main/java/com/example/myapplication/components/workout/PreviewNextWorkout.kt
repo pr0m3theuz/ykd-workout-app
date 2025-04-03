@@ -44,8 +44,10 @@ import androidx.navigation.NavController
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercise.AddSet
 import com.example.myapplication.components.exercise.ExerciseScreen
+import com.example.myapplication.components.exercise.ExerciseSetLazyColumn
 import com.example.myapplication.components.exercise.SetContent
 import com.example.myapplication.components.exercise.SetLazyListItem
+import com.example.myapplication.components.exercise.SwipeToDismissWorkoutNote
 import com.example.myapplication.components.history.ConfirmChangesToWorkout
 import com.example.myapplication.components.history.NoWorkoutFound
 import com.example.myapplication.components.history.WorkoutOverview
@@ -142,14 +144,14 @@ fun EditNextWorkoutScreen(
 ) {
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
-  if (!workoutID.isNullOrBlank()) {
+  if (workoutID.isNotBlank()) {
     workoutViewModel.loadWorkoutFromPreviousWorkout(ObjectId(workoutID))
   } else {
     NoWorkoutFound()
   }
 
   val workout by workoutViewModel.workout.collectAsState(null)
-  val exerciseExerciseSets by workoutViewModel.exercisesSets.collectAsState()
+  val workoutComponents by workoutViewModel.workoutComponents.collectAsState()
   val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
@@ -224,9 +226,9 @@ fun EditNextWorkoutScreen(
           }
         }*/
 
-        if (exerciseExerciseSets.isNotEmpty()) {
+        if (workoutComponents.isNotEmpty()) {
           ExerciseSetLazyColumn(
-            exercises = exerciseExerciseSets,
+            workoutComponents = workoutComponents,
             workoutNotes = workoutNotes,
             enableCancelWorkout = true,
             WorkoutNoteItem = { workoutNote ->
@@ -262,6 +264,8 @@ fun EditNextWorkoutScreen(
                     it
                   )
                 },
+                workoutComponents = workoutComponents,
+                onCreateSuperset = { /* TODO */ }
               )
             },
             SetItem = { exerciseSets, set, index ->
@@ -332,10 +336,11 @@ fun EditNextWorkoutScreen(
                 },
               )
             },
-            AddSet = { exerciseSets ->
+            AddSet = { supersetUuid, targetExSetsUuid ->
               AddSet(addSet = {
                 workoutViewModel.addSet(
-                  exerciseSets
+                  supersetUuid = supersetUuid,
+                  targetExSetsUuid = targetExSetsUuid
                 )
               })
             },

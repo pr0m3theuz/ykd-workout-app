@@ -2,6 +2,7 @@
 
 package com.example.myapplication.components
 
+import android.util.Log
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
@@ -9,7 +10,11 @@ import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.SetType
+import com.example.myapplication.data.model.Superset
+import com.example.myapplication.data.model.SupersetExercisesSets
 import com.example.myapplication.data.model.Workout
+import com.example.myapplication.data.model.WorkoutComponent
+import com.example.myapplication.data.model.WorkoutItem
 import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.calculateTotalVolume
 import com.example.myapplication.data.model.completeSet
@@ -26,10 +31,12 @@ import com.example.myapplication.data.network.InProgressWorkoutRepository
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.data.network.WorkoutNotesRepository
 import com.example.myapplication.data.network.WorkoutRepository
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.datetime.Clock
 import org.bson.types.ObjectId
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -65,26 +72,23 @@ class ManageWorkoutUseCase(
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout): Workout {
-    val newWorkout =
-      Workout(
-        id = workoutTemplate.id,
-        uuid = workoutTemplate.uuid,
-        name = workoutTemplate.name,
-        workoutAuthor = workoutTemplate.workoutAuthor,
-        //        notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
-        workoutType = workoutTemplate.workoutType,
-        dateCreated = workoutTemplate.dateCreated,
-        workoutStarted = Clock.System.now(),
-        day = workoutTemplate.day,
-        //        exercisesSets =,
-        // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets),
-        microcycleID = workoutTemplate.microcycleID,
-        programID = workoutTemplate.programID,
-        ownerID = tempOwnerId, // TODO Replace currentUser.id
-        isPublic = false,
-      )
-
-    return newWorkout
+    return Workout(
+      id = workoutTemplate.id,
+      uuid = workoutTemplate.uuid,
+      name = workoutTemplate.name,
+      workoutAuthor = workoutTemplate.workoutAuthor,
+      //        notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
+      workoutType = workoutTemplate.workoutType,
+      dateCreated = workoutTemplate.dateCreated,
+      workoutStarted = Clock.System.now(),
+      day = workoutTemplate.day,
+      //        exercisesSets =,
+      // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets),
+      microcycleID = workoutTemplate.microcycleID,
+      programID = workoutTemplate.programID,
+      ownerID = tempOwnerId, // TODO Replace currentUser.id
+      isPublic = false,
+    )
   }
 
   fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout): Workout {
@@ -108,45 +112,64 @@ class ManageWorkoutUseCase(
     return workoutNotesRepository.getPinnedWorkoutNotes(workoutUUID).toMutableList()
   }
 
-  fun copyExercisesSetsFromPreviousWorkout(
-    previousExercisesSets: List<ExerciseSets>,
-    _workoutID: ObjectId,
-  ): MutableList<ExerciseExerciseSets> {
-    val newExercisesSets = mutableListOf<ExerciseExerciseSets>()
-    previousExercisesSets.forEach { exerciseSets ->
-      // TODO get exercise by ID
-      val exerciseSetsID = ObjectId()
+  fun createNewWorkoutComponentsFromPreviousWorkout(
+    previousWorkoutItems: List<WorkoutItem>,
+    workoutID: ObjectId,
+  ): List<WorkoutComponent> {
+    return previousWorkoutItems.map { workoutItem ->
+      when (workoutItem) {
+        is ExerciseSets -> {
+          createNewExerciseExerciseSetsToPreviousWorkout(workoutItem, workoutID)
+        }
 
-      val exercise = exercisesRepository.getExercise(exerciseSets.exerciseID)
-      requireNotNull(exercise) { "Exercise not found." }
-
-      val newExerciseExerciseSets =
-        ExerciseExerciseSets(
-          id = exerciseSetsID,
-          exerciseOrder = exerciseSets.exerciseOrder,
-          exercise = exercise,
-          sets = copySetsFromPreviousWorkout(exerciseSets.sets, exerciseSetsID, _workoutID),
-          notes = exerciseSets.notes.filter { it.pinned }.toMutableList(),
-          workoutID = _workoutID,
-//          exerciseID = exerciseSets.exerciseID,
-          microcycleID = exerciseSets.microcycleID,
-          mesocycleID = exerciseSets.mesocycleID,
-          programID = exerciseSets.programID,
-          isPublic = false,
-          ownerID = exerciseSets.ownerID, // TODO Replace currentUser.id
-        )
-
-      exerciseSets.exerciseID.let {
-        newExerciseExerciseSets.notes =
-          exerciseNotesRepository.getPinnedExerciseNotes(it).toMutableList()
+        is Superset -> {
+          SupersetExercisesSets(
+            name = workoutItem.name,
+            exercisesSets = workoutItem.exercisesSets.map { exerciseSets ->
+              createNewExerciseExerciseSetsToPreviousWorkout(
+                previousExerciseSets = exerciseSets,
+                workoutID = workoutID
+              )
+            },
+            restBetweenExercises = workoutItem.restBetweenExercises,
+            enableRestBetweenExercises = workoutItem.enableRestBetweenExercises,
+            enableRestAfterSuperset = workoutItem.enableRestAfterSuperset,
+            restAfterSuperset = workoutItem.restAfterSuperset,
+            supersetNotes = workoutItem.supersetNotes.filter { it.pinned }.toMutableList(),
+            order = workoutItem.order,
+            ownerID = tempOwnerId,
+            isPublic = false
+          )
+        }
       }
-
-      newExercisesSets.add(newExerciseExerciseSets)
     }
-    return newExercisesSets.sortedBy { it.exerciseOrder }.toMutableList()
   }
 
-  fun copySetsFromPreviousWorkout(
+  private fun createNewExerciseExerciseSetsToPreviousWorkout(
+    previousExerciseSets: ExerciseSets,
+    workoutID: ObjectId
+  ): ExerciseExerciseSets {
+    val exercise = exercisesRepository.getExercise(previousExerciseSets.exerciseID)
+    requireNotNull(exercise) { "Exercise not found." }
+
+    val exerciseSetsID = ObjectId()
+
+    return ExerciseExerciseSets(
+      id = exerciseSetsID,
+      order = previousExerciseSets.order,
+      exercise = exercise,
+      sets = createNewSetsFromPreviousWorkout(previousExerciseSets.sets, exerciseSetsID, workoutID),
+      notes = previousExerciseSets.notes.filter { it.pinned }.toMutableList(),
+      workoutID = workoutID,
+      microcycleID = previousExerciseSets.microcycleID,
+      mesocycleID = previousExerciseSets.mesocycleID,
+      programID = previousExerciseSets.programID,
+      isPublic = false,
+      ownerID = tempOwnerId, // TODO Replace currentUser.id
+    )
+  }
+
+  fun createNewSetsFromPreviousWorkout(
     previousSets: List<Set>,
     currentExerciseSetsID: ObjectId,
     currentWorkoutID: ObjectId,
@@ -185,79 +208,118 @@ class ManageWorkoutUseCase(
     return newSets
   }
 
-  fun loadExercisesSetsFromWorkout(
-    previousExercisesSets: List<ExerciseSets>
-  ): MutableList<ExerciseExerciseSets> {
-    val newExercisesSets = mutableListOf<ExerciseExerciseSets>()
-    previousExercisesSets.forEach { exerciseSets ->
-      val exercise = exercisesRepository.getExercise(exerciseSets.exerciseID)
+  fun loadWorkoutItemsFromWorkout(
+    previousWorkoutItems: List<WorkoutItem>
+  ): List<WorkoutComponent> {
+    return previousWorkoutItems.map { previousWorkoutItem ->
+      when (previousWorkoutItem) {
+        is ExerciseSets -> {
+          loadExerciseSetsFromWorkout(previousWorkoutItem)
+        }
 
-      requireNotNull(exercise) { "Exercise not found." }
-
-      val newExerciseExerciseSets =
-        ExerciseExerciseSets(
-          id = exerciseSets.id,
-          exSetsUUID = exerciseSets.exSetsUUID,
-          workoutID = exerciseSets.workoutID,
-          exerciseOrder = exerciseSets.exerciseOrder,
-          //          exerciseID = exerciseSets.exerciseID,
-          exercise = exercise,
-          sets = loadSetsFromWorkout(exerciseSets.sets),
-          notes = exerciseSets.notes,
-          datePerformed = exerciseSets.datePerformed,
-          microcycleID = exerciseSets.microcycleID,
-          mesocycleID = exerciseSets.mesocycleID,
-          programID = exerciseSets.programID,
-          ownerID = exerciseSets.ownerID,
-        )
-
-      newExercisesSets.add(newExerciseExerciseSets)
-    }
-    return newExercisesSets.sortedBy { it.exerciseOrder }.toMutableList()
-  }
-
-  fun loadSetsFromWorkout(previousSets: List<Set>): MutableList<Set> {
-    val newSets = mutableListOf<Set>()
-    val latestPreviousSets = mutableListOf<Set>()
-    previousSets.forEach { set ->
-      val newSet =
-        Set(
-          id = set.id,
-          uuid = set.uuid,
-          setNumber = set.setNumber,
-          weightPounds = set.weightPounds,
-          weightKilograms = set.weightKilograms,
-          repetitions = set.repetitions,
-          ratePerceivedEffort = set.ratePerceivedEffort,
-          repetitionsInReserve = set.repetitionsInReserve,
-          targetWeightPounds = set.targetWeightPounds,
-          targetRepetitions = set.targetRepetitions,
-          targetRatePerceivedEffort = set.targetRatePerceivedEffort,
-          targetRepetitionsInReserve = set.targetRepetitionsInReserve,
-          percentage1RM = set.percentage1RM,
-          setCompleted = set.setCompleted,
-          setTypeID = set.setTypeID,
-          progressionSchemeID = set.progressionSchemeID,
-          workoutID = set.workoutID,
-          exerciseSetsID = set.exerciseSetsID,
-          exerciseID = set.exerciseID,
-          ownerID = tempOwnerId, // TODO Replace currentUser.id
-          isPublic = false,
-        )
-      newSets.add(newSet)
-      requireNotNull(set.setNumber) { "Set number cannot be null." }
-      requireNotNull(set.exerciseID) { "Exercise ID cannot be null." }
-      if (set.setNumber != null && set.exerciseID != null) {
-        val previousSet =
-          workoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
-        previousSet?.let { latestPreviousSets.add(it) }
+        is Superset -> {
+          SupersetExercisesSets(
+            id = previousWorkoutItem.id,
+            uuid = previousWorkoutItem.uuid,
+            name = previousWorkoutItem.name,
+            exercisesSets = previousWorkoutItem.exercisesSets.map { exerciseSets ->
+              loadExerciseSetsFromWorkout(exerciseSets)
+            },
+            restBetweenExercises = previousWorkoutItem.restBetweenExercises,
+            enableRestBetweenExercises = previousWorkoutItem.enableRestBetweenExercises,
+            enableRestAfterSuperset = previousWorkoutItem.enableRestAfterSuperset,
+            restAfterSuperset = previousWorkoutItem.restAfterSuperset,
+            supersetNotes = previousWorkoutItem.supersetNotes.filter { it.pinned }.toMutableList(),
+            order = previousWorkoutItem.order,
+            ownerID = previousWorkoutItem.owerID,
+            isPublic = previousWorkoutItem.isPublic,
+          )
+        }
       }
     }
-    return newSets
   }
 
-  fun populatePreviousSetField(exerciseID: ObjectId, setNumber: Int): Set? {
-    return workoutRepository.getPreviousSetForExercise(exerciseID, setNumber)
+  private fun loadExerciseSetsFromWorkout(
+    previousExerciseSets: ExerciseSets
+  ): ExerciseExerciseSets {
+    val exercise = exercisesRepository.getExercise(previousExerciseSets.exerciseID)
+    requireNotNull(exercise) { "Exercise not found." }
+
+    return ExerciseExerciseSets(
+      id = previousExerciseSets.id,
+      exSetsUUID = previousExerciseSets.exSetsUUID,
+      workoutID = previousExerciseSets.workoutID,
+      order = previousExerciseSets.order,
+      exercise = exercise,
+      sets = previousExerciseSets.sets,
+      notes = previousExerciseSets.notes,
+      datePerformed = previousExerciseSets.datePerformed,
+      microcycleID = previousExerciseSets.microcycleID,
+      mesocycleID = previousExerciseSets.mesocycleID,
+      programID = previousExerciseSets.programID,
+      ownerID = previousExerciseSets.ownerID,
+      isPublic = previousExerciseSets.isPublic,
+    )
+  }
+
+  /**
+   * Creates deep copies of a list of sets, resetting specific fields for use in a new context (e.g., starting a new workout).
+   * Assigns a temporary owner ID (TODO: fix) and sets visibility to private.
+   * Resets completion status.
+   *
+   * @param previousSets The list of Set objects to copy from a previous workout structure.
+   * @return A new immutable list of copied Set objects ready for a new workout.
+   */
+  private fun loadSetsFromWorkout(previousSets: List<Set>): List<Set> {
+
+    return previousSets.map { set ->
+      // Use the data class .copy() method for conciseness and safety
+      set.copy(
+        // --- Fields to Reset/Change for a New Instance ---
+
+        // Decide if you need new unique identifiers for the database/runtime
+        // id = ObjectId(), // Generate new primary key if storing as a new distinct row
+        // uuid = Uuid.random(), // Generate new UUID if needing unique instance tracking
+
+        // Reset status fields for a new workout
+        // setCompleted = false, // [cite: 90] A new workout's sets aren't completed yet
+
+        // Assign context-specific fields
+        ownerID = tempOwnerId, // TODO: Replace with actual current user ID logic [cite: 91]
+        isPublic = false, // Assuming new sets default to private [cite: 91]
+
+        // --- Fields typically kept from the previous set ---
+        // setNumber, weightPounds, weightKilograms, repetitions, RPE, RIR,
+        // targetWeightPounds, targetRepetitions, targetRPE, targetRIR,
+        // percentage1RM, setTypeID, progressionSchemeID,
+        // workoutID, exerciseSetsID, exerciseID (validated above)
+        // are all implicitly copied by .copy() unless overridden above.
+      )
+    }
+  }
+
+  /**
+   * Retrieves the most recent historical performance for a specific set number of a given exercise.
+   * Delegates the call to the workout repository.
+   *
+   * @param exerciseID The ID of the exercise.
+   * @param setNumber The specific set number (e.g., 1st working set).
+   * @return The historical Set object if found and no error occurs, null otherwise.
+   */
+  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
+    return try {
+      // Delegate the actual data fetching to the repository
+      workoutRepository.getPreviousSetForExercise(exerciseID, setNumber)
+    } catch (e: Exception) {
+      // Optional: Log the error or handle specific exceptions
+      Log.e(
+        "ManageWorkoutUseCase",
+        "Error fetching previous set for exercise $exerciseID, set $setNumber",
+        e
+      )
+      // Return null if any exception occurs during repository access
+      null
+    }
   }
 
   fun addWorkoutNote(
@@ -305,14 +367,14 @@ class ManageWorkoutUseCase(
     _workoutNotes: MutableList<WorkoutNote>,
     note: WorkoutNote,
   ): List<WorkoutNote> {
-    _workoutNotes.first { it == note }.lazyListID = newID()
+    _workoutNotes.first { it == note }.lazyListID = newLazyListItemID()
     return _workoutNotes
   }
 
   suspend fun saveWorkout(
     workout: Workout,
     workoutNotes: List<WorkoutNote>,
-    exercisesSets: List<ExerciseExerciseSets>,
+    workoutComponents: List<WorkoutComponent>,
   ) {
     //    TODO Implement this
     workout.notes = workoutNotes.toMutableList()
@@ -321,8 +383,8 @@ class ManageWorkoutUseCase(
     //    removeUncompletedSets(exercisesSets.toMutableList())
 
     workout.exercisesSets =
-      convertExerciseExerciseSetsToExerciseSets(
-        exercisesSets.toMutableList(),
+      convertWorkoutComponentsToWorkoutItems(
+        workoutComponents,
         userDefaultWeightUnit,
       )
 
@@ -330,27 +392,33 @@ class ManageWorkoutUseCase(
     //    workout.calculateTotalVolumeInPounds()
     //    workout.calculateTotalVolumeInKilograms()
 
-    workoutRepository.insertWorkout(workout)
+    val isInsertSuccess: Boolean = workoutRepository.insertWorkout(workout)
+    if (isInsertSuccess) {
+      inProgressWorkoutRepository.deleteActiveWorkout(workout)
+    } else {
+      throw Exception("Workout could not be saved.")
+    }
   }
 
   suspend fun saveInProgressWorkout(
     workout: Workout,
     workoutNotes: List<WorkoutNote>,
-    exercisesSets: List<ExerciseExerciseSets>,
+    workoutComponents: List<WorkoutComponent>,
   ) {
     workout.notes = workoutNotes.toMutableList()
 
+    // TODO Change to WorkoutComponents
     workout.exercisesSets =
-      convertExerciseExerciseSetsToExerciseSets(
-        exercisesSets.toMutableList(),
+      convertWorkoutComponentsToWorkoutItems(
+        workoutComponents,
         userDefaultWeightUnit,
       )
 
-    workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
+    // Note: Decide if calculating total volume should be done
+    // workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
 
     inProgressWorkoutRepository.saveInProgressWorkout(workout)
   }
-
 
   private fun convertExerciseExerciseSetsToExerciseSets(
     exerciseExerciseSets: List<ExerciseExerciseSets>,
@@ -363,7 +431,7 @@ class ManageWorkoutUseCase(
           id = _exerciseSets.id,
           exSetsUUID = _exerciseSets.exSetsUUID,
           workoutID = _exerciseSets.workoutID,
-          exerciseOrder = _exerciseSets.exerciseOrder,
+          order = _exerciseSets.order,
           exerciseID = _exerciseSets.exercise.id,
           sets = _exerciseSets.sets,
           notes = _exerciseSets.notes,
@@ -382,6 +450,62 @@ class ManageWorkoutUseCase(
     return exercisesSets
   }
 
+  private fun convertWorkoutComponentsToWorkoutItems(
+    workoutComponents: List<WorkoutComponent>,
+    userDefaultWeightUnit: String,
+  ): List<WorkoutItem> {
+    val workoutItems = mutableListOf<WorkoutItem>()
+    workoutComponents.forEach { it ->
+
+      when (it) {
+        is ExerciseExerciseSets -> {
+          workoutItems.add(
+            ExerciseSets(
+              id = it.id,
+              exSetsUUID = it.exSetsUUID,
+              workoutID = it.workoutID,
+              order = it.order,
+              exerciseID = it.exercise.id,
+              sets = it.sets,
+              notes = it.notes,
+              datePerformed = it.datePerformed,
+              totalVolumeInPounds = it.totalVolumeInPounds(),
+              totalVolumeInKilograms = it.totalVolumeInKilograms(),
+              isPublic = false,
+              microcycleID = it.microcycleID,
+              mesocycleID = it.mesocycleID,
+              programID = it.programID,
+              ownerID = tempOwnerId, // TODO Replace currentUser.id
+            )
+          )
+        }
+
+        is SupersetExercisesSets -> {
+          workoutItems.add(
+            Superset(
+              id = it.id,
+              uuid = it.uuid,
+              name = it.name,
+              exercisesSets = convertExerciseExerciseSetsToExerciseSets(
+                it.exercisesSets,
+                userDefaultWeightUnit
+              ),
+              restBetweenExercises = it.restBetweenExercises,
+              enableRestBetweenExercises = it.enableRestBetweenExercises,
+              enableRestAfterSuperset = it.enableRestAfterSuperset,
+              restAfterSuperset = it.restAfterSuperset,
+              supersetNotes = it.supersetNotes,
+              order = it.order
+            )
+          )
+        }
+      }
+    }
+
+    return workoutItems
+  }
+
+
   fun getCompletedWorkout(workoutID: ObjectId): Workout? {
     return workoutRepository.getWorkoutByID(workoutID)
   }
@@ -390,59 +514,187 @@ class ManageWorkoutUseCase(
     return workoutRepository.getWorkoutsCount()
   }
 
-  fun checkAllSetsComplete(exerciseExerciseSets: MutableList<ExerciseExerciseSets>): Boolean {
+  fun checkAllSetsComplete(workoutComponents: List<WorkoutComponent>): Pair<Int, Int> {
     var countSets: Int = 0
     var countSetsCompleted: Int = 0
 
-    exerciseExerciseSets.forEach { exerciseSets ->
-      exerciseSets.sets.forEach { set ->
-        countSets++
-        if (set.setCompleted) {
-          countSetsCompleted++
+    workoutComponents.forEach { workoutComponent ->
+      when (workoutComponent) {
+        is ExerciseExerciseSets -> {
+          workoutComponent.sets.forEach { set ->
+            countSets++
+            if (set.setCompleted) {
+              countSetsCompleted++
+            }
+          }
+        }
+
+        is SupersetExercisesSets -> {
+          workoutComponent.exercisesSets.forEach { exerciseSets ->
+            exerciseSets.sets.forEach { set ->
+              countSets++
+              if (set.setCompleted) {
+                countSetsCompleted++
+              }
+            }
+          }
         }
       }
     }
-
-    return countSetsCompleted == countSets && countSets > 0
+    return Pair(countSetsCompleted, countSets)
   }
 
+  /**
+   * Creates a new list of WorkoutComponents containing only the completed sets.
+   * - Removes incomplete sets within each component.
+   * - Removes ExerciseExerciseSets within a SupersetExercisesSets if they become empty.
+   * - Removes the entire WorkoutComponent if it becomes empty after removing incomplete sets.
+   *
+   * @param workoutComponents The original list of workout components.
+   * @return A new list of workout components with incomplete sets removed.
+   */
   fun removeUncompletedSets(
-    exerciseExerciseSets: MutableList<ExerciseExerciseSets>
-  ): List<ExerciseExerciseSets> {
-    //    TODO Doesn't Work, FIX
-    exerciseExerciseSets.forEach { it.sets.removeIf { set -> !set.setCompleted } }
-    exerciseExerciseSets.filter { it.sets.isNotEmpty() }
-    return exerciseExerciseSets.toList()
+    workoutComponents: MutableList<WorkoutComponent>
+  ): List<WorkoutComponent> {
+    return workoutComponents.mapNotNull { component ->
+      when (component) {
+        // Handle Superset components
+        is SupersetExercisesSets -> {
+          // Process each ExerciseExerciseSets within the superset
+          val updatedExercisesSets = component.exercisesSets.mapNotNull { exerciseSets ->
+            // Filter to keep only completed sets within this ExerciseExerciseSets
+            val completedSets = exerciseSets.sets.filter { set -> set.setCompleted }
+            // If sets remain, create a modified copy of ExerciseExerciseSets
+            if (completedSets.isNotEmpty()) {
+              exerciseSets.copy(sets = completedSets.toMutableList())
+            } else {
+              // If no sets remain, discard this ExerciseExerciseSets by returning null
+              null
+            }
+          }
+          // If ExerciseExerciseSets remain within the superset, create a modified copy of the Superset
+          if (updatedExercisesSets.isNotEmpty()) {
+            component.copy(exercisesSets = updatedExercisesSets)
+          } else {
+            // If no ExerciseExerciseSets remain, discard the entire Superset by returning null
+            null
+          }
+        }
+
+        is ExerciseExerciseSets -> {
+          val completedSets = component.sets.filter { set -> set.setCompleted }
+          if (completedSets.isNotEmpty()) {
+            component.copy(sets = completedSets.toMutableList())
+          } else {
+            null // Discard this component if it becomes empty
+          }
+        }
+
+      }
+    }
   }
 
+  /**
+   * Replaces a specific ExerciseExerciseSets within a list of WorkoutComponents with a new Exercise.
+   *
+   * It finds the target ExerciseExerciseSets within a SupersetExercisesSets component using
+   * its exSetsUUID, updates it immutably with the new Exercise details (including updating
+   * set exercise IDs and generating a new lazy list ID), and returns a new list
+   * of WorkoutComponents reflecting the change.
+   *
+   * @param workoutComponents The original immutable list of workout components.
+   * @param targetExerciseSets The specific ExerciseExerciseSets instance to find and replace.
+   * @param newExercise The new Exercise to associate with the replaced ExerciseExerciseSets.
+   * @return A new list of WorkoutComponents with the specified ExerciseExerciseSets updated,
+   * or the original list if the target was not found.
+   */
   fun replaceExerciseInExerciseSets(
-    exercisesSets: MutableList<ExerciseExerciseSets>,
-    exerciseSets: ExerciseExerciseSets,
+    workoutComponents: List<WorkoutComponent>,
+    targetExerciseSets: ExerciseExerciseSets,
     newExercise: Exercise,
-  ): List<ExerciseExerciseSets> {
-    val index = exercisesSets.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
-    exerciseSets.exercise = newExercise
-    for (set in exerciseSets.sets) {
-      set.exerciseID = newExercise.id
+  ): List<WorkoutComponent> {
+    // Use map to iterate through components and create a new list
+    return workoutComponents.map { component ->
+      when (component) {
+        is SupersetExercisesSets -> {
+          // Try to find the index of the target ExerciseExerciseSets within this Superset
+          val targetIndex = component.exercisesSets.indexOfFirst {
+            it.exSetsUUID == targetExerciseSets.exSetsUUID
+          }
+
+          // If the target ExerciseExerciseSets was found in this Superset
+          if (targetIndex != -1) {
+            // Get the original instance to copy from
+            val originalExerciseSets = component.exercisesSets[targetIndex]
+
+            // Create new Set instances with the updated exerciseID
+            val updatedSets = originalExerciseSets.sets.map { set ->
+              set.copy(exerciseID = newExercise.id)
+            }
+
+            // Create the new ExerciseExerciseSets instance using copy for immutability
+            val newExerciseSetsInstance = originalExerciseSets.copy(
+              exercise = newExercise,           // Assign the new Exercise
+              sets = updatedSets.toMutableList(),               // Assign the list of updated Sets
+              lazyListItemID = newLazyListItemID()    // Generate a new ID for UI purposes
+              // Note: exSetsUUID and id (ObjectId) remain the same as the original
+            )
+
+            // Create a new list of ExerciseExerciseSets for the Superset
+            val updatedSupersetExercisesList = component.exercisesSets.toMutableList().apply {
+              this[targetIndex] = newExerciseSetsInstance // Replace item at the index
+            }
+
+            // Return a copy of the Superset component with the updated list
+            component.copy(
+              lazyListItemID = newLazyListItemID(),
+              exercisesSets = updatedSupersetExercisesList.toList()
+            )
+          } else {
+            // Target not found in this Superset, return the component unmodified
+            component
+          }
+        }
+
+        is ExerciseExerciseSets -> {
+          // Try to find the target ExerciseExerciseSets within list of WorkoutComponents
+          if (component.exSetsUUID == targetExerciseSets.exSetsUUID) {
+            targetExerciseSets.exercise = newExercise
+
+            // Create new Set instances with the updated exerciseID
+            val updatedSets = component.sets.map { set ->
+              set.copy(exerciseID = newExercise.id)
+            }
+
+            // Create the new ExerciseExerciseSets instance using copy for immutability
+            val newExerciseSets = component.copy(
+              exercise = newExercise,           // Assign the new Exercise
+              sets = updatedSets.toMutableList(),               // Assign the list of updated Sets
+              lazyListItemID = newLazyListItemID()    // Generate a new ID for UI purposes
+              // Note: exSetsUUID and id (ObjectId) remain the same as the original
+            )
+
+            newExerciseSets
+          } else {
+            // Not the target ExerciseExerciseSets, return the component unmodified
+            component
+          }
+        }
+      }
     }
-    exerciseSets.exSetsLazyListItemID = newID()
-
-    exercisesSets[index] = exerciseSets
-
-    return exercisesSets
   }
 
   fun addMultipleEmptyExerciseSets(
-    exerciseSets: MutableList<ExerciseExerciseSets>,
+    exerciseSets: MutableList<WorkoutComponent>,
     exercisesSelectedToBeAddedToWorkout: List<Exercise>,
     _workoutID: ObjectId,
-  ): MutableList<ExerciseExerciseSets> {
+  ): MutableList<WorkoutComponent> {
     exercisesSelectedToBeAddedToWorkout.forEach { _exercise ->
       val pinnedNotes = exerciseNotesRepository.getPinnedExerciseNotes(_exercise.id)
       exerciseSets.add(
         ExerciseExerciseSets(
-          exerciseOrder =
-          if (exerciseSets.isEmpty()) 1 else exerciseSets.last().exerciseOrder.plus(1),
+          order =
+          if (exerciseSets.isEmpty()) 1 else exerciseSets.size.plus(1),
           exercise = _exercise,
           notes = pinnedNotes.toMutableList(),
           datePerformed = Clock.System.now(),
@@ -459,53 +711,143 @@ class ManageWorkoutUseCase(
   }
 
   fun removeExerciseSets(
-    exerciseExerciseSets: MutableList<ExerciseExerciseSets>,
+    exerciseExerciseSets: MutableList<WorkoutComponent>,
     exerciseSets: ExerciseExerciseSets,
-  ): List<ExerciseExerciseSets> {
+  ): List<WorkoutComponent> {
     return exerciseExerciseSets.filter { it != exerciseSets }
   }
 
+  // TODO Debug Causes Crash
+  /**
+   * Creates a new list of sets by adding a new set based on the state of the provided ExerciseExerciseSets.
+   * If exerciseSets.sets is empty, adds a default first set (setNumber 0).
+   * If exerciseSets.sets is not empty, adds a copy of the last set, incrementing the set number
+   * and resetting completion status.
+   *
+   * @param exerciseSets The context providing the current sets and exercise/workout IDs.
+   * @return A new immutable list containing the original sets plus the newly added one.
+   */
   fun addSet(exerciseSets: ExerciseExerciseSets): List<Set> {
-    val temporarySets: List<Set> =
-      if (exerciseSets.sets.isNotEmpty()) {
-        exerciseSets.sets +
-                Set(
-                  exerciseID = exerciseSets.exercise.id,
-                  setNumber = exerciseSets.sets.last().setNumber?.plus(1),
-                  weightPounds = exerciseSets.sets.last().weightPounds,
-                  weightKilograms = exerciseSets.sets.last().weightKilograms,
-                  repetitions = exerciseSets.sets.last().repetitions,
-                  ratePerceivedEffort = exerciseSets.sets.last().ratePerceivedEffort,
-                  repetitionsInReserve = exerciseSets.sets.last().repetitionsInReserve,
-                  setTypeID = exerciseSets.sets.last().setTypeID,
-                  percentage1RM = exerciseSets.sets.last().percentage1RM,
-                  isPublic = false,
-                  ownerID = tempOwnerId, // TODO Replace currentUser.id
-                  targetWeightPounds = exerciseSets.sets.last().targetWeightPounds,
-                  targetWeightKilograms = exerciseSets.sets.last().targetWeightKilograms,
-                  targetRepetitions = exerciseSets.sets.last().targetRepetitions,
-                  targetRepetitionsInReserve = exerciseSets.sets.last().targetRepetitionsInReserve,
-                  targetRatePerceivedEffort = exerciseSets.sets.last().targetRatePerceivedEffort,
-                  progressionSchemeID = exerciseSets.sets.last().progressionSchemeID,
-                  workoutID = exerciseSets.sets.last().workoutID,
-                  exerciseSetsID = exerciseSets.sets.last().exerciseSetsID,
-                )
-      } else {
-        listOf(
-          Set(
-            exerciseID = exerciseSets.exercise.id,
-            workoutID = exerciseSets.workoutID,
-            exerciseSetsID = exerciseSets.id,
-            setNumber = 0,
-            isPublic = false,
-            progressionSchemeID = null, // Random().nextInt() // TODO Replace with,
-            // progressionScheme.progressionSchemeID,
-            ownerID = tempOwnerId, // TODO Replace currentUser.id,
-          )
+    val currentSets = exerciseSets.sets
+
+    return if (currentSets.isNotEmpty()) {
+      // --- Case: Add based on the last set ---
+      val lastSet = currentSets.last()
+
+
+      // Create the new set by copying the last one and overriding specific fields
+      val newSet = lastSet.copy(
+        // Generate new unique identifiers if required for each distinct set instance
+        // id = ObjectId(),
+        // uuid = Uuid.random(),
+
+        // Calculate next set number, defaulting to 0 if the last one was null (adjust if null is invalid)
+        setNumber = lastSet.setNumber?.plus(1) ?: 0,
+        setCompleted = false, // New sets start as not completed
+
+        // Assign ownership/metadata
+        ownerID = tempOwnerId, // TODO: Replace currentUser.id
+        isPublic = false // Assuming default
+
+        // All other fields (weight, reps, targets, exerciseID, workoutID etc.) are copied from lastSet
+      )
+      // Return a new list combining the old list and the new set
+      currentSets + newSet
+    } else {
+      // --- Case: Add the very first set ---
+      // Return a new list containing only the first default set
+      listOf(
+        Set(
+          // Generate unique identifiers if required
+          // id = ObjectId(),
+          // uuid = Uuid.random(),
+
+          // Link to parent objects
+          exerciseID = exerciseSets.exercise.id,
+          workoutID = exerciseSets.workoutID,
+          exerciseSetsID = exerciseSets.id,
+
+          // Initial set details
+          setNumber = 0,
+          setCompleted = false,
+          isPublic = false,
+          progressionSchemeID = null, // TODO: Replace with actual logic if available
+          ownerID = tempOwnerId, // TODO: Replace currentUser.id
+
+          // Initialize performance fields to null/defaults as appropriate
+          // weightPounds = null,
+          // weightKilograms = null,
+          // repetitions = null,
+          // ratePerceivedEffort = null,
+          // repetitionsInReserve = null
+          // ... initialize target fields etc. if needed
         )
+      )
+    }
+  }
+
+  // TODO Debug Causes Crash
+  /**
+   * Adds a new set to a specific ExerciseExerciseSets instance nested within a specific SupersetExercisesSets.
+   * This function operates immutably, returning a new list of WorkoutComponents.
+   *
+   * @param workoutComponent The current immutable list of all workout components.
+   * @param supersetUuid The UUID identifying the target SupersetExercisesSets component.
+   * @param targetExSetsUuid The UUID identifying the target ExerciseExerciseSets within the superset.
+   * @return A new list of WorkoutComponents with the added set, or the original list if the target superset or exercise set is not found.
+   */
+  @OptIn(ExperimentalUuidApi::class) // If Uuid requires it
+  fun addSetToExerciseExerciseSet(
+    workoutComponent: List<WorkoutComponent>, // Input: immutable list
+    supersetUuid: Uuid?, // ID of the Superset component
+    targetExSetsUuid: Uuid // ID of the ExerciseExerciseSets within the Superset
+  ): List<WorkoutComponent> { // Return: new immutable list
+
+    // Use map to create a new list based on transformations
+    return workoutComponent.map { component ->
+      // Find the target Superset component by its UUID
+      when {
+        component is ExerciseExerciseSets && component.exSetsUUID == targetExSetsUuid -> {
+          component.copy(sets = addSet(component).toMutableList())
+        }
+
+        component is SupersetExercisesSets && component.uuid == supersetUuid -> {
+          var supersetModified = false // Flag to track if modification occurred
+
+          // Map the inner exercisesSets list to potentially update the target
+          val updatedInnerExercisesSets = component.exercisesSets.map { innerExSets ->
+            // Find the target ExerciseExerciseSets within the Superset by its UUID
+            if (innerExSets.exSetsUUID == targetExSetsUuid) {
+              supersetModified = true // Mark that we found and will modify the target
+
+              // *** Reuse the logic from your existing addSet function ***
+              // This generates a new list with the added set
+              val newSetsList =
+                addSet(innerExSets) // Assuming addSet(ExerciseExerciseSets) returns List<Set>
+
+              // Return a copy of the innerExSets with the new list of sets
+              innerExSets.copy(sets = newSetsList.toMutableList()) // Update the sets
+            } else {
+              // Not the target ExerciseExerciseSets, return it unmodified
+              innerExSets
+            }
+          }
+
+          // If we modified something inside, return a copy of the Superset with the updated list
+          if (supersetModified) {
+            component.copy(exercisesSets = updatedInnerExercisesSets)
+          } else {
+            // Target ExerciseExerciseSets wasn't found in this Superset, return Superset unmodified
+            component
+          }
+        }
+
+        else -> {
+          // Not the target Superset component, return it unmodified
+          component
+        }
       }
-    return temporarySets
-    //    updateExercisesSetsData(exerciseSets, temporarySets)
+    }
   }
 
   fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set): List<Set> {
@@ -520,7 +862,10 @@ class ManageWorkoutUseCase(
     //    updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun addExerciseNote(exerciseSets: ExerciseExerciseSets, workoutID: ObjectId): List<ExerciseNote> {
+  fun addExerciseNote(
+    exerciseSets: ExerciseExerciseSets,
+    workoutID: ObjectId
+  ): List<ExerciseNote> {
     exerciseSets.notes.add(
       ExerciseNote().apply {
         exercise = exerciseSets.exercise.id
@@ -565,30 +910,56 @@ class ManageWorkoutUseCase(
     //    updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  fun updateExerciseExerciseSetsData(
-    exerciseExerciseSets: MutableList<ExerciseExerciseSets>,
-    exerciseSets: ExerciseExerciseSets,
-  ): List<ExerciseExerciseSets> {
-    val index = exerciseExerciseSets.indexOfFirst { it.exSetsUUID == exerciseSets.exSetsUUID }
+  /**
+   * Creates a new list of WorkoutComponents with an updated exSetsLazyListItemID for a specific target ExerciseExerciseSets.
+   * Useful for forcing recomposition in a LazyColumn when an item's data changes.
+   *
+   * @param workoutComponents The original immutable list of workout components.
+   * @param targetExerciseSets The ExerciseExerciseSets instance whose corresponding component needs its ID refreshed.
+   * @return A new list of WorkoutComponents with updated exSetsLazyListItemID for the target.
+   */
+  fun refreshWorkoutComponentLazyListItemID(
+    workoutComponents: List<WorkoutComponent>,
+    targetExerciseEerciseSets: ExerciseExerciseSets,
+  ): List<WorkoutComponent> {
+    return workoutComponents.map { component ->
+      when (component) {
+        // Case 1: The component itself IS the target ExerciseExerciseSetsc
+        is ExerciseExerciseSets -> {
+          if (component.exSetsUUID == targetExerciseEerciseSets.exSetsUUID) {
+            // Return a copy with a new lazy ID
+            targetExerciseEerciseSets.copy(lazyListItemID = newLazyListItemID())
+          } else {
+            // Not the target, return unmodified
+            component
+          }
+        }
+        // Case 2: The component is a Superset potentially containing the target
+        is SupersetExercisesSets -> {
+          val targetIndex = component.exercisesSets.indexOfFirst {
+            it.exSetsUUID == targetExerciseEerciseSets.exSetsUUID
+          }
 
-    exerciseSets.exSetsLazyListItemID = newID()
-
-    exerciseExerciseSets[index] =
-      ExerciseExerciseSets(
-        exSetsUUID = exerciseSets.exSetsUUID,
-        exerciseOrder = exerciseSets.exerciseOrder,
-        exercise = exerciseSets.exercise,
-        sets = exerciseSets.sets,
-        notes = exerciseSets.notes,
-        workoutID = exerciseSets.workoutID,
-        //        exerciseID = exerciseSets.exerciseID,
-        microcycleID = exerciseSets.microcycleID,
-        mesocycleID = exerciseSets.mesocycleID,
-        programID = exerciseSets.programID,
-        ownerID = exerciseSets.ownerID,
-      )
-    // _allSets.value = allSets().toList()
-    return exerciseExerciseSets.toList()
+          // If the target ExerciseExerciseSets was found in this Superset
+          if (targetIndex != -1) {
+            // Create a new list of ExerciseExerciseSets for the Superset
+            val updatedSupersetExercisesList = component.exercisesSets.toMutableList().apply {
+              // Replace item at the index
+              this[targetIndex] =
+                targetExerciseEerciseSets.copy(lazyListItemID = newLazyListItemID())
+            }
+            // Return a copy of the Superset with the updated inner list
+            component.copy(
+//              lazyListItemID = newLazyListItemID(),
+              exercisesSets = updatedSupersetExercisesList
+            )
+          } else {
+            // Target not in this Superset, return unmodified
+            component
+          }
+        }
+      }
+    }
   }
 
   fun allSets(): MutableList<Set> {
@@ -604,7 +975,7 @@ class ManageWorkoutUseCase(
     exerciseSets: ExerciseExerciseSets,
     setUUID: Uuid,
     newWeight: Double?,
-  ): ExerciseExerciseSets {
+  ): WorkoutComponent {
     val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
     exerciseSets.updateSetWeight(uuid = setUUID, newWeight = newWeight, weightUnit = weightUnit)
     return exerciseSets
@@ -615,7 +986,7 @@ class ManageWorkoutUseCase(
     exerciseSets: ExerciseExerciseSets,
     setUUID: Uuid,
     newReps: Int?,
-  ): ExerciseExerciseSets {
+  ): WorkoutComponent {
     exerciseSets.updateSetReps(uuid = setUUID, newReps = newReps)
     return exerciseSets
     //    updateExerciseExerciseSetsData(exerciseSets)
@@ -625,7 +996,7 @@ class ManageWorkoutUseCase(
     exerciseSets: ExerciseExerciseSets,
     setUUID: Uuid,
     newRIR: Double?,
-  ): ExerciseExerciseSets {
+  ): WorkoutComponent {
     exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
     return exerciseSets
     //    updateExerciseExerciseSetsData(exerciseSets)
@@ -635,7 +1006,7 @@ class ManageWorkoutUseCase(
     exerciseSets: ExerciseExerciseSets,
     setUUID: Uuid,
     newRPE: Double?,
-  ): ExerciseExerciseSets {
+  ): WorkoutComponent {
     exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
     return exerciseSets
     //    updateExerciseExerciseSetsData(exerciseSets)
@@ -645,7 +1016,7 @@ class ManageWorkoutUseCase(
     exerciseSets: ExerciseExerciseSets,
     setUUID: Uuid,
     setComplete: Boolean,
-  ): ExerciseExerciseSets {
+  ): WorkoutComponent {
     exerciseSets.completeSet(setUUID, setComplete)
     return exerciseSets
     //    updateExerciseExerciseSetsData(exerciseSets)
@@ -655,7 +1026,7 @@ class ManageWorkoutUseCase(
     exerciseSets: ExerciseExerciseSets,
     setUUID: Uuid,
     setType: SetType,
-  ): ExerciseExerciseSets {
+  ): WorkoutComponent {
     exerciseSets.updateSetType(uuid = setUUID, setType = setType)
     return exerciseSets
     //    updateExerciseExerciseSetsData(exerciseSets)
@@ -668,6 +1039,75 @@ class ManageWorkoutUseCase(
       userDefaultWeightUnit
     }
   }
+
+  fun createSupersetFromExercise(
+    workoutComponents: MutableList<WorkoutComponent>,
+    exercises: List<Exercise>,
+    workout: Workout
+  ): MutableList<WorkoutComponent> {
+
+    val exercisesSetsList = mutableListOf<ExerciseExerciseSets>()
+
+    exercises.forEachIndexed { index, exercise ->
+      val pinnedNotes = exerciseNotesRepository.getPinnedExerciseNotes(exercise.id)
+
+      exercisesSetsList.add(
+        ExerciseExerciseSets(
+          order = index.plus(1),
+          exercise = exercise,
+          notes = pinnedNotes.toMutableList(),
+          datePerformed = Clock.System.now(),
+          workoutID = workout.id,
+          microcycleID = workout.microcycleID, // TODO get details from workout
+          mesocycleID = workout.mesocycleID, // TODO get details from workout
+          programID = workout.programID, // TODO get details from workout
+          ownerID = tempOwnerId, // TODO Replace currentUser.id
+          isPublic = false,
+        )
+      )
+    }
+
+    // TODO Get Superset Notes when no name, Use UUID?
+
+    workoutComponents.add(
+      SupersetExercisesSets(
+//        name = TODO(),
+        exercisesSets = exercisesSetsList.toList(),
+        restBetweenExercises = 0.toDuration(DurationUnit.SECONDS).inWholeMilliseconds,
+        enableRestBetweenExercises = false,
+        enableRestAfterSuperset = true,
+        restAfterSuperset = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+        order = workoutComponents.size.plus(1),
+      )
+    )
+
+    return workoutComponents
+  }
+
+  fun createSupersetFromExercisesSets(
+    workoutComponents: MutableList<WorkoutComponent>,
+    exercisesSets: List<ExerciseExerciseSets>,
+    workout: Workout
+  ): List<WorkoutComponent> {
+    // TODO Get Superset Notes when no name, Use UUID?
+
+    workoutComponents.add(
+      SupersetExercisesSets(
+//        name = TODO(),
+        exercisesSets = exercisesSets.sortedBy { it.order },
+        restBetweenExercises = 0.toDuration(DurationUnit.SECONDS).inWholeMilliseconds,
+        enableRestBetweenExercises = false,
+        enableRestAfterSuperset = true,
+        restAfterSuperset = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+        order = exercisesSets.first().order,
+      )
+    )
+
+    // Remove duplicated ExerciseExerciseSets
+    workoutComponents.removeAll { exercisesSets.contains(it) }
+
+    return workoutComponents.sortedBy { it.order }
+  }
 }
 
 class ManageExercisesUseCase(private val exercisesRepository: ExercisesRepository) {
@@ -679,7 +1119,11 @@ class ManageExercisesUseCase(private val exercisesRepository: ExercisesRepositor
     }
   }
 
-  suspend fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, time: Duration) {
+  suspend fun updateExerciseAutoRestTimer(
+    tabRowState: Int,
+    exercise: Exercise,
+    time: Duration
+  ) {
     if (tabRowState == 1) {
       exercise.warmUpSetRestInWholeMilliseconds = time.inWholeMilliseconds
     } else if (tabRowState == 0) {
@@ -688,7 +1132,11 @@ class ManageExercisesUseCase(private val exercisesRepository: ExercisesRepositor
     exercisesRepository.updateExercise(exercise)
   }
 
-  suspend fun enableExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, enable: Boolean) {
+  suspend fun enableExerciseAutoRestTimer(
+    tabRowState: Int,
+    exercise: Exercise,
+    enable: Boolean
+  ) {
     if (tabRowState == 1) {
       exercise.warmUpSetRestTimerEnabled = enable
     } else if (tabRowState == 0) {

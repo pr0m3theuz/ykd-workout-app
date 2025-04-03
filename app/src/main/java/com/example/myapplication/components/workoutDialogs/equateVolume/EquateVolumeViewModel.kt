@@ -10,7 +10,7 @@ import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.SetType
 import com.example.myapplication.data.model.setVolume
 import com.example.myapplication.data.network.UserRepository
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -187,7 +187,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     val temporarySets = _sets
     temporarySets.removeIf { it.lazyListItemID == id }
 
-    temporarySets.forEach { it.lazyListItemID = newID() }
+    temporarySets.forEach { it.lazyListItemID = newLazyListItemID() }
 
     _sets = temporarySets
     setNewTotalVolume(calculateTotalVolume(_sets))
@@ -236,7 +236,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
 
     val newSets = _sets
     newSets.forEach {
-      it.lazyListItemID = newID()
+      it.lazyListItemID = newLazyListItemID()
       it.weightPounds = newWeight
       it.repetitions = newRepetitions
     }
@@ -257,7 +257,7 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
 
     val newSets = sets.value
     newSets.forEach {
-      it.lazyListItemID = newID()
+      it.lazyListItemID = newLazyListItemID()
       it.weightPounds = newWeight
       it.repetitions = newRepetitions
     }

@@ -33,15 +33,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.ConfirmCompletedSetDeletionDialog
-import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.Set
+import com.example.myapplication.data.model.WorkoutComponent
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SetLazyListItem(
-  exerciseSets: ExerciseExerciseSets,
+  exerciseSets: WorkoutComponent,
   index: Int,
   set: Set,
   removeSet: () -> Unit,

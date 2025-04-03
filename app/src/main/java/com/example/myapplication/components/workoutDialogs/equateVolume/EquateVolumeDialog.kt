@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,7 +47,7 @@ fun EquateVolumeScreen(
   exerciseSets: ExerciseExerciseSets,
   equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
 ) {
-  val weightUnit = exerciseSets.exercise?.weightUnit ?: equateVolumeViewModel.userDefaultWeightUnit
+  val weightUnit = exerciseSets.exercise.weightUnit ?: equateVolumeViewModel.userDefaultWeightUnit
 
   val totalWorkingSetVolume = exerciseSets.totalWorkingSetVolume(weightUnit)
   val workingSetWeight = workoutViewModel.getWorkingSetWeight(exerciseSets)
@@ -80,7 +82,7 @@ fun EquateVolumeDialog(
 
   var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
 
-  var workingSetRepetitions: Int by remember { mutableStateOf(_workingSetRepetitions ?: 0) }
+  var workingSetRepetitions: Int by remember { mutableIntStateOf(_workingSetRepetitions ?: 0) }
 
   var workingSetRepetitionsText by remember { mutableStateOf(workingSetRepetitions.toString()) }
 
@@ -138,7 +140,9 @@ fun EquateVolumeDialog(
       // onDismissRequest.
       openDialog(false)
     },
-    modifier = Modifier.fillMaxSize(),
+    modifier = Modifier
+      .fillMaxSize()
+      .imePadding(),
     properties = DialogProperties(usePlatformDefaultWidth = false),
     shape = RoundedCornerShape(0),
     title = {

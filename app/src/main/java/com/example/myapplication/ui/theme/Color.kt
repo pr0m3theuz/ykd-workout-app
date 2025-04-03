@@ -14,3 +14,17 @@ val White = Color(0xFFFFFFFF)
 val MetallicOrange = Color(0xFFe26310)
 val Grey400 = Color(0xFFbdbdbd)
 val Red = Color(0xFFFF0000)
+
+val Ultramarine40 = Color(0xFF648FFF) // #648fff
+val Indigo50 = Color(0xFF785EF0) // #785ef0
+val Magenta50 = Color(0xFFDC267F) // #dc267f
+val Orange40 = Color(0xFFFE6100) // #fe6100
+val Gold20 = Color(0xFFFFB000) // #ffb000
+
+val IBMColorBlindPalette = listOf(
+  Ultramarine40,
+  Indigo50,
+  Magenta50,
+  Orange40,
+  Gold20
+)

@@ -17,9 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.example.myapplication.components.addExercisesList.ReplaceExerciseScreen
+import com.example.myapplication.components.exercise.CreateSupersetScreen
 import com.example.myapplication.components.exercise.EquateVolumeScreen
 import com.example.myapplication.components.setRestTimer.AutoRestTimerScreen
 import com.example.myapplication.data.model.ExerciseExerciseSets
+import com.example.myapplication.data.model.WorkoutComponent
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -34,6 +36,8 @@ fun ExerciseOptionsDropdownMenu(
   exerciseWeightUnit: String?,
   updateExerciseWeightUnit: (String?) -> Unit,
   navController: NavController,
+  workoutComponents: List<WorkoutComponent> = listOf(),
+  onCreateSuperset: (List<ExerciseExerciseSets>) -> Unit = {},
 ) {
   var expandedExerciseOptionsDropdownMenu by remember { mutableStateOf(false) }
   var expandedWeightUnitOptionsDropdownMenu by remember { mutableStateOf(false) }
@@ -44,6 +48,7 @@ fun ExerciseOptionsDropdownMenu(
   var openReplaceExerciseDialog by remember { mutableStateOf(false) }
   var openEquateVolumeDialog by remember { mutableStateOf(false) }
   var openReplaceExerciseScreen by remember { mutableStateOf(false) }
+  var openCreateSupersetScreen by remember { mutableStateOf(false) }
 
   fun closeAddWarmUpSetsDialog(close: Boolean) {
     openAddWarmUpSetsDialog = close
@@ -63,6 +68,10 @@ fun ExerciseOptionsDropdownMenu(
 
   fun closeEquateVolumeDialog(close: Boolean) {
     openEquateVolumeDialog = close
+  }
+
+  fun closeCreateSupersetDialog(close: Boolean) {
+    openCreateSupersetScreen = close
   }
 
   val primaryColor = MaterialTheme.colorScheme.primary
@@ -98,7 +107,9 @@ fun ExerciseOptionsDropdownMenu(
         text = { Text("Equate Volume") },
         onClick = { openEquateVolumeDialog = true }
       )
-      DropdownMenuItem(text = { Text("Create Superset") }, onClick = { /* TODO */ })
+      DropdownMenuItem(
+        text = { Text("Create Superset") },
+        onClick = { openCreateSupersetScreen = true })
       //            DropdownMenuItem(
       //                text = { Text("Create Giant Set") },
       //                onClick = { /* TODO */ }
@@ -124,9 +135,9 @@ fun ExerciseOptionsDropdownMenu(
         text = { Text("Auto Rest Timer") },
         trailingIcon = {
           exerciseSets.exercise
-            ?.workingSetRestInWholeMilliseconds
-            ?.toDuration(DurationUnit.MILLISECONDS)
-            ?.let {
+            .workingSetRestInWholeMilliseconds
+            .toDuration(DurationUnit.MILLISECONDS)
+            .let {
               Text(
                 it.toComponents { minutes, seconds, _ ->
                   "$minutes:${seconds.toString().padStart(2, '0')}"
@@ -189,7 +200,7 @@ fun ExerciseOptionsDropdownMenu(
     }
 
     if (openRestTimePicker) {
-      exerciseSets.exercise?.let {
+      exerciseSets.exercise.let {
         AutoRestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) }, exercise = it)
       }
     }
@@ -214,6 +225,17 @@ fun ExerciseOptionsDropdownMenu(
         exerciseSets = exerciseSets,
         setOpenDialog = { close -> openReplaceExerciseScreen = close },
         navController = navController,
+      )
+    }
+
+    if (openCreateSupersetScreen) {
+      CreateSupersetScreen(
+        onDismiss = { openCreateSupersetScreen = false },
+        workoutComponents = workoutComponents,
+        onCreateSuperset = { selectedExercises ->
+          onCreateSuperset(selectedExercises)
+        },
+        onShowMessage = { _ -> },
       )
     }
   }

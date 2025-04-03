@@ -11,7 +11,7 @@
 package com.example.myapplication.data.model
 
 import androidx.annotation.Keep
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -34,7 +34,7 @@ data class ExerciseDao(var Exercise: Exercise)
 data class Exercise(
   @SerialName("id")
   @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
-  var lazyListItemID: Long = newID(),
+  var lazyListItemID: Long = newLazyListItemID(),
   @OptIn(ExperimentalUuidApi::class)
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String,
@@ -71,9 +71,9 @@ data class Exercise(
 
   var weightUnit: String? = null, // TODO Could be ENUM -> Default KG LBS
   var workingSetRestInWholeMilliseconds: Long =
-    3.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+    2.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
   var warmUpSetRestInWholeMilliseconds: Long =
-    3.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+    1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
   var workingSetRestTimerEnabled: Boolean = true,
   var warmUpSetRestTimerEnabled: Boolean = false,
 

@@ -48,10 +48,10 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.SetTypeOptionsMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.setRestTimer.TimerScreen
-import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.SetType
+import com.example.myapplication.data.model.WorkoutComponent
 import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.model.setSummaryRIR
@@ -68,7 +68,7 @@ import org.koin.androidx.compose.koinViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun SetContent(
-  exerciseSets: ExerciseExerciseSets,
+  exerciseSets: WorkoutComponent,
   setIndex: Int,
   set: Set,
   getWeightUnit: () -> String,

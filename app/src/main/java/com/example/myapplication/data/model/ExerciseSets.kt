@@ -11,7 +11,7 @@
 
 package com.example.myapplication.data.model
 
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
@@ -31,17 +31,36 @@ import kotlin.uuid.Uuid
 @Serializable
 data class ExerciseSetsDao(val ExerciseSets: ExerciseSets)
 
+/**
+ * Represents a collection of sets for a specific exercise, linked by exercise ID.
+ * This class focuses on storing set data and linking it to hierarchical structures
+ * (workout, microcycle, mesocycle, program) via ObjectIds. It's a more normalized
+ * representation, requiring a separate lookup to retrieve full Exercise details.
+ *
+ * @property id The unique identifier for this set collection (using ObjectId).
+ * @property exSetsLazyListItemID An ID used for efficiently updating items in a LazyColumn (UI component).
+ * @property exSetsUUID A universally unique identifier for this set collection.
+ * @property order The order of this set collection within a sequence (e.g., within a workout).
+ * @property exerciseID The ID of the exercise this set collection belongs to (foreign key).
+ * @property sets A mutable list of [Set] objects, representing the individual sets performed.
+ * @property notes A mutable list of [ExerciseNote] objects, for any notes related to the sets.
+ * @property datePerformed The date and time when the exercise sets were performed (nullable, defaults to null).
+ * @property totalVolumeInPounds The total volume lifted in pounds across all sets (nullable, defaults to 0.0).
+ * @property totalVolumeInKilograms The total volume lifted in kilograms across all sets (nullable, defaults to 0.0).
+ * @property ownerID The ID of the user who owns this set collection.
+ * @property isPublic Indicates whether this set collection is publicly visible.
+ * @property workoutID The ID of the workout this set collection belongs to (foreign key).
+ * @property microcycleID The ID of the microcycle this set collection belongs to (nullable, foreign key).
+ * @property mesocycleID The ID of the mesocycle this set collection belongs to (nullable, foreign key).
+ * @property programID The ID of the program this set collection belongs to (nullable, foreign key).
+ */
 @ExperimentalUuidApi
 @Serializable
 data class ExerciseSets(
   @SerialName("id") @Serializable(with = ObjectIdSerializer::class) val id: ObjectId = ObjectId(),
-  val exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+  val exSetsLazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
   @Serializable(with = UuidSerializer::class) val exSetsUUID: Uuid = Uuid.random(),
-  @Serializable(with = ObjectIdSerializer::class) val workoutID: ObjectId, // External Primary Key
-  @Serializable(with = ObjectIdSerializer::class) val microcycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) val mesocycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) val programID: ObjectId?,
-  val exerciseOrder: Int = 1,
+  override val order: Int = 1,
   @Serializable(with = ObjectIdSerializer::class) val exerciseID: ObjectId,
   var sets: MutableList<Set> = mutableListOf(),
   val notes: MutableList<ExerciseNote> = mutableListOf(),
@@ -50,17 +69,42 @@ data class ExerciseSets(
   val totalVolumeInKilograms: Double? = 0.0,
   val ownerID: String,
   val isPublic: Boolean = false,
-)
+  @Serializable(with = ObjectIdSerializer::class) val workoutID: ObjectId, // External Primary Key
+  @Serializable(with = ObjectIdSerializer::class) val microcycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) val mesocycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) val programID: ObjectId?,
+) : WorkoutItem()
 
+/**
+ * Represents a collection of sets along with the *embedded* Exercise object itself.
+ * This class provides a richer, self-contained representation, including both set data
+ * and the complete exercise details. It's denormalized for easier access without
+ * requiring extra lookups.
+ *
+ * @property id The unique identifier for this set and exercise combination (using ObjectId).
+ * @property lazyListItemID An ID used for efficiently updating items in a LazyColumn (UI component).  This is mutable.
+ * @property exSetsUUID A universally unique identifier for this set and exercise combination. This is mutable.
+ * @property ownerID The ID of the user who owns this set and exercise combination.
+ * @property isPublic Indicates whether this set and exercise combination is publicly visible.
+ * @property order The order of this set and exercise combination within a sequence (e.g., within a workout). This is mutable.
+ * @property exercise The full [Exercise] object, embedded directly within this class. This is mutable.
+ * @property sets A mutable list of [Set] objects, representing the individual sets performed. This is mutable.
+ * @property notes A mutable list of [ExerciseNote] objects, for any notes related to the sets. This is mutable.
+ * @property datePerformed The date and time when the exercise sets were performed (defaults to the current time). This is mutable.
+ * @property workoutID The ID of the workout this set and exercise combination belongs to. This is mutable.
+ * @property microcycleID The ID of the microcycle this set and exercise belongs to (nullable).  This is mutable.
+ * @property mesocycleID The ID of the mesocycle this set and exercise belongs to (nullable). This is mutable.
+ * @property programID The ID of the program this set and exercise belongs to (nullable). This is mutable.
+ */
 @OptIn(ExperimentalUuidApi::class)
 @Serializable
 data class ExerciseExerciseSets(
-  @SerialName("id") @Serializable(ObjectIdSerializer::class) val id: ObjectId = ObjectId(),
-  var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+  @SerialName("id") @Serializable(ObjectIdSerializer::class) override val id: ObjectId = ObjectId(),
+  override val lazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
   @Serializable(UuidSerializer::class) var exSetsUUID: Uuid = Uuid.random(),
-  val ownerID: String,
-  val isPublic: Boolean = false,
-  var exerciseOrder: Int = 1,
+  override val ownerID: String,
+  override val isPublic: Boolean = false,
+  override var order: Int = 1,
   var exercise: Exercise,
   var sets: MutableList<Set> = mutableListOf(),
   var notes: MutableList<ExerciseNote> = mutableListOf(),
@@ -70,12 +114,9 @@ data class ExerciseExerciseSets(
   @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId?,
   @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId?,
   @Serializable(ObjectIdSerializer::class) var programID: ObjectId?,
-)
+) : WorkoutComponent()
 
-@Serializable
-class ListExerciseExerciseSets() {
-  var list: List<ExerciseExerciseSets> = emptyList()
-}
+
 
 /*fun ExerciseSets.addSet() {
 if (sets.isNotEmpty()) {
@@ -239,7 +280,7 @@ fun ExerciseExerciseSets.resetSets(
 ) {
   sets.forEach { set ->
     set.id = ObjectId()
-    set.lazyListItemID = newID()
+    set.lazyListItemID = newLazyListItemID()
     set.uuid = Uuid.random()
     //    set.workoutID = workout.workoutID
     //    set.workoutUUID = workout.uuid
@@ -257,7 +298,7 @@ data class ExercisesSets(
 @Serializable
 data class SerializableExerciseSets(
   @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
-  var exSetsLazyListItemID: Long = newID(), // Used for LazyColumn
+  var exSetsLazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
   @Contextual var exSetsUUID: Uuid = Uuid.random(),
   @Contextual val workout: ObjectId = ObjectId(),
   //  val workoutID: Long? = null // TODO May be useless

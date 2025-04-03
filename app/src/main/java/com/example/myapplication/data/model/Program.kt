@@ -11,7 +11,7 @@
 
 package com.example.myapplication.data.model
 
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -30,7 +30,7 @@ data class Program(
   @SerialName("id")
   @Serializable(with = ObjectIdSerializer::class)
   var id: ObjectId = ObjectId(),
-  var lazyListItemID: Long = newID(),
+  var lazyListItemID: Long = newLazyListItemID(),
 
   @Serializable(UuidSerializer::class)
   var uuid: Uuid = Uuid.random(),
@@ -48,7 +48,8 @@ data class Program(
   var programEquipment: String? = null,
   var daysPerWeek: String? = null,
   var programLength: String? = null,
-  var active: Boolean = false,
+  var isActive: Boolean = false,
+  var isCompleted: Boolean = false,
   var notes: List<ProgramNote> = emptyList(),
   var mesocycles: List<Mesocycle> = emptyList(),
   var ownerID: String = "PUBLIC",
@@ -74,7 +75,7 @@ data class MesocycleDao(val Mesocycle: Mesocycle)
 @Serializable
 data class Mesocycle(
   @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
-  var lazyListItemID: Long = newID(),
+  var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String? = null,
   var description: String? = null,
@@ -96,7 +97,7 @@ data class MicrocycleDao(val Microcycle: Microcycle)
 @Serializable
 data class Microcycle(
   @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
-  var lazyListItemID: Long = newID(),
+  var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String? = null,
   var description: String? = null,

@@ -2,6 +2,7 @@
 
 package com.example.myapplication.components
 
+//import com.example.myapplication.data.model.ListExerciseExerciseSets
 import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationChannel
@@ -30,12 +31,13 @@ import com.example.myapplication.components.setRestTimer.TimerState
 import com.example.myapplication.data.model.Exercise
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
-import com.example.myapplication.data.model.ExerciseSets
-import com.example.myapplication.data.model.ListExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.SetType
+import com.example.myapplication.data.model.SupersetExercisesSets
 import com.example.myapplication.data.model.Workout
+import com.example.myapplication.data.model.WorkoutComponent
+import com.example.myapplication.data.model.WorkoutItem
 import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.data.model.addWarmUpSets
 import com.example.myapplication.data.model.completeSet
@@ -47,7 +49,7 @@ import com.example.myapplication.data.model.updateSetWeight
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.utils.AlarmReceiver
 import com.example.myapplication.utils.cancelNotifications
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import com.example.myapplication.utils.sendNotification
 import com.google.firebase.perf.metrics.AddTrace
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -183,24 +185,30 @@ class WorkoutViewModel(
       )
 
     viewModelScope.launch {
-      _workout.collect { workout ->
-        _workoutNotes.collect { workoutNotes ->
-          _exerciseSetsFlow.collect { exercisesSets ->
-            runCatching {
-              manageWorkoutUseCase.saveInProgressWorkout(
-                workout = workout,
-                workoutNotes = workoutNotes,
-                exercisesSets = exercisesSets.toList(),
-              )
-            }.onFailure {
-              // Handle error, e.g., log error, show error message
-              Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
+      runCatching {
+        _workout.collect { workout ->
+          _workoutNotes.collect { workoutNotes ->
+            _workoutComponentFlow.collect { workoutComponents ->
+              runCatching {
+                manageWorkoutUseCase.saveInProgressWorkout(
+                  workout = workout,
+                  workoutNotes = workoutNotes,
+                  workoutComponents = workoutComponents,
+                )
+              }.onFailure {
+                // Handle error, e.g., log error, show error message
+                Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
+              }
             }
           }
         }
+      }.onFailure {
+        // Handle error, e.g., log error, show error message
+        Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
       }
     }
   }
+
 
   @AddTrace(name = "savedStateHandle WORKOUT_DETAILS", enabled = true)
   private fun testSaveStateHandle() {
@@ -369,35 +377,73 @@ class WorkoutViewModel(
     createTimer(_timerDuration)
   }
 
-  private var completedSets = mutableListOf<Long>()
+  private var completedSets = mutableSetOf<Long>()
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun startSetCompletedTimer(
-    exerciseSet: ExerciseExerciseSets,
+//    workoutComponent: WorkoutComponent, // Removed - We find the context from setUUID
     setUUID: Uuid,
     setLazyListItemID: Long,
   ) {
-    //    Log.i("startSetCompletedTimer() ", "called")
-    val exercise = exerciseSet.exercise
-    val set = exerciseSet.sets.first { it.uuid == setUUID }
+    //    Log.i("startSetCompletedTcimer() ", "called")
+    var foundExercise: Exercise? = null
+    var foundSet: Set? = null
+
+    // Search through the workout components to find the exercise and set matching the UUID
+    // Using run breaking@forEach to exit early once found
+    run breaking@{
+      _workoutComponents.forEach { component ->
+        when (component) {
+          is ExerciseExerciseSets -> {
+            // Check sets directly in this component
+            val set = component.sets.firstOrNull { it.uuid == setUUID }
+            if (set != null) {
+              foundExercise = component.exercise
+              foundSet = set
+              return@breaking // Exit loops, we found it
+            }
+          }
+
+          is SupersetExercisesSets -> {
+            // Check sets within each ExerciseExerciseSets of the superset
+            component.exercisesSets.forEach innerLoop@{ innerExSets ->
+              val set = innerExSets.sets.firstOrNull { it.uuid == setUUID }
+              if (set != null) {
+                foundExercise = innerExSets.exercise
+                foundSet = set
+                return@breaking // Exit loops, we found it
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (foundExercise == null || foundSet == null) {
+      Log.e("startSetCompletedTimer", "Could not find Exercise or Set for UUID: $setUUID")
+      return
+    }
+
     // Only allows new completed sets to start the timer once
-    if (!completedSets.contains(setLazyListItemID)) {
-      completedSets.add(setLazyListItemID)
+    if (completedSets.add(setLazyListItemID)) { // Use add() which returns true if added (wasn't present)
+
       /*
        * Doesn't allow the new completed set to cancel the timer if one is already running
        */
       if (_state != TimerState.RUNNING) {
-        if (exercise.warmUpSetRestTimerEnabled && (set.setTypeID == WARM_UP_SET)) {
-          _timerDuration = exercise.warmUpSetRestInWholeMilliseconds
+        if (foundExercise!!.warmUpSetRestTimerEnabled && (foundSet!!.setTypeID == WARM_UP_SET)) {
+          _timerDuration = foundExercise!!.warmUpSetRestInWholeMilliseconds
 
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
-        } else if (exercise.workingSetRestTimerEnabled && (set.setTypeID != WARM_UP_SET)) {
-          _timerDuration = exercise.workingSetRestInWholeMilliseconds
+        } else if (foundExercise!!.workingSetRestTimerEnabled && (foundSet!!.setTypeID != WARM_UP_SET)) {
+          _timerDuration = foundExercise!!.workingSetRestInWholeMilliseconds
 
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
         }
+        // If neither condition is met (e.g., rest timer disabled for the set type), no timer starts
       }
     }
+    // If completedSets.add() returns false, it means this ID was already processed, so do nothing.
   }
 
   private fun resetTimerState() {
@@ -453,7 +499,7 @@ class WorkoutViewModel(
 
   //    Workout
   private lateinit var initialWorkoutData: Workout
-  //  private var _workoutData: Workout = initWorkout()
+//  private var _workoutData: Workout = initWorkout()
 
   /*
     private var workoutDetails: Workout
@@ -527,10 +573,8 @@ class WorkoutViewModel(
       _workout.value = workoutDetails
 
       getPinnedWorkoutNotes(workout.uuid, workout.id)
-      setExercisesSets(loadExercisesSetsFromPreviousWorkout(workout.exercisesSets).toList())
+      setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.exercisesSets))
     }
-
-    //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
@@ -542,10 +586,9 @@ class WorkoutViewModel(
 
     getPinnedWorkoutNotes(workoutTemplate.uuid, newWorkout.id)
 
-    setExercisesSets(
+    setWorkoutComponents(
       copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets, newWorkout.id).toList()
     )
-    //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
   fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout) {
@@ -556,39 +599,39 @@ class WorkoutViewModel(
     _workout.value = workoutDetails
 
     getPinnedWorkoutNotes(previousWorkout.uuid, newWorkout.id)
-    setExercisesSets(
+    setWorkoutComponents(
       copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets, newWorkout.id).toList()
     )
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
   private fun copyExercisesSetsFromPreviousWorkout(
-    previousExercisesSets: List<ExerciseSets>,
+    previousWorkoutItems: List<WorkoutItem>,
     _workoutID: ObjectId,
-  ): MutableList<ExerciseExerciseSets> {
-    return manageWorkoutUseCase.copyExercisesSetsFromPreviousWorkout(
-      previousExercisesSets = previousExercisesSets,
-      _workoutID = _workoutID,
+  ): List<WorkoutComponent> {
+    return manageWorkoutUseCase.createNewWorkoutComponentsFromPreviousWorkout(
+      previousWorkoutItems = previousWorkoutItems,
+      workoutID = _workoutID,
     )
   }
 
-  private fun loadExercisesSetsFromPreviousWorkout(
-    previousExercisesSets: List<ExerciseSets>
-  ): MutableList<ExerciseExerciseSets> {
-    return manageWorkoutUseCase.loadExercisesSetsFromWorkout(
-      previousExercisesSets = previousExercisesSets
+  private fun loadWorkoutComponentsFromPreviousWorkout(
+    previousWorkoutItems: List<WorkoutItem>
+  ): List<WorkoutComponent> {
+    return manageWorkoutUseCase.loadWorkoutItemsFromWorkout(
+      previousWorkoutItems = previousWorkoutItems
     )
   }
 
-  // TODO Think out how to get Previous Set from the last time the exercise was performed
-  //   and what data structure to store them in
+// TODO Think out how to get Previous Set from the last time the exercise was performed
+//   and what data structure to store them in
 
   /* private fun copySetsFromPreviousWorkout(previousSets: List<Set>): List<Set> {
     return manageWorkoutUseCase.copySetsFromPreviousWorkout(previousSets)
   }*/
 
   fun populatePreviousSetField(exerciseID: ObjectId, setNumber: Int): Set? {
-    return manageWorkoutUseCase.populatePreviousSetField(exerciseID, setNumber)
+    return manageWorkoutUseCase.getPreviousSetForExercise(exerciseID, setNumber)
   }
 
   //  private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
@@ -638,7 +681,7 @@ class WorkoutViewModel(
   }
 
   fun updateWorkoutNotes(note: WorkoutNote) {
-    _workoutNotesData.first { it == note }.lazyListID = newID()
+    _workoutNotesData.first { it == note }.lazyListID = newLazyListItemID()
     _workoutNotes.value = _workoutNotesData.toList()
   }
 
@@ -650,12 +693,12 @@ class WorkoutViewModel(
     // TODO Navigate to Workout Complete Screen & Summary
   }
 
-  //    ExerciseExerciseSets
-  //  private var _exercisesSetsData = mutableListOf<ExerciseExerciseSets>()
+//    ExerciseExerciseSets
+//  private var _exercisesSetsData = mutableListOf<ExerciseExerciseSets>()
 
-  //  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
+//  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
 
-  private var _exercisesSets: MutableList<ExerciseExerciseSets> =
+  private var _workoutComponents: MutableList<WorkoutComponent> = mutableListOf() /*=
     savedStateHandle.saveable(
       key = EXERCISE_EXERCISE_SETS,
       saver =
@@ -672,50 +715,81 @@ class WorkoutViewModel(
       ),
     ) {
       mutableListOf()
-    }
+    }*/
 
-  private var _exerciseSetsFlow = MutableStateFlow(_exercisesSets.toList())
+  private var _workoutComponentFlow = MutableStateFlow(_workoutComponents.toList())
 
-  fun setExercisesSets(exercisesSets: List<ExerciseExerciseSets>) {
-    _exercisesSets = exercisesSets.toMutableList()
-    _exerciseSetsFlow.value = exercisesSets
+  private fun setWorkoutComponents(workoutComponents: List<WorkoutComponent>) {
+    _workoutComponents = workoutComponents.toMutableList()
+    _workoutComponentFlow.value = workoutComponents
     //    savedStateHandle[EXERCISE_EXERCISE_SETS] = exercisesSets.toMutableList()
   }
 
-  val exercisesSets: StateFlow<List<ExerciseExerciseSets>>
-    get() = _exerciseSetsFlow.asStateFlow()
+  val workoutComponents: StateFlow<List<WorkoutComponent>>
+    get() = _workoutComponentFlow.asStateFlow()
 
-  //  TODO What is this used for or purpose, Workout Summary?
-  //  private var _allSetsData: MutableList<Set> = allSets(_exercisesSets.value)
-  //  private var _allSets = MutableStateFlow(_allSetsData.toList())
-  //  val allSets
-  //    get() = _allSets.asStateFlow()
+//  TODO What is this used for or purpose, Workout Summary?
+//  private var _allSetsData: MutableList<Set> = allSets(_exercisesSets.value)
+//  private var _allSets = MutableStateFlow(_allSetsData.toList())
+//  val allSets
+//    get() = _allSets.asStateFlow()
 
   fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
     return manageWorkoutUseCase.getWeightUnit(exerciseSets)
   }
 
+  fun createSupersetFromExercise(exercises: List<Exercise>) {
+    val temporaryWorkoutComponents = manageWorkoutUseCase.createSupersetFromExercise(
+      _workoutComponents,
+      exercises,
+      _workout.value,
+    )
+
+    setWorkoutComponents(temporaryWorkoutComponents.toList())
+  }
+
+  fun createSupersetFromExercisesSets(exercisesSets: List<ExerciseExerciseSets>) {
+    setWorkoutComponents(
+      manageWorkoutUseCase.createSupersetFromExercisesSets(
+        _workoutComponents,
+        exercisesSets,
+        _workout.value,
+      )
+    )
+  }
+
   fun addMultipleEmptyExerciseSets(exercisesSelectedToBeAddedToWorkout: List<Exercise>) {
     val temporaryExerciseExerciseSets =
       manageWorkoutUseCase.addMultipleEmptyExerciseSets(
-        _exercisesSets,
+        _workoutComponents,
         exercisesSelectedToBeAddedToWorkout,
         _workout.value.id,
       )
 
     //    _exercisesSetsData = temporaryExerciseExerciseSets
-    setExercisesSets(temporaryExerciseExerciseSets.toList())
+    setWorkoutComponents(temporaryExerciseExerciseSets.toList())
   }
 
-  fun removeExerciseSets(exerciseSets: ExerciseExerciseSets) {
-    setExercisesSets(_exercisesSets.filter { it != exerciseSets }.toMutableList())
+  fun removeExerciseSets(exerciseSets: WorkoutComponent) {
+    setWorkoutComponents(_workoutComponents.filter { it != exerciseSets }.toMutableList())
     //    _exercisesSets.value = _exercisesSetsData
   }
 
-  fun addSet(exerciseSets: ExerciseExerciseSets) {
-    val temporarySets: List<Set> = manageWorkoutUseCase.addSet(exerciseSets)
+  fun addSet(
+//    workoutComponent: List<WorkoutComponent>, // Input: immutable list
+    supersetUuid: Uuid?, // ID of the Superset component
+    targetExSetsUuid: Uuid // ID of the ExerciseExerciseSets within the Superset
+  ) {
+    setWorkoutComponents(
+      manageWorkoutUseCase.addSetToExerciseExerciseSet(
+        workoutComponent = _workoutComponents,
+        supersetUuid = supersetUuid,
+        targetExSetsUuid = targetExSetsUuid
+      )
+    )
+//    val temporarySets: List<Set> = manageWorkoutUseCase.addSet(workoutComponent)
+//    updateExercisesSetsData (workoutComponent, temporarySets)
 
-    updateExercisesSetsData(exerciseSets, temporarySets)
   }
 
   fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set) {
@@ -736,7 +810,7 @@ class WorkoutViewModel(
   fun addExerciseNote(exerciseSets: ExerciseExerciseSets) {
     exerciseSets.notes.add(
       ExerciseNote().apply {
-        exercise = exerciseSets.exercise?.id
+        exercise = exerciseSets.exercise.id
         workout = _workout.value.id
       }
     )
@@ -774,30 +848,30 @@ class WorkoutViewModel(
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
-  //  private fun allSets(exerciseSets: List<ExerciseExerciseSets>): MutableList<Set> {
-  //    val setsList = mutableListOf<Set>()
-  //    exerciseSets.forEach { exerciseSet ->
-  //      exerciseSet.sets.forEach { set -> setsList.add(set) }
-  //    }
-  //
-  //    return setsList
-  //  fun getSetData(setUUID: RealmUUID): Set {
-  //    return allSets().first { it.uuid == setUUID }
+//  private fun allSets(exerciseSets: List<ExerciseExerciseSets>): MutableList<Set> {
+//    val setsList = mutableListOf<Set>()
+//    exerciseSets.forEach { exerciseSet ->
+//      exerciseSet.sets.forEach { set -> setsList.add(set) }
+//    }
+//
+//    return setsList
+//  fun getSetData(setUUID: RealmUUID): Set {
+//    return allSets().first { it.uuid == setUUID }
 
-  private fun updateExerciseExerciseSetsData(exerciseSets: ExerciseExerciseSets) {
+  private fun updateExerciseExerciseSetsData(workoutComponent: ExerciseExerciseSets) {
 
-    setExercisesSets(
-      manageWorkoutUseCase.updateExerciseExerciseSetsData(
-        exerciseExerciseSets = _exercisesSets,
-        exerciseSets = exerciseSets,
+    setWorkoutComponents(
+      manageWorkoutUseCase.refreshWorkoutComponentLazyListItemID(
+        workoutComponents = _workoutComponents,
+        targetExerciseEerciseSets = workoutComponent,
       )
     )
     //    _allSets.value = allSets(_exercisesSets.value).toList()
   }
 
-  //  }
+//  }
 
-  //  }
+//  }
 
   fun updateSetWeight(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newWeight: Double?) {
     val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
@@ -869,7 +943,7 @@ class WorkoutViewModel(
   }
 
   fun addWorkingSets(exerciseSets: ExerciseExerciseSets, workingSets: List<Set>) {
-    workingSets.forEach { it.lazyListItemID = newID() }
+    workingSets.forEach { it.lazyListItemID = newLazyListItemID() }
 
     exerciseSets.sets.removeAll { it.setTypeID != WARM_UP_SET }
 
@@ -933,14 +1007,7 @@ class WorkoutViewModel(
     var countSets: Int = 0
     var countSetsCompleted: Int = 0
 
-    _exercisesSets.forEach { exerciseSets ->
-      exerciseSets.sets.forEach { set ->
-        countSets++
-        if (set.setCompleted) {
-          countSetsCompleted++
-        }
-      }
-    }
+    manageWorkoutUseCase.checkAllSetsComplete(_workoutComponents)
 
     return Pair(countSetsCompleted, countSets)
   }
@@ -983,7 +1050,7 @@ class WorkoutViewModel(
     //    _workoutData.calculateTotalVolume(userDefaultWeightUnit)
 
     viewModelScope.launch {
-      manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _exercisesSets)
+      manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _workoutComponents)
     }
   }
 
@@ -1009,7 +1076,7 @@ class WorkoutViewModel(
     stopWorkoutTimer()
     workoutDetails = initWorkout()
     //    _exercisesSetsData = mutableListOf()
-    setExercisesSets(listOf())
+    setWorkoutComponents(listOf())
   }
 
   private fun removeUncompletedSets() {
@@ -1018,12 +1085,16 @@ class WorkoutViewModel(
     //    newData.forEach { it.sets.removeIf { set -> !set.setCompleted } }
     //    newData.filter { it.sets.isNotEmpty() }
     //    _exercisesSetsData = newData
-    setExercisesSets(manageWorkoutUseCase.removeUncompletedSets(_exercisesSets))
+    setWorkoutComponents(manageWorkoutUseCase.removeUncompletedSets(_workoutComponents))
   }
 
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseExerciseSets, newExercise: Exercise) {
-    setExercisesSets(
-      manageWorkoutUseCase.replaceExerciseInExerciseSets(_exercisesSets, exerciseSets, newExercise)
+    setWorkoutComponents(
+      manageWorkoutUseCase.replaceExerciseInExerciseSets(
+        _workoutComponents,
+        exerciseSets,
+        newExercise
+      )
     )
   }
 }

@@ -6,6 +6,7 @@ import com.example.myapplication.data.model.Force
 import com.example.myapplication.data.model.Mechanic
 import com.example.myapplication.data.model.MuscleGroup
 import com.example.myapplication.data.model.MuscleRoleFunction
+import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Utility
 import kotlinx.coroutines.flow.Flow
 import org.bson.types.ObjectId
@@ -63,4 +64,6 @@ interface ExercisesRepository {
   ): Flow<List<Exercise>>
 
   fun getExerciseByName(exerciseName: String): ObjectId?
+
+  fun getCompletedSetsByExercise(exercise: Exercise): Flow<List<Set>>
 }

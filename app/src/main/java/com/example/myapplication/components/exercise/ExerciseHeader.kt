@@ -47,6 +47,7 @@ import androidx.navigation.NavController
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
+import com.example.myapplication.data.model.WorkoutComponent
 import com.example.myapplication.data.model.averageWeight
 import com.example.myapplication.data.model.calculateTotalVolume
 import com.example.myapplication.data.model.totalRepetitions
@@ -65,7 +66,9 @@ fun ExerciseScreen(
   addExerciseNote: () -> Unit,
   removeExerciseNote: (note: ExerciseNote) -> Unit,
   pinExerciseNote: (note: ExerciseNote, pinned: Boolean) -> Unit,
-  updateExerciseWeightUnit: (weightUnit: String?) -> Unit
+  updateExerciseWeightUnit: (weightUnit: String?) -> Unit,
+  workoutComponents: List<WorkoutComponent> = listOf(),
+  onCreateSuperset: (List<ExerciseExerciseSets>) -> Unit = {},
 ) {
   val exerciseSets by remember { mutableStateOf(_exerciseSets) }
   //  Log.i("ExerciseScreen", "$_exerciseSets")
@@ -110,6 +113,10 @@ fun ExerciseScreen(
           )
         },
         navController = navController,
+        workoutComponents = workoutComponents,
+        onCreateSuperset = { selectedExercises ->
+          onCreateSuperset(selectedExercises)
+        },
       )
     },
     exerciseNotesList = {

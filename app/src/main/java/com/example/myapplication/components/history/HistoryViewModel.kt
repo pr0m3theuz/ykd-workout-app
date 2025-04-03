@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.components.ManageExercisesUseCase
 import com.example.myapplication.components.ManageWorkoutUseCase
 import com.example.myapplication.data.model.Exercise
-import com.example.myapplication.data.model.ExerciseExerciseSets
-import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Workout
+import com.example.myapplication.data.model.WorkoutComponent
+import com.example.myapplication.data.model.WorkoutItem
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.data.network.WorkoutRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,9 +39,9 @@ class HistoryViewModel(
   val workout
     get() = _workout.asStateFlow()
 
-  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
-  val exercisesSets
-    get() = _exercisesSets.asStateFlow()
+  private var _workoutComponents = MutableStateFlow(listOf<WorkoutComponent>())
+  val workoutComponents
+    get() = _workoutComponents.asStateFlow()
 
   init {
     viewModelScope.launch {
@@ -59,8 +59,8 @@ class HistoryViewModel(
     return exerciseRepository.getExercise(exerciseID)
   }
 
-  fun loadExercisesSetsFromWorkout(exercisesSets: List<ExerciseSets>) {
-    _exercisesSets.value = manageWorkoutUseCase.loadExercisesSetsFromWorkout(exercisesSets)
+  fun loadWorkoutItemsFromWorkout(workoutItems: List<WorkoutItem>) {
+    _workoutComponents.value = manageWorkoutUseCase.loadWorkoutItemsFromWorkout(workoutItems)
   }
 
   fun deleteWorkout(workout: Workout) {

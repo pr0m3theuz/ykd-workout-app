@@ -10,24 +10,24 @@
 
 package com.example.myapplication.data.model
 
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.serialization.UseSerializers
 
 // TODO Create screen to edit/create bar type
 // TODO Could be useful for Plate Calculator Feature
 // @Entity(tableName = "barType")
 data class BarType(
-    val id: Long = newID(),
-    val name: String,
-    var barWeightPounds: Double,
-    var barWeightKilograms: Double,
-    var ownerID: String? = null
+  val id: Long = newLazyListItemID(),
+  val name: String,
+  var barWeightPounds: Double,
+  var barWeightKilograms: Double,
+  var ownerID: String? = null
 )
 
 data class WeightUnit(
-    val id: Long = newID(),
-    val name: String,
-    val abbreviation: String,
+  val id: Long = newLazyListItemID(),
+  val name: String,
+  val abbreviation: String,
 )
 
 enum class MassUnit(val abbreviation: String) {

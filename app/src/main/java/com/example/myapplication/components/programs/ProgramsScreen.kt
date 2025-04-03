@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -70,7 +71,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.components.BottomNavigationBar
+import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Program
+import com.example.myapplication.data.model.Superset
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.utils.doubleFormatted
 import org.koin.androidx.compose.koinViewModel
@@ -114,6 +117,7 @@ fun ProgramsScreen(
   }
 
   Scaffold(
+    modifier = Modifier.imePadding(),
     topBar = {
       TopAppBar(
         title = { Text(text = "Programs", style = MaterialTheme.typography.titleLarge) },
@@ -631,65 +635,130 @@ fun CurrentProgramCard(
       Column() {
         // TODO List Exercises
         //        Text("Workout Summary", style = bodySmall)
-        workout.exercisesSets.forEach { exerciseSets ->
-          Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(2.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-          ) {
-            //            Log.i("getExerciseNameByID", "exercise ID: " +
-            // exerciseSets.exerciseID?.toHexString())
-            exerciseSets.exerciseID?.let {
-              Text(
-                text = programsViewModel.getExerciseNameByID(it) ?: "Exercise not found.",
-                style = bodySmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(0.5f),
-              )
+        workout.exercisesSets.forEach { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> {
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(2.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                // Log.i("getExerciseNameByID", "exercise ID: " +
+                // workoutItem.exerciseID?.toHexString())
+                Text(
+                  text = programsViewModel.getExerciseNameByID(workoutItem.exerciseID)
+                    ?: "Exercise not found.",
+                  style = bodySmall,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
+                  modifier = Modifier.weight(0.5f),
+                )
+
+                Box(Modifier.weight(0.5f)) {
+                  Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                  ) {
+                    Text(
+                      text = workoutItem.sets.size.toString(),
+                      style = bodySmall,
+                      textAlign = TextAlign.Center,
+                      modifier = Modifier.weight(weight = 1f, fill = true),
+                    )
+                    Text(
+                      text =
+                      if (
+                        !workoutItem.sets
+                          .maxBy { it.repetitions ?: 0 }
+                          .targetRepetitions
+                          .isNullOrBlank()
+                      )
+                        "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
+                      else "-",
+                      style = bodySmall,
+                      textAlign = TextAlign.Center,
+                      modifier = Modifier.weight(weight = 1f, fill = true),
+                    )
+                    Text(
+                      text =
+                      doubleFormatted(
+                        workoutItem.sets
+                          .minBy { it.repetitionsInReserve ?: 10.0 }
+                          .targetRepetitionsInReserve
+                      ),
+                      style = bodySmall,
+                      textAlign = TextAlign.Center,
+                      modifier = Modifier.weight(weight = 1f, fill = true),
+                    )
+                  }
+                }
+              }
             }
 
-            Box(Modifier.weight(0.5f)) {
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-              ) {
-                Text(
-                  text = exerciseSets.sets.size.toString(),
-                  style = bodySmall,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true),
-                )
-                Text(
-                  text =
-                  if (
-                    !exerciseSets.sets
-                      .maxBy { it.repetitions ?: 0 }
-                      .targetRepetitions
-                      .isNullOrBlank()
+            is Superset -> {
+              workoutItem.exercisesSets.forEach { exerciseSets ->
+                Row(
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically,
+                ) {
+                  Text(
+                    text = programsViewModel.getExerciseNameByID(exerciseSets.exerciseID)
+                      ?: "Exercise not found.",
+                    style = bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(0.5f),
                   )
-                    "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
-                  else "-",
-                  style = bodySmall,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true),
-                )
-                Text(
-                  text =
-                  doubleFormatted(
-                    exerciseSets.sets
-                      .minBy { it.repetitionsInReserve ?: 10.0 }
-                      .targetRepetitionsInReserve
-                  ),
-                  style = bodySmall,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.weight(weight = 1f, fill = true),
-                )
+
+                  Box(Modifier.weight(0.5f)) {
+                    Row(
+                      modifier = Modifier.fillMaxWidth(),
+                      horizontalArrangement = Arrangement.SpaceAround,
+                    ) {
+                      Text(
+                        text = exerciseSets.sets.size.toString(),
+                        style = bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(weight = 1f, fill = true),
+                      )
+                      Text(
+                        text =
+                        if (
+                          !exerciseSets.sets
+                            .maxBy { it.repetitions ?: 0 }
+                            .targetRepetitions
+                            .isNullOrBlank()
+                        )
+                          "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
+                        else "-",
+                        style = bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(weight = 1f, fill = true),
+                      )
+                      Text(
+                        text =
+                        doubleFormatted(
+                          exerciseSets.sets
+                            .minBy { it.repetitionsInReserve ?: 10.0 }
+                            .targetRepetitionsInReserve
+                        ),
+                        style = bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(weight = 1f, fill = true),
+                      )
+                    }
+                  }
+                }
               }
             }
           }
+
+
         }
       }
     }

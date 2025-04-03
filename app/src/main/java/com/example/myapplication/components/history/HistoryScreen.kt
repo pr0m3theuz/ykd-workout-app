@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -68,13 +69,15 @@ import com.example.myapplication.components.WorkoutOptionsDropdownMenu
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.exercise.AddSet
 import com.example.myapplication.components.exercise.ExerciseScreen
+import com.example.myapplication.components.exercise.ExerciseSetLazyColumn
 import com.example.myapplication.components.exercise.SetContent
 import com.example.myapplication.components.exercise.SetLazyListItem
+import com.example.myapplication.components.exercise.SwipeToDismissWorkoutNote
 import com.example.myapplication.components.workout.AddExercise
-import com.example.myapplication.components.workout.ExerciseSetLazyColumn
-import com.example.myapplication.components.workout.SwipeToDismissWorkoutNote
 import com.example.myapplication.components.workout.WorkoutSummaryCard
+import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.SetType
+import com.example.myapplication.data.model.SupersetExercisesSets
 import com.example.myapplication.data.model.formatLongWorkoutStarted
 import com.example.myapplication.data.model.formatWorkoutDuration
 import com.example.myapplication.data.model.setSummaryRIR
@@ -84,6 +87,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
+import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -106,6 +110,7 @@ fun HistoryScreen(navController: NavController) {
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
   Scaffold(
+    modifier = Modifier.imePadding(),
     topBar = {
       TopAppBar(
         title = {
@@ -163,10 +168,10 @@ fun HistoryScreen(navController: NavController) {
           SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             inputFieldColors =
-              TextFieldDefaults.colors(
-                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
-              ),
+            TextFieldDefaults.colors(
+              unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+              unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+            ),
           )
         /*
         AnimatedVisibility(
@@ -281,7 +286,7 @@ fun HistoryLazyColumn(
         stickyHeader {
           Text(
             modifier = Modifier.padding(0.dp),
-            text = month.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault()),
+            text = month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
           )
         }
 
@@ -291,14 +296,14 @@ fun HistoryLazyColumn(
         items(monthWorkouts) { workout ->
           Box(
             modifier =
-              Modifier.clickable(
-                onClick = {
-                  navController.navigate("history?overviewWorkout=${workout.id.toHexString()}")
-                },
-                enabled = true,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = LocalIndication.current,
-              )
+            Modifier.clickable(
+              onClick = {
+                navController.navigate("history?overviewWorkout=${workout.id.toHexString()}")
+              },
+              enabled = true,
+              interactionSource = remember { MutableInteractionSource() },
+              indication = LocalIndication.current,
+            )
           ) {
             WorkoutSummaryCard(
               completedWorkout = workout,
@@ -326,8 +331,8 @@ fun WorkoutOverview(
   historyViewModel.getWorkoutByID(ObjectId(workoutID))
   val workout by historyViewModel.workout.collectAsState()
 
-  workout?.exercisesSets?.let { historyViewModel.loadExercisesSetsFromWorkout(it) }
-  val exerciseExerciseSets by historyViewModel.exercisesSets.collectAsState()
+  workout?.exercisesSets?.let { historyViewModel.loadWorkoutItemsFromWorkout(it) }
+  val workoutComponents by historyViewModel.workoutComponents.collectAsState()
 
   val (openDeleteWorkoutDialog, setOpenDeleteWorkoutDialog) = remember { mutableStateOf(false) }
 
@@ -335,10 +340,10 @@ fun WorkoutOverview(
     workout?.let { itWorkout ->
       ConfirmDeleteWorkout(
         onDismissRequest = { setOpenDeleteWorkoutDialog(false) },
-          deleteWorkout = {
-              historyViewModel.deleteWorkout(itWorkout)
-              navController.popBackStack()
-          },
+        deleteWorkout = {
+          historyViewModel.deleteWorkout(itWorkout)
+          navController.popBackStack()
+        },
       )
     }
   }
@@ -348,10 +353,11 @@ fun WorkoutOverview(
     else ->
       workout?.let { itWorkout ->
         Scaffold(
+          modifier = Modifier.imePadding(),
           topBar = {
             TopAppBar(
               title = {
-                itWorkout.name?.let { workoutName ->
+                itWorkout.name.let { workoutName ->
                   Text(text = workoutName, style = MaterialTheme.typography.titleLarge)
                 }
               },
@@ -447,7 +453,7 @@ fun WorkoutOverview(
                     Icon(painter = weightIcon, contentDescription = null)
                     Text(
                       text =
-                        "${
+                      "${
                         doubleFormatted(
                           when (userDefaultWeightUnit) {
                             "kg" -> itWorkout.totalVolumeInKilograms
@@ -469,34 +475,71 @@ fun WorkoutOverview(
                 }
               }
 
-              exerciseExerciseSets.forEach { exerciseSets ->
-                Box(modifier = Modifier
-                  .padding(vertical = 12.dp)
-                  .fillMaxWidth()) {
+              workoutComponents.forEach { workoutComponent ->
+                Box(
+                  modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .fillMaxWidth()
+                ) {
                   Column(modifier = Modifier.fillMaxWidth()) {
-                    Row {
-                      Text(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        text = exerciseSets.exercise?.name ?: "Exercise Name",
-                        style = MaterialTheme.typography.titleMedium,
-                      )
-                    }
-                    exerciseSets.sets.forEach { set ->
-                      // TODO Chanage Text Color based on Set Type
-                      Row {
-                        Text(
-                          text =
-                          "${
-                            if (set.setTypeID == SetType.normalSet) {
-                              set.setNumber?.plus(1)
-                            } else {
-                              set.setTypeID
+                    when (workoutComponent) {
+                      is ExerciseExerciseSets -> {
+                        Row {
+                          Text(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            text = workoutComponent.exercise.name,
+                            style = MaterialTheme.typography.titleMedium,
+                          )
+                        }
+                        workoutComponent.sets.forEach { set ->
+                          // TODO Chanage Text Color based on Set Type
+                          Row {
+                            Text(
+                              text =
+                              "${
+                                if (set.setTypeID == SetType.normalSet) {
+                                  set.setNumber?.plus(1)
+                                } else {
+                                  set.setTypeID
+                                }
+                              }   ${set.setSummaryRIR(userDefaultWeightUnit)}",
+                              style = MaterialTheme.typography.bodyMedium,
+                            )
+                          }
+                        }
+                      }
+
+                      is SupersetExercisesSets -> {
+                        workoutComponent.exercisesSets.forEach { exerciseSets ->
+                          Row {
+                            Text(
+                              modifier = Modifier.padding(vertical = 8.dp),
+                              text = exerciseSets.exercise.name,
+                              style = MaterialTheme.typography.titleMedium,
+                            )
+                          }
+                          exerciseSets.sets.forEach { set ->
+                            // TODO Chanage Text Color based on Set Type
+                            Row {
+                              Text(
+                                text =
+                                "${
+                                  if (set.setTypeID == SetType.normalSet) {
+                                    set.setNumber?.plus(1)
+                                  } else {
+                                    set.setTypeID
+                                  }
+                                }   ${set.setSummaryRIR(userDefaultWeightUnit)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                              )
                             }
-                          }   ${set.setSummaryRIR(userDefaultWeightUnit)}",
-                          style = MaterialTheme.typography.bodyMedium,
-                        )
+                          }
+                        }
+
                       }
                     }
+
+
                   }
                 }
               }
@@ -508,7 +551,10 @@ fun WorkoutOverview(
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+  ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
+  ExperimentalUuidApi::class
+)
 @Composable
 fun EditWorkoutScreen(
   workoutViewModel: WorkoutViewModel = koinViewModel(),
@@ -520,14 +566,14 @@ fun EditWorkoutScreen(
 ) {
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
-  if (!workoutID.isNullOrBlank()) {
+  if (workoutID.isNotBlank()) {
     workoutViewModel.loadWorkoutFromPreviousWorkout(ObjectId(workoutID))
   } else {
     NoWorkoutFound()
   }
 
   val workout by workoutViewModel.workout.collectAsState(null)
-  val exerciseExerciseSets by workoutViewModel.exercisesSets.collectAsState()
+  val workoutComponents by workoutViewModel.workoutComponents.collectAsState()
   val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
@@ -542,6 +588,7 @@ fun EditWorkoutScreen(
 
   workout?.let { itWorkout ->
     Scaffold(
+      modifier = Modifier.imePadding(),
       topBar = {
         TopAppBar(
           title = {
@@ -616,9 +663,9 @@ fun EditWorkoutScreen(
           }
         }
 
-        if (exerciseExerciseSets.isNotEmpty()) {
+        if (workoutComponents.isNotEmpty()) {
           ExerciseSetLazyColumn(
-            exercises = exerciseExerciseSets,
+            workoutComponents = workoutComponents,
             workoutNotes = workoutNotes,
             enableCancelWorkout = true,
             WorkoutNoteItem = { workoutNote ->
@@ -647,6 +694,8 @@ fun EditWorkoutScreen(
                 updateExerciseWeightUnit = {
                   workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, it)
                 },
+                workoutComponents = workoutComponents,
+                onCreateSuperset = {},
               )
             },
             SetItem = { exerciseSets, set, index ->
@@ -663,7 +712,7 @@ fun EditWorkoutScreen(
                     set,
                     getWeightUnit = { workoutViewModel.getWeightUnit(exerciseSets) },
                     populatePreviousSetField = {
-                      exerciseSets.exercise?.let { exercise ->
+                      exerciseSets.exercise.let { exercise ->
                         set.setNumber?.let { setNumber ->
                           workoutViewModel.populatePreviousSetField(
                             exercise.id,
@@ -713,7 +762,14 @@ fun EditWorkoutScreen(
                 },
               )
             },
-            AddSet = { exerciseSets -> AddSet(addSet = { workoutViewModel.addSet(exerciseSets) }) },
+            AddSet = { supersetUuid, targetExSetsUuid ->
+              AddSet(addSet = {
+                workoutViewModel.addSet(
+                  supersetUuid = supersetUuid,
+                  targetExSetsUuid = targetExSetsUuid
+                )
+              })
+            },
             AddExercise = { AddExercise(navController = navController) },
             CancelWorkout = {},
           )

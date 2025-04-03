@@ -2,6 +2,7 @@
 
 package com.example.myapplication.components.workoutDialogs.warmUpSets
 
+
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.MassUnit
@@ -11,8 +12,6 @@ import com.example.myapplication.data.model.convertKgToPound
 import com.example.myapplication.data.model.convertPoundToKg
 import com.example.myapplication.data.network.UserRepository
 import com.example.myapplication.utils.ProgressionType
-
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.bson.types.ObjectId
@@ -30,7 +29,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
   val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   private var _exerciseSets: ExerciseExerciseSets? = null
-  var exerciseWeightUnit: String? = null
+  private var exerciseWeightUnit: String? = null
 
   private var _workingSetWeight = MutableStateFlow(100.0)
   val workingSetWeight

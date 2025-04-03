@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -92,6 +93,7 @@ import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Mesocycle
 import com.example.myapplication.data.model.Microcycle
 import com.example.myapplication.data.model.Program
+import com.example.myapplication.data.model.Superset
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.formatWorkoutDate
 import com.example.myapplication.utils.createAnnotatedLinkString
@@ -160,6 +162,7 @@ fun ProgramDetailsLayout(
   val (startButtonPressed, setStartButtonPressed) = rememberSaveable { mutableStateOf(false) }
 
   Scaffold(
+    modifier = Modifier.imePadding(),
     topBar = {
       TopAppBar(
         title = {
@@ -294,10 +297,10 @@ fun ProgramDetailsLayout(
                 //              programsViewModel = programsViewModel
               )
 
-            1 -> MesocyclesTab(activeProgram = program.active, mesocycles = mesocycles)
+            1 -> MesocyclesTab(activeProgram = program.isActive, mesocycles = mesocycles)
             2 ->
               WorkoutsTab(
-                activeProgram = program.active,
+                activeProgram = program.isActive,
                 navController = navController,
                 microcycles = microcycles,
               )
@@ -681,7 +684,7 @@ fun WorkoutDayCard(
   val bodyMedium = MaterialTheme.typography.bodyMedium
   val cardColors = CardDefaults.cardColors()
 
-  val exercisesSets = workout.exercisesSets
+  val workoutItems = workout.exercisesSets
 
   ElevatedCard() {
     Column(
@@ -697,12 +700,23 @@ fun WorkoutDayCard(
       ) {
         Text(text = "Day ${index.plus(1)}", style = labelMedium)
       }
-      if (exercisesSets.isNotEmpty()) {
-        exercisesSets
-          .sortedBy { it.exerciseOrder }
-          .forEachIndexed { index, exerciseSets ->
-            ExerciseOverview(index = index, exerciseSets = exerciseSets)
-            Spacer(modifier = Modifier.height(spacedByPadding))
+      if (workoutItems.isNotEmpty()) {
+        workoutItems
+          .sortedBy { it.order }
+          .forEachIndexed { _index, workoutItem ->
+            when (workoutItem) {
+              is ExerciseSets -> {
+                ExerciseOverview(index = _index, exerciseSets = workoutItem)
+                Spacer(modifier = Modifier.height(spacedByPadding))
+              }
+
+              is Superset -> {
+                workoutItem.exercisesSets.forEachIndexed { index, exerciseSets ->
+                  ExerciseOverview(index = index.plus(_index), exerciseSets = exerciseSets)
+                  Spacer(modifier = Modifier.height(spacedByPadding))
+                }
+              }
+            }
           }
       }
     }
@@ -725,9 +739,7 @@ fun ExerciseOverview(
         .fillMaxWidth()
         .padding(bottom = 4.dp)
     ) {
-      if (exercise != null) {
-        Text(text = "${index.plus(1)}. $exerciseName", style = labelMedium)
-      }
+      Text(text = "${index.plus(1)}. $exerciseName", style = labelMedium)
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
       Text(text = "Sets", style = labelMedium, modifier = Modifier.weight(1f))

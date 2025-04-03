@@ -12,7 +12,7 @@
 package com.example.myapplication.data.model
 
 import com.example.myapplication.utils.fakeULID
-import com.example.myapplication.utils.newID
+import com.example.myapplication.utils.newLazyListItemID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
@@ -25,11 +25,14 @@ import kotlin.uuid.Uuid
 
 // TODO Switch to use UUIDs instead of IDs
 @Serializable
+data class ExerciseNoteDao(val item: ExerciseNote)
+
+@Serializable
 class ExerciseNote() {
   @SerialName("id")
   @Contextual
   var id: ObjectId = ObjectId()
-  var lazyListID: Long = newID()
+  var lazyListID: Long = newLazyListItemID()
   @Contextual
   var uuid: Uuid = Uuid.random()
   var note: String? = null
@@ -50,6 +53,39 @@ class ExerciseNote() {
   var isPublic: Boolean = false
 }
 
+@Serializable
+data class SupersetNoteDao(val item: SupersetNote)
+
+@Serializable
+class SupersetNote() {
+  @SerialName("id")
+  @Contextual
+  var id: ObjectId = ObjectId()
+  var lazyListID: Long = newLazyListItemID()
+
+  @Contextual
+  var uuid: Uuid = Uuid.random()
+  var note: String? = null
+  var pinned: Boolean = false
+  var dateCreated: Instant = Clock.System.now()
+
+  @Contextual
+  var exercise: ObjectId? = null
+
+  @Contextual
+  var workout: ObjectId? = null
+
+  //    var program: Program
+  //    var programPinned: Boolean = false
+  //    var mesocycle: Mesocycle
+  //    var mesocyclePinned: Boolean = false
+  //    var microcycle: Microcycle
+  //    var microcyclePinned: Boolean = false
+  var ownerID: String? = null
+  var isPublic: Boolean = false
+}
+
+@Serializable
 data class WorkoutNoteDao(val item: WorkoutNote)
 
 // TODO Are the below necessary? TBD
@@ -58,7 +94,7 @@ class WorkoutNote() {
   @SerialName("id")
   @Contextual
   var id: ObjectId = ObjectId()
-  var lazyListID: Long = newID()
+  var lazyListID: Long = newLazyListItemID()
   @Contextual
   var uuid: Uuid = Uuid.random()
   var note: String? = null
@@ -78,11 +114,14 @@ class WorkoutNote() {
 }
 
 @Serializable
+data class ProgramNoteDao(val item: ProgramNote)
+
+@Serializable
 class ProgramNote() {
   @SerialName("id")
   @Contextual
   var id: ObjectId = ObjectId()
-  var lazyListID: Long = newID()
+  var lazyListID: Long = newLazyListItemID()
   @Contextual
   var uuid: Uuid = Uuid.random()
   var note: String? = null
@@ -94,11 +133,14 @@ class ProgramNote() {
 }
 
 @Serializable
+data class MesocycleNoteDao(val item: MesocycleNote)
+
+@Serializable
 class MesocycleNote() {
   @SerialName("id")
   @Contextual
   var id: Long = fakeULID()
-  var lazyListID: Long = newID()
+  var lazyListID: Long = newLazyListItemID()
   @Contextual
   var uuid: Uuid = Uuid.random()
   var note: String? = null
@@ -109,11 +151,17 @@ class MesocycleNote() {
   var isPublic: Boolean = false
 }
 
+@Serializable
+data class MicrocycleNoteDao(val item: MicrocycleNote)
+
+@Serializable
 class MicrocycleNote() {
   @SerialName("id")
   @Contextual
   var id: Long = fakeULID()
-  var lazyListID: Long = newID()
+  var lazyListID: Long = newLazyListItemID()
+
+  @Contextual
   var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
