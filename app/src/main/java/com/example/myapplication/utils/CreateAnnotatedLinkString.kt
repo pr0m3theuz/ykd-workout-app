@@ -38,15 +38,15 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
     fun processPattern(pattern: Regex, style: SpanStyle, text: String): String {
         var currentIndex = 0
         var updatedText = ""
-      Log.i("createAnnotatedLinkString.processPattern Pattern", "Pattern: $pattern")
+        Log.d("createAnnotatedLinkString.processPattern Pattern", "Pattern: $pattern")
         pattern.findAll(text, currentIndex).forEach { matchResult ->
-          Log.i(
+            Log.d(
             "createAnnotatedLinkString.processPattern Match",
             "Match Result: ${matchResult.value}"
           )
 
             val (content) = matchResult.destructured
-          Log.i("createAnnotatedLinkString.processPattern Content", "Content: $content")
+            Log.d("createAnnotatedLinkString.processPattern Content", "Content: $content")
             val startIndex = matchResult.range.first
             val endIndex = matchResult.range.last + 1
 
@@ -94,7 +94,7 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
     fun processList(pattern: Regex, isOrdered: Boolean, style: Any, text: String): String {
         var currentIndex = 0
         var updatedText = ""
-      Log.i("createAnnotatedLinkString Pattern", "Pattern: $pattern")
+        Log.d("createAnnotatedLinkString Pattern", "Pattern: $pattern")
         pattern.findAll(text, currentIndex).forEach { matchResult ->
             val listContent = matchResult.groupValues[1]
             val startIndex = matchResult.range.first
@@ -305,11 +305,11 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
 
     //  val spannableString = SpannableString(fullText)
 
-  Log.i("createAnnotatedLinkString Full Text", "Full Text:\n\n $fullText\n\n~~~~~~~~~\n\n")
+    Log.d("createAnnotatedLinkString Full Text", "Full Text:\n\n $fullText\n\n~~~~~~~~~\n\n")
 
     //  fullTextList.forEachIndexed { index, it -> println("Text $index: $it") }
 
-  Log.i("createAnnotatedLinkString", "\n\n~~~~~~~~~\n\n")
+    Log.d("createAnnotatedLinkString", "\n\n~~~~~~~~~\n\n")
 
     //  links.forEach { (url, linkText, start, end) ->
     //    println("URL: $url")
@@ -324,6 +324,6 @@ fun createAnnotatedLinkString(text: String, textLinkStyles: TextLinkStyles?): An
     //    )*/
     //  }
 
-  Log.i("createAnnotatedLinkString annotatedString Result", annotatedString.toString())
+    Log.d("createAnnotatedLinkString annotatedString Result", annotatedString.toString())
     return annotatedString
 }

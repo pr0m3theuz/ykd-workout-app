@@ -17,6 +17,8 @@ import com.example.myapplication.components.workoutDialogs.equateVolume.EquateVo
 import com.example.myapplication.components.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import com.example.myapplication.components.workoutDialogs.workingSets.WorkingSetViewModel
 import com.example.myapplication.data.database.DatabaseManager
+import com.example.myapplication.data.network.CompletedRepository
+import com.example.myapplication.data.network.CompletedRepositoryImpl
 import com.example.myapplication.data.network.ExerciseNotesRepository
 import com.example.myapplication.data.network.ExerciseNotesRepositoryImpl
 import com.example.myapplication.data.network.ExercisesRepository
@@ -97,6 +99,7 @@ val commonModule = module {
   singleOf(::UserRepositoryImpl) bind UserRepository::class
   singleOf(::ReplicatorServiceDb) bind ReplicatorService::class
   singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
+  singleOf(::CompletedRepositoryImpl) bind CompletedRepository::class
 //  singleOf(::ImportWorkoutProgramRepository)
 
   singleOf(::ManageWorkoutUseCase)

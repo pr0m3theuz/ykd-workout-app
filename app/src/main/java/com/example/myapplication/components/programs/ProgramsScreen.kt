@@ -635,7 +635,7 @@ fun CurrentProgramCard(
       Column() {
         // TODO List Exercises
         //        Text("Workout Summary", style = bodySmall)
-        workout.exercisesSets.forEach { workoutItem ->
+        workout.workoutItems.forEach { workoutItem ->
           when (workoutItem) {
             is ExerciseSets -> {
               Row(

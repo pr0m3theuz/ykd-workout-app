@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
@@ -76,7 +75,7 @@ fun WorkoutContent(
 
   fun navigateToWorkoutSummaryScreen() {
     //    val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
-    val thisWorkoutID = workoutViewModel.workout.value.id.toHexString()
+    val thisWorkoutID = workoutViewModel.workout.value?.id?.toHexString()
     val workoutsCount = workoutViewModel.getWorkoutsCount()
 
     Log.i("navigateToWorkoutSummaryScreen()", "workoutCount: $workoutsCount")
@@ -163,7 +162,7 @@ fun WorkoutContent(
   //  }
 
   Scaffold(
-    modifier = Modifier.imePadding(),
+//    modifier = Modifier.safeDrawingPadding(),
     topBar = {
       TopAppBar(
         title = {

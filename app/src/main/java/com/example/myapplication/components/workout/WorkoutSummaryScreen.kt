@@ -280,7 +280,7 @@ fun WorkoutSummaryCard(
         Text(text = "Exercise", style = style, modifier = Modifier.weight(1f))
         Text(text = "Top Set", style = style, modifier = Modifier.weight(0.5f))
       }
-      completedWorkout.exercisesSets.forEach { workoutItem ->
+      completedWorkout.workoutItems.forEach { workoutItem ->
         // TODO Seperate from WorkoutViewModel
         when (workoutItem) {
           is ExerciseSets -> {
@@ -314,7 +314,7 @@ fun WorkoutSummaryCard(
           }
 
           is Superset -> {
-            val backgroundColor = IBMColorBlindPalette.random()
+            val backgroundColor = IBMColorBlindPalette.stableColorFor(workoutItem.uuid)
 
             workoutItem.exercisesSets.forEach { exerciseSets ->
               val exercise = getExercise(exerciseSets.exerciseID)

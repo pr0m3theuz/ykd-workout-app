@@ -70,12 +70,10 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
           .where(Expression.property("id").equalTo(Expression.string(workoutID.toString())))
-          .orderBy(Ordering.property("name").ascending())
-          .limit(Expression.intValue(1))
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      val workout = result?.let { withUnknownKeys.decodeFromString<Workout>(it) }
+      val workout = result?.let { withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout }
 
       return workout
     } catch (e: Exception) {
@@ -374,13 +372,6 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     return flow {}
   }
 
-  override fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
-    // Implement logic to retrieve previous set based on exerciseID and setNumber
-    // This might require querying Sets and filtering
-    TODO("Implement logic to retrieve previous set")
-    return null
-  }
-
   override fun findNextWorkoutExerciseSets(
     exerciseSets: ExerciseSets,
     programID: ObjectId,
@@ -388,9 +379,10 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     // Implement logic to find the next workout containing the given ExerciseSets within the program
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
-      val collection = db.getCollection("Workout")
 
-      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val workoutCollection = db.getCollection("Workout")
+
+      requireNotNull(workoutCollection) { COLLECTION_IS_NULL }
 
       val exerciseSetsCollection = db.getCollection("ExerciseSets")
 
@@ -418,7 +410,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       val query =
         QueryBuilder.select(SelectResult.all())
-          .from(DataSource.collection(collection).`as`("workout"))
+          .from(DataSource.collection(workoutCollection).`as`("workout"))
           .join(Join.join(DataSource.collection(exerciseSetsCollection).`as`("exerciseSets")))
           .where(
             Expression.property("programID")
@@ -436,6 +428,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       // Execute first query to get potential matches
       val results = query.execute().allResults()
+      // TODO return results
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -443,7 +436,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
   }
 
   override suspend fun updateSets(sets: MutableList<Set>) {
-    // Implement logic to update multiple sets
+    // TODO Implement logic to update multiple sets
     // This might involve looping through the sets and updating their corresponding documents
 
   }

@@ -58,7 +58,7 @@ fun OldCreateSupersetScreen(
   fun onEditSuperset(superset: SupersetExercisesSets) {}
   fun onDeleteSuperset(supersetID: ObjectId) {}
 
-  val superset = SupersetExercisesSets()
+//  val superset = SupersetExercisesSets()
 
   val (selected, onSelected) = remember { mutableStateOf(false) }
 
@@ -116,7 +116,7 @@ fun OldCreateSupersetScreen(
                 .padding(vertical = 8.dp),
               shape = RoundedCornerShape(0f),
               colors = CardColors(
-                containerColor = IBMColorBlindPalette.random(),
+                containerColor = IBMColorBlindPalette.stableColorFor(component.uuid),
                 contentColor = MaterialTheme.colorScheme.onSurface,
                 disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 disabledContentColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -213,7 +213,7 @@ fun CreateSupersetScreen(
                     if (selectedIds.any { supersetIds.contains(it) }) {
                       removeSuperset = true
                       alreadyInSuperset = true
-                      parentSupersetName = component.name ?: "Superset" // Optional: get name
+//                      parentSupersetName = component.name ?: "Superset" // Optional: get name
                       break // Found a containing superset, no need to check others
                     }
                   }
@@ -289,7 +289,6 @@ fun CreateSupersetScreen(
             is SupersetExercisesSets -> false // Superset card itself isn't directly selectable here
           }
 
-          val supersetCardBackgroundColor: Color by remember { mutableStateOf(IBMColorBlindPalette.random()) }
 
           when (component) {
             is ExerciseExerciseSets -> {
@@ -312,6 +311,12 @@ fun CreateSupersetScreen(
 
             is SupersetExercisesSets -> {
               // Superset Card containing Exercise Rows
+              val supersetCardBackgroundColor: Color by remember {
+                mutableStateOf(
+                  IBMColorBlindPalette.stableColorFor(component.uuid)
+                )
+              }
+
               Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp), // Slightly rounded corners
@@ -357,6 +362,4 @@ fun CreateSupersetScreen(
       }
     }
   }
-
-
 }

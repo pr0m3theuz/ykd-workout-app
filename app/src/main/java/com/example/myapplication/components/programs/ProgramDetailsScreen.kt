@@ -55,6 +55,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -106,12 +107,10 @@ import kotlin.uuid.ExperimentalUuidApi
 fun ProgramDetailsScreen(
   navController: NavController,
   programsViewModel: ProgramsViewModel = koinViewModel(),
-  programID: String,
+  _programID: String,
 ) {
 
-  programsViewModel.getProgramById(ObjectId(programID))
-  programsViewModel.getMesocyclesByProgram(ObjectId(programID))
-  programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
+  val programID by remember { mutableStateOf(_programID) }
 
   val program by programsViewModel.selectedProgram.collectAsStateWithLifecycle(null)
 
@@ -120,6 +119,13 @@ fun ProgramDetailsScreen(
   val programMicrocycles by
   programsViewModel.selectedProgramMicrocycles.collectAsStateWithLifecycle()
   //  val mesocycles by programsViewModel.get
+
+  // 2. Use LaunchedEffect to trigger loading when programID changes
+  LaunchedEffect(programID) {
+    programsViewModel.getProgramById(ObjectId(programID))
+    programsViewModel.getMesocyclesByProgram(ObjectId(programID))
+    programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
+  }
 
   program?.let {
     ProgramDetailsLayout(
@@ -684,7 +690,7 @@ fun WorkoutDayCard(
   val bodyMedium = MaterialTheme.typography.bodyMedium
   val cardColors = CardDefaults.cardColors()
 
-  val workoutItems = workout.exercisesSets
+  val workoutItems = workout.workoutItems
 
   ElevatedCard() {
     Column(
@@ -965,7 +971,7 @@ fun MicrocycleCard(
                           }
                         }
 
-                        Text(text = "${workout.exercisesSets.size} Exercises", style = bodyMedium)
+                        Text(text = "${workout.workoutItems.size} Exercises", style = bodyMedium)
                       }
 
                       val workoutRoute = "workout?workoutID=${workout.id.toHexString()}"

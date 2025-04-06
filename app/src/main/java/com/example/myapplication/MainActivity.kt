@@ -170,7 +170,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
     arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
   ) {
     composable("workoutScreen?workoutID={workoutID}") { navBackStackEntry ->
-      Log.i("WorkoutNavGraph", "Navigated to Workout Screen")
+      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       WorkoutScreen(
         // TODO This is an anti-pattern
@@ -181,7 +181,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
     }
 
     composable("workoutSummary/{workoutID}/{workoutCount}") { navBackStackEntry ->
-      Log.i("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
+      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
@@ -203,7 +203,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
       "exerciseDetails/{exerciseID}",
       arguments = listOf(navArgument("exerciseID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
-      Log.i("WorkoutNavGraph", "Navigated to Exercise Details Screen")
+      Log.d("WorkoutNavGraph", "Navigated to Exercise Details Screen")
       navBackStackEntry.arguments?.getString("exerciseID")?.let {
         ExerciseDetailsScreen(
           // TODO This is an anti-pattern
@@ -276,7 +276,7 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
           // TODO This is an anti-pattern
           // https://developer.android.com/guide/navigation/use-graph/navigate
           navController,
-          programID = it,
+          _programID = it,
         )
       }
     }
@@ -290,7 +290,7 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController) {
   navigation(startDestination = "workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
     composable("workoutSummary/workoutID/workoutCount") { navBackStackEntry ->
-      Log.i("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
+      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
@@ -309,7 +309,7 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
 private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
   navigation("historyScreen", route = Screens.History.baseRoute) {
     composable("historyScreen") { navBackStackEntry ->
-      Log.i("HistoryNavGraph", "Navigated to History Screen")
+      Log.d("HistoryNavGraph", "Navigated to History Screen")
       HistoryScreen(navController = navController)
     }
 
@@ -331,13 +331,13 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
   navigation("profileScreen", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
-      Log.i("ProfileNavGraph", "Navigated to User Profile Screen")
+      Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
       ProfileScreen(navController = navController,
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") })
     }
 
     composable("replicatorScreen") {
-//      Log.i("ReplicatorNavGraph", "Navigated to Replicator Screen")
+//      Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
         navController,
         viewModel = koinViewModel<ReplicatorViewModel>(),
@@ -360,7 +360,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
 private fun NavGraphBuilder.addReplicatorGraph(navController: NavController) {
   navigation("replicatorScreen", route = Screens.Replicator.baseRoute) {
     composable("replicatorScreen") {
-      Log.i("ReplicatorNavGraph", "Navigated to Replicator Screen")
+      Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
         navController,
         viewModel = koinViewModel<ReplicatorViewModel>(),

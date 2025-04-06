@@ -83,7 +83,7 @@ data class Workout(
   var workoutStarted: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var workoutEnded: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var day: Int? = null,
-  var exercisesSets: List<WorkoutItem> = emptyList(),
+  @Serializable(with = WorkoutItemListSerializer::class) var workoutItems: List<WorkoutItem> = emptyList(),
   var totalVolumeInPounds: Double? = 0.0,
   var totalVolumeInKilograms: Double? = 0.0,
   var order: Int? = null, // For sorting workouts in a program
@@ -156,7 +156,7 @@ fun Workout.formatLongWorkoutStarted(): String {
 
 fun Workout.totalSets(): Int {
   var totalSets: Int = 0
-  exercisesSets.forEach { workoutItem ->
+  workoutItems.forEach { workoutItem ->
     when (workoutItem) {
       is ExerciseSets -> {
         totalSets += workoutItem.sets.size
@@ -175,7 +175,7 @@ fun Workout.totalSets(): Int {
 }
 
 fun Workout.calculateTotalVolume(userDefaultWeightUnit: String): Double? {
-  exercisesSets.forEach { workoutItem ->
+  workoutItems.forEach { workoutItem ->
     when (workoutItem) {
       is ExerciseSets -> {
         totalVolumeInPounds =

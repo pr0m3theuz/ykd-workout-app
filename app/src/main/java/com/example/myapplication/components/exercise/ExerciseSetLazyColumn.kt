@@ -14,12 +14,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -101,7 +101,7 @@ fun ExercisesSetsScreen(
                 set,
                 getWeightUnit = { workoutViewModel.getWeightUnit(exerciseSets) },
                 populatePreviousSetField = {
-                  exerciseSets.exercise?.let { exercise ->
+                  exerciseSets.exercise.let { exercise ->
                     set.setNumber?.let { setNumber ->
                       workoutViewModel.populatePreviousSetField(exercise.id, setNumber = setNumber)
                     }
@@ -166,7 +166,7 @@ fun ExercisesSetsScreen(
     },
     AddExercise = { AddExercise(navController = navController) },
     CancelWorkout = {
-      CancelWorkout() {
+      CancelWorkout {
         workoutViewModel.cancelWorkout()
         navController.popBackStack(Screens.Workout.route, inclusive = true)
       }
@@ -200,17 +200,17 @@ fun ExerciseSetLazyColumn(
     modifier = Modifier.fillMaxWidth()
     //  verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
-    items(workoutNotes, key = { item -> item.lazyListID }) { workoutNote ->
+    items(
+      workoutNotes,
+      contentType = { "WorkoutNote" },
+      key = { item -> item.lazyListID }) { workoutNote ->
       WorkoutNoteItem(workoutNote)
     }
 
 
-    items(workoutComponents, key = { component ->
-      when (component) {
-        is ExerciseExerciseSets -> component.exSetsUUID // Stable UUID
-        is SupersetExercisesSets -> component.uuid // Stable UUID
-      }
-    })
+    items(workoutComponents, contentType = { it.type },
+      key = { component -> component.lazyListItemID }
+    )
     { component ->
 /*
 Log.i(
@@ -221,45 +221,49 @@ Log.i(
 Log.i("ExerciseSetLazyColumn", "${exerciseSets.notes}")
 Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
 */
-      val supersetCardBackgroundColor: Color by remember { mutableStateOf(IBMColorBlindPalette.random()) }
+
       when (component) {
         is ExerciseExerciseSets -> {
-          ExerciseItem(component)
+          key(component.lazyListItemID) { ExerciseItem(component) }
 
-          component.sets.forEachIndexed { index: Int, set: Set -> SetItem(component, set, index) }
+          component.sets.forEachIndexed { index: Int, set: Set ->
+            key(set.lazyListItemID) { SetItem(component, set, index) }
+          }
 
           AddSet(null, component.exSetsUUID)
         }
 
         is SupersetExercisesSets -> {
+          val supersetCardBackgroundColor: Color =
+            remember(component.lazyListItemID) { IBMColorBlindPalette.stableColorFor(component.uuid) }
+
           Card(
             modifier = Modifier
               .fillMaxWidth()
               .padding(vertical = 8.dp),
             shape = RoundedCornerShape(0.dp),
-            colors = CardColors(
-              containerColor = supersetCardBackgroundColor,
-              contentColor = MaterialTheme.colorScheme.onSurface,
-              disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-              disabledContentColor = MaterialTheme.colorScheme.tertiaryContainer,
+            colors = CardDefaults.cardColors(
+              containerColor = supersetCardBackgroundColor
             )
           ) {
             Column(
               modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp, bottom = 4.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surface)
             ) {
               component.exercisesSets.forEach { exerciseSets: ExerciseExerciseSets ->
-                ExerciseItem(exerciseSets)
+                key(exerciseSets.lazyListItemID) { ExerciseItem(exerciseSets) }
 
                 exerciseSets.sets.forEachIndexed { setIndex: Int, set: Set ->
-                  SetItem(
-                    exerciseSets,
-                    set,
-                    setIndex
-                  )
+                  key(set.lazyListItemID) {
+                    SetItem(
+                      exerciseSets,
+                      set,
+                      setIndex
+                    )
+                  }
                 }
 
                 AddSet(component.uuid, exerciseSets.exSetsUUID)
@@ -268,7 +272,6 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
           }
         }
       }
-
     }
 
     item { AddExercise() }

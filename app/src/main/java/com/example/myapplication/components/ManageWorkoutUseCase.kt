@@ -25,6 +25,7 @@ import com.example.myapplication.data.model.updateSetRPE
 import com.example.myapplication.data.model.updateSetReps
 import com.example.myapplication.data.model.updateSetType
 import com.example.myapplication.data.model.updateSetWeight
+import com.example.myapplication.data.network.CompletedRepository
 import com.example.myapplication.data.network.ExerciseNotesRepository
 import com.example.myapplication.data.network.ExercisesRepository
 import com.example.myapplication.data.network.InProgressWorkoutRepository
@@ -48,7 +49,8 @@ class ManageWorkoutUseCase(
   private val workoutNotesRepository: WorkoutNotesRepository,
   private val exerciseNotesRepository: ExerciseNotesRepository,
   private val inProgressWorkoutRepository: InProgressWorkoutRepository,
-  userRepository: UserRepository,
+  private val completedRepository: CompletedRepository,
+  private val userRepository: UserRepository,
 ) {
 
   // TODO rewrite
@@ -77,11 +79,12 @@ class ManageWorkoutUseCase(
       uuid = workoutTemplate.uuid,
       name = workoutTemplate.name,
       workoutAuthor = workoutTemplate.workoutAuthor,
-      //        notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
+      notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
       workoutType = workoutTemplate.workoutType,
       dateCreated = workoutTemplate.dateCreated,
       workoutStarted = Clock.System.now(),
       day = workoutTemplate.day,
+      // workoutItems = workoutTemplate.workoutItems,
       //        exercisesSets =,
       // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets),
       microcycleID = workoutTemplate.microcycleID,
@@ -101,9 +104,14 @@ class ManageWorkoutUseCase(
         workoutType = previousWorkout.workoutType,
         workoutStarted = Clock.System.now(),
         day = previousWorkout.day,
+        // workoutItems = createNewExerciseExerciseSetsFromPreviousWorkout(previousWorkout.workoutItems),
         //        exercisesSets =,
         // copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets),
         microcycleID = previousWorkout.microcycleID,
+        mesocycleID = previousWorkout.mesocycleID,
+        programID = previousWorkout.programID,
+        ownerID = tempOwnerId, // TODO Replace currentUser.id
+        isPublic = false,
       )
     return newWorkout
   }
@@ -116,17 +124,17 @@ class ManageWorkoutUseCase(
     previousWorkoutItems: List<WorkoutItem>,
     workoutID: ObjectId,
   ): List<WorkoutComponent> {
-    return previousWorkoutItems.map { workoutItem ->
+    val workoutComponents = previousWorkoutItems.map { workoutItem ->
       when (workoutItem) {
         is ExerciseSets -> {
-          createNewExerciseExerciseSetsToPreviousWorkout(workoutItem, workoutID)
+          createNewExerciseExerciseSetsFromPreviousWorkout(workoutItem, workoutID)
         }
 
         is Superset -> {
           SupersetExercisesSets(
-            name = workoutItem.name,
+//            name = workoutItem.name,
             exercisesSets = workoutItem.exercisesSets.map { exerciseSets ->
-              createNewExerciseExerciseSetsToPreviousWorkout(
+              createNewExerciseExerciseSetsFromPreviousWorkout(
                 previousExerciseSets = exerciseSets,
                 workoutID = workoutID
               )
@@ -138,14 +146,20 @@ class ManageWorkoutUseCase(
             supersetNotes = workoutItem.supersetNotes.filter { it.pinned }.toMutableList(),
             order = workoutItem.order,
             ownerID = tempOwnerId,
-            isPublic = false
+            isPublic = false,
+            workoutID = workoutItem.workoutID,
+            microcycleID = workoutItem.microcycleID,
+            mesocycleID = workoutItem.mesocycleID,
+            programID = workoutItem.programID,
           )
         }
       }
     }
+
+    return workoutComponents
   }
 
-  private fun createNewExerciseExerciseSetsToPreviousWorkout(
+  private fun createNewExerciseExerciseSetsFromPreviousWorkout(
     previousExerciseSets: ExerciseSets,
     workoutID: ObjectId
   ): ExerciseExerciseSets {
@@ -169,7 +183,7 @@ class ManageWorkoutUseCase(
     )
   }
 
-  fun createNewSetsFromPreviousWorkout(
+  private fun createNewSetsFromPreviousWorkout(
     previousSets: List<Set>,
     currentExerciseSetsID: ObjectId,
     currentWorkoutID: ObjectId,
@@ -201,7 +215,7 @@ class ManageWorkoutUseCase(
       newSets.add(newSet)
       if (set.setNumber != null) {
         val previousSet =
-          workoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
+          completedRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
         previousSet?.let { latestPreviousSets.add(it) }
       }
     }
@@ -221,7 +235,7 @@ class ManageWorkoutUseCase(
           SupersetExercisesSets(
             id = previousWorkoutItem.id,
             uuid = previousWorkoutItem.uuid,
-            name = previousWorkoutItem.name,
+//            name = previousWorkoutItem.name,
             exercisesSets = previousWorkoutItem.exercisesSets.map { exerciseSets ->
               loadExerciseSetsFromWorkout(exerciseSets)
             },
@@ -231,8 +245,12 @@ class ManageWorkoutUseCase(
             restAfterSuperset = previousWorkoutItem.restAfterSuperset,
             supersetNotes = previousWorkoutItem.supersetNotes.filter { it.pinned }.toMutableList(),
             order = previousWorkoutItem.order,
-            ownerID = previousWorkoutItem.owerID,
+            ownerID = previousWorkoutItem.ownerID,
             isPublic = previousWorkoutItem.isPublic,
+            workoutID = previousWorkoutItem.workoutID,
+            microcycleID = previousWorkoutItem.microcycleID,
+            mesocycleID = previousWorkoutItem.mesocycleID,
+            programID = previousWorkoutItem.programID,
           )
         }
       }
@@ -309,7 +327,7 @@ class ManageWorkoutUseCase(
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     return try {
       // Delegate the actual data fetching to the repository
-      workoutRepository.getPreviousSetForExercise(exerciseID, setNumber)
+      completedRepository.getPreviousSetForExercise(exerciseID, setNumber)
     } catch (e: Exception) {
       // Optional: Log the error or handle specific exceptions
       Log.e(
@@ -382,7 +400,7 @@ class ManageWorkoutUseCase(
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     //    removeUncompletedSets(exercisesSets.toMutableList())
 
-    workout.exercisesSets =
+    workout.workoutItems =
       convertWorkoutComponentsToWorkoutItems(
         workoutComponents,
         userDefaultWeightUnit,
@@ -408,7 +426,7 @@ class ManageWorkoutUseCase(
     workout.notes = workoutNotes.toMutableList()
 
     // TODO Change to WorkoutComponents
-    workout.exercisesSets =
+    workout.workoutItems =
       convertWorkoutComponentsToWorkoutItems(
         workoutComponents,
         userDefaultWeightUnit,
@@ -485,7 +503,7 @@ class ManageWorkoutUseCase(
             Superset(
               id = it.id,
               uuid = it.uuid,
-              name = it.name,
+//              name = it.name,
               exercisesSets = convertExerciseExerciseSetsToExerciseSets(
                 it.exercisesSets,
                 userDefaultWeightUnit
@@ -495,7 +513,13 @@ class ManageWorkoutUseCase(
               enableRestAfterSuperset = it.enableRestAfterSuperset,
               restAfterSuperset = it.restAfterSuperset,
               supersetNotes = it.supersetNotes,
-              order = it.order
+              order = it.order,
+              workoutID = it.workoutID,
+              microcycleID = it.microcycleID,
+              mesocycleID = it.mesocycleID,
+              programID = it.programID,
+              ownerID = it.ownerID,
+              isPublic = it.isPublic,
             )
           )
         }
@@ -852,8 +876,6 @@ class ManageWorkoutUseCase(
 
   fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set): List<Set> {
     return exerciseSets.sets.minusElement(set)
-
-    //    updateExercisesSetsData(exerciseSets, temporarySets)
   }
 
   fun updateExercisesSetsData(exerciseSets: ExerciseExerciseSets, temporarySets: List<Set>) {
@@ -1078,6 +1100,10 @@ class ManageWorkoutUseCase(
         enableRestAfterSuperset = true,
         restAfterSuperset = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
         order = workoutComponents.size.plus(1),
+        workoutID = workout.id,
+        microcycleID = workout.microcycleID, // TODO get details from workout
+        mesocycleID = workout.mesocycleID, // TODO get details from workout
+        programID = workout.programID, // TODO get details from workout
       )
     )
 
@@ -1100,6 +1126,10 @@ class ManageWorkoutUseCase(
         enableRestAfterSuperset = true,
         restAfterSuperset = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
         order = exercisesSets.first().order,
+        workoutID = workout.id,
+        microcycleID = workout.microcycleID, // TODO get details from workout
+        mesocycleID = workout.mesocycleID, // TODO get details from workout
+        programID = workout.programID, // TODO get details from workout
       )
     )
 

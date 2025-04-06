@@ -331,7 +331,7 @@ fun WorkoutOverview(
   historyViewModel.getWorkoutByID(ObjectId(workoutID))
   val workout by historyViewModel.workout.collectAsState()
 
-  workout?.exercisesSets?.let { historyViewModel.loadWorkoutItemsFromWorkout(it) }
+  workout?.workoutItems?.let { historyViewModel.loadWorkoutItemsFromWorkout(it) }
   val workoutComponents by historyViewModel.workoutComponents.collectAsState()
 
   val (openDeleteWorkoutDialog, setOpenDeleteWorkoutDialog) = remember { mutableStateOf(false) }
@@ -357,9 +357,7 @@ fun WorkoutOverview(
           topBar = {
             TopAppBar(
               title = {
-                itWorkout.name.let { workoutName ->
-                  Text(text = workoutName, style = MaterialTheme.typography.titleLarge)
-                }
+                Text(text = itWorkout.name, style = MaterialTheme.typography.titleLarge)
               },
               navigationIcon = {
                 IconButton(onClick = { navController.navigateUp() }) {

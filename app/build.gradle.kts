@@ -94,21 +94,21 @@ composeCompiler {
 
 dependencies {
   implementation("androidx.core:core-ktx:1.15.0")
-  implementation("androidx.activity:activity-compose:1.9.3")
+  implementation("androidx.activity:activity-compose:1.10.1")
 
   implementation("androidx.compose.material3.adaptive:adaptive:1.0.0")
   implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0")
   implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0")
   implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.1")
-  implementation("com.google.firebase:firebase-perf-ktx:21.0.3")
+  implementation("com.google.firebase:firebase-perf-ktx:21.0.5")
   androidTestImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
 
-  val composeVersion = "1.7.6"
+  val composeVersion = "1.7.8"
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
   implementation("androidx.compose.material:material:$composeVersion")
   implementation("androidx.compose.material:material-icons-extended:$composeVersion")
-  implementation("androidx.compose.ui:ui-text-google-fonts:1.7.6")
+  implementation("androidx.compose.ui:ui-text-google-fonts:$composeVersion")
 
   implementation("com.google.android.material:material:1.12.0")
   implementation("androidx.compose.material3:material3:1.3.1")
@@ -164,11 +164,14 @@ dependencies {
   debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
   debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
 
+  testImplementation("org.assertj:assertj-core:3.27.2")
+
   val jqwik = "1.9.2"
   testImplementation("net.jqwik:jqwik:$jqwik")
   testImplementation("net.jqwik:jqwik-kotlin:$jqwik")
   // Navigation
-  implementation("androidx.navigation:navigation-compose:2.8.5")
+  implementation("androidx.navigation:navigation-compose:2.8.9")
+
 
   // realm
   // implementation ("io.realm.kotlin:library-base:1.11.1") // Add to use local realm (no sync)
@@ -200,14 +203,14 @@ dependencies {
   testImplementation("io.insert-koin:koin-test-junit5:$koin")
 
   // New Relic Crash Analytics
-  implementation("com.newrelic.agent.android:android-agent:7.6.2")
+  implementation("com.newrelic.agent.android:android-agent:7.6.5")
 
   // Apple pkl
 //  implementation("org.pkl-lang:pkl-config-kotlin:0.26.0")
 
   // Firebase
   // Import the Firebase BoM (see: https://firebase.google.com/docs/android/learn-more#bom)
-  implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+  implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
 
   // Firebase Crashlytics
   implementation("com.google.firebase:firebase-crashlytics")

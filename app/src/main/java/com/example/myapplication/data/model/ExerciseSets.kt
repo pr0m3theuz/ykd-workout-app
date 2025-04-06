@@ -38,7 +38,7 @@ data class ExerciseSetsDao(val ExerciseSets: ExerciseSets)
  * representation, requiring a separate lookup to retrieve full Exercise details.
  *
  * @property id The unique identifier for this set collection (using ObjectId).
- * @property exSetsLazyListItemID An ID used for efficiently updating items in a LazyColumn (UI component).
+ * @property lazyListItemID An ID used for efficiently updating items in a LazyColumn (UI component).
  * @property exSetsUUID A universally unique identifier for this set collection.
  * @property order The order of this set collection within a sequence (e.g., within a workout).
  * @property exerciseID The ID of the exercise this set collection belongs to (foreign key).
@@ -57,8 +57,8 @@ data class ExerciseSetsDao(val ExerciseSets: ExerciseSets)
 @ExperimentalUuidApi
 @Serializable
 data class ExerciseSets(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) val id: ObjectId = ObjectId(),
-  val exSetsLazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) override val id: ObjectId = ObjectId(),
+  @SerialName("exSetsLazyListItemID") val lazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
   @Serializable(with = UuidSerializer::class) val exSetsUUID: Uuid = Uuid.random(),
   override val order: Int = 1,
   @Serializable(with = ObjectIdSerializer::class) val exerciseID: ObjectId,
@@ -114,6 +114,7 @@ data class ExerciseExerciseSets(
   @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId?,
   @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId?,
   @Serializable(ObjectIdSerializer::class) var programID: ObjectId?,
+  override val type: String = "ExerciseExerciseSets"
 ) : WorkoutComponent()
 
 

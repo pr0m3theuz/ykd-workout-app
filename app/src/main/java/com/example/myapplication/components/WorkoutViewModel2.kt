@@ -184,29 +184,34 @@ class WorkoutViewModel(
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
       )
 
-    viewModelScope.launch {
-      runCatching {
-        _workout.collect { workout ->
-          _workoutNotes.collect { workoutNotes ->
-            _workoutComponentFlow.collect { workoutComponents ->
-              runCatching {
-                manageWorkoutUseCase.saveInProgressWorkout(
-                  workout = workout,
-                  workoutNotes = workoutNotes,
-                  workoutComponents = workoutComponents,
-                )
-              }.onFailure {
-                // Handle error, e.g., log error, show error message
-                Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
+    // TODO java.lang.NullPointerException: Attempt to invoke interface method 'java.lang.Object kotlinx.coroutines.flow.MutableStateFlow.getValue()' on a null object reference
+    /*    viewModelScope.launch {
+          runCatching {
+            _workout.value?.let { _ ->
+              _workout.collect { workout ->
+                _workoutNotes.collect { workoutNotes ->
+                  _workoutComponentFlow.collect { workoutComponents ->
+                    runCatching {
+                      workout?.let {
+                        manageWorkoutUseCase.saveInProgressWorkout(
+                          workout = workout,
+                          workoutNotes = workoutNotes,
+                          workoutComponents = workoutComponents,
+                        )
+                      }
+                    }.onFailure {
+                      // Handle error, e.g., log error, show error message
+                      Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
+                    }
+                  }
+                }
               }
             }
+          }.onFailure {
+            // Handle error, e.g., log error, show error message
+            Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
           }
-        }
-      }.onFailure {
-        // Handle error, e.g., log error, show error message
-        Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
-      }
-    }
+        }*/
   }
 
 
@@ -507,7 +512,7 @@ class WorkoutViewModel(
       set(value) = savedStateHandle.set(WORKOUT_DETAILS, value)
   */
 
-  private var workoutDetails: Workout =
+  private var workoutDetails: Workout? =
     savedStateHandle.saveable(
       key = WORKOUT_DETAILS,
       saver =
@@ -523,12 +528,12 @@ class WorkoutViewModel(
   val workout
     get() = _workout.asStateFlow()
 
-  private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(workoutDetails.name)
+  private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(workoutDetails!!.name)
   val workoutName
     get() = _workoutName.asStateFlow()
 
   fun setWorkoutName(newName: String) {
-    workoutDetails.name = newName
+    workoutDetails!!.name = newName
     _workout.value = workoutDetails
   }
 
@@ -573,7 +578,7 @@ class WorkoutViewModel(
       _workout.value = workoutDetails
 
       getPinnedWorkoutNotes(workout.uuid, workout.id)
-      setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.exercisesSets))
+      setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.workoutItems))
     }
   }
 
@@ -587,7 +592,7 @@ class WorkoutViewModel(
     getPinnedWorkoutNotes(workoutTemplate.uuid, newWorkout.id)
 
     setWorkoutComponents(
-      copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets, newWorkout.id).toList()
+      copyWorkoutItemsFromPreviousWorkout(workoutTemplate.workoutItems, newWorkout.id).toList()
     )
   }
 
@@ -600,12 +605,12 @@ class WorkoutViewModel(
 
     getPinnedWorkoutNotes(previousWorkout.uuid, newWorkout.id)
     setWorkoutComponents(
-      copyExercisesSetsFromPreviousWorkout(previousWorkout.exercisesSets, newWorkout.id).toList()
+      copyWorkoutItemsFromPreviousWorkout(previousWorkout.workoutItems, newWorkout.id).toList()
     )
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
-  private fun copyExercisesSetsFromPreviousWorkout(
+  private fun copyWorkoutItemsFromPreviousWorkout(
     previousWorkoutItems: List<WorkoutItem>,
     _workoutID: ObjectId,
   ): List<WorkoutComponent> {
@@ -651,8 +656,8 @@ class WorkoutViewModel(
   fun addWorkoutNote() {
     _workoutNotesData.add(
       WorkoutNote().apply {
-        workout = _workout.value.id
-        workoutUUID = _workout.value.uuid
+        workout = _workout.value!!.id
+        workoutUUID = _workout.value!!.uuid
         //        workoutID = _workout.value.workoutID,
         //        programID = _workout.value.programID,
         //        mesocycleID = _workout.value.mesocycleID,
@@ -687,8 +692,8 @@ class WorkoutViewModel(
 
   private fun stopWorkoutTimer() {
     workoutCountUpTimer.stop()
-    workoutDetails.workoutEnded = Clock.System.now()
-    workoutDetails.workoutDuration = workoutDuration
+    workoutDetails!!.workoutEnded = Clock.System.now()
+    workoutDetails!!.workoutDuration = workoutDuration
     _workout.value = workoutDetails
     // TODO Navigate to Workout Complete Screen & Summary
   }
@@ -739,31 +744,39 @@ class WorkoutViewModel(
   }
 
   fun createSupersetFromExercise(exercises: List<Exercise>) {
-    val temporaryWorkoutComponents = manageWorkoutUseCase.createSupersetFromExercise(
-      _workoutComponents,
-      exercises,
-      _workout.value,
-    )
+    requireNotNull(_workout.value) { "Workout details cannot be null" }
+    _workout.value?.let { workout ->
+      val temporaryWorkoutComponents = manageWorkoutUseCase.createSupersetFromExercise(
+        _workoutComponents,
+        exercises,
+        workout,
+      )
 
-    setWorkoutComponents(temporaryWorkoutComponents.toList())
+      setWorkoutComponents(temporaryWorkoutComponents.toList())
+    }
+
   }
 
   fun createSupersetFromExercisesSets(exercisesSets: List<ExerciseExerciseSets>) {
-    setWorkoutComponents(
-      manageWorkoutUseCase.createSupersetFromExercisesSets(
-        _workoutComponents,
-        exercisesSets,
-        _workout.value,
+    requireNotNull(_workout.value) { "Workout details cannot be null" }
+    _workout.value?.let { workout ->
+      setWorkoutComponents(
+        manageWorkoutUseCase.createSupersetFromExercisesSets(
+          _workoutComponents,
+          exercisesSets,
+          workout,
+        )
       )
-    )
+    }
   }
 
   fun addMultipleEmptyExerciseSets(exercisesSelectedToBeAddedToWorkout: List<Exercise>) {
+    requireNotNull(_workout.value) { "Workout details cannot be null" }
     val temporaryExerciseExerciseSets =
       manageWorkoutUseCase.addMultipleEmptyExerciseSets(
         _workoutComponents,
         exercisesSelectedToBeAddedToWorkout,
-        _workout.value.id,
+        _workout.value!!.id,
       )
 
     //    _exercisesSetsData = temporaryExerciseExerciseSets
@@ -793,7 +806,7 @@ class WorkoutViewModel(
   }
 
   fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set) {
-    val temporarySets = exerciseSets.sets.minusElement(set)
+    val temporarySets = manageWorkoutUseCase.removeSet(exerciseSets, set)
 
     updateExercisesSetsData(exerciseSets, temporarySets)
   }
@@ -811,7 +824,7 @@ class WorkoutViewModel(
     exerciseSets.notes.add(
       ExerciseNote().apply {
         exercise = exerciseSets.exercise.id
-        workout = _workout.value.id
+        workout = _workout.value!!.id
       }
     )
 
@@ -1050,8 +1063,12 @@ class WorkoutViewModel(
     //    _workoutData.calculateTotalVolume(userDefaultWeightUnit)
 
     viewModelScope.launch {
-      manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _workoutComponents)
+      requireNotNull(workoutDetails) { "Workout details cannot be null" }
+      workoutDetails?.let { workoutDetails ->
+        manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _workoutComponents)
+      }
     }
+
   }
 
   fun getCompletedWorkout(workoutID: ObjectId) {

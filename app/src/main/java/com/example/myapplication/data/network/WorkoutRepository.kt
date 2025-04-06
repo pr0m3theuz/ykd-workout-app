@@ -66,7 +66,6 @@ interface WorkoutRepository {
 
   fun getAllCompletedWorkouts(): Flow<List<Workout>>
 
-  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set?
 
   fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout?
 

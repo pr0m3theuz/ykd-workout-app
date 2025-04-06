@@ -21,10 +21,24 @@ val Magenta50 = Color(0xFFDC267F) // #dc267f
 val Orange40 = Color(0xFFFE6100) // #fe6100
 val Gold20 = Color(0xFFFFB000) // #ffb000
 
-val IBMColorBlindPalette = listOf(
-  Ultramarine40,
-  Indigo50,
-  Magenta50,
-  Orange40,
-  Gold20
-)
+object IBMColorBlindPalette {
+  private val colors = listOf(
+    Ultramarine40,
+    Indigo50,
+    Magenta50,
+    Orange40,
+    Gold20
+  )
+  private var currentIndex = 0
+  fun next(): Color { // Simple sequential assignment for stability
+    val color = colors[currentIndex % colors.size]
+    currentIndex++
+    return color
+  }
+
+  // Or, implement a stable random based on an ID/hash if preferred
+  fun stableColorFor(id: Any): Color {
+    val hashCode = id.hashCode()
+    return colors[kotlin.math.abs(hashCode) % colors.size]
+  }
+}
