@@ -67,7 +67,7 @@ fun ReplaceExerciseScreen(
   exerciseSets: ExerciseExerciseSets,
   setOpenDialog: (Boolean) -> Unit,
   exercisesViewModel: ExercisesViewModel = koinViewModel(),
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   navController: NavController,
 ) {
   val exercises by

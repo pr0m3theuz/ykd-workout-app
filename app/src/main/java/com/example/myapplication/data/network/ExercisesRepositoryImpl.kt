@@ -90,6 +90,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
         exercises.add(exercise) // 6
       }
     }
+    Log.i("ExercisesRepositoryImpl.mapQueryChangeToExercise()", exercises.firstOrNull().toString())
     return exercises // 7
   }
 
@@ -103,7 +104,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
         equipments.add(equipment)
       }
     }
-    Log.i("ExercisesRepositoryImpl.mapQueryChangeToEquipment()", equipments.toString())
+//    Log.i("ExercisesRepositoryImpl.mapQueryChangeToEquipment()", equipments.toString())
     return equipments
   }
 
@@ -117,7 +118,7 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
         muscleGroups.add(muscleGroup)
       }
     }
-    Log.i("ExercisesRepositoryImpl.mapQueryChangeToMuscleGroups()", muscleGroups.toString())
+//    Log.i("ExercisesRepositoryImpl.mapQueryChangeToMuscleGroups()", muscleGroups.toString())
     return muscleGroups
   }
 
@@ -622,46 +623,90 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
   ): Flow<List<Exercise>> {
 
     try {
-      val collection =
-        db?.getCollection("Exercise") ?: throw IllegalStateException("collection not found")
+      requireNotNull(db) { DATABASE_IS_NULL }
 
-      var whereQueryExpression =
-        Expression.property("isPublic")
-          .equalTo(Expression.booleanValue(true))
-          .and(
-            Function.lower(Expression.property("name"))
-              .like(Expression.string("%" + exercise.lowercase() + "%"))
-          )
+      val collection = db.getCollection("Exercise")
 
-      // Add muscle group filter if provided
-      if (muscleGroupIDs.isNotEmpty()) {
-        val muscleGroupExpression =
-          Expression.property("muscleGroupID").`in`(Expression.list(muscleGroupIDs))
+      requireNotNull(collection) { COLLECTION_IS_NULL }
 
-        whereQueryExpression = whereQueryExpression.and(muscleGroupExpression)
+      val value = when {
+        exercise.isEmpty() -> "%"
+        exercise.isBlank() -> "%"
+        else -> "%${exercise.lowercase()}%"
       }
 
-      // Add equipment filter if provided
-      if (equipmentIDs.isNotEmpty()) {
-        val equipmentExpression =
-          Expression.property("equipmentID").`in`(Expression.list(equipmentIDs))
+//      var whereQueryExpression =
+//        Expression.property("isPublic")
+//          .equalTo(Expression.booleanValue(true))
+//
+//      if (value != "%") {
+//        whereQueryExpression =
+//          whereQueryExpression.and(Expression.property("name").like(Expression.string(value)))
+//      }
+//
+//      // Add muscle group filter if provided
+//      if (muscleGroupIDs.isNotEmpty()) {
+//        val muscleGroupExpression =
+//          Expression.property("muscleGroupID").`in`(Expression.list(muscleGroupIDs))
+//
+//        whereQueryExpression = whereQueryExpression.and(muscleGroupExpression)
+//      }
+//
+//      // Add equipment filter if provided
+////      if (equipmentIDs.isNotEmpty()) {
+////        val equipmentExpression =
+////          Expression.property("equipmentID").`in`(Expression.list(equipmentIDs))
+////
+////        whereQueryExpression = whereQueryExpression.and(equipmentExpression)
+////      }
+//
+//      val query =
+//        QueryBuilder.select(SelectResult.all())
+//          .from(DataSource.collection(collection))
+//          .where(whereQueryExpression)
+//          .orderBy(Ordering.property("name").ascending())
 
-        whereQueryExpression = whereQueryExpression.and(equipmentExpression)
-      }
 
-      val query =
-        QueryBuilder.select(SelectResult.all())
-          .from(DataSource.collection(collection))
-          .where(whereQueryExpression)
-          .orderBy(Ordering.property("name").ascending())
+//        "SELECT * FROM `Exercise` WHERE isPublic = true AND LOWER(name) LIKE '$value' AND muscleGroupID IN $muscleGroupIDs AND equipmentID IN $equipmentIDs;"
+
+      val muscleGroupInClause =
+        muscleGroupIDs.joinToString(", ") { "'$it'" } // Join with comma and space
+          .let { "[$it]" } // Wrap in parentheses
+
+      val equipmentInClause = equipmentIDs.joinToString(", ") { "'$it'" }
+        .let { "[$it]" }
+
+      // Basic handling for potentially empty lists (IN () is often invalid)
+      // A real implementation might need more robust logic here depending on desired behavior
+      val muscleCondition = " AND muscleGroupID IN $muscleGroupInClause" // Or omit if appropriate
+      val equipmentCondition = " AND equipmentID IN $equipmentInClause" // Or omit if appropriate
+
+      Log.i("ExercisesRepositoryImpl.filterExercises()", "muscleCondition: $muscleCondition")
+      Log.i("ExercisesRepositoryImpl.filterExercises()", "equipmentCondition: $equipmentCondition")
+
+      val queryExpression = "SELECT *" +
+              " FROM `Exercise`" +
+              " WHERE isPublic = true" +
+              " AND LOWER(name) LIKE '$value'" +
+              muscleCondition +
+              equipmentCondition
+//              " AND muscleGroupID IN $muscleGroupIDs" +
+//              " AND equipmentID IN $equipmentIDs;"
+
+      Log.i("ExercisesRepositoryImpl.filterExercises()", "queryExpression: $queryExpression")
+
+      val sqlQuery = db.createQuery(queryExpression)
 
       val flow =
-        query
+        sqlQuery
           .queryChangeFlow()
           .map { queryChange -> mapQueryChangeToExercise(queryChange) }
           .flowOn(Dispatchers.IO)
 
-      query.execute()
+      sqlQuery.execute()
+
+//      Log.i("ExercisesRepositoryImpl.filterExercises()", whereQueryExpression.toString())
+
       return flow
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
@@ -687,7 +732,8 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
 
           val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-          val exercise = result?.let { withUnknownKeys.decodeFromString<ExerciseDao>(it).Exercise }
+          val exercise =
+            result?.let { xercise -> withUnknownKeys.decodeFromString<ExerciseDao>(xercise).Exercise }
           return exercise?.id
         }
       }

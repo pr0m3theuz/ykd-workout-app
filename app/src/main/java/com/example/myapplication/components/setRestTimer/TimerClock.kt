@@ -46,12 +46,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.components.WorkoutViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun TimerScreen(
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   openDialog: (Boolean) -> Unit,
 ) {
   val remainingTimeString by workoutViewModel.remainingTimeString.collectAsState()
@@ -60,6 +59,7 @@ fun TimerScreen(
   val timerProgress by workoutViewModel.remainingTimeProgress.collectAsState()
   val timerState by workoutViewModel.workoutTimerState.collectAsState()
   TimerClock(
+    workoutViewModel = workoutViewModel,
     remainingTimeString = remainingTimeString,
     timerDurationString = timerDurationString,
     restTimerAdjustmentString = restTimerAdjustmentString,
@@ -78,6 +78,7 @@ fun TimerScreen(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TimerClock(
+  workoutViewModel: WorkoutViewModel,
   remainingTimeString: String,
   timerDurationString: String,
   restTimerAdjustmentString: String,
@@ -115,7 +116,9 @@ fun TimerClock(
   }
 
   if (openEnterTimeScreen) {
-    ManualRestTimerScreen(openDialog = { close -> closeEnterTimeScreen(close) })
+    ManualRestTimerScreen(
+      workoutViewModel = workoutViewModel,
+      openDialog = { close -> closeEnterTimeScreen(close) })
   }
 
   AlertDialog(
@@ -144,11 +147,15 @@ fun TimerClock(
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxHeight().fillMaxWidth(),
+        modifier = Modifier
+          .fillMaxHeight()
+          .fillMaxWidth(),
       ) {
         Text("Adjust duration via the +/- buttons", modifier = Modifier.align(Alignment.Start))
         Box(contentAlignment = Alignment.Center) {
-          Canvas(modifier = Modifier.progressSemantics(animatedProgress).size(300.dp)) {
+          Canvas(modifier = Modifier
+            .progressSemantics(animatedProgress)
+            .size(300.dp)) {
             // Start at 12 o'clock
             val startAngle = 270f
             val sweep = animatedProgress * 360f

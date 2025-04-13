@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
@@ -37,6 +37,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -47,6 +50,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.example.myapplication.components.Screens
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.components.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.components.addExercisesList.AddExercisesScreen
 import com.example.myapplication.components.exerciseDetails.ExerciseDetailsScreen
@@ -88,7 +92,10 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    enableEdgeToEdge()
+//    enableEdgeToEdge()
+
+    WindowCompat.getInsetsController(window, window.decorView)
+      .isAppearanceLightStatusBars = true
 
     crashlytics = Firebase.crashlytics
     crashlytics.log("onCreate")
@@ -157,6 +164,26 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+// Helper function to get and remember the parent graph entry
+@Composable
+fun NavBackStackEntry.rememberParentEntry(
+  navController: NavController,
+  graphRoute: String
+): NavBackStackEntry {
+  // NavBackStackEntry is the owner of the composable, remember based on it
+  return remember(this) {
+    navController.getBackStackEntry(graphRoute)
+  }
+}
+
+@Composable
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController):
+        T {
+  val navGraphRoute = destination.parent?.route ?: return koinViewModel()
+  val parentEntry = remember(this) { navController.getBackStackEntry(navGraphRoute) }
+  return koinViewModel(viewModelStoreOwner = parentEntry)
+}
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addWorkoutGraph(
@@ -166,16 +193,23 @@ private fun NavGraphBuilder.addWorkoutGraph(
 ) {
   navigation(
     "workoutScreen?workoutID={workoutID}",
-    route = "workout?workoutID={workoutID}",
-    arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
+    route = "workout",
+//    arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
   ) {
     composable("workoutScreen?workoutID={workoutID}") { navBackStackEntry ->
       Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
+
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
+
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       WorkoutScreen(
         // TODO This is an anti-pattern
         // https://developer.android.com/guide/navigation/use-graph/navigate
         navController = navController,
+        workoutViewModel = workoutViewModel,
         workoutID = workoutID,
       )
     }
@@ -184,6 +218,13 @@ private fun NavGraphBuilder.addWorkoutGraph(
       Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
+
+//      val workoutViewModel: WorkoutViewModel = koinViewModel(
+//        viewModelStoreOwner = navBackStackEntry.rememberParentEntry(navController, Screens.Workout.baseRoute)
+//      )
+
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       //      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key =
       // WORKOUT_DETAILS)
@@ -195,6 +236,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
           navController = navController,
           workoutID = workoutID,
           workoutsCount = workoutsCount,
+          workoutViewModel = workoutViewModel,
         )
       }
     }
@@ -215,14 +257,19 @@ private fun NavGraphBuilder.addWorkoutGraph(
       }
     }
 
-    composable("AddExercise") {
+    composable("AddExercise") { navBackStackEntry ->
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      Log.d("WorkoutNavGraph:AddExercise", "AddExercise.WorkoutViewModel: $workoutViewModel")
+
       AddExerciseNavigableListDetailScreen(
-        navController = navController,
         exerciseListPane = { onClick ->
           AddExercisesScreen(
             setOpenDialog = { /*TODO*/ },
             navController = navController,
             navigateToDetailPane = onClick,
+            workoutViewModel = workoutViewModel,
           )
         },
         exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
@@ -291,6 +338,15 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
   navigation(startDestination = "workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
     composable("workoutSummary/workoutID/workoutCount") { navBackStackEntry ->
       Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
+
+      val workoutViewModel: WorkoutViewModel = koinViewModel(
+        viewModelStoreOwner = navBackStackEntry.rememberParentEntry(
+          navController,
+          Screens.Workout.baseRoute
+        )
+      )
+
+      // TODO to keep or to not keep?
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
@@ -299,6 +355,7 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
           navController = navController,
           workoutID = workoutID,
           workoutsCount = workoutsCount,
+          workoutViewModel = workoutViewModel,
         )
       }
     }
@@ -401,9 +458,11 @@ private fun TestScreen() {
 
       val fontFamily = FontFamily(Font(googleFont = fontName, fontProvider = provider))
 
-      Box(modifier = Modifier
-        .fillMaxWidth()
-        .height(250.dp), contentAlignment = Alignment.Center) {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(250.dp), contentAlignment = Alignment.Center
+      ) {
         AsyncImage(
           contentScale = ContentScale.FillWidth,
           alignment = Alignment.TopCenter,

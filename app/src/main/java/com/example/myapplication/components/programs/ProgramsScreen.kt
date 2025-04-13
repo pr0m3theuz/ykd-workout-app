@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.components.BottomNavigationBar
+import com.example.myapplication.components.Screens
 import com.example.myapplication.data.model.ExerciseSets
 import com.example.myapplication.data.model.Program
 import com.example.myapplication.data.model.Superset
@@ -225,7 +226,8 @@ fun ProgramsScreen(
         Text("Quick Start", style = titleMedium)
         Button(
           onClick = {
-            navController.navigate("workout?workoutID=") {
+            // TODO Navigate to Workout Screen
+            navController.navigate(Screens.Workout.baseRoute) {
               popUpTo(navController.graph.findStartDestination().id) { saveState = true }
               // Avoid multiple copies of the same destination when
               // reselecting the same item
@@ -772,7 +774,7 @@ fun CurrentProgramCard(
     ) {
       Button(
         onClick = {
-          navController.navigate("workout?workoutID=${workout.id.toHexString()}") {
+          navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}") {
             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
             // Avoid multiple copies of the same destination when
             // reselecting the same item

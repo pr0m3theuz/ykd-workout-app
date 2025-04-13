@@ -28,13 +28,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.WorkoutNote
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutNoteTextField(
     workoutNote: WorkoutNote,
-    workoutViewModel: WorkoutViewModel = koinViewModel(),
+    workoutViewModel: WorkoutViewModel,
     placeholder: String = "Write a note",
 ) {
   //        TODO Refactor this to workoutNotes
@@ -78,8 +77,8 @@ fun WorkoutNoteTextField(
     TextField(
         placeholder = { Text(placeholderText, color = MaterialTheme.colorScheme.secondary) },
         modifier = Modifier
-            .padding(/*horizontal = */ 8.dp)
-            .fillMaxWidth(),
+          .padding(/*horizontal = */ 8.dp)
+          .fillMaxWidth(),
         textStyle = MaterialTheme.typography.bodyMedium,
         value = note,
         onValueChange = {
@@ -95,8 +94,8 @@ fun WorkoutNoteTextField(
                 shape = MaterialTheme.shapes.small,
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .size(36.dp),
+                  .padding(horizontal = 8.dp)
+                  .size(36.dp),
                 colors =
                 ButtonDefaults.buttonColors(
                     containerColor = animateNoteButtonContainerColor.value,

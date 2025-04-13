@@ -102,6 +102,7 @@ fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
               workoutID = workoutID,
               navController = navController,
               editable = true,
+              workoutViewModel = koinViewModel()
             )
           }
         }
@@ -135,7 +136,7 @@ fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditNextWorkoutScreen(
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   workoutID: String,
   //  getExercise: (exerciseID: ObjectId) -> Exercise?,
   navController: NavController,
@@ -233,7 +234,8 @@ fun EditNextWorkoutScreen(
             enableCancelWorkout = true,
             WorkoutNoteItem = { workoutNote ->
               SwipeToDismissWorkoutNote(
-                workoutNote,
+                workoutViewModel = workoutViewModel,
+                workoutNote = workoutNote,
                 removeWorkoutNote = { workoutViewModel.removeWorkoutNote(workoutNote) },
               )
             },
@@ -265,7 +267,8 @@ fun EditNextWorkoutScreen(
                   )
                 },
                 workoutComponents = workoutComponents,
-                onCreateSuperset = { /* TODO */ }
+                onCreateSuperset = { /* TODO */ },
+                workoutViewModel = workoutViewModel,
               )
             },
             SetItem = { exerciseSets, set, index ->
@@ -277,6 +280,7 @@ fun EditNextWorkoutScreen(
                 removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
                 setContent = {
                   SetContent(
+                    workoutViewModel,
                     exerciseSets,
                     index,
                     set,

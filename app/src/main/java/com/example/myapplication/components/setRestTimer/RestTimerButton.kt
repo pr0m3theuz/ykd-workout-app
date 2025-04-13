@@ -44,18 +44,16 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.components.WorkoutViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalTextApi::class)
-@Preview
+//@Preview
 @Composable
-fun RestTimerButton(workoutViewModel: WorkoutViewModel = koinViewModel()) {
+fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
   var progress by remember { mutableFloatStateOf(1f) }
   val remainingTimeProgress by workoutViewModel.remainingTimeProgress.collectAsState()
   val timerState by workoutViewModel.workoutTimerState.collectAsState()
@@ -100,7 +98,9 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel = koinViewModel()) {
   if (openTimerScreen) {
     //        TODO Navigate to
     //        TODO openTimerClockDialog
-    TimerScreen(openDialog = { close -> closeTimerScreen(close) })
+    TimerScreen(
+      workoutViewModel = workoutViewModel,
+      openDialog = { close -> closeTimerScreen(close) })
   }
 
   var openEnterTimeScreen by remember { mutableStateOf(false) }
@@ -110,7 +110,9 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel = koinViewModel()) {
   }
 
   if (openEnterTimeScreen) {
-    ManualRestTimerScreen(openDialog = { close -> closeEnterTimeScreen(close) })
+    ManualRestTimerScreen(
+      workoutViewModel = workoutViewModel,
+      openDialog = { close -> closeEnterTimeScreen(close) })
   }
 
   val timerIconModifier = Modifier.size(30.dp)
@@ -120,7 +122,8 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel = koinViewModel()) {
   BoxWithConstraints(
     contentAlignment = Alignment.CenterStart,
     modifier =
-      Modifier.size(height = 40.dp, width = animatedBoxWidth)
+      Modifier
+        .size(height = 40.dp, width = animatedBoxWidth)
         .clip(RoundedCornerShape(25))
         .background(MaterialTheme.colorScheme.secondaryContainer)
         .clickable(
@@ -138,7 +141,8 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel = koinViewModel()) {
   ) {
     Box(
       modifier =
-        Modifier.size(width = maxWidth.times(animatedSize), height = maxHeight)
+        Modifier
+          .size(width = maxWidth.times(animatedSize), height = maxHeight)
           .background(color = animatedProgressBarColor)
     ) {}
 
@@ -175,13 +179,15 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel = koinViewModel()) {
     Box(
       contentAlignment = Alignment.Center,
       modifier =
-        Modifier.size(width = maxWidth, height = maxHeight).drawWithContent {
-          if (layoutDirection == LayoutDirection.Rtl) {
-            clipRect(left = size.width * animatedSize) { this@drawWithContent.drawContent() }
-          } else {
-            clipRect(right = size.width * animatedSize) { this@drawWithContent.drawContent() }
-          }
-        },
+        Modifier
+          .size(width = maxWidth, height = maxHeight)
+          .drawWithContent {
+            if (layoutDirection == LayoutDirection.Rtl) {
+              clipRect(left = size.width * animatedSize) { this@drawWithContent.drawContent() }
+            } else {
+              clipRect(right = size.width * animatedSize) { this@drawWithContent.drawContent() }
+            }
+          },
     ) {
       AnimatedVisibility(
         visible = remainingTimeVisible,

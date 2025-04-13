@@ -1,15 +1,13 @@
 package com.example.myapplication.components.addExercisesList
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
@@ -65,7 +63,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AddExercisesScreen(
   setOpenDialog: (Boolean) -> Unit,
   exercisesViewModel: ExercisesViewModel = koinViewModel(),
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   navController: NavController,
   navigateToDetailPane: (exerciseID: String) -> Unit,
 ) {
@@ -99,11 +97,9 @@ fun AddExercisesScreen(
 
 //  TODO EDGE TO EDGE isn't working
   Scaffold(
-    modifier = Modifier
-      .imePadding()
-      .windowInsetsPadding(WindowInsets.systemBars),
     topBar = {
       TopAppBar(
+//        windowInsets = WindowInsets.statusBars,
         title = {
           Text(
             text = "Add Exercises",
@@ -129,6 +125,7 @@ fun AddExercisesScreen(
             )
           }*/
         },
+//        scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
         actions = {
           val iconColors = IconButtonDefaults.iconButtonColors()
           IconButton(
@@ -147,16 +144,22 @@ fun AddExercisesScreen(
         },
       )
     },
-    bottomBar = {},
+    bottomBar = {
+//      NavigationBar {  }
+    },
     floatingActionButton = {
       FloatingActionButton(
         modifier = Modifier.imePadding(),
         onClick = {
+          Log.i(
+            "AddExercisesScreen.WorkoutViewModel",
+            "AddExercisesScreen.WorkoutViewModel: $workoutViewModel"
+          )
           workoutViewModel.addMultipleEmptyExerciseSets(
             exercisesSelectedToBeAddedToWorkout.toList()
           )
-          setOpenDialog(false)
-//          navController.navigateUp()
+//          setOpenDialog(false)
+          navController.navigateUp()
         }
       ) {
         // TODO Figure out right icon for this
@@ -169,7 +172,9 @@ fun AddExercisesScreen(
       }
     },
     content = { contentPadding ->
-      Column(Modifier.padding(contentPadding)) {
+      Column(Modifier
+        .padding(contentPadding)
+        .fillMaxWidth()) {
         TextFieldDefaults.colors(
           unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
           unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,

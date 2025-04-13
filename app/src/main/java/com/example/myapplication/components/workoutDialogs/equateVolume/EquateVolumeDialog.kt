@@ -43,7 +43,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun EquateVolumeScreen(
   openDialog: (Boolean) -> Unit,
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   exerciseSets: ExerciseExerciseSets,
   equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
 ) {

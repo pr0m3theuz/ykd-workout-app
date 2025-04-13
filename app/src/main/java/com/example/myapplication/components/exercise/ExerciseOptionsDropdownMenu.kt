@@ -29,6 +29,7 @@ import kotlin.time.toDuration
 
 @Composable
 fun ExerciseOptionsDropdownMenu(
+  workoutViewModel: WorkoutViewModel,
   exerciseSets: ExerciseExerciseSets,
   addNotes: () -> Unit,
   removeExerciseSets: () -> Unit,
@@ -194,15 +195,17 @@ fun ExerciseOptionsDropdownMenu(
     }
     if (openAddWorkingSetsDialog) {
       AddWorkingSetsScreen(
+        workoutViewModel = workoutViewModel,
         openDialog = { close -> closeWorkingSetsDialog(close) },
         exerciseSets = exerciseSets
       )
     }
 
     if (openRestTimePicker) {
-      exerciseSets.exercise.let {
-        AutoRestTimerScreen(openDialog = { close -> closeRestTimerDialog(close) }, exercise = it)
-      }
+      AutoRestTimerScreen(
+        workoutViewModel = workoutViewModel,
+        openDialog = { close -> closeRestTimerDialog(close) }, exercise = exerciseSets.exercise
+      )
     }
 
     if (openReplaceExerciseDialog) {
@@ -215,6 +218,7 @@ fun ExerciseOptionsDropdownMenu(
 
     if (openEquateVolumeDialog) {
       EquateVolumeScreen(
+        workoutViewModel = workoutViewModel,
         openDialog = { close -> closeEquateVolumeDialog(close) },
         exerciseSets = exerciseSets
       )
@@ -222,6 +226,7 @@ fun ExerciseOptionsDropdownMenu(
 
     if (openReplaceExerciseScreen) {
       ReplaceExerciseScreen(
+        workoutViewModel = workoutViewModel,
         exerciseSets = exerciseSets,
         setOpenDialog = { close -> openReplaceExerciseScreen = close },
         navController = navController,

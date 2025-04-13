@@ -59,7 +59,6 @@ import com.example.myapplication.utils.checkDoubleInput
 import com.example.myapplication.utils.checkIntInput
 import com.example.myapplication.utils.checkRIRInput
 import com.example.myapplication.utils.doubleFormatted
-import org.koin.androidx.compose.koinViewModel
 
 // TODO Add ability to rearrange sets
 // TODO Add placeholder text for target weight, reps, & rpe/rir
@@ -68,6 +67,7 @@ import org.koin.androidx.compose.koinViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun SetContent(
+  workoutViewModel: WorkoutViewModel,
   exerciseSets: WorkoutComponent,
   setIndex: Int,
   set: Set,
@@ -130,7 +130,10 @@ fun SetContent(
   }
 
   if (openTimerScreen && isTimerRunning) {
-    TimerScreen(openDialog = { open -> openTimerScreen(open) })
+    TimerScreen(
+      openDialog = { open -> openTimerScreen(open) },
+      workoutViewModel = workoutViewModel,
+    )
   }
 
   fun copyPreviousSetData() {
@@ -168,6 +171,7 @@ fun SetContent(
     },
     setCompleteCheckbox = {
       SetCompleteCheckbox(
+        workoutViewModel = workoutViewModel,
         checkedState,
         completeSet = { setComplete(it) },
         startRestTimer = { startSetCompletedTimer() },
@@ -214,6 +218,7 @@ fun SetContent(
         }
       set.repetitionsInReserve = repetitionsInReserveText.toDoubleOrNull()
     },
+    workoutViewModel = workoutViewModel,
   )
 }
 
@@ -223,7 +228,7 @@ fun SetContentFrame(
   setTypeOptionsMenu: @Composable () -> Unit,
   previousSet: @Composable () -> Unit,
   setCompleteCheckbox: @Composable (boxModifier: Modifier) -> Unit,
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   exerciseWeightText: String,
   targetWeight: String?,
   onWeightChange: (newWeight: String) -> Unit,
@@ -247,7 +252,9 @@ fun SetContentFrame(
   }
 
   if (openTimerScreen && workoutViewModel.isTimerRunning) {
-    TimerScreen(openDialog = { open -> openTimerScreen(open) })
+    TimerScreen(
+      workoutViewModel = workoutViewModel,
+      openDialog = { open -> openTimerScreen(open) })
   }
 
   Row(
@@ -489,6 +496,7 @@ private fun PreviousSet(
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 private fun SetCompleteCheckbox(
+  workoutViewModel: WorkoutViewModel,
   checkedState: MutableState<Boolean>,
   completeSet: (Boolean) -> Unit,
   startRestTimer: () -> Unit,
@@ -505,7 +513,9 @@ private fun SetCompleteCheckbox(
   }
 
   if (openTimerScreen && isTimerRunning) {
-    TimerScreen(openDialog = { open -> openTimerScreen(open) })
+    TimerScreen(
+      workoutViewModel = workoutViewModel,
+      openDialog = { open -> openTimerScreen(open) })
   }
 
   Checkbox(
@@ -672,7 +682,7 @@ private fun RIRTextField(
 }
 
 private fun getSetIconText(set: Set, setIndex: Int, setTypeAbbreviation: String): String =
-  if (set.setTypeID == com.example.myapplication.data.model.SetType.normalSet) {
+  if (set.setTypeID == SetType.normalSet) {
     setIndex.inc().toString()
   } else {
     setTypeAbbreviation

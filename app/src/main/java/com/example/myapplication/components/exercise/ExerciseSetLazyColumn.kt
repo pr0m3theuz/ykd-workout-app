@@ -36,7 +36,6 @@ import com.example.myapplication.data.model.SupersetExercisesSets
 import com.example.myapplication.data.model.WorkoutComponent
 import com.example.myapplication.data.model.WorkoutNote
 import com.example.myapplication.ui.theme.IBMColorBlindPalette
-import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -44,7 +43,7 @@ import kotlin.uuid.Uuid
 @Composable
 fun ExercisesSetsScreen(
   navController: NavController,
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
 ) {
   val workoutComponents by workoutViewModel.workoutComponents.collectAsState(emptyList())
   val workoutNotes by workoutViewModel.workoutNotes.collectAsState(emptyList())
@@ -55,8 +54,9 @@ fun ExercisesSetsScreen(
     enableCancelWorkout = true,
     WorkoutNoteItem = { workoutNote ->
       SwipeToDismissWorkoutNote(
-        workoutNote,
+        workoutViewModel = workoutViewModel,
         removeWorkoutNote = { workoutViewModel.removeWorkoutNote(workoutNote) },
+        workoutNote = workoutNote,
       )
     },
     ExerciseItem = { exerciseSets ->
@@ -79,6 +79,7 @@ fun ExercisesSetsScreen(
         onCreateSuperset = { selectedExercises ->
           workoutViewModel.createSupersetFromExercisesSets(selectedExercises)
         },
+        workoutViewModel = workoutViewModel,
       )
     },
     SetItem = { exerciseSets, set, index ->
@@ -96,6 +97,7 @@ fun ExercisesSetsScreen(
             removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
             setContent = {
               SetContent(
+                workoutViewModel,
                 exerciseSets,
                 index,
                 set,
@@ -287,8 +289,16 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
 }
 
 @Composable
-fun SwipeToDismissWorkoutNote(workoutNote: WorkoutNote, removeWorkoutNote: () -> Unit) {
+fun SwipeToDismissWorkoutNote(
+  workoutViewModel: WorkoutViewModel,
+  workoutNote: WorkoutNote,
+  removeWorkoutNote: () -> Unit
+) {
   SwipeToDismissItem(onDismissRequest = { removeWorkoutNote() }, dismissStateBoolean = true) {
-    WorkoutNoteTextField(workoutNote = workoutNote, placeholder = "Workout Note")
+    WorkoutNoteTextField(
+      workoutViewModel = workoutViewModel,
+      workoutNote = workoutNote,
+      placeholder = "Workout Note"
+    )
   }
 }

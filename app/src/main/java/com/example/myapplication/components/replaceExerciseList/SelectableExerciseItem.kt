@@ -21,13 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.Exercise
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SelectableExerciseItem(
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
   exercise: Exercise,
   selectedExercise: Boolean,
   muscleGroupName: String?,

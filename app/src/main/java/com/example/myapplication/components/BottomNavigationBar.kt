@@ -13,6 +13,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -61,7 +63,7 @@ fun BottomNavigationBar(navController: NavController) {
   val currentDestination = navBackStackEntry?.destination
 //  Log.i("BottomNavigationBar", "currentDestination: $currentDestination")
 
-  NavigationBar {
+  NavigationBar(windowInsets = WindowInsets.navigationBars) {
     items.forEach { item ->
 //      Log.i("BottomNavigationBar", "item.route: ${item.route}")
       val isSelected =
@@ -144,7 +146,7 @@ sealed class Screens(
 
   object Workout :
     Screens(
-      "workout?workoutID=",
+      "workout",
       "workout",
       R.string.workout,
       Icons.AutoMirrored.Filled.Assignment

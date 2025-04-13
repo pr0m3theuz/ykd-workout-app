@@ -52,14 +52,13 @@ import com.example.myapplication.utils.doubleFormatted
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
-import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutSummaryScreen(
   navController: NavController,
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   workoutID: String,
   workoutsCount: Int,
 ) {

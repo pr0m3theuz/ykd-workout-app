@@ -45,6 +45,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.components.ExerciseOptionsDropdownMenu
+import com.example.myapplication.components.WorkoutViewModel
 import com.example.myapplication.data.model.ExerciseExerciseSets
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.WorkoutComponent
@@ -57,7 +58,7 @@ import java.text.DecimalFormat
 @Composable
 fun ExerciseScreen(
   navController: NavController,
-//  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   _exerciseSets: ExerciseExerciseSets,
   weightUnit: String,
   exerciseWeightUnit: String?,
@@ -99,6 +100,7 @@ fun ExerciseScreen(
     },
     exerciseOptionsMenu = {
       ExerciseOptionsDropdownMenu(
+        workoutViewModel = workoutViewModel,
         exerciseSets = exerciseSets,
         addNotes = {
           setNotesVisible(true)

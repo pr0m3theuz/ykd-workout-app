@@ -78,21 +78,18 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
 
   init {
     viewModelScope.launch {
-//      getEquipment()
-//      getMuscleGroups()
+//      Log.i("ExercisesViewModel", "init: getAllExercises")
       getAllExercises()
     }
 
     viewModelScope.launch {
+//      Log.i("ExercisesViewModel", "init: getEquipment")
       getEquipment()
     }
 
     viewModelScope.launch {
+//      Log.i("ExercisesViewModel", "init: getMuscleGroups")
       getMuscleGroups()
-    }
-
-    viewModelScope.launch {
-      init(equipment.value, muscleGroup.value)
     }
   }
 
@@ -108,41 +105,37 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   }
 
   private suspend fun getEquipment() {
-    Log.i("ExercisesViewModel", "getEquipment")
+//    Log.i("ExercisesViewModel", "getEquipment")
     return coroutineScope {
       exercisesRepository.getAllEquipment().collect {
         _equipment.value = it
-//        Log.i("ExercisesViewModel.getEquipment()", it.toString())
+//        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
+
+        _equipmentsChecked.value =
+          it.map { equipment -> equipment to false }.toMutableStateMap().toMutableMap()
+        /*        Log.i(
+                  "ExercisesViewModel",
+                  "init _equipmentsChecked: ${_equipmentsChecked.value.keys.toList()}"
+                )*/
       }
     }
   }
 
   private suspend fun getMuscleGroups() {
-    Log.i("ExercisesViewModel", "getMuscleGroups")
+//    Log.i("ExercisesViewModel", "getMuscleGroups")
     return coroutineScope {
       exercisesRepository.getAllMuscleGroups().collect {
         _muscleGroup.value = it
-//        Log.i("ExercisesViewModel.getMuscleGroups()", it.toString())
+//        Log.i("ExercisesViewModel", "getMuscleGroups() $it")
+
+        _muscleGroupsChecked.value =
+          it.map { muscleGroup -> muscleGroup to false }.toMutableStateMap().toMutableMap()
+        /*        Log.i(
+                  "ExercisesViewModel",
+                  "init _muscleGroupsChecked: ${_muscleGroupsChecked.value.keys.toList()}"
+                )*/
       }
     }
-  }
-
-  private fun init(equipment: List<Equipment>, muscleGroup: List<MuscleGroup>) {
-    //    Log.i("ExercisesViewModel", "init: _muscleGroupsChecked")
-
-    _equipment.value = equipment
-    if (_equipmentsChecked.value.isEmpty()) {
-      _equipmentsChecked.value = equipment.map { it to false }.toMutableStateMap().toMutableMap()
-    }
-
-    _muscleGroup.value = muscleGroup
-    if (_muscleGroupsChecked.value.isEmpty()) {
-      _muscleGroupsChecked.value =
-        muscleGroup.map { it to false }.toMutableStateMap().toMutableMap()
-    }
-
-    //    Log.i("ExercisesViewModel", "${_muscleGroupsChecked.value.keys.toList()}")
-    //    Log.i("ExercisesViewModel", "${_equipmentsChecked.value.keys.toList()}")
   }
 
   fun getAllUtilities() {
@@ -236,6 +229,11 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
       selectedMovementTypes = mutableListOf("%")
     }
     */
+
+    Log.i("ExercisesViewModel", "filterExercises().selectedMuscleGroups: $selectedMuscleGroups")
+    Log.i("ExercisesViewModel", "filterExercises().selectedEquipments: $selectedEquipments")
+//    Log.i("ExercisesViewModel", "filterExercises().selectedMovementTypes: $selectedMovementTypes")
+    Log.i("ExercisesViewModel", "filterExercises()._searchExerciseName: $_searchExerciseName")
 
     // TODO If _exercises is empty, display "No results" Message
     viewModelScope.launch {

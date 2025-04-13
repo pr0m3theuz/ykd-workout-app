@@ -33,7 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddWorkingSetsScreen(
   workingSetViewModel: WorkingSetViewModel = koinViewModel(),
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   openDialog: (Boolean) -> Unit,
   exerciseSets: ExerciseExerciseSets,
 ) {

@@ -110,7 +110,6 @@ fun HistoryScreen(navController: NavController) {
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
   Scaffold(
-    modifier = Modifier.imePadding(),
     topBar = {
       TopAppBar(
         title = {
@@ -387,7 +386,7 @@ fun WorkoutOverview(
                   .fillMaxWidth()
                   .padding(12.dp),
                 onClick = {
-                  navController.navigate("workout?workoutID=${itWorkout.id.toHexString()}") {
+                  navController.navigate("workoutScreen?workoutID=${itWorkout.id.toHexString()}") {
                     popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                     // Avoid multiple copies of the same destination when
                     // reselecting the same item
@@ -668,13 +667,14 @@ fun EditWorkoutScreen(
             enableCancelWorkout = true,
             WorkoutNoteItem = { workoutNote ->
               SwipeToDismissWorkoutNote(
-                workoutNote,
+                workoutViewModel = workoutViewModel,
+                workoutNote = workoutNote,
                 removeWorkoutNote = { workoutViewModel.removeWorkoutNote(workoutNote) },
               )
             },
             ExerciseItem = { exerciseSets ->
               ExerciseScreen(
-                navController,
+                navController = navController,
                 _exerciseSets = exerciseSets,
                 weightUnit = workoutViewModel.getWeightUnit(exerciseSets),
                 exerciseWeightUnit = exerciseSets.exercise?.weightUnit,
@@ -694,6 +694,7 @@ fun EditWorkoutScreen(
                 },
                 workoutComponents = workoutComponents,
                 onCreateSuperset = {},
+                workoutViewModel = workoutViewModel,
               )
             },
             SetItem = { exerciseSets, set, index ->
@@ -705,6 +706,7 @@ fun EditWorkoutScreen(
                 removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
                 setContent = {
                   SetContent(
+                    workoutViewModel = workoutViewModel,
                     exerciseSets,
                     index,
                     set,

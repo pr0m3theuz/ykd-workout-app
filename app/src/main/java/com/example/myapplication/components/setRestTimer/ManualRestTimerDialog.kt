@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.components.WorkoutViewModel
-import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -51,10 +50,11 @@ import kotlin.time.toDuration
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun ManualRestTimerScreen(
-  workoutViewModel: WorkoutViewModel = koinViewModel(),
+  workoutViewModel: WorkoutViewModel,
   openDialog: (Boolean) -> Unit,
 ) {
   ManualRestTimerDialog(
+    workoutViewModel = workoutViewModel,
     openDialog = { close -> openDialog(close) },
     startTimer = { time -> workoutViewModel.startRestTimer(time) },
   )
@@ -63,13 +63,18 @@ fun ManualRestTimerScreen(
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun ManualRestTimerDialog(openDialog: (Boolean) -> Unit, startTimer: (Duration) -> Unit) {
+fun ManualRestTimerDialog(
+  workoutViewModel: WorkoutViewModel,
+  openDialog: (Boolean) -> Unit, startTimer: (Duration) -> Unit
+) {
   /* TODO create a function in the workoutViewModel that creates a timer and only takes a duration of time in milliseconds */
 
   var visible by remember { mutableStateOf(false) }
   var timeString: String by remember { mutableStateOf("") }
 
-  val buttonModifier = Modifier.requiredSize(80.dp).padding(0.dp)
+  val buttonModifier = Modifier
+    .requiredSize(80.dp)
+    .padding(0.dp)
 
   val iconSizeModifier = Modifier.size(24.dp)
 
@@ -80,7 +85,9 @@ fun ManualRestTimerDialog(openDialog: (Boolean) -> Unit, startTimer: (Duration) 
   }
 
   if (openTimerScreen) {
-    TimerScreen(openDialog = { close -> closeTimerScreen(close) })
+    TimerScreen(
+      workoutViewModel = workoutViewModel,
+      openDialog = { close -> closeTimerScreen(close) })
   }
 
   fun add(input: String) {
@@ -203,7 +210,9 @@ fun ManualRestTimerDialog(openDialog: (Boolean) -> Unit, startTimer: (Duration) 
                   )
               }*/
               Spacer(modifier = Modifier.width(80.dp))
-              Box(modifier = Modifier.width(80.dp).padding(0.dp)) {
+              Box(modifier = Modifier
+                .width(80.dp)
+                .padding(0.dp)) {
                 this@Row.AnimatedVisibility(
                   visible = visible,
                   enter = scaleIn(animationSpec = tween(500)),
