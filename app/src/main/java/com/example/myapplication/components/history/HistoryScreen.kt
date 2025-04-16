@@ -281,7 +281,7 @@ fun HistoryLazyColumn(
       contentPadding = PaddingValues(16.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-      groupedWorkouts.forEach() { month, monthWorkouts ->
+      groupedWorkouts.forEach { (month, monthWorkouts) ->
         stickyHeader {
           Text(
             modifier = Modifier.padding(0.dp),

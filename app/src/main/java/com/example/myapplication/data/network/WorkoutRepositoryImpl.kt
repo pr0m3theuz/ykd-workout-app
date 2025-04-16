@@ -6,6 +6,7 @@ import android.util.Log
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
+import com.couchbase.lite.Function
 import com.couchbase.lite.Join
 import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
@@ -16,7 +17,10 @@ import com.couchbase.lite.queryChangeFlow
 import com.example.myapplication.data.database.DatabaseManager
 import com.example.myapplication.data.model.ExerciseNote
 import com.example.myapplication.data.model.ExerciseSets
+import com.example.myapplication.data.model.Mesocycle
+import com.example.myapplication.data.model.MesocycleDao
 import com.example.myapplication.data.model.Microcycle
+import com.example.myapplication.data.model.MicrocycleDao
 import com.example.myapplication.data.model.Set
 import com.example.myapplication.data.model.Workout
 import com.example.myapplication.data.model.WorkoutDao
@@ -448,5 +452,278 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     endDate: String,
   ): Flow<List<Workout>> = flow {
     // Implement complex filtering logic using QueryBuilder
+  }
+
+  private fun mapQueryChangeToMesocycle(queryChange: QueryChange): List<Mesocycle> {
+    val mesocycles = mutableListOf<Mesocycle>() // 1
+    queryChange.results?.let { results -> // 2
+      results.forEach { result -> // 3
+        val json = result.toJSON() // 4
+        val mesocycle = withUnknownKeys.decodeFromString<MesocycleDao>(json).Mesocycle // 5
+        mesocycles.add(mesocycle) // 6
+      }
+    }
+    return mesocycles // 7
+  }
+
+  private fun mapQueryChangeToMicrocycle(queryChange: QueryChange): List<Microcycle> {
+    val microcycles = mutableListOf<Microcycle>() // 1
+    queryChange.results?.let { results -> // 2
+      results.forEach { result -> // 3
+        val json = result.toJSON() // 4
+        val microcycle = withUnknownKeys.decodeFromString<MicrocycleDao>(json).Microcycle // 5
+        microcycles.add(microcycle) // 6
+      }
+    }
+    return microcycles // 7
+  }
+
+  override fun getNextWorkoutInProgram(completedWorkout: Workout): Workout? {
+    try {
+      // write query to check if this is the last workout in the microcycle.
+      // if so, get the next microcycle then get the next workout in the microcycle
+      // write query to check if this microcycle is the last microcycle in current microcycle's mesocycle.
+      // if so, get the next mesocycle then get the next workout in the next microcycle
+
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val workoutCollection = db.getCollection("Workout")
+      val microcycleCollection = db.getCollection("Microcycle")
+      val mesocycleCollection = db.getCollection("Mesocycle")
+      val programCollection = db.getCollection("Program")
+
+      requireNotNull(workoutCollection) { COLLECTION_IS_NULL }
+      requireNotNull(microcycleCollection) { "Workout Repository: Microcycle Collection does not exist in the Database." }
+      requireNotNull(mesocycleCollection) { "Workout Repository: Mesocycle Collection does not exist in the Database." }
+      requireNotNull(programCollection) { "Workout Repository: Program Collection does not exist in the Database." }
+
+      "SELECT * FROM `Microcycle` WHERE id = '${completedWorkout.microcycleID}'"
+      "SELECT * FROM `Mesocycle` WHERE id = '${completedWorkout.mesocycleID}'"
+      "SELECT * FROM `Program` WHERE id = '${completedWorkout.programID}'"
+
+
+      val workoutCountQuery = QueryBuilder
+        .select(
+          SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+        )
+        .from(DataSource.collection(workoutCollection))
+        .where(
+          Expression.property("microcycleID")
+            .equalTo(Expression.string(completedWorkout.microcycleID.toString()))
+        )
+
+      var workoutCount = 0
+      workoutCountQuery.execute().use { rs ->
+        rs.allResults().forEach {
+          workoutCount = it.getInt("count")
+        }
+      }
+
+      requireNotNull(completedWorkout.day) { "Workout Repository: Completed Workout Day is null!" }
+
+      when {
+        completedWorkout.day!! < workoutCount -> {
+          // TODO("Implement logic to get next workout in microcycle")
+          val firstWorkoutInMicrcycleQuery = QueryBuilder
+            .select(SelectResult.all())
+            .from(DataSource.collection(workoutCollection))
+            .where(
+              Expression.property("microycleID")
+                .equalTo(Expression.string(completedWorkout.microcycleID.toString()))
+                .and(
+                  Expression.property("order")
+                    .equalTo(Expression.intValue(completedWorkout.day!!.plus(1)))
+                )
+            )
+          val firstWorkoutInMicrcycleQueryReslt =
+            firstWorkoutInMicrcycleQuery.execute().allResults().firstOrNull()?.toJSON()
+
+          val nextWorkout = firstWorkoutInMicrcycleQueryReslt?.let {
+            withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout
+          }
+
+          return nextWorkout
+        }
+
+        completedWorkout.day == workoutCount -> {
+          val microcycleQuery = QueryBuilder.select(
+            SelectResult.all()
+          )
+            .from(DataSource.collection(microcycleCollection))
+            .where(
+              Expression.property("id")
+                .equalTo(Expression.string(completedWorkout.microcycleID.toString()))
+            )
+
+          var currentMicrocycleOrder = 0
+          microcycleQuery.execute().use { rs ->
+            rs.allResults().forEach {
+              currentMicrocycleOrder = it.getInt("order")
+            }
+          }
+          val microcycleCountQuery = QueryBuilder
+            .select(
+              SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+            )
+            .from(DataSource.collection(microcycleCollection))
+            .where(
+              Expression.property("mesocycleID")
+                .equalTo(Expression.string(completedWorkout.mesocycleID.toString()))
+            )
+
+          var microcycleCount = 0
+          microcycleCountQuery.execute().use { rs ->
+            rs.allResults().forEach {
+              microcycleCount = it.getInt("count")
+            }
+          }
+
+          when {
+            currentMicrocycleOrder < microcycleCount -> {
+              // TODO("Implement logic to get next microcycle in mesocycle")
+              val nextMicrocycleInCurrentMesocycleQuery = QueryBuilder
+                .select(SelectResult.all())
+                .from(DataSource.collection(microcycleCollection))
+                .where(
+                  Expression.property("mesocycleID")
+                    .equalTo(Expression.string(completedWorkout.mesocycleID.toString()))
+                    .and(
+                      Expression.property("order")
+                        .equalTo(Expression.intValue(currentMicrocycleOrder.plus(1)))
+                    )
+                )
+
+              val nextMicrocycle =
+                nextMicrocycleInCurrentMesocycleQuery.execute().allResults().firstOrNull()?.toJSON()
+                  ?.let {
+                    withUnknownKeys.decodeFromString<MicrocycleDao>(it).Microcycle
+                  }
+
+              nextMicrocycle?.let {
+                // TODO("Implement logic to get next workout in microcycle")
+                val firstWorkoutInMicrcycleQuery = QueryBuilder
+                  .select(SelectResult.all())
+                  .from(DataSource.collection(workoutCollection))
+                  .where(
+                    Expression.property("microycleID")
+                      .equalTo(Expression.string(nextMicrocycle.id.toString()))
+                      .and(Expression.property("order").equalTo(Expression.intValue(1)))
+                  )
+                val firstWorkoutInMicrcycleQueryReslt =
+                  firstWorkoutInMicrcycleQuery.execute().allResults().firstOrNull()?.toJSON()
+
+                val nextWorkout = firstWorkoutInMicrcycleQueryReslt?.let {
+                  withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout
+                }
+
+                return nextWorkout
+              }
+            }
+
+            currentMicrocycleOrder == microcycleCount -> {
+              val mesocycleQuery = QueryBuilder.select(
+                SelectResult.all()
+              )
+                .from(DataSource.collection(mesocycleCollection))
+                .where(
+                  Expression.property("id")
+                    .equalTo(Expression.string(completedWorkout.mesocycleID.toString()))
+                )
+
+              var currentMesocycleOrder = 0
+              mesocycleQuery.execute().use { rs ->
+                rs.allResults().forEach {
+                  currentMesocycleOrder = it.getInt("order")
+                }
+              }
+
+              val mesocycleCountQuery = QueryBuilder
+                .select(
+                  SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+                )
+                .from(DataSource.collection(mesocycleCollection))
+                .where(
+                  Expression.property("programID")
+                    .equalTo(Expression.string(completedWorkout.programID.toString()))
+                )
+
+              var mesocycleCount = 0
+              mesocycleCountQuery.execute().use { rs ->
+                rs.allResults().forEach {
+                  mesocycleCount = it.getInt("count")
+                }
+              }
+
+              when {
+                currentMesocycleOrder >= mesocycleCount -> return null
+                currentMesocycleOrder < mesocycleCount -> {
+                  // TODO("Implement logic to get next mesocycle in program")
+                  val nextMesocycleQuery = QueryBuilder
+                    .select(SelectResult.all())
+                    .from(DataSource.collection(mesocycleCollection))
+                    .where(
+                      Expression.property("programID")
+                        .equalTo(Expression.string(completedWorkout.programID.toString()))
+                        .and(
+                          Expression.property("order")
+                            .equalTo(Expression.intValue(currentMesocycleOrder.plus(1)))
+                        )
+                    )
+
+                  val nextMesocycle =
+                    nextMesocycleQuery.execute().allResults().firstOrNull()?.toJSON()?.let {
+                      withUnknownKeys.decodeFromString<MesocycleDao>(it).Mesocycle
+                    }
+
+                  nextMesocycle?.let {
+                    // TODO("Implement logic to get next microcycle in mesocycle")
+                    val firstMicrocycleInMesocycleQuery = QueryBuilder
+                      .select(SelectResult.all())
+                      .from(DataSource.collection(microcycleCollection))
+                      .where(
+                        Expression.property("mesocycleID")
+                          .equalTo(Expression.string(nextMesocycle.id.toString()))
+                          .and(Expression.property("order").equalTo(Expression.intValue(1)))
+                      )
+
+                    val nextMicrocycle =
+                      firstMicrocycleInMesocycleQuery.execute().allResults().firstOrNull()?.toJSON()
+                        ?.let {
+                          withUnknownKeys.decodeFromString<MicrocycleDao>(it).Microcycle
+                        }
+
+                    nextMicrocycle?.let {
+                      // TODO("Implement logic to get next workout in microcycle")
+                      val firstWorkoutInMicrcycleQuery = QueryBuilder
+                        .select(SelectResult.all())
+                        .from(DataSource.collection(workoutCollection))
+                        .where(
+                          Expression.property("microycleID")
+                            .equalTo(Expression.string(nextMicrocycle.id.toString()))
+                            .and(Expression.property("order").equalTo(Expression.intValue(1)))
+                        )
+                      val firstWorkoutInMicrcycleQueryReslt =
+                        firstWorkoutInMicrcycleQuery.execute().allResults().firstOrNull()?.toJSON()
+
+                      val nextWorkout = firstWorkoutInMicrcycleQueryReslt?.let {
+                        withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout
+                      }
+
+                      return nextWorkout
+                    }
+                  }
+                }
+              }
+            }
+
+            else -> return null
+
+          }
+        }
+      }
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return null
   }
 }

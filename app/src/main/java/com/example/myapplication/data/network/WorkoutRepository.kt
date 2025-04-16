@@ -66,11 +66,11 @@ interface WorkoutRepository {
 
   fun getAllCompletedWorkouts(): Flow<List<Workout>>
 
-
   fun findNextWorkoutExerciseSets(exerciseSets: ExerciseSets, programID: ObjectId): Workout?
 
   suspend fun updateSets(sets: MutableList<Set>)
 
+  // TODO is this the right repository for this function?
   fun filterWorkouts(
     workout: String,
     programIDs: List<String>,
@@ -78,6 +78,8 @@ interface WorkoutRepository {
     endDate: String,
     //        movementTypes: List<String>
   ): Flow<List<Workout>>
+
+  fun getNextWorkoutInProgram(completedWorkout: Workout): Workout?
 }
 
 interface CurrentWorkoutRepository {

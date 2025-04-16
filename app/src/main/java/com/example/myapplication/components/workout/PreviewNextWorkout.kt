@@ -146,6 +146,8 @@ fun EditNextWorkoutScreen(
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
   if (workoutID.isNotBlank()) {
+    // TODO implement load workout from template workout
+    // TODO implement function to get next workout in program
     workoutViewModel.loadWorkoutFromPreviousWorkout(ObjectId(workoutID))
   } else {
     NoWorkoutFound()
@@ -244,7 +246,7 @@ fun EditNextWorkoutScreen(
                 navController,
                 _exerciseSets = exerciseSets,
                 weightUnit = workoutViewModel.getWeightUnit(exerciseSets),
-                exerciseWeightUnit = exerciseSets.exercise?.weightUnit,
+                exerciseWeightUnit = exerciseSets.exercise.weightUnit,
                 userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit,
                 removeExerciseSets = {
                   workoutViewModel.removeExerciseSets(

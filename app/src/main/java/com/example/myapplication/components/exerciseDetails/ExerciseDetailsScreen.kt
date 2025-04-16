@@ -126,8 +126,6 @@ private fun ExerciseDetailsLayout(
   }
 
   val context = LocalContext.current
-  var state =
-    tabState // TODO store in ViewModel. position is lost when navigating back from fullscreen chart
   val titles = listOf("About", "History", "Charts", "Records")
   val onSurface = MaterialTheme.colorScheme.onSurface
 
@@ -168,13 +166,13 @@ private fun ExerciseDetailsLayout(
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
       TabRow(
-        selectedTabIndex = state,
+        selectedTabIndex = tabState,
         backgroundColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
       ) {
         titles.forEachIndexed { index, title ->
           Tab(
-            selected = state == index,
+            selected = tabState == index,
             onClick = { setTabState(index) },
             text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
           )
@@ -185,7 +183,7 @@ private fun ExerciseDetailsLayout(
         Modifier
           .padding(8.dp)
           .fillMaxWidth()) {
-        when (state) {
+        when (tabState) {
           0 -> AboutTab(exercise.name)
           1 -> HistoryTab()
           2 -> ChartTab(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })

@@ -184,6 +184,8 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navControll
   return koinViewModel(viewModelStoreOwner = parentEntry)
 }
 
+
+// TODO rewrite shared viewmodel & consider using koin scope
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addWorkoutGraph(
