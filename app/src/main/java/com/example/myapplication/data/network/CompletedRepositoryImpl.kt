@@ -60,9 +60,7 @@ class CompletedRepositoryImpl(private val databaseManager: DatabaseManager) : Co
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      val set = result?.let { withUnknownKeys.decodeFromString<Set>(it) }
-
-      return set
+      return result?.let { withUnknownKeys.decodeFromString<SetDao>(it).Set }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }

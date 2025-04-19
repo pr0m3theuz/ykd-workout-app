@@ -76,18 +76,18 @@ fun linearProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
   var lowestWeightKilogramsPerformed =
     sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  val incrementWeightPounds = sets.mapNotNull { it.incrementWeightPounds!! }.first()
-  val incrementWeightKilograms = sets.mapNotNull { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = sets.mapNotNull { it.incrementWeightPounds }.first()
+  val incrementWeightKilograms = sets.mapNotNull { it.incrementWeightKilograms }.first()
 
-  var repetitionsList = sets.mapNotNull { it.repetitions!! }.toMutableList()
-  var weightPoundsList = sets.mapNotNull { it.weightPounds!! }.toMutableList()
-  var weightKilogramsList = sets.mapNotNull { it.weightKilograms!! }.toMutableList()
+  val repetitionsList = sets.mapNotNull { it.repetitions }.toMutableList()
+  val weightPoundsList = sets.mapNotNull { it.weightPounds }.toMutableList()
+  val weightKilogramsList = sets.mapNotNull { it.weightKilograms }.toMutableList()
 
-  var targetMinimumRepetitionsList = sets.mapNotNull { it.targetMinimumRepetitions!! }
-  var targetMaximumRepetitionsList = sets.mapNotNull { it.targetMaximumRepetitions!! }
-  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  var targetMinimumRepetitionsList = sets.mapNotNull { it.targetMinimumRepetitions }
+  var targetMaximumRepetitionsList = sets.mapNotNull { it.targetMaximumRepetitions }
+  val targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
+  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
+  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
 
   /*    var targetMinimumRepetitions =
         if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.firstOrNull() })
@@ -152,23 +152,23 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
   val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
   val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
 
-  var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-  var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-  var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  val repetitionsList = sets.map { it.repetitions!! }.toMutableList()
+  val weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
+  val weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
 
-  var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
-  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  val targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
+  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
+  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
 
   // Check if all target repetitions are the same
-  var targetMinimumRepetitions =
+  val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-  var targetMaximumRepetitions =
+  val targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
@@ -279,20 +279,20 @@ fun dynamicDoubleProgression(
   var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
   var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
 
-  var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
 
-  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  val targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
+  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
+  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
 
   // Check if all target repetitions are the same
-  var targetMinimumRepetitions =
+  val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-  var targetMaximumRepetitions =
+  val targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
@@ -351,20 +351,20 @@ fun waveProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<Mu
   var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
   var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
 
-  var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
 
-  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
+  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
+  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
 
   // Check if all target repetitions are the same
-  var targetMinimumRepetitions =
+  val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
 
-  var targetMaximumRepetitions =
+  val targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
@@ -425,7 +425,7 @@ fun amrapProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<M
   var lowestWeightKilogramsPerformed =
     sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  var targetWeightPounds = sets.map { it.targetWeightPounds!! }.first()
+  val targetWeightPounds = sets.map { it.targetWeightPounds!! }.first()
   var targetWeightKilograms = sets.map { it.targetWeightKilograms!! }.first()
 
   val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
@@ -435,15 +435,15 @@ fun amrapProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<M
   var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
   var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
 
-  var targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  var targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
 
   var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
+  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
 
   // Check if all target repetitions are the same
-  var targetMinimumRepetitions =
+  val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
     else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))

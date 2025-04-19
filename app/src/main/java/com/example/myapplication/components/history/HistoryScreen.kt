@@ -495,9 +495,9 @@ fun WorkoutOverview(
                               text =
                               "${
                                 if (set.setTypeID == SetType.normalSet) {
-                                  set.setNumber?.plus(1)
+                                  set.setNumber?.plus(1).toString()
                                 } else {
-                                  set.setTypeID
+                                  set.setTypeID.abbreviation
                                 }
                               }   ${set.setSummaryRIR(userDefaultWeightUnit)}",
                               style = MaterialTheme.typography.bodyMedium,
@@ -522,9 +522,9 @@ fun WorkoutOverview(
                                 text =
                                 "${
                                   if (set.setTypeID == SetType.normalSet) {
-                                    set.setNumber?.plus(1)
+                                    set.setNumber?.plus(1).toString()
                                   } else {
-                                    set.setTypeID
+                                    set.setTypeID.abbreviation
                                   }
                                 }   ${set.setSummaryRIR(userDefaultWeightUnit)}",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -532,11 +532,8 @@ fun WorkoutOverview(
                             }
                           }
                         }
-
                       }
                     }
-
-
                   }
                 }
               }

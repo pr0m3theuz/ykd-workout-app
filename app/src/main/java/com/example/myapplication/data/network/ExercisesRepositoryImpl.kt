@@ -635,38 +635,6 @@ class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : Ex
         else -> "%${exercise.lowercase()}%"
       }
 
-//      var whereQueryExpression =
-//        Expression.property("isPublic")
-//          .equalTo(Expression.booleanValue(true))
-//
-//      if (value != "%") {
-//        whereQueryExpression =
-//          whereQueryExpression.and(Expression.property("name").like(Expression.string(value)))
-//      }
-//
-//      // Add muscle group filter if provided
-//      if (muscleGroupIDs.isNotEmpty()) {
-//        val muscleGroupExpression =
-//          Expression.property("muscleGroupID").`in`(Expression.list(muscleGroupIDs))
-//
-//        whereQueryExpression = whereQueryExpression.and(muscleGroupExpression)
-//      }
-//
-//      // Add equipment filter if provided
-////      if (equipmentIDs.isNotEmpty()) {
-////        val equipmentExpression =
-////          Expression.property("equipmentID").`in`(Expression.list(equipmentIDs))
-////
-////        whereQueryExpression = whereQueryExpression.and(equipmentExpression)
-////      }
-//
-//      val query =
-//        QueryBuilder.select(SelectResult.all())
-//          .from(DataSource.collection(collection))
-//          .where(whereQueryExpression)
-//          .orderBy(Ordering.property("name").ascending())
-
-
 //        "SELECT * FROM `Exercise` WHERE isPublic = true AND LOWER(name) LIKE '$value' AND muscleGroupID IN $muscleGroupIDs AND equipmentID IN $equipmentIDs;"
 
       val muscleGroupInClause =
