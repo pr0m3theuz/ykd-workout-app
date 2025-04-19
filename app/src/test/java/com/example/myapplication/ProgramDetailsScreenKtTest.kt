@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import com.example.myapplication.utils.createAnnotatedLinkString
+import com.example.myapplication.common.util.createAnnotatedLinkString
 import net.jqwik.api.Example
 
 class ProgramDetailsScreenKtTest {

@@ -4,9 +4,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.couchbase.lite.ReplicatorChange
-import com.example.myapplication.data.database.DatabaseManager
-import com.example.myapplication.data.services.AuthenticationService
-import com.example.myapplication.data.services.ReplicatorService
+import com.example.myapplication.common.infrastructure.database.DatabaseManager
+import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
+import com.example.myapplication.common.infrastructure.services.AuthenticationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

@@ -1,8 +1,8 @@
 package com.example.myapplication.deserialization
 
-import com.example.myapplication.data.model.ExerciseSets
-import com.example.myapplication.data.model.Workout
-import com.example.myapplication.data.model.WorkoutDao
+import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.domain.model.WorkoutDao
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import net.jqwik.api.Example

@@ -1,7 +1,7 @@
 package com.example.myapplication
 
 import android.app.Application
-import com.example.myapplication.dependencyInjection.initKoin
+import com.example.myapplication.common.dependencyInjection.initKoin
 import org.koin.android.ext.koin.androidContext
 
 const val NOTIFICATION_CHANNEL_ID = "rest_timer"
