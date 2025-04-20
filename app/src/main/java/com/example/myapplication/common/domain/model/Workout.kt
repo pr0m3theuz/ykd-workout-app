@@ -69,6 +69,9 @@ object UuidSerializer : KSerializer<Uuid> {
 data class WorkoutDao(var Workout: Workout)
 
 @Serializable
+data class ActiveWorkoutDao(var ActiveWorkout: Workout)
+
+@Serializable
 data class Workout(
   @SerialName("id")
   @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),

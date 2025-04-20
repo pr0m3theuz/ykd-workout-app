@@ -13,5 +13,7 @@ interface InProgressWorkoutRepository {
 
   fun getWorkouts(): Flow<List<Workout>>
 
-  fun deleteActiveWorkout(workout: Workout): Boolean
+  fun deleteActiveWorkout(workoutID: ObjectId): Boolean
+
+  fun deleteAllWorkouts(): Boolean
 }

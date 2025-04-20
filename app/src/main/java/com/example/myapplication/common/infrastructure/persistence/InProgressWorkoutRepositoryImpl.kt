@@ -4,12 +4,14 @@ import android.util.Log
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
+import com.couchbase.lite.Function
 import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.couchbase.lite.queryChangeFlow
+import com.example.myapplication.common.domain.model.ActiveWorkoutDao
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutDao
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
+import java.util.Date
 
 private const val DATABASE_IS_NULL = "In Progress Workout Repository: Database does not exist."
 
@@ -57,9 +60,19 @@ class InProgressWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(workout)
+
+      collection.getDocument(workout.id.toString())?.let {
+        collection.delete(it)
+      }
+
       val document = MutableDocument(workout.id.toString(), json)
 
       collection.save(document)
+
+      // Document will be deleted after 1 week
+      val expiration =
+        Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7))
+      collection.setDocumentExpiration(workout.id.toString(), expiration)
 
       return true
     } catch (e: Exception) {
@@ -84,7 +97,8 @@ class InProgressWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      val workout = result?.let { withUnknownKeys.decodeFromString<Workout>(it) }
+      val workout =
+        result?.let { withUnknownKeys.decodeFromString<ActiveWorkoutDao>(it) }?.ActiveWorkout
 
       return workout
     } catch (e: Exception) {
@@ -143,17 +157,56 @@ class InProgressWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return flow {}
   }
 
-  override fun deleteActiveWorkout(workout: Workout): Boolean {
+  override fun deleteActiveWorkout(workoutID: ObjectId): Boolean {
     try {
       requireNotNull(currentActiveWorkoutDatabase) { DATABASE_IS_NULL }
       val collection = currentActiveWorkoutDatabase.getCollection("ActiveWorkout")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val document = collection.getDocument(workout.id.toString())
+      val document = collection.getDocument(workoutID.toString())
       requireNotNull(document) { "Workout Repository: Workout does not exist!" }
 
       collection.delete(document)
+      return true
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return false
+  }
+
+  override fun deleteAllWorkouts(): Boolean {
+    try {
+      requireNotNull(currentActiveWorkoutDatabase) { DATABASE_IS_NULL }
+      val collection = currentActiveWorkoutDatabase.getCollection("ActiveWorkout")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val countQuery = QueryBuilder.select(
+        SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+      )
+        .from(DataSource.collection(collection))
+
+      var results = countQuery.execute().allResults()
+      println("Active Workout Count: ${results[0].getInt("count")}")
+
+//      val queryExpression = "DELETE FROM `ActiveWorkout` WHERE META().id IS NOT NULL"
+//      val queryExpression = "TRUNCATE COLLECTION `ActiveWorkout`"
+//      val sqlQuery = currentActiveWorkoutDatabase.createQuery(queryExpression)
+//      sqlQuery.execute()
+
+      val query = QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
+
+      query.execute().allResults().forEach { item ->
+        val json = item.toJSON()
+        val workout = withUnknownKeys.decodeFromString<ActiveWorkoutDao>(json).ActiveWorkout
+
+        collection.purge(workout.id.toString())
+      }
+
+      results = countQuery.execute().allResults()
+      println("Active Workout Count: ${results[0].getInt("count")}")
+
       return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())

@@ -50,18 +50,22 @@ import com.example.myapplication.common.util.AlarmReceiver
 import com.example.myapplication.common.util.cancelNotifications
 import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.common.util.sendNotification
-import com.example.myapplication.features.ManageWorkoutUseCase
 import com.example.myapplication.features.workout.feature.setRestTimer.TimerState
 import com.google.firebase.perf.metrics.AddTrace
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import java.time.LocalTime
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
@@ -546,15 +550,63 @@ class WorkoutViewModel(
     }
   }
 
+  private var autoSaveJob: Job? = null // Keep track of the job
+
+  @OptIn(FlowPreview::class)
+  private fun startAutoSavingWorkout() {
+    // Cancel any previous auto-save job to avoid duplicates if called multiple times
+    autoSaveJob?.cancel()
+    autoSaveJob = viewModelScope.launch {
+      combine(
+        _workout,
+        _workoutNotes,
+        _workoutComponentFlow
+      ) { workout, notes, components ->
+        Triple(workout, notes, components)
+      }
+        .debounce(1000.milliseconds)
+        .collect { (latestWorkout, latestNotes, latestComponents) ->
+          runCatching {
+            Log.d("saveInProgressWorkout", "Auto-saving workout state...")
+            if (latestWorkout != null) {
+              manageWorkoutUseCase.saveInProgressWorkout(
+                workout = latestWorkout,
+                workoutNotes = latestNotes,
+                workoutComponents = latestComponents
+              )
+            }
+          }.onFailure { error ->
+            Log.e("saveInProgressWorkout", "Error auto-saving in-progress workout", error)
+          }
+        }
+    }
+    Log.d("ViewModelLifecycle", "Auto-save job started.")
+  }
+
+  private fun stopAutoSavingWorkout() {
+    autoSaveJob?.cancel()
+    autoSaveJob = null
+    Log.d("ViewModelLifecycle", "Auto-save job stopped.")
+  }
+
+  override fun onCleared() {
+    // viewModelScope is automatically cancelled, but good practice to nullify the job
+    autoSaveJob = null
+    super.onCleared()
+    Log.d("ViewModelLifecycle", "ViewModel cleared, auto-save implicitly stopped.")
+  }
+
   fun initWorkoutData() {
     if (!this::initialWorkoutData.isInitialized && !isWorkoutActive) {
       initialWorkoutData = initWorkout()
       workoutDetails = initialWorkoutData
       _workout.value = workoutDetails
       isWorkoutActive = true
-    }
 
-    testSaveStateHandle()
+      startAutoSavingWorkout()
+
+      testSaveStateHandle()
+    }
   }
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
@@ -562,14 +614,18 @@ class WorkoutViewModel(
   }
 
   fun getWorkoutByID(workoutID: ObjectId) {
+//    Log.i("WorkoutViewModel.getWorkoutByID() ", "called. WorkoutID: $workoutID")
     if (!this::initialWorkoutData.isInitialized && !isWorkoutActive) {
       initialWorkoutData = manageWorkoutUseCase.getWorkoutByID(workoutID) ?: initWorkout()
       // TODO Add logic for when copying from a template (active program) vs when copying from a
       // previous workout
       copyWorkoutFromWorkoutTemplate(initialWorkoutData)
       isWorkoutActive = true
+
+      startAutoSavingWorkout()
+
+      testSaveStateHandle()
     }
-    testSaveStateHandle()
   }
 
   fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {
@@ -1090,16 +1146,23 @@ class WorkoutViewModel(
     cancelSetCompletedTimer()
     stopWorkoutTimer()
     saveWorkout()
+    stopAutoSavingWorkout()
   }
 
   fun cancelWorkout() {
     //    TODO Pop workout screen of the backstack inclusively
     //    TODO navController.popBackStack( route = Programs.route, inclusive = true)
+    deleteWorkout()
     cancelSetCompletedTimer()
     stopWorkoutTimer()
     workoutDetails = initWorkout()
     //    _exercisesSetsData = mutableListOf()
     setWorkoutComponents(listOf())
+    stopAutoSavingWorkout()
+  }
+
+  private fun deleteWorkout() {
+    _workout.value?.let { manageWorkoutUseCase.deleteInProgressWorkout(it.id) }
   }
 
   private fun removeUncompletedSets() {

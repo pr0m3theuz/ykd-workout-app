@@ -7,6 +7,7 @@ import com.couchbase.lite.Collection
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
+import com.couchbase.lite.Function
 import com.couchbase.lite.Join
 import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
@@ -14,7 +15,6 @@ import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.couchbase.lite.queryChangeFlow
-import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import com.example.myapplication.common.domain.model.ExerciseNote
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Mesocycle
@@ -26,6 +26,7 @@ import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutDao
 import com.example.myapplication.common.domain.model.WorkoutNote
 import com.example.myapplication.common.domain.model.WorkoutNoteDao
+import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -98,11 +99,13 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      /*      val query =
-      QueryBuilder.select(SelectResult.expression(Function.count(Expression.string("*"))).`as`("mycount"))
-        .from(DataSource.collection(collection))*/
+      val query =
+        QueryBuilder.select(
+          SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+        )
+          .from(DataSource.collection(collection))
 
-      val query = QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
+//      val query = QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
 
       val results = query.execute().allResults()
       return results[0].getInt("count")
@@ -134,6 +137,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
         val json = item.toJSON()
         val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
         workouts.add(workout)
+//        println("WorkoutRepositoryImpl.getWorkoutsByMicrocycleID.Workout: $workout")
       }
 
 //      val countWorkoutsQuery =
@@ -151,7 +155,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 //      }
 
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+      Log.e(e.message, "microcycleID: $microcycleID\n${e.stackTraceToString()}")
     }
     return workouts.toList()
   }
