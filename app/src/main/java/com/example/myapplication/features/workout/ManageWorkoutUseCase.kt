@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class)
 
-package com.example.myapplication.features
+package com.example.myapplication.features.workout
 
 import android.util.Log
 import com.example.myapplication.common.domain.model.Exercise
@@ -412,7 +412,7 @@ class ManageWorkoutUseCase(
 
     val isInsertSuccess: Boolean = workoutRepository.insertWorkout(workout)
     if (isInsertSuccess) {
-      inProgressWorkoutRepository.deleteActiveWorkout(workout)
+      deleteInProgressWorkout(workout.id)
     } else {
       throw Exception("Workout could not be saved.")
     }
@@ -436,6 +436,13 @@ class ManageWorkoutUseCase(
     // workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
 
     inProgressWorkoutRepository.saveInProgressWorkout(workout)
+  }
+
+  fun deleteInProgressWorkout(
+    workoutID: ObjectId
+  ) {
+    inProgressWorkoutRepository.deleteActiveWorkout(workoutID)
+    inProgressWorkoutRepository.deleteAllWorkouts()
   }
 
   private fun convertExerciseExerciseSetsToExerciseSets(

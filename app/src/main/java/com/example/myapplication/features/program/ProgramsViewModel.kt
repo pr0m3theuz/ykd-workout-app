@@ -22,6 +22,7 @@ import kotlin.uuid.Uuid
 class ProgramsViewModel
 constructor(
   private val programsRepository: ProgramsRepository,
+  // TODO Replace workoutRepository
   private val workoutRepository: WorkoutRepository,
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
   //  private val setsRepository: SetsRepository,

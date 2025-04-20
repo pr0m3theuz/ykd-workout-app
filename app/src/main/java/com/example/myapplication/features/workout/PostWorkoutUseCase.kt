@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class)
 
-package com.example.myapplication.features
+package com.example.myapplication.features.workout
 
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set

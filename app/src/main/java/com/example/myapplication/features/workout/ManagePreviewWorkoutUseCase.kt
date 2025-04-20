@@ -1,4 +1,4 @@
-package com.example.myapplication.features
+package com.example.myapplication.features.workout
 
 import android.util.Log
 import com.example.myapplication.common.domain.model.ExerciseSets

@@ -11,8 +11,8 @@ import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.WorkoutItem
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
-import com.example.myapplication.features.ManageExercisesUseCase
-import com.example.myapplication.features.ManageWorkoutUseCase
+import com.example.myapplication.features.workout.ManageExercisesUseCase
+import com.example.myapplication.features.workout.ManageWorkoutUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +45,7 @@ class HistoryViewModel(
 
   init {
     viewModelScope.launch {
+      // TODO Replace workoutRepository
       workoutRepository.getAllCompletedWorkouts().collect() { workouts ->
         _workouts.value = workouts.sortedByDescending { it.workoutEnded }
       }
@@ -56,6 +57,7 @@ class HistoryViewModel(
   }
 
   fun getExerciseByExerciseID(exerciseID: ObjectId?): Exercise? {
+    // TODO Replace exerciseRepository
     return exerciseRepository.getExercise(exerciseID)
   }
 

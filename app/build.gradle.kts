@@ -178,7 +178,7 @@ dependencies {
 //  implementation("io.realm.kotlin:library-sync:2.3.0") // Add to use device sync)
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
-  implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.3.0")
+//  implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.3.0")
   implementation("org.mongodb:bson-kotlinx:5.3.0")
 //  implementation("live.ditto:ditto:4.8.1")
   // Add to use coroutines with the SDK

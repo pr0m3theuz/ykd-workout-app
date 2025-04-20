@@ -974,7 +974,7 @@ fun MicrocycleCard(
                         Text(text = "${workout.workoutItems.size} Exercises", style = bodyMedium)
                       }
 
-                      val workoutRoute = "workout?workoutID=${workout.id.toHexString()}"
+                      val workoutRoute = "workoutScreen?workoutID=${workout.id.toHexString()}"
 
                       if (!activeProgram) {
                         if (workout.workoutEnded == null) {
