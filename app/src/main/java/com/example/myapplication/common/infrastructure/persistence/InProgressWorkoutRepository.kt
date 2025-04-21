@@ -7,6 +7,7 @@ import org.bson.types.ObjectId
 interface InProgressWorkoutRepository {
   suspend fun saveInProgressWorkout(workout: Workout): Boolean
 
+  // TODO Implement feature to get active workout & ask user if they want to resume workout or delete it
   fun getWorkoutByID(workoutID: ObjectId): Workout?
 
   fun getWorkoutsCount(): Int

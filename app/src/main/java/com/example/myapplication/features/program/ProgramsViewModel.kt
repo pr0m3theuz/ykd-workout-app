@@ -10,8 +10,10 @@ import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
+import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,6 +24,7 @@ import kotlin.uuid.Uuid
 class ProgramsViewModel
 constructor(
   private val programsRepository: ProgramsRepository,
+  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
   // TODO Replace workoutRepository
   private val workoutRepository: WorkoutRepository,
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
@@ -67,8 +70,16 @@ constructor(
       program = programsRepository.getProgramById(programID)
       _selectedProgram.value = program
     }
+  }
 
-    //        return program
+  fun getProgramByID(programID: ObjectId): Program? {
+    var program: Program? = null
+
+    viewModelScope.launch {
+      program = programsRepository.getProgramById(programID)
+    }
+
+    return program
   }
 
   fun isProgramActive(programUUID: Uuid): Boolean {
@@ -172,6 +183,10 @@ constructor(
       _selectedProgramWorkouts.value[microcycle] =
         workoutRepository.getWorkoutsByMicrocycleID(microcycle, microcycle.id)
     }
+  }
+
+  fun getCurrentlyActiveWorkouts(): Flow<List<Workout>> {
+    return inProgressWorkoutRepository.getWorkouts()
   }
 
   fun getProgramData() {

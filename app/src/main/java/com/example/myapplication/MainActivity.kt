@@ -216,6 +216,24 @@ private fun NavGraphBuilder.addWorkoutGraph(
       )
     }
 
+    composable("workoutScreen?workoutID={workoutID}?isCurrentWorkout={isCurrentWorkout}") { navBackStackEntry ->
+      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
+
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
+
+      val workoutID = navBackStackEntry.arguments?.getString("workoutID")
+      WorkoutScreen(
+        // TODO This is an anti-pattern
+        // https://developer.android.com/guide/navigation/use-graph/navigate
+        navController = navController,
+        workoutViewModel = workoutViewModel,
+        workoutID = workoutID,
+      )
+    }
+
     composable("workoutSummary/{workoutID}/{workoutCount}") { navBackStackEntry ->
       Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")

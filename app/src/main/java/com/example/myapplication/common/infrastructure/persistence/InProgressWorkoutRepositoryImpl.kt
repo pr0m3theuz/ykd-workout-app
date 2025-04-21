@@ -139,7 +139,7 @@ class InProgressWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       query.execute().allResults().forEach { item ->
         val json = item.toJSON()
-        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
+        val workout = withUnknownKeys.decodeFromString<ActiveWorkoutDao>(json).ActiveWorkout
         workouts.add(workout)
       }
 
