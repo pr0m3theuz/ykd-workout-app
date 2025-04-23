@@ -189,6 +189,10 @@ constructor(
     return inProgressWorkoutRepository.getWorkouts()
   }
 
+  fun deleteCurrentlyActiveWorkout(workoutID: ObjectId): Boolean {
+    return inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
+  }
+
   fun getProgramData() {
     _selectedProgram.value?.let { getMicrocyclesByProgram(it.id) }
 

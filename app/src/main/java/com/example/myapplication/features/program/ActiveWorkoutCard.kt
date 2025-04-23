@@ -1,5 +1,6 @@
 package com.example.myapplication.features.program
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -89,16 +90,21 @@ fun ActiveWorkoutCard(
               // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
               DropdownMenuItem(
                 text = { Text(text = "Delete Workout") },
-                onClick = { /*TODO*/
-                  TODO("Implement Delete Active Workout in Program ViewModel")
-//                  val result = programsViewModel.deleteActiveProgram(null)
-//                  if (result.isSuccess) {
-//                    result.onSuccess { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
-//                  } else {
-//                    result.onFailure {
-//                      Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-//                    }
-//                  }
+                onClick = {
+                  programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
+
+                  val result =
+                    programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
+                  if (result) {
+                    Toast.makeText(context, "Workout deleted successfully.", Toast.LENGTH_SHORT)
+                      .show()
+                  } else {
+                    Toast.makeText(
+                      context,
+                      "Workout was not deleted successfully.",
+                      Toast.LENGTH_SHORT
+                    ).show()
+                  }
                 },
               )
             }
