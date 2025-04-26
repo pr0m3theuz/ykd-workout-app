@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.deserialization
 
 import com.example.myapplication.common.domain.model.ExerciseSets
@@ -27,7 +29,6 @@ class WorkoutDeserializationTest {
     // }
   }
 
-  @OptIn(ExperimentalUuidApi::class)
   @Example
   fun testWorkoutDeserializationFromJson() {
     // JSON string from the uploaded file example.txt [cite: 1]
@@ -127,7 +128,6 @@ class WorkoutDeserializationTest {
     println(workout.workoutItems.toString())
   }
 
-  @OptIn(ExperimentalUuidApi::class)
   @Example
   fun test2_WorkoutDeserializationFromJson() {
     // JSON string from the uploaded file example.txt [cite: 1]
