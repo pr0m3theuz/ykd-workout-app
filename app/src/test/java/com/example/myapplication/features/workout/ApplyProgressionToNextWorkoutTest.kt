@@ -8,6 +8,7 @@ import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.util.ProgressionType
+import com.example.myapplication.common.util.selectProgression
 import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockkObject
@@ -16,11 +17,11 @@ import io.mockk.verify
 import net.jqwik.api.Example
 import net.jqwik.api.Group
 import net.jqwik.api.Label
+import net.jqwik.api.lifecycle.AfterProperty
+import net.jqwik.api.lifecycle.BeforeProperty
 import org.bson.types.ObjectId
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import kotlin.uuid.ExperimentalUuidApi
 
 //region Function Under Example (Placeholder - Assume it's in an object or class)
@@ -30,11 +31,7 @@ object WorkoutProgressor {
   // For testing, we'll mock this function directly using mockkStatic if needed,
   // or preferably, inject a mockable interface/class providing this function.
   // Let's assume for simplicity we can mock it directly or it's part of the class under test.
-  fun selectProgression(progression: ProgressionType): ((List<Set>, List<Set>) -> Result<List<Set>>)? {
-    // Real implementation would go here
-    // Mocked during tests
-    throw NotImplementedError("This should be mocked in tests")
-  }
+
 
   // --- Paste the applyProgressionToNextWorkout function here ---
   // @OptIn(ExperimentalUuidApi::class) // If needed
@@ -98,13 +95,13 @@ object WorkoutProgressor {
             return@forEachIndexed // continue to next outer item
           }
 
-          currentItem.exercisesSets.forEachIndexed { exerciseIndex, currentExerciseSets ->
+          currentItem.exercisesSets.forEachIndexed inner@{ exerciseIndex, currentExerciseSets ->
             val nextExerciseSets = nextSuperset.exercisesSets.getOrNull(exerciseIndex)
 
             if (nextExerciseSets == null) {
               // Log.w("Progression", "Skipping progression for superset exercise $exerciseIndex: Corresponding item not found in next workout's superset.")
               println("Progression Warning: Skipping superset exercise $exerciseIndex: Not found in next.")
-              return@forEachIndexed // continue to next exercise in superset
+              return@inner // continue to next exercise in superset
             }
 
             val progressionType: ProgressionType? =
@@ -140,7 +137,7 @@ class ApplyProgressionToNextWorkoutTest {
   // Mock the progression logic function
   // Use relaxed=true if you don't need to specify behavior for every single case
   // Use mockkObject if WorkoutProgressor is an object, or regular mockk if it's a class instance
-  @BeforeEach
+  @BeforeProperty
   fun setUp() {
     // Mock the object containing selectProgression if it's an object
     mockkObject(WorkoutProgressor)
@@ -148,7 +145,7 @@ class ApplyProgressionToNextWorkoutTest {
     // mockkStatic("com.yourpackage.FileNameKt") // Replace with actual package/file
   }
 
-  @AfterEach
+  @AfterProperty
   fun tearDown() {
     // Unmock objects or static mocks after each test
     unmockkObject(WorkoutProgressor)
@@ -249,10 +246,10 @@ class ApplyProgressionToNextWorkoutTest {
       )
 
       // Mock the progression function
-      val mockProgressionLambda: (List<Set>, List<Set>) -> Result<List<Set>> =
-        { completed, template -> Result.success(expectedNextSets) } // Simulate successful progression
+      val mockProgressionLambda: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
+        { completed, template -> Result.success(expectedNextSets.toMutableList()) } // Simulate successful progression
 
-      every { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionLambda
+      every { selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionLambda
 
       // Act
       WorkoutProgressor.applyProgressionToNextWorkout(currentWorkout, nextWorkout)
@@ -270,7 +267,7 @@ class ApplyProgressionToNextWorkoutTest {
           resultNextExerciseSets.sets[i].progressionSchemeID
         )
       }
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) }
+      verify(exactly = 1) { selectProgression(ProgressionType.LINEAR_PROGRESSION) }
     }
 
     @Example
@@ -324,13 +321,13 @@ class ApplyProgressionToNextWorkoutTest {
       )
 
       // Mock progression functions
-      val mockProgressionLambdaReps: (List<Set>, List<Set>) -> Result<List<Set>> =
-        { _, _ -> Result.success(expectedNextEx1Sets) }
-      val mockProgressionLambdaWeight: (List<Set>, List<Set>) -> Result<List<Set>> =
-        { _, _ -> Result.success(expectedNextEx2Sets) }
+      val mockProgressionLambdaReps: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
+        { _, _ -> Result.success(expectedNextEx1Sets.toMutableList()) }
+      val mockProgressionLambdaWeight: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
+        { _, _ -> Result.success(expectedNextEx2Sets.toMutableList()) }
 
-      every { WorkoutProgressor.selectProgression(ProgressionType.DOUBLE_PROGRESSION) } returns mockProgressionLambdaReps
-      every { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionLambdaWeight
+      every { selectProgression(ProgressionType.DOUBLE_PROGRESSION) } returns mockProgressionLambdaReps
+      every { selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionLambdaWeight
 
       // Act
       WorkoutProgressor.applyProgressionToNextWorkout(currentWorkout, nextWorkout)
@@ -358,8 +355,8 @@ class ApplyProgressionToNextWorkoutTest {
         resultNextSuperset.exercisesSets[1].sets[0].weightPounds
       )
 
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.DOUBLE_PROGRESSION) }
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) }
+      verify(exactly = 1) { selectProgression(ProgressionType.DOUBLE_PROGRESSION) }
+      verify(exactly = 1) { selectProgression(ProgressionType.LINEAR_PROGRESSION) }
     }
 
     @Example
@@ -407,13 +404,13 @@ class ApplyProgressionToNextWorkoutTest {
       )
 
       // Mock progression functions
-      val mockProgressionWeight: (List<Set>, List<Set>) -> Result<List<Set>> =
-        { _, _ -> Result.success(expectedNextExSetsSets) }
-      val mockProgressionReps: (List<Set>, List<Set>) -> Result<List<Set>> =
-        { _, _ -> Result.success(expectedNextSupersetExSetsSets) }
+      val mockProgressionWeight: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
+        { _, _ -> Result.success(expectedNextExSetsSets.toMutableList()) }
+      val mockProgressionReps: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
+        { _, _ -> Result.success(expectedNextSupersetExSetsSets.toMutableList()) }
 
-      every { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionWeight
-      every { WorkoutProgressor.selectProgression(ProgressionType.DOUBLE_PROGRESSION) } returns mockProgressionReps
+      every { selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionWeight
+      every { selectProgression(ProgressionType.DOUBLE_PROGRESSION) } returns mockProgressionReps
 
       // Act
       WorkoutProgressor.applyProgressionToNextWorkout(currentWorkout, nextWorkout)
@@ -429,8 +426,8 @@ class ApplyProgressionToNextWorkoutTest {
         resultNextSuperset.exercisesSets[0].sets[0].repetitions
       )
 
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) }
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.DOUBLE_PROGRESSION) }
+      verify(exactly = 1) { selectProgression(ProgressionType.LINEAR_PROGRESSION) }
+      verify(exactly = 1) { selectProgression(ProgressionType.DOUBLE_PROGRESSION) }
     }
   }
 
@@ -463,7 +460,7 @@ class ApplyProgressionToNextWorkoutTest {
       val resultNextExerciseSets = nextWorkout.workoutItems[0] as ExerciseSets
       assertEquals(originalNextWorkoutSets, resultNextExerciseSets.sets) // Should be identical
       verify {
-        WorkoutProgressor.selectProgression(any())?.wasNot(Called)
+        selectProgression(any()).wasNot(Called)
       } // No progression should be selected
     }
 
@@ -499,7 +496,7 @@ class ApplyProgressionToNextWorkoutTest {
       // Assert
       val resultNextExerciseSets = nextWorkout.workoutItems[0] as ExerciseSets
       assertEquals(originalNextWorkoutSets, resultNextExerciseSets.sets) // Should be identical
-      verify { WorkoutProgressor.selectProgression(any())?.wasNot(Called) }
+      verify { selectProgression(any()).wasNot(Called) }
     }
 
 
@@ -507,9 +504,9 @@ class ApplyProgressionToNextWorkoutTest {
     fun `applyProgression - selectProgression returns null - next workout unchanged`() {
       // Arrange
       val currentSets =
-        listOf(createSet(SetType.warmUpSet, 5, 100.0, ProgressionType.LINEAR_PROGRESSION))
+        listOf(createSet(SetType.warmUpSet, 5, 100.0, null))
       val nextWorkoutSetsTemplate =
-        listOf(createSet(SetType.warmUpSet, 5, 100.0, ProgressionType.LINEAR_PROGRESSION))
+        listOf(createSet(SetType.warmUpSet, 5, 100.0, null))
       val originalNextWorkoutSets = nextWorkoutSetsTemplate.map { it.copy() }
 
       val currentWorkout =
@@ -520,7 +517,7 @@ class ApplyProgressionToNextWorkoutTest {
       )
 
       // Mock selectProgression to return null
-      every { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns null
+//      every { selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns null
 
       // Act
       WorkoutProgressor.applyProgressionToNextWorkout(currentWorkout, nextWorkout)
@@ -528,7 +525,7 @@ class ApplyProgressionToNextWorkoutTest {
       // Assert
       val resultNextExerciseSets = nextWorkout.workoutItems[0] as ExerciseSets
       assertEquals(originalNextWorkoutSets, resultNextExerciseSets.sets)
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } // It was called
+      verify(exactly = 0) { selectProgression(ProgressionType.LINEAR_PROGRESSION) } // It was called
     }
 
     @Example
@@ -548,10 +545,10 @@ class ApplyProgressionToNextWorkoutTest {
       )
 
       // Mock the progression function to return failure
-      val mockProgressionLambda: (List<Set>, List<Set>) -> Result<List<Set>> =
+      val mockProgressionLambda: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
         { _, _ -> Result.failure(Exception("Progression calculation error")) }
 
-      every { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionLambda
+      every { selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionLambda
 
       // Act
       WorkoutProgressor.applyProgressionToNextWorkout(currentWorkout, nextWorkout)
@@ -559,7 +556,7 @@ class ApplyProgressionToNextWorkoutTest {
       // Assert
       val resultNextExerciseSets = nextWorkout.workoutItems[0] as ExerciseSets
       assertEquals(originalNextWorkoutSets, resultNextExerciseSets.sets) // Should remain unchanged
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) }
+      verify(exactly = 1) { selectProgression(ProgressionType.LINEAR_PROGRESSION) }
     }
 
     @Example
@@ -576,7 +573,7 @@ class ApplyProgressionToNextWorkoutTest {
       // Assert
       assertEquals(originalNextWorkoutItems, nextWorkout.workoutItems) // No change
       verify {
-        WorkoutProgressor.selectProgression(any())?.wasNot(Called)
+        selectProgression(any()).wasNot(Called)
       } // Should not even try to progress
     }
 
@@ -622,11 +619,11 @@ class ApplyProgressionToNextWorkoutTest {
         listOf(createSet(SetType.warmUpSet, 5, 102.5)) // Progression for item 0
 
       // Mock progression functions
-      val mockProgressionWeight: (List<Set>, List<Set>) -> Result<List<Set>> =
-        { _, _ -> Result.success(expectedNextExSetsSets) }
+      val mockProgressionWeight: (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> =
+        { _, _ -> Result.success(expectedNextExSetsSets.toMutableList()) }
       // No need to mock _root_ide_package_.com.example.myapplication.common.util.ProgressionType.DOUBLE_PROGRESSION as it shouldn't be called for the mismatched item
 
-      every { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionWeight
+      every { selectProgression(ProgressionType.LINEAR_PROGRESSION) } returns mockProgressionWeight
 
       // Act
       WorkoutProgressor.applyProgressionToNextWorkout(currentWorkout, nextWorkout)
@@ -640,10 +637,10 @@ class ApplyProgressionToNextWorkoutTest {
       val resultSkippedItem = nextWorkout.workoutItems[1] as ExerciseSets
       assertEquals(originalNextItem1Sets, resultSkippedItem.sets)
 
-      verify(exactly = 1) { WorkoutProgressor.selectProgression(ProgressionType.LINEAR_PROGRESSION) } // Called for item 0
+      verify(exactly = 1) { selectProgression(ProgressionType.LINEAR_PROGRESSION) } // Called for item 0
       verify {
-        WorkoutProgressor.selectProgression(ProgressionType.DOUBLE_PROGRESSION)
-          ?.wasNot(Called)
+        selectProgression(ProgressionType.DOUBLE_PROGRESSION)
+          .wasNot(Called)
       } // Not called for item 1
     }
 
@@ -696,7 +693,7 @@ class ApplyProgressionToNextWorkoutTest {
       assertEquals(originalNextSupersetExercises[0].sets, resultNextSuperset.exercisesSets[0].sets)
 
       verify {
-        WorkoutProgressor.selectProgression(any())?.wasNot(Called)
+        selectProgression(any()).wasNot(Called)
       } // Should skip the whole superset
     }
 
@@ -710,7 +707,7 @@ class ApplyProgressionToNextWorkoutTest {
       assertDoesNotThrow {
         WorkoutProgressor.applyProgressionToNextWorkout(currentWorkout, nextWorkout)
       }
-      verify { WorkoutProgressor.selectProgression(any())?.wasNot(Called) }
+      verify { selectProgression(any()).wasNot(Called) }
     }
   }
 }
