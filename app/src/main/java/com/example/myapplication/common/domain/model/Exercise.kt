@@ -11,6 +11,8 @@
 package com.example.myapplication.common.domain.model
 
 import androidx.annotation.Keep
+import com.example.myapplication.common.util.ObjectIdSerializer
+import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

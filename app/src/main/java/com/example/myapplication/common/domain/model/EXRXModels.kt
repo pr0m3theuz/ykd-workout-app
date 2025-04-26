@@ -1,5 +1,6 @@
 package com.example.myapplication.common.domain.model
 
+import com.example.myapplication.common.util.ObjectIdSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId

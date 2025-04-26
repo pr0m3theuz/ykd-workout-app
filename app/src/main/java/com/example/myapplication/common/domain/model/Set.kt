@@ -12,7 +12,9 @@
 
 package com.example.myapplication.common.domain.model
 
+import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.ProgressionType
+import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.datetime.Clock

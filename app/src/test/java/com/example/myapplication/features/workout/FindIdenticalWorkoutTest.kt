@@ -32,14 +32,12 @@ class FindIdenticalWorkoutTest {
     // for deserializing directly into the Workout object. Ensure your actual JSON source
     // *only* contains the Workout object's representation.
     val filepath =
-      "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/test/java/com/example/myapplication/deserialization/workout_example.txt"
+      "/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/test/java/com/example/myapplication/resources/features/Workout_cb_exported.json"
+
     val workout =
       File(filepath).bufferedReader().readLines().map {
         json.decodeFromString<Workout>(it)
       } // [cite: 1] (structure adapted)
-
-    // Deserialize the JSON string to a Workout object
-
 
     // Assertions to verify the deserialized object's properties
     assertNotNull(workout, "Workout object should not be null")

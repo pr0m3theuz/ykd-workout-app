@@ -2,6 +2,8 @@
 
 package com.example.myapplication.common.domain.model
 
+import com.example.myapplication.common.util.ObjectIdSerializer
+import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
