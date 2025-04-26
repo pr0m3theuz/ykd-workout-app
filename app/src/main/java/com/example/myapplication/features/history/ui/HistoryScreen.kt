@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class)
 
-package com.example.myapplication.features.history
+package com.example.myapplication.features.history.ui
 
 import android.os.Build
 import android.util.Log
@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.common.ui.component.BottomNavigationBar
+import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.workout.ui.WorkoutSummaryCard
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone

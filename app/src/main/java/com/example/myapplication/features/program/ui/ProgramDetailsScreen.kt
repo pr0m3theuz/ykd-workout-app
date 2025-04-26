@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class)
 
-package com.example.myapplication.features.program
+package com.example.myapplication.features.program.ui
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -99,6 +99,7 @@ import com.example.myapplication.common.domain.model.formatWorkoutDate
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.util.createAnnotatedLinkString
 import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.program.ProgramsViewModel
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi

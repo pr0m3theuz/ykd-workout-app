@@ -1,3 +1,5 @@
+package com.example.myapplication.features.workout
+
 import com.example.myapplication.common.domain.model.Workout
 import kotlinx.serialization.json.Json
 import net.jqwik.api.Example
@@ -5,8 +7,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import java.io.File
 import kotlin.uuid.ExperimentalUuidApi
 
-class FindIdenticalWorkoutTest {
-
+class FindTheNextWorkoutTest {
   // Configure kotlinx.serialization Json instance
 // It needs to know about custom serializers if they are not contextually available
 // Add modules if your serializers require them (e.g., for ObjectId, Uuid if not standard)

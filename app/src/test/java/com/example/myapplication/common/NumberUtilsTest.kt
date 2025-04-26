@@ -1,4 +1,4 @@
-package com.example.myapplication.features.exercise
+package com.example.myapplication.common
 
 import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.checkIntInput
@@ -6,7 +6,7 @@ import com.example.myapplication.common.util.doubleFormatted
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class NumberUtilsKtTest {
+class NumberUtilsTest {
     @Test
     fun testCheckDoubleInput() {
         // Test input string with negative value

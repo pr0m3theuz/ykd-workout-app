@@ -1,4 +1,4 @@
-package com.example.myapplication.features.history
+package com.example.myapplication.features.history.ui
 
 import android.os.Build
 import androidx.annotation.RequiresApi

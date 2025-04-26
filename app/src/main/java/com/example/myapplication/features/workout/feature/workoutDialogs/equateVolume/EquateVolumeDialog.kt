@@ -1,4 +1,4 @@
-package com.example.myapplication.features.exercise
+package com.example.myapplication.features.workout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +33,6 @@ import com.example.myapplication.common.domain.model.totalWorkingSetVolume
 import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.checkIntInput
 import com.example.myapplication.common.util.doubleFormatted
-import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.workoutDialogs.DialogInput
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.equateVolume.EquateVolumeLazyColumn

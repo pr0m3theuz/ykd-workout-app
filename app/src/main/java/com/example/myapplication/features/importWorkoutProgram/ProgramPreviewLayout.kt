@@ -36,10 +36,10 @@ import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.Program
-import com.example.myapplication.features.program.MesocyclesTab
-import com.example.myapplication.features.program.OverviewTab
-import com.example.myapplication.features.program.ProgramDetailsOptionsDropdownMenu
-import com.example.myapplication.features.program.WorkoutsTab
+import com.example.myapplication.features.program.ui.MesocyclesTab
+import com.example.myapplication.features.program.ui.OverviewTab
+import com.example.myapplication.features.program.ui.ProgramDetailsOptionsDropdownMenu
+import com.example.myapplication.features.program.ui.WorkoutsTab
 
 // TODO Add animatedVisibility Function to expand more/less buttons
 // TODO Add Floating Action Button to Start Program

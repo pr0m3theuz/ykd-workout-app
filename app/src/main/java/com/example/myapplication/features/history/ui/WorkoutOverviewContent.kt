@@ -1,4 +1,4 @@
-package com.example.myapplication.features.history
+package com.example.myapplication.features.history.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

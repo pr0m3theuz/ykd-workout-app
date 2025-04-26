@@ -1,4 +1,4 @@
-package com.example.myapplication.features.exercise
+package com.example.myapplication.features.workout
 
 import com.example.myapplication.common.domain.model.Workout
 import kotlinx.serialization.json.Json

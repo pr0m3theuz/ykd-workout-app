@@ -41,9 +41,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.myapplication.features.history.ConfirmChangesToWorkout
-import com.example.myapplication.features.history.NoWorkoutFound
-import com.example.myapplication.features.history.WorkoutOverview
+import com.example.myapplication.features.history.ui.ConfirmChangesToWorkout
+import com.example.myapplication.features.history.ui.NoWorkoutFound
+import com.example.myapplication.features.history.ui.WorkoutOverview
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.AddSet
 import com.example.myapplication.features.workout.feature.exercise.ExerciseScreen

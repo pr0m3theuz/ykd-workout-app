@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class)
 
-package com.example.myapplication.features.exercise
+package com.example.myapplication.features.workout
 
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.util.amrapProgression

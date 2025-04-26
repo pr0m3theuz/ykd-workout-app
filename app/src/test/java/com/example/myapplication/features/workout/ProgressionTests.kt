@@ -1,4 +1,4 @@
-package com.example.myapplication.features.exercise
+package com.example.myapplication.features.workout
 
 import net.jqwik.api.Arbitraries
 import net.jqwik.api.Example

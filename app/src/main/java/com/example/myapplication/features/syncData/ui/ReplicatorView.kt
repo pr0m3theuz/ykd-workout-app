@@ -1,4 +1,4 @@
-package com.example.myapplication.features.syncData
+package com.example.myapplication.features.syncData.ui
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.common.ui.component.BottomNavigationBar
+import com.example.myapplication.features.syncData.ReplicatorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

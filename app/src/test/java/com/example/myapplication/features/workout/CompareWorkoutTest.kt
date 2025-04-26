@@ -1,4 +1,4 @@
-package com.example.myapplication.features.exercise
+package com.example.myapplication.features.workout
 
 //class CompareWorkoutTest {
 //

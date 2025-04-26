@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.features.addExercisesList.ReplaceExerciseScreen
-import com.example.myapplication.features.exercise.EquateVolumeScreen
+import com.example.myapplication.features.workout.EquateVolumeScreen
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.CreateSupersetScreen
 import com.example.myapplication.features.workout.feature.setRestTimer.AutoRestTimerScreen

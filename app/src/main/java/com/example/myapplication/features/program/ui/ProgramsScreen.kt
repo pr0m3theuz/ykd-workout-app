@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class)
 
-package com.example.myapplication.features.program
+package com.example.myapplication.features.program.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -65,6 +65,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
+import com.example.myapplication.features.program.ProgramsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 

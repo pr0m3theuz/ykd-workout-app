@@ -1,4 +1,4 @@
-package com.example.myapplication.features.program
+package com.example.myapplication.features.program.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -34,6 +34,7 @@ import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.program.ProgramsViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
 // @Preview
