@@ -640,7 +640,7 @@ class DoubleProgressionTest {
       }
 
 
-    var newInputSets = inputSets.toMutableList()
+    val newInputSets = inputSets.toMutableList()
 
     for (i in 0..50) {
 
