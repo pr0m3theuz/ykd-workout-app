@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalStdlibApi::class)
 
 package com.example.myapplication.common.util
 
@@ -7,6 +7,7 @@ import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutItem
+import java.security.MessageDigest
 import kotlin.uuid.ExperimentalUuidApi
 
 // --- Signature Generation Functions ---
@@ -122,17 +123,17 @@ fun areWorkoutsIdenticalBySignature(w1: Workout, w2: Workout, includeTargets: Bo
  * @param includeTargets Whether to include targets in the signature being hashed.
  * @return A SHA-256 hash string of the workout signature.
  */
-/* // Uncomment if needed and add necessary imports/dependencies
-fun generateWorkoutSignatureHash(workout: Workout, includeTargets: Boolean): String {
-    val signature = generateWorkoutSignature(workout, includeTargets)
+// Uncomment if needed and add necessary imports/dependencies
+fun generateWorkoutSignatureHash(signature: String): String {
+//    val signature = generateWorkoutSignature(workout, includeTargets)
     val digest = MessageDigest.getInstance("SHA-256")
-    val hashBytes = digest.digest(signature.toByteArray(Charsets.UTF_8))
+  val hashBytes = digest.digest(signature.toByteArray(Charsets.UTF_8)).toHexString()
     // Convert hashBytes to hex string (requires a helper function or library)
-    return bytesToHex(hashBytes) // Replace bytesToHex with actual implementation
+  return hashBytes // Replace bytesToHex with actual implementation
 }
 
 // Example helper (replace with a robust implementation or library)
-private fun bytesToHex(bytes: ByteArray): String {
+/*private fun bytesToHex(bytes: ByteArray): String {
     return bytes.joinToString("") { "%02x".format(it) }
 }
 
@@ -140,5 +141,4 @@ fun areWorkoutsIdenticalByHash(w1: Workout, w2: Workout, includeTargets: Boolean
     val hash1 = generateWorkoutSignatureHash(w1, includeTargets)
     val hash2 = generateWorkoutSignatureHash(w2, includeTargets)
     return hash1 == hash2
-}
-*/
+}*/

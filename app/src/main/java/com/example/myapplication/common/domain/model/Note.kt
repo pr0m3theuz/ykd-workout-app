@@ -69,8 +69,10 @@ class SupersetNote() {
   var note: String? = null
   var pinned: Boolean = false
   var dateCreated: Instant = Clock.System.now()
+
   @Serializable(ObjectIdSerializer::class)
   var exercise: ObjectId? = null
+
   @Serializable(ObjectIdSerializer::class)
   var workout: ObjectId? = null
 
@@ -99,10 +101,13 @@ class WorkoutNote() {
   var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
+
   @Serializable(ObjectIdSerializer::class)
   var workout: ObjectId? = null
+
   @Serializable(UuidSerializer::class)
   var workoutUUID: Uuid? = null
+
   //    var program: Program
   //    var programPinned: Boolean = false
   //    var mesocycle: Mesocycle
@@ -122,10 +127,12 @@ class ProgramNote() {
   @Serializable(ObjectIdSerializer::class)
   var id: ObjectId = ObjectId()
   var lazyListID: Long = newLazyListItemID()
+
   @Serializable(UuidSerializer::class)
   var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
+
   @Serializable(ObjectIdSerializer::class)
   val program: ObjectId? = null // TODO
   var ownerID: String? = null
@@ -141,6 +148,7 @@ class MesocycleNote() {
   @Contextual
   var id: Long = fakeULID()
   var lazyListID: Long = newLazyListItemID()
+
   @Serializable(UuidSerializer::class)
   var uuid: Uuid = Uuid.random()
   var note: String? = null

@@ -12,7 +12,6 @@ import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.couchbase.lite.queryChangeFlow
-import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.MesocycleDao
 import com.example.myapplication.common.domain.model.Microcycle
@@ -20,6 +19,7 @@ import com.example.myapplication.common.domain.model.MicrocycleDao
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.ProgramDao
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -612,6 +612,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
   }
 
   // TODO Current Implementation is inadequate for getting next workout
+//  @Deprecated("Current Implementation is inadequate for getting next workout", replaceWith = ReplaceWith("WorkoutRepository.getNextWorkoutInProgram()")
   override fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
     try {
       requireNotNull(userDatabase) { DATABASE_IS_NULL }

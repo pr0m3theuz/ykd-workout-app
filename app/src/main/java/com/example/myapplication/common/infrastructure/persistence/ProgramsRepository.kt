@@ -68,5 +68,6 @@ interface ProgramsRepository {
 
   suspend fun deleteMicrocycle(microcycle: Microcycle): Boolean
 
+  //  @Deprecated("Current Implementation is inadequate for getting next workout", replaceWith = ReplaceWith("WorkoutRepository.getNextWorkoutInProgram()")
   fun getNextWorkoutByProgramID(programID: ObjectId): Workout?
 }

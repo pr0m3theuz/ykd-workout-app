@@ -64,6 +64,8 @@ data class Workout(
   @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId? = null,
   var ownerID: String = "",
   var isPublic: Boolean = false,
+  var signature: String? = null,
+  var signatureHash: String? = null,
 //  var type: String? = null,
 )
 
