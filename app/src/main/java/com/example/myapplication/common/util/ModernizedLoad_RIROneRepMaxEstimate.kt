@@ -1,7 +1,6 @@
 package com.example.myapplication.common.util
 
 import com.example.myapplication.common.domain.model.Exercise
-import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
 import java.math.RoundingMode
 import kotlin.math.max
 import kotlin.math.min
@@ -58,14 +57,15 @@ fun estimateOneRepMaxModernized(
   rir: Double,
   rpe: Double,
   repCapacity: RepCapacity = RepCapacity.AVERAGE,
+  getRelativeLoadPercentage: (RepCapacity, Double, Double, Int) -> Double?,
 ): Double? {
   // Get the percentage of 1RM from the selected chart with interpolation
-  val percentage = ModernizedLoadRIRReposistory.getRelativeLoadPercentage(
-    repCapacity = repCapacity,
-    rir = rir,
-    rpe = rpe,
-    repsPerformed = reps
-  )?.relativeLoadPercent
+  val percentage = getRelativeLoadPercentage(
+    repCapacity,
+    rir,
+    rpe,
+    reps
+  )// ?.relativeLoadPercent
 
   // Calculate estimated 1RM if percentage is found and is greater than 0
   return if (percentage != null && percentage > 0) {
@@ -115,41 +115,28 @@ fun rirToRPE(rir: Double): Double {
 fun determineRepCapacity(
   relativeLoadPercent: Double,
   actualRepsPerformed: Int,
-  repCapacityLookupTable: List<RepCapacityLookupData>
+  getRepCapacity: (Double) -> RepCapacityLookupData?
 ): RepCapacity? {
   // Validate inputs
-  if (relativeLoadPercent < 15 || relativeLoadPercent > 100 || actualRepsPerformed < 0 || repCapacityLookupTable.isEmpty()) {
+  if (relativeLoadPercent < 15 || relativeLoadPercent > 100 || actualRepsPerformed < 0) {
     println("Error: Invalid input for rep capacity determination.")
     return null // Invalid input or empty lookup table
   }
 
-  relativeLoadPercent.toBigDecimal().setScale(2, RoundingMode.HALF_UP)
   // Find the entry in the table with the largest loadPercent less than or equal to the relativeLoadPercent.
-  // This mimics the approximate match behavior of VLOOKUP(..., TRUE).
-  // Since the table is sorted, we can use findLast.
-  // TODO replace with ModernizedLoadRIRReposistory.getRepCapacity(relativeLoadPercent.toBigDecimal().setScale(2, RoundingMode.HALF_UP))
-  val relevantEntry = repCapacityLookupTable.findLast { it.loadPercent <= relativeLoadPercent }
+  val relevantEntry: RepCapacityLookupData? = getRepCapacity(
+    relativeLoadPercent.toBigDecimal().setScale(2, RoundingMode.HALF_UP).toDouble()
+  )
 
-  // If no entry is found (shouldn't happen if loadPercent is >= min table load), or if the load is
-  // less than the minimum in the table, use the first entry's reps as the range.
-  // If the load is greater than the maximum in the table, use the last entry's reps.
-  val lookupEntry = when {
-    relevantEntry == null -> {
-      println("Warning: Relative load ($relativeLoadPercent%) is below the minimum table load. Using data for minimum load.")
-      repCapacityLookupTable.first() // Use the first entry's range
-    }
-
-//    relativeLoadPercent > 100.00 -> {
-//      println("Warning: Relative load ($relativeLoadPercent%) is above the maximum table load. Using data for maximum load.")
-//      repCapacityLookupTable.last() // Use the last entry's range
-//    }
-
-    else -> relevantEntry // Found a relevant entry <= relativeLoadPercent
+  // If no entry is found (shouldn't happen if loadPercent is >= min table load), return null.
+  if (relevantEntry == null) {
+    println("Warning: Relative load ($relativeLoadPercent%) is below the minimum table load. Using data for minimum load.")
+    return null // Use the first entry's range
   }
 
   // Get the expected rounded rep range from the found entry
-  val expectedLowReps = lookupEntry.lowRepsRounded
-  val expectedHighReps = lookupEntry.highRepsRounded
+  val expectedLowReps = relevantEntry.lowRepsRounded
+  val expectedHighReps = relevantEntry.highRepsRounded
 
   // Determine rep capacity based on actual reps performed and the expected range
   return when {
@@ -179,7 +166,7 @@ fun performRepCapacityTest(
   estimated1RM: Double,
   testWeight: Double,
   testRepsToFailure: Int,
-  repCapacityLookupTable: List<RepCapacityLookupData>
+  getRepCapacity: (Double) -> RepCapacityLookupData?
 ): Boolean {
   // Validate estimated 1RM to avoid division by zero
   if (estimated1RM <= 0) {
@@ -194,7 +181,7 @@ fun performRepCapacityTest(
   val determinedCapacity = determineRepCapacity(
     relativeLoadPercent = relativeLoadPercent,
     actualRepsPerformed = testRepsToFailure,
-    repCapacityLookupTable = repCapacityLookupTable
+    getRepCapacity = getRepCapacity
   )
 
   // Update the exercise's rep capacity if determined
