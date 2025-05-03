@@ -12,6 +12,7 @@ package com.example.myapplication.common.domain.model
 
 import androidx.annotation.Keep
 import com.example.myapplication.common.util.ObjectIdSerializer
+import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.serialization.SerialName
@@ -78,7 +79,7 @@ data class Exercise(
     1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
   var workingSetRestTimerEnabled: Boolean = true,
   var warmUpSetRestTimerEnabled: Boolean = false,
-
+  var repCapacity: RepCapacity = RepCapacity.AVERAGE,
 //  @Serializable(URLSerializer::class)
   var mediaURI: String? = null,
 

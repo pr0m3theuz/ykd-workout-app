@@ -232,6 +232,7 @@ dependencies {
 
   // couchbase lite
   implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.1")
+//  implementation("com.couchbase.client:kotlin-client:1.4.9")
 }
 
 /*kapt {

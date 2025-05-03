@@ -79,7 +79,7 @@ class ManagePreviewWorkoutUseCase(
 
   @OptIn(ExperimentalUuidApi::class)
   fun applyProgressionToNextWorkout_GEMINI(
-    currentWorkout: Workout, // Contains completed data or template for progression rules
+    currentWorkout: Workout, // Contains completed data or template for progression rulesTest
     nextWorkout: Workout     // The workout object to be modified
   ) {
     // Ensure workouts have comparable structures. You might need more robust checks.
@@ -157,7 +157,7 @@ class ManagePreviewWorkoutUseCase(
             return@forEachIndexed // continue to next outer item
           }
 
-          currentItem.exercisesSets.forEachIndexed { exerciseIndex, currentExerciseSets ->
+          currentItem.exercisesSets.forEachIndexed inner@{ exerciseIndex, currentExerciseSets ->
             // Get the corresponding exercise sets in the next superset
             val nextExerciseSets = nextSuperset.exercisesSets.getOrNull(exerciseIndex)
 
@@ -166,10 +166,10 @@ class ManagePreviewWorkoutUseCase(
                 "Progression",
                 "Skipping progression for superset exercise $exerciseIndex: Corresponding item not found in next workout's superset."
               )
-              return@forEachIndexed // continue to next exercise in superset
+              return@inner // continue to next exercise in superset
             }
-            // Optional: Check if exercise IDs match if needed
-            // if (currentExerciseSets.exerciseID != nextExerciseSets.exerciseID) { ... }
+            // TODO Optional: Check if exercise IDs match if needed
+            //  if (currentExerciseSets.exerciseID != nextExerciseSets.exerciseID) { ... }
 
 
             val progressionType: ProgressionType? =

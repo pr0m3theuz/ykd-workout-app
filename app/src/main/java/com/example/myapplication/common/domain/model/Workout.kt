@@ -65,7 +65,7 @@ data class Workout(
   var ownerID: String = "",
   var isPublic: Boolean = false,
   var signature: String? = null,
-  var signatureHash: String? = null,
+  var hashedSignature: String? = null,
 //  var type: String? = null,
 )
 
