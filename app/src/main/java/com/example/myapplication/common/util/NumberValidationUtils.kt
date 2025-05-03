@@ -5,10 +5,11 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 private const val DOUBLE_VALIDATION_REGEX = "^(-?\\d*)(\\.?)(\\d{0,2})(\\d*)\$"
-private const val POSITIVE_DOUBLE_VALIDATION_REGEX = "^(\\d*)(\\.?)(\\d{0,2})(\\d*)\$"
+private const val POSITIVE_DOUBLE_VALIDATION_REGEX = "^(\\d*)(\\.?)(\\d{0,1})(\\d*)\$"
 private fun isDoubleValid(double: String): Boolean {
     return Pattern.matches(DOUBLE_VALIDATION_REGEX, double)
 }
@@ -89,6 +90,7 @@ fun checkDoubleInput(input: String): String? {
 private val POSITIVE_DOUBLE_PATTERN = Pattern.compile(POSITIVE_DOUBLE_VALIDATION_REGEX)
 
 fun checkRIRInput(input: String): String? {
+    // TODO Allow localization of the decimal separator
     var manipulatedInput = input.replace(",", "")
     manipulatedInput = manipulatedInput.replace("-", "")
     val matcher = POSITIVE_DOUBLE_PATTERN.matcher(manipulatedInput)
@@ -105,7 +107,8 @@ fun checkRIRInput(input: String): String? {
             manipulatedInput.last() == '.' -> manipulatedInput // Prevent early removal of the decimal place
             else -> {
                 val paddedInput = NumberFormat.getInstance().parse(manipulatedInput)?.toString()
-                val parsedDouble = paddedInput?.toDoubleOrNull() ?: return null
+                val parsedDouble =
+                    paddedInput?.toDoubleOrNull()?.roundDownToMultipleOf(0.5) ?: return null
                 if (parsedDouble == 0.0) "0" else paddedInput
             }
         }
@@ -113,6 +116,8 @@ fun checkRIRInput(input: String): String? {
         null
     }
 }
+
+fun Double.roundDownToMultipleOf(base: Double): Double = base * floor(this / base)
 
 /**
  * Produced by OpenAI's ChatGPT

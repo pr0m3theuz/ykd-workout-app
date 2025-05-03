@@ -79,7 +79,9 @@ data class Exercise(
     1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
   var workingSetRestTimerEnabled: Boolean = true,
   var warmUpSetRestTimerEnabled: Boolean = false,
+
   var repCapacity: RepCapacity = RepCapacity.AVERAGE,
+  var estimated1RM: Double? = null,
 //  @Serializable(URLSerializer::class)
   var mediaURI: String? = null,
 
