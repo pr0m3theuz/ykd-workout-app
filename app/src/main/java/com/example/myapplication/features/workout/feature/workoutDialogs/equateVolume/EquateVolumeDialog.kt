@@ -39,6 +39,9 @@ import com.example.myapplication.features.workout.feature.workoutDialogs.equateV
 import com.example.myapplication.features.workout.feature.workoutDialogs.equateVolume.EquateVolumeViewModel
 import org.koin.androidx.compose.koinViewModel
 
+// TODO Add Target RIR & Target Reps & Use Rep Capacity to determine 1RM%
+//  make these optional
+
 @Composable
 fun EquateVolumeScreen(
   openDialog: (Boolean) -> Unit,

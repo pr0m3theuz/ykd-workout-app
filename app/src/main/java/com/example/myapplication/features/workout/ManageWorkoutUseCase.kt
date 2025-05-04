@@ -410,6 +410,14 @@ class ManageWorkoutUseCase(
     //    workout.calculateTotalVolumeInPounds()
     //    workout.calculateTotalVolumeInKilograms()
 
+    // TODO Check if new estimate 1RM record has been set, update exercise
+    //  if RIR/RPE is null, skip
+    // TODO Check if rep capacity has changed on sets taken to failure, prompt user
+    //  if they want to update the rep capacity for that exercise.
+    //  Sets need to be SetType.Failure and rir = 0 or rpe = 10.
+
+
+
     val isInsertSuccess: Boolean = workoutRepository.insertWorkout(workout)
     if (isInsertSuccess) {
       deleteInProgressWorkout(workout.id)

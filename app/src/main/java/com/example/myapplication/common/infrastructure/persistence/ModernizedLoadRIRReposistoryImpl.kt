@@ -8,11 +8,11 @@ import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
+import com.example.myapplication.common.util.LoadRepCapacity
+import com.example.myapplication.common.util.LoadRepCapacityDao
+import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.ModernizedLoadRIRDao
-import com.example.myapplication.common.util.ModernizedLoadRIRItem
 import com.example.myapplication.common.util.RepCapacity
-import com.example.myapplication.common.util.RepCapacityLookupDao
-import com.example.myapplication.common.util.RepCapacityLookupData
 import kotlinx.serialization.json.Json
 
 private const val DATABASE_IS_NULL = "Modernized Load RIR Repository: Database does not exist."
@@ -26,8 +26,8 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
   private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 
-  private fun mapQueryChangeToModernizedLoadRIR(queryChange: QueryChange): List<ModernizedLoadRIRItem> {
-    val workouts = mutableListOf<ModernizedLoadRIRItem>() // 1
+  private fun mapQueryChangeToModernizedLoadRIR(queryChange: QueryChange): List<ModernizedLoadRIR> {
+    val workouts = mutableListOf<ModernizedLoadRIR>() // 1
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
@@ -39,13 +39,13 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     return workouts // 7
   }
 
-  private fun mapQueryChangeToRepCapacity(queryChange: QueryChange): List<RepCapacityLookupData> {
-    val workouts = mutableListOf<RepCapacityLookupData>() // 1
+  private fun mapQueryChangeToRepCapacity(queryChange: QueryChange): List<LoadRepCapacity> {
+    val workouts = mutableListOf<LoadRepCapacity>() // 1
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
         val workout =
-          withUnknownKeys.decodeFromString<RepCapacityLookupDao>(json).RepCapacityLookup // 5
+          withUnknownKeys.decodeFromString<LoadRepCapacityDao>(json).LoadRepCapacity // 5
         workouts.add(workout) // 6
       }
     }
@@ -57,7 +57,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     rir: Double,
     rpe: Double,
     repsPerformed: Int
-  ): ModernizedLoadRIRItem? {
+  ): ModernizedLoadRIR? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("ModernizedLoadRIR")
@@ -92,7 +92,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     repCapacity: RepCapacity,
     repsPerformed: Int,
     relativeLoadPercent: Double
-  ): ModernizedLoadRIRItem? {
+  ): ModernizedLoadRIR? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("ModernizedLoadRIR")
@@ -129,7 +129,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     rir: Double,
     rpe: Double,
     relativeLoadPercent: Double
-  ): ModernizedLoadRIRItem? {
+  ): ModernizedLoadRIR? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("ModernizedLoadRIR")
@@ -161,7 +161,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
   override suspend fun getRepCapacity(
     estimated1RMPercent: Double,
-  ): RepCapacityLookupData? {
+  ): LoadRepCapacity? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("RepCapacityLookup")
@@ -178,7 +178,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<RepCapacityLookupDao>(it).RepCapacityLookup }
+      return result?.let { withUnknownKeys.decodeFromString<LoadRepCapacityDao>(it).LoadRepCapacity }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }

@@ -11,11 +11,9 @@ enum class RepCapacity {
   AVERAGE, HIGH, LOW
 }
 
-// Data class to hold the relevant data parsed from the Setup CSV file.
-// This data is assumed to be loaded and available from your database/storage.
-data class RepCapacityLookupDao(var RepCapacityLookup: RepCapacityLookupData)
+data class LoadRepCapacityDao(var LoadRepCapacity: LoadRepCapacity)
 
-data class RepCapacityLookupData(
+data class LoadRepCapacity(
   val loadPercent: Double, // Relative Load as a percentage (e.g., 80.0)
   val lowRepsRounded: Int,  // Rounded lower bound of the expected rep range
   val highRepsRounded: Int // Rounded upper bound of the expected rep range
@@ -26,9 +24,9 @@ data class RepCapacityLookupData(
 // The structure is a Map where the key is the RepCapacity enum, and the value
 // is another Map. This inner Map has the RIR (Reps in Reserve) as the key
 // and a Map of Reps Performed to the corresponding Percentage of 1RM (as a Double).
-data class ModernizedLoadRIRDao(var ModernizedLoadRIR: ModernizedLoadRIRItem)
+data class ModernizedLoadRIRDao(var ModernizedLoadRIR: ModernizedLoadRIR)
 
-data class ModernizedLoadRIRItem(
+data class ModernizedLoadRIR(
   val repCapacity: RepCapacity,
   val rir: Double, // Relative Load as a percentage (e.g., 80.0)
   val rpe: Double, // Relative Load as a percentage (e.g., 80.0)
@@ -108,14 +106,14 @@ fun rirToRPE(rir: Double): Double {
  *
  * @param relativeLoadPercent The percentage of 1RM lifted (e.g., 80.0 for 80%). Must be between 0 and 100.
  * @param actualRepsPerformed The actual number of repetitions performed to failure. Must be non-negative.
- * @param repCapacityLookupTable The parsed data from the Setup CSV (List<RepCapacityLookupData>), assumed to be sorted by loadPercent.
+ * @param getRepCapacity A function to retrieve the rep capacity lookup data for a given relative load.
  * @return The RepCapacityCategory (LOW_CAPACITY, AVERAGE_CAPACITY, HIGH_CAPACITY),
  * or null if the input is invalid or lookup fails (e.g., empty lookup table, load outside effective table range).
  */
 fun determineRepCapacity(
   relativeLoadPercent: Double,
   actualRepsPerformed: Int,
-  getRepCapacity: (Double) -> RepCapacityLookupData?
+  getRepCapacity: (Double) -> LoadRepCapacity?
 ): RepCapacity? {
   // Validate inputs
   if (relativeLoadPercent < 15 || relativeLoadPercent > 100 || actualRepsPerformed < 0) {
@@ -124,7 +122,7 @@ fun determineRepCapacity(
   }
 
   // Find the entry in the table with the largest loadPercent less than or equal to the relativeLoadPercent.
-  val relevantEntry: RepCapacityLookupData? = getRepCapacity(
+  val relevantEntry: LoadRepCapacity? = getRepCapacity(
     relativeLoadPercent.toBigDecimal().setScale(2, RoundingMode.HALF_UP).toDouble()
   )
 
@@ -158,7 +156,7 @@ fun determineRepCapacity(
  * @param estimated1RM The user's estimated 1RM for this exercise. Must be greater than 0.
  * @param testWeight The weight lifted during the test set to failure.
  * @param testRepsToFailure The number of repetitions performed to failure during the test set.
- * @param repCapacityLookupTable The parsed data from the Setup CSV (List<RepCapacityLookupData>), assumed to be sorted by loadPercent.
+ * @param getRepCapacity A function to retrieve the rep capacity lookup data for a given relative load.
  * @return true if the rep capacity was successfully determined and updated, false otherwise.
  */
 fun performRepCapacityTest(
@@ -166,7 +164,7 @@ fun performRepCapacityTest(
   estimated1RM: Double,
   testWeight: Double,
   testRepsToFailure: Int,
-  getRepCapacity: (Double) -> RepCapacityLookupData?
+  getRepCapacity: (Double) -> LoadRepCapacity?
 ): Boolean {
   // Validate estimated 1RM to avoid division by zero
   if (estimated1RM <= 0) {

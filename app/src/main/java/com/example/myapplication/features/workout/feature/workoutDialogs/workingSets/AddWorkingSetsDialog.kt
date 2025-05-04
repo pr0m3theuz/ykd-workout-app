@@ -31,6 +31,9 @@ import org.koin.androidx.compose.koinViewModel
 
 // @Preview
 
+// TODO Add Target RIR & Target Reps & Use Rep Capacity to determine 1RM%
+//  make these optional
+
 @Composable
 fun AddWorkingSetsScreen(
   workingSetViewModel: WorkingSetViewModel = koinViewModel(),

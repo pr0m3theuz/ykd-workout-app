@@ -23,6 +23,9 @@ import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHea
 import com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import org.koin.androidx.compose.koinViewModel
 
+// TODO Add Target RIR & Target Reps & Use Rep Capacity to determine 1RM%
+//  make these optional
+
 // @Preview
 @Composable
 fun AddWarmUpSetsScreen(

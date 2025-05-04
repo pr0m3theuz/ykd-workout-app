@@ -80,8 +80,8 @@ data class Exercise(
   var workingSetRestTimerEnabled: Boolean = true,
   var warmUpSetRestTimerEnabled: Boolean = false,
 
-  var repCapacity: RepCapacity = RepCapacity.AVERAGE,
-  var estimated1RM: Double? = null,
+  var repCapacity: RepCapacity = RepCapacity.AVERAGE, // TODO Store here in a different table/data class
+  var estimated1RM: Double? = null, // TODO Store here in a different table/data class
 //  @Serializable(URLSerializer::class)
   var mediaURI: String? = null,
 
@@ -95,6 +95,11 @@ data class Exercise(
   }
 }
 
+fun Exercise.updateEstimated1RM(newEstimated1RM: Double) {
+  if (this.estimated1RM != null && newEstimated1RM > this.estimated1RM!!) {
+    this.estimated1RM = newEstimated1RM
+  }
+}
 
 /*
 object URLSerializer : KSerializer<String> {

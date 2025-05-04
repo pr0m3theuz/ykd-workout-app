@@ -1,8 +1,8 @@
 package com.example.myapplication.common.infrastructure.persistence
 
-import com.example.myapplication.common.util.ModernizedLoadRIRItem
+import com.example.myapplication.common.util.LoadRepCapacity
+import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.RepCapacity
-import com.example.myapplication.common.util.RepCapacityLookupData
 
 interface ModernizedLoadRIRReposistory {
   suspend fun getRelativeLoadPercentage(
@@ -10,22 +10,22 @@ interface ModernizedLoadRIRReposistory {
     rir: Double,
     rpe: Double,
     repsPerformed: Int
-  ): ModernizedLoadRIRItem?
+  ): ModernizedLoadRIR?
 
   suspend fun getRIRRPE(
     repCapacity: RepCapacity,
     repsPerformed: Int,
     relativeLoadPercent: Double
-  ): ModernizedLoadRIRItem?
+  ): ModernizedLoadRIR?
 
   suspend fun getRepsPerformed(
     repCapacity: RepCapacity,
     rir: Double,
     rpe: Double,
     relativeLoadPercent: Double
-  ): ModernizedLoadRIRItem?
+  ): ModernizedLoadRIR?
 
   suspend fun getRepCapacity(
     estimated1RMPercent: Double,
-  ): RepCapacityLookupData?
+  ): LoadRepCapacity?
 }
