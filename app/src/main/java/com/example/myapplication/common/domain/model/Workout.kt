@@ -58,7 +58,7 @@ data class Workout(
   @Serializable(with = WorkoutItemListSerializer::class) var workoutItems: List<WorkoutItem> = emptyList(),
   var totalVolumeInPounds: Double? = 0.0,
   var totalVolumeInKilograms: Double? = 0.0,
-  var order: Int? = null, // For sorting workouts in a program
+//  var order: Int? = null, // For sorting workouts in a program
   @Serializable(ObjectIdSerializer::class) var programID: ObjectId? = null,
   @Serializable(ObjectIdSerializer::class) val mesocycleID: ObjectId? = null,
   @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId? = null,
