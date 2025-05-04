@@ -80,7 +80,7 @@ data class Exercise(
   var workingSetRestTimerEnabled: Boolean = true,
   var warmUpSetRestTimerEnabled: Boolean = false,
 
-  var repCapacity: RepCapacity = RepCapacity.AVERAGE, // TODO Store here in a different table/data class
+  var repCapacity: RepCapacity = RepCapacity.Average, // TODO Store here in a different table/data class
   var estimated1RM: Double? = null, // TODO Store here in a different table/data class
 //  @Serializable(URLSerializer::class)
   var mediaURI: String? = null,

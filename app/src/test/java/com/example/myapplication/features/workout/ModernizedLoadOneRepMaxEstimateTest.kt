@@ -1,5 +1,6 @@
 package com.example.myapplication.features.workout
 
+import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.estimateOneRepMaxModernized
 import com.example.myapplication.common.util.rirToRPE
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import java.io.File
+import java.io.InputStream
 
 
 // Enable edge case generation by jqwik
@@ -23,6 +26,48 @@ class ModernizedLoadOneRepMaxEstimateTest {
   // Define a tolerance for comparing Double values due to potential floating-point inaccuracies
   private val doubleTolerance = 0.0001
 
+  fun readCsv(inputStream: InputStream): List<ModernizedLoadRIR> {
+    val reader = inputStream.bufferedReader()
+    val header = reader.readLine()
+    return reader.lineSequence()
+      .filter { it.isNotBlank() }
+      .map {
+        val (repCapacity, rpe, rir, repsPerformed, loadPercent) = it.split(
+          ',',
+          ignoreCase = false,
+          limit = 5
+        )
+        ModernizedLoadRIR(
+          RepCapacity.valueOf(repCapacity.trim()),
+          rpe.trim().toDouble(),
+          rir.trim().toDouble(),
+          repsPerformed.trim().toInt(),
+          loadPercent.trim().toDouble()
+        )
+      }.toList()
+  }
+
+  val filename =
+    "/home/pablo/Downloads/Modernized Load_RIR Chart - Combined Rep Capacity_processed copy.csv"
+
+  val modernizedLoadRIRItems = readCsv(File(filename).inputStream())
+
+  fun getRelativeLoadPercentage(
+    repCapacity: RepCapacity,
+    rpe: Double,
+    rir: Double?,
+    repsPerformed: Int
+  ): Double? {
+    var resultList = modernizedLoadRIRItems.filter { it.repCapacity == repCapacity }
+      .filter { it.repsPerformed == repsPerformed }
+
+    resultList = resultList.filter { it.rir == rir }
+      .filter { it.rpe == rpe }
+
+    val result = resultList.firstOrNull()?.relativeLoadPercent
+
+    return result
+  }
   // Property tests for estimateOneRepMax
 
   @Property(tries = 100) // Run 100 tries with different generated inputs
@@ -37,7 +82,8 @@ class ModernizedLoadOneRepMaxEstimateTest {
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
     // For valid inputs within the chart ranges, the result should not be null
     assertNotNull(estimated1RM)
@@ -57,7 +103,8 @@ class ModernizedLoadOneRepMaxEstimateTest {
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
     assertNull(estimated1RM)
   }
@@ -65,7 +112,7 @@ class ModernizedLoadOneRepMaxEstimateTest {
   @Property(tries = 20) // Test with negative reps
   fun `estimateOneRepMax should return null for negative reps`(
     @ForAll @DoubleRange(min = 0.1, max = 1000.0) weight: Double,
-    @ForAll @IntRange(max = -1) reps: Int, // Negative reps
+    @ForAll @IntRange(min = -20, max = -1) reps: Int, // Negative reps
     @ForAll @IntRange(min = 0, max = 10) rir: Int,
     @ForAll repCapacity: RepCapacity
   ) {
@@ -74,7 +121,8 @@ class ModernizedLoadOneRepMaxEstimateTest {
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
     assertNull(estimated1RM)
   }
@@ -83,7 +131,7 @@ class ModernizedLoadOneRepMaxEstimateTest {
   fun `estimateOneRepMax should return a non-null value for negative RIR (handled by min function)`(
     @ForAll @DoubleRange(min = 0.1, max = 1000.0) weight: Double,
     @ForAll @IntRange(min = 1, max = 30) reps: Int,
-    @ForAll @IntRange(max = -1) rir: Int, // Negative RIR
+    @ForAll @IntRange(min = -20, max = -1) rir: Int, // Negative RIR
     @ForAll repCapacity: RepCapacity
   ) {
     // The rpeToRir function (used internally by getPercentageFromChart implicitly via RIR lookup)
@@ -94,10 +142,11 @@ class ModernizedLoadOneRepMaxEstimateTest {
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
-    assertNotNull(estimated1RM)
-    assertTrue(estimated1RM!! > 0)
+    assertNull(estimated1RM)
+//    assertTrue(estimated1RM!! > 0)
   }
 
   @Property(tries = 20) // Test with RIR outside the typical 0-10 range (handled by max/min)
@@ -115,10 +164,10 @@ class ModernizedLoadOneRepMaxEstimateTest {
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
-    assertNotNull(estimated1RM)
-    assertTrue(estimated1RM!! > 0)
+    assertNull(estimated1RM)
   }
 
 
@@ -129,15 +178,16 @@ class ModernizedLoadOneRepMaxEstimateTest {
     val weight = 100.0
     val reps = 6
     val rir = 2
-    val repCapacity = RepCapacity.AVERAGE
-    val expected1RM = 100.0 / 0.8305 // Based on chartData[AVERAGE][2][6]
+    val repCapacity = RepCapacity.Average
+    val expected1RM = 100.0 / (84.09 / 100) // Based on chartData[AVERAGE][2][6]
 
     val estimated1RM = estimateOneRepMaxModernized(
       weight,
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
 
     assertNotNull(estimated1RM)
@@ -149,15 +199,16 @@ class ModernizedLoadOneRepMaxEstimateTest {
     val weight = 120.0
     val reps = 8
     val rir = 3
-    val repCapacity = RepCapacity.HIGH
-    val expected1RM = 120.0 / 0.8585 // Based on chartData[HIGH][3][8]
+    val repCapacity = RepCapacity.High
+    val expected1RM = 120.0 / 0.8266 // Based on chartData[HIGH][3][8]
 
     val estimated1RM = estimateOneRepMaxModernized(
       weight,
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
 
     assertNotNull(estimated1RM)
@@ -169,15 +220,16 @@ class ModernizedLoadOneRepMaxEstimateTest {
     val weight = 80.0
     val reps = 15
     val rir = 6
-    val repCapacity = RepCapacity.LOW
-    val expected1RM = 80.0 / 0.6132 // Based on chartData[LOW][6][15]
+    val repCapacity = RepCapacity.Low
+    val expected1RM = 80.0 / 0.4946 // Based on chartData[LOW][6][15]
 
     val estimated1RM = estimateOneRepMaxModernized(
       weight,
       reps,
       rir.toDouble(),
       rirToRPE(rir.toDouble()),
-      repCapacity
+      repCapacity,
+      ::getRelativeLoadPercentage
     )
 
     assertNotNull(estimated1RM)

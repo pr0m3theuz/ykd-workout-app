@@ -8,7 +8,7 @@ import kotlin.math.min
 // Enum to represent the determined rep capacity category.
 // Enum to represent different rep capacities based on the provided charts.
 enum class RepCapacity {
-  AVERAGE, HIGH, LOW
+  Average, High, Low
 }
 
 data class LoadRepCapacityDao(var LoadRepCapacity: LoadRepCapacity)
@@ -54,9 +54,10 @@ fun estimateOneRepMaxModernized(
   reps: Int,
   rir: Double,
   rpe: Double,
-  repCapacity: RepCapacity = RepCapacity.AVERAGE,
+  repCapacity: RepCapacity = RepCapacity.Average,
   getRelativeLoadPercentage: (RepCapacity, Double, Double, Int) -> Double?,
 ): Double? {
+  if (weight <= 0 || reps <= 0 || rir < 0 || rir > 10 || rpe < 0 || rpe > 10) return null
   // Get the percentage of 1RM from the selected chart with interpolation
   val percentage = getRelativeLoadPercentage(
     repCapacity,
@@ -67,7 +68,7 @@ fun estimateOneRepMaxModernized(
 
   // Calculate estimated 1RM if percentage is found and is greater than 0
   return if (percentage != null && percentage > 0) {
-    weight.div(percentage)
+    weight.div(percentage.div(100))
   } else {
     null // Unable to estimate 1RM
   }
@@ -138,9 +139,9 @@ fun determineRepCapacity(
 
   // Determine rep capacity based on actual reps performed and the expected range
   return when {
-    actualRepsPerformed < expectedLowReps -> RepCapacity.LOW
-    actualRepsPerformed > expectedHighReps -> RepCapacity.HIGH
-    else -> RepCapacity.AVERAGE
+    actualRepsPerformed < expectedLowReps -> RepCapacity.Low
+    actualRepsPerformed > expectedHighReps -> RepCapacity.High
+    else -> RepCapacity.Average
   }
 }
 
