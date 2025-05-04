@@ -508,7 +508,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
             .equalTo(Expression.string(completedWorkout.programID.toString()))
             .and(
               Expression.property("day").equalTo(Expression.intValue(nextDay))
-            ) // Query using the 'order' field
+            )
         )
         .limit(Expression.intValue(1)) // We expect only one workout per order number in a program
 
@@ -546,4 +546,61 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
   }
 
   // TODO Implement getNextIdenticalWorkoutInProgram(workout: Workout) using hashedSignature
+  override fun getNextIdenticalWorkoutInProgram(completedWorkout: Workout): Workout? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      // Use the program-wide 'order' field from the completed workout
+      val currentWorkoutOrder = requireNotNull(completedWorkout.day) { WORKOUT_ORDER_IS_NULL }
+
+      val collection = db.getCollection("Workout")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val query = QueryBuilder
+        .select(SelectResult.all())
+        .from(DataSource.collection(collection))
+        .where(
+          Expression.property("programID")
+            .equalTo(Expression.string(completedWorkout.programID.toString()))
+            .and(Expression.property("day").greaterThan(Expression.intValue(currentWorkoutOrder)))
+            .and(
+              Expression.property("hashedSignature")
+                .equalTo(Expression.string(completedWorkout.hashedSignature))
+            )
+        )
+        .orderBy(Ordering.property("day").ascending())
+        .limit(Expression.intValue(1)) // We expect only one workout per order number in a program
+
+      val nextWorkout = query.execute().use { resultSet ->
+        resultSet.firstOrNull()?.toJSON()?.let { result ->
+          Log.d(TAG, "Parsing workout JSON for order $currentWorkoutOrder: $result")
+          withUnknownKeys.decodeFromString<WorkoutDao>(result).Workout
+        }
+      }
+
+      if (nextWorkout != null) {
+        Log.d(TAG, "Found next workout (order ${nextWorkout.day}): ${nextWorkout.id}")
+        return nextWorkout
+      } else {
+        // If no workout with the next order number exists, we are at the end of the program
+        Log.d(
+          TAG,
+          "No workout found with day $currentWorkoutOrder in program ${completedWorkout.programID}. End of program reached."
+        )
+        return null
+      }
+    } catch (e: IllegalStateException) {
+      // Catch specific exceptions from requireNotNull or collection checks
+      Log.e(TAG, "Precondition failed: ${e.message}", e)
+      return null
+    } catch (cblExc: com.couchbase.lite.CouchbaseLiteException) {
+      // Catch Couchbase Lite specific errors
+      Log.e(TAG, "Couchbase Lite error during query: ${cblExc.message}", cblExc)
+      return null
+    } catch (e: Exception) {
+      // General catch block
+      Log.e(TAG, "An unexpected error occurred: ${e.message}", e)
+      return null
+    }
+  }
 }

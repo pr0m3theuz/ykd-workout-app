@@ -80,6 +80,8 @@ interface WorkoutRepository {
   ): Flow<List<Workout>>
 
   fun getNextWorkoutInProgram(completedWorkout: Workout): Workout?
+
+  fun getNextIdenticalWorkoutInProgram(completedWorkout: Workout): Workout?
 }
 
 interface CurrentWorkoutRepository {
