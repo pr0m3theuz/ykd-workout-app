@@ -544,4 +544,6 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       return null
     }
   }
+
+  // TODO Implement getNextIdenticalWorkoutInProgram(workout: Workout) using hashedSignature
 }
