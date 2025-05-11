@@ -20,6 +20,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.workout.WorkoutViewModel
@@ -101,12 +102,16 @@ fun AddWorkingSetsDialog(
 
         modernizedLoadRIRList.takeIf { it.isNotEmpty() }?.let { list ->
           val selectedRir =
-            list.firstOrNull { it.repsPerformed == workingSetRepetitions } ?: list.first()
+            list.firstOrNull {
+              it.repsPerformed == sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.repetitions ||
+                      it.rir == sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.repetitionsInReserve ||
+                      it.rpe == sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.ratePerceivedEffort
+            } ?: list.first()
           ModernizedLoadRIRHeaderRow(
             list,
             selectedRir,
             onLoadRIRChange = { modernizedLoadRIR ->
-              modernizedLoadRIR?.let { equateVolumeViewModel.updateAllSets(it) }
+              modernizedLoadRIR?.let { }
             }
           )
         }

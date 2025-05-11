@@ -4,6 +4,7 @@ package com.example.myapplication.features.workout.feature.workoutDialogs.warmUp
 
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
@@ -12,9 +13,13 @@ import com.example.myapplication.common.domain.model.convertKgToPound
 import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
+import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.ProgressionType
+import com.example.myapplication.common.util.RepCapacity
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -44,6 +49,11 @@ class WarmUpSetsViewModel(
   val warmUpSets
     get() = _warmUpSetsFlow.asStateFlow()
 
+  private var _modernizedLoadRIRList: List<ModernizedLoadRIR> = listOf()
+  private val _modernizedLoadRIRListFlow = MutableStateFlow(_modernizedLoadRIRList)
+  val modernizedLoadRIRList: StateFlow<List<ModernizedLoadRIR>>
+    get() = _modernizedLoadRIRListFlow.asStateFlow()
+
   fun changeWorkingSetWeight(newWorkingWeight: Double) {
     _workingSetWeight.value = newWorkingWeight
   }
@@ -53,6 +63,7 @@ class WarmUpSetsViewModel(
     exerciseWeightUnit = exerciseSets.exercise.weightUnit
     _warmUpSets = initWarmUpSets(exerciseSets)
     _warmUpSetsFlow.value = _warmUpSets.toList()
+    getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
   }
 
   fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
@@ -60,6 +71,15 @@ class WarmUpSetsViewModel(
       exerciseSets.exercise.weightUnit ?: MassUnit.POUNDS.abbreviation
     } else {
       userDefaultWeightUnit
+    }
+  }
+
+  private fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
+    viewModelScope.launch {
+      modernizedLoadRIRReposistory.getAllModernizedLoadRIR(repCapacity).collect {
+        _modernizedLoadRIRList = it
+        _modernizedLoadRIRListFlow.value = _modernizedLoadRIRList
+      }
     }
   }
 

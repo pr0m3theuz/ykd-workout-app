@@ -19,6 +19,7 @@ import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.workoutDialogs.DialogInput
+import com.example.myapplication.features.workout.feature.workoutDialogs.ModernizedLoadRIRHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -62,6 +63,8 @@ fun AddWarmUpSetsDialog(
 
   var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
 
+  val modernizedLoadRIRList by warmUpSetsViewModel.modernizedLoadRIRList.collectAsState()
+
   AlertDialog(
     properties = DialogProperties(usePlatformDefaultWidth = false),
     onDismissRequest = {
@@ -89,6 +92,16 @@ fun AddWarmUpSetsDialog(
           },
           onImeAction = {}
         )
+
+        modernizedLoadRIRList.takeIf { it.isNotEmpty() }?.let { list ->
+          val selectedRir = // TODO Manage Hardcoded Values
+            list.firstOrNull { it.repsPerformed == 10 && it.rir == 5.0 } ?: list.first()
+          ModernizedLoadRIRHeaderRow(
+            list,
+            selectedRir,
+            onLoadRIRChange = {}
+          )
+        }
 
         SetsHeaderRow()
 
