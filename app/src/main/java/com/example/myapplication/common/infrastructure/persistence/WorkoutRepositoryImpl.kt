@@ -391,6 +391,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     exerciseSets: ExerciseSets,
     programID: ObjectId,
   ): Workout? {
+    // TODO Refactor logic to find the next workout containing the given ExerciseSets
     // Implement logic to find the next workout containing the given ExerciseSets within the program
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -545,7 +546,6 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     }
   }
 
-  // TODO Implement getNextIdenticalWorkoutInProgram(workout: Workout) using hashedSignature
   override fun getNextIdenticalWorkoutInProgram(completedWorkout: Workout): Workout? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
