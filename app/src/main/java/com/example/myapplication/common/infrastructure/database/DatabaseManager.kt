@@ -54,14 +54,14 @@ class DatabaseManager(private val context: Context) {
         "MesocycleNote",
         "Microcycle",
         "MicrocycleNote",
-        "ModernizedLoadRIR", // TODO Add to Sync Gateway
+        "ModernizedLoadRIR",
         "Muscle",
         "MuscleExercise",
         "MuscleGroup",
         "MuscleRoleFunction",
         "Program",
         "ProgramNote",
-        "LoadRepCapacity", // TODO Add to Sync Gateway
+        "LoadRepCapacity",
 //        "Set",
         "Users",
         "Utility",
