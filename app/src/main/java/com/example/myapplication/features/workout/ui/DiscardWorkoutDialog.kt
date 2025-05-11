@@ -1,6 +1,7 @@
 package com.example.myapplication.features.workout.ui
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,7 +29,7 @@ fun DiscardWorkoutDialog(
                     cancelWorkout()
                 }
             ) {
-                Text("Cancel Workout")
+                Text("Cancel Workout", color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
