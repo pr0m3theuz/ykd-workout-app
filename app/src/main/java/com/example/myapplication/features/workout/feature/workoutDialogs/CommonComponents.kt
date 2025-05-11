@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -418,8 +420,24 @@ fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -
   }
 }
 
+/**
+ * Text displayed for the null/empty selection in dropdowns.
+ */
 private const val NULL_SELECTION_TEXT = " "
 
+/**
+ * A generic composable for creating an exposed dropdown menu (Material 3).
+ * Allows for a null selection option (e.g., "--- Select ---").
+ *
+ * @param T The type of the options in the dropdown.
+ * @param label The label text for the dropdown field.
+ * @param options The list of available options of type [T].
+ * @param selectedOption The currently selected option (can be null).
+ * @param onOptionSelected Callback invoked when an option (or null) is selected.
+ * @param optionToString Lambda to convert an option of type [T] to a displayable string.
+ * @param enabled Whether the dropdown field is enabled.
+ * @param allowNullSelection If true, an additional "--- Select ---" option is added, allowing the user to select null.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> DropdownField(
@@ -427,10 +445,10 @@ fun <T> DropdownField(
   label: String,
   options: List<T>,
   selectedOption: T?,
-  onOptionSelected: (T?) -> Unit,
+  onOptionSelected: (T?) -> Unit, // Callback accepts nullable T
   optionToString: (T) -> String = { it.toString() }, // How to display the option
   enabled: Boolean = true,
-  allowNullSelection: Boolean = true
+  allowNullSelection: Boolean = true // Controls if "--- Select ---" is shown
 ) {
   var expanded by remember { mutableStateOf(false) }
 
@@ -442,6 +460,7 @@ fun <T> DropdownField(
     val type = MenuAnchorType.PrimaryEditable
     OutlinedTextField(
       modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+      // Display the selected option or the null selection text
       value = selectedOption?.let { optionToString(it) }
         ?: (if (allowNullSelection) NULL_SELECTION_TEXT else ""),
       onValueChange = {}, // Not directly editable
@@ -449,20 +468,23 @@ fun <T> DropdownField(
       label = { Text(label) },
       trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
     )
+    // Show dropdown menu if there are actual options
     if (options.isNotEmpty()) {
       ExposedDropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false }
       ) {
+        // Add "--- Select ---" item if allowed
         if (allowNullSelection) {
           DropdownMenuItem(
             text = { Text(NULL_SELECTION_TEXT) },
             onClick = {
-              onOptionSelected(null)
+              onOptionSelected(null) // Pass null to the callback
               expanded = false
             }
           )
         }
+        // Add actual options
         options.forEach { selectionOption ->
           DropdownMenuItem(
             text = { Text(optionToString(selectionOption)) },
@@ -477,12 +499,22 @@ fun <T> DropdownField(
   }
 }
 
+/**
+ * A Composable form for selecting parameters of [ModernizedLoadRIR] using cascading dropdowns.
+ * Selections in one dropdown filter the options in subsequent dropdowns.
+ *
+ * @param modernizedLoadRIRData The complete dataset of [ModernizedLoadRIR] entries parsed from CSV.
+ * @param initialLoadRIR The initial state for the form. Can be null to start with all fields unselected.
+ * @param onLoadRIRChange Callback invoked when a valid and complete [ModernizedLoadRIR] selection is made,
+ *                        or when the selection becomes incomplete (passes null).
+ */
 @Composable
 fun ModernizedLoadRIRHeaderRow(
   modernizedLoadRIRData: List<ModernizedLoadRIR>,
   initialLoadRIR: ModernizedLoadRIR?,
   onLoadRIRChange: (ModernizedLoadRIR?) -> Unit
 ) {
+  // Early return if no data is available
   if (modernizedLoadRIRData.isEmpty()) {
     Text("No chart data available to configure RIR.")
     return
@@ -499,13 +531,15 @@ fun ModernizedLoadRIRHeaderRow(
       ModernizedLoadRIR(RepCapacity.Low, 0.0, 0.0, 0, 0.0) // A dummy fallback
     }
 
+  // --- State variables for each dropdown field, now nullable ---
   var currentRepCapacity by remember { mutableStateOf(initialLoadRIR?.repCapacity) }
   var currentRpe by remember { mutableStateOf(initialLoadRIR?.rpe) }
   var currentRir by remember { mutableStateOf(initialLoadRIR?.rir) }
   var currentRepsPerformed by remember { mutableStateOf(initialLoadRIR?.repsPerformed) }
   var currentRelativeLoadPercent by remember { mutableStateOf(initialLoadRIR?.relativeLoadPercent) }
 
-// Derived options based on current selections
+  // --- Derive options for dropdowns based on current selections ---
+  // These are `remember`ed and will re-calculate when their dependent states change.
   val repCapacityOptions =
     remember(modernizedLoadRIRData) { getRepCapacityOptions(modernizedLoadRIRData) }
 
@@ -590,15 +624,22 @@ fun ModernizedLoadRIRHeaderRow(
       "LaunchedEffect: rpeVal: $rpeVal, rirVal: $rirVal, repsVal: $repsVal, loadVal: $loadVal"
     )
     if (rc != null && rpeVal != null && rirVal != null && repsVal != null && loadVal != null) {
+      // If all fields are selected, try to find a matching entry in the original data
       val completeEntry = modernizedLoadRIRData.find {
         it.repCapacity == rc && it.rpe == rpeVal && it.rir == rirVal &&
                 it.repsPerformed == repsVal && it.relativeLoadPercent == loadVal
       }
+      // Callback with the found entry (could be null if the combination is not in CSV but all fields are filled)
       onLoadRIRChange(completeEntry)
     } else {
+      // If any field is null, the selection is incomplete
       onLoadRIRChange(null)
     }
   }
+
+  // --- Selection Handlers with Cascading Null Logic ---
+  // When a selection changes, subsequent dependent selections are reset to null
+  // if their current value is no longer valid or if the new selection is null.
 
   val onRepCapacitySelected: (RepCapacity?) -> Unit = { newRepCap ->
     currentRepCapacity = newRepCap
@@ -747,6 +788,15 @@ fun ModernizedLoadRIRHeaderRow(
     currentRelativeLoadPercent = newLoad
   }
 
+  // Helper function for conditional formatting
+  val formatDoubleConditionally: (Double) -> String = { value ->
+    if (value == value.toInt().toDouble()) { // Check if it's a whole number
+      "%.0f".format(Locale.US, value) // Format as integer
+    } else {
+      "%.1f".format(Locale.US, value) // Format with one decimal place
+    }
+  }
+
   Column(modifier = Modifier.fillMaxWidth()) {
     Text("Modernized Load RIR Editor", style = MaterialTheme.typography.bodyMedium)
     Row(
@@ -754,7 +804,7 @@ fun ModernizedLoadRIRHeaderRow(
         .fillMaxWidth(),
 //    horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-      val modifier = Modifier.width(95.dp)
+      val modifier = Modifier.width(90.dp)
       // RIR Dropdown
       DropdownField(
         modifier = modifier,
@@ -762,7 +812,7 @@ fun ModernizedLoadRIRHeaderRow(
         options = rirOptions,
         selectedOption = currentRir,
         onOptionSelected = onRirSelected,
-        optionToString = { "%.1f".format(Locale.US, it) }, // Format to one decimal place
+        optionToString = { formatDoubleConditionally(it) }, // Format to one decimal place
         enabled = true
       )
 
@@ -773,13 +823,13 @@ fun ModernizedLoadRIRHeaderRow(
         options = rpeOptions,
         selectedOption = currentRpe,
         onOptionSelected = onRpeSelected,
-        optionToString = { "%.1f".format(Locale.US, it) },
+        optionToString = { formatDoubleConditionally(it) },
         enabled = true
       )
 
       // Reps Performed Dropdown
       DropdownField(
-        modifier = modifier,
+        modifier = Modifier.width(85.dp),
         label = "Reps",
         options = repsPerformedOptions,
         selectedOption = currentRepsPerformed,
@@ -790,22 +840,22 @@ fun ModernizedLoadRIRHeaderRow(
 
       // Relative Load Percent Dropdown
       DropdownField(
-        modifier = modifier,
+        modifier = Modifier.width(100.dp),
         label = "% e1RM",
         options = relativeLoadPercentOptions,
         selectedOption = currentRelativeLoadPercent,
         onOptionSelected = onRelativeLoadSelected,
-        optionToString = { "%.0f".format(Locale.US, it) },
+        optionToString = { formatDoubleConditionally(it) },
         enabled = true
       )
     }
 
-
+// --- Debugging Output Section ---
+    Spacer(modifier = Modifier.height(16.dp))
     Text("Current State:", style = MaterialTheme.typography.titleMedium)
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp),
+        .fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -814,13 +864,13 @@ fun ModernizedLoadRIRHeaderRow(
       Text("RPE: ${currentRpe?.let { "%.1f".format(Locale.US, it) } ?: "NS"}",
         style = MaterialTheme.typography.bodySmall)
       Text("Reps: ${currentRepsPerformed ?: "NS"}", style = MaterialTheme.typography.bodySmall)
-      Text("e1RM%: ${currentRelativeLoadPercent?.let { "%.1f%%".format(Locale.US, it) } ?: "NS"}",
+      Text("e1RM%: ${currentRelativeLoadPercent?.let { "%.2f%%".format(Locale.US, it) } ?: "NS"}",
         style = MaterialTheme.typography.bodySmall)
     }
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(vertical = 8.dp),
+        .padding(bottom = 8.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -837,6 +887,12 @@ fun getRepCapacityOptions(data: List<ModernizedLoadRIR>): List<RepCapacity> {
   return data.map { it.repCapacity }.distinct().sortedBy { it.ordinal }
 }
 
+/**
+ * Gets RPE options filtered by the selected [RepCapacity].
+ * @param data The full list of [ModernizedLoadRIR] data.
+ * @param repCapacity The currently selected [RepCapacity], or null if none selected.
+ * @return A list of unique, sorted RPE values for the given RepCapacity. Empty if repCapacity is null.
+ */
 fun getRpeOptions(
   data: List<ModernizedLoadRIR>, repCapacity: RepCapacity?,
   rir: Double?,
@@ -864,6 +920,13 @@ fun getRpeOptions(
   return list
 }
 
+/**
+ * Gets RIR options filtered by selected [RepCapacity] and RPE.
+ * @param data The full list of [ModernizedLoadRIR] data.
+ * @param repCapacity The currently selected [RepCapacity].
+ * @param rpe The currently selected RPE.
+ * @return A list of unique, sorted RIR values. Empty if prerequisites are null.
+ */
 fun getRirOptions(
   data: List<ModernizedLoadRIR>,
   repCapacity: RepCapacity?,
@@ -892,6 +955,14 @@ fun getRirOptions(
   return list
 }
 
+/**
+ * Gets Reps Performed options filtered by selected [RepCapacity], RPE, and RIR.
+ * @param data The full list of [ModernizedLoadRIR] data.
+ * @param repCapacity Selected [RepCapacity].
+ * @param rpe Selected RPE.
+ * @param rir Selected RIR.
+ * @return A list of unique, sorted Reps Performed values. Empty if prerequisites are null.
+ */
 fun getRepsPerformedOptions(
   data: List<ModernizedLoadRIR>,
   repCapacity: RepCapacity?,
