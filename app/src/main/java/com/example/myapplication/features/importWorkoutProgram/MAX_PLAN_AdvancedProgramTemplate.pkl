@@ -2,7 +2,7 @@ module com.example.myapplication.AdvancedProgramTemplate
 
 class Program {
   name: String
-  arthur: String
+  author: String
   shortDescription: String
   description: String
   programLength: String
@@ -30,7 +30,7 @@ class Microcycle {
 
 class Workout {
   name: String
-  //     workoutArthur: String
+  //     workoutAuthor: String
   day: Int
   notes: Listing
   exercisesSets: Listing<ExerciseSets>
@@ -38,7 +38,7 @@ class Workout {
 
 class AdvancedWorkout {
   name: String
-  //     workoutArthur: String
+  //     workoutAuthor: String
   day: Int
   notes: Listing
   exercisesSets: Listing<ExerciseSets>
@@ -49,7 +49,7 @@ class ExerciseSets {
   name: String
   notes: Listing
   // Number of sets to be performed
-  sets: Int 
+  sets: Int
   // Target repetitions
   repetitions: Int? = null
 
@@ -81,10 +81,10 @@ class AdvancedExerciseSets {
 
   targetWeightPounds: List<Float>? = null
   targetWeightKilograms: List<Float>? = null
-  
+
   weightIncrementPounds: Float? = null
   weightIncrementKilograms: Float? = null
-  
+
   percentage1RM: List<Float>? = null // Percentage of 1 Rep Max
 
   // TODO Determine Correct Type
@@ -98,14 +98,14 @@ class SetScheme {
   sets: Int
   setType: String = "" // Normal by default, Listing - length/number of elements must equal number of sets
   // Target repetitions
-  repetitions: List<Int> 
-  
+  repetitions: List<Int>
+
   targetWeightPounds: List<Float>
   targetWeightKilograms: List<Float>
-  
+
   weightIncrementPounds: Float? = null
   weightIncrementKilograms: Float? = null
-  
+
   targetRepetitionsInReserve: List<Int> // Reps in Reserve
   targetRatePerceivedEffort: List<Int> // Rate of Perceived Exertion
 
@@ -1901,7 +1901,7 @@ mesocycles: Listing<Mesocycle> = new {
               new {
                 name = "Smith Standing Leg Calf Raise"
                 setScheme = setSchemeMusclePhaseA2
-              } 
+              }
             }
           }
           new AdvancedWorkout {
