@@ -81,7 +81,7 @@ class EquateVolumeViewModel(
     _setsFlow.value = _sets.toList()
   }
 
-  fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
+  private fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
     viewModelScope.launch {
       modernizedLoadRIRReposistory.getAllModernizedLoadRIR(repCapacity).collect {
         _modernizedLoadRIRList = it
@@ -258,15 +258,16 @@ class EquateVolumeViewModel(
   }
 
   fun updateAllSets(modernizedLoadRIR: ModernizedLoadRIR) {
-    val temporarySets = _sets.toMutableList()
-    temporarySets.forEach {
-      it.repetitionsInReserve = modernizedLoadRIR.rir
-      it.percentage1RM = modernizedLoadRIR.relativeLoadPercent
-      it.ratePerceivedEffort = modernizedLoadRIR.rpe
-      it.repetitions = modernizedLoadRIR.repsPerformed
-    }
-    _sets = temporarySets
-    setNewTotalVolume(calculateTotalVolume(_sets))
+    // TODO Implement this
+//    val temporarySets = _sets.toMutableList()
+//    temporarySets.forEach {
+//      it.repetitionsInReserve = modernizedLoadRIR.rir
+//      it.percentage1RM = modernizedLoadRIR.relativeLoadPercent
+//      it.ratePerceivedEffort = modernizedLoadRIR.rpe
+//      it.repetitions = modernizedLoadRIR.repsPerformed
+//    }
+//    _sets = temporarySets
+//    setNewTotalVolume(calculateTotalVolume(_sets))
   }
 
   fun equateVolumeByWeight(newWeight: Double?) {

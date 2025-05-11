@@ -9,6 +9,7 @@ import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.convertKgToPound
 import com.example.myapplication.common.domain.model.convertPoundToKg
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class WorkingSetViewModel(private val userRepository: UserRepository) : ViewModel() {
+class WorkingSetViewModel(
+  private val userRepository: UserRepository,
+  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory
+) : ViewModel() {
 //  TODO REWRITE THIS
 //  val currentUser: User = userRepository.getCurrentUser()
 //

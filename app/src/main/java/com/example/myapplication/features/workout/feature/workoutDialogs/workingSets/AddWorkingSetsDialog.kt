@@ -24,6 +24,7 @@ import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.workoutDialogs.DialogInput
+import com.example.myapplication.features.workout.feature.workoutDialogs.ModernizedLoadRIRHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.workingSets.WorkingSetLazyColumn
 import com.example.myapplication.features.workout.feature.workoutDialogs.workingSets.WorkingSetViewModel
@@ -71,6 +72,8 @@ fun AddWorkingSetsDialog(
 
   var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
 
+  val modernizedLoadRIRList by workingSetViewModel.modernizedLoadRIRList.collectAsState()
+
   AlertDialog(
     properties = DialogProperties(usePlatformDefaultWidth = false),
     onDismissRequest = {
@@ -95,6 +98,18 @@ fun AddWorkingSetsDialog(
             workingSetViewModel.changeWorkingSetWeight(workingSetWeightText.toDoubleOrNull() ?: 0.0)
           },
         )
+
+        modernizedLoadRIRList.takeIf { it.isNotEmpty() }?.let { list ->
+          val selectedRir =
+            list.firstOrNull { it.repsPerformed == workingSetRepetitions } ?: list.first()
+          ModernizedLoadRIRHeaderRow(
+            list,
+            selectedRir,
+            onLoadRIRChange = { modernizedLoadRIR ->
+              modernizedLoadRIR?.let { equateVolumeViewModel.updateAllSets(it) }
+            }
+          )
+        }
 
         SetsHeaderRow()
 

@@ -10,6 +10,7 @@ import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.convertKgToPound
 import com.example.myapplication.common.domain.model.convertPoundToKg
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.common.util.ProgressionType
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,10 @@ import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewModel() {
+class WarmUpSetsViewModel(
+  private val userRepository: UserRepository,
+  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory
+) : ViewModel() {
 // TODO REWRITE THIS
 //  val currentUser = userRepository.getCurrentUser()
 //  val userDefaultWeightUnit: String =
@@ -140,7 +144,7 @@ class WarmUpSetsViewModel(private val userRepository: UserRepository) : ViewMode
         percentage1RM = 1.0,
         setTypeID = SetType.warmUpSet,
         progressionSchemeID =
-        ProgressionType.LINEAR_PROGRESSION, // TODO Replace with progressionScheme.progressionSchemeID
+          ProgressionType.LINEAR_PROGRESSION, // TODO Replace with progressionScheme.progressionSchemeID
         exerciseID = exerciseSets.exercise.id,
         exerciseSetsID = exerciseSets.id,
         workoutID = exerciseSets.workoutID,
