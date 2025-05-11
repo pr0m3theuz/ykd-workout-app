@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.util.checkIntInput
+import com.example.myapplication.common.util.checkRIRInput
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetContent
 import com.example.myapplication.features.workout.feature.workoutDialogs.calculateNewSetResults
 import com.example.myapplication.features.workout.feature.workoutDialogs.calculatePercentage
@@ -27,7 +28,13 @@ fun EquateVolumeLayout(
 
     var percentageText by remember { mutableStateOf(getFormattedPercentageText(workingSetPercentage)) }
 
-    var repetitionsText by remember { mutableStateOf(workingSet.repetitions?.toString() ?: "") }
+    var repetitionsText by remember {
+        mutableStateOf(
+            workingSet.targetRepetitions?.toString() ?: ""
+        )
+    }
+
+    var rirText by remember { mutableStateOf(workingSet.targetRepetitionsInReserve?.toString()) }
 
     val workingWeight = equateVolumeViewModel.getWorkoutSetWeight(workingSet)
 
@@ -43,6 +50,10 @@ fun EquateVolumeLayout(
         equateVolumeViewModel.updateSetPercentage(workingSet.uuid, newPercentage)
     }
 
+    fun newRIR(newRIR: Double?) {
+        equateVolumeViewModel.updateSetRIR(workingSet.uuid, newRIR)
+    }
+
     fun setPercentageText(percentage: String) {
         val (text, percent) = calculatePercentage(percentage)
         percentageText = text
@@ -55,13 +66,26 @@ fun EquateVolumeLayout(
         newReps(repetitionsText.toIntOrNull() ?: 0)
     }
 
+    fun setRIRText(rir: String) {
+        rirText = checkRIRInput(rir)?.takeIf { it.toDouble() in 0.0..10.0 }?.toString()
+        newRIR(rirText?.toDoubleOrNull())
+    }
+
     SetContent(
         setTypeText = setIndex.inc().toString(),
-        setTypeColor = Color.White /* TODO to get from SetType */,
-        resultsText = calculateNewSetResults(workingWeight, workingSetPercentage, repetitionsText),
+        setTypeColor = Color.White, /* TODO to get from SetType */
+        resultsText = calculateNewSetResults(
+            workingWeight,
+            workingSetPercentage,
+            repetitionsText,
+            rirText,
+            rpeText = null
+        ),
         percentageText = percentageText,
         repetitionsText = repetitionsText,
+        rirText = rirText,
         onPercentageTextChanged = { percentage -> setPercentageText(percentage) },
         onRepetitionsTextChanged = { repetitions -> setRepetitionsText(repetitions) },
+        onRIRTextChanged = { rir -> setRIRText(rir) },
     )
 }

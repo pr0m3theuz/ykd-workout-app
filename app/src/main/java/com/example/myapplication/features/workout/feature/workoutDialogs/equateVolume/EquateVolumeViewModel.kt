@@ -4,16 +4,21 @@ package com.example.myapplication.features.workout.feature.workoutDialogs.equate
 
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.setVolume
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
+import com.example.myapplication.common.util.ModernizedLoadRIR
+import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import java.math.RoundingMode
 import kotlin.math.roundToInt
@@ -21,8 +26,12 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 
-class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
+class EquateVolumeViewModel(
+  private val userRepository: UserRepository,
+  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory
+) : ViewModel() {
   private val WARM_UP_SET = SetType.warmUpSet
+
   //  TODO REWRITE THIS
 //  val currentUser = userRepository.getCurrentUser()
 //  val userDefaultWeightUnit: String =
@@ -57,6 +66,11 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
 
   private var _exerciseSets: ExerciseExerciseSets? = null
 
+  private var _modernizedLoadRIRList: List<ModernizedLoadRIR> = listOf()
+  private val _modernizedLoadRIRListFlow = MutableStateFlow(_modernizedLoadRIRList)
+  val modernizedLoadRIRList: StateFlow<List<ModernizedLoadRIR>>
+    get() = _modernizedLoadRIRListFlow.asStateFlow()
+
   private fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
     _exerciseSets = exerciseSets
     exerciseWeightUnit = exerciseSets.exercise.weightUnit
@@ -67,11 +81,22 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     _setsFlow.value = _sets.toList()
   }
 
+  fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
+    viewModelScope.launch {
+      modernizedLoadRIRReposistory.getAllModernizedLoadRIR(repCapacity).collect {
+        _modernizedLoadRIRList = it
+        _modernizedLoadRIRListFlow.value = _modernizedLoadRIRList
+      }
+    }
+  }
+
   fun initialize(exerciseSets: ExerciseExerciseSets) {
     getExerciseSets(exerciseSets)
     changeWorkingSets(exerciseSets.sets)
     setTotalVolume(calculateTotalVolume(exerciseSets.sets))
+    getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
   }
+
 
   fun setTotalVolume(totalVolume: Double) {
     _totalVolume = totalVolume
@@ -213,6 +238,13 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     setNewTotalVolume(calculateTotalVolume(_sets))
   }
 
+  fun updateSetRIR(uuid: Uuid, newRIR: Double?) {
+    val temporarySets = _sets.toMutableList()
+    temporarySets.forEach { if (it.uuid == uuid) it.repetitionsInReserve = newRIR }
+    _sets = temporarySets
+    setNewTotalVolume(calculateTotalVolume(_sets))
+  }
+
   fun updateSetPercentage(uuid: Uuid, newPercentage: Double) {
     val temporaryMap = _setsPercentage.value.toMutableMap()
     temporaryMap[uuid] = newPercentage
@@ -223,6 +255,18 @@ class EquateVolumeViewModel(userRepository: UserRepository) : ViewModel() {
     _sets = temporarySets
     setNewTotalVolume(calculateTotalVolume(_sets))
     _setsFlow.value = _sets.toList()
+  }
+
+  fun updateAllSets(modernizedLoadRIR: ModernizedLoadRIR) {
+    val temporarySets = _sets.toMutableList()
+    temporarySets.forEach {
+      it.repetitionsInReserve = modernizedLoadRIR.rir
+      it.percentage1RM = modernizedLoadRIR.relativeLoadPercent
+      it.ratePerceivedEffort = modernizedLoadRIR.rpe
+      it.repetitions = modernizedLoadRIR.repsPerformed
+    }
+    _sets = temporarySets
+    setNewTotalVolume(calculateTotalVolume(_sets))
   }
 
   fun equateVolumeByWeight(newWeight: Double?) {
