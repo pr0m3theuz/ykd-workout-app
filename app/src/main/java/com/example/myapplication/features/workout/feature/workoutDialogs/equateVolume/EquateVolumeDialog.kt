@@ -170,9 +170,16 @@ fun EquateVolumeDialog(
           Text(text = "Equate Volume of Working Sets based on Weight ($weightUnit) or Repetitions")
         }
 
-        Row { Text("Total Volume: $totalWorkingSetVolume $weightUnit") }
-
-        Row { Text("New Total Volume: $newTotalWorkingSetVolume $weightUnit") }
+        Row {
+          Text(
+            "Total Volume: $totalWorkingSetVolume $weightUnit",
+            modifier = Modifier.weight(0.5f, true)
+          )
+          Text(
+            "New Total Volume: $newTotalWorkingSetVolume $weightUnit",
+            modifier = Modifier.weight(0.5f, true)
+          )
+        }
 
         DialogInput(
           text = getWorkingSetWeightOrWorkingSetRepetitions(),
@@ -211,7 +218,7 @@ fun EquateVolumeDialog(
             list,
             selectedRir,
             onLoadRIRChange = { modernizedLoadRIR ->
-              equateVolumeViewModel.updateAllSets(modernizedLoadRIR)
+              modernizedLoadRIR?.let { equateVolumeViewModel.updateAllSets(it) }
             }
           )
         }
