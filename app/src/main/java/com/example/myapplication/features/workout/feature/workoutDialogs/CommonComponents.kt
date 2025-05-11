@@ -1,5 +1,6 @@
 package com.example.myapplication.features.workout.feature.workoutDialogs
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -417,7 +418,7 @@ fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -
   }
 }
 
-private const val NULL_SELECTION_TEXT = ""
+private const val NULL_SELECTION_TEXT = " "
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -508,14 +509,26 @@ fun ModernizedLoadRIRHeaderRow(
   val repCapacityOptions =
     remember(modernizedLoadRIRData) { getRepCapacityOptions(modernizedLoadRIRData) }
 
-  val rpeOptions = remember(modernizedLoadRIRData, currentRepCapacity) {
+  val rpeOptions = remember(
+    modernizedLoadRIRData,
+    currentRepCapacity,
+    currentRir,
+    currentRepsPerformed,
+    currentRelativeLoadPercent
+  ) {
     getRpeOptions(
       modernizedLoadRIRData, currentRepCapacity,
       currentRir, currentRepsPerformed, currentRelativeLoadPercent
     )
   }
 
-  val rirOptions = remember(modernizedLoadRIRData, currentRepCapacity) {
+  val rirOptions = remember(
+    modernizedLoadRIRData,
+    currentRepCapacity,
+    currentRpe,
+    currentRepsPerformed,
+    currentRelativeLoadPercent
+  ) {
     getRirOptions(
       modernizedLoadRIRData, currentRepCapacity, currentRpe,
       currentRepsPerformed,
@@ -524,7 +537,14 @@ fun ModernizedLoadRIRHeaderRow(
   }
 
   val repsPerformedOptions =
-    remember(modernizedLoadRIRData, currentRepCapacity, currentRpe, currentRir) {
+    remember(
+      modernizedLoadRIRData,
+      currentRepCapacity,
+      currentRpe,
+      currentRir,
+      currentRepsPerformed,
+      currentRelativeLoadPercent
+    ) {
       getRepsPerformedOptions(
         modernizedLoadRIRData,
         currentRepCapacity,
@@ -565,6 +585,10 @@ fun ModernizedLoadRIRHeaderRow(
     val repsVal = currentRepsPerformed
     val loadVal = currentRelativeLoadPercent
 
+    Log.i(
+      "ModernizedLoadRIRHeaderRow.LaunchedEffect",
+      "LaunchedEffect: rpeVal: $rpeVal, rirVal: $rirVal, repsVal: $repsVal, loadVal: $loadVal"
+    )
     if (rc != null && rpeVal != null && rirVal != null && repsVal != null && loadVal != null) {
       val completeEntry = modernizedLoadRIRData.find {
         it.repCapacity == rc && it.rpe == rpeVal && it.rir == rirVal &&
@@ -653,17 +677,27 @@ fun ModernizedLoadRIRHeaderRow(
 
   val onRirSelected: (Double?) -> Unit = { newRir ->
     currentRir = newRir
-    if (newRir == null || currentRepsPerformed !in getRepsPerformedOptions(
+    if (currentRir == null || currentRpe !in getRpeOptions(
+        modernizedLoadRIRData,
+        currentRepCapacity,
+        currentRir,
+        currentRepsPerformed,
+        currentRelativeLoadPercent
+      )
+    ) {
+      currentRir = null
+    }
+    if (currentRir == null || currentRepsPerformed !in getRepsPerformedOptions(
         modernizedLoadRIRData,
         currentRepCapacity,
         currentRpe,
-        newRir,
+        currentRir,
         currentRelativeLoadPercent
       )
     ) {
       currentRepsPerformed = null
     }
-    if (newRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
+    if (currentRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
         modernizedLoadRIRData,
         currentRepCapacity,
         currentRpe,
@@ -677,12 +711,32 @@ fun ModernizedLoadRIRHeaderRow(
 
   val onRepsPerformedSelected: (Int?) -> Unit = { newReps ->
     currentRepsPerformed = newReps
-    if (newReps == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
+    if (currentRepsPerformed == null || currentRpe !in getRpeOptions(
+        modernizedLoadRIRData,
+        currentRepCapacity,
+        currentRir,
+        currentRepsPerformed,
+        currentRelativeLoadPercent
+      )
+    ) {
+      currentRpe = null
+    }
+    if (currentRepsPerformed == null || currentRir !in getRirOptions(
+        modernizedLoadRIRData,
+        currentRepCapacity,
+        currentRpe,
+        currentRepsPerformed,
+        currentRelativeLoadPercent
+      )
+    ) {
+      currentRir = null
+    }
+    if (currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
         modernizedLoadRIRData,
         currentRepCapacity,
         currentRpe,
         currentRir,
-        newReps
+        currentRepsPerformed
       )
     ) {
       currentRelativeLoadPercent = null
@@ -739,18 +793,34 @@ fun ModernizedLoadRIRHeaderRow(
         modifier = modifier,
         label = "% e1RM",
         options = relativeLoadPercentOptions,
-        selectedOption = currentRelativeLoadPercent.takeIf { it in relativeLoadPercentOptions }
-          ?: relativeLoadPercentOptions.firstOrNull(),
+        selectedOption = currentRelativeLoadPercent,
         onOptionSelected = onRelativeLoadSelected,
         optionToString = { "%.0f".format(Locale.US, it) },
-        enabled = currentRepsPerformed != null || currentRir != null || currentRpe != null
+        enabled = true
       )
     }
 
 
     Text("Current State:", style = MaterialTheme.typography.titleMedium)
     Row(
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text("RIR: ${currentRir?.let { "%.1f".format(Locale.US, it) } ?: "NS"}",
+        style = MaterialTheme.typography.bodySmall)
+      Text("RPE: ${currentRpe?.let { "%.1f".format(Locale.US, it) } ?: "NS"}",
+        style = MaterialTheme.typography.bodySmall)
+      Text("Reps: ${currentRepsPerformed ?: "NS"}", style = MaterialTheme.typography.bodySmall)
+      Text("e1RM%: ${currentRelativeLoadPercent?.let { "%.1f%%".format(Locale.US, it) } ?: "NS"}",
+        style = MaterialTheme.typography.bodySmall)
+    }
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -758,19 +828,6 @@ fun ModernizedLoadRIRHeaderRow(
         "Rep Capacity: ${currentRepCapacity ?: "NS"}",
         style = MaterialTheme.typography.bodySmall
       )
-      Text("RPE: ${currentRpe?.let { "%.1f".format(Locale.US, it) } ?: "NS"}",
-        style = MaterialTheme.typography.bodySmall)
-      Text("RIR: ${currentRir?.let { "%.1f".format(Locale.US, it) } ?: "NS"}",
-        style = MaterialTheme.typography.bodySmall)
-    }
-    Row(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalAlignment = Alignment.CenterVertically
-    ) {
-      Text("Reps: ${currentRepsPerformed ?: "NS"}", style = MaterialTheme.typography.bodySmall)
-      Text("e1RM%: ${currentRelativeLoadPercent?.let { "%.1f%%".format(Locale.US, it) } ?: "NS"}",
-        style = MaterialTheme.typography.bodySmall)
     }
   }
 }
@@ -786,7 +843,11 @@ fun getRpeOptions(
   repsPerformed: Int?,
   relativeLoadPercent: Double?
 ): List<Double> {
-  return data.asSequence()
+  Log.i(
+    "getRpeOptions",
+    "repCapacity: $repCapacity, rir: $rir, repsPerformed: $repsPerformed, relativeLoadPercent: $relativeLoadPercent"
+  )
+  val list = data.asSequence()
     .filter { item ->
       item.repCapacity == repCapacity &&
               (rir == null || item.rir == rir) &&
@@ -797,6 +858,10 @@ fun getRpeOptions(
     .distinct()
     .sortedDescending()
     .toList() // RPE often shown high to low
+
+  Log.i("getRpeOptions", "RPE Dropdown Items: $list")
+
+  return list
 }
 
 fun getRirOptions(
@@ -806,7 +871,11 @@ fun getRirOptions(
   repsPerformed: Int?,
   relativeLoadPercent: Double?,
 ): List<Double> {
-  return data.asSequence()
+  Log.i(
+    "getRirOptions",
+    "repCapacity: $repCapacity, rpe: $rpe, repsPerformed: $repsPerformed, relativeLoadPercent: $relativeLoadPercent"
+  )
+  val list = data.asSequence()
     .filter { item ->
       item.repCapacity == repCapacity &&
               (rpe == null || item.rpe == rpe) &&
@@ -817,6 +886,10 @@ fun getRirOptions(
     .distinct()
     .sorted()
     .toList()
+
+  Log.i("getRirOptions", "RIR Dropdown Items: $list")
+
+  return list
 }
 
 fun getRepsPerformedOptions(
@@ -826,7 +899,11 @@ fun getRepsPerformedOptions(
   rir: Double?,
   relativeLoadPercent: Double?
 ): List<Int> {
-  return data.asSequence()
+  Log.i(
+    "getRepsPerformedOptions",
+    "repCapacity: $repCapacity, rpe: $rpe, rir: $rir, relativeLoadPercent: $relativeLoadPercent"
+  )
+  val list = data.asSequence()
     .filter { item ->
       item.repCapacity == repCapacity &&
               (rir == null || item.rir == rir) &&
@@ -837,6 +914,10 @@ fun getRepsPerformedOptions(
     .distinct()
     .sorted()
     .toList()
+
+  Log.i("getRepsPerformedOptions", "Reps Performed Dropdown Items: $list")
+
+  return list
 }
 
 /**
@@ -858,8 +939,11 @@ fun getRelativeLoadPercentOptions(
   repsPerformed: Int?
 ): List<Double> {
 //  if (repCapacity == null || rpe == null || rir == null || repsPerformed == null) return emptyList()
-
-  return data.asSequence()
+  Log.i(
+    "getRelativeLoadPercentOptions",
+    "repCapacity: $repCapacity, rpe: $rpe, rir: $rir, repsPerformed: $repsPerformed"
+  )
+  val list = data.asSequence()
     .filter { item ->
       item.repCapacity == repCapacity &&
               (rir == null || item.rir == rir) &&
@@ -871,6 +955,9 @@ fun getRelativeLoadPercentOptions(
     .sortedDescending()
     .toList()
 
+  Log.i("getRelativeLoadPercentOptions", "Relative Load Percent Dropdown Items: $list")
+
+  return list
 //  return when {
 //    rir != null && rpe != null && repsPerformed != null -> {
 //      data.filter { it.repCapacity == repCapacity && it.rir == rir && it.rpe == rpe && it.repsPerformed == repsPerformed }
