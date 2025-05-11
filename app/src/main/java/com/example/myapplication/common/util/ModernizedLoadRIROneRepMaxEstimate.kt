@@ -1,18 +1,22 @@
 package com.example.myapplication.common.util
 
 import com.example.myapplication.common.domain.model.Exercise
+import kotlinx.serialization.Serializable
 import java.math.RoundingMode
 import kotlin.math.max
 import kotlin.math.min
 
 // Enum to represent the determined rep capacity category.
 // Enum to represent different rep capacities based on the provided charts.
+@Serializable
 enum class RepCapacity {
   Average, High, Low
 }
 
+@Serializable
 data class LoadRepCapacityDao(var LoadRepCapacity: LoadRepCapacity)
 
+@Serializable
 data class LoadRepCapacity(
   val loadPercent: Double, // Relative Load as a percentage (e.g., 80.0)
   val lowRepsRounded: Int,  // Rounded lower bound of the expected rep range
@@ -24,8 +28,10 @@ data class LoadRepCapacity(
 // The structure is a Map where the key is the RepCapacity enum, and the value
 // is another Map. This inner Map has the RIR (Reps in Reserve) as the key
 // and a Map of Reps Performed to the corresponding Percentage of 1RM (as a Double).
+@Serializable
 data class ModernizedLoadRIRDao(var ModernizedLoadRIR: ModernizedLoadRIR)
 
+@Serializable
 data class ModernizedLoadRIR(
   val repCapacity: RepCapacity,
   val rir: Double, // Relative Load as a percentage (e.g., 80.0)
