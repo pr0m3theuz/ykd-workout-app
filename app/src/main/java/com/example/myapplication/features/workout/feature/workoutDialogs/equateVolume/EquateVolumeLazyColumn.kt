@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -15,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.myapplication.features.workout.feature.workoutDialogs.AddSetText
 import com.example.myapplication.features.workout.feature.workoutDialogs.SwipeToDismissBoxListItem
 import kotlinx.coroutines.launch
@@ -34,8 +32,7 @@ fun EquateVolumeLazyColumn(equateVolumeViewModel: EquateVolumeViewModel = koinVi
   LazyColumn(
     state = listState,
     modifier = Modifier
-      .fillMaxWidth()
-      .height(235.dp),
+      .fillMaxWidth(),
     //  verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
     items(count = workingSets.size, key = { index -> workingSets[index].lazyListItemID }) { index ->
