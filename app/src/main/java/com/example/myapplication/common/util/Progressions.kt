@@ -160,7 +160,7 @@ fun linearProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
   }
 
   // Update setsToUpdate with new values
-  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
   setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
   setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
     set.targetWeightKilograms = weight
@@ -316,7 +316,7 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
     }
   }
 
-  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
   setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
   setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
     set.targetWeightKilograms = weight
@@ -423,7 +423,7 @@ fun dynamicDoubleProgression(
   }
 
   // Update setsToUpdate with new values
-  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
   setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
   setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
     set.targetWeightKilograms = weight
@@ -503,7 +503,7 @@ fun waveProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<Mu
   }
 
   // Update setsToUpdate with new values
-  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
   setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
   setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
     set.targetWeightKilograms = weight
@@ -613,7 +613,7 @@ fun amrapProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<M
   }
 
   // Update setsToUpdate with new values
-  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep.toString() }
+  setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
   setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
   setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
     set.targetWeightKilograms = weight
