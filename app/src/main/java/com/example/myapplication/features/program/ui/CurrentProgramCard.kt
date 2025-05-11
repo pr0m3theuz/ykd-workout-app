@@ -194,10 +194,10 @@ fun CurrentProgramCard(
                     Text(
                       text =
                       if (
-                        !workoutItem.sets
+                        workoutItem.sets
                           .maxBy { it.repetitions ?: 0 }
                           .targetRepetitions
-                          .isNullOrBlank()
+                        != null
                       )
                         "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
                       else "-",
@@ -253,10 +253,10 @@ fun CurrentProgramCard(
                       Text(
                         text =
                         if (
-                          !exerciseSets.sets
+                          exerciseSets.sets
                             .maxBy { it.repetitions ?: 0 }
                             .targetRepetitions
-                            .isNullOrBlank()
+                          != null
                         )
                           "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
                         else "-",

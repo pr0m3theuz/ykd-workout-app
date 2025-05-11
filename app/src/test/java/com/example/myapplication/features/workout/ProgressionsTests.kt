@@ -36,12 +36,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 8,
@@ -51,12 +52,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -71,6 +73,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           incrementWeightPounds = 5.0,
@@ -80,6 +83,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -91,13 +95,13 @@ class DoubleProgressionTest {
       assertEquals(2, it.size, "Should return the same number of sets")
 
       it.first().let { set ->
-        assertEquals("9", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(9, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(100.0, set.targetWeightPounds, "Weight should not change")
         assertEquals(45.36, set.targetWeightKilograms, "Weight should not change")
       }
 
       it[1].let { set ->
-        assertEquals("8", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(8, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(100.0, set.targetWeightPounds, "Weight should not change")
         assertEquals(45.36, set.targetWeightKilograms, "Weight should not change")
       }
@@ -119,12 +123,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 5.0.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "10",
+          targetRepetitions = 10,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 100.0.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 10,
@@ -134,12 +139,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 5.0.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "10",
+          targetRepetitions = 10,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 100.0.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -154,6 +160,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           incrementWeightPounds = 5.0,
@@ -163,6 +170,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -170,13 +178,13 @@ class DoubleProgressionTest {
 
     result.onSuccess {
       it.first().let { set ->
-        assertEquals("6", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(6, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(105.0, set.targetWeightPounds, "Weight should change")
         assertEquals(105.0.times(0.45359237), set.targetWeightKilograms, "Weight should change")
       }
 
       it[1].let { set ->
-        assertEquals("6", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(6, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(105.0, set.targetWeightPounds, "Weight should change")
         assertEquals(105.0.times(0.45359237), set.targetWeightKilograms, "Weight should change")
       }
@@ -199,12 +207,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 5,
@@ -214,12 +223,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -234,6 +244,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           incrementWeightPounds = 5.0,
@@ -243,6 +254,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -250,13 +262,13 @@ class DoubleProgressionTest {
 
     result.onSuccess {
       it.first().let { set ->
-        assertEquals("8", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(8, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(100.0, set.targetWeightPounds, "Weight should not change")
         assertEquals(45.36, set.targetWeightKilograms, "Weight should not change")
       }
 
       it[1].let { set ->
-        assertEquals("8", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(8, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(100.0, set.targetWeightPounds, "Weight should not change")
         assertEquals(45.36, set.targetWeightKilograms, "Weight should not change")
       }
@@ -279,12 +291,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
-          exerciseSetsID = ObjectId()
+          exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 7,
@@ -294,12 +307,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "6",
+          targetRepetitions = 6,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 6,
@@ -309,12 +323,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "6",
+          targetRepetitions = 6,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -329,6 +344,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -337,18 +353,18 @@ class DoubleProgressionTest {
 
     result.onSuccess {
       it.first().let { set ->
-        assertEquals("9", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(9, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(100.0, set.targetWeightPounds, "Weight should not change")
         assertEquals(45.36, set.targetWeightKilograms, "Weight should not change")
       }
 
       it[1].let { set ->
-        assertEquals("6", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(6, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(100.0, set.targetWeightPounds, "Weight should not change")
         assertEquals(45.36, set.targetWeightKilograms, "Weight should not change")
       }
       it[2].let { set ->
-        assertEquals("6", set.targetRepetitions, "Repetitions should increase by 1")
+        assertEquals(6, set.targetRepetitions, "Repetitions should increase by 1")
         assertEquals(100.0, set.targetWeightPounds, "Weight should not change")
         assertEquals(45.36, set.targetWeightKilograms, "Weight should not change")
       }
@@ -372,12 +388,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = _repetitions.toString(),
+          targetRepetitions = _repetitions,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -392,6 +409,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -423,12 +441,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "10",
+          targetRepetitions = 10,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -442,6 +461,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -450,7 +470,7 @@ class DoubleProgressionTest {
     result.onSuccess {
       assertEquals(setCount, it.size)
       it.first().let { set ->
-        assertEquals("6", set.targetRepetitions)
+        assertEquals(6, set.targetRepetitions)
         assertEquals(_weightPounds.plus(_incrementWeightPounds), set.targetWeightPounds)
         assertEquals(
           _weightPounds.times(0.45359237).plus(_incrementWeightPounds.times(0.45359237)),
@@ -477,12 +497,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = _weightPounds.plus(10),
           targetWeightKilograms = _weightPounds.plus(10).times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -497,6 +518,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -513,7 +535,7 @@ class DoubleProgressionTest {
       result.onSuccess {
         assertEquals(setCount, it.size)
         it.first().let { set ->
-          assertEquals("8", set.targetRepetitions)
+          assertEquals(8, set.targetRepetitions)
           assertEquals(_weightPounds.plus(10), set.targetWeightPounds)
           assertEquals(_weightPounds.plus(10).times(0.45359237), set.targetWeightKilograms)
         }
@@ -538,12 +560,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "9",
+          targetRepetitions = 9,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -558,6 +581,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -567,7 +591,7 @@ class DoubleProgressionTest {
     result.onSuccess {
       assertEquals(setCount, it.size)
       it.first().let { set ->
-        assertEquals("9", set.targetRepetitions)
+        assertEquals(9, set.targetRepetitions)
         assertEquals(_weightPounds, set.targetWeightPounds)
         assertEquals(_weightPounds.times(0.45359237), set.targetWeightKilograms)
       }
@@ -586,12 +610,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 7,
@@ -601,12 +626,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "6",
+          targetRepetitions = 6,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 6,
@@ -616,12 +642,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "6",
+          targetRepetitions = 6,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -636,6 +663,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -686,12 +714,13 @@ class DoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "9",
+          targetRepetitions = 9,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -706,6 +735,7 @@ class DoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -727,7 +757,7 @@ class DoubleProgressionTest {
       }
 
       it.first().let { set ->
-        assertEquals("9", set.targetRepetitions)
+        assertEquals(9, set.targetRepetitions)
         assertEquals(_weightPounds, set.targetWeightPounds)
         assertEquals(_weightPounds.times(0.45359237), set.targetWeightKilograms)
       }
@@ -749,12 +779,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.3,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       )
 
@@ -768,6 +799,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       )
 
@@ -775,7 +807,7 @@ class DynamicDoubleProgressionTest {
 
     assertTrue(result.isSuccess)
     val updatedSets = result.getOrNull()!!
-    assertEquals("9", updatedSets[0].targetRepetitions)
+    assertEquals(9, updatedSets[0].targetRepetitions)
     assertEquals(100.0, updatedSets[0].targetWeightPounds)
     assertEquals(45.36, updatedSets[0].targetWeightKilograms)
   }
@@ -792,12 +824,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "10",
+          targetRepetitions = 10,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.3,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 9,
@@ -807,12 +840,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "9",
+          targetRepetitions = 9,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.3,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 8,
@@ -822,12 +856,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.3,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -841,6 +876,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -848,7 +884,7 @@ class DynamicDoubleProgressionTest {
 
     assertTrue(result.isSuccess)
     val updatedSets = result.getOrNull()!!
-    assertEquals("6", updatedSets[0].targetRepetitions)
+    assertEquals(6, updatedSets[0].targetRepetitions)
     assertEquals(105.0, updatedSets[0].targetWeightPounds)
     assertEquals(47.63, updatedSets[0].targetWeightKilograms)
   }
@@ -865,12 +901,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 5,
@@ -880,12 +917,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 2.27,
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 45.36,
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
     val setsToUpdate =
@@ -898,6 +936,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -906,7 +945,7 @@ class DynamicDoubleProgressionTest {
 
     assertTrue(result.isSuccess)
     val updatedSets = result.getOrNull()!!
-    assertEquals("8", updatedSets[0].targetRepetitions)
+    assertEquals(8, updatedSets[0].targetRepetitions)
     assertEquals(100.0, updatedSets[0].targetWeightPounds)
     assertEquals(45.36, updatedSets[0].targetWeightKilograms)
   }
@@ -923,12 +962,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 5.0.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "10",
+          targetRepetitions = 10,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 100.0.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = 10,
@@ -938,12 +978,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = 5.0.times(0.45359237),
           targetMinimumRepetitions = 7,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "10",
+          targetRepetitions = 10,
           targetWeightPounds = 100.0,
           targetWeightKilograms = 100.0.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -957,6 +998,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -983,12 +1025,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = _repetitions.toString(),
+          targetRepetitions = _repetitions,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1003,6 +1046,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1035,12 +1079,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "10",
+          targetRepetitions = 10,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1054,6 +1099,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1063,7 +1109,7 @@ class DynamicDoubleProgressionTest {
     val updatedSets = result.getOrNull()!!
     assertEquals(setCount, updatedSets.size)
     updatedSets.forEach { set ->
-      assertEquals("6", set.targetRepetitions)
+      assertEquals(6, set.targetRepetitions)
       assertEquals(_weightPounds.plus(_incrementWeightPounds), set.targetWeightPounds)
       assertEquals(
         _weightPounds.times(0.45359237).plus(_incrementWeightPounds.times(0.45359237)),
@@ -1090,12 +1136,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = "8",
+          targetRepetitions = 8,
           targetWeightPounds = _weightPounds.plus(10),
           targetWeightKilograms = _weightPounds.plus(10).times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1109,6 +1156,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1119,7 +1167,7 @@ class DynamicDoubleProgressionTest {
     val updatedSets = result.getOrNull()!!
     assertEquals(setCount, updatedSets.size)
     updatedSets.forEach { set ->
-      assertEquals("8", set.targetRepetitions)
+      assertEquals(8, set.targetRepetitions)
       assertEquals(_weightPounds.plus(10), set.targetWeightPounds)
       assertEquals(_weightPounds.plus(10).times(0.45359237), set.targetWeightKilograms)
     }
@@ -1146,12 +1194,13 @@ class DynamicDoubleProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = if (it < 6) "6" else it.toString(),
+          targetRepetitions = if (it < 6) 6 else it,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       )
     }
@@ -1166,6 +1215,7 @@ class DynamicDoubleProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1184,7 +1234,7 @@ class DynamicDoubleProgressionTest {
 
       updatedSets.forEachIndexed { index, set ->
         assertEquals(
-          if (repetitionsList[index] < 6 || repetitionsList[index] >= 10) "6"
+          if (repetitionsList[index] < 6 || repetitionsList[index] >= 10) 6
           else repetitionsList[index].plus(1).toString(),
           set.targetRepetitions,
         )
@@ -1205,7 +1255,7 @@ class DynamicDoubleProgressionTest {
     ) {
       updatedSets.forEachIndexed { index, set ->
         assertEquals(
-          if (repetitionsList[index] < 6 || repetitionsList[index] >= 10) "6"
+          if (repetitionsList[index] < 6 || repetitionsList[index] >= 10) 6
           else repetitionsList[index].toString(),
           set.targetRepetitions,
         )
@@ -1243,12 +1293,13 @@ class WaveProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = _repetitions.toString(),
+          targetRepetitions = _repetitions,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1262,6 +1313,7 @@ class WaveProgressionTest {
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         )
       }
 
@@ -1303,12 +1355,13 @@ class WaveProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 6,
           targetMaximumRepetitions = 10,
-          targetRepetitions = _repetitions.toString(),
+          targetRepetitions = _repetitions,
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
         Set(
           repetitions = _repetitions,
@@ -1318,12 +1371,13 @@ class WaveProgressionTest {
           incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
           targetMinimumRepetitions = 7,
           targetMaximumRepetitions = 10,
-          targetRepetitions = _repetitions.plus(1).toString(),
+          targetRepetitions = _repetitions.plus(1),
           targetWeightPounds = _weightPounds,
           targetWeightKilograms = _weightPounds.times(0.45359237),
           workoutID = ObjectId(),
           ownerID = "",
           exerciseSetsID = ObjectId(),
+          exerciseID = ObjectId(),
         ),
       )
 
@@ -1352,12 +1406,13 @@ class WaveProgressionTest {
         incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
         targetMinimumRepetitions = 6,
         targetMaximumRepetitions = _repetitions.minus(1),
-        targetRepetitions = _repetitions.minus(1).toString(),
+        targetRepetitions = _repetitions.minus(1),
         targetWeightPounds = _weightPounds,
         targetWeightKilograms = _weightPounds.times(0.45359237),
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1370,6 +1425,7 @@ class WaveProgressionTest {
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1399,12 +1455,13 @@ class WaveProgressionTest {
         incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
         targetMinimumRepetitions = _repetitions.plus(1),
         targetMaximumRepetitions = 10,
-        targetRepetitions = _repetitions.plus(1).toString(),
+        targetRepetitions = _repetitions.plus(1),
         targetWeightPounds = _weightPounds,
         targetWeightKilograms = _weightPounds.times(0.45359237),
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1417,6 +1474,7 @@ class WaveProgressionTest {
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1425,7 +1483,7 @@ class WaveProgressionTest {
     assertTrue(result.isSuccess)
     val updatedSets = result.getOrNull()!!
     assertEquals(setCount, updatedSets.size)
-    assertEquals(_repetitions.plus(1).toString(), updatedSets[0].targetRepetitions)
+    assertEquals(_repetitions.plus(1), updatedSets[0].targetRepetitions)
     assertEquals(_weightPounds, updatedSets[0].targetWeightPounds)
     assertEquals(_weightPounds.times(0.45359237), updatedSets[0].targetWeightKilograms)
   }
@@ -1449,12 +1507,13 @@ class AmrapProgressionTest {
         incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
         targetMinimumRepetitions = 10,
         targetMaximumRepetitions = 20,
-        targetRepetitions = 10.toString(),
+        targetRepetitions = 10,
         targetWeightPounds = _weightPounds,
         targetWeightKilograms = _weightPounds.times(0.45359237),
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     )
 
@@ -1467,6 +1526,7 @@ class AmrapProgressionTest {
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1516,12 +1576,13 @@ class LinearProgressionTest {
         incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
         targetMinimumRepetitions = 10,
         targetMaximumRepetitions = 20,
-        targetRepetitions = _repetitions.toString(),
+        targetRepetitions = _repetitions,
         targetWeightPounds = _weightPounds,
         targetWeightKilograms = _weightPounds.times(0.45359237),
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     )
 
@@ -1534,6 +1595,7 @@ class LinearProgressionTest {
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1572,12 +1634,13 @@ class LinearProgressionTest {
         incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
         targetMinimumRepetitions = 10,
         targetMaximumRepetitions = 20,
-        targetRepetitions = _repetitions.toString(),
+        targetRepetitions = _repetitions,
         targetWeightPounds = _weightPounds.plus(_incrementWeightPounds),
         targetWeightKilograms = _weightPounds.plus(_incrementWeightPounds).times(0.45359237),
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     )
 
@@ -1590,6 +1653,7 @@ class LinearProgressionTest {
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1603,7 +1667,7 @@ class LinearProgressionTest {
     val updatedWeightKilograms = updatedSets[0].targetWeightKilograms!!
 
     assertEquals(1, updatedSets.size)
-    assertEquals(_repetitions.toString(), updatedReps)
+    assertEquals(_repetitions, updatedReps)
     assertEquals(_weightPounds.plus(_incrementWeightPounds), updatedWeightPounds)
     assertEquals(
       _weightPounds.plus(_incrementWeightPounds).times(0.45359237),
@@ -1628,12 +1692,13 @@ class LinearProgressionTest {
         incrementWeightKilograms = _incrementWeightPounds.times(0.45359237),
         targetMinimumRepetitions = 10,
         targetMaximumRepetitions = 20,
-        targetRepetitions = _repetitions.toString(),
+        targetRepetitions = _repetitions,
         targetWeightPounds = _weightPounds,
         targetWeightKilograms = _weightPounds.times(0.45359237),
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     )
 
@@ -1646,6 +1711,7 @@ class LinearProgressionTest {
         workoutID = ObjectId(),
         ownerID = "",
         exerciseSetsID = ObjectId(),
+        exerciseID = ObjectId(),
       )
     }
 
@@ -1659,7 +1725,7 @@ class LinearProgressionTest {
     val updatedWeightKilograms = updatedSets[0].targetWeightKilograms!!
 
     assertEquals(1, updatedSets.size)
-    assertEquals(_repetitions.toString(), updatedReps)
+    assertEquals(_repetitions, updatedReps)
     assertEquals(_weightPounds.plus(_incrementWeightPounds), updatedWeightPounds)
     assertEquals(
       _weightPounds.plus(_incrementWeightPounds).times(0.45359237),

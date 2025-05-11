@@ -40,7 +40,7 @@ fun ExerciseSets.doubleProgression(
     ) {
       when {
         set.repetitions!! < maxRepetitionsCompleted -> {
-          set.targetRepetitions = set.repetitions?.plus(1).toString()
+          set.targetRepetitions = set.repetitions?.plus(1)
           return@forEach
         }
         repetitionsList.all {
@@ -48,7 +48,7 @@ fun ExerciseSets.doubleProgression(
             it!! < targetRepetitionRangeMax &&
             it == maxRepetitionsCompleted
         } -> {
-          sets.first().repetitions?.plus(1).toString()
+          sets.first().repetitions?.plus(1)
           return@forEach
         }
         repetitionsList.all { it!! == targetRepetitionRangeMax } -> {
@@ -91,7 +91,7 @@ fun ExerciseSets.waveProgression(
           set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
         }
         repetitionsList.all { it == repetitionsList[0] && it == maxRepetitionsCompleted } -> {
-          set.repetitions?.minus(1).toString()
+          set.repetitions?.minus(1)
           set.targetWeightPounds = set.weightPounds?.plus(incrementWeight)
           return@forEach
         }
@@ -115,7 +115,7 @@ fun ExerciseSets.dynamicDoubleProgression(
     ) {
       when {
         set.repetitions!! < targetRepetitionRangeMax -> {
-          set.targetRepetitions = set.repetitions?.plus(1).toString()
+          set.targetRepetitions = set.repetitions?.plus(1)
         }
         set.repetitions!! >= targetRepetitionRangeMax -> {
           set.repetitions = targetRepetitionRangeMin

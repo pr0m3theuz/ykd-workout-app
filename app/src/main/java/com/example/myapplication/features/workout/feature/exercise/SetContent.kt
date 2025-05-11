@@ -45,9 +45,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.features.SetTypeOptionsMenu
-import com.example.myapplication.features.workout.WorkoutViewModel
-import com.example.myapplication.features.workout.feature.setRestTimer.TimerScreen
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
@@ -59,6 +56,9 @@ import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.checkIntInput
 import com.example.myapplication.common.util.checkRIRInput
 import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.SetTypeOptionsMenu
+import com.example.myapplication.features.workout.WorkoutViewModel
+import com.example.myapplication.features.workout.feature.setRestTimer.TimerScreen
 
 // TODO Add ability to rearrange sets
 // TODO Add placeholder text for target weight, reps, & rpe/rir
@@ -201,7 +201,7 @@ fun SetContent(
       }
     },
     repetitionsText = repetitionsText,
-    targetReps = set.targetRepetitions,
+    targetReps = set.targetRepetitions?.toString(),
     onRepsChange = { reps ->
       repetitionsText = checkIntInput(reps)
       set.repetitions = repetitionsText.toIntOrNull()

@@ -162,7 +162,7 @@ private fun createSet(
     repetitions = repetitions,
     weightPounds = weightPounds,
     weightKilograms = weightPounds?.div(2.2046226218),
-    targetRepetitions = targetRepetitions.toString(),
+    targetRepetitions = targetRepetitions,
     targetMinimumRepetitions = targetMinimumRepetitions,
     targetMaximumRepetitions = targetMaximumRepetitions,
     targetWeightPounds = targetWeightPounds,
@@ -175,6 +175,7 @@ private fun createSet(
     incrementWeightPounds = incrementWeightPounds,
     incrementWeightKilograms = incrementWeightPounds?.div(2.2046226218),
     setCompleted = setCompleted,
+    exerciseID = ObjectId(),
   )
 }
 

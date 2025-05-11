@@ -72,28 +72,29 @@ data class Set(
   var repetitions: Int? = null,
   var ratePerceivedEffort: Double? = null,
   var repetitionsInReserve: Double? = null,
-  // TODO add targetWeight Mass Unit
   var targetWeightPounds: Double? = null,
   var targetWeightKilograms: Double? = null,
   var incrementWeightPounds: Double? = null,
   var incrementWeightKilograms: Double? = null,
-  var targetRepetitions: String? = null,
-  // TODO Update Realm Schema to include targetMinimumRepetitions and targetMaximumRepetitions
-  var targetMinimumRepetitions: Int? = null, // TODO for progression scheme & utils
-  var targetMaximumRepetitions: Int? = null, // TODO for progression scheme & utils
+  var targetRepetitions: Int? = null,
+  var targetMinimumRepetitions: Int? = null, // for progression scheme & utils
+  var targetMaximumRepetitions: Int? = null, // for progression scheme & utils
   var targetRatePerceivedEffort: Double? = null,
   var targetRepetitionsInReserve: Double? = null,
-  var percentage1RM: Double? = 1.0,
-  // TODO Update Realm Schema to include targetPercentage1RM
-  var targetPercentage1RM: Double? = null, // TODO for progression scheme & utils
+  var percentage1RM: Double? = null,
+  var estimated1RM: Double? = null, // TODO implement functions to update
+  var targetPercentage1RM: Double? = null, // for progression scheme & utils
   var setCompleted: Boolean = false,
+  var setVolumeInPounds: Double? = null,
+  var setVolumeInKilograms: Double? = null,
   @Serializable(ObjectIdSerializer::class) var workoutID: ObjectId,
   @Serializable(ObjectIdSerializer::class) var exerciseID: ObjectId? = null,
   @Serializable(ObjectIdSerializer::class) var exerciseSetsID: ObjectId,
-  //    var exerciseOrder: Int = 1
+  @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId? = null,
+  @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId? = null,
+  @Serializable(ObjectIdSerializer::class) var programID: ObjectId? = null,
   @Serializable(SetTypeSerializer::class) var setTypeID: SetType = SetType.normalSet,
-  //  @Serializable(ObjectIdSerializer::class) val exerciseSet: ObjectId, // TODO Use backlinks for ExerciseSets or not
-  @Serializable(ProgressionTypeSerializer::class) var progressionSchemeID: ProgressionType? = null, // TODO Create ProgressionScheme class/enum and RealmObject
+  @Serializable(ProgressionTypeSerializer::class) var progressionSchemeID: ProgressionType? = null,
   //    To use in query for previous sets
   var dateCreated: Instant? = Clock.System.now(),
   //    var programUUID: Uuid? = null
@@ -110,10 +111,12 @@ fun Set.setVolume(weightUnit: String): Double {
   return if (
     weightPounds != null && repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation
   ) {
+    this.setVolumeInPounds = weightPounds!!.times(repetitions!!)
     weightPounds!!.times(repetitions!!)
   } else if (
     weightKilograms != null && repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation
   ) {
+    this.setVolumeInKilograms = weightKilograms!!.times(repetitions!!)
     weightKilograms!!.times(repetitions!!)
   } else {
     0.0

@@ -195,10 +195,9 @@ fun ActiveWorkoutCard(
                       Text(
                         text =
                         if (
-                          !workoutItem.sets
+                          workoutItem.sets
                             .maxBy { it.repetitions ?: 0 }
-                            .targetRepetitions
-                            .isNullOrBlank()
+                            .targetRepetitions != null
                         )
                           "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
                         else "-",
@@ -254,10 +253,10 @@ fun ActiveWorkoutCard(
                         Text(
                           text =
                           if (
-                            !exerciseSets.sets
+                            exerciseSets.sets
                               .maxBy { it.repetitions ?: 0 }
                               .targetRepetitions
-                              .isNullOrBlank()
+                            != null
                           )
                             "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
                           else "-",
