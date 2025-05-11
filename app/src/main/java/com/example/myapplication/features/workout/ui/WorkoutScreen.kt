@@ -101,7 +101,10 @@ fun WorkoutContent(
 
   fun openFinishWorkoutDialog() {
     val (countSetsCompleted, countSets) = workoutViewModel.checkAllSetsComplete()
+    Log.i("openFinishWorkoutDialog()", "countSetsCompleted: $countSetsCompleted")
+    Log.i("openFinishWorkoutDialog()", "countSets: $countSets")
     when (countSetsCompleted) {
+      0 -> openCancelWorkoutDialog.value = true
       countSets -> openFinishWorkoutDialog.value = true
       in 1..<countSets -> openPartialFinishWorkoutDialog.value = true
       else -> openCancelWorkoutDialog.value = true
