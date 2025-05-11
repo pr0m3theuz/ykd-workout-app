@@ -34,10 +34,12 @@ import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.checkIntInput
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.workout.feature.workoutDialogs.DialogInput
+import com.example.myapplication.features.workout.feature.workoutDialogs.ModernizedLoadRIRHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.equateVolume.EquateVolumeLazyColumn
 import com.example.myapplication.features.workout.feature.workoutDialogs.equateVolume.EquateVolumeViewModel
 import org.koin.androidx.compose.koinViewModel
+import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Add Target RIR & Target Reps & Use Rep Capacity to determine 1RM%
 //  make these optional
@@ -67,6 +69,7 @@ fun EquateVolumeScreen(
   )
 }
 
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun EquateVolumeDialog(
   equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
@@ -89,6 +92,8 @@ fun EquateVolumeDialog(
   var workingSetRepetitionsText by remember { mutableStateOf(workingSetRepetitions.toString()) }
 
   //    Log.i("EquateVolumeScreen() workingSetRepetitions", "$workingSetRepetitions")
+
+  val modernizedLoadRIRList by equateVolumeViewModel.modernizedLoadRIRList.collectAsState()
 
   var isByWeightSelected: Boolean by remember { mutableStateOf(true) }
   var isByRepetitionsSelected: Boolean by remember { mutableStateOf(false) }
@@ -197,6 +202,18 @@ fun EquateVolumeDialog(
             )
             Text(text = "By Repetitions", style = MaterialTheme.typography.bodySmall)
           }
+        }
+
+        modernizedLoadRIRList.takeIf { it.isNotEmpty() }?.let { list ->
+          val selectedRir =
+            list.firstOrNull { it.repsPerformed == workingSetRepetitions } ?: list.first()
+          ModernizedLoadRIRHeaderRow(
+            list,
+            selectedRir,
+            onLoadRIRChange = { modernizedLoadRIR ->
+              equateVolumeViewModel.updateAllSets(modernizedLoadRIR)
+            }
+          )
         }
 
         SetsHeaderRow()
