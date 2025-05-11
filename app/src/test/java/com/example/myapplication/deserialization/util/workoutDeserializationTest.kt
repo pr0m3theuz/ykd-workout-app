@@ -36,7 +36,7 @@ class WorkoutDeserializationTest {
     // for deserializing directly into the Workout object. Ensure your actual JSON source
     // *only* contains the Workout object's representation.
     val workoutJson =
-      File("/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/test/java/com/example/myapplication/deserialization/workout_example.txt").readText() // [cite: 1] (structure adapted)
+      File("/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/test/java/com/example/myapplication/resources/serialization/workout_example.txt").readText() // [cite: 1] (structure adapted)
 
     // Deserialize the JSON string to a Workout object
     val workout = json.decodeFromString<Workout>(workoutJson)
@@ -47,8 +47,8 @@ class WorkoutDeserializationTest {
     // --- Verify fields based on the JSON [cite: 1] ---
     Assertions.assertEquals(
       workout.id.toString(),
+      "6779fb71b779f36f007c72c4",
       "ID should match JSON",
-      "6779fb71b779f36f007c72c4"
     )
     Assertions.assertEquals(
       "dfa0c237-6890-4bdc-a507-c3e93c5de610",
@@ -107,7 +107,7 @@ class WorkoutDeserializationTest {
       workout.totalVolumeInKilograms,
       "TotalVolumeInKilograms should be default"
     )
-    Assertions.assertNull(workout.order, "Order should be null")
+    Assertions.assertNotNull(workout.day, "Day should not be null")
 
 
     // --- Verify nested objects (WorkoutItems) ---
@@ -135,7 +135,7 @@ class WorkoutDeserializationTest {
     // for deserializing directly into the Workout object. Ensure your actual JSON source
     // *only* contains the Workout object's representation.
     val workoutJson =
-      File("/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/test/java/com/example/myapplication/deserialization/query_results.txt").readText() // [cite: 1] (structure adapted)
+      File("/mnt/lil_nas/icefoxneoalligator/Documents/AndroidStudioProjects/MyApplication4/app/src/test/java/com/example/myapplication/resources/serialization/query_results.txt").readText() // [cite: 1] (structure adapted)
 
     // Deserialize the JSON string to a Workout object
     val workout = json.decodeFromString<WorkoutDao>(workoutJson).Workout
@@ -224,7 +224,7 @@ class WorkoutDeserializationTest {
       workout.totalVolumeInKilograms,
       "TotalVolumeInKilograms should be default"
     )
-    Assertions.assertNull(workout.order, "Order should be null")
+    Assertions.assertNotNull(workout.day, "Day should be null")
 
 
     // --- Verify nested objects (WorkoutItems) ---
