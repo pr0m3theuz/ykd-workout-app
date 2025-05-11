@@ -3,29 +3,40 @@ package com.example.myapplication.common.infrastructure.persistence
 import com.example.myapplication.common.util.LoadRepCapacity
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.RepCapacity
+import kotlinx.coroutines.flow.Flow
 
 interface ModernizedLoadRIRReposistory {
-  suspend fun getRelativeLoadPercentage(
+  fun getRelativeLoadPercentage(
     repCapacity: RepCapacity,
     rir: Double,
     rpe: Double,
     repsPerformed: Int
   ): ModernizedLoadRIR?
 
-  suspend fun getRIRRPE(
+  fun getRIRRPE(
     repCapacity: RepCapacity,
     repsPerformed: Int,
     relativeLoadPercent: Double
   ): ModernizedLoadRIR?
 
-  suspend fun getRepsPerformed(
+  fun getRepsPerformed(
     repCapacity: RepCapacity,
     rir: Double,
     rpe: Double,
     relativeLoadPercent: Double
   ): ModernizedLoadRIR?
 
-  suspend fun getRepCapacity(
+  fun getRepCapacity(
     estimated1RMPercent: Double,
   ): LoadRepCapacity?
+
+  fun getAllModernizedLoadRIR(repCapacity: RepCapacity): Flow<List<ModernizedLoadRIR>>
+
+  fun getModernizedLoadRIR(
+    repCapacity: RepCapacity,
+    targetPercentage: Double?,
+    targetRIR: Double?,
+    targetRPE: Double?,
+    targetReps: Int?
+  ): List<ModernizedLoadRIR>?
 }
