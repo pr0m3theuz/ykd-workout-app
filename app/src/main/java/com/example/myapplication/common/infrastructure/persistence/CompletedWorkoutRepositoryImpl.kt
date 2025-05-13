@@ -10,6 +10,7 @@ import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetDao
+import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
@@ -19,7 +20,8 @@ private const val DATABASE_IS_NULL = "Completed Repository: Database does not ex
 private const val COLLECTION_IS_NULL =
   "Completed Repository: Completed * Collection does not exist in the Database."
 
-class CompletedRepositoryImpl(private val databaseManager: DatabaseManager) : CompletedRepository {
+class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManager) :
+  CompletedWorkoutRepository {
 
   val db: Database? = databaseManager.database
 
@@ -66,5 +68,17 @@ class CompletedRepositoryImpl(private val databaseManager: DatabaseManager) : Co
     }
 
     return null
+  }
+
+  override fun getCompletedWorkouts(): List<Workout> {
+    TODO("Not yet implemented")
+  }
+
+  override fun getCompletedWorkoutByID(workoutID: ObjectId): Workout? {
+    TODO("Not yet implemented")
+  }
+
+  override fun getLatestPreviousIdenticalWorkout(currentWorkout: Workout): Workout? {
+    TODO("Not yet implemented")
   }
 }
