@@ -141,7 +141,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("Program")
+      val collection = db.getCollection("CompletedPrograms")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
@@ -172,7 +172,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("Program")
+      val collection = db.getCollection("CompletedPrograms")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
@@ -203,10 +203,11 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
   }
 
   override suspend fun insertProgram(program: Program): Boolean {
+    TODO("What calls insertProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("Program")
+      val collection = db.getCollection("CompletedProgram")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
@@ -223,6 +224,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
   override suspend fun updateProgram(program: Program): Boolean {
 //    database.updateProgram(program)
+    TODO("What calls updateProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -243,6 +245,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
   override suspend fun deleteProgram(program: Program): Boolean {
 //    database.deleteProgram(program)
+    TODO("What calls deleteProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -266,7 +269,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("Program")
+      val collection = db.getCollection("CompletedProgram")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
