@@ -25,7 +25,7 @@ import com.example.myapplication.common.domain.model.updateSetRPE
 import com.example.myapplication.common.domain.model.updateSetReps
 import com.example.myapplication.common.domain.model.updateSetType
 import com.example.myapplication.common.domain.model.updateSetWeight
-import com.example.myapplication.common.infrastructure.persistence.CompletedRepository
+import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
@@ -49,7 +49,7 @@ class ManageWorkoutUseCase(
   private val workoutNotesRepository: WorkoutNotesRepository,
   private val exerciseNotesRepository: ExerciseNotesRepository,
   private val inProgressWorkoutRepository: InProgressWorkoutRepository,
-  private val completedRepository: CompletedRepository,
+  private val completedWorkoutRepository: CompletedWorkoutRepository,
   private val userRepository: UserRepository,
 ) {
 
@@ -215,7 +215,7 @@ class ManageWorkoutUseCase(
       newSets.add(newSet)
       if (set.setNumber != null) {
         val previousSet =
-          completedRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
+          completedWorkoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
         previousSet?.let { latestPreviousSets.add(it) }
       }
     }
@@ -327,7 +327,7 @@ class ManageWorkoutUseCase(
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     return try {
       // Delegate the actual data fetching to the repository
-      completedRepository.getPreviousSetForExercise(exerciseID, setNumber)
+      completedWorkoutRepository.getPreviousSetForExercise(exerciseID, setNumber)
     } catch (e: Exception) {
       // Optional: Log the error or handle specific exceptions
       Log.e(
