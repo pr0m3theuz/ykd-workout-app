@@ -92,30 +92,38 @@ fun selectProgression(
  * - The function returns a `Result.success` containing the updated `setsToUpdate` list if the progression was successful.
  * -  If the targetMin/MaxRepetitions are not all the same, the function will return success but will not affect the progression of weights.
  *
- * @param sets A list of [Set] objects representing the completed sets. Each set should have
+ * @param previousCompletedSets A list of [Set] objects representing the completed sets. Each set should have
  *             `repetitions`, `weightPounds`, `weightKilograms`, `incrementWeightPounds`,
  *             `incrementWeightKilograms`, `targetMinimumRepetitions`, `targetMaximumRepetitions`,
  *              `targetRepetitions`, */
-fun linearProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+fun linearProgression(
+  previousCompletedSets: List<Set>,
+  _setsToUpdate: MutableList<Set>
+): Result<MutableList<Set>> {
   val setsToUpdate = _setsToUpdate.toMutableList()
 
-  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted =
+    previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed =
+    previousCompletedSets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
   var lowestWeightKilogramsPerformed =
-    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+    previousCompletedSets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  val incrementWeightPounds = sets.mapNotNull { it.incrementWeightPounds }.first()
-  val incrementWeightKilograms = sets.mapNotNull { it.incrementWeightKilograms }.first()
+  val incrementWeightPounds = previousCompletedSets.mapNotNull { it.incrementWeightPounds }.first()
+  val incrementWeightKilograms =
+    previousCompletedSets.mapNotNull { it.incrementWeightKilograms }.first()
 
-  val repetitionsList = sets.mapNotNull { it.repetitions }.toMutableList()
-  val weightPoundsList = sets.mapNotNull { it.weightPounds }.toMutableList()
-  val weightKilogramsList = sets.mapNotNull { it.weightKilograms }.toMutableList()
+  val repetitionsList = previousCompletedSets.mapNotNull { it.repetitions }.toMutableList()
+  val weightPoundsList = previousCompletedSets.mapNotNull { it.weightPounds }.toMutableList()
+  val weightKilogramsList = previousCompletedSets.mapNotNull { it.weightKilograms }.toMutableList()
 
-  var targetMinimumRepetitionsList = sets.mapNotNull { it.targetMinimumRepetitions }
-  var targetMaximumRepetitionsList = sets.mapNotNull { it.targetMaximumRepetitions }
-  val targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
-  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
-  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
+  var targetMinimumRepetitionsList =
+    previousCompletedSets.mapNotNull { it.targetMinimumRepetitions }
+  var targetMaximumRepetitionsList =
+    previousCompletedSets.mapNotNull { it.targetMaximumRepetitions }
+  val targetRepetitionsList = previousCompletedSets.mapNotNull { it.targetRepetitions?.toInt() }
+  val targetWeightPoundsList = previousCompletedSets.mapNotNull { it.targetWeightPounds }
+  val targetWeightKilogramsList = previousCompletedSets.mapNotNull { it.targetWeightKilograms }
 
   /*    var targetMinimumRepetitions =
         if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.firstOrNull() })
@@ -205,26 +213,31 @@ fun linearProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
  *
  * - All sets in the input `sets` list have the same target minimum and maximum repetitions.
  * - All sets in the input list have a defined `incrementWeightPounds` and `incrementWeightKilograms` */
-fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+fun doubleProgression(
+  previousCompletedSets: List<Set>,
+  _setsToUpdate: MutableList<Set>
+): Result<MutableList<Set>> {
   val setsToUpdate = _setsToUpdate.toMutableList()
 
-  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted =
+    previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed =
+    previousCompletedSets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
   var lowestWeightKilogramsPerformed =
-    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+    previousCompletedSets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
-  val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
 
-  val repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-  val weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-  val weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  val repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
+  val weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
+  val weightKilogramsList = previousCompletedSets.map { it.weightKilograms!! }.toMutableList()
 
-  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
-  val targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
-  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
-  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
+  val targetMinimumRepetitionsList = previousCompletedSets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = previousCompletedSets.map { it.targetMaximumRepetitions!! }
+  val targetRepetitionsList = previousCompletedSets.mapNotNull { it.targetRepetitions?.toInt() }
+  val targetWeightPoundsList = previousCompletedSets.mapNotNull { it.targetWeightPounds }
+  val targetWeightKilogramsList = previousCompletedSets.mapNotNull { it.targetWeightKilograms }
 
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
@@ -347,7 +360,7 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
  * - All sets must have the same target maximum repetitions.
  * - `targetRepetitions`, `targetWeightPounds`, and `targetWeightKilograms` must be specified in each set, or this will return an error.
  *
- * @param sets A list of `Set` objects representing the completed sets from the current workout.
+ * @param previousCompletedSets A list of `Set` objects representing the completed sets from the current workout.
  *             Each `Set` must have the following properties populated:
  *             - `repetitions`: The number of repetitions completed in this set.
  *             - `weightPounds`: The weight used in pounds for this set.
@@ -358,29 +371,31 @@ fun doubleProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<
  *             - `targetMaximumRepetitions`: The maximum number of repetitions for a given set
  *             - `targetRepetitions`: The targeted number of repetitions for */
 fun dynamicDoubleProgression(
-  sets: List<Set>,
+  previousCompletedSets: List<Set>,
   _setsToUpdate: MutableList<Set>,
 ): Result<MutableList<Set>> {
   val setsToUpdate = _setsToUpdate.toMutableList()
 
-  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted =
+    previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed =
+    previousCompletedSets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
   var lowestWeightKilogramsPerformed =
-    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+    previousCompletedSets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
-  val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
 
-  var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-  var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-  var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  var repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
+  var weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
+  var weightKilogramsList = previousCompletedSets.map { it.weightKilograms!! }.toMutableList()
 
-  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  val targetMinimumRepetitionsList = previousCompletedSets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = previousCompletedSets.map { it.targetMaximumRepetitions!! }
 
-  val targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
-  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
-  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
+  val targetRepetitionsList = previousCompletedSets.mapNotNull { it.targetRepetitions?.toInt() }
+  val targetWeightPoundsList = previousCompletedSets.mapNotNull { it.targetWeightPounds }
+  val targetWeightKilogramsList = previousCompletedSets.mapNotNull { it.targetWeightKilograms }
 
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
@@ -417,9 +432,9 @@ fun dynamicDoubleProgression(
     }
   } else {
     // repeat this week
-    repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-    weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-    weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+    repetitionsList = previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+    weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
+    weightKilogramsList = previousCompletedSets.map { it.targetWeightKilograms!! }.toMutableList()
   }
 
   // Update setsToUpdate with new values
@@ -432,27 +447,70 @@ fun dynamicDoubleProgression(
   return Result.success(setsToUpdate)
 }
 
-fun waveProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+/**
+ * Implements a wave progression scheme for weightlifting sets.
+ *
+ * This function analyzes a list of completed `Set` objects from a workout and determines the target
+ * repetitions and weights for the next workout based on a wave progression pattern. The core idea
+ * is to cycle between higher repetitions at lighter weights and lower repetitions at heavier weights,
+ * gradually increasing the load.
+ *
+ * **Wave Progression Logic:**
+ *
+ * 1. **Repeat Week:** If the completed repetitions are not consistent across all sets, or if any set's
+ *    repetitions are outside the target minimum and maximum range, the target repetitions and weights
+ *    for the next week are reset to the original target values, and the workout should be repeated.
+ * 2. **Increase Weight and Decrease Reps:** If all sets were completed with the same number of repetitions
+ *    and that number was greater than the target minimum, the target repetitions for the next week are
+ *    decreased by 1, and the target weight (in pounds and kilograms) is increased by the specified
+ *    increment.
+ * 3. **Decrease Weight and Increase Reps:** If all sets were completed with the same number of repetitions
+ *    and that number was equal to the target minimum, the target repetitions for the next week are
+ *    increased to the target maximum, and the target weight (in pounds and kilograms) is decreased by
+ *    the specified increment.
+ * 4. **Repeat Week (Fallback):** If none of the above conditions are met, the target repetitions and
+ *    weights are reset to their initial values. This typically happens when there's an unexpected
+ *    state.
+ *
+ * **Error Handling:**
+ *
+ * - The function returns a `Result.failure` with an `IllegalArgumentException` if the target
+ *   minimum repetitions or target maximum repetitions are not the same across all sets.
+ *
+ * **Assumptions:**
+ *
+ * - All sets in the input `sets` list have the same target minimum and maximum repetitions.
+ * - All sets in the input list have a defined `incrementWeightPounds` and `incrementWeightKilograms`.
+ *
+ * @param previousCompletedSets A list of [Set] objects representing the completed sets from the current workout.
+ *                           Each `Set` must have the following properties populated:
+ */
+fun waveProgression(
+  previousCompletedSets: List<Set>,
+  _setsToUpdate: MutableList<Set>
+): Result<MutableList<Set>> {
   val setsToUpdate = _setsToUpdate.toMutableList()
 
-  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted =
+    previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed =
+    previousCompletedSets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
   var lowestWeightKilogramsPerformed =
-    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+    previousCompletedSets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
-  val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
 
-  var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-  var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-  var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  var repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
+  var weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
+  var weightKilogramsList = previousCompletedSets.map { it.weightKilograms!! }.toMutableList()
 
-  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  val targetMinimumRepetitionsList = previousCompletedSets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = previousCompletedSets.map { it.targetMaximumRepetitions!! }
 
-  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions?.toInt() }
-  var targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds }
-  var targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms }
+  var targetRepetitionsList = previousCompletedSets.mapNotNull { it.targetRepetitions?.toInt() }
+  var targetWeightPoundsList = previousCompletedSets.mapNotNull { it.targetWeightPounds }
+  var targetWeightKilogramsList = previousCompletedSets.mapNotNull { it.targetWeightKilograms }
 
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
@@ -471,9 +529,9 @@ fun waveProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<Mu
       repetitionsList.any { it < targetMinimumRepetitions }
   ) {
     // repeat this week
-    repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-    weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-    weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+    repetitionsList = previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+    weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
+    weightKilogramsList = previousCompletedSets.map { it.targetWeightKilograms!! }.toMutableList()
   } else if (
     repetitionsList.all {
       it == repetitionsList.firstOrNull() &&
@@ -495,9 +553,11 @@ fun waveProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<Mu
 
       else -> {
         println("repeat this week")
-        repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-        weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-        weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+        repetitionsList =
+          previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+        weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
+        weightKilogramsList =
+          previousCompletedSets.map { it.targetWeightKilograms!! }.toMutableList()
       }
     }
   }
@@ -545,31 +605,36 @@ fun waveProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<Mu
  *   - `targetWeightPounds`: The target weight for the set in pounds (nullable).
  *   - `targetWeightKilograms`: The target weight for the set in kilograms (nullable).
  *   - `incrementWeightPounds`: The amount to increment the weight by in */
-fun amrapProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<MutableList<Set>> {
+fun amrapProgression(
+  previousCompletedSets: List<Set>,
+  _setsToUpdate: MutableList<Set>
+): Result<MutableList<Set>> {
 
   val setsToUpdate = _setsToUpdate.toMutableList()
 
-  var maxRepetitionsCompleted = sets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
-  var lowestWeightPoundsPerformed = sets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
+  var maxRepetitionsCompleted =
+    previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
+  var lowestWeightPoundsPerformed =
+    previousCompletedSets.minByOrNull { it.weightPounds!! }?.weightPounds ?: 0.0
   var lowestWeightKilogramsPerformed =
-    sets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
+    previousCompletedSets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  val targetWeightPounds = sets.map { it.targetWeightPounds!! }.first()
-  var targetWeightKilograms = sets.map { it.targetWeightKilograms!! }.first()
+  val targetWeightPounds = previousCompletedSets.map { it.targetWeightPounds!! }.first()
+  var targetWeightKilograms = previousCompletedSets.map { it.targetWeightKilograms!! }.first()
 
-  val incrementWeightPounds = sets.map { it.incrementWeightPounds!! }.first()
-  val incrementWeightKilograms = sets.map { it.incrementWeightKilograms!! }.first()
+  val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
+  val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
 
-  var repetitionsList = sets.map { it.repetitions!! }.toMutableList()
-  var weightPoundsList = sets.map { it.weightPounds!! }.toMutableList()
-  var weightKilogramsList = sets.map { it.weightKilograms!! }.toMutableList()
+  var repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
+  var weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
+  var weightKilogramsList = previousCompletedSets.map { it.weightKilograms!! }.toMutableList()
 
-  val targetMinimumRepetitionsList = sets.map { it.targetMinimumRepetitions!! }
-  val targetMaximumRepetitionsList = sets.map { it.targetMaximumRepetitions!! }
+  val targetMinimumRepetitionsList = previousCompletedSets.map { it.targetMinimumRepetitions!! }
+  val targetMaximumRepetitionsList = previousCompletedSets.map { it.targetMaximumRepetitions!! }
 
-  var targetRepetitionsList = sets.mapNotNull { it.targetRepetitions!!.toInt() }
-  val targetWeightPoundsList = sets.mapNotNull { it.targetWeightPounds!! }
-  val targetWeightKilogramsList = sets.mapNotNull { it.targetWeightKilograms!! }
+  var targetRepetitionsList = previousCompletedSets.mapNotNull { it.targetRepetitions!! }
+  val targetWeightPoundsList = previousCompletedSets.mapNotNull { it.targetWeightPounds!! }
+  val targetWeightKilogramsList = previousCompletedSets.mapNotNull { it.targetWeightKilograms!! }
 
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
@@ -607,9 +672,9 @@ fun amrapProgression(sets: List<Set>, _setsToUpdate: MutableList<Set>): Result<M
     }
   } else {
     println("repeat this week")
-    repetitionsList = sets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-    weightPoundsList = sets.map { it.targetWeightPounds!! }.toMutableList()
-    weightKilogramsList = sets.map { it.targetWeightKilograms!! }.toMutableList()
+    repetitionsList = previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
+    weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
+    weightKilogramsList = previousCompletedSets.map { it.targetWeightKilograms!! }.toMutableList()
   }
 
   // Update setsToUpdate with new values
