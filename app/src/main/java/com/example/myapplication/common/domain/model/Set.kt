@@ -103,6 +103,8 @@ data class Set(
   // TODO Copies Strong App - Allows different rest intervals between sets
 //  var setRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
 //  var setRestTimerEnabled: Boolean = false,
+  var hashedSetSignature: String? = null,
+  var hashedWorkoutSignature: String? = null,
   var ownerID: String,
   var isPublic: Boolean = false
 )
