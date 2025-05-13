@@ -1029,40 +1029,4 @@ fun getRelativeLoadPercentOptions(
   Log.i("getRelativeLoadPercentOptions", "Relative Load Percent Dropdown Items: $list")
 
   return list
-//  return when {
-//    rir != null && rpe != null && repsPerformed != null -> {
-//      data.filter { it.repCapacity == repCapacity && it.rir == rir && it.rpe == rpe && it.repsPerformed == repsPerformed }
-//        .map { it.relativeLoadPercent }.distinct().sortedDescending()
-//    }
-//
-//    rir != null && repsPerformed != null -> {
-//      data.filter { it.repCapacity == repCapacity && it.rir == rir && it.repsPerformed == repsPerformed }
-//        .map { it.relativeLoadPercent }.distinct().sortedDescending()
-//    }
-//
-//    rpe != null && repsPerformed != null -> {
-//      data.filter { it.repCapacity == repCapacity && it.rpe == rpe && it.repsPerformed == repsPerformed }
-//        .map { it.relativeLoadPercent }.distinct().sortedDescending()
-//    }
-//
-//    rir != null -> {
-//      data.filter { it.repCapacity == repCapacity && it.rir == rir }
-//        .map { it.relativeLoadPercent }.distinct().sortedDescending()
-//    }
-//
-//    rpe != null -> {
-//      data.filter { it.repCapacity == repCapacity && it.rpe == rpe }
-//        .map { it.relativeLoadPercent }.distinct().sortedDescending()
-//    }
-//
-//    repsPerformed != null -> {
-//      data.filter { it.repCapacity == repCapacity && it.repsPerformed == repsPerformed }
-//        .map { it.relativeLoadPercent }.distinct().sortedDescending()
-//    }
-//
-//    else -> {
-//      data.filter { it.repCapacity == repCapacity }
-//        .map { it.relativeLoadPercent }.distinct().sortedDescending()
-//    }
-//  }
 }
