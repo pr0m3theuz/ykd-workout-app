@@ -5,8 +5,8 @@ package com.example.myapplication.common.dependencyInjection
 //import com.example.myapplication.data.network.ImportWorkoutProgramRepository
 import com.example.myapplication.MainViewModel
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
-import com.example.myapplication.common.infrastructure.persistence.CompletedRepository
-import com.example.myapplication.common.infrastructure.persistence.CompletedRepositoryImpl
+import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
+import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
@@ -101,7 +101,7 @@ val commonModule = module {
   singleOf(::UserRepositoryImpl) bind UserRepository::class
   singleOf(::ReplicatorServiceImpl) bind ReplicatorService::class
   singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
-  singleOf(::CompletedRepositoryImpl) bind CompletedRepository::class
+  singleOf(::CompletedWorkoutRepositoryImpl) bind CompletedWorkoutRepository::class
   singleOf(::ModernizedLoadRIRReposistoryImpl) bind ModernizedLoadRIRReposistory::class
 //  singleOf(::ImportWorkoutProgramRepository)
 
