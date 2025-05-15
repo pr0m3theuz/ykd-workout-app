@@ -84,11 +84,15 @@ fun generateSetSignature(set: Set, includeTargets: Boolean): String {
   signature.append("#prog:${set.progressionSchemeID ?: "null"}")
 
   if (includeTargets) {
-    signature.append("#trgReps:${set.targetRepetitions ?: "null"}")
-    signature.append("#trgLbs:${set.targetWeightPounds ?: "null"}")
-    // Add other targets as needed (RPE, RIR, Kg, etc.)
     signature.append("#trgRIR:${set.targetRepetitionsInReserve ?: "null"}")
     signature.append("#trgRPE:${set.targetRatePerceivedEffort ?: "null"}")
+    signature.append("#trgE1RM:${set.targetPercentage1RM ?: "null"}")
+    // Add other targets as needed (RPE, RIR, Kg, etc.)
+    signature.append("#trgReps:${set.targetRepetitions ?: "null"}")
+    signature.append("#trgMinReps:${set.targetMinimumRepetitions ?: "null"}")
+    signature.append("#trgMaxReps:${set.targetMinimumRepetitions ?: "null"}")
+    signature.append("#trgLbs:${set.targetWeightPounds ?: "null"}")
+    signature.append("#trgKG:${set.targetWeightKilograms ?: "null"}")
   }
   signature.append("}") // S for Set end
   return signature.toString()
