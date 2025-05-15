@@ -1,6 +1,11 @@
 package com.example.myapplication.common.util
 
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.util.ProgressionOutcome.FAILED
+import com.example.myapplication.common.util.ProgressionOutcome.PENDING
+import com.example.myapplication.common.util.ProgressionOutcome.PROGRESSED
+import com.example.myapplication.common.util.ProgressionOutcome.REJECTED
+import com.example.myapplication.common.util.ProgressionOutcome.UNCHANGED
 
 // TODO update the next workout
 //  add screen that asks the user to confirm the changes/progression applied to the next workout
@@ -13,11 +18,39 @@ import com.example.myapplication.common.domain.model.Set
 //  want to repeat the original workout or proceed with updating the next workout based on the
 //  completed workout
 
+/**
+ * Enum to represent the outcome of applying progression to a Set or ExerciseSets.
+ *
+ * This enum is used to track the result of progression logic, providing clear states
+ * for various scenarios that can occur during the progression calculation.
+ *
+ * @property PENDING Progression logic has not yet been run or is not applicable.
+ *                   This is often the initial state before any progression calculation.
+ * @property UNCHANGED Progression logic was executed, but no changes were made to the
+ *                     targets. This can happen if performance targets were not met,
+ *                     or if the conditions for progression were not satisfied.
+ * @property PROGRESSED Progression was applied successfully, resulting in changes
+ *                      to the targets (e.g., increased weight or repetitions).
+ * @property FAILED The progression logic encountered an error or could not be
+ *                  calculated. This might be due to missing data, invalid input,
+ *                  or an unexpected issue within the progression algorithm.
+ * @property REJECTED The progression was suggested to the user, but the user chose
+ *                    to reject the proposed changes.
+ */
+enum class ProgressionOutcome {
+  PENDING,      // Progression logic not yet run or applicable
+  UNCHANGED,    // Progression logic ran, but no changes were made (e.g., targets not met)
+  PROGRESSED,   // Progression applied successfully (e.g., weight/reps increased)
+  FAILED,       // Progression logic failed (e.g., couldn't calculate, error occurred)
+  REJECTED      // User rejected the progression
+}
+
 enum class ProgressionType(val progression: String) {
   LINEAR_PROGRESSION("linear"),
   DOUBLE_PROGRESSION("double"),
   DYNAMIC_DOUBLE_PROGRESSION("dynamic double"),
   WAVE_PROGRESSION("wave"),
+
   AMRAP_PROGRESSION("amrap");
 
   companion object {
@@ -25,6 +58,7 @@ enum class ProgressionType(val progression: String) {
       entries.find { it.progression == progression }
   }
 }
+
 
 /**
  * Returns a progression function based on the given [ProgressionType].
@@ -46,7 +80,7 @@ enum class ProgressionType(val progression: String) {
  */
 fun selectProgression(
   progressionType: ProgressionType
-): (List<Set>, MutableList<Set>) -> Result<MutableList<Set>> {
+): (List<Set>, MutableList<Set>) -> ProgressionResults {
   return when (progressionType) {
     ProgressionType.LINEAR_PROGRESSION -> ::linearProgression
     ProgressionType.DOUBLE_PROGRESSION -> ::doubleProgression
@@ -55,6 +89,23 @@ fun selectProgression(
     ProgressionType.AMRAP_PROGRESSION -> ::amrapProgression
   }
 }
+
+/**
+ * Represents the results of a progression calculation.
+ *
+ * This data class holds information about the outcome of applying a progression scheme to a series of sets.
+ *
+ * @property completedSets A list of [Set] objects representing the sets that were completed in the previous workout session. This data is used as input for the progression calculation.
+ * @property currentSets A mutable list of [Set] objects that were updated by the progression logic. This represents the suggested sets for the next workout session. Can be null if progression was not applicable or failed.
+ * @property outcome A [ProgressionOutcome] enum indicating the result of the progression calculation (e.g., PENDING, UNCHANGED, PROGRESSED, FAILED, REJECTED). Defaults to [ProgressionOutcome.PENDING].
+ * @property message An optional string providing additional information or context about the progression outcome (e.g., reasons for failure, details of changes). Can be null.
+ */
+data class ProgressionResults(
+  var completedSets: List<Set>,
+  var currentSets: MutableList<Set>? = null,
+  var outcome: ProgressionOutcome? = ProgressionOutcome.PENDING,
+  var message: String? = null
+)
 
 /*
  * TODO Each set has a progression scheme id
@@ -99,8 +150,15 @@ fun selectProgression(
 fun linearProgression(
   previousCompletedSets: List<Set>,
   _setsToUpdate: MutableList<Set>
-): Result<MutableList<Set>> {
+): ProgressionResults {
+  // Is this necessary? because if the user adds additional sets to the workout,
+  // the additional sets won't progress automatically.
+  // Should set hashed signatures be checked?
   val setsToUpdate = _setsToUpdate.toMutableList()
+
+  val progressionResults = ProgressionResults(
+    completedSets = previousCompletedSets,
+  )
 
   var maxRepetitionsCompleted =
     previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
@@ -150,6 +208,9 @@ fun linearProgression(
               actual < target
             } -> {
       // If targets are missed, reset to target values
+      progressionResults.message = "Targets were missed. Repeating previous workout targets."
+      progressionResults.outcome = ProgressionOutcome.UNCHANGED
+
       repetitionsList.clear()
       repetitionsList.addAll(targetRepetitionsList)
       weightPoundsList.clear()
@@ -160,6 +221,9 @@ fun linearProgression(
 
     else -> {
       // If all targets are exceeded, reset repetitions and increment weights
+      progressionResults.message = "Targets were exceeded."
+      progressionResults.outcome = ProgressionOutcome.PROGRESSED
+
       repetitionsList.clear()
       repetitionsList.addAll(targetRepetitionsList)
       weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
@@ -174,7 +238,9 @@ fun linearProgression(
     set.targetWeightKilograms = weight
   }
 
-  return Result.success(setsToUpdate)
+  progressionResults.currentSets = setsToUpdate
+
+  return progressionResults
 }
 
 /**
@@ -216,8 +282,10 @@ fun linearProgression(
 fun doubleProgression(
   previousCompletedSets: List<Set>,
   _setsToUpdate: MutableList<Set>
-): Result<MutableList<Set>> {
+): ProgressionResults {
   val setsToUpdate = _setsToUpdate.toMutableList()
+
+  val progressionResults = ProgressionResults(completedSets = previousCompletedSets)
 
   var maxRepetitionsCompleted =
     previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
@@ -241,14 +309,21 @@ fun doubleProgression(
 
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
-    if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
+    if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() }) {
       targetMinimumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
-
+    } else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target repetitions must be the same"
+      return progressionResults
+    }
   val targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+    else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target repetitions must be the same"
+      return progressionResults
+    }
 
   val actualWeightsPerformedEqualTargetWeight =
     (weightPoundsList == targetWeightPoundsList && weightKilogramsList == targetWeightKilogramsList)
@@ -258,6 +333,10 @@ fun doubleProgression(
             !actualWeightsPerformedEqualTargetWeight -> {
       // Reset to target values
       // repeat this week
+
+      progressionResults.message = "Targets were missed. Repeating previous workout targets."
+      progressionResults.outcome = ProgressionOutcome.UNCHANGED
+
       repetitionsList.clear()
       repetitionsList.addAll(targetRepetitionsList)
       weightPoundsList.clear()
@@ -276,6 +355,9 @@ fun doubleProgression(
       (actual == target) && (actual < targetMaximumRepetitions)
     }) && actualWeightsPerformedEqualTargetWeight -> {
 
+      progressionResults.outcome = ProgressionOutcome.PROGRESSED
+      progressionResults.message = "Targets were met. Incrementing targets."
+
       for (index in repetitionsList.indices) {
         repetitionsList[index]++
         break
@@ -285,6 +367,8 @@ fun doubleProgression(
     repetitionsList.zip(targetRepetitionsList).any { (actual, target) ->
       (actual >= target) && (actual < targetMaximumRepetitions)
     } && actualWeightsPerformedEqualTargetWeight -> {
+      progressionResults.outcome = ProgressionOutcome.PROGRESSED
+      progressionResults.message = "Targets were exceeded. Incrementing targets."
 
       val tempRepetitionsList = targetRepetitionsList.toMutableList()
 
@@ -304,6 +388,9 @@ fun doubleProgression(
     repetitionsList.all { it >= targetMaximumRepetitions } &&
             actualWeightsPerformedEqualTargetWeight -> {
 
+      progressionResults.outcome = ProgressionOutcome.PROGRESSED
+      progressionResults.message = "Maximum targets were met. Resetting to minimum targets."
+
       repetitionsList.clear()
       repetitionsList.addAll(targetMinimumRepetitionsList)
 
@@ -320,6 +407,9 @@ fun doubleProgression(
 
     else -> {
       println("repeat this week")
+      progressionResults.outcome = ProgressionOutcome.UNCHANGED
+      progressionResults.message = "Targets were missed. Repeating previous workout targets."
+
       repetitionsList.clear()
       repetitionsList.addAll(targetRepetitionsList)
       weightPoundsList.clear()
@@ -335,7 +425,9 @@ fun doubleProgression(
     set.targetWeightKilograms = weight
   }
 
-  return Result.success(setsToUpdate)
+  progressionResults.currentSets = setsToUpdate
+
+  return progressionResults
 }
 
 /**
@@ -373,8 +465,10 @@ fun doubleProgression(
 fun dynamicDoubleProgression(
   previousCompletedSets: List<Set>,
   _setsToUpdate: MutableList<Set>,
-): Result<MutableList<Set>> {
+): ProgressionResults {
   val setsToUpdate = _setsToUpdate.toMutableList()
+
+  val progressionResults = ProgressionResults(completedSets = previousCompletedSets)
 
   var maxRepetitionsCompleted =
     previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
@@ -401,14 +495,22 @@ fun dynamicDoubleProgression(
   val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+    else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target minimum repetitions must be the same"
+      return progressionResults
+    }
 
   val targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+    else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target maximum repetitions must be the same"
+      return progressionResults
+    }
 
-  val actualWeightsPerformedEqualTargetWeight =
+  val actualWeightsPerformedEqualTargetWeight = // TODO Redundant. Delete!
     (weightPoundsList == targetWeightPoundsList && weightKilogramsList == targetWeightKilogramsList)
 
   if (repetitionsList.zip(targetRepetitionsList).all { (actual, target) -> (actual >= target) }) {
@@ -416,13 +518,21 @@ fun dynamicDoubleProgression(
       if (
         repetition >= targetMinimumRepetitions &&
         weightPoundsList.zip(targetWeightPoundsList).all { (actual, target) -> actual >= target }
+      // weightKilogramsList.zip(targetWeightKilogramsList).all { (actual, target) -> actual >= target }
+      // should be the same as above
       ) {
         when {
           repetition < targetMaximumRepetitions -> {
+            progressionResults.outcome = ProgressionOutcome.PROGRESSED
+            progressionResults.message = "Targets were met. Incrementing targets."
+
             repetitionsList[index] = repetition.plus(1)
           }
 
           repetition >= targetMaximumRepetitions -> {
+            progressionResults.outcome = ProgressionOutcome.PROGRESSED
+            progressionResults.message = "Maximum targets were met. Resetting to minimum targets."
+
             repetitionsList[index] = targetMinimumRepetitions
             weightPoundsList[index] = weightPoundsList[index].plus(incrementWeightPounds)
             weightKilogramsList[index] = weightKilogramsList[index].plus(incrementWeightKilograms)
@@ -432,6 +542,9 @@ fun dynamicDoubleProgression(
     }
   } else {
     // repeat this week
+    progressionResults.outcome = ProgressionOutcome.UNCHANGED
+    progressionResults.message = "Targets were missed. Repeating previous workout targets."
+
     repetitionsList = previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
     weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
     weightKilogramsList = previousCompletedSets.map { it.targetWeightKilograms!! }.toMutableList()
@@ -444,7 +557,9 @@ fun dynamicDoubleProgression(
     set.targetWeightKilograms = weight
   }
 
-  return Result.success(setsToUpdate)
+  progressionResults.currentSets = setsToUpdate
+
+  return progressionResults
 }
 
 /**
@@ -488,8 +603,10 @@ fun dynamicDoubleProgression(
 fun waveProgression(
   previousCompletedSets: List<Set>,
   _setsToUpdate: MutableList<Set>
-): Result<MutableList<Set>> {
+): ProgressionResults {
   val setsToUpdate = _setsToUpdate.toMutableList()
+
+  val progressionResults = ProgressionResults(completedSets = previousCompletedSets)
 
   var maxRepetitionsCompleted =
     previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
@@ -516,19 +633,30 @@ fun waveProgression(
   val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+    else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target minimum repetitions must be the same"
+      return progressionResults
+    }
 
   val targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+    else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target maximum repetitions must be the same"
+      return progressionResults
+    }
 
   if (
     !(repetitionsList.all { it == repetitionsList.firstOrNull() }) ||
-      repetitionsList.any { it > targetMaximumRepetitions } ||
-      repetitionsList.any { it < targetMinimumRepetitions }
+    repetitionsList.any { it > targetMaximumRepetitions } ||
+    repetitionsList.any { it < targetMinimumRepetitions }
   ) {
     // repeat this week
+    progressionResults.outcome = ProgressionOutcome.UNCHANGED
+    progressionResults.message = "Targets were missed. Repeating previous workout targets."
+
     repetitionsList = previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
     weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
     weightKilogramsList = previousCompletedSets.map { it.targetWeightKilograms!! }.toMutableList()
@@ -540,12 +668,19 @@ fun waveProgression(
   ) {
     when {
       repetitionsList.all { it == targetMinimumRepetitions } -> {
+        progressionResults.outcome = ProgressionOutcome.PROGRESSED
+        progressionResults.message =
+          "Targets were met. Decreasing weight. Resetting to maximum repetitions ."
+
         repetitionsList.replaceAll { targetMaximumRepetitions }
         weightPoundsList.replaceAll { it.minus(incrementWeightPounds) }
         weightKilogramsList.replaceAll { it.minus(incrementWeightKilograms) }
       }
 
       repetitionsList.all { it > targetMinimumRepetitions } -> {
+        progressionResults.outcome = ProgressionOutcome.PROGRESSED
+        progressionResults.message = "Targets were met. Increasing weight. Decreasing repetitions."
+
         repetitionsList.replaceAll { it.minus(1) }
         weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
         weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
@@ -553,6 +688,9 @@ fun waveProgression(
 
       else -> {
         println("repeat this week")
+        progressionResults.outcome = ProgressionOutcome.UNCHANGED
+        progressionResults.message = "Targets were missed. Repeating previous workout targets."
+
         repetitionsList =
           previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
         weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
@@ -569,7 +707,9 @@ fun waveProgression(
     set.targetWeightKilograms = weight
   }
 
-  return Result.success(setsToUpdate)
+  progressionResults.currentSets = setsToUpdate
+
+  return progressionResults
 }
 
 /**
@@ -608,9 +748,11 @@ fun waveProgression(
 fun amrapProgression(
   previousCompletedSets: List<Set>,
   _setsToUpdate: MutableList<Set>
-): Result<MutableList<Set>> {
+): ProgressionResults {
 
   val setsToUpdate = _setsToUpdate.toMutableList()
+
+  val progressionResults = ProgressionResults(completedSets = previousCompletedSets)
 
   var maxRepetitionsCompleted =
     previousCompletedSets.maxByOrNull { it.repetitions!! }?.repetitions ?: 0
@@ -640,38 +782,55 @@ fun amrapProgression(
   val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+    else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target repetitions must be the same"
+      return progressionResults
+    }
 
   var targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
-    else return Result.failure(IllegalArgumentException("All target repetitions must be the same"))
+    else {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "All target repetitions must be the same"
+      return progressionResults
+    }
 
   if (
     weightPoundsList != targetWeightPoundsList && weightKilogramsList != targetWeightKilogramsList
   ) {
-    return Result.failure(
-      IllegalArgumentException("Actual weight performed do not match target values")
-    )
+    progressionResults.outcome = ProgressionOutcome.FAILED
+    progressionResults.message = "Actual weight performed do not match target values"
+    return progressionResults
   }
 
   if (
     weightPoundsList.all { it == targetWeightPounds } &&
-      repetitionsList.all { it >= targetMinimumRepetitions }
+    repetitionsList.all { it >= targetMinimumRepetitions }
   ) {
     when {
       repetitionsList.any { it >= targetMinimumRepetitions.times(2) } -> {
+        progressionResults.outcome = ProgressionOutcome.PROGRESSED
+        progressionResults.message = "Targets were met. Increasing weight."
+
         weightPoundsList.replaceAll { it.plus(incrementWeightPounds.times(2)) }
       }
 
       repetitionsList.any {
         it in targetMinimumRepetitions.until(targetMinimumRepetitions.times(2))
       } -> {
+        progressionResults.outcome = ProgressionOutcome.PROGRESSED
+        progressionResults.message = "Targets were met. Increasing weight."
+
         weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
       }
     }
   } else {
     println("repeat this week")
+    progressionResults.outcome = ProgressionOutcome.UNCHANGED
+    progressionResults.message = "Targets were missed. Repeating previous workout targets."
+
     repetitionsList = previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
     weightPoundsList = previousCompletedSets.map { it.targetWeightPounds!! }.toMutableList()
     weightKilogramsList = previousCompletedSets.map { it.targetWeightKilograms!! }.toMutableList()
@@ -684,5 +843,7 @@ fun amrapProgression(
     set.targetWeightKilograms = weight
   }
 
-  return Result.success(setsToUpdate)
+  progressionResults.currentSets = setsToUpdate
+
+  return progressionResults
 }
