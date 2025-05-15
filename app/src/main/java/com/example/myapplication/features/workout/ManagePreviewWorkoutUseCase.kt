@@ -5,7 +5,6 @@ package com.example.myapplication.features.workout
 import android.util.Log
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.ExerciseSets
-import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.SupersetExercisesSets
@@ -18,7 +17,7 @@ import com.example.myapplication.common.infrastructure.persistence.InProgressWor
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
-import com.example.myapplication.common.util.ProgressionType
+import com.example.myapplication.common.util.ProgressionOutcome
 import com.example.myapplication.common.util.selectProgression
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -38,219 +37,110 @@ class ManagePreviewWorkoutUseCase(
 ) {
   // TODO Look forward in the program to update the next workout
   //  or look backward in the workout history to update the current workout
-  @OptIn(ExperimentalUuidApi::class)
-  fun applyProgressionToNextWorkout(
-    currentWorkout: Workout,
-    nextWorkout: Workout
-  ) {
-    currentWorkout.workoutItems.forEach {
-      when (it) {
-        is ExerciseSets -> {
-          val progressionType: ProgressionType? =
-            it.sets.firstOrNull { set -> set.setTypeID != SetType.warmUpSet }?.progressionSchemeID
-
-          val result =
-            progressionType?.let { progression -> selectProgression(progression) }?.invoke(
-              it.sets,
-              it.sets.toMutableList()
-            )
-
-          result?.onSuccess { sets ->
-            it.sets.clear()
-            it.sets.addAll(sets)
-          }
-        }
-
-        is Superset -> {
-          it.exercisesSets.forEach { exerciseSets ->
-            val progressionType: ProgressionType? =
-              exerciseSets.sets.firstOrNull { set -> set.setTypeID != SetType.warmUpSet }?.progressionSchemeID
-
-            val result =
-              progressionType?.let { progression -> selectProgression(progression) }?.invoke(
-                exerciseSets.sets,
-                exerciseSets.sets.toMutableList()
-              )
-
-            result?.onSuccess { sets ->
-              exerciseSets.sets.clear()
-              exerciseSets.sets.addAll(sets)
-            }
-          }
-        }
-      }
-    }
-  }
-
-  @OptIn(ExperimentalUuidApi::class)
-  fun applyProgressionToNextWorkout_GEMINI(
-    currentWorkout: Workout, // Contains completed data or template for progression rulesTest
-    nextWorkout: Workout     // The workout object to be modified
-  ) {
-    // Ensure workouts have comparable structures. You might need more robust checks.
-    if (currentWorkout.workoutItems.size != nextWorkout.workoutItems.size) {
-      Log.w("Progression", "Cannot apply progression: Workout structures (item count) mismatch.")
-      return
-    }
-
-    currentWorkout.workoutItems.forEachIndexed { index, currentItem ->
-      // Get the corresponding item in the next workout
-      val nextItem = nextWorkout.workoutItems.getOrNull(index)
-
-      // Safety check: ensure nextItem exists and types match
-      if (nextItem == null) {
-        Log.w(
-          "Progression",
-          "Skipping progression for item $index: Corresponding item not found in next workout."
-        )
-        return@forEachIndexed // continue to next item
-      }
-      if (currentItem::class != nextItem::class) {
-        Log.w(
-          "Progression",
-          "Skipping progression for item $index: Component type mismatch between workouts (${currentItem::class.simpleName} vs ${nextItem::class.simpleName})."
-        )
-        return@forEachIndexed // continue to next item
-      }
-
-
-      when (currentItem) {
-        is ExerciseSets -> {
-          // Cast nextItem safely (already checked type)
-          val nextExerciseSets = nextItem as ExerciseSets
-
-          // Find progression scheme from the *current* workout item
-          val progressionType: ProgressionType? =
-            currentItem.sets.firstOrNull { set -> set.setTypeID != SetType.warmUpSet }?.progressionSchemeID
-
-          // Select the progression function (assuming updated signature)
-          val progressionFunction = progressionType?.let { selectProgression(it) }
-
-          // Invoke the function with sets from *both* workouts
-          val result: Result<List<Set>>? =
-            progressionFunction?.invoke(
-              currentItem.sets,         // Sets from the completed/current workout
-              nextExerciseSets.sets     // Template sets from the next workout
-            )
-
-          // Apply successful result to the *next* workout's item
-          result?.onSuccess { newCalculatedSets ->
-            Log.d(
-              "Progression",
-              "Applying progression (${progressionType.name}) to Exercise ${nextExerciseSets.exerciseID}"
-            )
-            nextExerciseSets.sets.clear()
-            nextExerciseSets.sets.addAll(newCalculatedSets)
-          }?.onFailure { error ->
-            Log.e(
-              "Progression",
-              "Progression (${progressionType.name}) failed for Exercise ${currentItem.exerciseID}: ${error.message}"
-            )
-          }
-        }
-
-        is Superset -> {
-          // Cast nextItem safely
-          val nextSuperset = nextItem as Superset
-
-          // Ensure supersets have comparable structures.
-          if (currentItem.exercisesSets.size != nextSuperset.exercisesSets.size) {
-            Log.w(
-              "Progression",
-              "Skipping progression for superset at index $index: Exercise count mismatch."
-            )
-            return@forEachIndexed // continue to next outer item
-          }
-
-          currentItem.exercisesSets.forEachIndexed inner@{ exerciseIndex, currentExerciseSets ->
-            // Get the corresponding exercise sets in the next superset
-            val nextExerciseSets = nextSuperset.exercisesSets.getOrNull(exerciseIndex)
-
-            if (nextExerciseSets == null) {
-              Log.w(
-                "Progression",
-                "Skipping progression for superset exercise $exerciseIndex: Corresponding item not found in next workout's superset."
-              )
-              return@inner // continue to next exercise in superset
-            }
-            // TODO Optional: Check if exercise IDs match if needed
-            //  if (currentExerciseSets.exerciseID != nextExerciseSets.exerciseID) { ... }
-
-
-            val progressionType: ProgressionType? =
-              currentExerciseSets.sets.firstOrNull { set -> set.setTypeID != SetType.warmUpSet }?.progressionSchemeID
-
-            val progressionFunction = progressionType?.let { selectProgression(it) }
-
-            val result: Result<List<Set>>? = progressionFunction?.invoke(
-              currentExerciseSets.sets, // Sets from the completed/current workout's exercise
-              nextExerciseSets.sets     // Template sets from the next workout's corresponding exercise
-            )
-
-            result?.onSuccess { newCalculatedSets ->
-              Log.d(
-                "Progression",
-                "Applying progression (${progressionType.name}) to Superset Exercise ${nextExerciseSets.exerciseID}"
-              )
-              nextExerciseSets.sets.clear()
-              nextExerciseSets.sets.addAll(newCalculatedSets)
-            }?.onFailure { error ->
-              Log.e(
-                "Progression",
-                "Progression (${progressionType.name}) failed for Superset Exercise ${currentExerciseSets.exerciseID}: ${error.message}"
-              )
-            }
-          }
-        }
-        // Add other WorkoutComponent types if necessary
-      }
-    }
-    Log.i("Progression", "Finished applying progression to next workout.")
-    // Note: You might need to explicitly save the modified `nextWorkout` object
-    // depending on your persistence mechanism.
-  }
-
 
   /**
-   * Applies progression to `currentWorkoutToPrepare` based on `lastCompletedWorkoutForSameExercises`.
-   * Modifies `currentWorkoutToPrepare` in place.
+   * Applies progression to `currentWorkoutToPrepare` based on the performance of the latest completed
+   * workout with the same exercises. This function modifies the `currentWorkoutWorkoutComponents`
+   * in place by adjusting sets (e.g., reps, weight) according to the defined progression schemes.
    *
-   * @param currentWorkoutToPrepare The workout template/plan for the session about to start.
+   * The progression logic is applied by comparing the completed sets from the
+   * `latestCompletedIdenticalWorkout` with the template sets in `currentWorkoutWorkoutComponents`.
+   *
+   * If no latest completed identical workout is found, or if an exercise in the current workout
+   * has no corresponding performance history, the sets for that exercise will remain unchanged.
+   *
+   * @param currentWorkoutToPrepare The [Workout] object representing the template or plan for the
+   *   current session. This is used to identify the corresponding last completed workout.
+   * @param currentWorkoutWorkoutComponents A mutable list of [WorkoutComponent] objects that
+   *   represent the exercises and their sets for the current workout. These components will be
+   *   modified directly if progression is applicable.
+   * @return A [Result] containing the (potentially modified) `currentWorkoutWorkoutComponents` if
+   *   progression was attempted (even if no changes were made due to lack of history or other
+   *   conditions). Returns a [Result.failure] if a `lastCompletedIdenticalWorkout` could not be
+   *   retrieved, indicating a prerequisite for progression was not met.
    */
   fun prepareCurrentWorkoutWithProgression(
     currentWorkoutToPrepare: Workout,
     currentWorkoutWorkoutComponents: MutableList<WorkoutComponent>,
   ): Result<MutableList<WorkoutComponent>> {
-    val lastCompletedIdenticalWorkout =
+    val latestCompletedIdenticalWorkout =
       completedWorkoutRepository.getLatestPreviousIdenticalWorkout(currentWorkout = currentWorkoutToPrepare)
 
-    lastCompletedIdenticalWorkout?.let { previousWorkout ->
+    val results = mutableListOf<Result<WorkoutComponent>>()
+
+    latestCompletedIdenticalWorkout?.let { previousWorkout ->
       currentWorkoutWorkoutComponents.forEach { currentItemToPrepare ->
+//        val originalCurrentItemToPrepare = currentItemToPrepare.copy()
         when (currentItemToPrepare) {
           is ExerciseExerciseSets -> {
             // Find the performance data for this exercise from the history
-            val lastPerformanceData = previousWorkout.workoutItems.filterIsInstance<ExerciseSets>()
+            val lastPerformance = previousWorkout.workoutItems.filterIsInstance<ExerciseSets>()
               .firstOrNull { it.exerciseID == currentItemToPrepare.exercise.id }
-              ?.sets?.filter { it.setCompleted } ?: emptyList() // Get completed sets
+
+            val lastPerformanceData =
+              lastPerformance?.sets?.filter { it.setCompleted } ?: emptyList() // Get completed sets
+
 
             if (lastPerformanceData.isNotEmpty()) { // Only progress if there's history
               val progressionType = currentItemToPrepare.sets // Use progression from current plan
                 .firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
 
-              progressionType?.let { progression ->
+              val progressionResults = progressionType?.let { progression ->
                 selectProgression(progression).invoke(
                   lastPerformanceData,
                   currentItemToPrepare.sets // Pass the current plan to be modified
-                ).onSuccess { progressedSetsForThisSession ->
-                  currentItemToPrepare.sets.clear()
-                  currentItemToPrepare.sets.addAll(progressedSetsForThisSession)
-                  println("Backward Progression applied to ${currentItemToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}")
-                }.onFailure {
-                  println("Backward Progression failed for ${currentItemToPrepare.exercise.name}: ${it.message}")
+                )
+              }
+
+              when (progressionResults?.outcome) {
+                ProgressionOutcome.PROGRESSED -> {
+                  progressionResults.currentSets?.let {
+                    currentItemToPrepare.sets.clear()
+                    currentItemToPrepare.sets.addAll(it)
+                    Log.i(
+                      "prepareCurrentWorkoutWithProgression",
+                      "Progression applied to ${currentItemToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}: ${progressionResults.message}"
+                    )
+                  }
+                }
+
+                ProgressionOutcome.UNCHANGED -> {
+                  progressionResults.currentSets?.let {
+                    currentItemToPrepare.sets.clear()
+                    currentItemToPrepare.sets.addAll(it)
+                    Log.i(
+                      "prepareCurrentWorkoutWithProgression",
+                      "${currentItemToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}: ${progressionResults.message}"
+                    )
+                  }
+                }
+
+                ProgressionOutcome.FAILED -> {
+                  Log.i(
+                    "prepareCurrentWorkoutWithProgression",
+                    "Progression failed for ${currentItemToPrepare.exercise.name}: ${progressionResults.message}"
+                  )
+                }
+
+                ProgressionOutcome.PENDING -> {
+                  Log.i(
+                    "prepareCurrentWorkoutWithProgression",
+                    "No progression to apply for ${currentItemToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}"
+                  )
+                }
+
+                else -> {
+                  Log.i(
+                    "prepareCurrentWorkoutWithProgression",
+                    "Progression failed for ${currentItemToPrepare.exercise.name}: ${progressionResults?.message}"
+                  )
                 }
               }
             } else {
-              println("No history found for ${currentItemToPrepare.exercise.name} to apply backward progression.")
+              Log.i(
+                "prepareCurrentWorkoutWithProgression",
+                "No history found for ${currentItemToPrepare.exercise.name} to apply backward progression."
+              )
             }
           }
 
@@ -267,20 +157,64 @@ class ManagePreviewWorkoutUseCase(
                 val progressionType = exerciseInSupersetToPrepare.sets
                   .firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
 
-                progressionType?.let { progression ->
+                val progressionResults = progressionType?.let { progression ->
                   selectProgression(progression).invoke(
                     lastPerformanceData,
                     exerciseInSupersetToPrepare.sets
-                  ).onSuccess { progressedSets ->
-                    exerciseInSupersetToPrepare.sets.clear()
-                    exerciseInSupersetToPrepare.sets.addAll(progressedSets)
-                    println("Backward Superset Progression applied to ${exerciseInSupersetToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}")
-                  }.onFailure {
-                    println("Backward Superset Progression failed for ${exerciseInSupersetToPrepare.exercise.name}: ${it.message}")
+                  )
+                }
+
+                when (progressionResults?.outcome) {
+                  ProgressionOutcome.PROGRESSED -> {
+                    progressionResults.currentSets?.let {
+                      exerciseInSupersetToPrepare.sets.clear()
+                      exerciseInSupersetToPrepare.sets.addAll(it)
+                      Log.i(
+                        "prepareCurrentWorkoutWithProgression",
+                        "Progression applied to ${exerciseInSupersetToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}: ${progressionResults.message}"
+                      )
+                    }
+                  }
+
+                  ProgressionOutcome.UNCHANGED -> {
+                    progressionResults.currentSets?.let {
+                      exerciseInSupersetToPrepare.sets.clear()
+                      exerciseInSupersetToPrepare.sets.addAll(it)
+                      Log.i(
+                        "prepareCurrentWorkoutWithProgression",
+                        "${exerciseInSupersetToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}: ${progressionResults.message}"
+                      )
+                    }
+                  }
+
+                  ProgressionOutcome.FAILED -> {
+                    Log.i(
+                      "prepareCurrentWorkoutWithProgression",
+                      "Progression failed for ${exerciseInSupersetToPrepare.exercise.name}: ${progressionResults.message}"
+                    )
+                  }
+
+                  ProgressionOutcome.PENDING -> {
+                    Log.i(
+                      "prepareCurrentWorkoutWithProgression",
+                      "No progression to apply for ${exerciseInSupersetToPrepare.exercise.name} in ${currentWorkoutToPrepare.name}"
+                    )
+                  }
+
+                  else -> {
+                    Log.i(
+                      "prepareCurrentWorkoutWithProgression",
+                      "Progression failed for ${exerciseInSupersetToPrepare.exercise.name}: ${progressionResults?.message}"
+                    )
                   }
                 }
+
+
               } else {
-                println("No history found for superset exercise ${exerciseInSupersetToPrepare.exercise.name} to apply backward progression.")
+                Log.i(
+                  "prepareCurrentWorkoutWithProgression",
+                  "No history found for superset exercise ${exerciseInSupersetToPrepare.exercise.name} to apply backward progression."
+                )
               }
             }
           }
