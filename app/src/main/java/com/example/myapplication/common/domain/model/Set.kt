@@ -143,8 +143,8 @@ fun Set.setSummaryRIR(weightUnit: String): String {
 
 fun Set.setTargetSummaryRIR(weightUnit: String): String {
 // TODO get user default weight unit or exercise specific weight unit
-  return "${doubleFormatted(this.targetWeightPounds).ifBlank { "?" }} $weightUnit".plus(" × ")
-    .plus("${this.targetRepetitions ?: "?"} reps").plus(
+  return "${doubleFormatted(this.targetWeightPounds).ifBlank { "–" }} $weightUnit".plus(" × ")
+    .plus("${this.targetRepetitions ?: "–"} reps").plus(
       if (this.targetRepetitionsInReserve != null)
         " @ ${doubleFormatted(this.targetRepetitionsInReserve)} RIR"
       else ""
@@ -153,7 +153,7 @@ fun Set.setTargetSummaryRIR(weightUnit: String): String {
 }
 
 fun Set.setSummaryRPE(): String {
-  return "${doubleFormatted(this.weightPounds).ifBlank { "x" }} × ${this.repetitions ?: "x"} reps @ ${
+  return "${doubleFormatted(this.weightPounds).ifBlank { "–" }} × ${this.repetitions ?: "–"} reps @ ${
     doubleFormatted(
       this.ratePerceivedEffort
     )
