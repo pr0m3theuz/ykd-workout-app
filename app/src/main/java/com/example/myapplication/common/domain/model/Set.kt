@@ -1,4 +1,3 @@
-
 @file:UseSerializers(
   /*  MutableRealmIntKSerializer::class,
     RealmAnyKSerializer::class,
@@ -111,28 +110,26 @@ data class Set(
 
 fun Set.setVolume(weightUnit: String): Double {
   return if (
-    weightPounds != null && repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation
+    this.weightPounds != null && this.repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation
   ) {
-    this.setVolumeInPounds = weightPounds!!.times(repetitions!!)
-    weightPounds!!.times(repetitions!!)
+    this.setVolumeInPounds = this.weightPounds!!.times(this.repetitions!!)
+    weightPounds!!.times(this.repetitions!!)
   } else if (
-    weightKilograms != null && repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation
+    this.weightKilograms != null && this.repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation
   ) {
-    this.setVolumeInKilograms = weightKilograms!!.times(repetitions!!)
-    weightKilograms!!.times(repetitions!!)
+    this.setVolumeInKilograms = this.weightKilograms!!.times(this.repetitions!!)
+    this.weightKilograms!!.times(this.repetitions!!)
   } else {
     0.0
   }
 }
 
 fun Set.setSummaryRIR(weightUnit: String): String {
-
-  return "${doubleFormatted(weightPounds)} $weightUnit × $repetitions ${
-    if (repetitionsInReserve != null) "@ ${
-      doubleFormatted(
-        repetitionsInReserve
-      )
-    }" else ""
+// TODO get user default weight unit or exercise specific weight unit
+  return "${doubleFormatted(this.weightPounds)} $weightUnit × ${this.repetitions} reps${
+    if (this.repetitionsInReserve != null)
+      " @ ${doubleFormatted(this.repetitionsInReserve)} RIR"
+    else ""
   }"
 
   //  ${doubleFormatted(weightKilograms)} × $repetitions ${
@@ -144,18 +141,33 @@ fun Set.setSummaryRIR(weightUnit: String): String {
   //  }"
 }
 
+fun Set.setTargetSummaryRIR(weightUnit: String): String {
+// TODO get user default weight unit or exercise specific weight unit
+  return "${doubleFormatted(this.targetWeightPounds).ifBlank { "?" }} $weightUnit".plus(" × ")
+    .plus("${this.targetRepetitions ?: "?"} reps").plus(
+      if (this.targetRepetitionsInReserve != null)
+        " @ ${doubleFormatted(this.targetRepetitionsInReserve)} RIR"
+      else ""
+
+    )
+}
+
 fun Set.setSummaryRPE(): String {
-  return "${doubleFormatted(weightPounds)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)} RPE"
+  return "${doubleFormatted(this.weightPounds).ifBlank { "x" }} × ${this.repetitions ?: "x"} reps @ ${
+    doubleFormatted(
+      this.ratePerceivedEffort
+    )
+  } RPE"
   //  "${doubleFormatted(weightKilograms)} × $repetitions @ ${doubleFormatted(ratePerceivedEffort)}
   // RPE"
 }
 
 fun Set.convertPoundToKg(): Double {
-  return weightPounds?.times(0.45359237) ?: 0.0
+  return this.weightPounds?.times(0.45359237) ?: 0.0
 }
 
 fun Set.convertKgToPound(): Double {
-  return weightKilograms?.times(2.2046226218) ?: 0.0
+  return this.weightKilograms?.times(2.2046226218) ?: 0.0
 }
 
 fun Set.getWeight(weightUnit: String?) {
@@ -166,3 +178,11 @@ fun Set.getWeight(weightUnit: String?) {
 
 @Serializable
 data class Sets(val sets: List<Set>)
+
+fun Double.convertPoundToKg(): Double {
+  return this.times(0.45359237) ?: 0.0
+}
+
+fun Double.convertKgToPound(): Double {
+  return this.times(2.2046226218) ?: 0.0
+}
