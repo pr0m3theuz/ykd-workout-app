@@ -7,6 +7,7 @@ import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.util.ProgressionResults
 import com.example.myapplication.common.util.ProgressionType
 import com.example.myapplication.common.util.selectProgression
 import net.jqwik.api.Example
@@ -51,19 +52,20 @@ private fun applyProgressionToNextWorkout(
           currentItem.sets.firstOrNull { set -> set.setTypeID != SetType.warmUpSet }?.progressionSchemeID
         val progressionFunction = progressionType?.let { selectProgression(it) }
 
-        val result: Result<List<Set>>? = progressionFunction?.invoke(
+        val result: ProgressionResults? = progressionFunction?.invoke(
           currentItem.sets,
           nextExerciseSets.sets
         )
 
-        result?.onSuccess { newCalculatedSets ->
+        result?.currentSets?.let { newCalculatedSets ->
           // Log.d("Progression", "Applying progression to Exercise ${nextExerciseSets.exerciseID}")
           nextExerciseSets.sets.clear()
           nextExerciseSets.sets.addAll(newCalculatedSets)
-        }?.onFailure { error ->
+        }
+        /*{ error ->
           // Log.e("Progression", "Progression failed for Exercise ${currentItem.exerciseID}: ${error.message}")
           println("Progression Error: Progression failed for Exercise ${currentItem.exerciseID}: ${error.message}")
-        }
+        }*/
       }
 
       is Superset -> {
@@ -88,19 +90,20 @@ private fun applyProgressionToNextWorkout(
             currentExerciseSets.sets.firstOrNull { set -> set.setTypeID != SetType.warmUpSet }?.progressionSchemeID
           val progressionFunction = progressionType?.let { selectProgression(it) }
 
-          val result: Result<List<Set>>? = progressionFunction?.invoke(
+          val result: ProgressionResults? = progressionFunction?.invoke(
             currentExerciseSets.sets,
             nextExerciseSets.sets
           )
 
-          result?.onSuccess { newCalculatedSets ->
+          result?.currentSets?.let { newCalculatedSets ->
             // Log.d("Progression", "Applying progression to Superset Exercise ${nextExerciseSets.exerciseID}")
             nextExerciseSets.sets.clear()
             nextExerciseSets.sets.addAll(newCalculatedSets)
-          }?.onFailure { error ->
+          }
+          /*?.onFailure { error ->
             // Log.e("Progression", "Progression failed for Superset Exercise ${currentExerciseSets.exerciseID}: ${error.message}")
             println("Progression Error: Progression failed for Superset Exercise ${currentExerciseSets.exerciseID}: ${error.message}")
-          }
+          }*/
         }
       }
     }
