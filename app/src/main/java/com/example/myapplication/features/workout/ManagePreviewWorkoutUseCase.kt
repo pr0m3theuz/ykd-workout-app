@@ -63,6 +63,7 @@ class ManagePreviewWorkoutUseCase(
     currentWorkoutToPrepare: Workout,
     currentWorkoutWorkoutComponents: MutableList<WorkoutComponent>,
   ): Result<MutableList<WorkoutComponent>> {
+    // TODO Move this out. Doesn't respect Referential Transparency.
     val latestCompletedIdenticalWorkout =
       completedWorkoutRepository.getLatestPreviousIdenticalWorkout(currentWorkout = currentWorkoutToPrepare)
 
