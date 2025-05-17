@@ -41,7 +41,7 @@ private val setId3 = ObjectId("662330000000000000000003")
 private fun createTestSet(
   setNumber: Int,
   setType: SetType = SetType.normalSet,
-  targetReps: String? = "8-12",
+  targetReps: Int? = 8,
   targetLbs: Double? = 100.0,
   targetRir: Double? = 2.0,
   targetRpe: Double? = null, // Example: RPE might be null if using RIR
@@ -181,7 +181,7 @@ class SignatureGenerationTests {
     val set = createTestSet(
       1,
       SetType.dropSet,
-      targetReps = "10",
+      targetReps = 10,
       targetLbs = 150.0,
       targetRir = 1.0,
       targetRpe = null,
@@ -217,7 +217,7 @@ class SignatureGenerationTests {
       workoutId = workoutId1
     )
     // Modify targets for testing
-    es.sets[0].targetRepetitions = "15"
+    es.sets[0].targetRepetitions = 15
     es.sets[1].targetWeightPounds = 120.0
     val expected =
       "ES(exID:662300000000000000000001|sets:[S{type:2#prog:null#trgReps:15#trgLbs:100.0#trgRIR:2.0#trgRPE:null},S{type:1#prog:null#trgReps:8-12#trgLbs:120.0#trgRIR:2.0#trgRPE:null}])"
@@ -304,8 +304,8 @@ class SignatureComparisonTests {
     val es2 =
       createTestExerciseSets(exId1, listOf(SetType.normalSet to "ProgA"), workoutId = workoutId2)
     // Ensure targets are identical
-    es1.sets[0].targetRepetitions = "5"
-    es2.sets[0].targetRepetitions = "5"
+    es1.sets[0].targetRepetitions = 5
+    es2.sets[0].targetRepetitions = 5
     es1.sets[0].targetWeightPounds = 50.0
     es2.sets[0].targetWeightPounds = 50.0
 
@@ -321,8 +321,8 @@ class SignatureComparisonTests {
       createTestExerciseSets(exId1, listOf(SetType.normalSet to "ProgA"), workoutId = workoutId1)
     val es2 =
       createTestExerciseSets(exId1, listOf(SetType.normalSet to "ProgA"), workoutId = workoutId2)
-    es1.sets[0].targetRepetitions = "5" // Different target
-    es2.sets[0].targetRepetitions = "8" // Different target
+    es1.sets[0].targetRepetitions = 5 // Different target
+    es2.sets[0].targetRepetitions = 8 // Different target
 
     val w1 = createTestWorkout("Workout 1", listOf(es1), id = workoutId1)
     val w2 = createTestWorkout("Workout 2", listOf(es2), id = workoutId2)
@@ -336,8 +336,8 @@ class SignatureComparisonTests {
       createTestExerciseSets(exId1, listOf(SetType.normalSet to "ProgA"), workoutId = workoutId1)
     val es2 =
       createTestExerciseSets(exId1, listOf(SetType.normalSet to "ProgA"), workoutId = workoutId2)
-    es1.sets[0].targetRepetitions = "5" // Different target
-    es2.sets[0].targetRepetitions = "8" // Different target
+    es1.sets[0].targetRepetitions = 5 // Different target
+    es2.sets[0].targetRepetitions = 8 // Different target
 
     val w1 = createTestWorkout("Workout 1", listOf(es1), id = workoutId1)
     val w2 = createTestWorkout("Workout 2", listOf(es2), id = workoutId2)
