@@ -52,7 +52,6 @@ import coil.compose.AsyncImage
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
 import com.example.myapplication.common.ui.component.Screens
-import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.exercises.ui.ExerciseDetailsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseNavigableListDetailScreen
 import com.example.myapplication.features.exercises.ui.ExercisesLazyColumn
@@ -134,7 +133,7 @@ class MainActivity : ComponentActivity() {
 
       replicatorService.updateAuthentication(isReset = false)
 
-      MyApplicationTheme {
+      MaterialTheme {
         //        TestScreen()
 
         val navController = rememberNavController()
