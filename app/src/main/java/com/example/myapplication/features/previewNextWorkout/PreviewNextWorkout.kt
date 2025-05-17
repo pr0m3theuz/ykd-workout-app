@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ import com.example.myapplication.features.workout.feature.exercise.SetContent
 import com.example.myapplication.features.workout.feature.exercise.SetLazyListItem
 import com.example.myapplication.features.workout.feature.exercise.SwipeToDismissWorkoutNote
 import com.example.myapplication.features.workout.ui.AddExercise
+import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
@@ -62,9 +64,14 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
+  val coroutineScope = rememberCoroutineScope()
   val scaffoldNavigator = rememberSupportingPaneScaffoldNavigator()
 
-  BackHandler(scaffoldNavigator.canNavigateBack()) { scaffoldNavigator.navigateBack() }
+  BackHandler(scaffoldNavigator.canNavigateBack()) {
+    coroutineScope.launch {
+      scaffoldNavigator.navigateBack()
+    }
+  }
 
   Surface {
     SupportingPaneScaffold(
@@ -87,9 +94,11 @@ fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
                 Button(
                   modifier = Modifier.wrapContentSize(),
                   onClick = {
-                    scaffoldNavigator.navigateTo(
-                      SupportingPaneScaffoldRole.Supporting
-                    )
+                    coroutineScope.launch {
+                      scaffoldNavigator.navigateTo(
+                        SupportingPaneScaffoldRole.Supporting
+                      )
+                    }
                   },
                 ) {
                   Text("Show Previous Workout")
