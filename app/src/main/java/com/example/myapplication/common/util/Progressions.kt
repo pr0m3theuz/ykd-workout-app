@@ -42,7 +42,8 @@ enum class ProgressionOutcome {
   UNCHANGED,    // Progression logic ran, but no changes were made (e.g., targets not met)
   PROGRESSED,   // Progression applied successfully (e.g., weight/reps increased)
   FAILED,       // Progression logic failed (e.g., couldn't calculate, error occurred)
-  REJECTED      // User rejected the progression
+  REJECTED,      // User rejected the progression
+  NULL,         // No progression logic applied
 }
 
 enum class ProgressionType(val progression: String) {
@@ -101,7 +102,7 @@ fun selectProgression(
  * @property message An optional string providing additional information or context about the progression outcome (e.g., reasons for failure, details of changes). Can be null.
  */
 data class ProgressionResults(
-  var completedSets: List<Set>,
+  var completedSets: List<Set>?,
   var currentSets: MutableList<Set>? = null,
   var outcome: ProgressionOutcome? = ProgressionOutcome.PENDING,
   var message: String? = null
@@ -171,6 +172,10 @@ fun linearProgression(
   val incrementWeightKilograms =
     previousCompletedSets.mapNotNull { it.incrementWeightKilograms }.first()
 
+  // TODO Require user to enter/have default increment values, when not provided.
+  requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
+  requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
+
   val repetitionsList = previousCompletedSets.mapNotNull { it.repetitions }.toMutableList()
   val weightPoundsList = previousCompletedSets.mapNotNull { it.weightPounds }.toMutableList()
   val weightKilogramsList = previousCompletedSets.mapNotNull { it.weightKilograms }.toMutableList()
@@ -197,6 +202,10 @@ fun linearProgression(
     repetitionsList == targetRepetitionsList &&
             weightPoundsList == targetWeightPoundsList &&
             weightKilogramsList == targetWeightKilogramsList -> {
+
+      progressionResults.outcome = ProgressionOutcome.PROGRESSED
+      progressionResults.message = "Targets were met. Incrementing targets."
+
       weightPoundsList.replaceAll { it.plus(incrementWeightPounds) }
       weightKilogramsList.replaceAll { it.plus(incrementWeightKilograms) }
     }
@@ -232,6 +241,7 @@ fun linearProgression(
   }
 
   // Update setsToUpdate with new values
+
   setsToUpdate.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
   setsToUpdate.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
   setsToUpdate.zip(weightKilogramsList).forEach { (set, weight) ->
@@ -296,6 +306,9 @@ fun doubleProgression(
 
   val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
   val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
+
+  requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
+  requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
 
   val repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
   val weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
@@ -477,12 +490,17 @@ fun dynamicDoubleProgression(
   var lowestWeightKilogramsPerformed =
     previousCompletedSets.minByOrNull { it.weightKilograms!! }?.weightPounds ?: 0.0
 
-  val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
-  val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
 
-  var repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
-  var weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
-  var weightKilogramsList = previousCompletedSets.map { it.weightKilograms!! }.toMutableList()
+  val incrementWeightPounds = previousCompletedSets.firstNotNullOf { it.incrementWeightPounds }
+  val incrementWeightKilograms =
+    previousCompletedSets.firstNotNullOf { it.incrementWeightKilograms }
+
+  requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
+  requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
+
+  var repetitionsList = previousCompletedSets.mapNotNull { it.repetitions }.toMutableList()
+  var weightPoundsList = previousCompletedSets.mapNotNull { it.weightPounds }.toMutableList()
+  var weightKilogramsList = previousCompletedSets.mapNotNull { it.weightKilograms }.toMutableList()
 
   val targetMinimumRepetitionsList = previousCompletedSets.map { it.targetMinimumRepetitions!! }
   val targetMaximumRepetitionsList = previousCompletedSets.map { it.targetMaximumRepetitions!! }
@@ -617,6 +635,9 @@ fun waveProgression(
 
   val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
   val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
+
+  requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
+  requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
 
   var repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
   var weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
@@ -766,6 +787,12 @@ fun amrapProgression(
 
   val incrementWeightPounds = previousCompletedSets.map { it.incrementWeightPounds!! }.first()
   val incrementWeightKilograms = previousCompletedSets.map { it.incrementWeightKilograms!! }.first()
+
+  requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
+  requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
+
+  progressionResults.outcome = ProgressionOutcome.FAILED
+  progressionResults.message = "Targets were missed. Repeating previous workout targets."
 
   var repetitionsList = previousCompletedSets.map { it.repetitions!! }.toMutableList()
   var weightPoundsList = previousCompletedSets.map { it.weightPounds!! }.toMutableList()
