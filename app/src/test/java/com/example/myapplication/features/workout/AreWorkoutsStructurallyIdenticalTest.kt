@@ -160,11 +160,11 @@ class WorkoutStructuralIdentityTest {
   fun `areWorkoutsStructurallyIdentical - identical structure different targets - returns true`() {
     val exId1 = ObjectId()
     val exerciseSets1 = createTestExerciseSets(exId1, listOf(SetType.normalSet))
-    exerciseSets1.sets[0].targetRepetitions = "8-10" // Different Target
+    exerciseSets1.sets[0].targetRepetitions = 8 // Different Target
     exerciseSets1.sets[0].weightPounds = 100.0 // Different Target
 
     val exerciseSets2 = createTestExerciseSets(exId1, listOf(SetType.normalSet))
-    exerciseSets2.sets[0].targetRepetitions = "10-12" // Different Target
+    exerciseSets2.sets[0].targetRepetitions = 12 // Different Target
     exerciseSets2.sets[0].weightPounds = 90.0 // Different Target
 
     val w1 = createTestWorkout("Workout A", listOf(exerciseSets1))
