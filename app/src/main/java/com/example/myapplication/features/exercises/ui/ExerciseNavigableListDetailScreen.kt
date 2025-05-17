@@ -8,7 +8,9 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3AdaptiveApi
 @Composable
@@ -17,6 +19,7 @@ fun ExerciseNavigableListDetailScreen(
   exerciseListPane: @Composable (onClick: (exerciseID: String) -> Unit) -> Unit,
   exerciseDetailPane: @Composable (exerciseID: String, onClick: () -> Unit) -> Unit,
 ) {
+  val coroutineScope = rememberCoroutineScope()
   val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator<Any>()
 
   Surface(color = MaterialTheme.colorScheme.background) {
@@ -26,22 +29,26 @@ fun ExerciseNavigableListDetailScreen(
         AnimatedPane() {
           Surface(color = MaterialTheme.colorScheme.primary) {
             exerciseListPane() { exerciseID ->
-              scaffoldNavigator.navigateTo(
-                pane = ListDetailPaneScaffoldRole.Detail,
-                content = exerciseID,
-              )
+              coroutineScope.launch {
+                scaffoldNavigator.navigateTo(
+                  pane = ListDetailPaneScaffoldRole.Detail,
+                  contentKey = exerciseID,
+                )
+              }
             }
           }
         }
       },
       detailPane = {
         val exerciseID =
-          scaffoldNavigator.currentDestination?.content?.toString() ?: "Select an exercise"
+          scaffoldNavigator.currentDestination?.contentKey?.toString() ?: "Select an exercise"
 
         AnimatedPane() {
           Surface(color = MaterialTheme.colorScheme.secondary) {
             exerciseDetailPane(exerciseID) {
-              scaffoldNavigator.navigateTo(pane = ListDetailPaneScaffoldRole.List)
+              coroutineScope.launch {
+                scaffoldNavigator.navigateTo(pane = ListDetailPaneScaffoldRole.List)
+              }
             }
           }
         }
