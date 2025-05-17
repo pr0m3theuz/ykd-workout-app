@@ -2,7 +2,7 @@
 
 package com.example.myapplication.features.workout.feature.previewWorkout
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,7 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -25,6 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -41,13 +43,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.common.domain.model.ExerciseSets
@@ -58,7 +60,9 @@ import com.example.myapplication.common.domain.model.WorkoutItem
 import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.domain.model.setSummaryRIR
 import com.example.myapplication.common.domain.model.setTargetSummaryRIR
+import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.common.util.ProgressionOutcome
+import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.serialization.json.Json
 import kotlin.uuid.ExperimentalUuidApi
@@ -114,6 +118,7 @@ fun WorkoutPreviewScreen(
 }
 
 // Helper to get a stable key for LazyColumn items
+@OptIn(ExperimentalUuidApi::class)
 fun getItemId(item: Any): Long {
   return when (item) {
     is PreviewExerciseSets -> item.originalItem.lazyListItemID
@@ -137,30 +142,110 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
     modifier = Modifier.fillMaxWidth(),
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
   ) {
+    var isExpanded by remember { mutableStateOf(false) } // State for expansion
+
     Column(modifier = Modifier.padding(12.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-          text = "Exercise",
+          text = "Exercise", // TODO Replace with exercise name
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.Bold,
           modifier = Modifier.weight(1f)
         )
-        ProgressionStatusIcon(outcome = preview.overallOutcome)
+//        ProgressionStatusIcon(outcome = preview.overallOutcome)
+        IconButton(
+          onClick = { isExpanded = !isExpanded },
+//          modifier = Modifier.padding(start = 8.dp)
+        ) {
+          Icon(
+            imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            contentDescription = if (isExpanded) "Collapse" else "Expand",
+          )
+        }
+
       }
       when (preview.overallOutcome) {
         ProgressionOutcome.PROGRESSED -> {
-          Text(
-            "Progression Applied",
-            style = MaterialTheme.typography.labelSmall,
-            fontStyle = FontStyle.Italic
-          )
+          if (preview.isProgressionUniform && preview.previewSets.any { it.wasModified }) {
+            // Show Summary for Uniform Progression
+            val firstModifiedSet = preview.previewSets.first { it.wasModified }
+            val weightChange = firstModifiedSet.previousSet?.weightPounds?.let {
+              firstModifiedSet.progressedSet.targetWeightPounds?.minus(
+                it
+              )
+            }
+            val repChange = firstModifiedSet.previousSet?.repetitions?.let {
+              firstModifiedSet.progressedSet.targetRepetitions?.minus(
+                it
+              )
+            }
+
+            var summaryText = "All sets: "
+            val changes = mutableListOf<String>()
+            weightChange?.let {
+              if (it != 0.0) changes.add(
+                "${
+                  when {
+                    it > 0.0 -> "+"
+                    else -> "-"
+                  }
+                }${doubleFormatted(it)} lbs"
+              )
+            }
+
+            repChange?.let {
+              if (it != 0) {
+                changes.add(
+                  "${
+                    when {
+                      it > 0 -> "+"
+                      else -> "-"
+                    }
+                  }$repChange reps"
+                )
+              }
+            }
+            // TODO Add RIR/RPE changes if tracked
+
+            summaryText += if (changes.isNotEmpty()) changes.joinToString(", ") else "No significant change."
+            Text(
+              summaryText,
+              style = MaterialTheme.typography.bodyMedium,
+              fontWeight = FontWeight.SemiBold,
+              color = MaterialTheme.colorScheme.primary,
+              modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+//            preview.previewSets.forEach { setPreview ->
+//              SetPreviewRow(
+//                setPreview,
+//                showFullDetailEvenIfUniform = false
+//              )
+//            }
+          } else {
+            // Non-Uniform Progression or just want to always show details
+            Text(
+              "Progression applied (see details)",
+              style = MaterialTheme.typography.labelMedium,
+              color = MaterialTheme.colorScheme.primary,
+              modifier = Modifier.padding(top = 8.dp)
+            )
+//            Spacer(modifier = Modifier.height(8.dp))
+//            preview.previewSets.forEach { setPreview ->
+//              SetPreviewRow(
+//                setPreview,
+//                showFullDetailEvenIfUniform = true
+//              )
+//            }
+          }
         }
 
         ProgressionOutcome.FAILED -> {
           Text(
             "Progression Failed",
             color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(top = 8.dp)
           )
         }
 
@@ -169,16 +254,31 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
           // or inline if preferred for brevity and the condition is simple enough.
           if (preview.previewSets.none { it.wasModified }) {
             Text(
-              "No changes applied",
-              style = MaterialTheme.typography.labelSmall,
-              fontStyle = FontStyle.Italic
+              "No progression applied",
+              style = MaterialTheme.typography.labelMedium,
+              fontStyle = FontStyle.Italic,
+//              modifier = Modifier.padding(top = 8.dp)
             )
           }
         }
       }
-      Spacer(modifier = Modifier.height(8.dp))
-      preview.previewSets.forEach { setPreview ->
-        SetPreviewRow(setPreview)
+      AnimatedVisibility(visible = isExpanded) {
+        Column(modifier = Modifier.padding(top = 8.dp)) { // Add some padding when expanded
+          preview.previewSets.forEachIndexed { index, setPreview ->
+            SetPreviewRow(
+              setPreview,
+              showFullDetailEvenIfUniform = true
+            )
+//            if (index < preview.previewSets.size - 1) {
+//              HorizontalDivider(
+//                modifier = Modifier
+//                  .padding(vertical = 2.dp)
+//                  .height(0.5.dp)
+//              ) // Thinner divider
+//            }
+          }
+        }
+
       }
     }
   }
@@ -210,7 +310,7 @@ fun SupersetPreviewItem(preview: PreviewSuperset) {
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(1f)
           )
-          ProgressionStatusIcon(outcome = exercisePreview.overallOutcome)
+//          ProgressionStatusIcon(outcome = exercisePreview.overallOutcome)
         }
         if (exercisePreview.overallOutcome == ProgressionOutcome.FAILED) {
           Text(
@@ -228,7 +328,7 @@ fun SupersetPreviewItem(preview: PreviewSuperset) {
         }
         Spacer(modifier = Modifier.height(4.dp))
         exercisePreview.previewSets.forEach { setPreview ->
-          SetPreviewRow(setPreview)
+          SetPreviewRow(setPreview, showFullDetailEvenIfUniform = true)
         }
         if (index < preview.previewExerciseSets.size - 1) {
           HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -264,7 +364,7 @@ private fun SetTypeIcon(
       SetType.warmUpSet -> MaterialTheme.colorScheme.tertiary
       SetType.amrapSet -> MaterialTheme.colorScheme.error
       SetType.failureSet -> MaterialTheme.colorScheme.error
-      else -> MaterialTheme.colorScheme.primary
+      else -> MaterialTheme.colorScheme.onSurface
     }
 
   val iconColor: Color =
@@ -286,7 +386,10 @@ private fun SetTypeIcon(
 }
 
 @Composable
-fun SetPreviewRow(setPreview: PreviewSet) {
+fun SetPreviewRow(
+  setPreview: PreviewSet,
+  showFullDetailEvenIfUniform: Boolean // New parameter
+) {
   val previousSet = setPreview.previousSet
   val originalSet = setPreview.originalSet
   val progressedSet = setPreview.progressedSet
@@ -309,7 +412,7 @@ fun SetPreviewRow(setPreview: PreviewSet) {
       )
       // TODO Show progress from previous workout or change from template
       Text(
-        text = previousSet?.setSummaryRIR("lbs") ?: "No previous set was found. -> ".plus(
+        text = previousSet?.setSummaryRIR("lbs") ?: "No previous set was found. ➔ ".plus(
           progressedSet.setTargetSummaryRIR("lbs")
         ),
         fontSize = 14.sp,
@@ -320,7 +423,7 @@ fun SetPreviewRow(setPreview: PreviewSet) {
       Spacer(modifier = Modifier.width(8.dp))
       // Progressed Value
       Text(
-        text = "-> ".plus(progressedSet.setTargetSummaryRIR("lbs")),
+        text = "➔ ".plus(progressedSet.setTargetSummaryRIR("lbs")),
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
         color = color
@@ -353,11 +456,7 @@ fun ProgressionStatusIcon(outcome: ProgressionOutcome) {
       tint = MaterialTheme.colorScheme.error
     )
 
-    else -> Icon(
-      Icons.Filled.RadioButtonUnchecked,
-      "Unchanged/Pending",
-      tint = Color.Gray
-    ) // Or hide it
+    else -> {} // Or hide it
   }
 }
 
@@ -373,7 +472,7 @@ fun PreviewBottomBar(
     Column(modifier = Modifier.padding(16.dp)) {
       Text(
         text = message,
-        color = if (overallSuccess) Color.Black else MaterialTheme.colorScheme.error,
+        color = if (overallSuccess) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodyMedium,
         fontWeight = FontWeight.SemiBold
       )
@@ -384,17 +483,15 @@ fun PreviewBottomBar(
       ) {
         Button(
           onClick = onAccept,
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)) // Greenish
+          colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-          Text("Accept Progressions")
+          Text("Accept Progression")
         }
         OutlinedButton(
           onClick = onReject,
           colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-          border = ButtonDefaults.outlinedButtonBorder.copy(
-            brush = SolidColor(MaterialTheme.colorScheme.error) // Temporary fix if needed
-          )
-
+          border = ButtonDefaults.outlinedButtonBorder(true)
+//            brush = SolidColor(MaterialTheme.colorScheme.error) // Temporary fix if needed)
         ) {
           Text("Reject / Use Original")
         }
@@ -405,7 +502,11 @@ fun PreviewBottomBar(
 
 // Add a Preview for easy visualization in Android Studio
 @OptIn(ExperimentalUuidApi::class)
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Preview(
+//  uiMode = UI_MODE_NIGHT_YES,
+//  showSystemUi = true,
+  wallpaper = Wallpapers.NONE
+)
 @Composable
 fun WorkoutPreviewScreenPreview() {
   // Create dummy data for preview
@@ -463,53 +564,18 @@ fun WorkoutPreviewScreenPreview() {
     }
   }
 
-
-// --- Define ProgressionResults (Simulating what your progression logic would output) ---
-
-// Assign to the viewModel if it had a direct field for it,
-// otherwise this map is used directly in setupPreview
-// dummyViewModel.progressionResults = progressionResultsMap // If viewModel stores this directly
-
-// Call the setup logic which internally uses createWorkoutPreview
-// We pass the map directly to simulate the ViewModel's internal state after progression logic runs.
-// For the preview, we are essentially bypassing the `runActualProgressionLogic`
-// and providing its output directly.
-
   dummyViewModel.setupPreview(
     workoutToPrepare = currentWorkout,
     previousWorkout = previousWorkout
   )
 
-//  dummyViewModel.previewItems.clear()
-//  dummyViewModel.previewItems.addAll(
-//    createWorkoutPreview(
-//      dummyViewModel.originalWorkout,
-//      progressionResultsMap
-//    )
-//  )
-
-// Manually set overall success and message for the preview based on our dummy results
-  val failures = dummyViewModel.previewItems.count {
-    (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.FAILED) ||
-            (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.FAILED })
-  }
-  val successes = dummyViewModel.previewItems.count {
-    (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.PROGRESSED) ||
-            (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.PROGRESSED })
-  }
-  dummyViewModel.overallProgressionSuccess.value = failures == 0
-  dummyViewModel.progressionMessage.value = when {
-    failures > 0 -> "Progression failed for $failures exercise(s)."
-    successes > 0 -> "Progression applied successfully to $successes exercise(s)."
-    else -> "No progressions applied."
-  }
-
-
   // Use your app's theme
-  WorkoutPreviewScreen(
-    viewModel = dummyViewModel,
-    onAccept = {},
-    onReject = {},
-    onBack = {}
-  )
+  MyApplicationTheme {
+    WorkoutPreviewScreen(
+      viewModel = dummyViewModel,
+      onAccept = {},
+      onReject = {},
+      onBack = {}
+    )
+  }
 }
