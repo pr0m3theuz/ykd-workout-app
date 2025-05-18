@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.common.infrastructure.persistence
 
 import android.util.Log
+import com.couchbase.lite.Collection
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
@@ -8,12 +11,22 @@ import com.couchbase.lite.Ordering
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
+import com.couchbase.lite.queryChangeFlow
+import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetDao
+import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.domain.model.WorkoutDao
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
 
 private const val DATABASE_IS_NULL = "Completed Repository: Database does not exist."
 
@@ -42,6 +55,62 @@ class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManage
     return sets // 7
   }
 
+  private fun mapQueryChangeToWorkout(queryChange: QueryChange): List<Workout> {
+    val workouts = mutableListOf<Workout>() // 1
+    queryChange.results?.let { results -> // 2
+      results.forEach { result -> // 3
+        val json = result.toJSON() // 4
+        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout // 5
+        workouts.add(workout) // 6
+      }
+    }
+    return workouts // 7
+  }
+
+  // TODO is this best practice?
+  private fun mapQueryChangeToWorkoutCompletedSets(
+    queryChange: QueryChange,
+    setCollection: Collection
+  ): List<Workout> {
+    val workouts = mutableListOf<Workout>() // 1
+    queryChange.results?.let { results -> // 2
+      results.forEach { result -> // 3
+        val json = result.toJSON() // 4
+        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout // 5
+
+        val completedSetsQueryBuilder =
+          QueryBuilder.select(SelectResult.all())
+            .from(DataSource.collection(setCollection)) // Replace with your database instance
+            .where(
+              Expression.property("workoutID").equalTo(Expression.string(workout.id.toString()))
+            )
+        val setsResult = completedSetsQueryBuilder.execute().allResults()
+        val sets = setsResult.map { withUnknownKeys.decodeFromString<SetDao>(it.toJSON()).Set }
+
+        workout.let {
+          it.workoutItems.forEach { workoutItem ->
+            when (workoutItem) {
+              is ExerciseSets -> {
+                workoutItem.sets = sets.filter { set -> set.exerciseSetsID == workoutItem.id }
+                  .sortedBy { set -> set.setNumber }.toMutableList()
+              }
+
+              is Superset -> {
+                workoutItem.exercisesSets.forEach { exerciseSets ->
+                  exerciseSets.sets = sets.filter { set -> set.exerciseSetsID == exerciseSets.id }
+                    .sortedBy { set -> set.setNumber }.toMutableList()
+                }
+              }
+            }
+          }
+        }
+
+        workouts.add(workout) // 6
+      }
+    }
+    return workouts // 7
+  }
+
   override fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -56,6 +125,7 @@ class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManage
           .where(
             Expression.property("exerciseID").equalTo(Expression.string(exerciseID.toString()))
               .and(Expression.property("setNumber").equalTo(Expression.intValue(setNumber)))
+              .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
           )
           .orderBy(Ordering.property("dateCreated").descending()) // Get latest set
           .limit(Expression.intValue(1))
@@ -66,19 +136,161 @@ class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManage
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
+    return null
+  }
+
+  override fun getCompletedSetsForExercise(exerciseID: ObjectId): Flow<List<Set>> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("CompletedSets")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val queryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection)) // Replace with your database instance
+          .where(
+            Expression.property("exerciseID").equalTo(Expression.string(exerciseID.toString()))
+              .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
+          )
+          .orderBy(Ordering.property("dateCreated").descending()) // Get latest set
+          .limit(Expression.intValue(1))
+
+      val flow = queryBuilder.queryChangeFlow().map {
+        mapQueryChangeToSet(it)
+      }.flowOn(Dispatchers.IO)
+
+      queryBuilder.execute()
+
+      return flow
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return emptyFlow()
+  }
+
+  override fun getCompletedWorkouts(): Flow<List<Workout>> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val workoutCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(workoutCollection) { COLLECTION_IS_NULL }
+
+      val setCollection = db.getCollection("CompletedSets")
+      requireNotNull(setCollection) { COLLECTION_IS_NULL }
+
+      val completedWorkoutQuery =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(workoutCollection)) // Replace with your database instance
+          .where(
+            Expression.property("isCompleted").equalTo(Expression.booleanValue(true))
+          )
+          .orderBy(Ordering.property("dateCreated").descending())
+
+      val workoutsFlow = completedWorkoutQuery.queryChangeFlow()
+        .map {
+          mapQueryChangeToWorkoutCompletedSets(it, setCollection)
+        }.flowOn(Dispatchers.IO)
+
+      completedWorkoutQuery.execute()
+
+      return workoutsFlow
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return emptyFlow()
+  }
+
+  override fun getCompletedWorkoutByID(workoutID: ObjectId): Workout? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val workoutCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(workoutCollection) { COLLECTION_IS_NULL }
+
+      val setCollection = db.getCollection("CompletedSets")
+      requireNotNull(setCollection) { COLLECTION_IS_NULL }
+
+      val completedWorkoutQueryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(workoutCollection)) // Replace with your database instance
+          .where(
+            Expression.property("id").equalTo(Expression.string(workoutID.toString()))
+          )
+
+      val completedSetsQueryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(setCollection)) // Replace with your database instance
+          .where(
+            Expression.property("workoutID").equalTo(Expression.string(workoutID.toString()))
+          )
+
+      val workoutResult =
+        completedWorkoutQueryBuilder.execute().allResults().firstOrNull()?.toJSON()
+
+      val workout = workoutResult?.let { withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout }
+
+      val setsResult = completedSetsQueryBuilder.execute().allResults()
+      val sets = setsResult.map { withUnknownKeys.decodeFromString<SetDao>(it.toJSON()).Set }
+
+      workout?.let {
+        it.workoutItems.forEach { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> {
+              workoutItem.sets = sets.filter { set -> set.exerciseSetsID == workoutItem.id }
+                .sortedBy { set -> set.setNumber }.toMutableList()
+            }
+
+            is Superset -> {
+              workoutItem.exercisesSets.forEach { exerciseSets ->
+                exerciseSets.sets = sets.filter { set -> set.exerciseSetsID == exerciseSets.id }
+                  .sortedBy { set -> set.setNumber }.toMutableList()
+              }
+            }
+          }
+        }
+      }
+
+      return workout
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
 
     return null
   }
 
-  override fun getCompletedWorkouts(): List<Workout> {
-    TODO("Not yet implemented")
-  }
-
-  override fun getCompletedWorkoutByID(workoutID: ObjectId): Workout? {
-    TODO("Not yet implemented")
-  }
-
   override fun getLatestPreviousIdenticalWorkout(currentWorkout: Workout): Workout? {
-    TODO("Not yet implemented")
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("CompletedWorkouts")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val queryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection)) // Replace with your database instance
+          .where(
+            Expression.property("hashedSignature")
+              .equalTo(Expression.string(currentWorkout.hashedSignature))
+              .and(Expression.property("isCompleted").equalTo(Expression.booleanValue(true)))
+              .and(
+                Expression.property("programID")
+                  .notEqualTo(Expression.string(currentWorkout.programID.toString()))
+              )
+          )
+          .orderBy(Ordering.property("dateCreated").descending()) // Get latest set
+          .limit(Expression.intValue(1))
+
+      val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
+
+      return result?.let { withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout }
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return null
   }
 }
