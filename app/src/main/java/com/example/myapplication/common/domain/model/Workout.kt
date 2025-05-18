@@ -54,6 +54,7 @@ data class Workout(
   var dateCreated: kotlinx.datetime.Instant = Clock.System.now(), // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var workoutStarted: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var workoutEnded: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var isCompleted: Boolean = false,
   var day: Int? = null,
   @Serializable(with = WorkoutItemListSerializer::class) var workoutItems: List<WorkoutItem> = emptyList(),
   var totalVolumeInPounds: Double? = 0.0,
