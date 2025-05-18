@@ -13,49 +13,19 @@ package com.example.myapplication.common.domain.model
 
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.ProgressionType
+import com.example.myapplication.common.util.ProgressionTypeSerializer
+import com.example.myapplication.common.util.SetTypeSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-
-object ProgressionTypeSerializer : KSerializer<ProgressionType> {
-  override val descriptor: SerialDescriptor =
-    PrimitiveSerialDescriptor("com.example.MyApplication.ProgressionType", PrimitiveKind.INT)
-
-  override fun deserialize(decoder: Decoder): ProgressionType {
-    return ProgressionType.entries[(decoder.decodeInt())]
-  }
-
-  override fun serialize(encoder: Encoder, value: ProgressionType) {
-    encoder.encodeInt(value.ordinal)
-  }
-}
-
-object SetTypeSerializer : KSerializer<SetType> {
-  override val descriptor: SerialDescriptor =
-    PrimitiveSerialDescriptor("com.example.MyApplication.ProgressionType", PrimitiveKind.INT)
-
-  override fun deserialize(decoder: Decoder): SetType {
-    return SetType.getSetType(decoder.decodeInt())
-  }
-
-  override fun serialize(encoder: Encoder, value: SetType) {
-    encoder.encodeInt(value.setTypeID)
-  }
-}
 
 @Serializable
 data class SetDao(var Set: Set)
