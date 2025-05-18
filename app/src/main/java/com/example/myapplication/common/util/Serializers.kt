@@ -2,6 +2,7 @@
 
 package com.example.myapplication.common.util
 
+import com.example.myapplication.common.domain.model.SetType
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -35,5 +36,31 @@ object UuidSerializer : KSerializer<Uuid> {
 
   override fun serialize(encoder: Encoder, value: Uuid) {
     encoder.encodeString(value.toHexString())
+  }
+}
+
+object ProgressionTypeSerializer : KSerializer<ProgressionType> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("com.example.MyApplication.ProgressionType", PrimitiveKind.INT)
+
+  override fun deserialize(decoder: Decoder): ProgressionType {
+    return ProgressionType.entries[(decoder.decodeInt())]
+  }
+
+  override fun serialize(encoder: Encoder, value: ProgressionType) {
+    encoder.encodeInt(value.ordinal)
+  }
+}
+
+object SetTypeSerializer : KSerializer<SetType> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("com.example.MyApplication.ProgressionType", PrimitiveKind.INT)
+
+  override fun deserialize(decoder: Decoder): SetType {
+    return SetType.getSetType(decoder.decodeInt())
+  }
+
+  override fun serialize(encoder: Encoder, value: SetType) {
+    encoder.encodeInt(value.setTypeID)
   }
 }
