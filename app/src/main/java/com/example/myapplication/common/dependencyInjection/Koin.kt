@@ -34,6 +34,7 @@ import com.example.myapplication.features.syncData.ReplicatorConfigViewModel
 import com.example.myapplication.features.syncData.ReplicatorViewModel
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 import com.example.myapplication.features.workout.ManageExercisesUseCase
+import com.example.myapplication.features.workout.ManagePreviewWorkoutUseCase
 import com.example.myapplication.features.workout.ManageWorkoutUseCase
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.workoutDialogs.equateVolume.EquateVolumeViewModel
@@ -106,13 +107,14 @@ val commonModule = module {
 //  singleOf(::ImportWorkoutProgramRepository)
 
   singleOf(::ManageWorkoutUseCase)
+  singleOf(::ManagePreviewWorkoutUseCase)
   singleOf(::ManageExercisesUseCase)
 //  singleOf(::ImportWorkoutProgram)
 
   viewModel { MainViewModel(get(), get(), get()) }
   viewModel { ProgramsViewModel(get(), get(), get(), get()) }
   viewModel { ExercisesViewModel(get()) }
-  viewModel { WorkoutViewModel(get(), get(), get(), get()) }
+  viewModel { WorkoutViewModel(get(), get(), get(), get(), get()) }
   viewModel { EquateVolumeViewModel(get(), get()) }
   viewModel { WorkingSetViewModel(get(), get()) }
   viewModel { WarmUpSetsViewModel(get(), get()) }
