@@ -19,10 +19,10 @@ import org.bson.types.ObjectId
 @Serializable
 data class User(
   @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
-  var name: String,
-  var username: String,
-  var email: String,
-  var password: String,
+  var name: String? = null,
+  var username: String? = null,
+  var email: String? = null,
+  var password: String? = null,
   var defaultWeightUnit: String = MassUnit.POUNDS.abbreviation, // TODO have enum class??????
   var intensity: String = Intensity.RIR.abbreviation // TODO have enum class??????
 )
