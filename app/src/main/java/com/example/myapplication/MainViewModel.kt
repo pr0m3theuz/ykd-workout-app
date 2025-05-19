@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,6 +27,7 @@ class MainViewModel(
   private var replicatorFlow: Flow<ReplicatorChange>? = null
 
   val startDatabase: () -> Unit = {
+    Log.i("MainViewModel", "startDatabase called")
     viewModelScope.launch(Dispatchers.IO) {
       databaseManager.initializeDatabases(/*authService.getCurrentUser()*/)
 
@@ -95,6 +97,7 @@ class MainViewModel(
   }
 
   val closeDatabase: () -> Unit = {
+    Log.i("MainViewModel", "closeDatabase called")
     viewModelScope.launch(Dispatchers.IO) {
       replicatorService.stopReplication()
       databaseManager.closeDatabases()
