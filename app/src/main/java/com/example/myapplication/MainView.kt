@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 @Composable
 fun MainView(startDatabase: () -> Unit, closeDatabase: () -> Unit) {
   val lifecycleOwner = LocalLifecycleOwner.current
+  Log.i("MainView", "MainView called")
 
   // Safely update the current lambdas when a new one is provided
   val currentOnStart by rememberUpdatedState(startDatabase)
