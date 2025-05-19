@@ -41,7 +41,7 @@ class DatabaseManager(private val context: Context) {
       requireNotNull(database) { "DatabaseManager: Database was not created!" }
 
       val collections = listOf(
-//        "CompletedPrograms", // TODO Add to Sync Gateway
+        "CompletedPrograms",
         "CompletedSets",
         "CompletedWorkouts",
         "Equipment",
