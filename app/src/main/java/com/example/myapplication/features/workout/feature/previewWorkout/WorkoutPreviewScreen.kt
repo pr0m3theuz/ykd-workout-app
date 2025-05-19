@@ -53,6 +53,9 @@ import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.PreviewExerciseSets
+import com.example.myapplication.common.domain.model.PreviewSet
+import com.example.myapplication.common.domain.model.PreviewSuperset
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
@@ -60,10 +63,10 @@ import com.example.myapplication.common.domain.model.WorkoutItem
 import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.domain.model.setSummaryRIR
 import com.example.myapplication.common.domain.model.setTargetSummaryRIR
-import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.common.util.ProgressionOutcome
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.common.util.newLazyListItemID
+import com.example.myapplication.features.workout.WorkoutViewModel
 import kotlinx.serialization.json.Json
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -72,7 +75,7 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutPreviewScreen(
-  viewModel: WorkoutPreviewViewModel,
+  viewModel: WorkoutViewModel,
   onAccept: (Workout) -> Unit,
   onReject: (Workout) -> Unit,
   onBack: () -> Unit
@@ -570,12 +573,12 @@ fun WorkoutPreviewScreenPreview() {
   )
 
   // Use your app's theme
-  MyApplicationTheme {
+  /*MyApplicationTheme {
     WorkoutPreviewScreen(
       viewModel = dummyViewModel,
       onAccept = {},
       onReject = {},
       onBack = {}
     )
-  }
+  }*/
 }
