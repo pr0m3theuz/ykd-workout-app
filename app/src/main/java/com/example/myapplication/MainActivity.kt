@@ -52,6 +52,7 @@ import coil.compose.AsyncImage
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
 import com.example.myapplication.common.ui.component.Screens
+import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.exercises.ui.ExerciseDetailsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseNavigableListDetailScreen
 import com.example.myapplication.features.exercises.ui.ExercisesLazyColumn
@@ -71,6 +72,7 @@ import com.example.myapplication.features.userProfileScreen.ProfileScreen
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExercisesScreen
+import com.example.myapplication.features.workout.feature.previewWorkout.WorkoutPreviewScreen
 import com.example.myapplication.features.workout.ui.WorkoutScreen
 import com.example.myapplication.features.workout.ui.WorkoutSummaryScreen
 import com.google.firebase.Firebase
@@ -123,6 +125,7 @@ class MainActivity : ComponentActivity() {
     setContent {
 
       val authService: AuthenticationService by inject()
+      // TODO Add User Profile Manager here by injecting it
       //      val userProfileRepository: KeyValueRepository by inject()
       val replicatorService: ReplicatorService by inject()
       val mainViewModel = getViewModel<MainViewModel>()
@@ -133,7 +136,7 @@ class MainActivity : ComponentActivity() {
 
       replicatorService.updateAuthentication(isReset = false)
 
-      MaterialTheme {
+      MyApplicationTheme {
         //        TestScreen()
 
         val navController = rememberNavController()
@@ -212,6 +215,25 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navController = navController,
         workoutViewModel = workoutViewModel,
         workoutID = workoutID,
+      )
+    }
+
+    composable("previewWorkoutScreen") { navBackStackEntry ->
+      Log.d("WorkoutNavGraph", "Navigated to Preview Workout Screen")
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      WorkoutPreviewScreen(
+        viewModel = workoutViewModel,
+        onBack = { navController.popBackStack() },
+        onAccept = {
+          workoutViewModel.acceptProgressions()
+          navController.navigate("workoutScreen?workoutID=${it.id}")
+        },
+        onReject = {
+          workoutViewModel.rejectProgressions()
+          navController.navigate("workoutScreen?workoutID=${it.id}")
+        }
       )
     }
 
