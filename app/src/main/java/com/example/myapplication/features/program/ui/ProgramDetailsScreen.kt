@@ -244,7 +244,7 @@ fun ProgramDetailsLayout(
                 model = program.imageUri,
                 contentDescription = null,
                 colorFilter =
-                ColorFilter.tint(color = Color.LightGray, blendMode = BlendMode.Modulate),
+                  ColorFilter.tint(color = Color.LightGray, blendMode = BlendMode.Modulate),
               )
               if (!program.imageFont.isNullOrBlank()) {
                 val fontName = GoogleFont(program.imageFont ?: "Montserrat")
@@ -254,12 +254,12 @@ fun ProgramDetailsLayout(
                 Text(
                   text = program.name?.uppercase() ?: "",
                   style =
-                  TextStyle(
-                    color = Color.White,
-                    fontSize = MaterialTheme.typography.displayLarge.fontSize,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = fontFamily,
-                  ),
+                    TextStyle(
+                      color = Color.White,
+                      fontSize = MaterialTheme.typography.displayLarge.fontSize,
+                      fontWeight = FontWeight.Bold,
+                      fontFamily = fontFamily,
+                    ),
                 )
               }
             }
@@ -426,11 +426,11 @@ fun ProgramOverviewCard(program: Program) {
   val textLinkStyles =
     TextLinkStyles(
       style =
-      SpanStyle(
-        color = MaterialTheme.colorScheme.primary,
-        fontStyle = FontStyle.Italic,
-        textDecoration = TextDecoration.Underline,
-      )
+        SpanStyle(
+          color = MaterialTheme.colorScheme.primary,
+          fontStyle = FontStyle.Italic,
+          textDecoration = TextDecoration.Underline,
+        )
     )
 
   Card() {
@@ -554,11 +554,11 @@ fun ProgramDescriptionCard(program: Program) {
   val textLinkStyles =
     TextLinkStyles(
       style =
-      SpanStyle(
-        color = MaterialTheme.colorScheme.primary,
-        fontStyle = FontStyle.Italic,
-        textDecoration = TextDecoration.Underline,
-      )
+        SpanStyle(
+          color = MaterialTheme.colorScheme.primary,
+          fontStyle = FontStyle.Italic,
+          textDecoration = TextDecoration.Underline,
+        )
     )
 
   val (expanded, onClick) = remember { mutableStateOf(false) }
@@ -777,18 +777,22 @@ fun ExerciseOverview(
           )
           Text(
             text =
-            when {
-              set.targetMinimumRepetitions != null && set.targetMaximumRepetitions != null ->
-                "${set.targetMinimumRepetitions} - ${set.targetMaximumRepetitions}"
+              when {
+                set.targetMinimumRepetitions != null && set.targetMaximumRepetitions != null ->
+                  if (set.targetMinimumRepetitions == set.targetMaximumRepetitions) {
+                    set.targetMinimumRepetitions.toString()
+                  } else {
+                    "${set.targetMinimumRepetitions} - ${set.targetMaximumRepetitions}"
+                  }
 
-              set.targetMinimumRepetitions != null && set.targetMaximumRepetitions == null ->
-                "${set.targetMinimumRepetitions}"
+                set.targetMinimumRepetitions != null && set.targetMaximumRepetitions == null ->
+                  "${set.targetMinimumRepetitions}"
 
-              set.targetMinimumRepetitions == null && set.targetMaximumRepetitions != null ->
-                "${set.targetMaximumRepetitions}"
+                set.targetMinimumRepetitions == null && set.targetMaximumRepetitions != null ->
+                  "${set.targetMaximumRepetitions}"
 
-              else -> "-"
-            },
+                else -> "–"
+              },
             style = labelMedium,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center,
@@ -820,11 +824,11 @@ fun MicrocycleCard(
   val textLinkStyles =
     TextLinkStyles(
       style =
-      SpanStyle(
-        color = MaterialTheme.colorScheme.primary,
-        fontStyle = FontStyle.Italic,
-        textDecoration = TextDecoration.Underline,
-      )
+        SpanStyle(
+          color = MaterialTheme.colorScheme.primary,
+          fontStyle = FontStyle.Italic,
+          textDecoration = TextDecoration.Underline,
+        )
     )
 
   fun getExpandCollapseIcon(visible: Boolean): ImageVector {
@@ -858,11 +862,11 @@ fun MicrocycleCard(
           ) {
             Text(
               text =
-              if (microcycle.name == "Week ${index.plus(1)}") {
-                "Week ${index.plus(1)}"
-              } else {
-                "Week ${index.plus(1)}: ${microcycle.name}"
-              },
+                if (microcycle.name == "Week ${index.plus(1)}") {
+                  "Week ${index.plus(1)}"
+                } else {
+                  "Week ${index.plus(1)}: ${microcycle.name}"
+                },
               style = titleMedium,
               //              overflow = TextOverflow.Ellipsis,
               softWrap = true,
@@ -954,13 +958,13 @@ fun MicrocycleCard(
                           Box(
                             contentAlignment = Alignment.Center,
                             modifier =
-                            Modifier
-                              .padding(horizontal = 0.dp)
-                              .height(22.dp)
-                              .background(
-                                color = MaterialTheme.colorScheme.tertiaryContainer,
-                                shape = ShapeDefaults.ExtraSmall,
-                              ),
+                              Modifier
+                                .padding(horizontal = 0.dp)
+                                .height(22.dp)
+                                .background(
+                                  color = MaterialTheme.colorScheme.tertiaryContainer,
+                                  shape = ShapeDefaults.ExtraSmall,
+                                ),
                           ) {
                             if (workout.formatWorkoutDate().isNotEmpty()) {
                               Text(
@@ -1053,11 +1057,11 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
       val textLinkStyles =
         TextLinkStyles(
           style =
-          SpanStyle(
-            color = MaterialTheme.colorScheme.primary,
-            fontStyle = FontStyle.Italic,
-            textDecoration = TextDecoration.Underline,
-          )
+            SpanStyle(
+              color = MaterialTheme.colorScheme.primary,
+              fontStyle = FontStyle.Italic,
+              textDecoration = TextDecoration.Underline,
+            )
         )
 
       Card() {
@@ -1075,13 +1079,13 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
           ) {
             Text(
               text =
-              "Mesocycle ${index.plus(1)}${
-                if (!mesocycle.name.isNullOrBlank()) {
-                  " - ${mesocycle.name}"
-                } else {
-                  ""
-                }
-              }",
+                "Mesocycle ${index.plus(1)}${
+                  if (!mesocycle.name.isNullOrBlank()) {
+                    " - ${mesocycle.name}"
+                  } else {
+                    ""
+                  }
+                }",
               style = titleMedium,
               //              overflow = TextOverflow.Ellipsis,
               softWrap = true,
@@ -1184,13 +1188,13 @@ fun MesocycleCard(activeProgram: Boolean, mesocycles: List<Mesocycle>) {
                         Box(
                           contentAlignment = Alignment.Center,
                           modifier =
-                          Modifier
-                            .padding(horizontal = 0.dp)
-                            .height(22.dp)
-                            .background(
-                              color = MaterialTheme.colorScheme.tertiaryContainer,
-                              shape = ShapeDefaults.ExtraSmall,
-                            ),
+                            Modifier
+                              .padding(horizontal = 0.dp)
+                              .height(22.dp)
+                              .background(
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                shape = ShapeDefaults.ExtraSmall,
+                              ),
                         ) {
                           Text(
                             text = "Date Completed", // TODO Add date of completion
