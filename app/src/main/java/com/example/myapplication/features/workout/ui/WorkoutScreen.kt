@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +54,14 @@ fun WorkoutScreen(
     workoutViewModel.initWorkoutData()
   }
 
-  WorkoutContent(navController = navController, workoutViewModel = workoutViewModel)
+  val previewItems by remember { derivedStateOf { workoutViewModel.previewItems.toList() } } // Observe list changes
+
+  if (previewItems.isNotEmpty()) {
+    navController.navigate("previewWorkoutScreen")
+  } else {
+    WorkoutContent(navController = navController, workoutViewModel = workoutViewModel)
+  }
+
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
