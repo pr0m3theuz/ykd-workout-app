@@ -16,6 +16,7 @@ import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetDao
 import com.example.myapplication.common.domain.model.Superset
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutDao
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
@@ -33,13 +34,16 @@ private const val DATABASE_IS_NULL = "Completed Repository: Database does not ex
 private const val COLLECTION_IS_NULL =
   "Completed Repository: Completed * Collection does not exist in the Database."
 
-class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManager) :
+class CompletedWorkoutRepositoryImpl(
+  private val databaseManager: DatabaseManager,
+  private val userProfileManager: UserProfileManager
+) :
   CompletedWorkoutRepository {
 
   val db: Database? = databaseManager.database
 
   // TODO Decide if I should create a repository for user data
-  val userDatabase: Database? = databaseManager.userDatabase
+  val user = userProfileManager.getCurrentUser()
 
   private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 
@@ -76,38 +80,19 @@ class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManage
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout // 5
-
-        val completedSetsQueryBuilder =
-          QueryBuilder.select(SelectResult.all())
-            .from(DataSource.collection(setCollection)) // Replace with your database instance
-            .where(
-              Expression.property("workoutID").equalTo(Expression.string(workout.id.toString()))
-            )
-        val setsResult = completedSetsQueryBuilder.execute().allResults()
-        val sets = setsResult.map { withUnknownKeys.decodeFromString<SetDao>(it.toJSON()).Set }
-
-        workout.let {
-          it.workoutItems.forEach { workoutItem ->
-            when (workoutItem) {
-              is ExerciseSets -> {
-                workoutItem.sets = sets.filter { set -> set.exerciseSetsID == workoutItem.id }
-                  .sortedBy { set -> set.setNumber }.toMutableList()
-              }
-
-              is Superset -> {
-                workoutItem.exercisesSets.forEach { exerciseSets ->
-                  exerciseSets.sets = sets.filter { set -> set.exerciseSetsID == exerciseSets.id }
-                    .sortedBy { set -> set.setNumber }.toMutableList()
-                }
-              }
-            }
-          }
-        }
-
+        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
         workouts.add(workout) // 6
       }
     }
+
+    val workoutIds = workouts.map { it.id.toString() }
+
+    val workoutIDClause = workoutIds.joinToString(",") { "'$it'" }.let { "[$it]" }
+
+
+
+
+
     return workouts // 7
   }
 
@@ -171,7 +156,7 @@ class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManage
     return emptyFlow()
   }
 
-  override fun getCompletedWorkouts(): Flow<List<Workout>> {
+  override fun getCompletedWorkouts(): List<Workout>? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -185,22 +170,68 @@ class CompletedWorkoutRepositoryImpl(private val databaseManager: DatabaseManage
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(workoutCollection)) // Replace with your database instance
           .where(
-            Expression.property("isCompleted").equalTo(Expression.booleanValue(true))
+            Expression.property("isCompleted").equalTo(Expression.booleanValue(true)).and(
+              Expression.property("isPublic").equalTo(Expression.booleanValue(false))
+            ).and(
+              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
+            )
           )
           .orderBy(Ordering.property("dateCreated").descending())
 
-      val workoutsFlow = completedWorkoutQuery.queryChangeFlow()
+      val workouts = completedWorkoutQuery.execute().allResults()
         .map {
-          mapQueryChangeToWorkoutCompletedSets(it, setCollection)
-        }.flowOn(Dispatchers.IO)
+          withUnknownKeys.decodeFromString<WorkoutDao>(it.toJSON()).Workout
+        }
 
-      completedWorkoutQuery.execute()
+      val workoutIds = workouts.map { it.id.toString() }
 
-      return workoutsFlow
+      val workoutIDClause = workoutIds.joinToString(",") { "'$it'" }.let { "[$it]" }
+
+      val setsQuery = "SELECT * FROM `CompletedSets` " +
+              "WHERE workoutID IN $workoutIDClause" +
+              " AND isPublic = false" +
+              " AND ownerID = '${user.id.toHexString()}'"
+
+      val setsResult = db.createQuery(setsQuery).execute().allResults()
+      val sets = setsResult.mapNotNull {
+        try {
+          withUnknownKeys.decodeFromString<SetDao>(it.toJSON()).Set
+        } catch (e: Exception) {
+          null
+        }
+      }
+
+      val setsByWorkoutID = sets.groupBy { it.workoutID }
+
+      workouts.forEach { workout ->
+        val relevantSetsForWorkout = setsByWorkoutID[workout.id] ?: emptyList()
+        // Further group by exerciseSetsID for efficiency if needed, as discussed before
+        val setsByExerciseSetsID = relevantSetsForWorkout.groupBy { it.exerciseSetsID }
+
+        workout.workoutItems.forEach { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> {
+              workoutItem.sets = (setsByExerciseSetsID[workoutItem.id] ?: emptyList())
+                .sortedBy { it.setNumber }
+                .toMutableList() // Or toList() if immutability is preferred
+            }
+
+            is Superset -> {
+              workoutItem.exercisesSets.forEach { exerciseSets ->
+                exerciseSets.sets = (setsByExerciseSetsID[exerciseSets.id] ?: emptyList())
+                  .sortedBy { it.setNumber }
+                  .toMutableList() // Or toList()
+              }
+            }
+          }
+        }
+      }
+
+      return workouts
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
-    return emptyFlow()
+    return null
   }
 
   override fun getCompletedWorkoutByID(workoutID: ObjectId): Workout? {
