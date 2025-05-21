@@ -28,7 +28,7 @@ interface ProgramsRepository {
 
   fun isProgramActive(programUUID: Uuid): Boolean
 
-  suspend fun copyProgramFromTemplate(program: Program): Boolean
+  suspend fun createActiveProgram(program: Program): Boolean
 
   suspend fun insertProgram(program: Program): Boolean
 
