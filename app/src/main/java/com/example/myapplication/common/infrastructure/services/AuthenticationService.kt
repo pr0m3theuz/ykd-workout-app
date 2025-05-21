@@ -1,18 +1,25 @@
 package com.example.myapplication.common.infrastructure.services
 
-import com.example.myapplication.common.domain.model.User
+import com.example.myapplication.common.domain.model.UserProfile
 
 interface AuthenticationService {
-  fun getCurrentUser(): User
+  fun getCurrentUser(): UserProfile
   fun authenticatedUser(username: String, password: String): Boolean
   fun logout()
 }
 
 class AuthenticationServiceImpl() : AuthenticationService {
-  private var _user: User? = null
+  private var _user: UserProfile? = null
 
-  override fun getCurrentUser(): User {
-    return _user ?: User(name = "user", username = "user", email = "", password = "password")
+  override fun getCurrentUser(): UserProfile {
+    return _user ?: UserProfile(
+      name = "user",
+      username = "user",
+      email = "",
+      password = "password",
+      authToken = "",
+      isLoggedIn = true
+    )
   }
 
   override fun authenticatedUser(username: String, password: String): Boolean {
