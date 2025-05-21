@@ -200,7 +200,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(workout)
-      val document = MutableDocument(workout.id.toString(), json)
+      val document = MutableDocument(workout.id.toHexString(), json)
 
       collection.save(document)
       return true
@@ -217,11 +217,12 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val mutableDoc = collection.getDocument(workout.id.toString())?.toMutable() // Not Necessary
+      val mutableDoc =
+        collection.getDocument(workout.id.toHexString())?.toMutable() // Not Necessary
       requireNotNull(mutableDoc) { "Workout Repository: Workout does not exist!" }
 
       val json = Json.encodeToString(workout)
-      val document = MutableDocument(workout.id.toString(), json)
+      val document = MutableDocument(workout.id.toHexString(), json)
 
       collection.save(document)
 
@@ -239,7 +240,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val document = collection.getDocument(workout.id.toString())
+      val document = collection.getDocument(workout.id.toHexString())
       requireNotNull(document) { "Workout Repository: Workout does not exist!" }
 
       collection.delete(document)
