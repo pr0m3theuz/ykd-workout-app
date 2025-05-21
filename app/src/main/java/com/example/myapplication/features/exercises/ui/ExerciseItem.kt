@@ -15,14 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.Exercise
 
 @Composable
 fun ExerciseItem(
   exercise: Exercise,
   muscleGroupName: String?,
-  navController: NavController,
   navigateToDetailPane: (exerciseID: String) -> Unit,
 ) {
 
