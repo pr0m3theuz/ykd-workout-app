@@ -11,8 +11,8 @@ import com.couchbase.lite.ReplicatorType
 import com.couchbase.lite.URLEndpoint
 import com.couchbase.lite.newConfig
 import com.couchbase.lite.replicatorChangesFlow
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
-import com.example.myapplication.common.infrastructure.services.AuthenticationService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -25,11 +25,14 @@ private const val DATABASE_IS_NULL = "ReplicatorServiceDb: Database does not exi
 @InternalCoroutinesApi
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReplicatorServiceImpl(
-  private val authenticationService: AuthenticationService,
+//  private val authenticationService: AuthenticationService,
+  private val userProfileManager: UserProfileManager,
   private val databaseManager: DatabaseManager,
 ) : ReplicatorService {
   private var replicatorManager: ReplicatorManager? = null
-  private var loggedInUser = authenticationService.getCurrentUser()
+
+  //  private var loggedInUser = authenticationService.getCurrentUser()
+  private var loggedInUser = userProfileManager.getCurrentUser()
 
   // track replication state
   override var isReplicationStarted = false
@@ -38,8 +41,8 @@ class ReplicatorServiceImpl(
   override var replicationConfig =
     mutableStateOf(
       ReplicatorConfig(
-        username = loggedInUser.username,
-        password = loggedInUser.password,
+        username = loggedInUser.username ?: "user",
+        password = loggedInUser.password ?: "password",
         endpointUrl = "ws://192.168.1.98:4984/workouts",
         replicatorType = "PUSH AND PULL",
         heartBeat = 60L,
@@ -61,13 +64,13 @@ class ReplicatorServiceImpl(
 
   override fun updateAuthentication(isReset: Boolean) {
     Log.i("updateReplicationConfig()", "called")
-    loggedInUser = authenticationService.getCurrentUser()
+    loggedInUser = userProfileManager.getCurrentUser()
     if (isReset) {
       replicationConfig.value.username = ""
       replicationConfig.value.password = ""
     } else {
-      replicationConfig.value.username = loggedInUser.username
-      replicationConfig.value.password = loggedInUser.password
+      replicationConfig.value.username = loggedInUser.username ?: "user"
+      replicationConfig.value.password = loggedInUser.password ?: "password"
       databaseManager.database?.let { replicatorManager = ReplicatorManager(it) }
     }
   }
@@ -92,6 +95,12 @@ class ReplicatorServiceImpl(
           else -> ReplicatorType.PUSH_AND_PULL
         }
 
+        // For Basic Authentication - https://docs.couchbase.com/couchbase-lite/current/android/replication.html#basic-authentication
+        // For Session Authentication - https://docs.couchbase.com/couchbase-lite/current/android/replication.html#session-authentication
+        // OIDC Authorization -
+        //    https://www.couchbase.com/blog/oauth-2-oidc-fundamentals-authentication-authorization/
+        //    https://www.couchbase.com/blog/oidc-implicit-flow-client-authentication-couchbase-sync-gateway/
+        //    https://www.couchbase.com/blog/oidc-authorization-code-flow-client-authentication-couchbase-sync-gateway/
         val authenticator =
           BasicAuthenticator(replicationConfig.username, replicationConfig.password.toCharArray())
 
