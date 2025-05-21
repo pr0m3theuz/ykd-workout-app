@@ -109,7 +109,7 @@ constructor(
 
   fun startNewProgram(program: Program) {
     // TODO Create a copy of selected program, Keep UUID the same -> Implemented
-    viewModelScope.launch { programsRepository.copyProgramFromTemplate(program) }
+    viewModelScope.launch { programsRepository.createActiveProgram(program) }
 
     // TODO Navigate to Workouts Tab of the Active Program
     // TODO Enable Workout Start Buttons -> Implemented
