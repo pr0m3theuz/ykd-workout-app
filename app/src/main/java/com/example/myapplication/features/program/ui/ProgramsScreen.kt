@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,7 +48,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -393,19 +393,8 @@ fun ProgramsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutSearchBar() {
-  //    val context = LocalContext.current
   var text by rememberSaveable { mutableStateOf("") }
   var active by rememberSaveable { mutableStateOf(false) }
-
-  val color =
-    SearchBarDefaults.colors(
-      containerColor = MaterialTheme.colorScheme.secondaryContainer,
-      inputFieldColors =
-      TextFieldDefaults.colors(
-        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
-      ),
-    )
 
   SearchBar(
     inputField = {
@@ -437,11 +426,7 @@ fun WorkoutSearchBar() {
     expanded = active,
     onExpandedChange = { active = false },
     modifier = Modifier.fillMaxWidth(),
-    shape = SearchBarDefaults.inputFieldShape,
-    colors = color,
-    tonalElevation = SearchBarDefaults.TonalElevation,
-    shadowElevation = SearchBarDefaults.ShadowElevation,
-    windowInsets = SearchBarDefaults.windowInsets,
+    windowInsets = WindowInsets(0.dp),
   ) {}
 }
 
