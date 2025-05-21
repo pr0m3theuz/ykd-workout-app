@@ -18,6 +18,7 @@ import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.MicrocycleDao
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.ProgramDao
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -36,10 +36,15 @@ private const val DATABASE_IS_NULL = "Program Repository: Database does not exis
 private const val COLLECTION_IS_NULL =
   "Program Repository: Collection does not exist in the Database."
 
-class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : ProgramsRepository {
+class ProgramsRepositoryImpl(
+  private val databaseManager: DatabaseManager,
+  private val userProfileManager: UserProfileManager
+) : ProgramsRepository {
   // Room executes all queries on a separate thread.
   // Observed Flow will notify the observer when the data has changed.
   val db: Database? = databaseManager.database
+
+  val user = userProfileManager.getCurrentUser()
 
   // TODO Decide if I should create a repository for user data
   val userDatabase: Database? = databaseManager.userDatabase
@@ -151,7 +156,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
           .where(
             Expression.property("active")
               .equalTo(Expression.booleanValue(true))
-              .and(Expression.property("ownerID").equalTo(Expression.string("USER ID")))
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
 
       val flow =
@@ -182,7 +187,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
           .where(
             Expression.property("uuid")
               .equalTo(Expression.string(programUUID.toString()))
-              .and(Expression.property("ownerID").equalTo(Expression.string("USER ID")))
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
@@ -195,23 +200,46 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
     return false
   }
 
-  override suspend fun copyProgramFromTemplate(program: Program): Boolean {
+  override suspend fun createActiveProgram(program: Program): Boolean {
 //    database.copyProgramFromTemplate(program)
-    TODO("Implement copyProgramFromTemplate")
+//    TODO("Implement copyProgramFromTemplate")
     // TODO copy program to UserDatabase
+    // TODO Copy programs workouts to CompletedWorkouts
+    // TODO
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val completedProgramsCollection = db.getCollection("CompletedPrograms")
+
+      requireNotNull(completedProgramsCollection) { COLLECTION_IS_NULL }
+
+      val json = Json.encodeToString(
+        program.copy(
+          isActive = true,
+          isPublic = false,
+          ownerID = user.id.toHexString()
+        )
+      )
+      val document = MutableDocument(program.id.toString(), json)
+
+      completedProgramsCollection.save(document)
+      return true
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
     return false
   }
 
   override suspend fun insertProgram(program: Program): Boolean {
-    TODO("What calls insertProgram")
+//    TODO("What calls insertProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("CompletedProgram")
+      val collection = db.getCollection("CompletedPrograms")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val json = Json.encodeToString(program)
+      val json = Json.encodeToString(program.copy(ownerID = user.id.toHexString()))
       val document = MutableDocument(program.id.toString(), json)
 
       collection.save(document)
@@ -224,19 +252,25 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
   override suspend fun updateProgram(program: Program): Boolean {
 //    database.updateProgram(program)
-    TODO("What calls updateProgram")
+//    TODO("What calls updateProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
       val collection = db.getCollection("Program")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
+      var document = collection.getDocument(user.id.toHexString())?.toMutable()
+      requireNotNull(document) { "Program Repository: Program does not exist!" }
 
-      val json = Json.encodeToString(program)
-      val document = MutableDocument(program.id.toString(), json)
+      if (document.getString("id") == program.id.toHexString()) {
+        val json = Json.encodeToString(program)
+        document = MutableDocument(program.id.toHexString(), json)
 
-      collection.save(document)
-      return true
+        collection.save(document)
+        return true
+      }
+
+
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -245,7 +279,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
   override suspend fun deleteProgram(program: Program): Boolean {
 //    database.deleteProgram(program)
-    TODO("What calls deleteProgram")
+//    TODO("What calls deleteProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -253,7 +287,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val document = collection.getDocument(program.id.toString())
+      val document = collection.getDocument(program.id.toHexString())
       requireNotNull(document) { "Program Repository: Program does not exist!" }
 
       collection.delete(document)
@@ -278,7 +312,7 @@ class ProgramsRepositoryImpl(private val databaseManager: DatabaseManager) : Pro
           .from(DataSource.collection(collection))
           .where(
             Expression.property("id")
-              .equalTo(Expression.string(program.id.toString()))
+              .equalTo(Expression.string(program.id.toHexString()))
               .and(Expression.property("ownerID").equalTo(Expression.string("USER ID")))
               .and(Expression.property("active").equalTo(Expression.booleanValue(true)))
           ).limit(Expression.intValue(1))
