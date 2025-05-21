@@ -3,7 +3,9 @@ package com.example.myapplication.common.dependencyInjection
 //import com.example.myapplication.components.importWorkoutProgram.ImportWorkoutProgram
 //import com.example.myapplication.data.database.RealmDatabase
 //import com.example.myapplication.data.network.ImportWorkoutProgramRepository
+//import org.koin.android.ext.koin.androidContext
 import com.example.myapplication.MainViewModel
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepositoryImpl
@@ -92,6 +94,10 @@ val commonModule = module {
 
   // Couchbase
   singleOf(::DatabaseManager)
+  singleOf(::UserProfileManager) //
+//  single { UserProfileManager(androidContext(), get()) }
+
+  singleOf(::UserRepositoryImpl) bind UserRepository::class
   singleOf(::ReplicatorServiceImpl) bind ReplicatorService::class
   singleOf(::AuthenticationServiceImpl) bind AuthenticationService::class
   singleOf(::WorkoutRepositoryImpl) bind WorkoutRepository::class
@@ -99,7 +105,6 @@ val commonModule = module {
   singleOf(::ExercisesRepositoryImpl) bind ExercisesRepository::class
   singleOf(::ExerciseNotesRepositoryImpl) bind ExerciseNotesRepository::class
   singleOf(::WorkoutNotesRepositoryImpl) bind WorkoutNotesRepository::class
-  singleOf(::UserRepositoryImpl) bind UserRepository::class
   singleOf(::ReplicatorServiceImpl) bind ReplicatorService::class
   singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
   singleOf(::CompletedWorkoutRepositoryImpl) bind CompletedWorkoutRepository::class
