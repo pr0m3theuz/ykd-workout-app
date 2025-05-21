@@ -95,6 +95,7 @@ composeCompiler {
 dependencies {
   implementation("androidx.core:core-ktx:1.16.0")
   implementation("androidx.activity:activity-compose:1.10.1")
+  implementation("androidx.datastore:datastore-core-android:1.1.6")
 
   val adaptiveLayout = "1.0.0"
   implementation("androidx.compose.material3.adaptive:adaptive:$adaptiveLayout")
@@ -235,6 +236,10 @@ dependencies {
   // couchbase lite
   implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.1")
 //  implementation("com.couchbase.client:kotlin-client:1.4.9")
+
+  // Jetpack DataStore Preferences
+  implementation("androidx.datastore:datastore-preferences:1.1.6") // Check for the latest version
+  implementation("androidx.datastore:datastore:1.1.6")
 }
 
 /*kapt {
