@@ -49,6 +49,8 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.example.myapplication.common.domain.model.UserProfile
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
 import com.example.myapplication.common.ui.component.Screens
@@ -127,12 +129,20 @@ class MainActivity : ComponentActivity() {
       val authService: AuthenticationService by inject()
       // TODO Add User Profile Manager here by injecting it
       //      val userProfileRepository: KeyValueRepository by inject()
+      val userProfileManager: UserProfileManager by inject()
       val replicatorService: ReplicatorService by inject()
       val mainViewModel = getViewModel<MainViewModel>()
 
-      val uname = "glare_parmesan992@simplelogin.com"
-      val pwd = "RpHg!Xe%beN5XNCBhvs#jj*PkN23H&ux"
-      authService.authenticatedUser(username = uname, password = pwd)
+      userProfileManager.updateUserProfile(
+        UserProfile(
+          username = "user",
+          name = "user",
+          email = "user",
+          password = "password",
+          authToken = "TOKEN"
+        )
+      )
+//      authService.authenticatedUser(username = uname, password = pwd)
 
       replicatorService.updateAuthentication(isReset = false)
 
