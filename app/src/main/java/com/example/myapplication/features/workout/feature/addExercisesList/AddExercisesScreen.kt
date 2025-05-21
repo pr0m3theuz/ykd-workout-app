@@ -3,6 +3,7 @@ package com.example.myapplication.features.workout.feature.addExercisesList
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -10,21 +11,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarDefaults.colors
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -47,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.MuscleGroup
+import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.features.exercises.ExercisesViewModel
 import com.example.myapplication.features.exercises.ui.ExerciseOptionsDropdownMenu
 import com.example.myapplication.features.exercises.ui.ExercisesFilterMenu
@@ -172,9 +176,11 @@ fun AddExercisesScreen(
       }
     },
     content = { contentPadding ->
-      Column(Modifier
-        .padding(contentPadding)
-        .fillMaxWidth()) {
+      Column(
+        Modifier
+          .padding(contentPadding)
+          .fillMaxWidth()
+      ) {
         TextFieldDefaults.colors(
           unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
           unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
@@ -182,30 +188,41 @@ fun AddExercisesScreen(
         val searchBarColors =
           colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
 
-// TODO DEPRECATION
+        val onActiveChange = { _active: Boolean -> active = _active }
         SearchBar(
-          query = query,
-          onQueryChange = {
-            query = it
-            filterExercises(it)
-          },
-          onSearch = { active = false },
-          active = active,
-          colors = searchBarColors,
-          onActiveChange = { active = false },
-          placeholder = {
-            Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
-          },
-          leadingIcon = {
-            Icon(
-              Icons.Default.Search,
-              contentDescription = null,
-              tint = MaterialTheme.colorScheme.onSecondaryContainer,
+          windowInsets = WindowInsets(0.dp),
+          inputField = {
+            SearchBarDefaults.InputField(
+              query = query,
+              onQueryChange = {
+                query = it
+                filterExercises(it)
+              },
+              onSearch = { active = false },
+              expanded = false,
+              onExpandedChange = onActiveChange,
+              enabled = true,
+              placeholder = {
+                Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
+              },
+              leadingIcon = {
+                Icon(
+                  Icons.Default.Search,
+                  contentDescription = null,
+                  tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+              },
+              trailingIcon = { Icon(Icons.Default.Clear, contentDescription = null) },
+              interactionSource = null,
             )
           },
+          expanded = false,
+          onExpandedChange = {},
           modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
+          shape = SearchBarDefaults.inputFieldShape,
+          colors = searchBarColors,
         ) {}
 
         SelectedFiltersLazyRow(exercisesViewModel)
@@ -213,6 +230,7 @@ fun AddExercisesScreen(
         when {
           exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
           exercises.isNotEmpty() -> {
+            exercises.forEach { exercise -> exercise.lazyListItemID = newLazyListItemID() }
             ExercisesLazyList(
               exercises = exercises,
               muscleGroups = muscleGroups,
@@ -245,6 +263,7 @@ fun AddExercisesScreen(
             }
           }
         }
+
       }
     },
   )
@@ -314,3 +333,4 @@ private fun ExercisesLazyList(
     }
   }
 }
+
