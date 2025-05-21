@@ -10,7 +10,7 @@ interface CompletedWorkoutRepository {
 
   fun getCompletedSetsForExercise(exerciseID: ObjectId): Flow<List<Set>>
 
-  fun getCompletedWorkouts(): Flow<List<Workout>>
+  fun getCompletedWorkouts(): List<Workout>?
 
 // TODO fun getCompletedWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>>
 
