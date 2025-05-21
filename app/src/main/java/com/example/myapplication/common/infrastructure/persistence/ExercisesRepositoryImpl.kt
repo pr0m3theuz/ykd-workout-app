@@ -25,6 +25,8 @@ import com.example.myapplication.common.domain.model.MuscleRoleFunction
 import com.example.myapplication.common.domain.model.MuscleRoleFunctionDao
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetDao
+import com.example.myapplication.common.domain.model.UserProfile
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Utility
 import com.example.myapplication.common.domain.model.UtilityDao
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
@@ -44,10 +46,14 @@ private const val DATABASE_IS_NULL = "Exercise Repository: Database does not exi
 private const val COLLECTION_IS_NULL =
   "Exercise Repository: Exercise Collection does not exist in the Database."
 
-class ExercisesRepositoryImpl(private val databaseManager: DatabaseManager) : ExercisesRepository {
+class ExercisesRepositoryImpl(
+  private val databaseManager: DatabaseManager,
+  userProfileManager: UserProfileManager
+) : ExercisesRepository {
   // Room executes all queries on a separate thread.
   // Observed Flow will notify the observer when the data has changed.
   val db: Database? = databaseManager.database
+  val user: UserProfile = userProfileManager.getCurrentUser()
   private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 
   override fun getAllExercises(): Flow<List<Exercise>> {
