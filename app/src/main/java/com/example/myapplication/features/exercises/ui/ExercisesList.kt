@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -31,7 +32,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults.colors
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -83,7 +84,7 @@ fun ExercisesLazyColumn(
   //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
 
   val exercises by
-    exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
+  exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
 
   val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
 
@@ -143,7 +144,7 @@ fun ExercisesLazyColumn(
               contentDescription = "Search Exercises",
             )
           }
-          ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/ )
+          ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
           ExerciseOptionsDropdownMenu()
         },
       )
@@ -155,52 +156,53 @@ fun ExercisesLazyColumn(
         unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
         unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
       )
-      val searchBarColors =
-        colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-      /*
-      AnimatedVisibility(
-        visible = searchBarVisibility,
-        enter = expandVertically(),
-        exit = shrinkVertically()
-      ) {
-      */
+
       SearchBar(
-        query = query,
-        onQueryChange = {
-          query = it
-          filterExercises(it)
-        },
-        onSearch = { active = false },
-        active = active,
+        inputField = {
+          SearchBarDefaults.InputField(
+            query = query,
+            onQueryChange = {
+              query = it
+              filterExercises(it)
+            },
+            onSearch = { active = false },
+            expanded = active,
 //        colors = searchBarColors,
-        onActiveChange = { active = false },
-        placeholder = {
-          Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
-        },
-        leadingIcon = {
-          Icon(
-            Icons.Default.Search,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            onExpandedChange = {},
+            enabled = true,
+            placeholder = {
+              Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
+            },
+            leadingIcon = {
+              Icon(
+                Icons.Default.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+              )
+            },
+            trailingIcon = null,
+            interactionSource = null,
           )
         },
+        expanded = active,
+        onExpandedChange = { },
         modifier = Modifier
           .fillMaxWidth()
           .padding(horizontal = 8.dp),
+        tonalElevation = SearchBarDefaults.TonalElevation,
+        shadowElevation = SearchBarDefaults.ShadowElevation,
+        windowInsets = WindowInsets(0.dp),
       ) {}
-      //        }
 
       SelectedFiltersLazyRow(exercisesViewModel)
 
       when {
         exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
         exercises.isNotEmpty() -> {
-//          ExercisesLazyList(exercises, muscleGroups, navController, onClick)
           ExercisesLazyList(exercises, muscleGroups) { exercise, muscleGroupName ->
             ExerciseItem(
               exercise = exercise,
               muscleGroupName = muscleGroupName,
-              navController = navController,
               navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
             )
           }
