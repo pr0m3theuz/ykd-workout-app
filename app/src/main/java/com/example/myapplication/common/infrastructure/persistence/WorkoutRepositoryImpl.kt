@@ -41,12 +41,13 @@ private const val DATABASE_IS_NULL = "Workout Repository: Database does not exis
 private const val COLLECTION_IS_NULL =
   "Workout Repository: Workout Collection does not exist in the Database."
 
-const val WORKOUT_ORDER_IS_NULL = "Workout Repository: Completed Workout program order is null!"
+private const val WORKOUT_ORDER_IS_NULL =
+  "Workout Repository: Completed Workout program order is null!"
 
-const val COLLECTION_IS_NULL_TEMPLATE =
+private const val COLLECTION_IS_NULL_TEMPLATE =
   "Workout Repository: %s Collection does not exist in the Database."
-const val WORKOUT_DAY_IS_NULL = "Workout Repository: Completed Workout Day is null!"
-const val TAG = "WorkoutRepository" // For Logging
+private const val WORKOUT_DAY_IS_NULL = "Workout Repository: Completed Workout Day is null!"
+private const val TAG = "WorkoutRepository" // For Logging
 
 class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : WorkoutRepository {
 
@@ -202,7 +203,9 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       val json = Json.encodeToString(workout)
       val document = MutableDocument(workout.id.toHexString(), json)
 
-      collection.save(document)
+      // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
+
+//      collection.save(document)
       return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
