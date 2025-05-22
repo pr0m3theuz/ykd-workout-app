@@ -56,7 +56,7 @@ data class Program(
   var mesocycles: List<Mesocycle> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
-//  var type: String? = null,
+  private val type: String = "Program",
 )
 
 @Serializable
@@ -90,7 +90,7 @@ data class Mesocycle(
   var microcycles: List<Microcycle> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
-//  var type: String? = null,
+  private val type: String = "Mesocycle",
 )
 
 @Serializable
@@ -113,7 +113,7 @@ data class Microcycle(
   var workouts: List<Workout> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
-//  var type: String? = null,
+  private val type: String = "Microcycle",
 )
 
 
