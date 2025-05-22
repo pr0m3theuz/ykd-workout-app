@@ -18,9 +18,11 @@ import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.MicrocycleDao
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.ProgramDao
+import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
+import com.example.myapplication.common.util.duplicateProgramStructure
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -34,7 +36,10 @@ import kotlin.uuid.Uuid
 private const val DATABASE_IS_NULL = "Program Repository: Database does not exist."
 
 private const val COLLECTION_IS_NULL =
-  "Program Repository: Collection does not exist in the Database."
+  "Program Repository: %s Collection does not exist in the Database."
+
+private const val COLLECTION_IS_NULL_TEMPLATE =
+  "Program Repository: %s Collection does not exist in the Database."
 
 class ProgramsRepositoryImpl(
   private val databaseManager: DatabaseManager,
@@ -121,7 +126,7 @@ class ProgramsRepositoryImpl(
 
       val collection = db.getCollection("Program")
 
-      requireNotNull(collection) { COLLECTION_IS_NULL }
+      requireNotNull(collection) { String.format(COLLECTION_IS_NULL) }
 
       val queryBuilder =
         QueryBuilder.select(SelectResult.all())
@@ -148,7 +153,7 @@ class ProgramsRepositoryImpl(
 
       val collection = db.getCollection("CompletedPrograms")
 
-      requireNotNull(collection) { COLLECTION_IS_NULL }
+      requireNotNull(collection) { String.format(COLLECTION_IS_NULL, "CompletedPrograms") }
 
       val query =
         QueryBuilder.select(SelectResult.all())
@@ -210,19 +215,51 @@ class ProgramsRepositoryImpl(
       requireNotNull(db) { DATABASE_IS_NULL }
 
       val completedProgramsCollection = db.getCollection("CompletedPrograms")
-
-      requireNotNull(completedProgramsCollection) { COLLECTION_IS_NULL }
-
-      val json = Json.encodeToString(
-        program.copy(
-          isActive = true,
-          isPublic = false,
-          ownerID = user.id.toHexString()
+      requireNotNull(completedProgramsCollection) {
+        String.format(
+          COLLECTION_IS_NULL_TEMPLATE,
+          "CompletedPrograms"
         )
-      )
-      val document = MutableDocument(program.id.toString(), json)
+      }
 
-      completedProgramsCollection.save(document)
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) {
+        String.format(
+          COLLECTION_IS_NULL_TEMPLATE,
+          "CompletedWorkouts"
+        )
+      }
+
+      val completedSetsCollection = db.getCollection("CompletedSets")
+      requireNotNull(completedSetsCollection) {
+        String.format(
+          COLLECTION_IS_NULL_TEMPLATE,
+          "CompletedSets"
+        )
+      }
+
+      // TODO Refactor using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
+      val (newProgram: Program, newProgramWorkouts: List<Workout>, newProgramSets: List<Set>) = duplicateProgramStructure(
+        program,
+        user
+      )
+
+      val newProgramJson = Json.encodeToString(newProgram)
+      val newProgramDocument = MutableDocument(newProgram.id.toString(), newProgramJson)
+      completedProgramsCollection.save(newProgramDocument)
+
+      newProgramWorkouts.forEach { workout ->
+        val workoutJson = Json.encodeToString(workout)
+        val newProgramWorkoutsDocument = MutableDocument(workout.id.toString(), workoutJson)
+        completedWorkoutsCollection.save(newProgramWorkoutsDocument)
+      }
+
+      newProgramSets.forEach { set ->
+        val setJson = Json.encodeToString(newProgramSets)
+        val newProgramSetsDocument = MutableDocument(newProgram.id.toString(), setJson)
+        completedSetsCollection.save(newProgramSetsDocument)
+      }
+
       return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
@@ -242,7 +279,7 @@ class ProgramsRepositoryImpl(
       val json = Json.encodeToString(program.copy(ownerID = user.id.toHexString()))
       val document = MutableDocument(program.id.toString(), json)
 
-      collection.save(document)
+//      collection.save(document)
       return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
