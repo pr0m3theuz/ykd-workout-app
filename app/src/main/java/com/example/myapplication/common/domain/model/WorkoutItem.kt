@@ -51,8 +51,11 @@ data class WorkoutItemDao(val WorkoutItem: WorkoutItem)
 
 @Serializable
 sealed class WorkoutItem {
-  abstract val id: ObjectId
+  abstract var id: ObjectId
   abstract val order: Int
+  abstract val ownerID: String?
+  abstract val isPublic: Boolean
+  abstract val type: String
 }
 
 @Serializable
@@ -88,12 +91,13 @@ data class Superset(
   var restAfterSuperset: Long = 0L, // Rest time after all exercises in superset are completed
   var supersetNotes: List<SupersetNote> = emptyList(),
   override val order: Int = 1, // Order within workout
-  var ownerID: String?,
-  var isPublic: Boolean = false,
-  @Serializable(with = ObjectIdSerializer::class) val workoutID: ObjectId, // External Primary Key
-  @Serializable(with = ObjectIdSerializer::class) val microcycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) val mesocycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) val programID: ObjectId?,
+  override var ownerID: String?,
+  override var isPublic: Boolean = false,
+  override val type: String = "Superset",
+  @Serializable(with = ObjectIdSerializer::class) var workoutID: ObjectId, // External Primary Key
+  @Serializable(with = ObjectIdSerializer::class) var microcycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) var mesocycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) var programID: ObjectId?,
 ) : WorkoutItem()
 
 @Serializable
