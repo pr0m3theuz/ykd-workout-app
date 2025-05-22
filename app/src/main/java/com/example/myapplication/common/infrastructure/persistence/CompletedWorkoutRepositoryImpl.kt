@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class)
 
 package com.example.myapplication.common.infrastructure.persistence
 
@@ -7,10 +7,12 @@ import com.couchbase.lite.Collection
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
+import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
+import com.couchbase.lite.UnitOfWork
 import com.couchbase.lite.queryChangeFlow
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Set
@@ -324,4 +326,81 @@ class CompletedWorkoutRepositoryImpl(
 
     return null
   }
+
+  override suspend fun upsertCompletedWorkout(workout: Workout) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL }
+
+      val completedSetsCollection = db.getCollection("CompletedSets")
+      requireNotNull(completedSetsCollection) { COLLECTION_IS_NULL }
+
+      val completedSets = workout.workoutItems.flatMap { workoutItem ->
+        when (workoutItem) {
+          is ExerciseSets -> workoutItem.sets
+          is Superset -> workoutItem.exercisesSets.flatMap { it.sets }
+        }
+      }
+
+      if (completedSets.isEmpty()) return
+
+      db.inBatch(UnitOfWork {
+        completedSets.forEach { set ->
+          val setIdStr = set.id.toHexString()
+          try {
+            val setJsonContent = Json.encodeToString(set)
+            completedSetsCollection.getDocument(set.id.toHexString())?.toMutable()?.let {
+              it.setJSON(setJsonContent)
+              completedSetsCollection.save(it)
+            } ?: completedSetsCollection.save(MutableDocument(set.id.toHexString(), setJsonContent))
+          } catch (e: kotlinx.serialization.SerializationException) {
+            Log.e(
+              "Failed to serialize set $setIdStr for workout ${workout.id}",
+              e.stackTraceToString()
+            )
+//            throw e // Or handle as per your strategy
+          } catch (e: Exception) { // Catch generic exception from DB for now
+            Log.e(
+              "Failed to save set $setIdStr for workout ${workout.id} to DB",
+              e.stackTraceToString()
+            )
+//            throw ("Failed to save set $setIdStr", e) // Wrap in custom exception
+          }
+
+        }
+      })
+
+      // Create a new workout instance with all set data cleared,
+      val newWorkout = workout.copy(workoutItems = workout.workoutItems.map { workoutItem ->
+        when (workoutItem) {
+          is ExerciseSets -> {
+            workoutItem.copy(sets = mutableListOf<Set>())
+          }
+
+          is Superset -> {
+            workoutItem.copy(exercisesSets = workoutItem.exercisesSets.map { exerciseSets ->
+              exerciseSets.copy(sets = mutableListOf<Set>())
+            })
+          }
+        }
+      })
+
+      val workoutJson = Json.encodeToString(newWorkout)
+      completedWorkoutsCollection.getDocument(workout.id.toHexString())?.toMutable()?.let {
+        it.setJSON(workoutJson)
+        completedWorkoutsCollection.save(it)
+      } ?: completedWorkoutsCollection.save(MutableDocument(workout.id.toHexString(), workoutJson))
+
+
+      // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
+
+//      collection.save(document)
+
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+  }
 }
+
