@@ -402,7 +402,7 @@ class ExercisesRepositoryImpl(
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val mutableDoc = MutableDocument()
-
+      // TODO Refactor
       mutableDoc.setString("lazyListItemID", exercise.lazyListItemID.toString())
       mutableDoc.setString("name", exercise.name)
       mutableDoc.setString("exrxExerciseID", exercise.exrxExerciseID)
@@ -429,6 +429,7 @@ class ExercisesRepositoryImpl(
       mutableDoc.setString("pageURI", exercise.pageURI)
       mutableDoc.setString("owner_id", exercise.owner_id)
       mutableDoc.setBoolean("isPublic", exercise.isPublic)
+      mutableDoc.setString("type", "Exercise")
 
       collection.save(mutableDoc)
     } catch (e: Exception) {
