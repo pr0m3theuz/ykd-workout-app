@@ -59,7 +59,7 @@ data class ExerciseSetsDao(val ExerciseSets: ExerciseSets)
 @ExperimentalUuidApi
 @Serializable
 data class ExerciseSets(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) override val id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) override var id: ObjectId = ObjectId(),
   @SerialName("exSetsLazyListItemID") val lazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
   @Serializable(with = UuidSerializer::class) val exSetsUUID: Uuid = Uuid.random(),
   override val order: Int = 1,
@@ -69,12 +69,13 @@ data class ExerciseSets(
   val datePerformed: Instant? = null,
   val totalVolumeInPounds: Double? = 0.0,
   val totalVolumeInKilograms: Double? = 0.0,
-  val ownerID: String,
-  val isPublic: Boolean = false,
-  @Serializable(with = ObjectIdSerializer::class) val workoutID: ObjectId, // External Primary Key
-  @Serializable(with = ObjectIdSerializer::class) val microcycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) val mesocycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) val programID: ObjectId?,
+  override var ownerID: String,
+  override var isPublic: Boolean = false,
+  override val type: String = "ExerciseSets",
+  @Serializable(with = ObjectIdSerializer::class) var workoutID: ObjectId, // External Primary Key
+  @Serializable(with = ObjectIdSerializer::class) var microcycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) var mesocycleID: ObjectId?,
+  @Serializable(with = ObjectIdSerializer::class) var programID: ObjectId?,
 ) : WorkoutItem()
 
 /**
