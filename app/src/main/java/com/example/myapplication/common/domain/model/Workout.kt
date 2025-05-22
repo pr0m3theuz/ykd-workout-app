@@ -61,13 +61,13 @@ data class Workout(
   var totalVolumeInKilograms: Double? = 0.0,
 //  var order: Int? = null, // For sorting workouts in a program
   @Serializable(ObjectIdSerializer::class) var programID: ObjectId? = null,
-  @Serializable(ObjectIdSerializer::class) val mesocycleID: ObjectId? = null,
+  @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId? = null,
   @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId? = null,
   var ownerID: String = "",
   var isPublic: Boolean = false,
   var signature: String? = null,
   var hashedSignature: String? = null,
-//  var type: String? = null,
+  private val type: String = "Workout",
 )
 
 @Parcelize
