@@ -75,7 +75,8 @@ data class Set(
   var hashedSetSignature: String? = null,
   var hashedWorkoutSignature: String? = null,
   var ownerID: String,
-  var isPublic: Boolean = false
+  var isPublic: Boolean = false,
+  private val type: String = "Set"
 )
 
 fun Set.setVolume(weightUnit: String): Double {
