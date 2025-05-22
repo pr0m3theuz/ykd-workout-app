@@ -11,6 +11,7 @@ plugins {
   id("newrelic")
   id("kotlin-parcelize")
   id("org.jetbrains.kotlin.plugin.compose")
+  id("com.google.protobuf") version "0.9.5"
   //  id("org.jetbrains.kotlin.plugin.kotlin-parcelize")
 //  id("org.pkl-lang")
 
@@ -92,12 +93,29 @@ composeCompiler {
 //  stabilityConfigurationFiles.addAll(rootProject.layout.projectDirectory.file("stability_config.conf"))
 }
 
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:3.25.1" // Ensure version matches
+  }
+  generateProtoTasks {
+    all().forEach { task ->
+      task.builtins {
+        create("java") {
+          option("lite")
+        }
+        create("kotlin") {
+          option("lite")
+        }
+      }
+    }
+  }
+}
+
 dependencies {
   implementation("androidx.core:core-ktx:1.16.0")
   implementation("androidx.activity:activity-compose:1.10.1")
-  implementation("androidx.datastore:datastore-core-android:1.1.6")
 
-  val adaptiveLayout = "1.0.0"
+  val adaptiveLayout = "1.1.0"
   implementation("androidx.compose.material3.adaptive:adaptive:$adaptiveLayout")
   implementation("androidx.compose.material3.adaptive:adaptive-layout:$adaptiveLayout")
   implementation("androidx.compose.material3.adaptive:adaptive-navigation:$adaptiveLayout")
@@ -105,7 +123,7 @@ dependencies {
   implementation("com.google.firebase:firebase-perf-ktx:21.0.5")
   androidTestImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
 
-  val composeVersion = "1.8.1"
+  val composeVersion = "1.8.2"
 //  implementation(platform("androidx.compose:compose-bom:2025.05.01"))
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
@@ -123,7 +141,7 @@ dependencies {
 //  implementation("androidx.navigation3:navigation3:1.0.0-alpha01")
 //  implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:1.0.0-alpha01")
 
-  implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+  implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
   implementation("com.google.dagger:hilt-android:2.56.2")
   //    testImplementation "junit:junit:4.13.2"
   //    testImplementation "org.robolectric:robolectric:4.10.3"
@@ -159,7 +177,7 @@ dependencies {
   // classpath.
   androidTestImplementation("androidx.test.espresso:espresso-idling-resource:$espressoVersion")
 
-  testImplementation("io.mockk:mockk:1.13.13")
+  testImplementation("io.mockk:mockk:1.14.2")
 
   testImplementation("junit:junit:4.13.2")
 
@@ -172,7 +190,7 @@ dependencies {
   debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
   debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
 
-  testImplementation("org.assertj:assertj-core:3.27.2")
+  testImplementation("org.assertj:assertj-core:3.27.3")
 
   val jqwik = "1.9.2"
   testImplementation("net.jqwik:jqwik:$jqwik")
@@ -183,7 +201,7 @@ dependencies {
   // realm
   // implementation ("io.realm.kotlin:library-base:1.11.1") // Add to use local realm (no sync)
 //  implementation("io.realm.kotlin:library-sync:2.3.0") // Add to use device sync)
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
 //  implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.3.0")
   implementation("org.mongodb:bson-kotlinx:5.5.0")
@@ -217,7 +235,7 @@ dependencies {
 
   // Firebase
   // Import the Firebase BoM (see: https://firebase.google.com/docs/android/learn-more#bom)
-  implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+  implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
 
   // Firebase Crashlytics
   implementation("com.google.firebase:firebase-crashlytics")
@@ -238,12 +256,14 @@ dependencies {
   implementation("com.patrykandpatrick.vico:core:2.1.2")
 
   // couchbase lite
-  implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.1")
+  implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.3")
 //  implementation("com.couchbase.client:kotlin-client:1.4.9")
 
   // Jetpack DataStore Preferences
-  implementation("androidx.datastore:datastore-preferences:1.1.6") // Check for the latest version
-  implementation("androidx.datastore:datastore:1.1.6")
+//  implementation("com.google.protobuf:protobuf-javalite:4.31.0")
+  implementation("androidx.datastore:datastore-core-android:1.1.7")
+  implementation("androidx.datastore:datastore-preferences:1.1.7") // Check for the latest version
+  implementation("androidx.datastore:datastore:1.1.7")
 }
 
 /*kapt {
