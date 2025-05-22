@@ -106,6 +106,7 @@ dependencies {
   androidTestImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
 
   val composeVersion = "1.8.1"
+//  implementation(platform("androidx.compose:compose-bom:2025.05.01"))
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
   implementation("androidx.compose.material:material:$composeVersion")
@@ -119,6 +120,9 @@ dependencies {
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+//  implementation("androidx.navigation3:navigation3:1.0.0-alpha01")
+//  implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:1.0.0-alpha01")
+
   implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
   implementation("com.google.dagger:hilt-android:2.56.2")
   //    testImplementation "junit:junit:4.13.2"
