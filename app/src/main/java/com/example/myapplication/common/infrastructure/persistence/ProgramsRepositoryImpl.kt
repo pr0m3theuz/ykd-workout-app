@@ -11,6 +11,7 @@ import com.couchbase.lite.Ordering
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
+import com.couchbase.lite.UnitOfWork
 import com.couchbase.lite.queryChangeFlow
 import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.MesocycleDao
@@ -248,17 +249,21 @@ class ProgramsRepositoryImpl(
       val newProgramDocument = MutableDocument(newProgram.id.toString(), newProgramJson)
       completedProgramsCollection.save(newProgramDocument)
 
-      newProgramWorkouts.forEach { workout ->
-        val workoutJson = Json.encodeToString(workout)
-        val newProgramWorkoutsDocument = MutableDocument(workout.id.toString(), workoutJson)
-        completedWorkoutsCollection.save(newProgramWorkoutsDocument)
-      }
+      db.inBatch(UnitOfWork {
+        newProgramWorkouts.forEach { workout ->
+          val workoutJson = Json.encodeToString(workout)
+          val newProgramWorkoutsDocument = MutableDocument(workout.id.toString(), workoutJson)
+          completedWorkoutsCollection.save(newProgramWorkoutsDocument)
+        }
+      })
 
-      newProgramSets.forEach { set ->
-        val setJson = Json.encodeToString(newProgramSets)
-        val newProgramSetsDocument = MutableDocument(newProgram.id.toString(), setJson)
-        completedSetsCollection.save(newProgramSetsDocument)
-      }
+      db.inBatch(UnitOfWork {
+        newProgramSets.forEach { set ->
+          val setJson = Json.encodeToString(newProgramSets)
+          val newProgramSetsDocument = MutableDocument(newProgram.id.toString(), setJson)
+          completedSetsCollection.save(newProgramSetsDocument)
+        }
+      })
 
       return true
     } catch (e: Exception) {
