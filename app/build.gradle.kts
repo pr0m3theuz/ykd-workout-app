@@ -15,6 +15,7 @@ plugins {
 //  id("org.pkl-lang")
 
   //  id("org.jetbrains.compose")
+  id("com.google.protobuf") version "0.9.4" // Or the latest stable version
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
@@ -92,10 +93,36 @@ composeCompiler {
 //  stabilityConfigurationFiles.addAll(rootProject.layout.projectDirectory.file("stability_config.conf"))
 }
 
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:3.25.1" // Ensure version matches
+  }
+  generateProtoTasks {
+    all().forEach { task ->
+      task.builtins {
+        create("java") {
+          option("lite")
+        }
+        create("kotlin") {
+          option("lite")
+        }
+      }
+    }
+  }
+}
+
 dependencies {
   implementation("androidx.core:core-ktx:1.16.0")
   implementation("androidx.activity:activity-compose:1.10.1")
   implementation("androidx.datastore:datastore-core-android:1.1.6")
+
+  // Protobuf
+  implementation("com.google.protobuf:protobuf-javalite:3.25.1")
+  implementation("androidx.datastore:datastore-core:1.1.0-beta01") // For Proto DataStore
+  implementation("androidx.datastore:datastore:1.1.0-beta01") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
+
+//Room uses KSP now
+//kapt("com.google.protobuf:protoc:3.25.1")
 
   val adaptiveLayout = "1.0.0"
   implementation("androidx.compose.material3.adaptive:adaptive:$adaptiveLayout")

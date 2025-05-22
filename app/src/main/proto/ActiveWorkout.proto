@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+option java_package = "com.example.myapplication.datastore";
+option java_multiple_files = true;
+
+message ActiveWorkout {
+  string id = 1;
+  int64 lazyListItemID = 2;
+  string uuid = 3;
+  string name = 4;
+  optional string workoutAuthor = 5;
+  repeated WorkoutNoteProto notes = 6;
+  int64 workoutDuration = 7;
+  optional string workoutType = 8;
+  int64 dateCreated = 9;
+  optional int64 workoutStarted = 10;
+  optional int64 workoutEnded = 11;
+  bool isCompleted = 12;
+  optional int32 day = 13;
+  repeated WorkoutItemProto workoutItems = 14;
+  optional double totalVolumeInPounds = 15;
+  optional double totalVolumeInKilograms = 16;
+  optional string programID = 17;
+  optional string mesocycleID = 18;
+  optional string microcycleID = 19;
+  string ownerID = 20;
+  bool isPublic = 21;
+  optional string signature = 22;
+  optional string hashedSignature = 23;
+}
+
+message WorkoutNoteProto {
+  string id = 1;
+  int64 lazyListID = 2;
+  string uuid = 3;
+  string workout = 4;
+  string workoutUUID = 5;
+  optional string note = 6;
+  bool pinned = 7;
+  string ownerID = 8;
+}
+
+message WorkoutItemProto {
+  oneof item {
+    ExerciseSetsProto exerciseSets = 1;
+    SupersetProto superset = 2;
+  }
+}
+
+message ExerciseSetsProto {
+  string id = 1;
+  int64 lazyListItemID = 2;
+  string uuid = 3;
+  string exerciseID = 4;
+  string workoutID = 5;
+  repeated ExerciseNoteProto notes = 6;
+  repeated SetProto sets = 7;
+  string ownerID = 8;
+  int32 order = 9;
+}
+
+message SupersetProto {
+  string id = 1;
+  int64 lazyListItemID = 2;
+  string uuid = 3;
+  repeated ExerciseSetsProto exercisesSets = 4;
+  string workoutID = 5;
+  string ownerID = 6;
+  int32 order = 7;
+}
+
+message ExerciseNoteProto {
+  string id = 1;
+  int64 lazyListID = 2;
+  string uuid = 3;
+  string exercise = 4;
+  string workout = 5;
+  optional string note = 6;
+  bool pinned = 7;
+  string ownerID = 8;
+}
+
+message SetProto {
+  string id = 1;
+  int64 lazyListItemID = 2;
+  string uuid = 3;
+  optional int32 setNumber = 4;
+  optional double weightPounds = 5;
+  optional double weightKilograms = 6;
+  optional int32 repetitions = 7;
+  optional double ratePerceivedEffort = 8;
+  optional double repetitionsInReserve = 9;
+  optional string setTypeID = 10;
+  optional double percentage1RM = 11;
+  bool setCompleted = 12;
+  optional int64 restTimerInSeconds = 13;
+  optional string notes = 14;
+  string exerciseID = 15;
+  string exerciseSetsID = 16;
+  string workoutID = 17;
+  string ownerID = 18;
+  int32 order = 19;
+}
