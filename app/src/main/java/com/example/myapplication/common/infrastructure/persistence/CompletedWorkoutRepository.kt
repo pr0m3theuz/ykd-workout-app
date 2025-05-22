@@ -17,4 +17,6 @@ interface CompletedWorkoutRepository {
   fun getCompletedWorkoutByID(workoutID: ObjectId): Workout?
 
   fun getLatestPreviousIdenticalWorkout(currentWorkout: Workout): Workout?
+
+  suspend fun upsertCompletedWorkout(workout: Workout)
 }
