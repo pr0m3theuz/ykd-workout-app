@@ -1,12 +1,3 @@
-@file:UseSerializers(
-//  MutableRealmIntKSerializer::class,
-//  RealmAnyKSerializer::class,
-//  RealmDictionaryKSerializer::class,
-//  RealmInstantKSerializer::class,
-//  RealmListKSerializer::class,
-//  RealmSetKSerializer::class,
-//  RealmUUIDKSerializer::class,
-)
 @file:OptIn(ExperimentalUuidApi::class)
 
 package com.example.myapplication.common.domain.model
@@ -20,7 +11,6 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -53,6 +43,7 @@ class ExerciseNote() {
   //    var microcyclePinned: Boolean = false
   var ownerID: String? = null
   var isPublic: Boolean = false
+  private val type: String = "ExerciseNote"
 }
 
 @Serializable
@@ -84,6 +75,7 @@ class SupersetNote() {
   //    var microcyclePinned: Boolean = false
   var ownerID: String? = null
   var isPublic: Boolean = false
+  private val type: String = "SupersetNote"
 }
 
 @Serializable
@@ -116,6 +108,7 @@ class WorkoutNote() {
   //    var microcyclePinned: Boolean = false
   var ownerID: String? = null
   var isPublic: Boolean = false
+  private val type: String = "WorkoutNote"
 }
 
 @Serializable
