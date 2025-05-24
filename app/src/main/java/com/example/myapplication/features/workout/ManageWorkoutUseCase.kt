@@ -213,10 +213,16 @@ class ManageWorkoutUseCase(
           ownerID = tempOwnerId, // TODO Replace currentUser.id
         )
       newSets.add(newSet)
+      Log.i(
+        "createNewSetsFromPreviousWorkout",
+        "setNumber: ${set.setNumber}, set.exerciseID: ${set.exerciseID}"
+      )
       if (set.setNumber != null) {
-        val previousSet =
-          completedWorkoutRepository.getPreviousSetForExercise(set.exerciseID!!, set.setNumber!!)
-        previousSet?.let { latestPreviousSets.add(it) }
+        set.exerciseID?.let { exerciseID ->
+          val previousSet =
+            completedWorkoutRepository.getPreviousSetForExercise(exerciseID, set.setNumber!!)
+          previousSet?.let { latestPreviousSets.add(it) }
+        }
       }
     }
     return newSets
@@ -415,7 +421,6 @@ class ManageWorkoutUseCase(
     // TODO Check if rep capacity has changed on sets taken to failure, prompt user
     //  if they want to update the rep capacity for that exercise.
     //  Sets need to be SetType.Failure and rir = 0 or rpe = 10.
-
 
 
     val isInsertSuccess: Boolean = workoutRepository.insertWorkout(workout)
@@ -733,7 +738,7 @@ class ManageWorkoutUseCase(
       exerciseSets.add(
         ExerciseExerciseSets(
           order =
-          if (exerciseSets.isEmpty()) 1 else exerciseSets.size.plus(1),
+            if (exerciseSets.isEmpty()) 1 else exerciseSets.size.plus(1),
           exercise = _exercise,
           notes = pinnedNotes.toMutableList(),
           datePerformed = Clock.System.now(),
