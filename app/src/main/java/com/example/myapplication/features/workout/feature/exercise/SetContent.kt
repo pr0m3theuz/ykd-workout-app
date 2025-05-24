@@ -1,8 +1,10 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.features.workout.feature.exercise
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,6 +61,7 @@ import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.SetTypeOptionsMenu
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.setRestTimer.TimerScreen
+import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Add ability to rearrange sets
 // TODO Add placeholder text for target weight, reps, & rpe/rir
@@ -123,6 +126,23 @@ fun SetContent(
     updateRIR(repetitionsInReserveText)
   }
 
+  // Function to call when completing the set via checkbox or keyboard action
+  fun completeSetWithCurrentOrTargetValues() {
+    // If actualWeight is empty AND there was a target, use target.
+    // (You might want different logic: e.g., only complete if weight is filled)
+    if (exerciseWeightText.isBlank() && (set.targetWeightPounds != null || set.targetWeightKilograms != null)) {
+      updateWeight(set.targetWeightPounds.toString())
+    }
+    // If actualReps is empty, use target. (It's pre-filled, but user might clear it)
+    if (repetitionsText.isBlank() && set.targetRepetitions != null) {
+      updateReps(set.targetRepetitions.toString())
+    }
+    // If actualRir is empty, use target.
+    if (ratePerceivedEffortText.isBlank() && (set.targetRepetitionsInReserve != null || set.targetRatePerceivedEffort != null)) {
+      updateRIR(set.targetRepetitionsInReserve.toString())
+    }
+  }
+
   var openTimerScreen by remember { mutableStateOf(false) }
 
   fun openTimerScreen(open: Boolean) {
@@ -130,6 +150,7 @@ fun SetContent(
   }
 
   if (openTimerScreen && isTimerRunning) {
+    Log.i("SetContent", "SetContent: openTimerScreen: $openTimerScreen")
     TimerScreen(
       openDialog = { open -> openTimerScreen(open) },
       workoutViewModel = workoutViewModel,
@@ -141,8 +162,8 @@ fun SetContent(
     // Only copy if all fields are empty
     if (
       exerciseWeightText.isEmpty() &&
-        repetitionsText.isEmpty() &&
-        repetitionsInReserveText.isEmpty()
+      repetitionsText.isEmpty() &&
+      repetitionsInReserveText.isEmpty()
     ) {
       if (getWeightUnit() == MassUnit.POUNDS.abbreviation) {
         updateWeight(previousSet?.weightPounds.toString())
@@ -173,7 +194,10 @@ fun SetContent(
       SetCompleteCheckbox(
         workoutViewModel = workoutViewModel,
         checkedState,
-        completeSet = { setComplete(it) },
+        completeSet = {
+          setComplete(it)
+          completeSetWithCurrentOrTargetValues()
+        },
         startRestTimer = { startSetCompletedTimer() },
         isTimerRunning = isTimerRunning,
       )
@@ -252,6 +276,7 @@ fun SetContentFrame(
   }
 
   if (openTimerScreen && workoutViewModel.isTimerRunning) {
+    Log.i("SetContentFrame", "openTimerScreen: $openTimerScreen")
     TimerScreen(
       workoutViewModel = workoutViewModel,
       openDialog = { open -> openTimerScreen(open) })
@@ -302,21 +327,21 @@ fun SetContentFrame(
         singleLine = true,
         maxLines = 1,
         keyboardOptions =
-        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+          KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = { focusRequester.requestFocus() }),
         cursorBrush = cursorBrush,
       )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
-                Text(
-                    text = targetWeight,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+      ) {
+        if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
+          Text(
+            text = targetWeight,
+            color = MaterialTheme.colorScheme.outline
+          )
+        }
       }
     }
 
@@ -330,7 +355,7 @@ fun SetContentFrame(
         modifier = modifier.focusRequester(focusRequester),
         textStyle = textStyle,
         keyboardOptions =
-        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+          KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Next) }),
         value = repetitionsText,
         singleLine = true,
@@ -338,14 +363,14 @@ fun SetContentFrame(
         onValueChange = { onRepsChange(it.take(4).trim()) },
         cursorBrush = cursorBrush,
       )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            if (!targetReps.isNullOrBlank() && repetitionsText.isBlank()) {
-                Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
-            }
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+      ) {
+        if (!targetReps.isNullOrBlank() && repetitionsText.isBlank()) {
+          Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
+        }
       }
     }
 
@@ -371,31 +396,31 @@ fun SetContentFrame(
       BasicTextField(
         modifier = modifier,
         textStyle =
-        TextStyle(
-          fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-          textAlign = TextAlign.Center,
-          color = textColor,
-        ),
+          TextStyle(
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+            textAlign = TextAlign.Center,
+            color = textColor,
+          ),
         singleLine = true,
         maxLines = 1,
         keyboardOptions =
-        KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+          KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         value = repetitionsInReserveText,
         onValueChange = { onRIRChange(it.take(4).trim()) },
         cursorBrush = cursorBrush,
-          decorationBox = { innerTextField ->
-              Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Center
-              ) {
-                  if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
-                      Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
-                  }
-              }
-              innerTextField()
-          },
+        decorationBox = { innerTextField ->
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+          ) {
+            if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
+              Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
+            }
+          }
+          innerTextField()
+        },
       )
 
     }
@@ -477,7 +502,7 @@ private fun PreviousSet(
   previousSetText: String,
   copyPreviousSetData: () -> Unit,
 ) {
-  Box(/*modifier = Modifier.width(110.dp)*/ ) {
+  Box(/*modifier = Modifier.width(110.dp)*/) {
     TextButton(
       onClick = { copyPreviousSetData() },
       modifier = modifier,
@@ -501,10 +526,6 @@ private fun SetCompleteCheckbox(
   completeSet: (Boolean) -> Unit,
   startRestTimer: () -> Unit,
   isTimerRunning: Boolean,
-  //  workoutViewModel: WorkoutViewModel,
-  //  exerciseSets: ExerciseExerciseSets,
-  //  setUUID: Uuid,
-  //  set: Set,
 ) {
   var openTimerScreen by remember { mutableStateOf(false) }
 
@@ -513,6 +534,7 @@ private fun SetCompleteCheckbox(
   }
 
   if (openTimerScreen && isTimerRunning) {
+    Log.i("SetCompleteCheckbox", "SetCompleteCheckbox: openTimerScreen: $openTimerScreen")
     TimerScreen(
       workoutViewModel = workoutViewModel,
       openDialog = { open -> openTimerScreen(open) })
@@ -524,169 +546,10 @@ private fun SetCompleteCheckbox(
       checkedState.value = it
       completeSet(it)
       startRestTimer()
-      //        if (!workoutViewModel.isTimerRunning) {
-      //          openTimerScreen(it)
-      //        }
     },
   )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun ExerciseWeightTextField(
-  boxModifier: Modifier = Modifier,
-  textFieldModifier: Modifier = Modifier,
-  textFieldBackgroundColor: Color,
-  exerciseWeightText: String,
-  targetWeight: String?,
-  onWeightChange: (newWeight: String) -> Unit,
-  onImeAction: () -> Unit = {},
-) {
-  Box(
-    modifier =
-    boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //      .align(Alignment.CenterVertically)
-      //      .width(96.dp)
-      .wrapContentSize(Alignment.Center),
-    propagateMinConstraints = true,
-    contentAlignment = Alignment.Center,
-  ) {
-    BasicTextField(
-      value = exerciseWeightText,
-      onValueChange = { onWeightChange(it.take(6).trim()) },
-      modifier = textFieldModifier.padding(PaddingValues(8.dp)),
-      textStyle =
-        TextStyle(
-          fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-          textAlign = TextAlign.Center,
-          color = MaterialTheme.colorScheme.onBackground,
-        ),
-      singleLine = true,
-      maxLines = 1,
-      keyboardOptions =
-      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-      keyboardActions = KeyboardActions(onNext = { onImeAction() }),
-      cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-    )
-    if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
-      Text(text = targetWeight, color = MaterialTheme.colorScheme.outline)
-    }
-  }
-}
-
-@Composable
-private fun ExerciseRepsTextField(
-  boxModifier: Modifier = Modifier,
-  textFieldModifier: Modifier = Modifier,
-  textFieldBackgroundColor: Color,
-  repetitionsText: String,
-  targetReps: String?,
-  onRepsChange: (newReps: String) -> Unit,
-  onImeAction: () -> Unit = {},
-) {
-  Box(
-    modifier =
-    boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //        .align(Alignment.CenterVertically)
-        //        .width(96.dp)
-        .wrapContentSize(Alignment.Center),
-    propagateMinConstraints = true,
-    contentAlignment = Alignment.Center,
-  ) {
-    BasicTextField(
-      modifier = textFieldModifier.padding(PaddingValues(8.dp)),
-      textStyle =
-        TextStyle(
-          fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-          textAlign = TextAlign.Center,
-          color = MaterialTheme.colorScheme.onBackground,
-        ),
-      keyboardOptions =
-      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-      keyboardActions = KeyboardActions(onNext = { onImeAction() }),
-      value = repetitionsText,
-      singleLine = true,
-      maxLines = 1,
-      onValueChange = { onRepsChange(it.take(4).trim()) },
-      cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-    )
-    if (!targetReps.isNullOrBlank() && repetitionsText.isBlank()) {
-      Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
-    }
-  }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun RIRTextField(
-  boxModifier: Modifier = Modifier,
-  textFieldModifier: Modifier = Modifier,
-  textFieldBackgroundColor: Color,
-  repetitionsInReserveText: String,
-  targetRIR: String?,
-  onRIRChange: (newRIR: String) -> Unit,
-  onImeAction: () -> Unit = {},
-) {
-  val uneditedTextColor = MaterialTheme.colorScheme.onSecondaryContainer.copy()
-  var textColor by remember { mutableStateOf(uneditedTextColor) }
-
-  var changeTextColor by remember { mutableStateOf(false) }
-
-  fun changeTextColor() {
-    changeTextColor = true
-  }
-
-  if (changeTextColor) {
-    textColor = MaterialTheme.colorScheme.onBackground
-  }
-
-  Box(
-    modifier =
-    boxModifier
-      .padding(4.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(textFieldBackgroundColor)
-      //      .align(Alignment.CenterVertically)
-        //        .width(40.dp)
-        .wrapContentSize(Alignment.Center),
-    propagateMinConstraints = true,
-    contentAlignment = Alignment.Center,
-  ) {
-    BasicTextField(
-      modifier = textFieldModifier.padding(PaddingValues(8.dp)),
-      textStyle =
-        TextStyle(
-          fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-          textAlign = TextAlign.Center,
-          color = textColor,
-        ),
-      singleLine = true,
-      maxLines = 1,
-      keyboardOptions =
-      KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-      keyboardActions = KeyboardActions(onDone = { onImeAction() }),
-      value = repetitionsInReserveText,
-      onValueChange = { onRIRChange(it.take(4).trim()) },
-      cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-    )
-    if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
-      Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
-    }
-  }
-}
-
-private fun getSetIconText(set: Set, setIndex: Int, setTypeAbbreviation: String): String =
-  if (set.setTypeID == SetType.normalSet) {
-    setIndex.inc().toString()
-  } else {
-    setTypeAbbreviation
-  }
 
 private fun getRatePerceivedEffort(set: Set): String = doubleFormatted(set.ratePerceivedEffort)
 
