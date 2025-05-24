@@ -22,7 +22,8 @@ fun CancelWorkout(cancelWorkout: () -> Unit) {
 
     if (openDiscardWorkoutDialog.value) {
         DiscardWorkoutDialog(
-            openDialog = { closeDiscardWorkoutDialog() },
+            closeDialog = { closeDiscardWorkoutDialog() },
+
             cancelWorkout = { cancelWorkout() }
         )
     }
