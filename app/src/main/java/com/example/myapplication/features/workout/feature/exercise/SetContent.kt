@@ -3,7 +3,6 @@
 package com.example.myapplication.features.workout.feature.exercise
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -60,7 +59,6 @@ import com.example.myapplication.common.util.checkRIRInput
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.SetTypeOptionsMenu
 import com.example.myapplication.features.workout.WorkoutViewModel
-import com.example.myapplication.features.workout.feature.setRestTimer.TimerScreen
 import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Add ability to rearrange sets
@@ -149,14 +147,6 @@ fun SetContent(
     openTimerScreen = open
   }
 
-  if (openTimerScreen && isTimerRunning) {
-    Log.i("SetContent", "SetContent: openTimerScreen: $openTimerScreen")
-    TimerScreen(
-      openDialog = { open -> openTimerScreen(open) },
-      workoutViewModel = workoutViewModel,
-    )
-  }
-
   fun copyPreviousSetData() {
     // TODO Show toast message that all fields are must be empty for this to work
     // Only copy if all fields are empty
@@ -192,14 +182,14 @@ fun SetContent(
     },
     setCompleteCheckbox = {
       SetCompleteCheckbox(
-        workoutViewModel = workoutViewModel,
+//        workoutViewModel = workoutViewModel,
+//        isTimerRunning = isTimerRunning,
         checkedState,
         completeSet = {
           setComplete(it)
           completeSetWithCurrentOrTargetValues()
         },
         startRestTimer = { startSetCompletedTimer() },
-        isTimerRunning = isTimerRunning,
       )
     },
     exerciseWeightText = exerciseWeightText,
@@ -242,7 +232,7 @@ fun SetContent(
         }
       set.repetitionsInReserve = repetitionsInReserveText.toDoubleOrNull()
     },
-    workoutViewModel = workoutViewModel,
+    completeSetWithCurrentOrTargetValues = { completeSetWithCurrentOrTargetValues() }
   )
 }
 
@@ -252,7 +242,6 @@ fun SetContentFrame(
   setTypeOptionsMenu: @Composable () -> Unit,
   previousSet: @Composable () -> Unit,
   setCompleteCheckbox: @Composable (boxModifier: Modifier) -> Unit,
-  workoutViewModel: WorkoutViewModel,
   exerciseWeightText: String,
   targetWeight: String?,
   onWeightChange: (newWeight: String) -> Unit,
@@ -262,25 +251,13 @@ fun SetContentFrame(
   repetitionsInReserveText: String,
   targetRIR: String?,
   onRIRChange: (newRIR: String) -> Unit,
+  completeSetWithCurrentOrTargetValues: () -> Unit
 ) {
 
   val focusRequester = remember { FocusRequester() }
   val focusManager = LocalFocusManager.current
 
   val textFieldBackgroundColor = MaterialTheme.colorScheme.secondaryContainer
-
-  var openTimerScreen by remember { mutableStateOf(false) }
-
-  fun openTimerScreen(open: Boolean) {
-    openTimerScreen = open
-  }
-
-  if (openTimerScreen && workoutViewModel.isTimerRunning) {
-    Log.i("SetContentFrame", "openTimerScreen: $openTimerScreen")
-    TimerScreen(
-      workoutViewModel = workoutViewModel,
-      openDialog = { open -> openTimerScreen(open) })
-  }
 
   Row(
     modifier = Modifier.fillMaxWidth(),
@@ -379,10 +356,6 @@ fun SetContentFrame(
 
     var changeTextColor by remember { mutableStateOf(false) }
 
-    fun changeTextColor() {
-      changeTextColor = true
-    }
-
     if (changeTextColor) {
       textColor = MaterialTheme.colorScheme.onBackground
     }
@@ -405,7 +378,11 @@ fun SetContentFrame(
         maxLines = 1,
         keyboardOptions =
           KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        keyboardActions = KeyboardActions(onDone = {
+          completeSetWithCurrentOrTargetValues()
+          focusManager.clearFocus()
+        }
+        ),
         value = repetitionsInReserveText,
         onValueChange = { onRIRChange(it.take(4).trim()) },
         cursorBrush = cursorBrush,
@@ -521,24 +498,24 @@ private fun PreviousSet(
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 private fun SetCompleteCheckbox(
-  workoutViewModel: WorkoutViewModel,
+//  workoutViewModel: WorkoutViewModel,
   checkedState: MutableState<Boolean>,
   completeSet: (Boolean) -> Unit,
   startRestTimer: () -> Unit,
-  isTimerRunning: Boolean,
+//  isTimerRunning: Boolean,
 ) {
-  var openTimerScreen by remember { mutableStateOf(false) }
+//  var openTimerScreen by remember { mutableStateOf(false) }
+//
+//  fun openTimerScreen(open: Boolean) {
+//    openTimerScreen = open
+//  }
 
-  fun openTimerScreen(open: Boolean) {
-    openTimerScreen = open
-  }
-
-  if (openTimerScreen && isTimerRunning) {
-    Log.i("SetCompleteCheckbox", "SetCompleteCheckbox: openTimerScreen: $openTimerScreen")
-    TimerScreen(
-      workoutViewModel = workoutViewModel,
-      openDialog = { open -> openTimerScreen(open) })
-  }
+//  if (openTimerScreen && isTimerRunning) {
+//    Log.i("SetCompleteCheckbox", "SetCompleteCheckbox: openTimerScreen: $openTimerScreen")
+//    TimerScreen(
+//      workoutViewModel = workoutViewModel,
+//      openDialog = { open -> openTimerScreen(open) })
+//  }
 
   Checkbox(
     checked = checkedState.value,
