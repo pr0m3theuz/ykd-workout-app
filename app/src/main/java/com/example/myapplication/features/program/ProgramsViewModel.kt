@@ -67,7 +67,7 @@ constructor(
     var program: Program?
 
     viewModelScope.launch {
-      program = programsRepository.getProgramById(programID)
+      program = programsRepository.getProgramByID(programID)
       _selectedProgram.value = program
     }
   }
@@ -76,7 +76,7 @@ constructor(
     var program: Program? = null
 
     viewModelScope.launch {
-      program = programsRepository.getProgramById(programID)
+      program = programsRepository.getProgramByID(programID)
     }
 
     return program
@@ -124,9 +124,11 @@ constructor(
 
   fun getMesocyclesByProgram(programID: ObjectId) {
     //        var mesocycles = emptyList<Mesocycle>()
+    TODO("Implement getMesocyclesByProgram")
     viewModelScope.launch {
       programsRepository.getMesocyclesByProgram(programID).collect() {
         _selectedProgramMesocycles.value = it
+        _selectedProgram.value?.mesocycles = it
       }
     }
     //        return mesocycles
@@ -149,6 +151,7 @@ constructor(
     get() = _selectedProgramMicrocycles
 
   fun getMicrocyclesByProgram(programID: ObjectId) /*: List<Microcycle>*/ {
+    TODO("Implement getMicrocyclesByProgram")
     //        var microcycles = emptyList<Microcycle>()
     Log.i("getMicrocyclesByProgram", "programID: $programID")
     viewModelScope.launch {
@@ -161,11 +164,17 @@ constructor(
           microcycle.workouts =
             workoutRepository.getWorkoutsByMicrocycleID(microcycle, microcycle.id)
         }
+
+        microcycleList.groupBy { it.mesocycleID }.forEach {
+          _selectedProgram.value?.mesocycles?.find { mesocycle -> mesocycle.id == it.key }?.microcycles =
+            it.value
+        }
       }
     }
   }
 
   fun getMicrocyclesByMesocycle(mesocycleID: ObjectId): List<Microcycle> {
+    TODO("Implement getMicrocyclesByMesocycle")
     var microcycles = emptyList<Microcycle>()
     viewModelScope.launch {
       programsRepository.getMicrocyclesByMesocycle(mesocycleID).collect() { microcycles = it }
