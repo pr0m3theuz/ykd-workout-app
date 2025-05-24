@@ -103,9 +103,9 @@ protobuf {
         create("java") {
           option("lite")
         }
-        create("kotlin") {
-          option("lite")
-        }
+//        create("kotlin") {
+//          option("lite")
+//        }
       }
     }
   }
