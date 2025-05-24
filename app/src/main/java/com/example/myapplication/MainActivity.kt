@@ -49,9 +49,9 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
+import com.example.myapplication.common.infrastructure.replicator.ReplicatorServiceImpl
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
@@ -82,15 +82,28 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.crashlytics.setCustomKeys
 import com.newrelic.agent.android.NewRelic
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.java.KoinJavaComponent.inject
 
 class MainActivity : ComponentActivity() {
 
   private lateinit var crashlytics: FirebaseCrashlytics
+  private val applicationScope =
+    CoroutineScope(Dispatchers.Default) // Or SupervisorJob() + Dispatchers.Default
 
+  lateinit var userProfileManager: UserProfileManager
+  var replicatorService: ReplicatorService? = null // Make it nullable initially
+
+  @OptIn(InternalCoroutinesApi::class)
   @RequiresApi(Build.VERSION_CODES.S)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -122,28 +135,32 @@ class MainActivity : ComponentActivity() {
       .withLoggingEnabled(true)
       .start(this.applicationContext)
 
+    userProfileManager = inject<UserProfileManager>(UserProfileManager::class.java).value
+    println("MainActivity.onCreate(): userProfileManager: $userProfileManager")
+    val authService: AuthenticationService by inject()
+    // TODO Add User Profile Manager here by injecting it
+    //      val userProfileRepository: KeyValueRepository by inject()
+//    val userProfileManager: UserProfileManager by inject()
 
+    applicationScope.launch {
+      userProfileManager.userProfile
+        .filterNotNull() // Wait until a non-null profile is emitted
+        .collect { profile ->
+          println("MyApplication: UserProfile loaded, initializing ReplicatorServiceImpl.")
+          if (replicatorService == null) { // Ensure it's initialized only once
+            replicatorService = ReplicatorServiceImpl(
+              userProfileManager = userProfileManager,
+              databaseManager = get(),
+            )
+          }
+        }
+    }
+
+    val replicatorService: ReplicatorService by inject()
 
     setContent {
 
-      val authService: AuthenticationService by inject()
-      // TODO Add User Profile Manager here by injecting it
-      //      val userProfileRepository: KeyValueRepository by inject()
-      val userProfileManager: UserProfileManager by inject()
-      val replicatorService: ReplicatorService by inject()
       val mainViewModel = getViewModel<MainViewModel>()
-
-      userProfileManager.updateUserProfile(
-        UserProfile(
-          username = "user",
-          name = "user",
-          email = "user",
-          password = "password",
-          authToken = "TOKEN"
-        )
-      )
-//      authService.authenticatedUser(username = uname, password = pwd)
-
       replicatorService.updateAuthentication(isReset = false)
 
       MyApplicationTheme {
