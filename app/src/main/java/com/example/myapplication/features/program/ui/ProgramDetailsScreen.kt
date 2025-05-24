@@ -115,17 +115,17 @@ fun ProgramDetailsScreen(
 
   val program by programsViewModel.selectedProgram.collectAsStateWithLifecycle(null)
 
-  val programMesocycles by programsViewModel.selectedProgramMesocycles.collectAsStateWithLifecycle()
-
-  val programMicrocycles by
-  programsViewModel.selectedProgramMicrocycles.collectAsStateWithLifecycle()
+//  val programMesocycles by programsViewModel.selectedProgramMesocycles.collectAsStateWithLifecycle()
+//
+//  val programMicrocycles by
+//  programsViewModel.selectedProgramMicrocycles.collectAsStateWithLifecycle()
   //  val mesocycles by programsViewModel.get
 
   // 2. Use LaunchedEffect to trigger loading when programID changes
   LaunchedEffect(programID) {
     programsViewModel.getProgramById(ObjectId(programID))
-    programsViewModel.getMesocyclesByProgram(ObjectId(programID))
-    programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
+//    programsViewModel.getMesocyclesByProgram(ObjectId(programID))
+//    programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
   }
 
   program?.let {
@@ -133,8 +133,10 @@ fun ProgramDetailsScreen(
       navController,
       programsViewModel,
       it,
-      programMesocycles,
-      programMicrocycles,
+      it.mesocycles,
+      it.mesocycles.flatMap { mesocycle -> mesocycle.microcycles },
+//      programMesocycles,
+//      programMicrocycles,
     )
   }
 }
