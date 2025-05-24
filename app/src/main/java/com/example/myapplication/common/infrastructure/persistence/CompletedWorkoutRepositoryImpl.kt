@@ -7,7 +7,6 @@ import com.couchbase.lite.Collection
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
-import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
+import org.koin.java.KoinJavaComponent.inject
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val DATABASE_IS_NULL = "Completed Repository: Database does not exist."
@@ -37,10 +37,10 @@ private const val COLLECTION_IS_NULL =
   "Completed Repository: Completed * Collection does not exist in the Database."
 
 class CompletedWorkoutRepositoryImpl(
-  private val databaseManager: DatabaseManager,
-  private val userProfileManager: UserProfileManager
+  private val databaseManager: DatabaseManager
 ) :
   CompletedWorkoutRepository {
+  val userProfileManager: UserProfileManager by inject(UserProfileManager::class.java)
 
   val db: Database? = databaseManager.database
 
@@ -175,7 +175,7 @@ class CompletedWorkoutRepositoryImpl(
             Expression.property("isCompleted").equalTo(Expression.booleanValue(true)).and(
               Expression.property("isPublic").equalTo(Expression.booleanValue(false))
             ).and(
-              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
+              Expression.property("ownerID").equalTo(Expression.string(user.id?.toHexString()))
             )
           )
           .orderBy(Ordering.property("dateCreated").descending())
@@ -192,7 +192,7 @@ class CompletedWorkoutRepositoryImpl(
       val setsQuery = "SELECT * FROM `CompletedSets` " +
               "WHERE workoutID IN $workoutIDClause" +
               " AND isPublic = false" +
-              " AND ownerID = '${user.id.toHexString()}'"
+              " AND ownerID = '${user.id?.toHexString()}'"
 
       val setsResult = db.createQuery(setsQuery).execute().allResults()
       val sets = setsResult.mapNotNull {
@@ -352,8 +352,16 @@ class CompletedWorkoutRepositoryImpl(
             val setJsonContent = Json.encodeToString(set)
             completedSetsCollection.getDocument(set.id.toHexString())?.toMutable()?.let {
               it.setJSON(setJsonContent)
-              completedSetsCollection.save(it)
-            } ?: completedSetsCollection.save(MutableDocument(set.id.toHexString(), setJsonContent))
+              Log.i(
+                "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
+                "Updating set $setJsonContent"
+              )
+//              completedSetsCollection.save(it)
+            } ?: Log.i(
+              "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
+              "Saving set $setJsonContent"
+            )
+//            completedSetsCollection.save(MutableDocument(set.id.toHexString(), setJsonContent))
           } catch (e: kotlinx.serialization.SerializationException) {
             Log.e(
               "Failed to serialize set $setIdStr for workout ${workout.id}",
@@ -389,8 +397,16 @@ class CompletedWorkoutRepositoryImpl(
       val workoutJson = Json.encodeToString(newWorkout)
       completedWorkoutsCollection.getDocument(workout.id.toHexString())?.toMutable()?.let {
         it.setJSON(workoutJson)
-        completedWorkoutsCollection.save(it)
-      } ?: completedWorkoutsCollection.save(MutableDocument(workout.id.toHexString(), workoutJson))
+        Log.i(
+          "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
+          "Updating workout $workoutJson"
+        )
+//        completedWorkoutsCollection.save(it)
+      } ?: Log.i(
+        "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
+        "Saving workout $workoutJson"
+      )
+      // completedWorkoutsCollection.save(MutableDocument(workout.id.toHexString(), workoutJson))
 
 
       // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
