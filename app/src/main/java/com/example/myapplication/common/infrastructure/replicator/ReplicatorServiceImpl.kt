@@ -32,7 +32,15 @@ class ReplicatorServiceImpl(
   private var replicatorManager: ReplicatorManager? = null
 
   //  private var loggedInUser = authenticationService.getCurrentUser()
-  private var loggedInUser = userProfileManager.getCurrentUser()
+  private var loggedInUser = userProfileManager.userProfile.value
+
+  init {
+    Log.i("ReplicatorServiceImpl", "init ReplicatorService: $this")
+    Log.i(
+      "ReplicatorServiceImpl",
+      "init loggedInUser: $loggedInUser\nUserProfileManager: $userProfileManager\nReplicatorService: $this"
+    )
+  }
 
   // track replication state
   override var isReplicationStarted = false
@@ -63,8 +71,12 @@ class ReplicatorServiceImpl(
     get() = _canStartReplication.asStateFlow()
 
   override fun updateAuthentication(isReset: Boolean) {
-    Log.i("updateReplicationConfig()", "called")
-    loggedInUser = userProfileManager.getCurrentUser()
+    Log.i("ReplicatorServiceImpl.updateAuthentication", "updateReplicationConfig() called")
+    Log.i(
+      "ReplicatorServiceImpl.updateAuthentication",
+      "ReplicatorServiceImpl.updateAuthentication(): loggedInUser: $loggedInUser\nReplicatorService: $this"
+    )
+//    loggedInUser = userProfileManager.getCurrentUser()
     if (isReset) {
       replicationConfig.value.username = ""
       replicationConfig.value.password = ""
