@@ -104,7 +104,7 @@ fun WorkoutContent(
   }
 
   fun closeDiscardWorkoutDialog() {
-    openFinishWorkoutDialog.value = false
+    openCancelWorkoutDialog.value = false
   }
 
   fun openFinishWorkoutDialog() {
@@ -137,7 +137,7 @@ fun WorkoutContent(
 
   if (openCancelWorkoutDialog.value) {
     DiscardWorkoutDialog(
-      openDialog = { closeDiscardWorkoutDialog() },
+      closeDialog = { closeDiscardWorkoutDialog() },
       cancelWorkout = {
         closeDiscardWorkoutDialog()
         workoutViewModel.cancelWorkout()
