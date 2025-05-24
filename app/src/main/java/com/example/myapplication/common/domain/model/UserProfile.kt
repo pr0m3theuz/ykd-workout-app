@@ -24,7 +24,7 @@ import org.bson.types.ObjectId
 
 @Serializable
 data class UserProfile(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId? = null,
   var name: String? = null,
   var username: String? = null,
   var email: String? = null,
@@ -32,7 +32,8 @@ data class UserProfile(
   var defaultWeightUnit: String = MassUnit.POUNDS.abbreviation, // TODO have enum class??????
   var intensity: String = Intensity.RIR.abbreviation, // TODO have enum class??????
   var authToken: String? = null,
-  var isLoggedIn: Boolean = false
+  var isLoggedIn: Boolean = false,
+  private val type: String = "User"
 )
 
 // Define DataStore keys
