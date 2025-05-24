@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun DiscardWorkoutDialog(
-    openDialog: (Boolean) -> Unit,
+    closeDialog: () -> Unit,
     cancelWorkout: () -> Unit
 ) {
     AlertDialog(
@@ -16,7 +16,7 @@ fun DiscardWorkoutDialog(
             // Dismiss the dialog when the user clicks outside the dialog or on the back
             // button. If you want to disable that functionality, simply use an empty
             // onCloseRequest.
-            openDialog(false)
+            closeDialog()
         },
         title = {
             Text(text = "Discard workout?")
@@ -25,7 +25,7 @@ fun DiscardWorkoutDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    openDialog(false)
+                    closeDialog()
                     cancelWorkout()
                 }
             ) {
@@ -35,7 +35,7 @@ fun DiscardWorkoutDialog(
         dismissButton = {
             TextButton(
                 onClick = {
-                    openDialog(false)
+                    closeDialog()
                 }
             ) {
                 Text("Resume")
