@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
@@ -200,20 +201,29 @@ private fun ExerciseNotesList(
   }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun SetContentHeaderPreview() {
+  SetContentHeader(weightUnit = "kg")
+}
+
+
 @Composable
 private fun SetContentHeader(weightUnit: String) {
   Row(
     modifier = Modifier
       .fillMaxWidth()
       .padding(vertical = 8.dp),
-    horizontalArrangement = Arrangement.SpaceBetween,
+//    horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
   ) {
     val textStyle = MaterialTheme.typography.bodyMedium
 
     Box(modifier = Modifier
-      .padding(0.dp)
-      .width(48.dp), contentAlignment = Alignment.Center) {
+      .width(48.dp),
+//      .weight(0.1f),
+      contentAlignment = Alignment.Center
+    ) {
       Text("Set", style = textStyle)
     }
 
@@ -222,15 +232,17 @@ private fun SetContentHeader(weightUnit: String) {
       Modifier
         // .padding(4.dp)
         .width(110.dp),
+//        .weight(0.22f),
       contentAlignment = Alignment.Center
     ) {
-      Text("Previous", style = textStyle)
+      Text("Previous Set", style = textStyle)
     }
 
     Box(
       modifier = Modifier
         .padding(PaddingValues(horizontal = 0.dp))
-        .width(92.dp),
+        .width(105.dp),
+//        .weight(0.20f),
       contentAlignment = Alignment.Center
     ) {
       Text("Weight ($weightUnit)", style = textStyle)
@@ -239,7 +251,8 @@ private fun SetContentHeader(weightUnit: String) {
     Box(
       modifier = Modifier
         .padding(PaddingValues(horizontal = 0.dp))
-        .width(60.dp),
+        .width(65.dp),
+//        .weight(0.15f),
       contentAlignment = Alignment.Center
     ) {
       Text("Reps", style = textStyle)
@@ -247,14 +260,14 @@ private fun SetContentHeader(weightUnit: String) {
 
     Box(modifier = Modifier
       .padding(0.dp)
-      .width(40.dp), contentAlignment = Alignment.Center) {
+      .width(60.dp),
+//      .weight(0.1f),
+      contentAlignment = Alignment.Center
+    ) {
       Text("RIR", style = textStyle)
     }
 
-    Spacer(
-      Modifier
-        .width(32.dp)
-        .padding(PaddingValues(horizontal = 4.dp)))
+    Spacer(Modifier.weight(0.1f))
   }
 }
 
@@ -297,7 +310,7 @@ private fun ExerciseSetsWorkoutSummary(
       text = "Volume: ${df.format(totalVolume)} $weightUnit",
       style = textStyle
     )
-    Text(text = "Reps: $totalRepetitions", style = textStyle)
+    Text(text = "Total Reps: $totalRepetitions", style = textStyle)
     Text(text = "Avg Weight: ${df.format(averageWeight)}", style = textStyle)
   }
 }
