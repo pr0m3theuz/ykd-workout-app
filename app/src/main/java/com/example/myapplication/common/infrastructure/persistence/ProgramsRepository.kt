@@ -22,7 +22,7 @@ interface ProgramsRepository {
 
   fun getAllDistinctProgramTemplates(): Flow<List<Program>>
 
-  fun getProgramById(programID: ObjectId): Program?
+  fun getProgramByID(programID: ObjectId): Program?
 
   fun getActivePrograms(): Flow<List<Program>>
 
