@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
-import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.convertKgToPound
 import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.domain.model.setSummaryRIR
@@ -58,18 +57,13 @@ import com.example.myapplication.common.util.checkIntInput
 import com.example.myapplication.common.util.checkRIRInput
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.SetTypeOptionsMenu
-import com.example.myapplication.features.workout.WorkoutViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Add ability to rearrange sets
-// TODO Add placeholder text for target weight, reps, & rpe/rir
-// TODO FocusRequester.requestFocus() to tab to next field doesn't work
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun SetContent(
-  workoutViewModel: WorkoutViewModel,
-  exerciseSets: WorkoutComponent,
   setIndex: Int,
   set: Set,
   getWeightUnit: () -> String,
@@ -77,7 +71,6 @@ fun SetContent(
   updateSetReps: (reps: String) -> Unit,
   updateSetRIR: (rir: String) -> Unit,
   updateSetWeight: (weight: String) -> Unit,
-  isTimerRunning: Boolean,
   updateSetType: (setType: SetType) -> Unit,
   setComplete: (Boolean) -> Unit,
   startSetCompletedTimer: () -> Unit,
@@ -114,8 +107,6 @@ fun SetContent(
 
   fun updateWeight(weight: String) {
     updateSetWeight(weight)
-    //    weightFocusState = true
-    //    weightState.isFocusedDirty = weightFocusState
   }
 
   fun updateSetData() {
@@ -139,12 +130,6 @@ fun SetContent(
     if (ratePerceivedEffortText.isBlank() && (set.targetRepetitionsInReserve != null || set.targetRatePerceivedEffort != null)) {
       updateRIR(set.targetRepetitionsInReserve.toString())
     }
-  }
-
-  var openTimerScreen by remember { mutableStateOf(false) }
-
-  fun openTimerScreen(open: Boolean) {
-    openTimerScreen = open
   }
 
   fun copyPreviousSetData() {
@@ -498,25 +483,10 @@ private fun PreviousSet(
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 private fun SetCompleteCheckbox(
-//  workoutViewModel: WorkoutViewModel,
   checkedState: MutableState<Boolean>,
   completeSet: (Boolean) -> Unit,
   startRestTimer: () -> Unit,
-//  isTimerRunning: Boolean,
 ) {
-//  var openTimerScreen by remember { mutableStateOf(false) }
-//
-//  fun openTimerScreen(open: Boolean) {
-//    openTimerScreen = open
-//  }
-
-//  if (openTimerScreen && isTimerRunning) {
-//    Log.i("SetCompleteCheckbox", "SetCompleteCheckbox: openTimerScreen: $openTimerScreen")
-//    TimerScreen(
-//      workoutViewModel = workoutViewModel,
-//      openDialog = { open -> openTimerScreen(open) })
-//  }
-
   Checkbox(
     checked = checkedState.value,
     onCheckedChange = {
