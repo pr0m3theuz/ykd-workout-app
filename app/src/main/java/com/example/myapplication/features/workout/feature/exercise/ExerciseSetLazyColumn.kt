@@ -5,8 +5,8 @@ package com.example.myapplication.features.workout.feature.exercise
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -280,9 +280,9 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
     item { AddExercise() }
     if (enableCancelWorkout) item { CancelWorkout() }
     item {
-      Box(
+      Spacer(
         modifier = Modifier
-          .height(128.dp)
+          .height(200.dp)
           .fillMaxWidth()
       )
     }
