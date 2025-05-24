@@ -18,7 +18,6 @@ import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import kotlin.time.DurationUnit
@@ -80,7 +79,7 @@ data class Exercise(
   var workingSetRestTimerEnabled: Boolean = true,
   var warmUpSetRestTimerEnabled: Boolean = false,
 
-  var repCapacity: RepCapacity = RepCapacity.Average, // TODO Store here in a different table/data class
+  var repCapacity: RepCapacity = RepCapacity.Average,
   var estimated1RM: Double? = null, // TODO Store here in a different table/data class
 //  @Serializable(URLSerializer::class)
   var mediaURI: String? = null,
