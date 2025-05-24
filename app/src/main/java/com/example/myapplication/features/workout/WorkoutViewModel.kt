@@ -818,10 +818,13 @@ class WorkoutViewModel(
   private fun setWorkoutComponents(workoutComponents: List<WorkoutComponent>) {
     _workoutComponents = workoutComponents.toMutableList()
     _workoutComponentFlow.value = workoutComponents
-    Log.i("setWorkoutComponents", "setWorkoutComponents.workoutViewModel: $this")
     Log.i(
-      "setWorkoutComponents",
-      "setWorkoutComponents._workoutComponents: ${workoutComponents.size}"
+      "WorkoutViewModel.setWorkoutComponents",
+      "WorkoutViewModel.setWorkoutComponents.workoutViewModel: $this"
+    )
+    Log.i(
+      "WorkoutViewModel.setWorkoutComponents",
+      "WorkoutViewModel.setWorkoutComponents._workoutComponents: ${workoutComponents.size}"
     )
     //    savedStateHandle[EXERCISE_EXERCISE_SETS] = exercisesSets.toMutableList()
   }
