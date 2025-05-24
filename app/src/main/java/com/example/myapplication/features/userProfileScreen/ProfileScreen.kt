@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,8 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import org.koin.androidx.compose.koinViewModel
+import org.koin.java.KoinJavaComponent.inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +56,9 @@ fun ProfileScreen(
 //  val user = profileViewModel.currentUser
 //  val userEmail = user?.profileAsBsonDocument()!!["email"]?.asString()?.value ?: "anon@anon.anon"
 
-  val user = "Anonymous"
+//  val user = "Anonymous"
+  val userProfileManager by inject<UserProfileManager>(UserProfileManager::class.java)
+  val user = userProfileManager.userProfile.collectAsState().value
 //  val userEmail = "TEMP@anon.anon"
 
   Scaffold(
@@ -87,7 +92,10 @@ fun ProfileScreen(
               contentDescription = "profile picture"
             )
 //          Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
-            Text(text = user, fontSize = MaterialTheme.typography.titleLarge.fontSize)
+            Text(
+              text = user.name ?: "MISSING",
+              fontSize = MaterialTheme.typography.titleLarge.fontSize
+            )
           }
         }
 
@@ -98,7 +106,7 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
           ) {
             Text(text = "Profile")
-            Text(text = "????")
+            Text(text = user.id?.toHexString() ?: "MISSING")
           }
           HorizontalDivider()
         }
