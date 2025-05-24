@@ -86,7 +86,7 @@ fun SetContent(
 
   val previousSet = populatePreviousSetField()
 
-  val previousSetText by remember { mutableStateOf(previousSet?.setSummaryRIR(weightUnit) ?: "") }
+  val previousSetText by remember { mutableStateOf(previousSet?.setSummaryRIR(weightUnit) ?: "–") }
 
   val exerciseWeight = getExerciseWeight(set, weightUnit)
   var exerciseWeightText by remember { mutableStateOf(exerciseWeight) }
