@@ -1,8 +1,11 @@
 package com.example.myapplication.common.infrastructure.persistence
 
 import android.util.Log
+import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.MutableDocument
+import com.couchbase.lite.QueryBuilder
+import com.couchbase.lite.SelectResult
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import kotlinx.serialization.json.Json
@@ -16,6 +19,8 @@ interface UserRepository {
   fun createUser(user: UserProfile)
   fun updateCurrentUser(user: UserProfile)
   fun deleteCurrentUser(user: UserProfile)
+
+  fun getUser(): UserProfile?
 }
 
 class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRepository {
@@ -30,13 +35,14 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val document = MutableDocument()
-      document.setString("id", user.id.toHexString())
+      document.setString("id", user.id?.toHexString())
       document.setString("name", user.name)
       document.setString("email", user.email)
       document.setString("password", user.password)
       document.setString("weightUnit", user.defaultWeightUnit)
       document.setString("intensity", user.intensity)
       document.setString("type", "User")
+      document.setString("authToken", user.authToken)
 //      document.setString("lengthUnit", user.defaultLengthUnit)
 
       collection.save(document)
@@ -51,7 +57,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
 
       val collection = db.getCollection("Users")
       requireNotNull(collection) { COLLECTION_IS_NULL }
-      val document = collection.getDocument(user.id.toHexString())?.toMutable()
+      val document = user.id?.let { collection.getDocument(it.toHexString())?.toMutable() }
       requireNotNull(document) { "User Repository: User does not exist!" }
 
       document.setString("name", user.name)
@@ -59,6 +65,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       document.setString("password", user.password)
       document.setString("weightUnit", user.defaultWeightUnit)
       document.setString("intensity", user.intensity)
+      document.setString("authToken", user.authToken)
 //      document.setString("lengthUnit", user.defaultLengthUnit)
 
       collection.save(document)
@@ -72,13 +79,28 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("Users")
       requireNotNull(collection) { COLLECTION_IS_NULL }
-      val document = collection.getDocument(user.id.toHexString())
+      val document = collection.getDocument(user.id?.toHexString() ?: "MISSING_VALUE")
       requireNotNull(document) { "User Repository: User does not exist!" }
 
       collection.delete(document)
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
+  }
+
+  override fun getUser(): UserProfile? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("Users")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val queryBuilder =
+        QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
+      TODO("to be implemented")
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return null
   }
 
 }
