@@ -172,6 +172,7 @@ fun ProgramsScreen(
                 // Text("Continue Program", style = titleMedium)
                 val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program.id)
 
+                // TODO reassess logic/purpose of this
                 val currentlyActiveWorkout = programsViewModel.getCurrentlyActiveWorkouts()
                   .collectAsState(initial = emptyList())
                 // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
