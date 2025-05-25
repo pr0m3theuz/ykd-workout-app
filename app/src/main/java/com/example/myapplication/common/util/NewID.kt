@@ -9,7 +9,8 @@ import kotlin.random.nextUInt
 val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
 
 fun newLazyListItemID(): Long {
-    return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 999))
+    return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 9999))
+        .plus(Random.nextUInt().toLong())
 }
 
 fun fakeULID(): Long {
