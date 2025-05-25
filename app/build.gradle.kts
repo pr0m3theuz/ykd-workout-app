@@ -95,7 +95,7 @@ composeCompiler {
 
 protobuf {
   protoc {
-    artifact = "com.google.protobuf:protoc:3.25.1" // Ensure version matches
+    artifact = "com.google.protobuf:protoc:3.25.5" // Ensure version matches
   }
   generateProtoTasks {
     all().forEach { task ->
@@ -103,9 +103,9 @@ protobuf {
         create("java") {
           option("lite")
         }
-//        create("kotlin") {
-//          option("lite")
-//        }
+        create("kotlin") {
+          option("lite")
+        }
       }
     }
   }
@@ -114,6 +114,15 @@ protobuf {
 dependencies {
   implementation("androidx.core:core-ktx:1.16.0")
   implementation("androidx.activity:activity-compose:1.10.1")
+
+  // Jetpack DataStore Preferences
+  // Protobuf
+  implementation("com.google.protobuf:protobuf-javalite:3.25.5")
+  implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.5")
+//  implementation("androidx.datastore:datastore-core-android:1.1.7")
+  implementation("androidx.datastore:datastore-preferences:1.1.7")
+  implementation("androidx.datastore:datastore-core:1.1.7") // For Proto DataStore
+  implementation("androidx.datastore:datastore:1.1.7") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
 
   val adaptiveLayout = "1.1.0"
   implementation("androidx.compose.material3.adaptive:adaptive:$adaptiveLayout")
@@ -214,9 +223,9 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serialization")
 
-    //    Koin
+  //    Koin
   val koin = "4.0.4"
-    implementation("io.insert-koin:koin-core:$koin")
+  implementation("io.insert-koin:koin-core:$koin")
   implementation("io.insert-koin:koin-android:$koin")
   //    implementation("io.insert-koin:koin-annotations:3.4.3")
   //    ksp("io.insert-koin:koin-ksp-compiler:3.4.3")
@@ -258,12 +267,6 @@ dependencies {
   // couchbase lite
   implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.3")
 //  implementation("com.couchbase.client:kotlin-client:1.4.9")
-
-  // Jetpack DataStore Preferences
-//  implementation("com.google.protobuf:protobuf-javalite:4.31.0")
-  implementation("androidx.datastore:datastore-core-android:1.1.7")
-  implementation("androidx.datastore:datastore-preferences:1.1.7") // Check for the latest version
-  implementation("androidx.datastore:datastore:1.1.7")
 }
 
 /*kapt {
