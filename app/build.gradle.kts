@@ -133,7 +133,7 @@ dependencies {
   androidTestImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
 
   val composeVersion = "1.8.2"
-//  implementation(platform("androidx.compose:compose-bom:2025.05.01"))
+  implementation(platform("androidx.compose:compose-bom:2025.05.01"))
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
   implementation("androidx.compose.material:material:$composeVersion")
