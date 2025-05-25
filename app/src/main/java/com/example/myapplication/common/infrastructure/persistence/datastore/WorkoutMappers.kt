@@ -176,10 +176,9 @@ fun ExerciseSets.toProto(): ExerciseSetsProto {
     builder.addAllSets(this.sets.map { it.toProto() })
     builder.ownerID = this.ownerID
     builder.order = this.order
-    builder.microcycleID = this.microcycleID?.toProtoString()
-    builder.mesocycleID = this.mesocycleID?.toProtoString()
-    builder.programID = this.programID?.toProtoString()
-
+    this.microcycleID?.let { builder.microcycleID = it.toProtoString() }
+    this.mesocycleID?.let { builder.mesocycleID = it.toProtoString() }
+    this.programID?.let { builder.programID = it.toProtoString() }
     return builder.build()
 }
 
@@ -194,9 +193,9 @@ fun ExerciseSetsProto.toDomain(): ExerciseSets {
         sets = this.setsList.map { it.toDomain() }.toMutableList(),
         ownerID = this.ownerID,
         order = this.order,
-        microcycleID = this.microcycleID.toDomainObjectId(),
-        mesocycleID = this.mesocycleID.toDomainObjectId(),
-        programID = this.programID.toDomainObjectId(),
+        programID = if (this.hasProgramID() && this.programID != "") this.programID.toDomainObjectId() else null,
+        mesocycleID = if (this.hasMesocycleID() && this.mesocycleID != "") this.mesocycleID.toDomainObjectId() else null,
+        microcycleID = if (this.hasMicrocycleID() && this.microcycleID != "") this.microcycleID.toDomainObjectId() else null,
         // isPublic is in domain but not in proto ExerciseSetsProto (it's in WorkoutItem)
     )
 }
@@ -210,9 +209,9 @@ fun Superset.toProto(): SupersetProto {
     builder.workoutID = this.workoutID.toProtoString()
     this.ownerID?.let { builder.ownerID = it } // ownerID is nullable in domain Superset
     builder.order = this.order
-    builder.microcycleID = this.microcycleID?.toProtoString()
-    builder.mesocycleID = this.mesocycleID?.toProtoString()
-    builder.programID = this.programID?.toProtoString()
+    this.programID?.let { builder.programID = it.toProtoString() }
+    this.mesocycleID?.let { builder.mesocycleID = it.toProtoString() }
+    this.microcycleID?.let { builder.microcycleID = it.toProtoString() }
     // isPublic is in domain but not in proto SupersetProto (it's in WorkoutItem)
     // supersetNotes in domain, not in proto
     return builder.build()
@@ -227,9 +226,9 @@ fun SupersetProto.toDomain(): Superset {
         workoutID = this.workoutID.toDomainObjectId(),
         ownerID = this.ownerID,
         order = this.order,
-        microcycleID = this.microcycleID.toDomainObjectId(),
-        mesocycleID = this.mesocycleID.toDomainObjectId(),
-        programID = this.programID.toDomainObjectId(),
+        programID = if (this.hasProgramID() && this.programID != "") this.programID.toDomainObjectId() else null,
+        mesocycleID = if (this.hasMesocycleID() && this.mesocycleID != "") this.mesocycleID.toDomainObjectId() else null,
+        microcycleID = if (this.hasMicrocycleID() && this.microcycleID != "") this.microcycleID.toDomainObjectId() else null,
         // isPublic is in domain but not in proto SupersetProto (it's in WorkoutItem)
         // supersetNotes in domain, not in proto
     )
