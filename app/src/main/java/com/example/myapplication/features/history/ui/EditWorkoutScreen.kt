@@ -207,10 +207,8 @@ fun EditWorkoutScreen(
                 removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
                 setContent = {
                   SetContent(
-                    workoutViewModel = workoutViewModel,
-                    exerciseSets,
-                    index,
-                    set,
+                    setIndex = index,
+                    set = set,
                     getWeightUnit = { workoutViewModel.getWeightUnit(exerciseSets) },
                     populatePreviousSetField = {
                       exerciseSets.exercise.let { exercise ->
@@ -243,7 +241,6 @@ fun EditWorkoutScreen(
                         newWeight = weight.toDoubleOrNull(),
                       )
                     },
-                    isTimerRunning = false,
                     updateSetType = { setType ->
                       workoutViewModel.updateSetType(
                         exerciseSets = exerciseSets,
