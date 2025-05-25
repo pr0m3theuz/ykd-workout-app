@@ -57,9 +57,9 @@ message ExerciseSetsProto {
   repeated SetProto sets = 7;
   string ownerID = 8;
   int32 order = 9;
-  string microcycleID = 10;
-  string mesocycleID = 11;
-  string programID = 12;
+  optional string microcycleID = 10;
+  optional string mesocycleID = 11;
+  optional string programID = 12;
 }
 
 message SupersetProto {
@@ -70,9 +70,9 @@ message SupersetProto {
   string workoutID = 5;
   string ownerID = 6;
   int32 order = 7;
-  string microcycleID = 8;
-  string mesocycleID = 9;
-  string programID = 10;
+  optional string microcycleID = 8;
+  optional string mesocycleID = 9;
+  optional string programID = 10;
 }
 
 message ExerciseNoteProto {
