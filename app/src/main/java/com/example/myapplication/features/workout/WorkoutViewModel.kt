@@ -295,35 +295,6 @@ class WorkoutViewModel(
         notifyIntent,
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
       )
-
-    // TODO java.lang.NullPointerException: Attempt to invoke interface method 'java.lang.Object kotlinx.coroutines.flow.MutableStateFlow.getValue()' on a null object reference
-    /*    viewModelScope.launch {
-          runCatching {
-            _workout.value?.let { _ ->
-              _workout.collect { workout ->
-                _workoutNotes.collect { workoutNotes ->
-                  _workoutComponentFlow.collect { workoutComponents ->
-                    runCatching {
-                      workout?.let {
-                        manageWorkoutUseCase.saveInProgressWorkout(
-                          workout = workout,
-                          workoutNotes = workoutNotes,
-                          workoutComponents = workoutComponents,
-                        )
-                      }
-                    }.onFailure {
-                      // Handle error, e.g., log error, show error message
-                      Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
-                    }
-                  }
-                }
-              }
-            }
-          }.onFailure {
-            // Handle error, e.g., log error, show error message
-            Log.e("saveInProgressWorkout", "Error saving in progress workout", it)
-          }
-        }*/
   }
 
 
