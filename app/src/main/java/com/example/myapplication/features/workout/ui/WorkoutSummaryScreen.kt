@@ -194,7 +194,7 @@ fun WorkoutSummaryCard(
 
   Card(modifier = Modifier.padding(vertical = 0.dp)) {
     Column(modifier = Modifier.padding(8.dp)) {
-      Row { Text(text = "${completedWorkout.name}", style = MaterialTheme.typography.titleMedium) }
+      Row { Text(text = completedWorkout.name, style = MaterialTheme.typography.titleMedium) }
 
       Row {
         Text(
