@@ -459,7 +459,7 @@ class ManageWorkoutUseCase(
     // Note: Decide if calculating total volume should be done
     // workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
 
-    inProgressWorkoutRepository.saveInProgressWorkout(workout)
+//    inProgressWorkoutRepository.saveInProgressWorkout(workout)
   }
 
   fun deleteInProgressWorkout(
@@ -567,7 +567,7 @@ class ManageWorkoutUseCase(
   }
 
   fun getWorkoutsCount(): Int {
-    return workoutRepository.getWorkoutsCount()
+    return completedWorkoutRepository.getCompletedWorkoutsCount()
   }
 
   fun checkAllSetsComplete(workoutComponents: List<WorkoutComponent>): Pair<Int, Int> {
