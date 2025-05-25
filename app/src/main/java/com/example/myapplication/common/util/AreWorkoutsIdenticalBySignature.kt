@@ -37,8 +37,6 @@ fun generateWorkoutItemSignature(item: WorkoutItem, includeTargets: Boolean): St
   return when (item) {
     is ExerciseSets -> generateExerciseSetsSignature(item, includeTargets)
     is Superset -> generateSupersetSignature(item, includeTargets)
-    // Add cases for other WorkoutItem subtypes if they exist
-    else -> "UNKNOWN_ITEM"
   }
 }
 
