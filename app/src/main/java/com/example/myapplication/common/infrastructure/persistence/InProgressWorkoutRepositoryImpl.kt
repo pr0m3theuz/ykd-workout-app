@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import java.util.Date
@@ -159,15 +158,6 @@ class InProgressWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
   override fun deleteActiveWorkout(workoutID: ObjectId): Boolean {
     try {
-      requireNotNull(currentActiveWorkoutDatabase) { DATABASE_IS_NULL }
-      val collection = currentActiveWorkoutDatabase.getCollection("ActiveWorkout")
-
-      requireNotNull(collection) { COLLECTION_IS_NULL }
-
-      val document = collection.getDocument(workoutID.toString())
-      requireNotNull(document) { "Workout Repository: Workout does not exist!" }
-
-      collection.delete(document)
       return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
