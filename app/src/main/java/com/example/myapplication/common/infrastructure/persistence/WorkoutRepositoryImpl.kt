@@ -6,7 +6,6 @@ import android.util.Log
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
-import com.couchbase.lite.Function
 import com.couchbase.lite.Join
 import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
@@ -91,29 +90,6 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       Log.e(e.message, e.stackTraceToString())
     }
     return null
-  }
-
-  override fun getWorkoutsCount(): Int {
-    try {
-      requireNotNull(db) { DATABASE_IS_NULL }
-      val collection = db.getCollection("Workout")
-
-      requireNotNull(collection) { COLLECTION_IS_NULL }
-
-      val query =
-        QueryBuilder.select(
-          SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
-        )
-          .from(DataSource.collection(collection))
-
-//      val query = QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
-
-      val results = query.execute().allResults()
-      return results[0].getInt("count")
-    } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
-    }
-    return 0
   }
 
   override fun getWorkoutsByMicrocycleID(
