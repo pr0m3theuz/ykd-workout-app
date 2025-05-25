@@ -200,22 +200,30 @@ class WorkoutViewModel(
   init {
     //    startWorkoutTimer()
     // testSaveStateHandle() // Potentially remove or adjust based on DataStore as SOT
-
-    // Load from DataStore first
+    Log.d("WorkoutViewModel", "WorkoutViewModel init ${this@WorkoutViewModel}")
     Log.d(
       "WorkoutViewModel",
       "is initialWorkoutData.isInitialized : ${this::initialWorkoutData.isInitialized}"
     )
 
+
+    // TODO there is a race condition between getWorkoutByID and load from DataStore
+    // Load from DataStore first
     viewModelScope.launch {
       // This triggered each item the current workout is saved to the DataStore due to collecting the updated activeWorkout
 //      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
       val activeWorkout = workoutDatastore.getActiveWorkout.first()
 
       Log.d("WorkoutViewModel", "is _workout.value null: ${_workout.value == null}")
+      Log.d("WorkoutViewModel", "_workout.name: ${_workout.value?.name}")
+      Log.d("WorkoutViewModel", "isWorkoutActive: $isWorkoutActive")
 //        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}")
-//        Log.d("WorkoutViewModel", "activeWorkout: $activeWorkout")
-      if (activeWorkout != ActiveWorkout.getDefaultInstance()) {
+//      Log.d(
+//        "WorkoutViewModel",
+//        "activeWorkout == getDefaultInstance(): ${activeWorkout != ActiveWorkout.getDefaultInstance()}"
+//      )
+
+      if (activeWorkout != ActiveWorkout.getDefaultInstance() && !isWorkoutActive) {
         val domainWorkout = activeWorkout.toDomainWorkout()
         _workout.value = domainWorkout
         _workoutName.value = domainWorkout.name
@@ -763,7 +771,11 @@ class WorkoutViewModel(
     // it should probably clear DataStore first or handle the merge carefully.
 
     if (!isWorkoutActive || _workout.value?.id != workoutID) { // Only load if not already active with same ID
-      Log.d("WorkoutViewModel", "getWorkoutByID: Loading workout $workoutID explicitly.")
+      Log.d(
+        "WorkoutViewModel",
+        "WorkoutViewModel.getWorkoutByID: Loading workout $workoutID explicitly."
+      )
+      Log.d("WorkoutViewModel", "WorkoutViewModel.getWorkoutByID: $this")
       val loadedWorkout = manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
         managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
           ?.let { previousWorkout ->
