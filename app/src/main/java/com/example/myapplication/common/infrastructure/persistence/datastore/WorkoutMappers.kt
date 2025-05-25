@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.example.myapplication.common.infrastructure.persistence.datastore
 
 import com.example.myapplication.common.domain.model.ExerciseNote
@@ -16,6 +18,7 @@ import com.example.myapplication.datastore.SupersetProto
 import com.example.myapplication.datastore.WorkoutItemProto
 import com.example.myapplication.datastore.WorkoutNoteProto
 import org.bson.types.ObjectId
+import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlinx.datetime.Instant as KotlinxInstant
 
@@ -33,7 +36,8 @@ fun Long.toDomainInstant(): KotlinxInstant = KotlinxInstant.fromEpochMillisecond
 // --- Enum Mappers (Example for SetType) ---
 // Assuming SetType has a 'name' property or similar unique string identifier.
 // Adjust if SetType uses ordinal or a specific ID.
-fun SetType.toProtoString(): String = this.name // Or this.id, this.ordinal.toString()
+fun SetType.toProtoString(): String =
+    this.setTypeID.toString() // Or this.id, this.ordinal.toString()
 fun String.toDomainSetType(): SetType {
     // This might require a lookup map or a when statement if SetType is more complex
     // For simplicity, assuming SetType.valueOf(name) works or there's a similar factory method.
@@ -42,7 +46,7 @@ fun String.toDomainSetType(): SetType {
     // For now, let's assume a simple 'valueOf', which might not be robust for all enum cases.
     // You'll likely need a more specific implementation based on your SetType definition.
     // Placeholder:
-    return SetType.values().firstOrNull { it.name == this } ?: SetType.normalSet // Default if not found
+    return SetType.getSetType(this.toInt()) // Default if not found
 }
 
 
@@ -59,7 +63,7 @@ fun WorkoutNote.toProto(): WorkoutNoteProto {
     builder.pinned = this.pinned
     this.ownerID?.let { builder.ownerID = it }
     // isPublic is not in domain WorkoutNote, defaulting to false or consider adding it
-    builder.isPublic = false // Default value
+//    builder.isPublic = false // Default value
     return builder.build()
 }
 
@@ -68,11 +72,11 @@ fun WorkoutNoteProto.toDomain(): WorkoutNote {
     domain.id = this.id.toDomainObjectId()
     domain.lazyListID = this.lazyListID
     domain.uuid = this.uuid.toDomainUuid()
-    if (this.hasWorkout()) domain.workout = this.workout.toDomainObjectId()
-    if (this.hasWorkoutUUID()) domain.workoutUUID = this.workoutUUID.toDomainUuid()
-    if (this.hasNote()) domain.note = this.note
+    domain.workout = this.workout.toDomainObjectId()
+    domain.workoutUUID = this.workoutUUID.toDomainUuid()
+    domain.note = this.note
     domain.pinned = this.pinned
-    if (this.hasOwnerID()) domain.ownerID = this.ownerID
+    domain.ownerID = this.ownerID
     // isPublic is not in domain WorkoutNote, so it's ignored or handled if domain model changes
     return domain
 }
@@ -88,7 +92,7 @@ fun ExerciseNote.toProto(): ExerciseNoteProto {
     builder.pinned = this.pinned
     this.ownerID?.let { builder.ownerID = it }
     // isPublic is not in domain ExerciseNote, defaulting to false
-    builder.isPublic = false // Default value
+//    builder.isPublic = false // Default value
     // dateCreated is in domain but not in proto ExerciseNoteProto
     return builder.build()
 }
@@ -98,11 +102,11 @@ fun ExerciseNoteProto.toDomain(): ExerciseNote {
     domain.id = this.id.toDomainObjectId()
     domain.lazyListID = this.lazyListID
     domain.uuid = this.uuid.toDomainUuid()
-    if (this.hasExercise()) domain.exercise = this.exercise.toDomainObjectId()
-    if (this.hasWorkout()) domain.workout = this.workout.toDomainObjectId()
-    if (this.hasNote()) domain.note = this.note
+    domain.exercise = this.exercise.toDomainObjectId()
+    domain.workout = this.workout.toDomainObjectId()
+    domain.note = this.note
     domain.pinned = this.pinned
-    if (this.hasOwnerID()) domain.ownerID = this.ownerID
+    domain.ownerID = this.ownerID
     // isPublic is not in domain ExerciseNote
     // dateCreated is in domain but not in proto, will take default in domain
     return domain
@@ -152,7 +156,7 @@ fun SetProto.toDomain(): Set {
     domain.setTypeID = this.setTypeID.toDomainSetType()
     if (this.hasPercentage1RM()) domain.percentage1RM = this.percentage1RM
     domain.setCompleted = this.setCompleted
-    if (this.hasExerciseID() && this.exerciseID.isNotEmpty()) domain.exerciseID = this.exerciseID.toDomainObjectId()
+    domain.exerciseID = this.exerciseID.toDomainObjectId()
     // restTimerInSeconds not in domain Set
     // notes (String) not in domain Set
     // order not in domain Set
@@ -172,6 +176,10 @@ fun ExerciseSets.toProto(): ExerciseSetsProto {
     builder.addAllSets(this.sets.map { it.toProto() })
     builder.ownerID = this.ownerID
     builder.order = this.order
+    builder.microcycleID = this.microcycleID?.toProtoString()
+    builder.mesocycleID = this.mesocycleID?.toProtoString()
+    builder.programID = this.programID?.toProtoString()
+
     return builder.build()
 }
 
@@ -185,7 +193,10 @@ fun ExerciseSetsProto.toDomain(): ExerciseSets {
         notes = this.notesList.map { it.toDomain() }.toMutableList(),
         sets = this.setsList.map { it.toDomain() }.toMutableList(),
         ownerID = this.ownerID,
-        order = this.order
+        order = this.order,
+        microcycleID = this.microcycleID.toDomainObjectId(),
+        mesocycleID = this.mesocycleID.toDomainObjectId(),
+        programID = this.programID.toDomainObjectId(),
         // isPublic is in domain but not in proto ExerciseSetsProto (it's in WorkoutItem)
     )
 }
@@ -199,6 +210,10 @@ fun Superset.toProto(): SupersetProto {
     builder.workoutID = this.workoutID.toProtoString()
     this.ownerID?.let { builder.ownerID = it } // ownerID is nullable in domain Superset
     builder.order = this.order
+    builder.microcycleID = this.microcycleID?.toProtoString()
+    builder.mesocycleID = this.mesocycleID?.toProtoString()
+    builder.programID = this.programID?.toProtoString()
+    // isPublic is in domain but not in proto SupersetProto (it's in WorkoutItem)
     // supersetNotes in domain, not in proto
     return builder.build()
 }
@@ -210,8 +225,11 @@ fun SupersetProto.toDomain(): Superset {
         uuid = this.uuid.toDomainUuid(),
         exercisesSets = this.exercisesSetsList.map { it.toDomain() },
         workoutID = this.workoutID.toDomainObjectId(),
-        ownerID = if (this.hasOwnerID()) this.ownerID else null,
-        order = this.order
+        ownerID = this.ownerID,
+        order = this.order,
+        microcycleID = this.microcycleID.toDomainObjectId(),
+        mesocycleID = this.mesocycleID.toDomainObjectId(),
+        programID = this.programID.toDomainObjectId(),
         // isPublic is in domain but not in proto SupersetProto (it's in WorkoutItem)
         // supersetNotes in domain, not in proto
     )
