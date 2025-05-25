@@ -46,12 +46,6 @@ fun areWorkoutsStructurallyIdentical(w1: Workout, w2: Workout): Boolean {
         // Ensure item2 is also Superset and compare their structure
         areSupersetsStructurallyIdentical(item1, item2 as Superset)
       }
-      // Add cases for other WorkoutItem subtypes if they exist
-      else -> {
-        // Unknown or unhandled type, consider them not identical for safety
-        // Or, if they have no relevant structure, consider them identical: true
-        false // Assuming unknown types mean non-identical structure
-      }
     }
 
     // If any pair of items is not structurally identical, the workouts are not
