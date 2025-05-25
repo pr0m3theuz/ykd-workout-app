@@ -1,6 +1,7 @@
 package com.example.myapplication.features.workout.ui
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -80,14 +81,14 @@ fun FinishWorkoutDialog(
         },
         text = { /*Text("Are you sure you want to discard this workout? This cannot be undone.")*/ },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     openDialog(false)
                     confirmFinishWorkout()
                     navigateToWorkoutSummaryScreen()
                 }
             ) {
-                Text("Finish", color = MaterialTheme.colorScheme.primary)
+                Text("FINISH", color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
@@ -96,7 +97,7 @@ fun FinishWorkoutDialog(
                     openDialog(false)
                 }
             ) {
-                Text("Cancel", color = MaterialTheme.colorScheme.tertiary)
+                Text("CANCEL", color = MaterialTheme.colorScheme.primary)
             }
         }
     )
@@ -132,14 +133,14 @@ fun PartialFinishWorkoutDialog(
             )
         },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     openDialog(false)
                     confirmFinishWorkout()
                     navigateToWorkoutSummaryScreen()
                 }
             ) {
-                Text("Finish Workout", color = MaterialTheme.colorScheme.primary)
+                Text("FINISH", color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
@@ -148,7 +149,7 @@ fun PartialFinishWorkoutDialog(
                     openDialog(false)
                 }
             ) {
-                Text("Cancel", color = MaterialTheme.colorScheme.tertiary)
+                Text("CANCEL", color = MaterialTheme.colorScheme.primary)
             }
         }
     )
