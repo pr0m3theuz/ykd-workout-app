@@ -417,7 +417,6 @@ class ManageWorkoutUseCase(
     //  Sets need to be SetType.Failure and rir = 0 or rpe = 10.
 
 
-
     val isInsertSuccess: Boolean = workoutRepository.insertWorkout(workout)
     if (isInsertSuccess) {
       deleteInProgressWorkout(workout.id)
@@ -733,7 +732,7 @@ class ManageWorkoutUseCase(
       exerciseSets.add(
         ExerciseExerciseSets(
           order =
-          if (exerciseSets.isEmpty()) 1 else exerciseSets.size.plus(1),
+            if (exerciseSets.isEmpty()) 1 else exerciseSets.size.plus(1),
           exercise = _exercise,
           notes = pinnedNotes.toMutableList(),
           datePerformed = Clock.System.now(),
@@ -777,8 +776,9 @@ class ManageWorkoutUseCase(
       // Create the new set by copying the last one and overriding specific fields
       val newSet = lastSet.copy(
         // Generate new unique identifiers if required for each distinct set instance
-        // id = ObjectId(),
-        // uuid = Uuid.random(),
+        id = ObjectId(),
+        uuid = Uuid.random(),
+        lazyListItemID = newLazyListItemID(),
 
         // Calculate next set number, defaulting to 0 if the last one was null (adjust if null is invalid)
         setNumber = lastSet.setNumber?.plus(1) ?: 0,
