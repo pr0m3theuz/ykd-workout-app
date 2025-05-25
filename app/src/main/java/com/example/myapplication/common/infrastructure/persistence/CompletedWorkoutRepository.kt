@@ -8,6 +8,8 @@ import org.bson.types.ObjectId
 interface CompletedWorkoutRepository {
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set?
 
+  fun getCompletedWorkoutsCount(): Int
+
   fun getCompletedSetsForExercise(exerciseID: ObjectId): Flow<List<Set>>
 
   fun getCompletedWorkouts(): List<Workout>?
