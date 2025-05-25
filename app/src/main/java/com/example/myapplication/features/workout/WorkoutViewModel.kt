@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, FlowPreview::class)
 
 package com.example.myapplication.features.workout
 
@@ -36,6 +36,7 @@ import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.PreviewExerciseSets
 import com.example.myapplication.common.domain.model.PreviewSuperset
+import com.example.myapplication.common.domain.model.Quadruple
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
@@ -54,6 +55,9 @@ import com.example.myapplication.common.domain.model.updateSetReps
 import com.example.myapplication.common.domain.model.updateSetType
 import com.example.myapplication.common.domain.model.updateSetWeight
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
+import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
+import com.example.myapplication.common.infrastructure.persistence.datastore.toDomainWorkout
+import com.example.myapplication.common.infrastructure.persistence.datastore.toProtoActiveWorkout
 import com.example.myapplication.common.util.AlarmReceiver
 import com.example.myapplication.common.util.ProgressionOutcome
 import com.example.myapplication.common.util.ProgressionResults
@@ -61,6 +65,7 @@ import com.example.myapplication.common.util.cancelNotifications
 import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.common.util.selectProgression
 import com.example.myapplication.common.util.sendNotification
+import com.example.myapplication.datastore.ActiveWorkout
 import com.example.myapplication.features.workout.feature.setRestTimer.TimerState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -69,6 +74,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
@@ -97,6 +103,7 @@ class WorkoutViewModel(
   private val manageWorkoutUseCase: ManageWorkoutUseCase,
   private val managePreviewWorkoutUseCase: ManagePreviewWorkoutUseCase,
   private val exerciseRepository: ExercisesRepository,
+  private val workoutDatastore: WorkoutDatastore, // Added WorkoutDatastore
   private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
   private val WARM_UP_SET = SetType.warmUpSet
@@ -108,9 +115,9 @@ class WorkoutViewModel(
   private val REQUEST_CODE = 0
   private val notifyPendingIntent: PendingIntent
 
-  private var workoutDuration: Long
-    get() = savedStateHandle.get<Long>(WORKOUT_DURATION) ?: 0L
-    set(value) = savedStateHandle.set(WORKOUT_DURATION, value)
+  private var workoutDuration = MutableStateFlow<Long>(0L)
+//    get() = savedStateHandle.get<Long>(WORKOUT_DURATION) ?: 0L
+//    set(value) = savedStateHandle.set(WORKOUT_DURATION, value)
 
   private var pausedElapsedTime: Long
     get() = savedStateHandle.get<Long>(WORKOUT_PAUSED_ELAPSED_TIME) ?: 0L
@@ -122,14 +129,16 @@ class WorkoutViewModel(
     get() = _isWorkoutCountUpTimerPaused
 
   private var _workoutDurationFormatted =
-    workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours, minutes, seconds, _
-      ->
-      if (hours > 0) {
-        "$hours:" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0')
-      } else {
-        "$minutes:${seconds.toString().padStart(2, '0')}"
+    workoutDuration.value.toDuration(DurationUnit.MILLISECONDS)
+      .toComponents { hours, minutes, seconds, _
+        ->
+        if (hours > 0) {
+          "$hours:" + minutes.toString().padStart(2, '0') + ":" + seconds.toString()
+            .padStart(2, '0')
+        } else {
+          "$minutes:${seconds.toString().padStart(2, '0')}"
+        }
       }
-    }
 
   private val _workoutDurationString = MutableStateFlow(_workoutDurationFormatted)
   val workoutDurationString: StateFlow<String>
@@ -138,13 +147,13 @@ class WorkoutViewModel(
   private val workoutCountUpTimer =
     object : CountUpTimer(1000) {
       override fun onTick(elapsedTime: Long) {
-        workoutDuration = elapsedTime
+        workoutDuration.value = elapsedTime
 
         _workoutDurationString.value =
-          workoutDuration.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
-                                                                               minutes,
-                                                                               seconds,
-                                                                               _ ->
+          workoutDuration.value.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                                     minutes,
+                                                                                     seconds,
+                                                                                     _ ->
             if (hours > 0) {
               "$hours:" +
                       minutes.toString().padStart(2, '0') +
@@ -165,7 +174,7 @@ class WorkoutViewModel(
 
   fun pauseWorkoutTimer() {
     workoutCountUpTimer.stop()
-    pausedElapsedTime = workoutDuration
+    pausedElapsedTime = workoutDuration.value
     _isWorkoutCountUpTimerPaused.value = true
   }
 
@@ -190,7 +199,94 @@ class WorkoutViewModel(
 
   init {
     //    startWorkoutTimer()
-    testSaveStateHandle()
+    // testSaveStateHandle() // Potentially remove or adjust based on DataStore as SOT
+
+    // Load from DataStore first
+    Log.d(
+      "WorkoutViewModel",
+      "is initialWorkoutData.isInitialized : ${this::initialWorkoutData.isInitialized}"
+    )
+
+    viewModelScope.launch {
+      // This triggered each item the current workout is saved to the DataStore due to collecting the updated activeWorkout
+//      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
+      val activeWorkout = workoutDatastore.getActiveWorkout.first()
+
+      Log.d("WorkoutViewModel", "is _workout.value null: ${_workout.value == null}")
+//        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}")
+//        Log.d("WorkoutViewModel", "activeWorkout: $activeWorkout")
+      if (activeWorkout != ActiveWorkout.getDefaultInstance()) {
+        val domainWorkout = activeWorkout.toDomainWorkout()
+        _workout.value = domainWorkout
+        _workoutName.value = domainWorkout.name
+        _workoutNotesData =
+          domainWorkout.notes.toMutableList() // Assuming notes are part of Workout domain model
+        _workoutNotes.value = _workoutNotesData.toList()
+
+        // Map WorkoutItemProto list to domain WorkoutComponent list
+        val domainWorkoutComponents = domainWorkout.workoutItems.map { workoutItem ->
+          // This mapping logic depends on how WorkoutItem is structured in your domain
+          // and how it corresponds to ExerciseSets/Superset after mapping from proto.
+          // The WorkoutItem.toDomain() from mappers should handle this.
+          // For now, we assume workoutItem.toDomain() from mappers correctly returns ExerciseSets or Superset
+          // which are subclasses of WorkoutComponent.
+          // If WorkoutItem itself is not a WorkoutComponent, adjust this mapping.
+          workoutItem // Assuming toDomain() in mappers produces correct WorkoutComponent types
+        }
+        setWorkoutComponents(
+          loadWorkoutComponentsFromPreviousWorkout(
+            previousWorkoutItems = domainWorkoutComponents,
+//              _workoutID = domainWorkout.id
+          )
+        )
+
+
+        // Update timer states if needed from the loaded workout
+        workoutDuration.value = domainWorkout.workoutDuration
+        pausedElapsedTime =
+          domainWorkout.workoutDuration // If workout was paused, resume from its duration
+        _workoutDurationString.value =
+          workoutDuration.value.toDuration(DurationUnit.MILLISECONDS)
+            .toComponents { hours, minutes, seconds, _ ->
+              if (hours > 0) "$hours:${minutes.toString().padStart(2, '0')}:${
+                seconds.toString().padStart(2, '0')
+              }"
+              else "$minutes:${seconds.toString().padStart(2, '0')}"
+            }
+        Log.d(
+          "WorkoutViewModel",
+          "Loaded workout duration from DataStore: ${domainWorkout.workoutDuration}"
+        )
+
+        Log.d(
+          "WorkoutViewModel",
+          "Loaded workout duration from DataStore: ${_workoutDurationString.value}"
+        )
+
+        if (!domainWorkout.isCompleted && domainWorkout.workoutStarted != null && domainWorkout.workoutEnded == null) {
+          isWorkoutActive = true
+          // If the workout was active and not paused, timer might need to be restarted
+          // or its state restored more carefully. For now, setting pausedElapsedTime.
+          // If it was running, the startWorkoutTimer() call below might handle it.
+        }
+
+        Log.d("WorkoutViewModel", "Loaded workout from DataStore: ${domainWorkout.name}")
+        startAutoSavingWorkout() // Start auto-save after loading from DataStore
+      } else {
+        // No active workout in DataStore, try SavedStateHandle or initialize new
+        // This part preserves existing logic for SavedStateHandle or new workout initialization
+        // if DataStore is empty.
+        Log.d(
+          "WorkoutViewModel",
+          "No active workout in DataStore, using SavedStateHandle or init new."
+        )
+        testSaveStateHandle() // Fallback to SavedStateHandle logic
+        if (_workout.value == null || _workout.value?.name == initWorkout().name) { // Check if it's still default/uninitialized
+          initWorkoutData() // Or specific logic to init new if not relying on this func for DataStore load
+        }
+      }
+//      }
+    }
 
     notifyPendingIntent =
       PendingIntent.getBroadcast(
@@ -574,35 +670,72 @@ class WorkoutViewModel(
 
   private var autoSaveJob: Job? = null // Keep track of the job
 
-  @OptIn(FlowPreview::class)
+
   private fun startAutoSavingWorkout() {
+    Log.d(
+      "WorkoutViewModel",
+      "autoSaveJob?.isActive ${autoSaveJob?.isActive == true}\nautoSaveJob: $autoSaveJob"
+    )
     // Cancel any previous auto-save job to avoid duplicates if called multiple times
-    autoSaveJob?.cancel()
-    autoSaveJob = viewModelScope.launch {
-      combine(
-        _workout,
-        _workoutNotes,
-        _workoutComponentFlow
-      ) { workout, notes, components ->
-        Triple(workout, notes, components)
-      }
-        .debounce(1000.milliseconds)
-        .collect { (latestWorkout, latestNotes, latestComponents) ->
-          runCatching {
-            Log.d("saveInProgressWorkout", "Auto-saving workout state...")
-            if (latestWorkout != null) {
-              manageWorkoutUseCase.saveInProgressWorkout(
-                workout = latestWorkout,
-                workoutNotes = latestNotes,
-                workoutComponents = latestComponents
-              )
-            }
-          }.onFailure { error ->
-            Log.e("saveInProgressWorkout", "Error auto-saving in-progress workout", error)
-          }
+//    autoSaveJob?.cancel()
+    if (autoSaveJob?.isActive != true) {
+      autoSaveJob = viewModelScope.launch {
+        combine(
+          _workout,
+          _workoutNotes,
+          _workoutComponentFlow,
+          workoutDuration
+        ) { workout, notes, components, duration ->
+          Quadruple(workout, notes, components, duration)
         }
+          .debounce(1000.milliseconds)
+          .collect { (latestWorkout, latestNotes, latestComponents, latestDuration) ->
+            runCatching {
+              if (latestWorkout != null) {
+                Log.d("WorkoutViewModel", "Auto-saving workout to DataStore: ${latestWorkout.name}")
+                Log.d("WorkoutViewModel", "latestDuration: $latestDuration")
+                Log.d(
+                  "WorkoutViewModel",
+                  "autoSaveJob._workoutDurationString: ${_workoutDurationString.value}"
+                )
+                // Ensure latestNotes and latestComponents are correctly reflected in latestWorkout instance
+                // if they are not already part of its direct state.
+                // The mappers expect Workout.notes and Workout.workoutItems to be up-to-date.
+                // Let's assume _workout.value (which is latestWorkout) is the source of truth and
+                // its 'notes' and 'workoutItems' are updated elsewhere when latestNotes/latestComponents change.
+                // If not, we might need to create a new Workout instance here:
+                val workoutToSave = latestWorkout.copy(
+                  workoutDuration = latestDuration,
+                  notes = latestNotes, // Assuming Workout data class has notes: List<WorkoutNote>
+                  workoutItems = manageWorkoutUseCase.convertWorkoutComponentsToWorkoutItems(
+                    latestComponents
+                  ) // Assuming Workout data class has workoutItems: List<WorkoutItem>
+                  // and WorkoutComponent can be filtered/mapped to WorkoutItem.
+                  // This needs to be correct based on your domain model structure.
+                  // If WorkoutComponent IS a WorkoutItem, then just `latestComponents` might be fine.
+                )
+                // TODO: Verify that latestWorkout actually contains the most up-to-date lists for notes and items,
+                // or reconstruct it properly here before mapping.
+                // For now, assuming latestWorkout is sufficiently up-to-date for toProtoActiveWorkout()
+                val activeWorkoutProto = workoutToSave.toProtoActiveWorkout()
+                workoutDatastore.saveActiveWorkout(activeWorkoutProto)
+                Log.d("WorkoutViewModel", "Successfully auto-saved workout to DataStore.")
+
+                // Optionally, keep the old repository call if it serves other purposes,
+                // or remove if DataStore is the sole persistence for active workouts.
+                // manageWorkoutUseCase.saveInProgressWorkout(
+                //   workout = latestWorkout,
+                //   workoutNotes = latestNotes,
+                //   workoutComponents = latestComponents
+                // )
+              }
+            }.onFailure { error ->
+              Log.e("WorkoutViewModel", "Error auto-saving workout to DataStore", error)
+            }
+          }
+      }
+      Log.d("ViewModelLifecycle", "Auto-save job started.")
     }
-    Log.d("ViewModelLifecycle", "Auto-save job started.")
   }
 
   private fun stopAutoSavingWorkout() {
@@ -619,16 +752,32 @@ class WorkoutViewModel(
   }
 
   fun initWorkoutData() {
-    if (!this::initialWorkoutData.isInitialized && !isWorkoutActive) {
+    // This initWorkoutData might need adjustment.
+    // If DataStore has data, it's already loaded.
+    // This should primarily handle the case where DataStore is empty and we need a fresh start.
+    if (!isWorkoutActive && (_workout.value == null || _workout.value?.name == initWorkout().name)) {
+      Log.d(
+        "WorkoutViewModel",
+        "initWorkoutData: Initializing new workout as DataStore was empty or workout not active."
+      )
       initialWorkoutData = initWorkout()
       workoutDetails = initialWorkoutData
       _workout.value = workoutDetails
+      _workoutName.value = initialWorkoutData.name
+      _workoutNotesData.clear()
+      _workoutNotes.value = _workoutNotesData.toList()
+      setWorkoutComponents(emptyList())
       isWorkoutActive = true
-
-      startAutoSavingWorkout()
-
-      testSaveStateHandle()
+      startAutoSavingWorkout() // Start auto-save for the new workout
+    } else if (isWorkoutActive) {
+      Log.d("WorkoutViewModel", "initWorkoutData: Workout is already active, not re-initializing.")
+    } else {
+      Log.d(
+        "WorkoutViewModel",
+        "initWorkoutData: Workout loaded from DataStore, not re-initializing."
+      )
     }
+    // testSaveStateHandle() // Consider if this is needed here anymore
   }
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
@@ -637,8 +786,14 @@ class WorkoutViewModel(
 
   fun getWorkoutByID(workoutID: ObjectId) {
 //    Log.i("WorkoutViewModel.getWorkoutByID() ", "called. WorkoutID: $workoutID")
-    if (!this::initialWorkoutData.isInitialized && !isWorkoutActive) {
-      initialWorkoutData = manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
+    // This function loads a workout template or a specific workout by ID,
+    // potentially overriding what was loaded from DataStore if called explicitly.
+    // If it's intended to be the primary way to start a *new* workout from template/existing,
+    // it should probably clear DataStore first or handle the merge carefully.
+
+    if (!isWorkoutActive || _workout.value?.id != workoutID) { // Only load if not already active with same ID
+      Log.d("WorkoutViewModel", "getWorkoutByID: Loading workout $workoutID explicitly.")
+      val loadedWorkout = manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
         managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
           ?.let { previousWorkout ->
             setupWorkoutPreview(
@@ -646,23 +801,25 @@ class WorkoutViewModel(
               previousWorkout = previousWorkout
             )
           }
-        return@let currentWorkout
+        currentWorkout
       } ?: initWorkout()
-      // TODO if workout is null, then show error message "Workout not found"
-      // TODO Add logic for when copying from a template (active program) vs when copying from a
-      // previous workout
 
-
-      copyWorkoutFromWorkoutTemplate(initialWorkoutData)
+      initialWorkoutData = loadedWorkout
+      copyWorkoutFromWorkoutTemplate(initialWorkoutData) // This sets _workout.value and other states
       isWorkoutActive = true
-
-      startAutoSavingWorkout()
-
-      testSaveStateHandle()
+      startAutoSavingWorkout() // Ensure auto-saving starts for this explicitly loaded workout
+      // testSaveStateHandle() // Consider if this is needed
+    } else {
+      Log.d(
+        "WorkoutViewModel",
+        "getWorkoutByID: Workout $workoutID already active or loaded, not reloading."
+      )
     }
   }
 
   fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {
+    // Similar to getWorkoutByID, this could override DataStore's loaded workout.
+    // Ensure this is the desired behavior.
     manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { workout ->
       _workoutName.value = workout.name
       workoutDetails = workout
@@ -731,9 +888,9 @@ class WorkoutViewModel(
   }
 
   //  private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
-  private var _workoutNotesData: MutableList<WorkoutNote>
-    get() = savedStateHandle.get<MutableList<WorkoutNote>>(WORKOUT_NOTES) ?: mutableListOf()
-    set(value) = savedStateHandle.set(WORKOUT_NOTES, value)
+  private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
+//    get() = savedStateHandle.get<MutableList<WorkoutNote>>(WORKOUT_NOTES) ?: mutableListOf() // Removed SavedStateHandle
+//    set(value) = savedStateHandle.set(WORKOUT_NOTES, value)
 
   private var _workoutNotes: MutableStateFlow<List<WorkoutNote>> =
     MutableStateFlow(_workoutNotesData.toList())
@@ -784,7 +941,7 @@ class WorkoutViewModel(
   private fun stopWorkoutTimer() {
     workoutCountUpTimer.stop()
     workoutDetails!!.workoutEnded = Clock.System.now()
-    workoutDetails!!.workoutDuration = workoutDuration
+    workoutDetails!!.workoutDuration = workoutDuration.value
     _workout.value = workoutDetails
     // TODO Navigate to Workout Complete Screen & Summary
   }
@@ -1177,20 +1334,32 @@ class WorkoutViewModel(
     //    TODO Navigate to Workout Summary Screen
     cancelSetCompletedTimer()
     stopWorkoutTimer()
-    saveWorkout()
+    saveWorkout() // This likely saves to the main database, not DataStore for "active"
     stopAutoSavingWorkout()
+    viewModelScope.launch {
+      workoutDatastore.clearActiveWorkout()
+      Log.d("WorkoutViewModel", "Active workout cleared from DataStore in finishWorkout.")
+    }
   }
 
   fun cancelWorkout() {
     //    TODO Pop workout screen of the backstack inclusively
     //    TODO navController.popBackStack( route = Programs.route, inclusive = true)
-    deleteWorkout()
+    deleteWorkout() // This likely deletes from the main database
     cancelSetCompletedTimer()
     stopWorkoutTimer()
-    workoutDetails = initWorkout()
-    //    _exercisesSetsData = mutableListOf()
-    setWorkoutComponents(listOf())
+    workoutDetails = initWorkout() // Resets ViewModel state
+    _workout.value = workoutDetails // Ensure LiveData/StateFlow is updated
+    _workoutName.value = workoutDetails?.name
+    _workoutNotesData.clear()
+    _workoutNotes.value = _workoutNotesData.toList()
+    setWorkoutComponents(emptyList()) // Clears UI components
     stopAutoSavingWorkout()
+    viewModelScope.launch {
+      workoutDatastore.clearActiveWorkout()
+      Log.d("WorkoutViewModel", "Active workout cleared from DataStore in cancelWorkout.")
+    }
+    isWorkoutActive = false // Ensure workout is marked as not active
   }
 
   private fun deleteWorkout() {

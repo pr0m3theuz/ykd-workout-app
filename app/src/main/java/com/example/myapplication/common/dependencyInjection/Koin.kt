@@ -25,6 +25,7 @@ import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesR
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepositoryImpl
+import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore // Added WorkoutDatastore import
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorServiceImpl
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
@@ -111,6 +112,8 @@ val commonModule = module {
   singleOf(::ModernizedLoadRIRReposistoryImpl) bind ModernizedLoadRIRReposistory::class
 //  singleOf(::ImportWorkoutProgramRepository)
 
+  single { WorkoutDatastore(get()) } // Added WorkoutDatastore to Koin module
+
   singleOf(::ManageWorkoutUseCase)
   singleOf(::ManagePreviewWorkoutUseCase)
   singleOf(::ManageExercisesUseCase)
@@ -119,7 +122,7 @@ val commonModule = module {
   viewModel { MainViewModel(get(), get(), get()) }
   viewModel { ProgramsViewModel(get(), get(), get(), get()) }
   viewModel { ExercisesViewModel(get()) }
-  viewModel { WorkoutViewModel(get(), get(), get(), get(), get()) }
+  viewModel { WorkoutViewModel(get(), get(), get(), get(), get(), get()) } // Added WorkoutDatastore to WorkoutViewModel definition
   viewModel { EquateVolumeViewModel(get(), get()) }
   viewModel { WorkingSetViewModel(get(), get()) }
   viewModel { WarmUpSetsViewModel(get(), get()) }

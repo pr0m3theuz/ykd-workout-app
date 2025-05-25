@@ -84,25 +84,6 @@ class ManageWorkoutUseCase(
       ownerID = userID,
       isPublic = false,
     )
-
-//    return Workout(
-//      id = ObjectId(),
-//      uuid = workoutTemplate.uuid,
-//      name = workoutTemplate.name,
-//      workoutAuthor = workoutTemplate.workoutAuthor,
-//      notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
-//      workoutType = workoutTemplate.workoutType,
-//      dateCreated = workoutTemplate.dateCreated,
-//      workoutStarted = Clock.System.now(),
-//      day = workoutTemplate.day,
-//      // workoutItems = workoutTemplate.workoutItems,
-//      //        exercisesSets =,
-//      // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets),
-//      microcycleID = workoutTemplate.microcycleID,
-//      programID = workoutTemplate.programID,
-//      ownerID = userID,
-//      isPublic = false,
-//    )
   }
 
   fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout): Workout {
@@ -453,7 +434,7 @@ class ManageWorkoutUseCase(
     workout.workoutItems =
       convertWorkoutComponentsToWorkoutItems(
         workoutComponents,
-        userDefaultWeightUnit,
+//        userDefaultWeightUnit,
       )
 
     // Note: Decide if calculating total volume should be done
@@ -471,7 +452,7 @@ class ManageWorkoutUseCase(
 
   private fun convertExerciseExerciseSetsToExerciseSets(
     exerciseExerciseSets: List<ExerciseExerciseSets>,
-    userDefaultWeightUnit: String,
+//    userDefaultWeightUnit: String,
   ): List<ExerciseSets> {
     val exercisesSets = mutableListOf<ExerciseSets>()
     exerciseExerciseSets.forEach { _exerciseSets ->
@@ -499,9 +480,9 @@ class ManageWorkoutUseCase(
     return exercisesSets
   }
 
-  private fun convertWorkoutComponentsToWorkoutItems(
+  fun convertWorkoutComponentsToWorkoutItems(
     workoutComponents: List<WorkoutComponent>,
-    userDefaultWeightUnit: String,
+//    userDefaultWeightUnit: String,
   ): List<WorkoutItem> {
     val workoutItems = mutableListOf<WorkoutItem>()
     workoutComponents.forEach { it ->
@@ -537,7 +518,7 @@ class ManageWorkoutUseCase(
 //              name = it.name,
               exercisesSets = convertExerciseExerciseSetsToExerciseSets(
                 it.exercisesSets,
-                userDefaultWeightUnit
+//                userDefaultWeightUnit
               ),
               restBetweenExercises = it.restBetweenExercises,
               enableRestBetweenExercises = it.enableRestBetweenExercises,
@@ -794,8 +775,9 @@ class ManageWorkoutUseCase(
       // Create the new set by copying the last one and overriding specific fields
       val newSet = lastSet.copy(
         // Generate new unique identifiers if required for each distinct set instance
-        // id = ObjectId(),
-        // uuid = Uuid.random(),
+        id = ObjectId(),
+        uuid = Uuid.random(),
+        lazyListItemID = newLazyListItemID(),
 
         // Calculate next set number, defaulting to 0 if the last one was null (adjust if null is invalid)
         setNumber = lastSet.setNumber?.plus(1) ?: 0,
