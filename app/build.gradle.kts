@@ -118,6 +118,7 @@ dependencies {
 
   // Protobuf
   implementation("com.google.protobuf:protobuf-javalite:3.25.1")
+  implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.1")
   implementation("androidx.datastore:datastore-core:1.1.0-beta01") // For Proto DataStore
   implementation("androidx.datastore:datastore:1.1.0-beta01") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
 
