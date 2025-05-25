@@ -16,8 +16,6 @@ import kotlin.uuid.Uuid
 interface WorkoutRepository {
   fun getWorkoutByID(workoutID: ObjectId): Workout?
 
-  fun getWorkoutsCount(): Int
-
   /*    suspend fun getWorkoutByMicrocycleUUID(microcycleUUID: UUID): List<Workout> {
       return workoutsDao.getWorkoutsByMicrocycleUUID(microcycleUUID)
   }
