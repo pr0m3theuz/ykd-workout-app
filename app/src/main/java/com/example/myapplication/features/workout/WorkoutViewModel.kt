@@ -1328,7 +1328,6 @@ class WorkoutViewModel(
   fun cancelWorkout() {
     //    TODO Pop workout screen of the backstack inclusively
     //    TODO navController.popBackStack( route = Programs.route, inclusive = true)
-    deleteWorkout() // This likely deletes from the main database
     cancelSetCompletedTimer()
     stopWorkoutTimer()
     workoutDetails = initWorkout() // Resets ViewModel state
@@ -1343,10 +1342,6 @@ class WorkoutViewModel(
       Log.d("WorkoutViewModel", "Active workout cleared from DataStore in cancelWorkout.")
     }
     isWorkoutActive = false // Ensure workout is marked as not active
-  }
-
-  private fun deleteWorkout() {
-    _workout.value?.let { manageWorkoutUseCase.deleteInProgressWorkout(it.id) }
   }
 
   private fun removeUncompletedSets() {
