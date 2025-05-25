@@ -195,8 +195,6 @@ fun createWorkoutPreview(
           previewInnerExercises
         ) // Pass a copy of original item
       }
-
-      else -> originalItem // Keep other WorkoutItem types as is (or their deep copies)
     }
   }
 }
@@ -284,8 +282,6 @@ fun Workout.deepCopy(): Workout {
         is Superset -> item.copy(exercisesSets = item.exercisesSets.map { ex ->
           ex.copy(sets = ex.sets.map { it.copy() }.toMutableList())
         }.toMutableList())
-
-        else -> item // Assume other types are immutable or don't need deep copy
       }
     }.toMutableList()
   )
