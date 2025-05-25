@@ -10,12 +10,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -26,12 +30,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -49,7 +56,6 @@ import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.theme.IBMColorBlindPalette
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.workout.WorkoutViewModel
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -108,11 +114,11 @@ fun WorkoutSummaryScreen(
         )
       }
       // TODO Handle Null Case
-      /*else {
-        navController.navigate("programs")*/
-      /* { popUpTo("programs") { inclusive = false } }*/
-      /*
-      }*/
+      else {
+        NoWorkoutFound()
+//        navController.navigate("programs")
+//       { popUpTo("programs") { inclusive = false } }
+      }
       if (completedWorkout?.programID != null) {
         Row(
           modifier = Modifier.fillMaxWidth(),
@@ -166,7 +172,7 @@ fun WorkoutSummaryContent(
       WorkoutSummaryCard(completedWorkout, userDefaultWeightUnit) { exerciseID ->
         workoutViewModel.getExerciseByID(exerciseID)
       }
-      Button(onClick = {}) { Text(text = "Preview the next workout!") }
+//      Button(onClick = {}) { Text(text = "Preview the next workout!") }
     }
   }
 }
@@ -349,6 +355,95 @@ fun WorkoutSummaryCard(
 
       }
     }
+  }
+}
+
+@Composable
+private fun ErrorContent(errorMessage: String, onRetry: (() -> Unit)?) {
+  Icon(
+    imageVector = Icons.Filled.ErrorOutline,
+    contentDescription = "Error Saving Workout",
+    modifier = Modifier.size(48.dp),
+    tint = MaterialTheme.colorScheme.error
+  )
+  Spacer(modifier = Modifier.height(16.dp))
+  Text(
+    text = "Oops! Workout Not Saved",
+    style = MaterialTheme.typography.titleMedium,
+    color = MaterialTheme.colorScheme.error
+  )
+  Spacer(modifier = Modifier.height(8.dp))
+  Text(
+    text = errorMessage,
+    style = MaterialTheme.typography.bodyMedium,
+    textAlign = TextAlign.Center,
+    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+  )
+  if (onRetry != null) {
+    Spacer(modifier = Modifier.height(24.dp))
+    Button(onClick = onRetry) {
+      Text(text = "Try Again")
+    }
+  }
+  Spacer(modifier = Modifier.height(8.dp))
+  // Optionally, add a button to go back or dismiss
+  TextButton(onClick = { /* TODO: Navigate back or dismiss */ }) {
+    Text("Dismiss")
+  }
+}
+
+@Composable
+private fun NoDataContent(message: String) {
+  Icon(
+    imageVector = Icons.Filled.Info,
+    contentDescription = "No workout data",
+    modifier = Modifier.size(48.dp),
+    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+  )
+  Spacer(modifier = Modifier.height(16.dp))
+  Text(
+    text = message,
+    style = MaterialTheme.typography.titleMedium,
+    textAlign = TextAlign.Center,
+    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+  )
+}
+
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+private fun NoWorkoutFound() {
+  Column(
+    modifier = Modifier
+      .fillMaxSize() // Fill the whole screen for the "empty" state
+//      .padding(16.dp)
+    ,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center // Center content vertically
+  ) {
+    Icon(
+      imageVector = Icons.Filled.Info, // Or any other suitable icon
+      contentDescription = "No workout data",
+      modifier = Modifier.size(48.dp),
+      tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) // Softer color
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+    Text(
+      text = "Workout data not available.",
+      style = MaterialTheme.typography.titleMedium,
+      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+      text = "There's no completed workout to display right now.",
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    )
+    Text(
+      text = "An unknown error occurred while saving.",
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    )
   }
 }
 
