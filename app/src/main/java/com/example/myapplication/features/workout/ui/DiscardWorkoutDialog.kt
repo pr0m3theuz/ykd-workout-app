@@ -1,6 +1,8 @@
 package com.example.myapplication.features.workout.ui
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -19,17 +21,20 @@ fun DiscardWorkoutDialog(
             closeDialog()
         },
         title = {
-            Text(text = "Discard workout?")
+            Text(text = "Discard Workout?")
         },
         text = { Text("Are you sure you want to discard this workout? This cannot be undone.") },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     closeDialog()
                     cancelWorkout()
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
             ) {
-                Text("Cancel Workout", color = MaterialTheme.colorScheme.error)
+                Text("CANCEL WORKOUT", color = MaterialTheme.colorScheme.onError)
             }
         },
         dismissButton = {
@@ -38,7 +43,7 @@ fun DiscardWorkoutDialog(
                     closeDialog()
                 }
             ) {
-                Text("Resume")
+                Text("RESUME")
             }
         }
     )
