@@ -12,6 +12,7 @@ import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.SupersetExercisesSets
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.WorkoutItem
@@ -51,6 +52,7 @@ class ManageWorkoutUseCase(
   private val inProgressWorkoutRepository: InProgressWorkoutRepository,
   private val completedWorkoutRepository: CompletedWorkoutRepository,
   private val userRepository: UserRepository,
+  private val userProfileManager: UserProfileManager,
 ) {
 
   // TODO rewrite
@@ -59,7 +61,7 @@ class ManageWorkoutUseCase(
   //    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
   //      ?: MassUnit.POUNDS.abbreviation
 
-  private val tempOwnerId = ObjectId().toString()
+  private val userID = userProfileManager.userProfile.value.id?.toHexString() ?: "TemporaryUserID"
   val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
@@ -74,24 +76,33 @@ class ManageWorkoutUseCase(
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout): Workout {
-    return Workout(
-      id = workoutTemplate.id,
-      uuid = workoutTemplate.uuid,
-      name = workoutTemplate.name,
-      workoutAuthor = workoutTemplate.workoutAuthor,
+    return workoutTemplate.copy(
+      id = ObjectId(),
       notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
-      workoutType = workoutTemplate.workoutType,
-      dateCreated = workoutTemplate.dateCreated,
+      dateCreated = Clock.System.now(),
       workoutStarted = Clock.System.now(),
-      day = workoutTemplate.day,
-      // workoutItems = workoutTemplate.workoutItems,
-      //        exercisesSets =,
-      // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets),
-      microcycleID = workoutTemplate.microcycleID,
-      programID = workoutTemplate.programID,
-      ownerID = tempOwnerId, // TODO Replace currentUser.id
+      ownerID = userID,
       isPublic = false,
     )
+
+//    return Workout(
+//      id = ObjectId(),
+//      uuid = workoutTemplate.uuid,
+//      name = workoutTemplate.name,
+//      workoutAuthor = workoutTemplate.workoutAuthor,
+//      notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
+//      workoutType = workoutTemplate.workoutType,
+//      dateCreated = workoutTemplate.dateCreated,
+//      workoutStarted = Clock.System.now(),
+//      day = workoutTemplate.day,
+//      // workoutItems = workoutTemplate.workoutItems,
+//      //        exercisesSets =,
+//      // copyExercisesSetsFromPreviousWorkout(workoutTemplate.exercisesSets),
+//      microcycleID = workoutTemplate.microcycleID,
+//      programID = workoutTemplate.programID,
+//      ownerID = userID,
+//      isPublic = false,
+//    )
   }
 
   fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout): Workout {
@@ -110,7 +121,7 @@ class ManageWorkoutUseCase(
         microcycleID = previousWorkout.microcycleID,
         mesocycleID = previousWorkout.mesocycleID,
         programID = previousWorkout.programID,
-        ownerID = tempOwnerId, // TODO Replace currentUser.id
+        ownerID = userID, // TODO Replace currentUser.id
         isPublic = false,
       )
     return newWorkout
@@ -145,7 +156,7 @@ class ManageWorkoutUseCase(
             restAfterSuperset = workoutItem.restAfterSuperset,
             supersetNotes = workoutItem.supersetNotes.filter { it.pinned }.toMutableList(),
             order = workoutItem.order,
-            ownerID = tempOwnerId,
+            ownerID = userID,
             isPublic = false,
             workoutID = workoutItem.workoutID,
             microcycleID = workoutItem.microcycleID,
@@ -179,7 +190,7 @@ class ManageWorkoutUseCase(
       mesocycleID = previousExerciseSets.mesocycleID,
       programID = previousExerciseSets.programID,
       isPublic = false,
-      ownerID = tempOwnerId, // TODO Replace currentUser.id
+      ownerID = userID, // TODO Replace currentUser.id
     )
   }
 
@@ -210,7 +221,7 @@ class ManageWorkoutUseCase(
           exerciseSetsID = currentExerciseSetsID,
           workoutID = currentWorkoutID,
           exerciseID = set.exerciseID,
-          ownerID = tempOwnerId, // TODO Replace currentUser.id
+          ownerID = userID, // TODO Replace currentUser.id
         )
       newSets.add(newSet)
       Log.i(
@@ -309,7 +320,7 @@ class ManageWorkoutUseCase(
         // setCompleted = false, // [cite: 90] A new workout's sets aren't completed yet
 
         // Assign context-specific fields
-        ownerID = tempOwnerId, // TODO: Replace with actual current user ID logic [cite: 91]
+        ownerID = userID, // TODO: Replace with actual current user ID logic [cite: 91]
         isPublic = false, // Assuming new sets default to private [cite: 91]
 
         // --- Fields typically kept from the previous set ---
@@ -422,7 +433,7 @@ class ManageWorkoutUseCase(
     //  if they want to update the rep capacity for that exercise.
     //  Sets need to be SetType.Failure and rir = 0 or rpe = 10.
 
-
+    completedWorkoutRepository.upsertCompletedWorkout(workout)
     val isInsertSuccess: Boolean = workoutRepository.insertWorkout(workout)
     if (isInsertSuccess) {
       deleteInProgressWorkout(workout.id)
@@ -480,7 +491,7 @@ class ManageWorkoutUseCase(
           microcycleID = _exerciseSets.microcycleID,
           mesocycleID = _exerciseSets.mesocycleID,
           programID = _exerciseSets.programID,
-          ownerID = tempOwnerId, // TODO Replace currentUser.id
+          ownerID = userID, // TODO Replace currentUser.id
         )
       )
     }
@@ -513,7 +524,7 @@ class ManageWorkoutUseCase(
               microcycleID = it.microcycleID,
               mesocycleID = it.mesocycleID,
               programID = it.programID,
-              ownerID = tempOwnerId, // TODO Replace currentUser.id
+              ownerID = userID, // TODO Replace currentUser.id
             )
           )
         }
@@ -551,7 +562,8 @@ class ManageWorkoutUseCase(
 
 
   fun getCompletedWorkout(workoutID: ObjectId): Workout? {
-    return workoutRepository.getWorkoutByID(workoutID)
+    // TODO Change to CompletedWorkoutRepository
+    return completedWorkoutRepository.getCompletedWorkoutByID(workoutID)
   }
 
   fun getWorkoutsCount(): Int {
@@ -746,7 +758,7 @@ class ManageWorkoutUseCase(
           microcycleID = null, // TODO get details from workout
           mesocycleID = null, // TODO get details from workout
           programID = null, // TODO get details from workout
-          ownerID = tempOwnerId, // TODO Replace currentUser.id
+          ownerID = userID, // TODO Replace currentUser.id
           isPublic = false,
         )
       )
@@ -790,7 +802,7 @@ class ManageWorkoutUseCase(
         setCompleted = false, // New sets start as not completed
 
         // Assign ownership/metadata
-        ownerID = tempOwnerId, // TODO: Replace currentUser.id
+        ownerID = userID, // TODO: Replace currentUser.id
         isPublic = false // Assuming default
 
         // All other fields (weight, reps, targets, exerciseID, workoutID etc.) are copied from lastSet
@@ -816,7 +828,7 @@ class ManageWorkoutUseCase(
           setCompleted = false,
           isPublic = false,
           progressionSchemeID = null, // TODO: Replace with actual logic if available
-          ownerID = tempOwnerId, // TODO: Replace currentUser.id
+          ownerID = userID, // TODO: Replace currentUser.id
 
           // Initialize performance fields to null/defaults as appropriate
           // weightPounds = null,
@@ -1103,7 +1115,7 @@ class ManageWorkoutUseCase(
           microcycleID = workout.microcycleID, // TODO get details from workout
           mesocycleID = workout.mesocycleID, // TODO get details from workout
           programID = workout.programID, // TODO get details from workout
-          ownerID = tempOwnerId, // TODO Replace currentUser.id
+          ownerID = userID, // TODO Replace currentUser.id
           isPublic = false,
         )
       )
