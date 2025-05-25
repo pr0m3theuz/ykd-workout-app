@@ -401,7 +401,7 @@ class ManageWorkoutUseCase(
     workout.workoutItems =
       convertWorkoutComponentsToWorkoutItems(
         workoutComponents,
-        userDefaultWeightUnit,
+//        userDefaultWeightUnit,
       )
 
     workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
