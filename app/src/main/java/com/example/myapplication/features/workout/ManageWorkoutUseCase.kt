@@ -403,7 +403,7 @@ class ManageWorkoutUseCase(
     workout.workoutItems =
       convertWorkoutComponentsToWorkoutItems(
         workoutComponents,
-        userDefaultWeightUnit,
+//        userDefaultWeightUnit,
       )
 
     workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
@@ -437,7 +437,7 @@ class ManageWorkoutUseCase(
     workout.workoutItems =
       convertWorkoutComponentsToWorkoutItems(
         workoutComponents,
-        userDefaultWeightUnit,
+//        userDefaultWeightUnit,
       )
 
     // Note: Decide if calculating total volume should be done
@@ -455,7 +455,7 @@ class ManageWorkoutUseCase(
 
   private fun convertExerciseExerciseSetsToExerciseSets(
     exerciseExerciseSets: List<ExerciseExerciseSets>,
-    userDefaultWeightUnit: String,
+//    userDefaultWeightUnit: String,
   ): List<ExerciseSets> {
     val exercisesSets = mutableListOf<ExerciseSets>()
     exerciseExerciseSets.forEach { _exerciseSets ->
@@ -483,9 +483,9 @@ class ManageWorkoutUseCase(
     return exercisesSets
   }
 
-  private fun convertWorkoutComponentsToWorkoutItems(
+  fun convertWorkoutComponentsToWorkoutItems(
     workoutComponents: List<WorkoutComponent>,
-    userDefaultWeightUnit: String,
+//    userDefaultWeightUnit: String,
   ): List<WorkoutItem> {
     val workoutItems = mutableListOf<WorkoutItem>()
     workoutComponents.forEach { it ->
@@ -521,7 +521,7 @@ class ManageWorkoutUseCase(
 //              name = it.name,
               exercisesSets = convertExerciseExerciseSetsToExerciseSets(
                 it.exercisesSets,
-                userDefaultWeightUnit
+//                userDefaultWeightUnit
               ),
               restBetweenExercises = it.restBetweenExercises,
               enableRestBetweenExercises = it.enableRestBetweenExercises,
