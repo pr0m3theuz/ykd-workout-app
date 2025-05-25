@@ -50,9 +50,9 @@ fun WorkoutScreen(
 ) {
   if (!workoutID.isNullOrBlank()) {
     workoutViewModel.getWorkoutByID(ObjectId(workoutID))
-  } else {
+  } /*else {
     workoutViewModel.initWorkoutData()
-  }
+  }*/
 
   val previewItems by remember { derivedStateOf { workoutViewModel.previewItems.toList() } } // Observe list changes
 
