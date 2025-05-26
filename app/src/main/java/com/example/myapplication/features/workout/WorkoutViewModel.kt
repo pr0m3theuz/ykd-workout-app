@@ -1306,7 +1306,9 @@ class WorkoutViewModel(
   }
 
   fun getCompletedWorkout(workoutID: ObjectId) {
-    _completedWorkout.value = manageWorkoutUseCase.getCompletedWorkout(workoutID)
+    if (_completedWorkout.value == null) {
+      _completedWorkout.value = manageWorkoutUseCase.getCompletedWorkout(workoutID)
+    }
   }
 
   fun getWorkoutsCount(): Int {
@@ -1317,7 +1319,15 @@ class WorkoutViewModel(
     //    TODO Navigate to Workout Summary Screen
     cancelSetCompletedTimer()
     stopWorkoutTimer()
-    saveWorkout() // This likely saves to the main database, not DataStore for "active"
+    saveWorkout()
+
+    workoutDetails?.notes = _workoutNotesData
+    workoutDetails?.workoutItems =
+      manageWorkoutUseCase.convertWorkoutComponentsToWorkoutItems(workoutComponents.value)
+
+    _completedWorkout.value = workoutDetails
+
+
     stopAutoSavingWorkout()
     viewModelScope.launch {
       workoutDatastore.clearActiveWorkout()
