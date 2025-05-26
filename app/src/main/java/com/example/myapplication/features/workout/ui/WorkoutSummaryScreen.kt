@@ -87,7 +87,8 @@ fun WorkoutSummaryScreen(
               /*TODO Navigate to Previous Screen */
               // TODO This is an anti-pattern
               // https://developer.android.com/guide/navigation/use-graph/navigate
-              navController.navigate("programs") { popUpTo("programs") { inclusive = false } }
+              // TODO Fix bug, can't navigate to Workout screen after navigating to Programs
+              navController.navigate("programs") { popUpTo("workouts") { inclusive = false } }
             }
           ) {
             Icon(
