@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.ExerciseSets
@@ -53,6 +54,7 @@ import com.example.myapplication.common.domain.model.setSummaryRIR
 import com.example.myapplication.common.domain.model.setVolume
 import com.example.myapplication.common.domain.model.totalSets
 import com.example.myapplication.common.ui.component.BottomNavigationBar
+import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.IBMColorBlindPalette
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.workout.WorkoutViewModel
@@ -88,7 +90,12 @@ fun WorkoutSummaryScreen(
               // TODO This is an anti-pattern
               // https://developer.android.com/guide/navigation/use-graph/navigate
               // TODO Fix bug, can't navigate to Workout screen after navigating to Programs
-              navController.navigate("programs") { popUpTo("workouts") { inclusive = false } }
+
+              navController.navigate(Screens.Programs.baseRoute) {
+                popUpTo(navController.graph.findStartDestination().id)
+                launchSingleTop = true
+                restoreState = true
+              }
             }
           ) {
             Icon(
@@ -275,11 +282,11 @@ fun WorkoutSummaryCard(
       val backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
       Row(
         modifier =
-        Modifier
-          .fillMaxWidth()
-          .border(4.dp, backgroundColor)
-          .padding(4.dp)
-          .background(color = backgroundColor),
+          Modifier
+            .fillMaxWidth()
+            .border(4.dp, backgroundColor)
+            .padding(4.dp)
+            .background(color = backgroundColor),
         verticalAlignment = Alignment.CenterVertically,
       ) {
         val style = MaterialTheme.typography.titleMedium
