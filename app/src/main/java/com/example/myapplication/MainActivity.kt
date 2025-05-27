@@ -136,7 +136,7 @@ class MainActivity : ComponentActivity() {
       .start(this.applicationContext)
 
     userProfileManager = inject<UserProfileManager>(UserProfileManager::class.java).value
-    println("MainActivity.onCreate(): userProfileManager: $userProfileManager")
+    Log.d("MainActivity", "MainActivity.onCreate(): userProfileManager: $userProfileManager")
     val authService: AuthenticationService by inject()
     // TODO Add User Profile Manager here by injecting it
     //      val userProfileRepository: KeyValueRepository by inject()
@@ -156,17 +156,39 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    val replicatorService: ReplicatorService by inject()
+//    val replicatorService: ReplicatorService by inject()
 
     setContent {
 
       val mainViewModel = getViewModel<MainViewModel>()
-      replicatorService.updateAuthentication(isReset = false)
+      replicatorService?.updateAuthentication(isReset = false)
 
       MyApplicationTheme {
         //        TestScreen()
 
         val navController = rememberNavController()
+        // <<< --- ADD LOGGING FOR getCurrentBackStackEntryFlow() HERE --- >>>
+        /*        LaunchedEffect(navController) {
+                  navController.currentBackStackEntryFlow.onEach {
+                     navBackStackEntry ->
+                      Log.d(
+                        "BackStackFlow",
+                        "Current NavBackStackEntry: ${navBackStackEntry.destination.route}, ID: ${navBackStackEntry.id}"
+                      )
+                    }
+                    .launchIn(this) // Launch collection in the LaunchedEffect's scope
+
+                  // Optional: Log the entire back stack whenever the current entry changes
+                  // This can be verbose but very helpful for debugging popUpTo issues.
+                  navController.currentBackStack.collect { backStack ->
+                    Log.d("BackStackFlow", "Current full back stack:")
+                    backStack.forEachIndexed { index, entry ->
+                      Log.d("BackStackFlow", "  [$index] Route: ${entry.destination.route}, ID: ${entry.id}, Args: ${entry.arguments}")
+                    }
+                  }
+                }*/
+        // <<< --- END OF LOGGING --- >>>
+
 
         MainView(mainViewModel.startDatabase, mainViewModel.closeDatabase)
 
@@ -228,12 +250,12 @@ private fun NavGraphBuilder.addWorkoutGraph(
 //    arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
   ) {
     composable("workoutScreen?workoutID={workoutID}") { navBackStackEntry ->
-      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
+//      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
 
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
-      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
+//      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       WorkoutScreen(
@@ -246,7 +268,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
     }
 
     composable("previewWorkoutScreen") { navBackStackEntry ->
-      Log.d("WorkoutNavGraph", "Navigated to Preview Workout Screen")
+//      Log.d("WorkoutNavGraph", "Navigated to Preview Workout Screen")
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
@@ -265,7 +287,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
     }
 
     composable("workoutScreen?workoutID={workoutID}?isCurrentWorkout={isCurrentWorkout}") { navBackStackEntry ->
-      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
+//      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
 
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
@@ -283,7 +305,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
     }
 
     composable("workoutSummary/{workoutID}/{workoutCount}") { navBackStackEntry ->
-      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
+//      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
@@ -313,7 +335,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
       "exerciseDetails/{exerciseID}",
       arguments = listOf(navArgument("exerciseID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
-      Log.d("WorkoutNavGraph", "Navigated to Exercise Details Screen")
+//      Log.d("WorkoutNavGraph", "Navigated to Exercise Details Screen")
       navBackStackEntry.arguments?.getString("exerciseID")?.let {
         ExerciseDetailsScreen(
           // TODO This is an anti-pattern
@@ -329,7 +351,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
-      Log.d("WorkoutNavGraph:AddExercise", "AddExercise.WorkoutViewModel: $workoutViewModel")
+//      Log.d("WorkoutNavGraph:AddExercise", "AddExercise.WorkoutViewModel: $workoutViewModel")
 
       AddExerciseNavigableListDetailScreen(
         exerciseListPane = { onClick ->
