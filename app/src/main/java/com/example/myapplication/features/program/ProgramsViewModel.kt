@@ -72,7 +72,7 @@ constructor(
     }
   }
 
-  fun getProgramByID(programID: ObjectId): Program? {
+  fun getCurrentlyActiveProgramByID(programID: ObjectId): Program? {
     var program: Program? = null
 
     viewModelScope.launch {
@@ -195,10 +195,12 @@ constructor(
   }
 
   fun getCurrentlyActiveWorkouts(): Flow<List<Workout>> {
+//    TODO "Implement getCurrentlyActiveWorkouts"
     return inProgressWorkoutRepository.getWorkouts()
   }
 
   fun deleteCurrentlyActiveWorkout(workoutID: ObjectId): Boolean {
+//    TODO "Implement deleteCurrentlyActiveWorkout"
     return inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
   }
 
