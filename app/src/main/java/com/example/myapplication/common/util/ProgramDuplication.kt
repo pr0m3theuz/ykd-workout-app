@@ -24,7 +24,7 @@ fun duplicateProgramStructure(
     TAG,
     "duplicateProgramStructure called with program: ${originalProgram.id}, user: ${user.id}"
   )
-  val newOwnerIdString = user.id?.toHexString() ?: "MISSING_VALUE"
+  val newOwnerIdString = user.id.toHexString() ?: "MISSING_VALUE"
   val collectedNewWorkouts = mutableListOf<Workout>()
   val collectedNewSets = mutableListOf<Set>()
 
