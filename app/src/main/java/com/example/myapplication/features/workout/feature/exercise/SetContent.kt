@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,7 +52,7 @@ import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.convertKgToPound
 import com.example.myapplication.common.domain.model.convertPoundToKg
-import com.example.myapplication.common.domain.model.setSummaryRIR
+import com.example.myapplication.common.domain.model.previousSetSummaryRIR
 import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.checkIntInput
 import com.example.myapplication.common.util.checkRIRInput
@@ -80,7 +81,11 @@ fun SetContent(
 
   val previousSet = populatePreviousSetField()
 
-  val previousSetText by remember { mutableStateOf(previousSet?.setSummaryRIR(weightUnit) ?: "–") }
+  val previousSetText by remember {
+    mutableStateOf(
+      previousSet?.previousSetSummaryRIR(weightUnit) ?: "–"
+    )
+  }
 
   val exerciseWeight = getExerciseWeight(set, weightUnit)
   var exerciseWeightText by remember { mutableStateOf(exerciseWeight) }
@@ -473,6 +478,8 @@ private fun PreviousSet(
     ) {
       Text(
         text = previousSetText,
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(maxFontSize = MaterialTheme.typography.bodySmall.fontSize),
         color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.bodySmall,
       )
