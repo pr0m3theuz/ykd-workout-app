@@ -38,6 +38,9 @@ import kotlin.uuid.Uuid
 data class WorkoutDao(var Workout: Workout)
 
 @Serializable
+data class CompletedWorkoutsDao(var CompletedWorkouts: Workout)
+
+@Serializable
 data class ActiveWorkoutDao(var ActiveWorkout: Workout)
 
 @Serializable
@@ -67,7 +70,7 @@ data class Workout(
   var isPublic: Boolean = false,
   var signature: String? = null,
   var hashedSignature: String? = null,
-  private val type: String = "Workout",
+  val type: String = "Workout",
 )
 
 @Parcelize
