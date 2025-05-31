@@ -13,7 +13,10 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="WorkoutPreviewScreenPreview">
+      <SelectionState runConfigName="WorkoutProfileScreenPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="SettingsScreenPreview_StrengthLog">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
