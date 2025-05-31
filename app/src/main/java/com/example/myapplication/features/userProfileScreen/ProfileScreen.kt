@@ -106,7 +106,7 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
           ) {
             Text(text = "Profile")
-            Text(text = user.id?.toHexString() ?: "MISSING")
+            Text(text = user.id.toHexString() ?: "MISSING")
           }
           HorizontalDivider()
         }
