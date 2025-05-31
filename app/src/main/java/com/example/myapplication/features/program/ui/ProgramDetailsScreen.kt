@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
@@ -109,6 +110,7 @@ fun ProgramDetailsScreen(
   navController: NavController,
   programsViewModel: ProgramsViewModel = koinViewModel(),
   _programID: String,
+  isProgramActive: Boolean = false
 ) {
 
   val programID by remember { mutableStateOf(_programID) }
@@ -870,6 +872,8 @@ fun MicrocycleCard(
                   "Week ${index.plus(1)}: ${microcycle.name}"
                 },
               style = titleMedium,
+              maxLines = 1,
+              autoSize = TextAutoSize.StepBased(maxFontSize = titleMedium.fontSize),
               //              overflow = TextOverflow.Ellipsis,
               softWrap = true,
               modifier = Modifier.weight(1f),
@@ -948,7 +952,7 @@ fun MicrocycleCard(
                       Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                           Text(
-                            text = workout.name ?: "Workout",
+                            text = workout.name,
                             style = titleMedium,
                             softWrap = true,
                             modifier = Modifier.weight(1f),
@@ -981,9 +985,12 @@ fun MicrocycleCard(
                         Text(text = "${workout.workoutItems.size} Exercises", style = bodyMedium)
                       }
 
-                      val workoutRoute = "workoutScreen?workoutID=${workout.id.toHexString()}"
+
 
                       if (!activeProgram) {
+                        // this workout in a Active Program, so copy Workout from Workout Template
+                        val workoutRoute =
+                          "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true"
                         if (workout.workoutEnded == null) {
                           Button(
                             enabled = true, // activeProgram,
@@ -1003,6 +1010,9 @@ fun MicrocycleCard(
                             Text(text = "Start")
                           }
                         } else {
+                          // this workout in a Active Program, so view it
+                          val workoutRoute =
+                            "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=false"
                           OutlinedButton(
                             enabled = activeProgram,
                             onClick = {
