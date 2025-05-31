@@ -26,7 +26,7 @@ class UserProfileManager(
   private val userRepository: UserRepository
 ) {
 
-  private val _userProfile = MutableStateFlow(UserProfile()) // Default empty profile
+  private val _userProfile = MutableStateFlow(UserProfile(ObjectId())) // Default empty profile
   val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
 
   val name = listOf(
@@ -175,7 +175,7 @@ class UserProfileManager(
   }
 
   fun clearUserProfile() {
-    val loggedOutProfile = UserProfile(isLoggedIn = false)
+    val loggedOutProfile = UserProfile(id = ObjectId(), isLoggedIn = false)
     // Update in-memory state
     _userProfile.update { loggedOutProfile }
 
