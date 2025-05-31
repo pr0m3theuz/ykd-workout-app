@@ -156,7 +156,8 @@ fun SetProto.toDomain(): Set {
     domain.setTypeID = this.setTypeID.toDomainSetType()
     if (this.hasPercentage1RM()) domain.percentage1RM = this.percentage1RM
     domain.setCompleted = this.setCompleted
-    domain.exerciseID = this.exerciseID.toDomainObjectId()
+    domain.exerciseID =
+        if (this.exerciseID.isNotEmpty()) this.exerciseID.toDomainObjectId() else null
     // restTimerInSeconds not in domain Set
     // notes (String) not in domain Set
     // order not in domain Set
