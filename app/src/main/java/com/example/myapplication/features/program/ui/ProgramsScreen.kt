@@ -487,7 +487,7 @@ fun ProgramCard(navController: NavController, program: Program) {
       .padding(vertical = padding)
       .clickable {
         /* TODO Navigate to Program Details Screen */
-        navController.navigate("programDetails/${program.id.toHexString()}")
+        navController.navigate("programDetails/${program.id.toHexString()}/isProgramActive=false")
       }
   ) {
     Row(
