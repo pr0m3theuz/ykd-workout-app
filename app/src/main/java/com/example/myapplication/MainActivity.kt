@@ -245,15 +245,20 @@ private fun NavGraphBuilder.addWorkoutGraph(
   //  viewModelStoreOwner: ViewModelStoreOwner
 ) {
   navigation(
-    "workoutScreen?workoutID={workoutID}",
+    "workoutScreen?workoutID={workoutID}/copyWorkoutFromPreviousWorkout={copyWorkoutFromPreviousWorkout}",
     route = "workout",
 //    arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
   ) {
-    composable("workoutScreen?workoutID={workoutID}") { navBackStackEntry ->
+    composable("workoutScreen?workoutID={workoutID}/copyWorkoutFromPreviousWorkout={copyWorkoutFromPreviousWorkout}")
+    { navBackStackEntry ->
 //      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
 
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+      val loadPreviousWorkout =
+        navBackStackEntry.arguments?.getBoolean("loadPreviousWorkout") ?: false
+      val copyWorkoutFromPreviousWorkout =
+        navBackStackEntry.arguments?.getBoolean("copyWorkoutFromPreviousWorkout") ?: false
 
 //      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
 
@@ -264,6 +269,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navController = navController,
         workoutViewModel = workoutViewModel,
         workoutID = workoutID,
+        loadPreviousWorkout = loadPreviousWorkout,
+        copyWorkoutFromPreviousWorkout = copyWorkoutFromPreviousWorkout
       )
     }
 
@@ -286,23 +293,28 @@ private fun NavGraphBuilder.addWorkoutGraph(
       )
     }
 
-    composable("workoutScreen?workoutID={workoutID}?isCurrentWorkout={isCurrentWorkout}") { navBackStackEntry ->
-//      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
+    /* TODO not used
+        composable("workoutScreen?workoutID={workoutID}?isCurrentWorkout={isCurrentWorkout}") { navBackStackEntry ->
+    //      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
 
-      val workoutViewModel: WorkoutViewModel =
-        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+          val workoutViewModel: WorkoutViewModel =
+            navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
-      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
+          val isCurrentWorkout = navBackStackEntry.arguments?.getBoolean("isCurrentWorkout") ?: false
 
-      val workoutID = navBackStackEntry.arguments?.getString("workoutID")
-      WorkoutScreen(
-        // TODO This is an anti-pattern
-        // https://developer.android.com/guide/navigation/use-graph/navigate
-        navController = navController,
-        workoutViewModel = workoutViewModel,
-        workoutID = workoutID,
-      )
-    }
+          Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
+
+          val workoutID = navBackStackEntry.arguments?.getString("workoutID")
+          WorkoutScreen(
+            // TODO This is an anti-pattern
+            // https://developer.android.com/guide/navigation/use-graph/navigate
+            navController = navController,
+            workoutViewModel = workoutViewModel,
+            workoutID = workoutID,
+            loadPreviousWorkout = false,
+            copyWorkoutFromPreviousWorkout = false
+          )
+        }*/
 
     composable("workoutSummary/{workoutID}/{workoutCount}") { navBackStackEntry ->
 //      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
@@ -405,17 +417,22 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
     composable("programsScreen") { ProgramsScreen(navController) }
 
     composable(
-      "programDetails/{programID}",
+      "programDetails/{programID}/isProgramActive={isProgramActive}",
       arguments = listOf(navArgument("programID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
-      navBackStackEntry.arguments?.getString("programID")?.let {
-        ProgramDetailsScreen(
-          // TODO This is an anti-pattern
-          // https://developer.android.com/guide/navigation/use-graph/navigate
-          navController,
-          _programID = it,
-        )
-      }
+
+      val programID = navBackStackEntry.arguments?.getString("programID")
+      val isProgramActive = navBackStackEntry.arguments?.getBoolean("isProgramActive") ?: false
+
+      requireNotNull(programID)
+
+      // TODO This is an anti-pattern
+      // https://developer.android.com/guide/navigation/use-graph/navigate
+      ProgramDetailsScreen(
+        navController,
+        _programID = programID,
+        isProgramActive = isProgramActive
+      )
     }
 
     composable("importWorkoutProgram") { ImportWorkoutProgramScreen(navController) }
@@ -479,7 +496,8 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
   navigation("profileScreen", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
       Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
-      ProfileScreen(navController = navController,
+      ProfileScreen(
+        navController = navController,
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") })
     }
 
@@ -564,12 +582,12 @@ private fun TestScreen() {
         Text(
           text = "RAIDER",
           style =
-          TextStyle(
-            color = Color.White,
-            fontSize = MaterialTheme.typography.headlineLarge.fontSize.times(4),
-            fontWeight = FontWeight.Bold,
-            fontFamily = fontFamily,
-          ),
+            TextStyle(
+              color = Color.White,
+              fontSize = MaterialTheme.typography.headlineLarge.fontSize.times(4),
+              fontWeight = FontWeight.Bold,
+              fontFamily = fontFamily,
+            ),
         )
       }
 
