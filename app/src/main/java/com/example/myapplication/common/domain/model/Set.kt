@@ -31,6 +31,9 @@ import kotlin.uuid.Uuid
 data class SetDao(var Set: Set)
 
 @Serializable
+data class CompletedSetsDao(var CompletedSets: Set)
+
+@Serializable
 data class Set(
   @SerialName("id") @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
@@ -102,14 +105,22 @@ fun Set.setSummaryRIR(weightUnit: String): String {
       " @ ${doubleFormatted(this.repetitionsInReserve)} RIR"
     else ""
   }"
+}
+//  ${doubleFormatted(weightKilograms)} × $repetitions ${
+//    if (repetitionsInReserve != null) "@ ${
+//      doubleFormatted(
+//        repetitionsInReserve
+//      )
+//    } RIR" else ""
+//  }"
 
-  //  ${doubleFormatted(weightKilograms)} × $repetitions ${
-  //    if (repetitionsInReserve != null) "@ ${
-  //      doubleFormatted(
-  //        repetitionsInReserve
-  //      )
-  //    } RIR" else ""
-  //  }"
+fun Set.previousSetSummaryRIR(weightUnit: String): String {
+// TODO get user default weight unit or exercise specific weight unit
+  return "${doubleFormatted(this.weightPounds)} × ${this.repetitions} ${
+    if (this.repetitionsInReserve != null)
+      " @ ${doubleFormatted(this.repetitionsInReserve)} RIR"
+    else ""
+  }"
 }
 
 fun Set.setTargetSummaryRIR(weightUnit: String): String {
