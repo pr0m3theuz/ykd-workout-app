@@ -24,7 +24,7 @@ import org.bson.types.ObjectId
 
 @Serializable
 data class UserProfile(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId? = null,
+  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId,
   var name: String? = null,
   var username: String? = null,
   var email: String? = null,
