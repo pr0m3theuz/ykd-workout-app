@@ -83,9 +83,9 @@ fun WorkoutOverviewContent(
         Button(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(32.dp),
           onClick = {
-            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}") {
+            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true") {
               popUpTo(navController.graph.findStartDestination().id) { saveState = true }
               // Avoid multiple copies of the same destination when
               // reselecting the same item
@@ -124,7 +124,7 @@ fun WorkoutOverviewContent(
         }
         Row(
           modifier = Modifier
-            .padding()
+            .padding(vertical = 8.dp)
             .fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically,
@@ -174,7 +174,7 @@ fun WorkoutOverviewContent(
         workoutComponents.forEach { workoutComponent ->
           Box(
             modifier = Modifier
-              .padding(vertical = 12.dp)
+              .padding(vertical = 16.dp)
               .fillMaxWidth()
           ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -189,7 +189,7 @@ fun WorkoutOverviewContent(
                   }
                   workoutComponent.sets.forEach { set ->
                     // TODO Chanage Text Color based on Set Type
-                    Row {
+                    Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)) {
                       Text(
                         text =
                         "${
