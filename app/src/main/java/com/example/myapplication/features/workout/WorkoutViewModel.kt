@@ -41,6 +41,8 @@ import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.SupersetExercisesSets
+import com.example.myapplication.common.domain.model.UserProfile
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.WorkoutItem
@@ -105,7 +107,10 @@ class WorkoutViewModel(
   private val exerciseRepository: ExercisesRepository,
   private val workoutDatastore: WorkoutDatastore, // Added WorkoutDatastore
   private val savedStateHandle: SavedStateHandle,
+  private val userProfileManager: UserProfileManager
 ) : ViewModel() {
+  private val user: UserProfile? = userProfileManager.userProfile.value
+
   private val WARM_UP_SET = SetType.warmUpSet
 
   var isWorkoutActive: Boolean
@@ -803,7 +808,7 @@ class WorkoutViewModel(
   fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {
     // Similar to getWorkoutByID, this could override DataStore's loaded workout.
     // Ensure this is the desired behavior.
-    manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { workout ->
+    manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)?.let { workout ->
       _workoutName.value = workout.name
       workoutDetails = workout
       _workout.value = workoutDetails
@@ -813,7 +818,8 @@ class WorkoutViewModel(
     }
   }
 
-  fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
+  // TODO Rename function
+  private fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
     val newWorkout = manageWorkoutUseCase.copyWorkoutFromWorkoutTemplate(workoutTemplate)
 
     _workoutName.value = newWorkout.name
@@ -827,17 +833,28 @@ class WorkoutViewModel(
     )
   }
 
-  fun copyWorkoutFromPreviousWorkout(previousWorkout: Workout) {
-    val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(previousWorkout)
+  /**
+   * Copies workout data from a previously completed workout or a workout template.
+   *
+   * This function retrieves a completed workout by its ID, creates a new workout
+   * based on it, and updates the ViewModel's state with the new workout's details.
+   * This includes the workout name, notes, and its constituent exercises and sets.
+   *
+   * @param previousWorkout The [ObjectId] of the previously completed workout to copy from.
+   */
+  fun copyWorkoutFromPreviousWorkout(previousWorkout: ObjectId) {
 
-    _workoutName.value = newWorkout.name
-    workoutDetails = newWorkout
-    _workout.value = workoutDetails
+    manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkout)?.let { workout ->
+      val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(workout)
+      _workoutName.value = newWorkout.name
+      workoutDetails = newWorkout
+      _workout.value = workoutDetails
 
-    getPinnedWorkoutNotes(previousWorkout.uuid, newWorkout.id)
-    setWorkoutComponents(
-      copyWorkoutItemsFromPreviousWorkout(previousWorkout.workoutItems, newWorkout.id).toList()
-    )
+      getPinnedWorkoutNotes(newWorkout.uuid, newWorkout.id)
+      setWorkoutComponents(
+        copyWorkoutItemsFromPreviousWorkout(newWorkout.workoutItems, newWorkout.id).toList()
+      )
+    }
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
@@ -889,6 +906,7 @@ class WorkoutViewModel(
       WorkoutNote().apply {
         workout = _workout.value!!.id
         workoutUUID = _workout.value!!.uuid
+        ownerID = user?.id?.toHexString() ?: "MISSING VALUE"
         //        workoutID = _workout.value.workoutID,
         //        programID = _workout.value.programID,
         //        mesocycleID = _workout.value.mesocycleID,
@@ -1288,7 +1306,8 @@ class WorkoutViewModel(
     //    TODO Implement this
     //
     //    _workoutData.notes = _workoutNotesData.toMutableList()
-    //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
+    //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompl
+    //     eted Sets
     removeUncompletedSets()
 
     //    _workoutData.exercisesSets =
@@ -1319,6 +1338,9 @@ class WorkoutViewModel(
     //    TODO Navigate to Workout Summary Screen
     cancelSetCompletedTimer()
     stopWorkoutTimer()
+
+    workoutDetails?.ownerID = user?.id?.toHexString() ?: "MISSING USER ID"
+
     saveWorkout()
 
     workoutDetails?.notes = _workoutNotesData
@@ -1326,7 +1348,6 @@ class WorkoutViewModel(
       manageWorkoutUseCase.convertWorkoutComponentsToWorkoutItems(workoutComponents.value)
 
     _completedWorkout.value = workoutDetails
-
 
     stopAutoSavingWorkout()
     viewModelScope.launch {
@@ -1340,6 +1361,7 @@ class WorkoutViewModel(
     //    TODO navController.popBackStack( route = Programs.route, inclusive = true)
     cancelSetCompletedTimer()
     stopWorkoutTimer()
+
     workoutDetails = initWorkout() // Resets ViewModel state
     _workout.value = workoutDetails // Ensure LiveData/StateFlow is updated
     _workoutName.value = workoutDetails?.name
@@ -1531,6 +1553,7 @@ private fun initWorkout(): Workout {
         name = "Morning Workout",
         dateCreated = Clock.System.now(),
         workoutStarted = Clock.System.now(),
+        isPublic = false
       )
     }
 
@@ -1539,6 +1562,7 @@ private fun initWorkout(): Workout {
         name = "Afternoon Workout",
         dateCreated = Clock.System.now(),
         workoutStarted = Clock.System.now(),
+        isPublic = false,
       )
     }
 
@@ -1547,6 +1571,7 @@ private fun initWorkout(): Workout {
         name = "Evening Workout",
         dateCreated = Clock.System.now(),
         workoutStarted = Clock.System.now(),
+        isPublic = false,
       )
     }
   }
