@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalMaterial3ExpressiveApi::class)
 
 package com.example.myapplication.features.history.ui
 
@@ -7,12 +7,14 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -210,14 +213,22 @@ fun HistoryLazyColumn(
   } else {
     LazyColumn(
       contentPadding = PaddingValues(16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       groupedWorkouts.forEach { (month, monthWorkouts) ->
         stickyHeader {
-          Text(
-            modifier = Modifier.padding(0.dp),
-            text = month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
-          )
+          Row(
+            modifier = Modifier
+              .background(MaterialTheme.colorScheme.background)
+              .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Text(
+              style = MaterialTheme.typography.titleMediumEmphasized,
+              modifier = Modifier.padding(vertical = 16.dp),
+              text = month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+            )
+          }
         }
 
         // TODO Implement Search & Filtering of Workouts & Programs
@@ -226,14 +237,14 @@ fun HistoryLazyColumn(
         items(monthWorkouts) { workout ->
           Box(
             modifier =
-            Modifier.clickable(
-              onClick = {
-                navController.navigate("history?overviewWorkout=${workout.id.toHexString()}")
-              },
-              enabled = true,
-              interactionSource = remember { MutableInteractionSource() },
-              indication = LocalIndication.current,
-            )
+              Modifier.clickable(
+                onClick = {
+                  navController.navigate("history?overviewWorkout=${workout.id.toHexString()}")
+                },
+                enabled = true,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = LocalIndication.current,
+              )
           ) {
             WorkoutSummaryCard(
               completedWorkout = workout,
