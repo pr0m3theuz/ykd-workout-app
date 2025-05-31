@@ -122,7 +122,17 @@ val commonModule = module {
   viewModel { MainViewModel(get(), get(), get()) }
   viewModel { ProgramsViewModel(get(), get(), get(), get()) }
   viewModel { ExercisesViewModel(get()) }
-  viewModel { WorkoutViewModel(get(), get(), get(), get(), get(), get()) } // Added WorkoutDatastore to WorkoutViewModel definition
+  viewModel {
+    WorkoutViewModel(
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get()
+    )
+  } // Added WorkoutDatastore to WorkoutViewModel definition
   viewModel { EquateVolumeViewModel(get(), get()) }
   viewModel { WorkingSetViewModel(get(), get()) }
   viewModel { WarmUpSetsViewModel(get(), get()) }
