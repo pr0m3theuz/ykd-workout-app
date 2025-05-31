@@ -61,7 +61,7 @@ class ManageWorkoutUseCase(
   //    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
   //      ?: MassUnit.POUNDS.abbreviation
 
-  private val userID = userProfileManager.userProfile.value.id?.toHexString() ?: "TemporaryUserID"
+  private val userID = userProfileManager.userProfile.value.id.toHexString() ?: "TemporaryUserID"
   val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
@@ -73,6 +73,13 @@ class ManageWorkoutUseCase(
     // TODO Add logic for when copying from a template (active program) vs when copying from a
     // previous workout
     return workoutRepository.getWorkoutByID(workoutID = workoutID)
+  }
+
+  fun getCompletedWorkoutByID(workoutID: ObjectId): Workout? {
+    // workoutRepository.getWorkoutByID(workoutID = workoutID)
+    // TODO Add logic for when copying from a template (active program) vs when copying from a
+    // previous workout
+    return completedWorkoutRepository.getCompletedWorkoutByID(workoutID = workoutID)
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout): Workout {
@@ -164,7 +171,12 @@ class ManageWorkoutUseCase(
       id = exerciseSetsID,
       order = previousExerciseSets.order,
       exercise = exercise,
-      sets = createNewSetsFromPreviousWorkout(previousExerciseSets.sets, exerciseSetsID, workoutID),
+      sets = createNewSetsFromPreviousWorkout(
+        previousExerciseSets.sets,
+        exerciseSetsID,
+        workoutID,
+        exerciseID = exercise.id
+      ),
       notes = previousExerciseSets.notes.filter { it.pinned }.toMutableList(),
       workoutID = workoutID,
       microcycleID = previousExerciseSets.microcycleID,
@@ -179,6 +191,7 @@ class ManageWorkoutUseCase(
     previousSets: List<Set>,
     currentExerciseSetsID: ObjectId,
     currentWorkoutID: ObjectId,
+    exerciseID: ObjectId,
   ): MutableList<Set> {
     val newSets = mutableListOf<Set>()
     val latestPreviousSets = mutableListOf<Set>()
@@ -201,7 +214,7 @@ class ManageWorkoutUseCase(
           progressionSchemeID = set.progressionSchemeID,
           exerciseSetsID = currentExerciseSetsID,
           workoutID = currentWorkoutID,
-          exerciseID = set.exerciseID,
+          exerciseID = exerciseID,
           ownerID = userID, // TODO Replace currentUser.id
         )
       newSets.add(newSet)
@@ -394,6 +407,9 @@ class ManageWorkoutUseCase(
   ) {
     //    TODO Implement this
     workout.notes = workoutNotes.toMutableList()
+
+    workout.isPublic = false
+    workout.isCompleted = true
 
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     //    removeUncompletedSets(exercisesSets.toMutableList())
