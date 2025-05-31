@@ -9,8 +9,8 @@ import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.WorkoutItem
+import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
-import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import com.example.myapplication.features.workout.ManageExercisesUseCase
 import com.example.myapplication.features.workout.ManageWorkoutUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ class HistoryViewModel(
   private val application: Application,
   private val manageWorkoutUseCase: ManageWorkoutUseCase,
   private val manageExercisesUseCase: ManageExercisesUseCase,
-  private val workoutRepository: WorkoutRepository,
+  private val completedWorkoutRepository: CompletedWorkoutRepository,
   private val exerciseRepository: ExercisesRepository,
 ) : ViewModel() {
   val userDefaultWeightUnit: String = manageWorkoutUseCase.userDefaultWeightUnit
@@ -46,14 +46,15 @@ class HistoryViewModel(
   init {
     viewModelScope.launch {
       // TODO Replace workoutRepository
-      workoutRepository.getAllCompletedWorkouts().collect() { workouts ->
-        _workouts.value = workouts.sortedByDescending { it.workoutEnded }
-      }
+      _workouts.value =
+        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
+          ?: emptyList()
+
     }
   }
 
   fun getWorkoutByID(workoutID: ObjectId) {
-    _workout.value = manageWorkoutUseCase.getWorkoutByID(workoutID)
+    _workout.value = manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)
   }
 
   fun getExerciseByExerciseID(exerciseID: ObjectId?): Exercise? {
@@ -66,6 +67,6 @@ class HistoryViewModel(
   }
 
   fun deleteWorkout(workout: Workout) {
-    viewModelScope.launch { workoutRepository.deleteWorkout(workout) }
+    viewModelScope.launch { completedWorkoutRepository.deleteCompletedWorkout(workout) }
   }
 }
