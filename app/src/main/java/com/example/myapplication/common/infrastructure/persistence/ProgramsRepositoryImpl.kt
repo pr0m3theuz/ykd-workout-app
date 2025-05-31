@@ -13,6 +13,8 @@ import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.couchbase.lite.UnitOfWork
 import com.couchbase.lite.queryChangeFlow
+import com.example.myapplication.common.domain.model.CompletedProgramsDao
+import com.example.myapplication.common.domain.model.CompletedWorkoutsDao
 import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.MesocycleDao
 import com.example.myapplication.common.domain.model.Microcycle
@@ -92,6 +94,19 @@ class ProgramsRepositoryImpl(
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
         val program = withUnknownKeys.decodeFromString<ProgramDao>(json).Program // 5
+        programs.add(program) // 6
+      }
+    }
+    return programs // 7
+  }
+
+  private fun mapQueryChangeToCompletedPrograms(queryChange: QueryChange): List<Program> {
+    val programs = mutableListOf<Program>() // 1
+    queryChange.results?.let { results -> // 2
+      results.forEach { result -> // 3
+        val json = result.toJSON() // 4
+        val program =
+          withUnknownKeys.decodeFromString<CompletedProgramsDao>(json).CompletedPrograms // 5
         programs.add(program) // 6
       }
     }
@@ -218,17 +233,17 @@ class ProgramsRepositoryImpl(
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
           .where(
-            Expression.property("active")
+            Expression.property("isActive")
               .equalTo(Expression.booleanValue(true))
               .and(
-                Expression.property("ownerID").equalTo(Expression.string(user.id?.toHexString()))
+                Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
               )
           )
 
       val flow =
         query
           .queryChangeFlow()
-          .map { queryChange: QueryChange -> mapQueryChangeToProgram(queryChange) }
+          .map { queryChange: QueryChange -> mapQueryChangeToCompletedPrograms(queryChange) }
           .flowOn(Dispatchers.IO)
 
       query.execute()
@@ -248,13 +263,13 @@ class ProgramsRepositoryImpl(
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val query =
-        QueryBuilder.select(SelectResult.property("active"))
+        QueryBuilder.select(SelectResult.property("isActive"))
           .from(DataSource.collection(collection))
           .where(
             Expression.property("uuid")
               .equalTo(Expression.string(programUUID.toString()))
               .and(
-                Expression.property("ownerID").equalTo(Expression.string(user.id?.toHexString()))
+                Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
               )
           )
 
@@ -311,9 +326,13 @@ class ProgramsRepositoryImpl(
       val newProgramDocument = MutableDocument(newProgram.id.toString(), newProgramJson)
       Log.i(
         "ProgramRepositoryImpl.createActiveProgram()",
+        "newProgramJson: $newProgramJson"
+      )
+      Log.i(
+        "ProgramRepositoryImpl.createActiveProgram()",
         "newProgramDocument: $newProgramDocument"
       )
-//      completedProgramsCollection.save(newProgramDocument)
+      completedProgramsCollection.save(newProgramDocument)
 
       db.inBatch(UnitOfWork {
         newProgramWorkouts.forEach { workout ->
@@ -331,7 +350,7 @@ class ProgramsRepositoryImpl(
         newProgramSets.forEach { set ->
           Log.i("ProgramRepositoryImpl.createActiveProgram()", "set: $set")
 
-          val setJson = Json.encodeToString(newProgramSets)
+          val setJson = Json.encodeToString(set)
           Log.i("ProgramRepositoryImpl.createActiveProgram()", "setJson: $setJson")
 
           val newProgramSetsDocument = MutableDocument(newProgram.id.toString(), setJson)
@@ -359,7 +378,7 @@ class ProgramsRepositoryImpl(
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val json = Json.encodeToString(program.copy(ownerID = user.id?.toHexString() ?: "MISSING_ID"))
+      val json = Json.encodeToString(program.copy(ownerID = user.id.toHexString() ?: "MISSING_ID"))
       val document = MutableDocument(program.id.toString(), json)
 
 //      collection.save(document)
@@ -423,7 +442,7 @@ class ProgramsRepositoryImpl(
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("CompletedProgram")
+      val collection = db.getCollection("CompletedPrograms")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
@@ -775,11 +794,11 @@ class ProgramsRepositoryImpl(
 //  @Deprecated("Current Implementation is inadequate for getting next workout", replaceWith = ReplaceWith("WorkoutRepository.getNextWorkoutInProgram()")
   override fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
     try {
-      requireNotNull(userDatabase) { DATABASE_IS_NULL }
+      requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = userDatabase.getCollection("Workout")
+      val collection = db.getCollection("CompletedWorkouts")
 
-      requireNotNull(collection) { COLLECTION_IS_NULL }
+      requireNotNull(collection) { COLLECTION_IS_NULL.format("CompletedWorkouts") }
 
       val query = QueryBuilder
         .selectDistinct(SelectResult.all())
@@ -787,12 +806,14 @@ class ProgramsRepositoryImpl(
         .where(
           Expression.property("programID").equalTo(Expression.string(programID.toString()))
             .and(Expression.property("workoutEnded").isNotValued)
+            .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
         )
         .limit(Expression.intValue(1))
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      val workout = result?.let { withUnknownKeys.decodeFromString<Workout>(it) }
+      val workout =
+        result?.let { withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts }
 
       return workout
     } catch (e: Exception) {
