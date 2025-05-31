@@ -63,6 +63,9 @@ data class Program(
 data class ProgramDao(val Program: Program)
 
 @Serializable
+data class CompletedProgramsDao(val CompletedPrograms: Program)
+
+@Serializable
 data class Programs(val programs: List<Program>)
 
 @Serializable
