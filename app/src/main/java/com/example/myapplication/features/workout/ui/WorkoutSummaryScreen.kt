@@ -3,8 +3,6 @@
 package com.example.myapplication.features.workout.ui
 
 import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ErrorOutline
@@ -200,8 +200,10 @@ fun WorkoutSummaryCard(
       }
     )
 
+  val workoutSummaryTextStyle = MaterialTheme.typography.bodyMedium
+
   Card(modifier = Modifier.padding(vertical = 0.dp)) {
-    Column(modifier = Modifier.padding(8.dp)) {
+    Column(modifier = Modifier.padding(16.dp)) {
       Row { Text(text = completedWorkout.name, style = MaterialTheme.typography.titleMedium) }
 
       Row {
@@ -223,14 +225,21 @@ fun WorkoutSummaryCard(
               horizontalArrangement = Arrangement.Center,
             ) {
               Icon(Icons.Filled.Timer, contentDescription = null)
-              Text(text = "Duration")
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = "Duration",
+                style = MaterialTheme.typography.titleSmall
+              )
             }
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.Center,
             ) {
-              Text(text = completedWorkout.formatWorkoutDuration())
+              Text(
+                text = completedWorkout.formatWorkoutDuration(),
+                style = workoutSummaryTextStyle
+              )
             }
           }
         }
@@ -245,7 +254,11 @@ fun WorkoutSummaryCard(
               val weightIcon = painterResource(R.drawable.weight_fill1_wght400_grad0_opsz24)
               //                  Image(painter = weightIcon, contentDescription = null)
               Icon(painter = weightIcon, contentDescription = null)
-              Text(text = "Volume")
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = "Volume",
+                style = MaterialTheme.typography.titleSmall
+              )
             }
             Row(
               modifier = Modifier.fillMaxWidth(),
@@ -253,7 +266,10 @@ fun WorkoutSummaryCard(
               horizontalArrangement = Arrangement.Center,
             ) {
               // TODO Get Default Weight Unit from User Settings
-              Text(text = "$totalVolume $userDefaultWeightUnit")
+              Text(
+                text = "$totalVolume $userDefaultWeightUnit",
+                style = workoutSummaryTextStyle
+              )
             }
           }
         }
@@ -266,30 +282,37 @@ fun WorkoutSummaryCard(
               horizontalArrangement = Arrangement.Center,
             ) {
               Icon(Icons.Filled.FormatListNumbered, contentDescription = null)
-              Text(text = "Sets")
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = "Sets",
+                style = MaterialTheme.typography.titleSmall
+              )
             }
             Row(
               modifier = Modifier.fillMaxWidth(),
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.Center,
             ) {
-              Text(text = "$totalSets")
+              Text(
+                text = "$totalSets",
+                style = workoutSummaryTextStyle
+              )
             }
           }
         }
       }
 
-      val backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
+//      val backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
       Row(
         modifier =
           Modifier
-            .fillMaxWidth()
-            .border(4.dp, backgroundColor)
-            .padding(4.dp)
-            .background(color = backgroundColor),
+            .fillMaxWidth(),
+//            .border(4.dp, backgroundColor)
+//            .padding(4.dp)
+//            .background(color = backgroundColor)
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        val style = MaterialTheme.typography.titleMedium
+        val style = MaterialTheme.typography.titleSmall
         Text(text = "Exercise", style = style, modifier = Modifier.weight(1f))
         Text(text = "Top Set", style = style, modifier = Modifier.weight(0.5f))
       }
@@ -301,28 +324,40 @@ fun WorkoutSummaryCard(
             Row(
               modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 2.dp, horizontal = 4.dp),
+                .padding(vertical = 4.dp),
               verticalAlignment = Alignment.CenterVertically,
             ) {
-              val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
-              val style = MaterialTheme.typography.bodyMedium
-              // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
-              val maxWeight = workoutItem.sets.maxBy { it.weightPounds ?: 0.0 }
-              val maxRIR = workoutItem.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
-              val maxVolume = workoutItem.sets.maxBy { it.setVolume(weightUnit) }
+              if (workoutItem.sets.isNotEmpty()) {
+                val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+                val style = MaterialTheme.typography.bodyMedium
+                // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
+                val maxWeight = workoutItem.sets.maxBy { it.weightPounds ?: 0.0 }
+                val maxRIR = workoutItem.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
+                val maxVolume = workoutItem.sets.maxBy { it.setVolume(weightUnit) }
 
-              Text(
-                text = "${workoutItem.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
-                style = style,
-                modifier = Modifier.weight(1f),
-              )
+                Text(
+                  text = "${workoutItem.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
+                  autoSize = TextAutoSize.StepBased(maxFontSize = style.fontSize),
+                  style = style,
+                  maxLines = 1,
+                  modifier = Modifier.weight(0.6f),
+                )
 
-              Text(
-                // RIR
-                text = maxWeight.setSummaryRIR(weightUnit),
-                style = style,
-                modifier = Modifier.weight(0.5f),
-              )
+                Text(
+                  // RIR
+                  text = maxWeight.setSummaryRIR(weightUnit),
+                  autoSize = TextAutoSize.StepBased(maxFontSize = style.fontSize),
+                  style = style,
+                  maxLines = 1,
+                  modifier = Modifier.weight(0.4f),
+                )
+              } else {
+                Text(
+                  text = "No data available.",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+              }
             }
           }
 
@@ -337,25 +372,37 @@ fun WorkoutSummaryCard(
                   .padding(vertical = 2.dp, horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
               ) {
-                val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
-                val style = MaterialTheme.typography.bodyMedium
-                // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
-                val maxWeight = exerciseSets.sets.maxBy { it.weightPounds ?: 0.0 }
-                val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
-                val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
+                if (exerciseSets.sets.isNotEmpty()) {
+                  val weightUnit = exercise?.weightUnit ?: userDefaultWeightUnit
+                  val style = MaterialTheme.typography.bodyMedium
+                  // TODO Change to Total Volume or Max Weight or lowest RIR for Top Set
+                  val maxWeight = exerciseSets.sets.maxBy { it.weightPounds ?: 0.0 }
+                  val maxRIR = exerciseSets.sets.maxBy { it.repetitionsInReserve ?: 10.0 }
+                  val maxVolume = exerciseSets.sets.maxBy { it.setVolume(weightUnit) }
 
-                Text(
-                  text = "${exerciseSets.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
-                  style = style,
-                  modifier = Modifier.weight(1f),
-                )
+                  Text(
+                    text = "${exerciseSets.sets.size} × ${exercise?.name ?: "Missing Exercise"}",
+                    style = style,
+                    autoSize = TextAutoSize.StepBased(maxFontSize = style.fontSize),
+                    maxLines = 1,
+                    modifier = Modifier.weight(0.55f),
+                  )
 
-                Text(
-                  // RIR
-                  text = maxWeight.setSummaryRIR(weightUnit),
-                  style = style,
-                  modifier = Modifier.weight(0.5f),
-                )
+                  Text(
+                    // RIR
+                    text = maxWeight.setSummaryRIR(weightUnit),
+                    style = style,
+                    autoSize = TextAutoSize.StepBased(maxFontSize = style.fontSize),
+                    maxLines = 1,
+                    modifier = Modifier.weight(0.45f),
+                  )
+                } else {
+                  Text(
+                    text = "No data available.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                  )
+                }
               }
             }
           }
