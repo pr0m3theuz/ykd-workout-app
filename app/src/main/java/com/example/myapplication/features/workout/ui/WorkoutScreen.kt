@@ -47,10 +47,15 @@ fun WorkoutScreen(
   navController: NavController,
   workoutViewModel: WorkoutViewModel,
   workoutID: String?,
+  loadPreviousWorkout: Boolean,
+  copyWorkoutFromPreviousWorkout: Boolean
 ) {
-  if (!workoutID.isNullOrBlank()) {
+  if (!workoutID.isNullOrBlank() && !copyWorkoutFromPreviousWorkout) {
     workoutViewModel.getWorkoutByID(ObjectId(workoutID))
-  } /*else {
+  } else if (!workoutID.isNullOrBlank() && copyWorkoutFromPreviousWorkout) {
+    workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
+  }
+  /*else {
     workoutViewModel.initWorkoutData()
   }*/
 
@@ -83,7 +88,15 @@ fun WorkoutContent(
     val workoutsCount = workoutViewModel.getWorkoutsCount()
 
     Log.i("navigateToWorkoutSummaryScreen()", "workoutCount: $workoutsCount")
-    navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount")
+    navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount") {
+      val route = navController.currentBackStackEntry?.destination?.route
+      route?.let {
+        popUpTo(it)
+        {
+          inclusive = true
+        }
+      }
+    }
   }
 
   //  if (openFinishWorkoutDialog) {
@@ -239,20 +252,20 @@ private fun WorkoutDuration(workoutViewModel: WorkoutViewModel) {
     val colorAlpha by
     animateFloatAsState(
       targetValue =
-      if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") 0f else 1f,
+        if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") 0f else 1f,
       animationSpec = infiniteRepeatable(animation = tween(1000)),
       label = "textColorAlpha",
     )
     Text(
       text =
-      if (isWorkoutCountUpTimerPaused && workoutDurationString == "0:00") "Start Workout Clock"
-      else workoutDurationString,
+        if (isWorkoutCountUpTimerPaused && workoutDurationString == "0:00") "Start Workout Clock"
+        else workoutDurationString,
       style = MaterialTheme.typography.bodyLarge,
       color =
-      MaterialTheme.colorScheme.onPrimary.copy(
-        alpha =
-        if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") colorAlpha else 1f
-      ),
+        MaterialTheme.colorScheme.onPrimary.copy(
+          alpha =
+            if (isWorkoutCountUpTimerPaused && workoutDurationString != "0:00") colorAlpha else 1f
+        ),
     )
   }
 }
@@ -265,11 +278,11 @@ private fun WorkoutNameTextField(workoutName: String, setWorkoutName: (String) -
     enabled = false,
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
-    TextStyle(
-      fontSize = MaterialTheme.typography.titleMedium.fontSize,
-      textAlign = TextAlign.Center,
-      color = MaterialTheme.colorScheme.onBackground,
-    ),
+      TextStyle(
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onBackground,
+      ),
     value = name,
     onValueChange = {
       name = it
