@@ -130,7 +130,7 @@ dependencies {
   implementation("androidx.compose.material3.adaptive:adaptive-navigation:$adaptiveLayout")
   implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.2")
   implementation("com.google.firebase:firebase-perf-ktx:21.0.5")
-  androidTestImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+  androidTestImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
 
   val composeVersion = "1.8.2"
   implementation(platform("androidx.compose:compose-bom:2025.05.01"))
@@ -141,7 +141,7 @@ dependencies {
   implementation("androidx.compose.ui:ui-text-google-fonts:$composeVersion")
 
   implementation("com.google.android.material:material:1.12.0")
-  implementation("androidx.compose.material3:material3:1.3.2")
+  implementation("androidx.compose.material3:material3:1.4.0-alpha15")
   val lifecycleVersion = "2.9.0"
   implementation("androidx.navigation:navigation-compose:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
@@ -190,7 +190,7 @@ dependencies {
 
   testImplementation("junit:junit:4.13.2")
 
-  val junitJupiter = "5.12.2"
+  val junitJupiter = "5.13.0"
   testImplementation(platform("org.junit:junit-bom:$junitJupiter"))
   testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiter")
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiter")
@@ -256,13 +256,13 @@ dependencies {
   implementation("io.coil-kt:coil-compose:2.7.0")
 
   // For Jetpack Compose.
-  implementation("com.patrykandpatrick.vico:compose:2.1.2")
+  implementation("com.patrykandpatrick.vico:compose:2.1.3")
 
   // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
   implementation("com.patrykandpatrick.vico:compose-m3:2.1.2")
 
   // Houses the core logic for charts and other elements. Included in all other modules.
-  implementation("com.patrykandpatrick.vico:core:2.1.2")
+  implementation("com.patrykandpatrick.vico:core:2.1.3")
 
   // couchbase lite
   implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.3")
