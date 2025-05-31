@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ButtonElevation
@@ -219,8 +220,9 @@ private fun SetContentHeader(weightUnit: String) {
   ) {
     val textStyle = MaterialTheme.typography.bodyMedium
 
-    Box(modifier = Modifier
-      .width(48.dp),
+    Box(
+      modifier = Modifier
+        .width(48.dp),
 //      .weight(0.1f),
       contentAlignment = Alignment.Center
     ) {
@@ -229,13 +231,18 @@ private fun SetContentHeader(weightUnit: String) {
 
     Box(
       modifier =
-      Modifier
-        // .padding(4.dp)
-        .width(110.dp),
+        Modifier
+          // .padding(4.dp)
+          .width(110.dp),
 //        .weight(0.22f),
       contentAlignment = Alignment.Center
     ) {
-      Text("Previous Set", style = textStyle)
+      Text(
+        "Previous Set (${weightUnit})",
+        style = textStyle,
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(maxFontSize = textStyle.fontSize)
+      )
     }
 
     Box(
@@ -258,9 +265,10 @@ private fun SetContentHeader(weightUnit: String) {
       Text("Reps", style = textStyle)
     }
 
-    Box(modifier = Modifier
-      .padding(0.dp)
-      .width(60.dp),
+    Box(
+      modifier = Modifier
+        .padding(0.dp)
+        .width(60.dp),
 //      .weight(0.1f),
       contentAlignment = Alignment.Center
     ) {
