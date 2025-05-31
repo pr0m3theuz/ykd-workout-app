@@ -35,7 +35,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val document = MutableDocument()
-      document.setString("id", user.id?.toHexString())
+      document.setString("id", user.id.toHexString())
       document.setString("name", user.name)
       document.setString("email", user.email)
       document.setString("password", user.password)
@@ -57,7 +57,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
 
       val collection = db.getCollection("Users")
       requireNotNull(collection) { COLLECTION_IS_NULL }
-      val document = user.id?.let { collection.getDocument(it.toHexString())?.toMutable() }
+      val document = user.id.let { collection.getDocument(it.toHexString())?.toMutable() }
       requireNotNull(document) { "User Repository: User does not exist!" }
 
       document.setString("name", user.name)
@@ -79,7 +79,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("Users")
       requireNotNull(collection) { COLLECTION_IS_NULL }
-      val document = collection.getDocument(user.id?.toHexString() ?: "MISSING_VALUE")
+      val document = collection.getDocument(user.id.toHexString() ?: "MISSING_VALUE")
       requireNotNull(document) { "User Repository: User does not exist!" }
 
       collection.delete(document)
