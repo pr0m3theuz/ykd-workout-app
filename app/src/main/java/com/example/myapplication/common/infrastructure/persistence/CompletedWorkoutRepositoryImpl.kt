@@ -3,24 +3,24 @@
 package com.example.myapplication.common.infrastructure.persistence
 
 import android.util.Log
-import com.couchbase.lite.Collection
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
 import com.couchbase.lite.Function
+import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.couchbase.lite.UnitOfWork
 import com.couchbase.lite.queryChangeFlow
+import com.example.myapplication.common.domain.model.CompletedSetsDao
+import com.example.myapplication.common.domain.model.CompletedWorkoutsDao
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Set
-import com.example.myapplication.common.domain.model.SetDao
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
-import com.example.myapplication.common.domain.model.WorkoutDao
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +38,7 @@ private const val COLLECTION_IS_NULL =
   "Completed Repository: Completed * Collection does not exist in the Database."
 
 class CompletedWorkoutRepositoryImpl(
-  private val databaseManager: DatabaseManager
+  databaseManager: DatabaseManager
 ) :
   CompletedWorkoutRepository {
   val userProfileManager: UserProfileManager by inject(UserProfileManager::class.java)
@@ -55,7 +55,7 @@ class CompletedWorkoutRepositoryImpl(
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val set = withUnknownKeys.decodeFromString<SetDao>(json).Set // 5
+        val set = withUnknownKeys.decodeFromString<CompletedSetsDao>(json).CompletedSets // 5
         sets.add(set) // 6
       }
     }
@@ -67,35 +67,11 @@ class CompletedWorkoutRepositoryImpl(
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout // 5
+        val workout =
+          withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(json).CompletedWorkouts // 5
         workouts.add(workout) // 6
       }
     }
-    return workouts // 7
-  }
-
-  // TODO is this best practice?
-  private fun mapQueryChangeToWorkoutCompletedSets(
-    queryChange: QueryChange,
-    setCollection: Collection
-  ): List<Workout> {
-    val workouts = mutableListOf<Workout>() // 1
-    queryChange.results?.let { results -> // 2
-      results.forEach { result -> // 3
-        val json = result.toJSON() // 4
-        val workout = withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
-        workouts.add(workout) // 6
-      }
-    }
-
-    val workoutIds = workouts.map { it.id.toString() }
-
-    val workoutIDClause = workoutIds.joinToString(",") { "'$it'" }.let { "[$it]" }
-
-
-
-
-
     return workouts // 7
   }
 
@@ -120,7 +96,7 @@ class CompletedWorkoutRepositoryImpl(
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<SetDao>(it).Set }
+      return result?.let { withUnknownKeys.decodeFromString<CompletedSetsDao>(it).CompletedSets }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -141,7 +117,7 @@ class CompletedWorkoutRepositoryImpl(
           .from(DataSource.collection(collection))
           .where(
             Expression.property("isCompleted").equalTo(Expression.booleanValue(true)).and(
-              Expression.property("ownerID").equalTo(Expression.string(user.id?.toHexString()))
+              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
             )
           )
 
@@ -202,16 +178,15 @@ class CompletedWorkoutRepositoryImpl(
           .from(DataSource.collection(workoutCollection)) // Replace with your database instance
           .where(
             Expression.property("isCompleted").equalTo(Expression.booleanValue(true)).and(
-              Expression.property("isPublic").equalTo(Expression.booleanValue(false))
-            ).and(
-              Expression.property("ownerID").equalTo(Expression.string(user.id?.toHexString()))
+              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
             )
           )
-          .orderBy(Ordering.property("dateCreated").descending())
+//          .orderBy(Ordering.property("workoutEnded").descending())
 
       val workouts = completedWorkoutQuery.execute().allResults()
         .map {
-          withUnknownKeys.decodeFromString<WorkoutDao>(it.toJSON()).Workout
+          Log.d("CompletedWorkoutRepositoryImpl.getCompletedWorkouts()", it.toJSON())
+          withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it.toJSON()).CompletedWorkouts
         }
 
       val workoutIds = workouts.map { it.id.toString() }
@@ -220,14 +195,14 @@ class CompletedWorkoutRepositoryImpl(
 
       val setsQuery = "SELECT * FROM `CompletedSets` " +
               "WHERE workoutID IN $workoutIDClause" +
-              " AND isPublic = false" +
-              " AND ownerID = '${user.id?.toHexString()}'"
+              " AND ownerID = '${user.id.toHexString()}'"
 
       val setsResult = db.createQuery(setsQuery).execute().allResults()
       val sets = setsResult.mapNotNull {
         try {
-          withUnknownKeys.decodeFromString<SetDao>(it.toJSON()).Set
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
         } catch (e: Exception) {
+          Log.e(e.message, e.stackTraceToString())
           null
         }
       }
@@ -292,10 +267,12 @@ class CompletedWorkoutRepositoryImpl(
       val workoutResult =
         completedWorkoutQueryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      val workout = workoutResult?.let { withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout }
+      val workout =
+        workoutResult?.let { withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts }
 
       val setsResult = completedSetsQueryBuilder.execute().allResults()
-      val sets = setsResult.map { withUnknownKeys.decodeFromString<SetDao>(it.toJSON()).Set }
+      val sets =
+        setsResult.map { withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets }
 
       workout?.let {
         it.workoutItems.forEach { workoutItem ->
@@ -348,7 +325,7 @@ class CompletedWorkoutRepositoryImpl(
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<WorkoutDao>(it).Workout }
+      return result?.let { withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -390,7 +367,7 @@ class CompletedWorkoutRepositoryImpl(
               "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
               "Saving set $setJsonContent"
             )
-//            completedSetsCollection.save(MutableDocument(set.id.toHexString(), setJsonContent))
+            completedSetsCollection.save(MutableDocument(set.id.toHexString(), setJsonContent))
           } catch (e: kotlinx.serialization.SerializationException) {
             Log.e(
               "Failed to serialize set $setIdStr for workout ${workout.id}",
@@ -430,12 +407,12 @@ class CompletedWorkoutRepositoryImpl(
           "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
           "Updating workout $workoutJson"
         )
-//        completedWorkoutsCollection.save(it)
+        completedWorkoutsCollection.save(it)
       } ?: Log.i(
         "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
         "Saving workout $workoutJson"
       )
-      // completedWorkoutsCollection.save(MutableDocument(workout.id.toHexString(), workoutJson))
+      completedWorkoutsCollection.save(MutableDocument(workout.id.toHexString(), workoutJson))
 
 
       // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
@@ -446,6 +423,10 @@ class CompletedWorkoutRepositoryImpl(
       Log.e(e.message, e.stackTraceToString())
     }
 
+  }
+
+  override suspend fun deleteCompletedWorkout(workout: Workout) {
+    TODO("Not yet implemented")
   }
 }
 
