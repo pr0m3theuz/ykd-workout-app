@@ -333,7 +333,7 @@ class EquateVolumeViewModel(
   private fun initSets(exerciseSets: ExerciseExerciseSets): MutableList<Set> {
     return MutableList(3) { index ->
       Set(
-        setNumber = index,
+        setNumber = index.plus(1),
         weightPounds = 100.00,
         repetitions = 10,
         percentage1RM = 1.0,
