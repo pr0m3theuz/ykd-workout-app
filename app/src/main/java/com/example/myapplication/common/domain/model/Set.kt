@@ -38,7 +38,7 @@ data class Set(
   @SerialName("id") @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
-  var setNumber: Int? = 0,
+  var setNumber: Int? = 1,
   var weightPounds: Double? = null,
   var weightKilograms: Double? = null,
   var repetitions: Int? = null,
