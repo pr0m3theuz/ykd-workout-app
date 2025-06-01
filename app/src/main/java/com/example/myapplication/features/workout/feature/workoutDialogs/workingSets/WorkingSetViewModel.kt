@@ -161,7 +161,7 @@ class WorkingSetViewModel(
         exerciseID = exerciseSets.exercise.id,
         exerciseSetsID = exerciseSets.id,
         workoutID = exerciseSets.workoutID,
-        setNumber = index,
+        setNumber = index.plus(1),
         ownerID = exerciseSets.ownerID,
         weightPounds = 100.00,
         repetitions = 10,
