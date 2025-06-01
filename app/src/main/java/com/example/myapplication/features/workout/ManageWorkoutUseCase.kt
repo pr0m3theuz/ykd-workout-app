@@ -822,7 +822,7 @@ class ManageWorkoutUseCase(
           exerciseSetsID = exerciseSets.id,
 
           // Initial set details
-          setNumber = 0,
+          setNumber = 1,
           setCompleted = false,
           isPublic = false,
           progressionSchemeID = null, // TODO: Replace with actual logic if available
