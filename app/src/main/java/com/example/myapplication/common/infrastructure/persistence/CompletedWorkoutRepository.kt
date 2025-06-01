@@ -22,5 +22,5 @@ interface CompletedWorkoutRepository {
 
   suspend fun upsertCompletedWorkout(workout: Workout)
 
-  suspend fun deleteCompletedWorkout(workout: Workout)
+  suspend fun deleteCompletedWorkout(workout: Workout): Boolean
 }
