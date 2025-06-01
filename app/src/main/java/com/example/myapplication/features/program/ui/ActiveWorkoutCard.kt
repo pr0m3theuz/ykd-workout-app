@@ -58,7 +58,7 @@ fun ActiveWorkoutCard(
   val bodySmall = MaterialTheme.typography.bodySmall
   Card(modifier = Modifier.padding(vertical = padding)) {
     workout.programID?.let { programID ->
-      val program = programsViewModel.getProgramByID(programID)
+      val program = programsViewModel.getCurrentlyActiveProgramByID(programID)
       program?.let {
         Row(
           modifier = Modifier
@@ -75,7 +75,7 @@ fun ActiveWorkoutCard(
             Modifier
               .clickable {
                 /* TODO Navigate to Program Details Screen */
-                navController.navigate("programDetails/${workout.programID?.toHexString()}")
+                navController.navigate("programDetails/${workout.programID?.toHexString()}/isProgramActive=true")
               }
               .weight(1f, fill = true),
           )
@@ -114,7 +114,7 @@ fun ActiveWorkoutCard(
       }
 
       Text(
-        text = workout.name ?: "Workout Name",
+        text = workout.name,
         modifier = Modifier.padding(horizontal = 8.dp),
         style = bodySmall,
       )
@@ -294,7 +294,7 @@ fun ActiveWorkoutCard(
       ) {
         Button(
           onClick = {
-            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}") {
+            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=false") {
               popUpTo(navController.graph.findStartDestination().id) { saveState = true }
               // Avoid multiple copies of the same destination when
               // reselecting the same item
@@ -311,7 +311,7 @@ fun ActiveWorkoutCard(
           IconButton(
             onClick = { /*TODO*/
               // TODO Navigate to Program's Workout Tab
-              navController.navigate("programDetails/${workout.programID?.toHexString()}")
+              navController.navigate("programDetails/${workout.programID?.toHexString()}/isProgramActive=true")
             }
           ) {
             Icon(
