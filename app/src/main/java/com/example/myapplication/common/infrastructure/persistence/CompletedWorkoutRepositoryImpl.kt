@@ -425,7 +425,7 @@ class CompletedWorkoutRepositoryImpl(
 
   }
 
-  override suspend fun deleteCompletedWorkout(workout: Workout) {
+  override suspend fun deleteCompletedWorkout(workout: Workout): Boolean {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
@@ -462,9 +462,12 @@ class CompletedWorkoutRepositoryImpl(
           )
         }
       }
+
+      return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
+    return false
   }
 }
 
