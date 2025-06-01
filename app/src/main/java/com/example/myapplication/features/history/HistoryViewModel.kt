@@ -67,6 +67,14 @@ class HistoryViewModel(
   }
 
   fun deleteWorkout(workout: Workout) {
-    viewModelScope.launch { completedWorkoutRepository.deleteCompletedWorkout(workout) }
+    // TODO Add toast
+    viewModelScope.launch {
+      completedWorkoutRepository.deleteCompletedWorkout(workout)
+
+      // Update workouts list
+      _workouts.value =
+        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
+          ?: emptyList()
+    }
   }
 }
