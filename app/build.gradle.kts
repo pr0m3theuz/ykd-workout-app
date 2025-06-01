@@ -211,6 +211,7 @@ dependencies {
   // implementation ("io.realm.kotlin:library-base:1.11.1") // Add to use local realm (no sync)
 //  implementation("io.realm.kotlin:library-sync:2.3.0") // Add to use device sync)
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 
 //  implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.3.0")
   implementation("org.mongodb:bson-kotlinx:5.5.0")
