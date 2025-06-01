@@ -13,8 +13,11 @@ import com.example.myapplication.common.infrastructure.persistence.CompletedWork
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.features.workout.ManageExercisesUseCase
 import com.example.myapplication.features.workout.ManageWorkoutUseCase
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
@@ -30,6 +33,17 @@ class HistoryViewModel(
   private val exerciseRepository: ExercisesRepository,
 ) : ViewModel() {
   val userDefaultWeightUnit: String = manageWorkoutUseCase.userDefaultWeightUnit
+
+  private val _toastMessage = MutableSharedFlow<String>()
+  val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow() // or just _toastMessage
+
+  fun triggerToast() {
+    viewModelScope.launch {
+      // ... your function logic ...
+      val result = "Operation successful via Flow!"
+      _toastMessage.emit(result)
+    }
+  }
 
   private val _workouts: MutableStateFlow<List<Workout>> = MutableStateFlow(emptyList())
   val workouts: StateFlow<List<Workout>>
@@ -69,7 +83,13 @@ class HistoryViewModel(
   fun deleteWorkout(workout: Workout) {
     // TODO Add toast
     viewModelScope.launch {
-      completedWorkoutRepository.deleteCompletedWorkout(workout)
+      val result = completedWorkoutRepository.deleteCompletedWorkout(workout)
+
+      if (result) {
+        _toastMessage.emit("Workout deleted successfully.")
+      } else {
+        _toastMessage.emit("Error deleting workout.")
+      }
 
       // Update workouts list
       _workouts.value =
