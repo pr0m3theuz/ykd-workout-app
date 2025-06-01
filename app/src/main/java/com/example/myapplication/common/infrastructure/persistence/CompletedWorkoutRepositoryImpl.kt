@@ -362,7 +362,7 @@ class CompletedWorkoutRepositoryImpl(
                 "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
                 "Updating set $setJsonContent"
               )
-//              completedSetsCollection.save(it)
+              completedSetsCollection.save(it)
             } ?: Log.i(
               "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
               "Saving set $setJsonContent"
@@ -426,7 +426,45 @@ class CompletedWorkoutRepositoryImpl(
   }
 
   override suspend fun deleteCompletedWorkout(workout: Workout) {
-    TODO("Not yet implemented")
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL }
+
+      val completedSetsCollection = db.getCollection("CompletedSets")
+      requireNotNull(completedSetsCollection) { COLLECTION_IS_NULL }
+
+      val workoutQuery = QueryBuilder.select(SelectResult.all())
+        .from(DataSource.collection(completedWorkoutsCollection))
+        .where(Expression.property("id").equalTo(Expression.string(workout.id.toHexString())))
+
+      val completedSets = workout.workoutItems.flatMap { workoutItem ->
+        when (workoutItem) {
+          is ExerciseSets -> workoutItem.sets
+          is Superset -> workoutItem.exercisesSets.flatMap { it.sets }
+        }
+      }
+
+      completedWorkoutsCollection.getDocument(workout.id.toHexString())?.let {
+        completedWorkoutsCollection.delete(it)
+        Log.d(
+          "CompletedWorkoutRepositoryImpl.deleteCompletedWorkout()",
+          "Deleted workout: ${workout.id.toHexString()}"
+        )
+      }
+
+      completedSets.forEach { set ->
+        completedSetsCollection.getDocument(set.id.toHexString())?.let { setDocument ->
+          completedSetsCollection.delete(setDocument)
+          Log.d(
+            "CompletedWorkoutRepositoryImpl.deleteCompletedWorkout()",
+            "Deleted set: ${set.id.toHexString()}"
+          )
+        }
+      }
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
   }
 }
 
