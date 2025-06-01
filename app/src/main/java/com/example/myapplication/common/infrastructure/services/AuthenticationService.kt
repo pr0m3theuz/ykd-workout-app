@@ -1,6 +1,7 @@
 package com.example.myapplication.common.infrastructure.services
 
 import com.example.myapplication.common.domain.model.UserProfile
+import org.bson.types.ObjectId
 
 interface AuthenticationService {
   fun getCurrentUser(): UserProfile
@@ -13,6 +14,7 @@ class AuthenticationServiceImpl() : AuthenticationService {
 
   override fun getCurrentUser(): UserProfile {
     return _user ?: UserProfile(
+      id = ObjectId(),
       name = "user",
       username = "user",
       email = "",
