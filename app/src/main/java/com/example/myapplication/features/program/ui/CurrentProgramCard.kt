@@ -113,7 +113,7 @@ fun CurrentProgramCard(
     }
 
     Text(
-      text = workout.name ?: "Workout Name",
+      text = workout.name,
       modifier = Modifier.padding(horizontal = 8.dp),
       style = bodySmall,
     )
@@ -294,7 +294,8 @@ fun CurrentProgramCard(
     ) {
       Button(
         onClick = {
-          navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}") {
+          // TODO
+          navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=false") {
             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
             // Avoid multiple copies of the same destination when
             // reselecting the same item
