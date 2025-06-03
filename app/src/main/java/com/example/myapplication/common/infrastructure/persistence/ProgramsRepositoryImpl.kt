@@ -342,7 +342,7 @@ class ProgramsRepositoryImpl(
             "ProgramRepositoryImpl.createActiveProgram()",
             "newProgramWorkoutsDocument: $newProgramWorkoutsDocument"
           )
-//          completedWorkoutsCollection.save(newProgramWorkoutsDocument)
+          completedWorkoutsCollection.save(newProgramWorkoutsDocument)
         }
       })
 
@@ -358,7 +358,7 @@ class ProgramsRepositoryImpl(
             "ProgramRepositoryImpl.createActiveProgram()",
             "newProgramSetsDocument: $newProgramSetsDocument"
           )
-//          completedSetsCollection.save(newProgramSetsDocument)
+          completedSetsCollection.save(newProgramSetsDocument)
         }
       })
 
