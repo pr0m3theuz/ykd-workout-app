@@ -22,7 +22,7 @@ val Orange40 = Color(0xFFFE6100) // #fe6100
 val Gold20 = Color(0xFFFFB000) // #ffb000
 
 object IBMColorBlindPalette {
-  private val colors = listOf(
+  val colors = listOf(
     Ultramarine40,
     Indigo50,
     Magenta50,
