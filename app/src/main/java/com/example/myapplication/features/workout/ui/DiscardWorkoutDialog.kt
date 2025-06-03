@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.myapplication.common.ui.theme.MyApplicationTheme
 
 @Composable
 fun DiscardWorkoutDialog(
@@ -34,7 +36,7 @@ fun DiscardWorkoutDialog(
                     containerColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("CANCEL WORKOUT", color = MaterialTheme.colorScheme.onError)
+              Text("DISCARD", color = MaterialTheme.colorScheme.onError)
             }
         },
         dismissButton = {
@@ -47,4 +49,15 @@ fun DiscardWorkoutDialog(
             }
         }
     )
+}
+
+@Preview
+@Composable
+fun PreviewDiscardWorkoutDialog() {
+  MyApplicationTheme {
+    DiscardWorkoutDialog(
+      closeDialog = {},
+      cancelWorkout = {}
+    )
+  }
 }
