@@ -355,7 +355,7 @@ fun WorkoutSummaryCard(
                 Text(
                   text = "No data available.",
                   style = MaterialTheme.typography.bodySmall,
-                  color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                  color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
               }
             }
@@ -400,7 +400,7 @@ fun WorkoutSummaryCard(
                   Text(
                     text = "No data available.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                   )
                 }
               }
@@ -432,7 +432,7 @@ private fun ErrorContent(errorMessage: String, onRetry: (() -> Unit)?) {
     text = errorMessage,
     style = MaterialTheme.typography.bodyMedium,
     textAlign = TextAlign.Center,
-    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+    color = MaterialTheme.colorScheme.onSurfaceVariant
   )
   if (onRetry != null) {
     Spacer(modifier = Modifier.height(24.dp))
@@ -453,14 +453,14 @@ private fun NoDataContent(message: String) {
     imageVector = Icons.Filled.Info,
     contentDescription = "No workout data",
     modifier = Modifier.size(48.dp),
-    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    tint = MaterialTheme.colorScheme.onSurfaceVariant
   )
   Spacer(modifier = Modifier.height(16.dp))
   Text(
     text = message,
     style = MaterialTheme.typography.titleMedium,
     textAlign = TextAlign.Center,
-    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+    color = MaterialTheme.colorScheme.onSurfaceVariant
   )
 }
 
@@ -486,18 +486,18 @@ private fun NoWorkoutFound() {
     Text(
       text = "Workout data not available.",
       style = MaterialTheme.typography.titleMedium,
-      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+      color = MaterialTheme.colorScheme.onSurfaceVariant
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
       text = "There's no completed workout to display right now.",
       style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+      color = MaterialTheme.colorScheme.onSurfaceVariant
     )
     Text(
       text = "An unknown error occurred while saving.",
       style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+      color = MaterialTheme.colorScheme.onSurfaceVariant
     )
   }
 }
