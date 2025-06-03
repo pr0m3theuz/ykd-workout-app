@@ -325,7 +325,12 @@ fun ProgramDetailsLayout(
 }
 
 @Composable
-fun ProgramDetailsOptionsDropdownMenu() {
+fun ProgramDetailsOptionsDropdownMenu(
+  isProgramActive: Boolean = false,
+  onDelete: () -> Unit = {},
+  onEdit: () -> Unit = {},
+  onSubstitute: () -> Unit = {}
+) {
   var expanded by remember { mutableStateOf(false) }
 
   val onSurface = MaterialTheme.colorScheme.onSurface
@@ -341,8 +346,25 @@ fun ProgramDetailsOptionsDropdownMenu() {
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
       DropdownMenuItem(
         text = { Text("Edit Program", color = onSurface) },
-        onClick = { /* TODO Navigate to Create Edit Program Screen*/ },
+        onClick = {
+          /* TODO Navigate to Create Edit Program Screen*/
+          onEdit
+        },
       )
+      if (isProgramActive) {
+        DropdownMenuItem(
+          text = { Text("Substitute Exercises in the Program", color = onSurface) },
+          onClick = {
+            /* TODO Navigate to Create Edit Program Screen*/
+            onSubstitute()
+          },
+        )
+
+        DropdownMenuItem(
+          text = { Text("Delete Program", color = onSurface) },
+          onClick = { onDelete() /* TODO Delete Program*/ },
+        )
+      }
     }
   }
 }
