@@ -1,18 +1,10 @@
 package com.example.myapplication.common.ui.component
 
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.ExperimentalAnimationSpecApi
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
@@ -32,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -91,24 +82,11 @@ fun BottomNavigationBar(navController: NavController) {
           }
         },
         label = {
-          AnimatedVisibility(
-            visible = isSelected,
-            enter = slideInVertically(
-              animationSpec = spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessLow,
-                visibilityThreshold = IntOffset.VisibilityThreshold
-              ),
-              initialOffsetY = { 100 }
-            ) + fadeIn(),
-            exit = slideOutVertically() + fadeOut()
-          ) {
             Text(
               stringResource(item.resourceId),
               color = animatedColor,
               style = MaterialTheme.typography.labelSmall
             )
-          }
         },
         selected = false, // isSelected,
         onClick = {
