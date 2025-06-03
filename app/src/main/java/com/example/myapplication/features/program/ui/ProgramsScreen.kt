@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalMaterial3ExpressiveApi::class)
 
 package com.example.myapplication.features.program.ui
 
@@ -31,7 +31,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material.icons.outlined.CreateNewFolder
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
@@ -40,6 +39,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -171,11 +171,11 @@ fun ProgramsScreen(
               } else {
                 // Text("Continue Program", style = titleMedium)
                 val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program.id)
+                // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
 
-                // TODO reassess logic/purpose of this
+                // TODO resume current workout
                 val currentlyActiveWorkout = programsViewModel.getCurrentlyActiveWorkouts()
                   .collectAsState(initial = emptyList())
-                // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
                 if (currentlyActiveWorkout.value.isNotEmpty()) {
                   currentlyActiveWorkout.value.forEach {
                     ActiveWorkoutCard(
@@ -195,7 +195,7 @@ fun ProgramsScreen(
                 } else {
                   Text(
                     text =
-                    "This program has no workouts or all workouts have been completed. You can start a new program."
+                      "This program has no workouts or all workouts have been completed. You can start a new program."
                   )
                 }
               }
@@ -313,13 +313,18 @@ fun ProgramsScreen(
       }
 
       if (programs.isNotEmpty()) {
-        items(programs, key = { it.lazyListItemID }) { program ->
+        items(programs, key = { it.lazyListItemID }) { programTemplate ->
+          val program = activePrograms.find { it.uuid == programTemplate.uuid } ?: programTemplate
+
           AnimatedVisibility(
             visible = programVisible,
             enter = expandVertically(animationSpec = tween(500)),
             exit = shrinkVertically(animationSpec = tween(500)),
           ) {
-            ProgramCard(navController, program)
+            ProgramCard(
+              onNavigate = { navController.navigate("programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}") },
+              program
+            )
           }
         }
       } else {
@@ -439,10 +444,10 @@ fun WorkoutCard() {
 
   Card(
     modifier =
-    Modifier
-      .padding(vertical = padding)
-      .clickable { /* TODO Navigate to Workout Details Screen */
-      }
+      Modifier
+        .padding(vertical = padding)
+        .clickable { /* TODO Navigate to Workout Details Screen */
+        }
   ) {
     Row(
       modifier = Modifier
@@ -477,48 +482,60 @@ fun WorkoutCard() {
 }
 
 @Composable
-fun ProgramCard(navController: NavController, program: Program) {
-  val padding = 8.dp
+fun ProgramCard(onNavigate: () -> Unit, program: Program) {
+  val padding = 16.dp
   val titleMedium = MaterialTheme.typography.titleMedium
 
   Card(
     modifier =
-    Modifier
-      .padding(vertical = padding)
-      .clickable {
-        /* TODO Navigate to Program Details Screen */
-        navController.navigate("programDetails/${program.id.toHexString()}/isProgramActive=false")
-      }
+      Modifier
+        .padding(vertical = 8.dp)
+        .clickable {
+          // Navigate to Program Details Screen
+          onNavigate()
+        }
   ) {
+//    Row(
+//      modifier = Modifier
+//        .fillMaxWidth()
+//        .padding(padding),
+//      horizontalArrangement = Arrangement.Center,
+//      verticalAlignment = Alignment.CenterVertically,
+//    ) {
+//      Icon(
+//        imageVector = Icons.Outlined.BrokenImage,
+//        contentDescription = "Missing Image",
+//        tint = MaterialTheme.colorScheme.primary,
+//      )
+//    }
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(padding),
-      horizontalArrangement = Arrangement.Center,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Icon(
-        imageVector = Icons.Outlined.BrokenImage,
-        contentDescription = "Missing Image",
-        tint = MaterialTheme.colorScheme.primary,
-      )
-    }
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, bottom = padding),
+        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.Bottom,
+      verticalAlignment = Alignment.Top,
     ) {
-      Column() {
+      Column(
+        modifier = Modifier.weight(1f),
+      ) {
         Text(text = program.name ?: "New Program", style = titleMedium)
-        Text(text = program.author ?: "", style = MaterialTheme.typography.titleSmall)
+        Text(text = program.author ?: "", style = MaterialTheme.typography.bodyMedium)
       }
-      //            TODO To Keep or not to not Keep
-      IconButton(onClick = { /* TODO */ }) {
-        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
+      if (program.isActive) {
+        Box(
+          modifier = Modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
+//            .padding(4.dp)
+        ) {
+          Text(
+            text = "Active", style = MaterialTheme.typography.titleSmallEmphasized,
+            modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.onTertiaryContainer
+          )
+        }
       }
+      ProgramDetailsOptionsDropdownMenu()
     }
   }
 }
-
