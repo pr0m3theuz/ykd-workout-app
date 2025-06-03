@@ -14,8 +14,11 @@ import com.example.myapplication.common.infrastructure.persistence.InProgressWor
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -37,6 +40,9 @@ constructor(
     //    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exercise?.name}")
     return exercise?.name
   }
+
+  private val _toastMessage = MutableSharedFlow<String>()
+  val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow() // or just _toastMessage
 
   private val _programs = MutableStateFlow(emptyList<Program>())
 
@@ -109,7 +115,15 @@ constructor(
 
   fun startNewProgram(program: Program) {
     // TODO Create a copy of selected program, Keep UUID the same -> Implemented
-    viewModelScope.launch { programsRepository.createActiveProgram(program) }
+    viewModelScope.launch {
+      val result = programsRepository.createActiveProgram(program)
+
+      if (result) {
+        _toastMessage.emit("Program started successfully.")
+      } else {
+        _toastMessage.emit("Error starting program.")
+      }
+    }
 
     // TODO Navigate to Workouts Tab of the Active Program
     // TODO Enable Workout Start Buttons -> Implemented
