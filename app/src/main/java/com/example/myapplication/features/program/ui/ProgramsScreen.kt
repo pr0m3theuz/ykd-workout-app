@@ -46,6 +46,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -60,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.Program
@@ -103,6 +105,14 @@ fun ProgramsScreen(
       Icons.Outlined.ExpandLess
     } else {
       Icons.Outlined.ExpandMore
+    }
+  }
+
+  val toastMessage = programsViewModel.toastMessage.collectAsStateWithLifecycle("")
+
+  if (toastMessage.value.isNotEmpty()) {
+    Snackbar {
+      Text(text = toastMessage.value)
     }
   }
 
@@ -322,8 +332,14 @@ fun ProgramsScreen(
             exit = shrinkVertically(animationSpec = tween(500)),
           ) {
             ProgramCard(
+              program = program,
               onNavigate = { navController.navigate("programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}") },
-              program
+              programDetailsOptionsDropdownMenu = {
+                ProgramDetailsOptionsDropdownMenu(
+                  isProgramActive = program.isActive,
+                  onDelete = { programsViewModel.deleteActiveProgram(program) },
+                )
+              },
             )
           }
         }
@@ -482,7 +498,11 @@ fun WorkoutCard() {
 }
 
 @Composable
-fun ProgramCard(onNavigate: () -> Unit, program: Program) {
+fun ProgramCard(
+  program: Program,
+  onNavigate: () -> Unit,
+  programDetailsOptionsDropdownMenu: @Composable () -> Unit = {}
+) {
   val padding = 16.dp
   val titleMedium = MaterialTheme.typography.titleMedium
 
@@ -511,7 +531,7 @@ fun ProgramCard(onNavigate: () -> Unit, program: Program) {
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp),
+        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 0.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.Top,
     ) {
@@ -535,7 +555,7 @@ fun ProgramCard(onNavigate: () -> Unit, program: Program) {
           )
         }
       }
-      ProgramDetailsOptionsDropdownMenu()
+      programDetailsOptionsDropdownMenu()
     }
   }
 }
