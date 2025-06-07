@@ -135,6 +135,12 @@ class UserProfileManager(
 //          println("UserProfileManager: Loaded user profile: $loadedProfile\nUserProfileManager: ${this@UserProfileManager}")
         }
     }
+
+    // The database hasn't been opened yet when this has been called
+//    Log.i(
+//      "UserProfileManager",
+//      "user in DB: ${userRepository.getUser(userProfile.value) ?: "does not match user in DataStore!"}"
+//    )
   }
 
   fun updateUserProfile(newProfile: UserProfile) {
@@ -159,7 +165,7 @@ class UserProfileManager(
       // Then persist to DataStore
       dataStoreScope.launch {
         context.userProfileDataStore.edit { preferences ->
-          preferences[UserProfileDataStoreKeys.USER_ID] = newProfile.id?.toHexString() ?: ""
+          preferences[UserProfileDataStoreKeys.USER_ID] = newProfile.id.toHexString() ?: ""
           preferences[UserProfileDataStoreKeys.USER_NAME] = newProfile.name ?: name
           preferences[UserProfileDataStoreKeys.USER_EMAIL] = newProfile.email ?: name
           preferences[UserProfileDataStoreKeys.USER_USERNAME] = newProfile.username ?: ""
@@ -171,7 +177,7 @@ class UserProfileManager(
         }
       }
     }
-//    userRepository.updateCurrentUser(newProfile)
+    userRepository.updateCurrentUser(newProfile)
   }
 
   fun clearUserProfile() {
