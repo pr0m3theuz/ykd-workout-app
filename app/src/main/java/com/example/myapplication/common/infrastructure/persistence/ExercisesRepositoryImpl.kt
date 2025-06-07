@@ -762,4 +762,8 @@ class ExercisesRepositoryImpl(
     }
     return flow {}
   }
+
+  override fun createExercise(exercise: Exercise): Boolean {
+    TODO("Not yet implemented")
+  }
 }
