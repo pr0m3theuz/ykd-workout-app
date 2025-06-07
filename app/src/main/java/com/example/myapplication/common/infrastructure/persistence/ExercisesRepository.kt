@@ -66,4 +66,6 @@ interface ExercisesRepository {
   fun getExerciseByName(exerciseName: String): ObjectId?
 
   fun getCompletedSetsByExercise(exercise: Exercise): Flow<List<Set>>
+
+  fun createExercise(exercise: Exercise): Boolean
 }
