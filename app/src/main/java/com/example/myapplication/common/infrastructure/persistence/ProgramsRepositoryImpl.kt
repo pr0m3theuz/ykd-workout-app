@@ -442,28 +442,82 @@ class ProgramsRepositoryImpl(
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("CompletedPrograms")
+      val completedProgramsCollection = db.getCollection("CompletedPrograms")
+      requireNotNull(completedProgramsCollection) { COLLECTION_IS_NULL.format("CompletedPrograms") }
 
-      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL.format("CompletedWorkouts") }
 
-      val query =
+      val completedSetsCollection = db.getCollection("CompletedSets")
+      requireNotNull(completedSetsCollection) { COLLECTION_IS_NULL.format("CompletedSets") }
+
+      val completedProgramQuery =
         QueryBuilder.select(SelectResult.all())
-          .from(DataSource.collection(collection))
+          .from(DataSource.collection(completedProgramsCollection))
           .where(
             Expression.property("id")
               .equalTo(Expression.string(program.id.toHexString()))
-              .and(Expression.property("ownerID").equalTo(Expression.string("USER ID")))
-              .and(Expression.property("active").equalTo(Expression.booleanValue(true)))
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+//              .and(Expression.property("active").equalTo(Expression.booleanValue(true)))
           ).limit(Expression.intValue(1))
 
-      val result = query.execute().allResults().firstOrNull()?.getString("id")
+      val result = completedProgramQuery.execute().allResults().firstOrNull()?.getString("id")
 
-      val document = result?.let { collection.getDocument(it) }
-      requireNotNull(document) { "Program Repository: Program does not exist!" }
+      val document = result?.let { completedProgramsCollection.getDocument(it) }
+//      requireNotNull(document) { "Program Repository: Program does not exist!" }
+      Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "program: $program")
+      Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "deleted document: $document")
+//      completedProgramsCollection.delete(document)
 
-      // TODO delete Mesocycles, Microcycles, Unfinished Workouts based on programID
+      val completedWorkoutsQuery = QueryBuilder
+        .select(SelectResult.property("id"))
+        .from(DataSource.collection(completedWorkoutsCollection))
+        .where(
+          Expression.property("programID")
+            .equalTo(Expression.string(program.id.toHexString())).and(
+              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
+            )
+        )
 
-      collection.delete(document)
+      val completedWorkoutsResult = completedWorkoutsQuery.execute().allResults().mapNotNull {
+        it.getString("id")
+      }
+
+      db.inBatch(UnitOfWork {
+        completedWorkoutsResult.forEach { workoutID ->
+          val workoutDocument = completedWorkoutsCollection.getDocument(workoutID)
+          requireNotNull(workoutDocument) { "Program Repository: Workout does not exist!" }
+          Log.i(
+            "ProgramRepositoryImpl.deleteActiveProgram()",
+            "deleted workoutDocument: $workoutDocument"
+          )
+//          completedWorkoutsCollection.delete(workoutDocument)
+        }
+      })
+
+      val completedSetsQuery = QueryBuilder
+        .select(SelectResult.property("id"))
+        .from(DataSource.collection(completedSetsCollection))
+        .where(
+          Expression.property("programID")
+            .equalTo(Expression.string(program.id.toHexString())).and(
+              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
+            )
+        )
+
+      val completedSetsResult = completedSetsQuery.execute().allResults().mapNotNull {
+        it.getString("id")
+      }
+
+      db.inBatch(UnitOfWork {
+        completedSetsResult.forEach { setID ->
+          val setDocument = completedSetsCollection.getDocument(setID)
+          requireNotNull(setDocument) { "Program Repository: Set does not exist!" }
+          Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "deleted setDocument: $setDocument")
+//          completedSetsCollection.delete(setDocument)
+        }
+      })
+
       return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
