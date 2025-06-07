@@ -107,8 +107,10 @@ constructor(
   fun deleteActiveProgram(program: Program): Result<String> {
     if (program.isActive) {
       viewModelScope.launch { programsRepository.deleteActiveProgram(program) }
+      _toastMessage.tryEmit("Program deleted successfully")
       return Result.success("Program deleted successfully")
     } else {
+      _toastMessage.tryEmit("Error. Program could not be deleted.")
       return Result.failure(Exception("Program is not active"))
     }
   }
