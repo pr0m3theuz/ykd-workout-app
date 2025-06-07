@@ -349,20 +349,25 @@ fun ProgramDetailsOptionsDropdownMenu(
         onClick = {
           /* TODO Navigate to Create Edit Program Screen*/
           onEdit
+          expanded = false
         },
       )
       if (isProgramActive) {
         DropdownMenuItem(
-          text = { Text("Substitute Exercises in the Program", color = onSurface) },
+          text = { Text("Substitute Exercises", color = onSurface) },
           onClick = {
             /* TODO Navigate to Create Edit Program Screen*/
             onSubstitute()
+            expanded = false
           },
         )
 
         DropdownMenuItem(
           text = { Text("Delete Program", color = onSurface) },
-          onClick = { onDelete() /* TODO Delete Program*/ },
+          onClick = {
+            onDelete() /* TODO Delete Program*/
+            expanded = false
+          },
         )
       }
     }
