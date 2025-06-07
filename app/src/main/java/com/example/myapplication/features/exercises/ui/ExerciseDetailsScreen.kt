@@ -209,9 +209,19 @@ fun ExerciseDetailsOptionsDropdownMenu() {
       )
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+//      if (exercise.ownerID == user.id.toHexString()))
       DropdownMenuItem(
         text = { Text("Edit Exercise", color = onSurface) },
         onClick = { /* TODO Navigate to Create Exercise Screen*/ },
+      )
+
+      DropdownMenuItem(
+        text = { Text("Clone Exercise", color = onSurface) },
+        onClick = { /* TODO Clone Exercise */ },
+      )
+      DropdownMenuItem(
+        text = { Text("Delete Exercise", color = onSurface) },
+        onClick = { /* TODO Delete Exercise */ },
       )
     }
   }
@@ -310,7 +320,7 @@ fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
   }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun RecordsTab() {
   val rowPadding = 4.dp
