@@ -3,6 +3,7 @@ package com.example.myapplication.common.infrastructure.persistence
 import android.util.Log
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
+import com.couchbase.lite.Expression
 import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.SelectResult
@@ -20,7 +21,7 @@ interface UserRepository {
   fun updateCurrentUser(user: UserProfile)
   fun deleteCurrentUser(user: UserProfile)
 
-  fun getUser(): UserProfile?
+  fun getUser(user: UserProfile): UserProfile?
 }
 
 class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRepository {
@@ -88,15 +89,29 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
     }
   }
 
-  override fun getUser(): UserProfile? {
+  override fun getUser(user: UserProfile): UserProfile? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("Users")
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val queryBuilder =
-        QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
-      TODO("to be implemented")
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection))
+          .where(
+            Expression.property("id").equalTo(Expression.string(user.id.toHexString()))
+          )
+          .limit(Expression.intValue(1))
+
+      val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
+
+      val dbUser = withUnknownKeys.decodeFromString<UserProfile>(result.toString())
+
+      return if (dbUser.id == user.id) {
+        dbUser
+      } else {
+        null
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
