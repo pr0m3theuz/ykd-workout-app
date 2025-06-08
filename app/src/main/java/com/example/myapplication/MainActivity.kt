@@ -61,7 +61,6 @@ import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.exercises.ui.ExerciseDetailsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseNavigableListDetailScreen
 import com.example.myapplication.features.exercises.ui.ExercisesLazyColumn
-import com.example.myapplication.features.exercises.ui.FullScreenChart
 import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.history.ui.EditWorkoutScreen
 import com.example.myapplication.features.history.ui.HistoryScreen
@@ -76,6 +75,14 @@ import com.example.myapplication.features.syncData.ReplicatorViewModel
 import com.example.myapplication.features.syncData.ui.ReplicatorConfigView
 import com.example.myapplication.features.syncData.ui.ReplicatorView
 import com.example.myapplication.features.userProfileScreen.ProfileScreen
+import com.example.myapplication.features.userProfileScreen.ProfileScreenV2
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.AnalyticsScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.CalculatorsScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.ChooseUnitsScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.EditProfileScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundOffScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.SettingsScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.TimerSettingsScreen
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExercisesScreen
@@ -275,7 +282,21 @@ private fun NavGraphBuilder.addWorkoutGraph(
         workoutViewModel = workoutViewModel,
         workoutID = workoutID,
         loadPreviousWorkout = loadPreviousWorkout,
-        copyWorkoutFromPreviousWorkout = copyWorkoutFromPreviousWorkout
+        copyWorkoutFromPreviousWorkout = copyWorkoutFromPreviousWorkout,
+        currentDestination = navController.currentBackStackEntry?.destination,
+        onNavigateBottomBar = { route ->
+          navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        }
       )
     }
 
@@ -344,6 +365,20 @@ private fun NavGraphBuilder.addWorkoutGraph(
           workoutID = workoutID,
           workoutsCount = workoutsCount,
           workoutViewModel = workoutViewModel,
+          currentDestination = navController.currentBackStackEntry?.destination,
+          onNavigateBottomBar = { route ->
+            navController.navigate(route) {
+              // Pop up to the start destination of the graph to
+              // avoid building up a large stack of destinations
+              // on the back stack as users select items
+              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+              // Avoid multiple copies of the same destination when
+              // reselecting the same item
+              launchSingleTop = true
+              // Restore state when reselecting a previously selected item
+              restoreState = true
+            }
+          }
         )
       }
     }
@@ -405,7 +440,23 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
       ExerciseNavigableListDetailScreen(
         navController = navController,
         exerciseListPane = { onClick ->
-          ExercisesLazyColumn(navController = navController, navigateToDetailPane = onClick)
+          ExercisesLazyColumn(
+            navigateToDetailPane = onClick,
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigateBottomBar = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            }
+          )
         },
         exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
           ExerciseDetailsScreen(navController, exerciseID, onClick)
@@ -413,13 +464,30 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
       )
     }
 
-    composable("exerciseChart") { FullScreenChart(navigateUp = { navController.navigateUp() }) }
+//    composable("exerciseChart") { FullScreenChart(navigateUp = { navController.navigateUp() }) }
   }
 }
 
 private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
   navigation("programsScreen", route = "programs") {
-    composable("programsScreen") { ProgramsScreen(navController) }
+    composable("programsScreen") {
+      ProgramsScreen(
+        navController,
+        currentDestination = navController.currentBackStackEntry?.destination,
+        onNavigateBottomBar = { route ->
+          navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        })
+    }
 
     composable(
       "programDetails/{programID}/isProgramActive={isProgramActive}",
@@ -436,7 +504,21 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
       ProgramDetailsScreen(
         navController,
         _programID = programID,
-        isProgramActive = isProgramActive
+        isProgramActive = isProgramActive,
+        currentDestination = navController.currentBackStackEntry?.destination,
+        onNavigateBottomBar = { route ->
+          navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        }
       )
     }
 
@@ -468,6 +550,20 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
           workoutID = workoutID,
           workoutsCount = workoutsCount,
           workoutViewModel = workoutViewModel,
+          currentDestination = navController.currentBackStackEntry?.destination,
+          onNavigateBottomBar = { route ->
+            navController.navigate(route) {
+              // Pop up to the start destination of the graph to
+              // avoid building up a large stack of destinations
+              // on the back stack as users select items
+              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+              // Avoid multiple copies of the same destination when
+              // reselecting the same item
+              launchSingleTop = true
+              // Restore state when reselecting a previously selected item
+              restoreState = true
+            }
+          }
         )
       }
     }
@@ -485,14 +581,30 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 
       HistoryScreen(
         historyViewModel,
-        bottomNavigationBar = { BottomNavigationBar(navController) },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            })
+        },
         navigateToWorkoutOverview = {
-          navController.navigate("history?overviewWorkout=${it.id.toHexString()}")
+          navController.navigate("history?workoutOverview=${it.id.toHexString()}")
         }
       )
     }
 
-    composable(route = "history?overviewWorkout={workoutID}") { navBackStackEntry ->
+    composable(route = "history?workoutOverview={workoutID}") { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("workoutID")?.let {
 
         val historyViewModel: HistoryViewModel =
@@ -537,22 +649,78 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
-  navigation("profileScreen", route = Screens.Profile.baseRoute) {
+  navigation("profileScreenV2", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
       Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
       ProfileScreen(
 //        navController = navController,
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
-        bottomNavigationBar = { BottomNavigationBar(navController) },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            })
+        },
+      )
+    }
+
+    composable("profileScreenV2") {
+      ProfileScreenV2(
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            })
+        },
+        navigateToReplicatorScreen = {},
+        navigateToAnalyticsScreen = { navController.navigate("analyticsScreen") },
+        navigateToSettingsScreen = { navController.navigate("settingsScreen") },
+        navigateToHistoryScreen = { navController.navigate(Screens.History.route) },
+        navigateToWorkoutOverview = { workout -> "history?workoutOverview=${workout.id.toHexString()}" }
       )
     }
 
     composable("replicatorScreen") {
 //      Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
-        navController,
         viewModel = koinViewModel<ReplicatorViewModel>(),
         replicatorConfigNav = { navController.navigate("configScreen") },
+        currentDestination = navController.currentBackStackEntry?.destination,
+        onNavigateBottomBar = { route ->
+          navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        }
       )
     }
 
@@ -560,34 +728,170 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       ReplicatorConfigView(
         viewModel = koinViewModel<ReplicatorViewModel>(),
         navigateUp = { navController.popBackStack() },
+      )
+    }
+
+    composable("settingsScreen") {
+      SettingsScreen(
+        onNavigate = { navController.navigate(it) },
+        navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            })
+        }
+      )
+    }
+
+    composable("profileSettings") {
+      EditProfileScreen()
+    }
+
+    composable("timerSettings") {
+      TimerSettingsScreen(
+        onNavigateBack = { navController.popBackStack() },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            })
+        }
+      )
+    }
+
+    composable("calculatorsScreen") {
+      CalculatorsScreen(
+        onNavigateBack = { navController.popBackStack() },
+        onCalculatorSelected = { id -> println("Selected: $id") },
+        onShowHelp = { id -> println("Help for: $id") },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            })
+        }
+      )
+    }
+
+    composable("analyticsScreen") {
+      AnalyticsScreen(onNavigateToDashboardsInfo = {})
+    }
+
+    composable("unitsSettings") {
+      ChooseUnitsScreen(
+        onNavigateBack = { navController.popBackStack() },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            }
+          )
+        }
+      )
+    }
+
+    composable("roundOffSettings") {
+      RoundOffScreen(
+        onNavigateBack = { navController.popBackStack() },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            }
+          )
+        }
       )
     }
 
   }
 }
 
-//val scaffoldState: ScaffoldState = rememberScaffoldState()
-
 private fun NavGraphBuilder.addReplicatorGraph(navController: NavController) {
   navigation("replicatorScreen", route = Screens.Replicator.baseRoute) {
     composable("replicatorScreen") {
       Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
-        navController,
         viewModel = koinViewModel<ReplicatorViewModel>(),
-//        openDrawer = TODO(),
         replicatorConfigNav = { navController.navigate("configScreen") },
-//        scaffoldState = TODO()
+        currentDestination = navController.currentBackStackEntry?.destination,
+        onNavigateBottomBar = { route ->
+          navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        }
       )
     }
+  }
 
-    composable("configScreen") {
-      ReplicatorConfigView(
-        viewModel = koinViewModel<ReplicatorViewModel>(),
-        navigateUp = { navController.popBackStack() },
-//        scaffoldState = TODO()
-      )
-    }
+  composable("configScreen") {
+    ReplicatorConfigView(
+      viewModel = koinViewModel<ReplicatorViewModel>(),
+      navigateUp = { navController.popBackStack() },
+    )
   }
 }
 
