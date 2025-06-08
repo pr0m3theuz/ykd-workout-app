@@ -52,10 +52,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.common.domain.model.Equipment
@@ -75,10 +74,12 @@ fun ExercisesScreen(navController: NavHostController = rememberNavController()) 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExercisesLazyColumn(
-  navController: NavController,
   navigateToDetailPane: (exerciseID: String) -> Unit,
   exercisesViewModel: ExercisesViewModel = koinViewModel(),
-) {
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
+
+  ) {
   //    val selectedCategoriesMap by
   // exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
   //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
@@ -149,7 +150,12 @@ fun ExercisesLazyColumn(
         },
       )
     },
-    bottomBar = { BottomNavigationBar(navController = navController) },
+    bottomBar = {
+      BottomNavigationBar(
+        currentDestination = currentDestination,
+        onNavigate = onNavigateBottomBar,
+      )
+    },
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
       TextFieldDefaults.colors(
@@ -383,7 +389,7 @@ fun SelectedFiltersLazyRow(exercisesViewModel: ExercisesViewModel) {
   }
 }
 
-@Preview
+//@Preview(showBackground = true)
 @Composable
 fun ExerciseOptionsDropdownMenu() {
   var expanded by remember { mutableStateOf(false) }
