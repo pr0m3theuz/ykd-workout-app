@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 
 @Composable
@@ -31,9 +30,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
     topBar = {
 //      TopAppBar()
     },
-    bottomBar = {
-      BottomNavigationBar(navController = navController)
-    },
+    bottomBar = {},
     content = { contentPadding ->
       Column(
         modifier = Modifier
