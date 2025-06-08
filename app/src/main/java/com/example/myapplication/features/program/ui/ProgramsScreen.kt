@@ -63,6 +63,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.ui.component.BottomNavigationBar
@@ -86,6 +87,8 @@ import kotlin.uuid.ExperimentalUuidApi
 fun ProgramsScreen(
   navController: NavController,
   programsViewModel: ProgramsViewModel = koinViewModel(),
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
 ) {
   val padding8 = 8.dp
   val titleMedium = MaterialTheme.typography.titleMedium
@@ -135,7 +138,12 @@ fun ProgramsScreen(
         actions = { ProgramDetailsOptionsDropdownMenu() },
       )
     },
-    bottomBar = { BottomNavigationBar(navController = navController) },
+    bottomBar = {
+      BottomNavigationBar(
+        currentDestination = currentDestination,
+        onNavigate = onNavigateBottomBar,
+      )
+    },
   ) { contentPadding ->
     LazyColumn(
       contentPadding = contentPadding,
