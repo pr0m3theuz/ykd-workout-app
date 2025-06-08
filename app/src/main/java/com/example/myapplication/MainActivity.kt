@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -53,15 +55,18 @@ import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorServiceImpl
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
+import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.exercises.ui.ExerciseDetailsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseNavigableListDetailScreen
 import com.example.myapplication.features.exercises.ui.ExercisesLazyColumn
 import com.example.myapplication.features.exercises.ui.FullScreenChart
+import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.history.ui.EditWorkoutScreen
 import com.example.myapplication.features.history.ui.HistoryScreen
 import com.example.myapplication.features.history.ui.WorkoutOverview
+import com.example.myapplication.features.history.ui.WorkoutOverviewContent
 import com.example.myapplication.features.homeScreen.HomeScreen
 import com.example.myapplication.features.importWorkoutProgram.ImportWorkoutProgramScreen
 import com.example.myapplication.features.previewNextWorkout.PreviewNextWorkoutScreen
@@ -474,12 +479,51 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
   navigation("historyScreen", route = Screens.History.baseRoute) {
     composable("historyScreen") { navBackStackEntry ->
       Log.d("HistoryNavGraph", "Navigated to History Screen")
-      HistoryScreen(navController = navController)
+
+      val historyViewModel: HistoryViewModel =
+        navBackStackEntry.sharedViewModel<HistoryViewModel>(navController)
+
+      HistoryScreen(
+        historyViewModel,
+        bottomNavigationBar = { BottomNavigationBar(navController) },
+        navigateToWorkoutOverview = {
+          navController.navigate("history?overviewWorkout=${it.id.toHexString()}")
+        }
+      )
     }
 
     composable(route = "history?overviewWorkout={workoutID}") { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("workoutID")?.let {
-        WorkoutOverview(workoutID = it, navController = navController, performAgain = true)
+
+        val historyViewModel: HistoryViewModel =
+          navBackStackEntry.sharedViewModel<HistoryViewModel>(navController)
+
+        WorkoutOverview(
+          historyViewModel = historyViewModel,
+          workoutID = it,
+          popBackStack = { navController.popBackStack() },
+          workoutOverviewContent = { workout, setOpenDeleteWorkoutDialog ->
+            WorkoutOverviewContent(
+              workout = workout,
+              setOpenDeleteWorkoutDialog = { setOpenDeleteWorkoutDialog },
+              performAgain = true,
+              userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
+              workoutComponents = historyViewModel.workoutComponents.collectAsState().value,
+              navigateUp = { navController.navigateUp() },
+              navigateToEditWorkout = { workout -> navController.navigate("history?editWorkout=${workout.id.toHexString()}") },
+              navigateToWorkout = { workout ->
+                navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true") {
+                  popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                  // Avoid multiple copies of the same destination when
+                  // reselecting the same item
+                  launchSingleTop = true
+                  // Restore state when reselecting a previously selected item
+                  restoreState = true
+                }
+              }
+            )
+          }
+        )
       }
     }
 
@@ -497,8 +541,10 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
     composable("profileScreen") { navBackStackEntry ->
       Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
       ProfileScreen(
-        navController = navController,
-        navigateToReplicatorScreen = { navController.navigate("replicatorScreen") })
+//        navController = navController,
+        navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
+        bottomNavigationBar = { BottomNavigationBar(navController) },
+      )
     }
 
     composable("replicatorScreen") {
