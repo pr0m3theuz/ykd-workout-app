@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
+import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.features.history.HistoryViewModel
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
@@ -31,11 +31,9 @@ fun WorkoutOverview(
   historyViewModel: HistoryViewModel = koinViewModel(),
   workoutID: String,
   //  getExercise: (exerciseID: ObjectId) -> Exercise?,
-  navController: NavController,
-  performAgain: Boolean,
+  popBackStack: () -> Unit,
+  workoutOverviewContent: @Composable (workout: Workout, setOpenDeleteWorkoutDialog: () -> Unit) -> Unit
 ) {
-  val userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit
-
   val toastMessage = historyViewModel.toastMessage.collectAsStateWithLifecycle("")
 
   if (toastMessage.value.isNotEmpty()) {
@@ -48,7 +46,7 @@ fun WorkoutOverview(
   val workout by historyViewModel.workout.collectAsState()
 
   workout?.workoutItems?.let { historyViewModel.loadWorkoutItemsFromWorkout(it) }
-  val workoutComponents by historyViewModel.workoutComponents.collectAsState()
+//  val workoutComponents by historyViewModel.workoutComponents.collectAsState()
 
   val (openDeleteWorkoutDialog, setOpenDeleteWorkoutDialog) = remember { mutableStateOf(false) }
 
@@ -58,7 +56,7 @@ fun WorkoutOverview(
         onDismissRequest = { setOpenDeleteWorkoutDialog(false) },
         deleteWorkout = {
           historyViewModel.deleteWorkout(it)
-          navController.popBackStack()
+          popBackStack()
         },
       )
     }
@@ -68,14 +66,7 @@ fun WorkoutOverview(
     null -> NoWorkoutFound()
     else ->
       workout?.let {
-        WorkoutOverviewContent(
-          it,
-          navController,
-          setOpenDeleteWorkoutDialog,
-          performAgain,
-          userDefaultWeightUnit,
-          workoutComponents
-        )
+        workoutOverviewContent(it, { setOpenDeleteWorkoutDialog(false) })
       }
   }
 }
