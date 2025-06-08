@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Exercise
@@ -69,6 +70,8 @@ fun WorkoutSummaryScreen(
   workoutViewModel: WorkoutViewModel,
   workoutID: String,
   workoutsCount: Int,
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
 ) {
   workoutViewModel.getCompletedWorkout(ObjectId(workoutID))
   val completedWorkout by workoutViewModel.completedWorkout.collectAsStateWithLifecycle()
@@ -110,7 +113,12 @@ fun WorkoutSummaryScreen(
     },
     // TODO This is an anti-pattern
     // https://developer.android.com/guide/navigation/use-graph/navigate
-    bottomBar = { BottomNavigationBar(navController = navController) },
+    bottomBar = {
+      BottomNavigationBar(
+        currentDestination = currentDestination,
+        onNavigate = onNavigateBottomBar,
+      )
+    },
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
       if (completedWorkout != null) {
