@@ -312,11 +312,11 @@ fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
   val state = rememberScrollState()
   Column(modifier = Modifier.verticalScroll(state)) {
     Text(text = "Chart Name")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() }) }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = { }) }
     Text(text = "Estimated 1RM")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() }) }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = { }) }
     Text(text = "Volume")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() }) }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = { }) }
   }
 }
 
