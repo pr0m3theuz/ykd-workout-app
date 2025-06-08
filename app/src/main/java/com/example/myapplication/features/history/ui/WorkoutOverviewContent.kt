@@ -26,8 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.SetType
@@ -44,11 +42,13 @@ import com.example.myapplication.features.workout.ui.EditWorkoutOptionsDropdownM
 @OptIn(ExperimentalMaterial3Api::class)
 fun WorkoutOverviewContent(
   workout: Workout,
-  navController: NavController,
   setOpenDeleteWorkoutDialog: (Boolean) -> Unit,
   performAgain: Boolean,
   userDefaultWeightUnit: String,
-  workoutComponents: List<WorkoutComponent>
+  workoutComponents: List<WorkoutComponent>,
+  navigateUp: () -> Unit,
+  navigateToEditWorkout: (Workout) -> Unit,
+  navigateToWorkout: (Workout) -> Unit,
 ) {
   Scaffold(
     modifier = Modifier.imePadding(),
@@ -58,7 +58,7 @@ fun WorkoutOverviewContent(
           Text(text = workout.name, style = MaterialTheme.typography.titleLarge)
         },
         navigationIcon = {
-          IconButton(onClick = { navController.navigateUp() }) {
+          IconButton(onClick = { navigateUp() }) {
             Icon(
               imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
               tint = MaterialTheme.colorScheme.onSurface,
@@ -69,7 +69,8 @@ fun WorkoutOverviewContent(
         actions = {
           EditWorkoutOptionsDropdownMenu(
             editWorkout = {
-              navController.navigate("history?editWorkout=${workout.id.toHexString()}")
+              navigateToEditWorkout(workout)
+//              navController.navigate("history?editWorkout=${workout.id.toHexString()}")
             },
             deleteWorkout = { setOpenDeleteWorkoutDialog(true) },
             saveWorkoutAsTemplate = { /* TODO Create Save Workout As Template Function */ },
@@ -85,14 +86,9 @@ fun WorkoutOverviewContent(
             .fillMaxWidth()
             .padding(32.dp),
           onClick = {
-            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true") {
-              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-              // Avoid multiple copies of the same destination when
-              // reselecting the same item
-              launchSingleTop = true
-              // Restore state when reselecting a previously selected item
-              restoreState = true
-            }
+            navigateToWorkout(workout)
+
+
           },
         ) {
           Text(text = "Perform Again")
