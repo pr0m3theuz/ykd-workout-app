@@ -87,6 +87,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import coil.compose.AsyncImage
 import com.example.myapplication.R
@@ -110,7 +111,9 @@ fun ProgramDetailsScreen(
   navController: NavController,
   programsViewModel: ProgramsViewModel = koinViewModel(),
   _programID: String,
-  isProgramActive: Boolean = false
+  isProgramActive: Boolean = false,
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
 ) {
 
   val programID by remember { mutableStateOf(_programID) }
@@ -132,13 +135,15 @@ fun ProgramDetailsScreen(
 
   program?.let {
     ProgramDetailsLayout(
-      navController,
-      programsViewModel,
-      it,
-      it.mesocycles,
-      it.mesocycles.flatMap { mesocycle -> mesocycle.microcycles },
+      navController = navController,
+      programsViewModel = programsViewModel,
+      program = it,
+      mesocycles = it.mesocycles,
+      microcycles = it.mesocycles.flatMap { mesocycle -> mesocycle.microcycles },
 //      programMesocycles,
 //      programMicrocycles,
+      currentDestination = currentDestination,
+      onNavigateBottomBar = onNavigateBottomBar,
     )
   }
 }
@@ -154,6 +159,8 @@ fun ProgramDetailsLayout(
   program: Program,
   mesocycles: List<Mesocycle>,
   microcycles: List<Microcycle>,
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
 ) {
 
   val titleMedium = MaterialTheme.typography.titleLarge
@@ -198,7 +205,12 @@ fun ProgramDetailsLayout(
         actions = { ProgramDetailsOptionsDropdownMenu() },
       )
     },
-    bottomBar = { BottomNavigationBar(navController = navController) },
+    bottomBar = {
+      BottomNavigationBar(
+        currentDestination = currentDestination,
+        onNavigate = onNavigateBottomBar,
+      )
+    },
     floatingActionButton = {
       if (!programActive || startButtonPressed) {
         ExtendedFloatingActionButton(
