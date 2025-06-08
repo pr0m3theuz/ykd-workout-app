@@ -23,13 +23,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,19 +35,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavController
 import com.example.myapplication.R
-import com.example.myapplication.common.domain.model.UserProfileManager
-import com.example.myapplication.common.ui.component.BottomNavigationBar
-import org.koin.androidx.compose.koinViewModel
-import org.koin.java.KoinJavaComponent.inject
+import com.example.myapplication.common.domain.model.UserProfile
+import com.example.myapplication.common.ui.theme.MyApplicationTheme
+import org.bson.types.ObjectId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-  navController: NavController,
+//  navController: NavController,
   navigateToReplicatorScreen: () -> Unit,
-  profileViewModel: ProfileViewModel = koinViewModel(),
+  bottomNavigationBar: @Composable () -> Unit,
+//  profileViewModel: ProfileViewModel = koinViewModel(),
 ) {
 
   // TODO REWRITE THIS
@@ -57,9 +54,11 @@ fun ProfileScreen(
 //  val userEmail = user?.profileAsBsonDocument()!!["email"]?.asString()?.value ?: "anon@anon.anon"
 
 //  val user = "Anonymous"
-  val userProfileManager by inject<UserProfileManager>(UserProfileManager::class.java)
-  val user = userProfileManager.userProfile.collectAsState().value
+//  val userProfileManager by inject<UserProfileManager>(UserProfileManager::class.java)
+//  val user = userProfileManager.userProfile.collectAsState().value
 //  val userEmail = "TEMP@anon.anon"
+
+  val user = UserProfile(ObjectId())
 
   Scaffold(
     modifier = Modifier.imePadding(),
@@ -67,13 +66,13 @@ fun ProfileScreen(
       TopAppBar(
         title = { Text(text = "Profile") },
         actions = {
-          IconButton(onClick = { navController.navigate("replicatorScreen") }) {
+          IconButton(onClick = { }) {
             Icon(imageVector = Icons.Default.Settings, contentDescription = null)
           }
         },
       )
     },
-    bottomBar = { BottomNavigationBar(navController = navController) },
+    bottomBar = { bottomNavigationBar() },
     content = { paddingValues ->
       LazyColumn(
         modifier = Modifier
@@ -221,7 +220,8 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.Center
           ) {
             SectionTitle("Sync")
-            ListItem(headlineContent = { Text(text = "Sync Settings") },
+            ListItem(
+              headlineContent = { Text(text = "Sync Settings") },
               supportingContent = { Text(text = "Sync Server Settings") },
               modifier = Modifier.clickable(
                 onClickLabel = "Sync Server Settings",
@@ -250,6 +250,7 @@ fun ProfileScreen(
   )
 }
 
+
 @Composable
 private fun SectionTitle(title: String) {
   Text(
@@ -262,48 +263,33 @@ private fun SectionTitle(title: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun SettingsScreenPreview() {
-//  SettingsComponent()
+private fun SettingsScreenPreview() {
+  MyApplicationTheme {
+    ProfileScreen(
+      navigateToReplicatorScreen = {},
+      bottomNavigationBar = {}
+    )
+  }
+
 }
 
 @Composable
 fun ThemeDialog() {
   // TODO https://developer.android.com/develop/ui/views/theming/darktheme
   Dialog(onDismissRequest = { }) {
-    Card() {
-      Column() {
+    Card {
+      Column {
         Text(text = "Choose Theme", fontStyle = MaterialTheme.typography.displayMedium.fontStyle)
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("Light")
         }
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("Dark")
         }
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("System Default")
         }
         Spacer(modifier = Modifier.height(24.dp))
@@ -318,34 +304,20 @@ fun ThemeDialog() {
   }
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun WeightUnitDialog() {
   // TODO Update User Settings
   Dialog(onDismissRequest = { }) {
-    Card() {
-      Column() {
+    Card {
+      Column {
         Text(text = "Weight", fontStyle = MaterialTheme.typography.displayMedium.fontStyle)
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("Kilograms")
         }
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("Pounds")
         }
         Spacer(modifier = Modifier.height(24.dp))
@@ -365,43 +337,22 @@ fun WeightUnitDialog() {
 fun StartOfTheWeekDialog() {
   // TODO Update User Settings
   Dialog(onDismissRequest = { }) {
-    Card() {
-      Column() {
+    Card {
+      Column {
         Text(
           text = "Start of the Week",
           fontStyle = MaterialTheme.typography.displayMedium.fontStyle
         )
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("Saturday")
         }
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("Sunday")
         }
         Row {
-          RadioButton(
-            selected = TODO(),
-            onClick = TODO(),
-            modifier = TODO(),
-            enabled = TODO(),
-            colors = TODO(),
-            interactionSource = TODO()
-          )
+//          RadioButton()
           Text("Monday")
         }
         Spacer(modifier = Modifier.height(24.dp))
