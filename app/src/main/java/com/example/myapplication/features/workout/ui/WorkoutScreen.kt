@@ -33,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.ExercisesSetsScreen
@@ -48,7 +49,9 @@ fun WorkoutScreen(
   workoutViewModel: WorkoutViewModel,
   workoutID: String?,
   loadPreviousWorkout: Boolean,
-  copyWorkoutFromPreviousWorkout: Boolean
+  copyWorkoutFromPreviousWorkout: Boolean,
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
 ) {
   if (!workoutID.isNullOrBlank() && !copyWorkoutFromPreviousWorkout) {
     workoutViewModel.getWorkoutByID(ObjectId(workoutID))
@@ -64,7 +67,12 @@ fun WorkoutScreen(
   if (previewItems.isNotEmpty()) {
     navController.navigate("previewWorkoutScreen")
   } else {
-    WorkoutContent(navController = navController, workoutViewModel = workoutViewModel)
+    WorkoutContent(
+      navController = navController,
+      workoutViewModel = workoutViewModel,
+      currentDestination = currentDestination,
+      onNavigateBottomBar = onNavigateBottomBar,
+    )
   }
 
 }
@@ -75,6 +83,8 @@ fun WorkoutScreen(
 fun WorkoutContent(
   navController: NavController,
   workoutViewModel: WorkoutViewModel,
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
 ) {
   val workoutName by workoutViewModel.workoutName.collectAsState()
 
@@ -216,7 +226,12 @@ fun WorkoutContent(
         },
       )
     },
-    bottomBar = { BottomNavigationBar(navController = navController) },
+    bottomBar = {
+      BottomNavigationBar(
+        currentDestination = currentDestination,
+        onNavigate = onNavigateBottomBar,
+      )
+    },
   ) { contentPadding ->
     Column(Modifier.padding(contentPadding)) {
       Row(
