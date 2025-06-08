@@ -45,32 +45,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.myapplication.common.ui.component.BottomNavigationBar
+import com.example.myapplication.common.domain.model.Exercise
+import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.workout.ui.WorkoutSummaryCard
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import org.koin.androidx.compose.koinViewModel
-import java.time.format.TextStyle
-import java.util.Locale
+import kotlinx.datetime.toJavaInstant
+import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen(navController: NavController) {
-  //    val selectedCategoriesMap by
-  // exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
-  //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
-
+fun HistoryScreen(
+  historyViewModel: HistoryViewModel,
+  bottomNavigationBar: @Composable () -> Unit,
+  navigateToWorkoutOverview: (Workout) -> Unit = {},
+) {
+  // TODO Implement Search & Filtering of Workouts & Programs
   fun filterWorkouts(search: String) {
     // TODO .setSearchExerciseName(search)
     // TODO .filterExercises()
   }
 
-  //  var query by rememberSaveable { mutableStateOf(/* TODO .searchExerciseName */ ) }
+  //  var query by rememberSaveable { mutableStateOf(/* TODO .search History */ ) }
   var active by remember { mutableStateOf(false) }
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
@@ -88,24 +86,7 @@ fun HistoryScreen(navController: NavController) {
             overflow = TextOverflow.Ellipsis,
           )
         },
-        navigationIcon = {
-          /*IconButton(
-          onClick = {
-            */
-          /*TODO Navigate to Previous Screen */
-          /*
-              navController.navigateUp()
-              Toast.makeText(context, "TODO: Navigate to Previous Screen", Toast.LENGTH_SHORT)
-                .show()
-            }
-          ) {
-            Icon(
-              imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-              tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen",
-            )
-          }*/
-        },
+        navigationIcon = {},
         actions = {
           val iconColors = IconButtonDefaults.iconButtonColors()
           IconButton(
@@ -116,7 +97,7 @@ fun HistoryScreen(navController: NavController) {
             Icon(
               imageVector = Icons.Outlined.Search,
               tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Search Exercises",
+              contentDescription = "Search Workouts",
             )
           }
           //          TODO ExercisesFilterMenu(/*modifier =
@@ -125,7 +106,7 @@ fun HistoryScreen(navController: NavController) {
         },
       )
     },
-    bottomBar = { BottomNavigationBar(navController = navController) },
+    bottomBar = { bottomNavigationBar() },
     content = { contentPadding ->
       Column(Modifier.padding(contentPadding)) {
         SearchBar(
@@ -162,7 +143,18 @@ fun HistoryScreen(navController: NavController) {
           windowInsets = WindowInsets(0.dp),
         ) {}
 
-        HistoryLazyColumn(navController = navController)
+        val workouts by historyViewModel.workouts.collectAsState()
+
+        HistoryLazyColumn(
+          workouts = workouts,
+          userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
+          getExerciseByExerciseID = { exerciseID ->
+            historyViewModel.getExerciseByExerciseID(
+              exerciseID
+            )
+          },
+          navigateToWorkoutOverview = { navigateToWorkoutOverview(it) }
+        )
       }
     },
   )
@@ -185,7 +177,9 @@ fun NoWorkoutsPerformed() {
         .padding(top = 24.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      Text("No Workouts Performed!")
+      Text(
+        "No Workouts Performed!",
+      )
     }
   }
 }
@@ -193,17 +187,17 @@ fun NoWorkoutsPerformed() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HistoryLazyColumn(
-  historyViewModel: HistoryViewModel = koinViewModel(),
-  navController: NavController,
+  workouts: List<Workout>,
+  userDefaultWeightUnit: String = "lbs",
+  getExerciseByExerciseID: (exerciseID: ObjectId?) -> Exercise?,
+  navigateToWorkoutOverview: (Workout) -> Unit,
 ) {
-
-  val workouts by historyViewModel.workouts.collectAsState()
-
   val groupedWorkouts =
     workouts.groupBy {
-      Instant.fromEpochSeconds(it.workoutEnded?.epochSeconds!!)
-        .toLocalDateTime(TimeZone.currentSystemDefault())
-        .month
+      java.time.YearMonth.from(
+        Instant.fromEpochSeconds(it.workoutEnded?.epochSeconds!!)
+          .toJavaInstant()
+      )
     }
 
   Log.i("HistoryLazyColumn", "workout count: ${workouts.size}")
@@ -215,7 +209,7 @@ fun HistoryLazyColumn(
       contentPadding = PaddingValues(16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      groupedWorkouts.forEach { (month, monthWorkouts) ->
+      groupedWorkouts.forEach { (yearMonth, monthWorkouts) ->
         stickyHeader {
           Row(
             modifier = Modifier
@@ -226,7 +220,7 @@ fun HistoryLazyColumn(
             Text(
               style = MaterialTheme.typography.titleMediumEmphasized,
               modifier = Modifier.padding(vertical = 16.dp),
-              text = month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+              text = "${yearMonth.month} ${yearMonth.year}"
             )
           }
         }
@@ -239,7 +233,7 @@ fun HistoryLazyColumn(
             modifier =
               Modifier.clickable(
                 onClick = {
-                  navController.navigate("history?overviewWorkout=${workout.id.toHexString()}")
+                  navigateToWorkoutOverview(workout)
                 },
                 enabled = true,
                 interactionSource = remember { MutableInteractionSource() },
@@ -248,8 +242,8 @@ fun HistoryLazyColumn(
           ) {
             WorkoutSummaryCard(
               completedWorkout = workout,
-              userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
-              getExercise = { exerciseID -> historyViewModel.getExerciseByExerciseID(exerciseID) },
+              userDefaultWeightUnit = userDefaultWeightUnit,
+              getExercise = { exerciseID -> getExerciseByExerciseID(exerciseID) },
             )
           }
         }
