@@ -25,17 +25,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.myapplication.R
 import com.example.myapplication.common.ui.icon.ExerciseFilled
 import com.example.myapplication.common.ui.icon.MyIconPack
 
 @OptIn(ExperimentalAnimationSpecApi::class)
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(
+  currentDestination: NavDestination?,
+  onNavigate: (route: String) -> Unit
+) {
   //    var selectedItem by remember { mutableIntStateOf(0) }
   //    val items = listOf("Profile", "History", "Workout", "Programs", "Exercise", "Settings")
 
@@ -50,8 +51,6 @@ fun BottomNavigationBar(navController: NavController) {
       Screens.Replicator
     )
 
-  val navBackStackEntry by navController.currentBackStackEntryAsState()
-  val currentDestination = navBackStackEntry?.destination
 //  Log.i("BottomNavigationBar", "currentDestination: $currentDestination")
 
   NavigationBar(windowInsets = WindowInsets.navigationBars) {
@@ -94,17 +93,7 @@ fun BottomNavigationBar(navController: NavController) {
             currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) == true } !=
             true
           ) {
-            navController.navigate(item.route) {
-              // Pop up to the start destination of the graph to
-              // avoid building up a large stack of destinations
-              // on the back stack as users select items
-              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-              // Avoid multiple copies of the same destination when
-              // reselecting the same item
-              launchSingleTop = true
-              // Restore state when reselecting a previously selected item
-              restoreState = true
-            }
+            onNavigate(item.route)
           }
         }
       )
