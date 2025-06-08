@@ -27,18 +27,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.features.syncData.ReplicatorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReplicatorView(
-  navController: NavController,
   viewModel: ReplicatorViewModel,
-//  openDrawer: () -> Unit,
   replicatorConfigNav: () -> Unit,
-//  scaffoldState: ScaffoldState = rememberScaffoldState()
+  currentDestination: NavDestination? = null,
+  onNavigateBottomBar: (route: String) -> Unit,
 ) {
 
   val replicationStatus by viewModel.replicationStatus.collectAsState()
@@ -68,7 +67,13 @@ fun ReplicatorView(
         }
       )
     },
-    bottomBar = { BottomNavigationBar(navController) })
+    bottomBar = {
+      BottomNavigationBar(
+        currentDestination = currentDestination,
+        onNavigate = onNavigateBottomBar,
+      )
+    }
+  )
   { contentPadding ->
     Surface(
 //        color = MaterialTheme.colorScheme.background,
