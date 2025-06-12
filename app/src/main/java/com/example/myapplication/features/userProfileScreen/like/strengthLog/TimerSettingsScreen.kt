@@ -40,6 +40,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
+import androidx.compose.runtime.collectAsState
+import com.example.myapplication.features.userProfileScreen.ProfileViewModel
+import org.koin.androidx.compose.koinViewModel
+
+// Helper function (can be placed in the file or a util file)
+fun Long.formatMillisToMmSs(): String {
+    val totalSeconds = this / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return String.format("%02d:%02d", minutes, seconds)
+}
+
+// Helper function
+fun Long.formatMillisToSecondsString(): String {
+    val seconds = this / 1000
+    return String.format("%ds", seconds)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,10 +65,22 @@ fun TimerSettingsScreen(
   onNavigate: (String) -> Unit = {}, // For general navigation like "Notification Sound"
   onOpenTimePicker: () -> Unit = {},
   bottomNavigationBar: @Composable () -> Unit,
+  profileViewModel: ProfileViewModel = koinViewModel(),
 ) {
+  // ViewModel states
+  val userProfile by profileViewModel.userProfile.collectAsState()
+  // Default duration
+  val defaultRestTimerDurationMillis by profileViewModel.defaultRestTimerDurationMillis.collectAsState()
+  // Timer adjustment
+  val timerAdjustmentMillis by profileViewModel.timerAdjustmentMillis.collectAsState()
+
+  // Format values for display
+  val formattedDefaultRestTime = defaultRestTimerDurationMillis.formatMillisToMmSs()
+  val formattedTimerAdjustment = timerAdjustmentMillis.formatMillisToSecondsString()
+
   // State for switches
   var activateSetTimerEnabled by remember { mutableStateOf(true) }
-  var restTimeDisplay by remember { mutableStateOf("02:00") } // Example time
+  var restTimeDisplay by remember { mutableStateOf("02:00") } // Example time - may become unused for display
   var startAutomaticallyEnabled by remember { mutableStateOf(true) }
   var countUpEnabled by remember { mutableStateOf(false) }
   var showProgressBarEnabled by remember { mutableStateOf(true) }
@@ -90,10 +119,19 @@ fun TimerSettingsScreen(
 
       item {
         TimerRestItem(
-          title = "Rest",
-          subtitle = "The time you would like to rest between sets.",
-          time = restTimeDisplay,
-          onClick = onOpenTimePicker // To open a time picker dialog
+          title = "Default Rest Time", // Clarified title
+          subtitle = "Default time to rest between sets.",
+          time = formattedDefaultRestTime, // Use the collected and formatted value
+          onClick = { /* TODO: Implement time picker to update defaultRestTimerDurationMillis via profileViewModel.updateDefaultRestTimerDuration() */ }
+        )
+      }
+
+      item {
+        TimerRestItem( // Or a new Composable like TimerEditableValueItem
+            title = "Timer Adjustment Step",
+            subtitle = "Seconds to add/subtract with timer adjustment buttons.",
+            time = formattedTimerAdjustment, // Use the collected and formatted value
+            onClick = { /* TODO: Implement input dialog to update timerAdjustmentMillis via profileViewModel.updateTimerAdjustment() */ }
         )
       }
 

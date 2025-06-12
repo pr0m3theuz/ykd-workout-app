@@ -33,7 +33,9 @@ data class UserProfile(
   var intensity: String = Intensity.RIR.abbreviation, // TODO have enum class??????
   var authToken: String? = null,
   var isLoggedIn: Boolean = false,
-  private val type: String = "User"
+  private val type: String = "User",
+  val defaultRestTimerDurationMillis: Long = 60000L,
+  val timerAdjustmentMillis: Long = 30000L
 )
 
 // Define DataStore keys
@@ -47,6 +49,8 @@ object UserProfileDataStoreKeys {
   val DEFAULT_INTENSITY = stringPreferencesKey("default_intensity")
   val AUTH_TOKEN = stringPreferencesKey("auth_token")
   val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+  val DEFAULT_REST_TIMER_DURATION_MILLIS = longPreferencesKey("default_rest_timer_duration_millis")
+  val TIMER_ADJUSTMENT_MILLIS = longPreferencesKey("timer_adjustment_millis")
 }
 
 val Context.userProfileDataStore by preferencesDataStore(name = "user_prefs")

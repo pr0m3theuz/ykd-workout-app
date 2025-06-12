@@ -316,7 +316,7 @@ class WorkoutViewModel(
   }
 
   private var _timerDuration: Long
-    get() = savedStateHandle.get<Long>(TIMER_DURATION) ?: 60000L
+    get() = savedStateHandle.get<Long>(TIMER_DURATION) ?: (user?.defaultRestTimerDurationMillis ?: 60000L)
     set(value) = savedStateHandle.set(TIMER_DURATION, value)
 
   private var _timerDurationFormatted =
@@ -331,7 +331,7 @@ class WorkoutViewModel(
     get() = _timerDurationString.asStateFlow()
 
   // TODO Store User Settings for Rest Timer Adjustments
-  private val _restTimerAdjustment: Long = 30.toDuration(DurationUnit.SECONDS).inWholeMilliseconds
+  private val _restTimerAdjustment: Long = user?.timerAdjustmentMillis ?: 30000L
   val restTimerAdjustmentString =
     _restTimerAdjustment.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString()
 

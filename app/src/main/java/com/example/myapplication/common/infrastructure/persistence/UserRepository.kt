@@ -44,6 +44,8 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       document.setString("intensity", user.intensity)
       document.setString("type", "User")
       document.setString("authToken", user.authToken)
+      document.setLong("defaultRestTimerDurationMillis", user.defaultRestTimerDurationMillis)
+      document.setLong("timerAdjustmentMillis", user.timerAdjustmentMillis)
 //      document.setString("lengthUnit", user.defaultLengthUnit)
 
       collection.save(document)
@@ -67,6 +69,8 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       document.setString("weightUnit", user.defaultWeightUnit)
       document.setString("intensity", user.intensity)
       document.setString("authToken", user.authToken)
+      document.setLong("defaultRestTimerDurationMillis", user.defaultRestTimerDurationMillis)
+      document.setLong("timerAdjustmentMillis", user.timerAdjustmentMillis)
 //      document.setString("lengthUnit", user.defaultLengthUnit)
 
       collection.save(document)
