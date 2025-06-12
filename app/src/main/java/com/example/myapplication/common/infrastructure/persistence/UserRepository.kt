@@ -62,6 +62,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       requireNotNull(document) { "User Repository: User does not exist!" }
 
       document.setString("name", user.name)
+      document.setString("username", user.username) // Added username persistence
       document.setString("email", user.email)
       document.setString("password", user.password)
       document.setString("weightUnit", user.defaultWeightUnit)
