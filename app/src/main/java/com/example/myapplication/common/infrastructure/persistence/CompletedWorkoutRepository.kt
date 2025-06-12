@@ -12,7 +12,11 @@ interface CompletedWorkoutRepository {
 
   fun getCompletedSetsForExercise(exerciseID: ObjectId): Flow<List<Set>>
 
-  fun getCompletedWorkouts(): List<Workout>?
+  fun getCompletedWorkouts(): List<Workout>? {
+    return getCompletedWorkouts(null, null, null)
+  }
+
+  fun getCompletedWorkouts(query: String?, startDate: Long?, endDate: Long?): List<Workout>?
 
 // TODO fun getCompletedWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>>
 

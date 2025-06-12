@@ -16,8 +16,11 @@ import com.example.myapplication.features.workout.ManageWorkoutUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
@@ -37,6 +40,15 @@ class HistoryViewModel(
   private val _toastMessage = MutableSharedFlow<String>()
   val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow() // or just _toastMessage
 
+  private val _searchQuery = MutableStateFlow<String?>(null)
+  val searchQuery: StateFlow<String?> = _searchQuery.asStateFlow()
+
+  private val _startDate = MutableStateFlow<Long?>(null)
+  val startDate: StateFlow<Long?> = _startDate.asStateFlow()
+
+  private val _endDate = MutableStateFlow<Long?>(null)
+  val endDate: StateFlow<Long?> = _endDate.asStateFlow()
+
   fun triggerToast() {
     viewModelScope.launch {
       // ... your function logic ...
@@ -46,25 +58,36 @@ class HistoryViewModel(
   }
 
   private val _workouts: MutableStateFlow<List<Workout>> = MutableStateFlow(emptyList())
-  val workouts: StateFlow<List<Workout>>
-    get() = _workouts.asStateFlow()
+  val workouts: StateFlow<List<Workout>> = _workouts.asStateFlow()
 
-  private var _workout: MutableStateFlow<Workout?> = MutableStateFlow(null)
+  private val _workout: MutableStateFlow<Workout?> = MutableStateFlow(null)
   val workout
     get() = _workout.asStateFlow()
 
-  private var _workoutComponents = MutableStateFlow(listOf<WorkoutComponent>())
+  private val _workoutComponents = MutableStateFlow(listOf<WorkoutComponent>())
   val workoutComponents
     get() = _workoutComponents.asStateFlow()
 
   init {
-    viewModelScope.launch {
-      // TODO Replace workoutRepository
-      _workouts.value =
-        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
-          ?: emptyList()
+    loadWorkouts()
+  }
 
+  private fun loadWorkouts() {
+    viewModelScope.launch {
+      _workouts.value =
+        completedWorkoutRepository.getCompletedWorkouts(
+          searchQuery.value,
+          startDate.value,
+          endDate.value
+        )?.sortedByDescending { it.workoutEnded } ?: emptyList()
     }
+  }
+
+  fun updateFilters(newQuery: String? = null, newStartDate: Long? = null, newEndDate: Long? = null) {
+    _searchQuery.value = newQuery
+    _startDate.value = newStartDate
+    _endDate.value = newEndDate
+    loadWorkouts()
   }
 
   fun getWorkoutByID(workoutID: ObjectId) {
@@ -92,9 +115,7 @@ class HistoryViewModel(
       }
 
       // Update workouts list
-      _workouts.value =
-        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
-          ?: emptyList()
+      loadWorkouts()
     }
   }
 }
