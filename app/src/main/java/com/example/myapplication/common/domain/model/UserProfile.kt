@@ -29,7 +29,7 @@ data class UserProfile(
   var username: String? = null,
   var email: String? = null,
   var password: String? = null,
-  var defaultWeightUnit: String = MassUnit.POUNDS.abbreviation, // TODO have enum class??????
+  var defaultWeightUnit: MassUnit = MassUnit.POUNDS,
   var intensity: String = Intensity.RIR.abbreviation, // TODO have enum class??????
   var authToken: String? = null,
   var isLoggedIn: Boolean = false,
