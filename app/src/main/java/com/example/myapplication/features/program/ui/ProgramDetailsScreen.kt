@@ -20,11 +20,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -34,6 +37,8 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,9 +59,11 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -392,11 +399,110 @@ fun OverviewTab(
   microcycles: List<Microcycle>,
   //  programsViewModel: ProgramsViewModel = koinViewModel()
 ) {
+  val programsViewModel: ProgramsViewModel = koinViewModel() // Added to access ViewModel
+  val allProgramTags by programsViewModel.allProgramTags.collectAsState() // Collect all tags
+
   //  Log.i("OverviewTab", "microcycles: $microcycles")
   Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
     ProgramOverviewCard(program = program)
     //    CoachsCard(program = program)
     ProgramDescriptionCard(program = program)
+
+    // Display Existing Tags
+    program.let { prog ->
+      if (prog.tags.isNotEmpty()) {
+        Text(
+          "Tags:",
+          style = MaterialTheme.typography.titleMedium,
+          modifier = Modifier.padding(top = 16.dp, bottom = 4.dp) // Added more top padding
+        )
+        androidx.compose.foundation.layout.FlowRow(
+          mainAxisSpacing = 4.dp,
+          crossAxisSpacing = 4.dp,
+        ) {
+          prog.tags.forEach { tag ->
+            androidx.compose.material3.AssistChip(
+              onClick = { /* TODO: Future enhancement: remove tag on click? */ },
+              label = { Text(tag) }
+            )
+          }
+        }
+      }
+    }
+
+    // Manage Tags Button and Dialog
+    var showTagDialog by rememberSaveable { mutableStateOf(false) }
+    var newTagText by rememberSaveable { mutableStateOf("") }
+    var currentSelectedTags by remember(program?.tags, showTagDialog) { mutableStateOf(program?.tags?.toSet() ?: emptySet()) }
+
+    Button(onClick = { showTagDialog = true }, modifier = Modifier.padding(top = 8.dp)) {
+      Text("Manage Tags")
+    }
+
+    if (showTagDialog) {
+      AlertDialog(
+        onDismissRequest = {
+          newTagText = ""
+          showTagDialog = false
+        },
+        title = { Text("Manage Tags") },
+        text = {
+          Column {
+            TextField(
+              value = newTagText,
+              onValueChange = { newTagText = it },
+              label = { Text("Add new tag") },
+              modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            Text("Select existing tags:", style = MaterialTheme.typography.labelMedium)
+            LazyColumn(modifier = Modifier.heightIn(max = 200.dp)) { // Limit height
+              items(allProgramTags.sorted().distinct()) { existingTag ->
+                val isSelected = currentSelectedTags.contains(existingTag)
+                Row(
+                  Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                      currentSelectedTags = if (isSelected) {
+                        currentSelectedTags - existingTag
+                      } else {
+                        currentSelectedTags + existingTag
+                      }
+                    }
+                    .padding(vertical = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Checkbox(checked = isSelected, onCheckedChange = null)
+                  Spacer(Modifier.width(8.dp))
+                  Text(existingTag)
+                }
+              }
+            }
+          }
+        },
+        confirmButton = {
+          Button(onClick = {
+            val finalTags = currentSelectedTags.toMutableSet()
+            if (newTagText.isNotBlank()) {
+              finalTags.add(newTagText.trim())
+            }
+            program?.copy(tags = finalTags.toList().sorted())?.let { updatedProgram ->
+              programsViewModel.updateProgram(updatedProgram)
+              // programsViewModel.getProgramById(updatedProgram.id) // Optional refresh
+            }
+            newTagText = ""
+            showTagDialog = false
+          }) { Text("Confirm") }
+        },
+        dismissButton = {
+          Button(onClick = {
+            newTagText = ""
+            showTagDialog = false
+          }) { Text("Cancel") }
+        }
+      )
+    }
+
     WorkoutOverviewCard(microcycles = microcycles /*programsViewModel = programsViewModel*/)
     Spacer(modifier = Modifier.height(60.dp))
   }

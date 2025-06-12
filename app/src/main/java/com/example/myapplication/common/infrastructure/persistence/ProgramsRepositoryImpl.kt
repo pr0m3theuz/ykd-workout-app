@@ -60,17 +60,28 @@ class ProgramsRepositoryImpl(
 
   private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 
-  override fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
+  override fun getAllDistinctProgramTemplates(filterTags: List<String>?): Flow<List<Program>> {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
       val collection = db.getCollection("Program")
 
-      requireNotNull(collection) { COLLECTION_IS_NULL }
+      requireNotNull(collection) { String.format(COLLECTION_IS_NULL, "Program") }
+
+      var PREDICATE: Expression? = null
+      filterTags?.takeIf { it.isNotEmpty() }?.let { tags ->
+        var combinedExpression: Expression? = null
+        tags.forEach { tag ->
+          val tagExpression = Expression.property("tags").contains(Expression.string(tag))
+          combinedExpression = combinedExpression?.and(tagExpression) ?: tagExpression
+        }
+        PREDICATE = combinedExpression
+      }
 
       val query =
         QueryBuilder.selectDistinct(SelectResult.all())
           .from(DataSource.collection(collection))
+          .apply { PREDICATE?.let { where(it) } } // Apply the predicate if it exists
           .orderBy(Ordering.property("name").ascending())
 
       val flow =

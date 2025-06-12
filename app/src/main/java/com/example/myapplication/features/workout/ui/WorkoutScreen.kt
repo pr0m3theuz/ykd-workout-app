@@ -10,15 +10,27 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,6 +38,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,10 +48,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.example.myapplication.common.ui.component.BottomNavigationBar
+import com.example.myapplication.features.program.ProgramsViewModel
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.ExercisesSetsScreen
 import com.example.myapplication.features.workout.feature.setRestTimer.RestTimerButton
 import org.bson.types.ObjectId
+import org.koin.androidx.compose.koinViewModel
 
 // TODO Takes a Workout Object
 
@@ -47,6 +62,7 @@ import org.bson.types.ObjectId
 fun WorkoutScreen(
   navController: NavController,
   workoutViewModel: WorkoutViewModel,
+  programsViewModel: ProgramsViewModel = koinViewModel(), // Added ProgramsViewModel
   workoutID: String?,
   loadPreviousWorkout: Boolean,
   copyWorkoutFromPreviousWorkout: Boolean,
@@ -83,10 +99,13 @@ fun WorkoutScreen(
 fun WorkoutContent(
   navController: NavController,
   workoutViewModel: WorkoutViewModel,
+  programsViewModel: ProgramsViewModel, // Added ProgramsViewModel
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
   val workoutName by workoutViewModel.workoutName.collectAsState()
+  val workout by workoutViewModel.workout.collectAsState() // Collect workout for tags
+  val allWorkoutTags by programsViewModel.allWorkoutTags.collectAsState() // Collect all workout tags
 
   //  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
 
@@ -245,6 +264,104 @@ fun WorkoutContent(
         FinishWorkoutButton(
           workoutViewModel = workoutViewModel,
           navigateToWorkoutSummaryScreen = { navigateToWorkoutSummaryScreen() })
+      }
+
+      // Display Existing Tags
+      workout?.let { currentWorkout ->
+        if (currentWorkout.tags.isNotEmpty()) {
+          Text(
+            "Tags:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+          )
+          androidx.compose.foundation.layout.FlowRow(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            mainAxisSpacing = 4.dp,
+            crossAxisSpacing = 4.dp,
+          ) {
+            currentWorkout.tags.forEach { tag ->
+              androidx.compose.material3.AssistChip(
+                onClick = { /* TODO: Future: remove tag */ },
+                label = { Text(tag) }
+              )
+            }
+          }
+        }
+      }
+
+      // Manage Tags Button and Dialog
+      var showTagDialog by rememberSaveable { mutableStateOf(false) }
+      var newTagText by rememberSaveable { mutableStateOf("") }
+      var currentSelectedTags by remember(workout?.tags, showTagDialog) { mutableStateOf(workout?.tags?.toSet() ?: emptySet()) }
+
+      Button(
+          onClick = { showTagDialog = true },
+          modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp).fillMaxWidth()
+      ) {
+          Text("Manage Tags")
+      }
+
+      if (showTagDialog) {
+          AlertDialog(
+              onDismissRequest = {
+                  newTagText = ""
+                  showTagDialog = false
+              },
+              title = { Text("Manage Tags") },
+              text = {
+                  Column {
+                      TextField(
+                          value = newTagText,
+                          onValueChange = { newTagText = it },
+                          label = { Text("Add new tag") },
+                          modifier = Modifier.fillMaxWidth()
+                      )
+                      Spacer(Modifier.height(8.dp))
+                      Text("Select existing tags:", style = MaterialTheme.typography.labelMedium)
+                      LazyColumn(modifier = Modifier.heightIn(max = 200.dp)) {
+                          items(allWorkoutTags.sorted().distinct()) { existingTag ->
+                              val isSelected = currentSelectedTags.contains(existingTag)
+                              Row(
+                                  Modifier
+                                      .fillMaxWidth()
+                                      .clickable {
+                                          currentSelectedTags = if (isSelected) {
+                                              currentSelectedTags - existingTag
+                                          } else {
+                                              currentSelectedTags + existingTag
+                                          }
+                                      }
+                                      .padding(vertical = 4.dp),
+                                  verticalAlignment = Alignment.CenterVertically
+                              ) {
+                                  Checkbox(checked = isSelected, onCheckedChange = null)
+                                  Spacer(Modifier.width(8.dp))
+                                  Text(existingTag)
+                              }
+                          }
+                      }
+                  }
+              },
+              confirmButton = {
+                  Button(onClick = {
+                      val finalTags = currentSelectedTags.toMutableSet()
+                      if (newTagText.isNotBlank()) {
+                          finalTags.add(newTagText.trim())
+                      }
+                      workout?.copy(tags = finalTags.toList().sorted())?.let { updatedWorkout ->
+                          workoutViewModel.updateWorkoutTemplate(updatedWorkout)
+                      }
+                      newTagText = ""
+                      showTagDialog = false
+                  }) { Text("Confirm") }
+              },
+              dismissButton = {
+                  Button(onClick = {
+                      newTagText = ""
+                      showTagDialog = false
+                  }) { Text("Cancel") }
+              }
+          )
       }
 
       ExercisesSetsScreen(navController = navController, workoutViewModel = workoutViewModel)

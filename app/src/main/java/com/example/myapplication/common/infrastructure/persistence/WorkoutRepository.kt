@@ -60,7 +60,7 @@ interface WorkoutRepository {
 
   suspend fun deleteWorkout(workout: Workout): Boolean
 
-  fun getAllWorkoutTemplates(): Flow<List<Workout>>
+  fun getAllWorkoutTemplates(filterTags: List<String>? = null): Flow<List<Workout>>
 
   fun getAllCompletedWorkouts(): Flow<List<Workout>>
 

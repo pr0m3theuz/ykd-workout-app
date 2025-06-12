@@ -56,6 +56,7 @@ data class Program(
   var mesocycles: List<Mesocycle> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
+  var tags: List<String> = emptyList(),
   private val type: String = "Program",
 )
 

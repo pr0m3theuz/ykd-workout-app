@@ -9,6 +9,7 @@ import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
@@ -17,8 +18,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -44,11 +50,20 @@ constructor(
   private val _toastMessage = MutableSharedFlow<String>()
   val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow() // or just _toastMessage
 
+  private val _selectedProgramFilterTags = MutableStateFlow<Set<String>>(emptySet())
+  val selectedProgramFilterTags: StateFlow<Set<String>> = _selectedProgramFilterTags.asStateFlow()
+
+  private val _selectedWorkoutFilterTags = MutableStateFlow<Set<String>>(emptySet())
+  val selectedWorkoutFilterTags: StateFlow<Set<String>> = _selectedWorkoutFilterTags.asStateFlow()
+
   private val _programs = MutableStateFlow(emptyList<Program>())
 
   //  TODO Get unique list of programs, DISTINCT (name and author and dateCreated)
   val programs: StateFlow<List<Program>>
     get() = _programs
+
+  private val _workoutTemplates = MutableStateFlow<List<Workout>>(emptyList())
+  val workoutTemplates: StateFlow<List<Workout>> = _workoutTemplates.asStateFlow()
 
   private val _selectedProgram = MutableStateFlow<Program?>(null)
   val selectedProgram: StateFlow<Program?>
@@ -60,13 +75,29 @@ constructor(
 
   init {
     viewModelScope.launch {
-      //      programsRepository.migrateData() // Used to import data
-      programsRepository.getAllDistinctProgramTemplates().collect() { _programs.value = it }
+      // programsRepository.migrateData() // Used to import data
+      _selectedProgramFilterTags.flatMapLatest { tags ->
+        programsRepository.getAllDistinctProgramTemplates(filterTags = if (tags.isEmpty()) null else tags.toList())
+      }.collect { _programs.value = it }
+    }
+
+    viewModelScope.launch {
+      _selectedWorkoutFilterTags.flatMapLatest { tags ->
+        workoutRepository.getAllWorkoutTemplates(filterTags = if (tags.isEmpty()) null else tags.toList())
+      }.collect { _workoutTemplates.value = it }
     }
 
     viewModelScope.launch {
       programsRepository.getActivePrograms().collect() { _activePrograms.value = it }
     }
+  }
+
+  fun updateSelectedProgramFilterTags(tags: Set<String>) {
+    _selectedProgramFilterTags.value = tags
+  }
+
+  fun updateSelectedWorkoutFilterTags(tags: Set<String>) {
+    _selectedWorkoutFilterTags.value = tags
   }
 
   fun getProgramById(programID: ObjectId) {
@@ -339,4 +370,12 @@ constructor(
       }
     }
   }*/
+
+  val allProgramTags: StateFlow<List<String>> = programs.map { programList ->
+    programList.flatMap { it.tags }.distinct().sorted()
+  }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+  val allWorkoutTags: StateFlow<List<String>> = workoutTemplates.map { workoutList ->
+    workoutList.flatMap { it.tags }.distinct().sorted()
+  }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }

@@ -20,7 +20,7 @@ interface ProgramsRepository {
 //            database.importExerciseSets()
   }
 
-  fun getAllDistinctProgramTemplates(): Flow<List<Program>>
+  fun getAllDistinctProgramTemplates(filterTags: List<String>? = null): Flow<List<Program>>
 
   fun getProgramByID(programID: ObjectId): Program?
 

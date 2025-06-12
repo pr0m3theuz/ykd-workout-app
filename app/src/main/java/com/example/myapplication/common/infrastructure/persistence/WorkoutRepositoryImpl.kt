@@ -230,7 +230,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
     return false
   }
 
-  override fun getAllWorkoutTemplates(): Flow<List<Workout>> {
+  override fun getAllWorkoutTemplates(filterTags: List<String>?): Flow<List<Workout>> {
 
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -239,10 +239,20 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
+      var PREDICATE: Expression? = null
+      filterTags?.takeIf { it.isNotEmpty() }?.let { tags ->
+        var combinedExpression: Expression? = null
+        tags.forEach { tag ->
+          val tagExpression = Expression.property("tags").contains(Expression.string(tag))
+          combinedExpression = combinedExpression?.and(tagExpression) ?: tagExpression
+        }
+        PREDICATE = combinedExpression
+      }
+
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(Expression.all())
+          .apply { PREDICATE?.let { where(it) } ?: where(Expression.all()) } // Apply predicate or Expression.all() if no tags
           .orderBy(Ordering.property("dateCreated").descending())
 
       val flow =

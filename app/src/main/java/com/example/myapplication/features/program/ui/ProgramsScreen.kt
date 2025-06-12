@@ -29,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CreateNewFolder
@@ -36,9 +37,12 @@ import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Chip
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,7 +55,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -66,6 +70,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.Program
+import com.example.myapplication.common.domain.model.Workout // Added import for Workout
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.features.program.ProgramsViewModel
@@ -272,14 +277,65 @@ fun ProgramsScreen(
           Text(text = "Programs", style = titleMedium)
 
           Box {
-            Row {
-              IconButton(onClick = { /*TODO*/ }) {
+            Row(verticalAlignment = Alignment.CenterVertically) { // Ensure icons are vertically centered
+              // Program Filter Button
+              var showProgramFilterDialog by rememberSaveable { mutableStateOf(false) }
+              IconButton(onClick = { showProgramFilterDialog = true }) {
+                Icon(
+                  imageVector = Icons.Default.FilterList,
+                  contentDescription = "Filter Programs"
+                )
+              }
+              if (showProgramFilterDialog) {
+                val allProgramTags by programsViewModel.allProgramTags.collectAsState()
+                val currentProgramFilters by programsViewModel.selectedProgramFilterTags.collectAsState()
+                var selectedTagsForFilter by remember(currentProgramFilters) { mutableStateOf(currentProgramFilters) }
+
+                AlertDialog(
+                  onDismissRequest = { showProgramFilterDialog = false },
+                  title = { Text("Filter Programs by Tags") },
+                  text = {
+                    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                      items(allProgramTags.sorted().distinct()) { tag ->
+                        val isSelected = selectedTagsForFilter.contains(tag)
+                        Row(
+                          Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                              selectedTagsForFilter = if (isSelected) {
+                                selectedTagsForFilter - tag
+                              } else {
+                                selectedTagsForFilter + tag
+                              }
+                            }
+                            .padding(vertical = 4.dp),
+                          verticalAlignment = Alignment.CenterVertically
+                        ) {
+                          Checkbox(checked = isSelected, onCheckedChange = null)
+                          Text(tag, modifier = Modifier.padding(start = 8.dp))
+                        }
+                      }
+                    }
+                  },
+                  confirmButton = {
+                    Button(onClick = {
+                      programsViewModel.updateSelectedProgramFilterTags(selectedTagsForFilter)
+                      showProgramFilterDialog = false
+                    }) { Text("Apply") }
+                  },
+                  dismissButton = {
+                    Button(onClick = { showProgramFilterDialog = false }) { Text("Cancel") }
+                  }
+                )
+              }
+
+              IconButton(onClick = { /*TODO Import/Export*/ }) {
                 Icon(
                   imageVector = Icons.Outlined.FileUpload,
                   contentDescription = "Import/Export New Program",
                 )
               }
-              IconButton(onClick = { /*TODO*/ }) {
+              IconButton(onClick = { /*TODO Create New Program*/ }) {
                 Icon(
                   imageVector = Icons.Outlined.CreateNewFolder,
                   contentDescription = "Add New Program",
@@ -321,7 +377,8 @@ fun ProgramsScreen(
           ) {
             Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
           }
-          IconButton(onClick = { /*TODO*/ }) {
+          // TODO: Consider moving this MoreVert to a more common place if it's for overall screen options
+          IconButton(onClick = { /*TODO More Program Options*/ }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
               contentDescription = "Localized Description",
@@ -331,7 +388,7 @@ fun ProgramsScreen(
       }
 
       if (programs.isNotEmpty()) {
-        items(programs, key = { it.lazyListItemID }) { programTemplate ->
+        items(programs, key = { it.lazyListItemID }) { programTemplate -> // Ensure this uses the filtered programs
           val program = activePrograms.find { it.uuid == programTemplate.uuid } ?: programTemplate
 
           AnimatedVisibility(
@@ -359,6 +416,34 @@ fun ProgramsScreen(
             exit = shrinkVertically(animationSpec = tween(500)),
           ) {
             Text("No Programs")
+          }
+        }
+      }
+      // Display Active Program Filters
+      item {
+        val currentProgramFilters by programsViewModel.selectedProgramFilterTags.collectAsState()
+        if (currentProgramFilters.isNotEmpty()) {
+          Row(
+            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+          ) {
+            Text("Active Filters:", style = MaterialTheme.typography.labelSmall)
+            androidx.compose.foundation.layout.FlowRow(
+                mainAxisSpacing = 4.dp,
+                crossAxisSpacing = 4.dp
+            ) {
+                currentProgramFilters.forEach { tag ->
+                    androidx.compose.material3.Chip(
+                        onClick = { /* Maybe remove single tag? */ },
+                        label = { Text(tag, style = MaterialTheme.typography.labelSmall) },
+                        // colors = ChipDefaults.secondaryChipColors() // Example
+                    )
+                }
+            }
+            TextButton(onClick = { programsViewModel.updateSelectedProgramFilterTags(emptySet()) }) {
+              Text("Clear", style = MaterialTheme.typography.labelSmall)
+            }
           }
         }
       }
@@ -397,8 +482,61 @@ fun ProgramsScreen(
               contentDescription = "Show more workouts",
             )
           }
-          Text(text = "Workouts (###)")
-          IconButton(onClick = { /*TODO*/ }) {
+          val workoutTemplates by programsViewModel.workoutTemplates.collectAsState()
+          Text(text = "Workouts (${workoutTemplates.size})", modifier = Modifier.weight(1f)) // Allow text to take space before filter icon
+
+          // Workout Filter Button
+          var showWorkoutFilterDialog by rememberSaveable { mutableStateOf(false) }
+          IconButton(onClick = { showWorkoutFilterDialog = true }) {
+            Icon(
+              imageVector = Icons.Default.FilterList,
+              contentDescription = "Filter Workouts"
+            )
+          }
+          if (showWorkoutFilterDialog) {
+            val allWorkoutTags by programsViewModel.allWorkoutTags.collectAsState()
+            val currentWorkoutFilters by programsViewModel.selectedWorkoutFilterTags.collectAsState()
+            var selectedTagsForFilter by remember(currentWorkoutFilters) { mutableStateOf(currentWorkoutFilters) }
+
+            AlertDialog(
+              onDismissRequest = { showWorkoutFilterDialog = false },
+              title = { Text("Filter Workouts by Tags") },
+              text = {
+                LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                  items(allWorkoutTags.sorted().distinct()) { tag ->
+                    val isSelected = selectedTagsForFilter.contains(tag)
+                    Row(
+                      Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                          selectedTagsForFilter = if (isSelected) {
+                            selectedTagsForFilter - tag
+                          } else {
+                            selectedTagsForFilter + tag
+                          }
+                        }
+                        .padding(vertical = 4.dp),
+                      verticalAlignment = Alignment.CenterVertically
+                    ) {
+                      Checkbox(checked = isSelected, onCheckedChange = null)
+                      Text(tag, modifier = Modifier.padding(start = 8.dp))
+                    }
+                  }
+                }
+              },
+              confirmButton = {
+                Button(onClick = {
+                  programsViewModel.updateSelectedWorkoutFilterTags(selectedTagsForFilter)
+                  showWorkoutFilterDialog = false
+                }) { Text("Apply") }
+              },
+              dismissButton = {
+                Button(onClick = { showWorkoutFilterDialog = false }) { Text("Cancel") }
+              }
+            )
+          }
+
+          IconButton(onClick = { /*TODO More Workout Options*/ }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
               contentDescription = "Localized Description",
@@ -407,13 +545,44 @@ fun ProgramsScreen(
         }
       }
 
-      items(20) {
+      // Display Active Workout Filters
+      item {
+        val currentWorkoutFilters by programsViewModel.selectedWorkoutFilterTags.collectAsState()
+        if (currentWorkoutFilters.isNotEmpty()) {
+          Row(
+            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+          ) {
+            Text("Active Filters:", style = MaterialTheme.typography.labelSmall)
+            androidx.compose.foundation.layout.FlowRow(
+                mainAxisSpacing = 4.dp,
+                crossAxisSpacing = 4.dp
+            ) {
+                currentWorkoutFilters.forEach { tag ->
+                    Chip(
+                        onClick = { /* Maybe remove single tag? */ },
+                        label = { Text(tag, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+            TextButton(onClick = { programsViewModel.updateSelectedWorkoutFilterTags(emptySet()) }) {
+              Text("Clear", style = MaterialTheme.typography.labelSmall)
+            }
+          }
+        }
+      }
+
+      val workoutTemplates by programsViewModel.workoutTemplates.collectAsState()
+      items(workoutTemplates, key = { it.lazyListItemID }) { workoutTemplate ->
         AnimatedVisibility(
           visible = workoutVisible,
           enter = expandVertically(animationSpec = tween(500)),
           exit = shrinkVertically(animationSpec = tween(500)),
         ) {
-          WorkoutCard()
+          WorkoutCard(workout = workoutTemplate, onClick = {
+            navController.navigate(Screens.Workout.baseRoute + "/${workoutTemplate.id.toHexString()}")
+          })
         }
       }
     }
@@ -462,45 +631,40 @@ fun WorkoutSearchBar() {
 
 // @Preview
 @Composable
-fun WorkoutCard() {
-  val padding = 8.dp
-  val titleMedium = MaterialTheme.typography.titleMedium
-
-  Card(
-    modifier =
-      Modifier
-        .padding(vertical = padding)
-        .clickable { /* TODO Navigate to Workout Details Screen */
-        }
-  ) {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(padding),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.Top,
+fun WorkoutCard(workout: com.example.myapplication.common.domain.model.Workout, onClick: () -> Unit) {
+    val padding = 8.dp
+    val titleMedium = MaterialTheme.typography.titleMedium
+    Card(
+        modifier = Modifier
+            .padding(vertical = padding)
+            .fillMaxWidth() // Ensure it takes full width
+            .clickable(onClick = onClick)
     ) {
-      Column() {
-        Text(text = "Workout Title", style = titleMedium)
-        Text(text = "Workout Author", style = MaterialTheme.typography.titleSmall)
-        Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall)
-      }
-      // TODO To Keep or not to not Keep
-      Column(verticalArrangement = Arrangement.Top) {
-        IconButton(onClick = { /* TODO Open WorkoutOptionMenu */ }) {
-          Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Localized Description")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp), // Consistent padding
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
+        ) {
+            Column(modifier = Modifier.weight(1f)) { // Allow text to take space
+                Text(text = workout.name, style = titleMedium)
+                Text(text = workout.workoutAuthor ?: "Unknown Author", style = MaterialTheme.typography.titleSmall)
+                // Display a few tags if available
+                if (workout.tags.isNotEmpty()) {
+                    Text(
+                        text = "Tags: ${workout.tags.take(3).joinToString(", ")}${if (workout.tags.size > 3) "..." else ""}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1
+                    )
+                }
+                // Text(text = "Last performed: Date", style = MaterialTheme.typography.bodySmall) // Placeholder
+            }
+            // IconButton for options - can be added later if needed
+            // IconButton(onClick = { /* TODO: Options for workout template */ }) {
+            //    Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "Options")
+            // }
         }
-      }
-    }
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, bottom = padding)
-    ) {
-      Column() {
-        // TODO List Exercises
-        Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
-      }
     }
   }
 }

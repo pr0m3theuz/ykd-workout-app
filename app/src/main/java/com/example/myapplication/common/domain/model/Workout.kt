@@ -70,6 +70,7 @@ data class Workout(
   var isPublic: Boolean = false,
   var signature: String? = null,
   var hashedSignature: String? = null,
+  var tags: List<String> = emptyList(),
   val type: String = "Workout",
 )
 

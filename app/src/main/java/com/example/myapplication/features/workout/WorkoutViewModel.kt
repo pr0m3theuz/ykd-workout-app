@@ -57,6 +57,7 @@ import com.example.myapplication.common.domain.model.updateSetReps
 import com.example.myapplication.common.domain.model.updateSetType
 import com.example.myapplication.common.domain.model.updateSetWeight
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
+import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.toDomainWorkout
 import com.example.myapplication.common.infrastructure.persistence.datastore.toProtoActiveWorkout
@@ -105,6 +106,7 @@ class WorkoutViewModel(
   private val manageWorkoutUseCase: ManageWorkoutUseCase,
   private val managePreviewWorkoutUseCase: ManagePreviewWorkoutUseCase,
   private val exerciseRepository: ExercisesRepository,
+  private val workoutRepository: WorkoutRepository, // Added WorkoutRepository
   private val workoutDatastore: WorkoutDatastore, // Added WorkoutDatastore
   private val savedStateHandle: SavedStateHandle,
   private val userProfileManager: UserProfileManager
@@ -1542,6 +1544,19 @@ class WorkoutViewModel(
     previewItems.clear()
   }
 
+  fun updateWorkoutTemplate(workout: Workout) {
+    viewModelScope.launch {
+      // Assuming direct repository access for simplicity in this subtask
+      workoutRepository.updateWorkout(workout)
+
+      // Refresh the local state of the workout if it was updated.
+      // This ensures the UI reflects the change immediately if `_workout.value` is not automatically updated.
+      // Only update if the current loaded workout is the one being changed.
+      if (_workout.value?.id == workout.id) {
+        _workout.value = workout
+      }
+    }
+  }
 }
 
 private fun initWorkout(): Workout {
