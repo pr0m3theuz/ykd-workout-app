@@ -51,7 +51,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,79 +63,73 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import com.example.myapplication.common.domain.model.Barbell as DomainBarbell
+import com.example.myapplication.common.domain.model.Collar as DomainCollar
+import com.example.myapplication.common.domain.model.Plate as DomainPlate
+import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.userProfileScreen.bad.BottomNavItem
-import java.util.UUID
+// Remove java.util.UUID import if no longer needed locally after domain model adoption
+// import java.util.UUID
 
-// --- Data Classes ---
-data class Plate(
-  val id: String = UUID.randomUUID().toString(),
-  val weight: Float,
-  val unit: String = "lb",
-  var count: Int?, // Nullable for "unlimited"
-  val color: Color
-) {
-  val displayCount: String
-    get() = count?.toString() ?: "∞"
+
+// Helper function to convert hex string to Color
+fun String.toColor(): Color {
+    return try {
+        // Allow both #RRGGBBAA and RRGGBBAA
+        val colorString = if (this.startsWith("#")) this else "#$this"
+        // Handle common hex formats, default alpha to FF if not present
+        when (colorString.length) {
+            7 -> Color(android.graphics.Color.parseColor(colorString.replace("#", "#FF"))) // #RGB -> #RRGGBB
+            9 -> Color(android.graphics.Color.parseColor(colorString)) // #AARRGGBB
+            else -> Color.Gray // Fallback for unexpected formats
+        }
+    } catch (e: IllegalArgumentException) {
+        Color.Gray // Default color on parsing error
+    }
 }
 
-data class Barbell(
-  val id: String = UUID.randomUUID().toString(),
-  val weight: Float,
-  val unit: String = "lb"
-)
+// Helper function to convert Color to hex string (ARGB)
+fun Color.toHexString(): String {
+    return String.format("#%02X%02X%02X%02X",
+        (this.alpha * 255).toInt(),
+        (this.red * 255).toInt(),
+        (this.green * 255).toInt(),
+        (this.blue * 255).toInt()
+    )
+}
 
-data class Collar(
-  val id: String = UUID.randomUUID().toString(),
-  val weight: Float,
-  val unit: String = "lb"
-)
 
 // --- Predefined Colors for Plates (example) ---
-val plateColors = listOf(
+val plateUiColors = listOf(
   Color.Red,
-  Color.hsl(224.9f, 1f, 0.5f),
-  Color.Yellow, //(0xFFDBA800), // Gold/Yellow
-  Color.hsl(130f, 0.76f, 0.31f),
-  Color.White,
+  Color.hsl(224.9f, 1f, 0.5f), // Blue
+  Color.Yellow,
+  Color.hsl(130f, 0.76f, 0.31f), // Green
+  Color.White, // Often used for smaller plates, with black text
 )
 
 // --- Main Screen Composable ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EquipmentProfileScreen(
-  profileName: String = "First profile",
-  unitSystem: String = "lb",
+  viewModel: ProfileViewModel, // Added ViewModel parameter
   onNavigateBack: () -> Unit,
-  onEditProfile: () -> Unit = {},
-  onDeleteProfile: () -> Unit = {}
+  onEditProfile: () -> Unit = {}, // Keep these for now, might be wired to VM later
+  onDeleteProfile: () -> Unit = {} // Keep these for now
 ) {
   var selectedBottomNavItem by remember { mutableIntStateOf(4) } // Assuming settings/profile is last
 
-  // --- States for Lists ---
-  val platesList = remember {
-    mutableStateListOf(
-      Plate(weight = 55f, count = null, color = plateColors[0]),
-      Plate(weight = 45f, count = null, color = plateColors[1]),
-      Plate(weight = 35f, count = null, color = plateColors[2]),
-      Plate(weight = 25f, count = null, color = plateColors[3]),
-      Plate(weight = 10f, count = null, color = plateColors[4]),
-      Plate(weight = 5f, count = null, color = plateColors[0]),
-      Plate(weight = 2.5f, count = null, color = plateColors[3]),
-      Plate(weight = 1f, count = null, color = plateColors[4]),
+  val userProfileState by viewModel.userProfile.collectAsState()
+  val platesList by viewModel.plates.collectAsState()
+  val barbellsList by viewModel.barbells.collectAsState()
+  val collarsList by viewModel.collars.collectAsState()
 
-      )
-  }
-  val barbellsList = remember {
-    mutableStateListOf(
-      Barbell(weight = 65f), Barbell(weight = 52f), Barbell(weight = 45f), Barbell(weight = 44f),
-      Barbell(weight = 35f), Barbell(weight = 25f), Barbell(weight = 22f), Barbell(weight = 17f)
-    )
-  }
-  val collarsList = remember { mutableStateListOf(Collar(weight = 5.5f)) }
+  val currentProfileName = userProfileState?.name ?: "User"
+  val currentUnitSystem = userProfileState?.defaultWeightUnit ?: "lb"
 
   // --- Dialog States ---
   var showAddPlateDialog by remember { mutableStateOf(false) }
@@ -143,7 +139,7 @@ fun EquipmentProfileScreen(
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text("$profileName: $unitSystem") },
+        title = { Text("$currentProfileName: $currentUnitSystem") }, // Use ViewModel state
         navigationIcon = {
           IconButton(onClick = onNavigateBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
@@ -188,8 +184,8 @@ fun EquipmentProfileScreen(
     ) {
       // --- Your Plates Section ---
       item { SectionHeader("Your plates") }
-      items(platesList) { plate ->
-        PlateItemRow(plate = plate, unit = unitSystem, onRemove = { platesList.remove(plate) })
+      items(platesList) { plate -> // Use DomainPlate from ViewModel
+        PlateItemRow(plate = plate, unit = currentUnitSystem, onRemove = { viewModel.removePlate(plate.id) })
         HorizontalDivider()
       }
       item {
@@ -198,11 +194,11 @@ fun EquipmentProfileScreen(
 
       // --- Your Barbells Section ---
       item { SectionHeader("Your barbells") }
-      items(barbellsList) { barbell ->
+      items(barbellsList) { barbell -> // Use DomainBarbell from ViewModel
         BarbellItemRow(
           barbell = barbell,
-          unit = unitSystem,
-          onRemove = { barbellsList.remove(barbell) })
+          unit = currentUnitSystem,
+          onRemove = { viewModel.removeBarbell(barbell.id) })
         HorizontalDivider()
       }
       item {
@@ -211,8 +207,8 @@ fun EquipmentProfileScreen(
 
       // --- Your Collars Section ---
       item { SectionHeader("Your collars") }
-      items(collarsList) { collar ->
-        CollarItemRow(collar = collar, unit = unitSystem, onRemove = { collarsList.remove(collar) })
+      items(collarsList) { collar -> // Use DomainCollar from ViewModel
+        CollarItemRow(collar = collar, unit = currentUnitSystem, onRemove = { viewModel.removeCollar(collar.id) })
         HorizontalDivider()
       }
       item {
@@ -224,30 +220,32 @@ fun EquipmentProfileScreen(
   // --- Dialogs ---
   if (showAddPlateDialog) {
     AddPlateDialog(
-      unit = unitSystem,
+      unit = currentUnitSystem, // Use ViewModel state
       onDismiss = { showAddPlateDialog = false },
-      onAddPlate = { weight, count, color ->
-        platesList.add(Plate(weight = weight, count = count, color = color, unit = unitSystem))
+      onAddPlate = { weight, count, uiColor -> // uiColor is Jetpack Compose Color
+        // Convert uiColor to hex string for domain model
+        val colorHexString = uiColor.toHexString()
+        viewModel.addPlate(DomainPlate(weight = weight, count = count, color = colorHexString, unit = currentUnitSystem))
         showAddPlateDialog = false
       }
     )
   }
   if (showAddBarbellDialog) {
     AddBarbellDialog(
-      unit = unitSystem,
+      unit = currentUnitSystem, // Use ViewModel state
       onDismiss = { showAddBarbellDialog = false },
       onAddBarbell = { weight ->
-        barbellsList.add(Barbell(weight = weight, unit = unitSystem))
+        viewModel.addBarbell(DomainBarbell(weight = weight, unit = currentUnitSystem))
         showAddBarbellDialog = false
       }
     )
   }
   if (showAddCollarDialog) {
     AddCollarDialog(
-      unit = unitSystem,
+      unit = currentUnitSystem, // Use ViewModel state
       onDismiss = { showAddCollarDialog = false },
       onAddCollar = { weight ->
-        collarsList.add(Collar(weight = weight, unit = unitSystem))
+        viewModel.addCollar(DomainCollar(weight = weight, unit = currentUnitSystem))
         showAddCollarDialog = false
       }
     )
@@ -268,25 +266,25 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
-private fun PlateItemRow(plate: Plate, unit: String, onRemove: () -> Unit) {
+private fun PlateItemRow(plate: DomainPlate, unit: String, onRemove: () -> Unit) { // Use DomainPlate
   EquipmentItemBaseRow(
     leadingContent = {
       Box(
         modifier = Modifier
           .size(24.dp)
           .clip(CircleShape)
-          .background(plate.color)
+          .background(plate.color.toColor()) // Convert hex string to Color
           .border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
       )
     },
     text = "${plate.weight} $unit x ${plate.displayCount}",
     onRemove = onRemove,
-    showRemoveIcon = true // No remove icon visible in screenshot for individual plates
+    showRemoveIcon = true
   )
 }
 
 @Composable
-fun BarbellItemRow(barbell: Barbell, unit: String, onRemove: () -> Unit) {
+fun BarbellItemRow(barbell: DomainBarbell, unit: String, onRemove: () -> Unit) { // Use DomainBarbell
   EquipmentItemBaseRow(
     text = "${barbell.weight} $unit",
     onRemove = onRemove,
@@ -295,7 +293,7 @@ fun BarbellItemRow(barbell: Barbell, unit: String, onRemove: () -> Unit) {
 }
 
 @Composable
-private fun CollarItemRow(collar: Collar, unit: String, onRemove: () -> Unit) {
+private fun CollarItemRow(collar: DomainCollar, unit: String, onRemove: () -> Unit) { // Use DomainCollar
   EquipmentItemBaseRow(
     text = "${collar.weight} $unit",
     onRemove = onRemove,
@@ -386,7 +384,7 @@ private fun AddPlateDialog(
     val weight = weightStr.toFloatOrNull()
     val count = if (isUnlimited) null else amountStr.toIntOrNull()
     if (weight != null && (isUnlimited || count != null)) {
-      onAddPlate(weight, count, plateColors[selectedColorIndex])
+      onAddPlate(weight, count, plateUiColors[selectedColorIndex]) // Pass Compose Color
     }
   }) {
     OutlinedTextField(
@@ -417,7 +415,7 @@ private fun AddPlateDialog(
     Spacer(modifier = Modifier.height(8.dp))
     Text("Color:", style = MaterialTheme.typography.bodyMedium)
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-      plateColors.forEachIndexed { index, color ->
+      plateUiColors.forEachIndexed { index, color -> // Use plateUiColors
         Box(
           Modifier
             .size(32.dp)
@@ -439,7 +437,7 @@ private fun AddPlateDialog(
 private fun AddBarbellDialog(
   unit: String,
   onDismiss: () -> Unit,
-  onAddBarbell: (weight: Float) -> Unit
+  onAddBarbell: (weight: Float) -> Unit // DomainBarbell will be created in EquipmentProfileScreen
 ) {
   var weightStr by remember { mutableStateOf("") }
   DialogBase(title = "Add barbell", onDismiss = onDismiss, onConfirm = {
@@ -461,7 +459,7 @@ private fun AddBarbellDialog(
 private fun AddCollarDialog(
   unit: String,
   onDismiss: () -> Unit,
-  onAddCollar: (weight: Float) -> Unit
+  onAddCollar: (weight: Float) -> Unit // DomainCollar will be created in EquipmentProfileScreen
 ) {
   var weightStr by remember { mutableStateOf("") }
   DialogBase(title = "Add collar", onDismiss = onDismiss, onConfirm = {
@@ -516,18 +514,26 @@ private fun DialogBase(
 }
 
 // --- Preview ---
+// Previews would need a mock ViewModel or be adapted.
+// For now, commenting out or ensuring they don't break compilation if viewModel is mandatory.
+/*
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun EquipmentProfileScreenPreview() {
-  MyApplicationTheme { // Assuming DarkColorSchemePreview is defined
-    EquipmentProfileScreen(onNavigateBack = {})
-  }
+private fun EquipmentProfileScreenPreviewNight() {
+    MyApplicationTheme {
+        // val mockViewModel = remember { ProfileViewModel(mockUserRepository) } // Requires mock repo
+        // EquipmentProfileScreen(viewModel = mockViewModel, onNavigateBack = {})
+        Text("Preview needs ViewModel mocking")
+    }
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-private fun EquipmentProfileScreenLightPreview() {
-  MyApplicationTheme { // Assuming LightColorSchemePreview is defined
-    EquipmentProfileScreen(onNavigateBack = {})
-  }
+private fun EquipmentProfileScreenPreviewLight() {
+    MyApplicationTheme {
+        // val mockViewModel = remember { ProfileViewModel(mockUserRepository) } // Requires mock repo
+        // EquipmentProfileScreen(viewModel = mockViewModel, onNavigateBack = {})
+        Text("Preview needs ViewModel mocking")
+    }
 }
+*/
