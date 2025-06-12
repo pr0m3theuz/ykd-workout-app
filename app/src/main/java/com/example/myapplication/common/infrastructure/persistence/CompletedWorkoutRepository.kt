@@ -23,4 +23,6 @@ interface CompletedWorkoutRepository {
   suspend fun upsertCompletedWorkout(workout: Workout)
 
   suspend fun deleteCompletedWorkout(workout: Workout): Boolean
+
+  suspend fun substituteExerciseInCompletedWorkouts(programId: ObjectId, oldExerciseId: ObjectId, newExerciseId: ObjectId)
 }

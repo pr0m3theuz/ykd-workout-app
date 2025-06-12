@@ -6,9 +6,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.Mesocycle
+import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.Program
+import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
@@ -33,6 +37,7 @@ constructor(
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
   //  private val setsRepository: SetsRepository,
   private val exercisesRepository: ExercisesRepository,
+  private val completedWorkoutRepository: CompletedWorkoutRepository
 ) : ViewModel() {
   fun getExerciseNameByID(exerciseID: ObjectId?): String? {
     //    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
@@ -66,6 +71,48 @@ constructor(
 
     viewModelScope.launch {
       programsRepository.getActivePrograms().collect() { _activePrograms.value = it }
+    }
+  }
+
+  fun substituteExerciseInProgram(programId: ObjectId, oldExerciseId: ObjectId, newExerciseId: ObjectId) {
+    viewModelScope.launch {
+      try {
+        val program = programsRepository.getProgramByID(programId)
+        if (program != null) {
+          program.mesocycles.forEach { mesocycle ->
+            mesocycle.microcycles.forEach { microcycle ->
+              microcycle.workouts.forEach { workout ->
+                workout.workoutItems.forEach { workoutItem ->
+                  when (workoutItem) {
+                    is ExerciseSets -> {
+                      if (workoutItem.exerciseID == oldExerciseId) {
+                        workoutItem.exerciseID = newExerciseId
+                      }
+                    }
+                    is Superset -> {
+                      workoutItem.exerciseSets.forEach { exerciseSet ->
+                        if (exerciseSet.exerciseID == oldExerciseId) {
+                          exerciseSet.exerciseID = newExerciseId
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          // Attempt to update the program structure
+          programsRepository.updateProgram(program)
+          // If program structure update is successful, then update completed workouts
+          completedWorkoutRepository.substituteExerciseInCompletedWorkouts(programId, oldExerciseId, newExerciseId)
+          _toastMessage.emit("Exercise substituted successfully in program '${program.name}' and its completed workouts.")
+        } else {
+          _toastMessage.emit("Failed to find program with ID $programId.")
+        }
+      } catch (e: Exception) {
+        Log.e("ProgramsViewModel", "Error substituting exercise: ${e.message}", e)
+        _toastMessage.emit("Error substituting exercise: ${e.message}")
+      }
     }
   }
 

@@ -103,6 +103,85 @@ class CompletedWorkoutRepositoryImpl(
     return null
   }
 
+  // New function to get completed workouts by Program ID
+  fun getCompletedWorkoutsByProgramID(programId: ObjectId): List<Workout>? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val workoutCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(workoutCollection) { COLLECTION_IS_NULL }
+
+      val setCollection = db.getCollection("CompletedSets")
+      requireNotNull(setCollection) { COLLECTION_IS_NULL }
+
+      val completedWorkoutQuery =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(workoutCollection))
+          .where(
+            Expression.property("isCompleted").equalTo(Expression.booleanValue(true))
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+              .and(Expression.property("programID").equalTo(Expression.string(programId.toHexString()))) // Added programID filter
+          )
+
+      val workouts = completedWorkoutQuery.execute().allResults()
+        .map {
+          withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it.toJSON()).CompletedWorkouts
+        }
+
+      if (workouts.isEmpty()) {
+        return emptyList()
+      }
+
+      val workoutIds = workouts.map { it.id.toString() }
+      // Efficiently create the IN clause values
+      val workoutIdExpressions = workoutIds.map { Expression.string(it) }
+
+
+      val setsQuery = QueryBuilder.select(SelectResult.all())
+        .from(DataSource.collection(setCollection))
+        .where(Expression.property("workoutID").`in`(*workoutIdExpressions.toTypedArray()) // Use IN operator
+          .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))))
+
+      val setsResult = setsQuery.execute().allResults()
+      val sets = setsResult.mapNotNull {
+        try {
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
+        } catch (e: Exception) {
+          Log.e("CompletedWorkoutRepositoryImpl.getCompletedWorkoutsByProgramID", "Error decoding set: ${e.message}")
+          null
+        }
+      }
+
+      val setsByWorkoutID = sets.groupBy { it.workoutID }
+
+      workouts.forEach { workout ->
+        val relevantSetsForWorkout = setsByWorkoutID[workout.id] ?: emptyList()
+        val setsByExerciseSetsID = relevantSetsForWorkout.groupBy { it.exerciseSetsID }
+
+        workout.workoutItems.forEach { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> {
+              workoutItem.sets = (setsByExerciseSetsID[workoutItem.id] ?: emptyList())
+                .sortedBy { it.setNumber }
+                .toMutableList()
+            }
+            is Superset -> {
+              workoutItem.exercisesSets.forEach { exerciseSets ->
+                exerciseSets.sets = (setsByExerciseSetsID[exerciseSets.id] ?: emptyList())
+                  .sortedBy { it.setNumber }
+                  .toMutableList()
+              }
+            }
+          }
+        }
+      }
+      return workouts
+    } catch (e: Exception) {
+      Log.e("CompletedWorkoutRepositoryImpl.getCompletedWorkoutsByProgramID", "Error: ${e.message}", e)
+    }
+    return null
+  }
+
   override fun getCompletedWorkoutsCount(): Int {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -468,6 +547,63 @@ class CompletedWorkoutRepositoryImpl(
       Log.e(e.message, e.stackTraceToString())
     }
     return false
+  }
+
+  suspend fun substituteExerciseInCompletedWorkouts(programId: ObjectId, oldExerciseId: ObjectId, newExerciseId: ObjectId) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedSetsCollection = db.getCollection("CompletedSets")
+      requireNotNull(completedSetsCollection) { "Completed Repository: CompletedSets Collection does not exist in the Database." }
+
+      val workouts = getCompletedWorkoutsByProgramID(programId)
+
+      workouts?.forEach { workout ->
+        workout.workoutItems.forEach { workoutItem ->
+          val setsToUpdate = mutableListOf<Set>()
+          when (workoutItem) {
+            is ExerciseSets -> {
+              workoutItem.sets.forEach { set ->
+                if (set.exerciseID == oldExerciseId) {
+                  setsToUpdate.add(set.copy(exerciseID = newExerciseId))
+                }
+              }
+            }
+            is Superset -> {
+              workoutItem.exercisesSets.forEach { exerciseSet ->
+                exerciseSet.sets.forEach { set ->
+                  if (set.exerciseID == oldExerciseId) {
+                    setsToUpdate.add(set.copy(exerciseID = newExerciseId))
+                  }
+                }
+              }
+            }
+          }
+
+          if (setsToUpdate.isNotEmpty()) {
+            db.inBatch(UnitOfWork {
+              setsToUpdate.forEach { updatedSet ->
+                try {
+                  val setJsonContent = Json.encodeToString(updatedSet)
+                  val docId = updatedSet.id.toHexString()
+                  // Try to get existing document, if not, create new.
+                  val doc = completedSetsCollection.getDocument(docId)?.toMutable()
+                    ?: MutableDocument(docId)
+                  doc.setJSON(setJsonContent)
+                  completedSetsCollection.save(doc)
+                  Log.i("CompletedWorkoutRepositoryImpl.substituteExercise", "Updated set $docId to new exercise $newExerciseId")
+                } catch (e: kotlinx.serialization.SerializationException) {
+                  Log.e("CompletedWorkoutRepositoryImpl.substituteExercise", "Failed to serialize set ${updatedSet.id}: ${e.message}", e)
+                } catch (e: Exception) {
+                  Log.e("CompletedWorkoutRepositoryImpl.substituteExercise", "Failed to save set ${updatedSet.id} to DB: ${e.message}", e)
+                }
+              }
+            })
+          }
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("CompletedWorkoutRepositoryImpl.substituteExercise", "Error substituting exercise: ${e.message}", e)
+    }
   }
 }
 
