@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.example.myapplication.features.workout.feature.workoutDialogs
 
 import android.util.Log
@@ -22,12 +24,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -53,6 +59,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.myapplication.common.ui.theme.White
@@ -184,7 +191,7 @@ fun Textfield(text: String, onValueChange: (String) -> Unit) {
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
       TextStyle(
-        fontSize = 4.em,
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onBackground,
       ),
@@ -213,7 +220,21 @@ fun SetTypeButton(setTypeText: String, setTypeColor: Color, onClick: () -> Unit)
 }
 
 @Composable
+fun SetNumber(setTypeText: String) {
+  Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
+    Text(
+      text = setTypeText,
+      color = MaterialTheme.colorScheme.onSurface,
+      style = MaterialTheme.typography.bodyLargeEmphasized,
+      modifier = Modifier.padding(8.dp)
+    )
+  }
+}
+
+
+@Composable
 fun SetContent(
+  setNumber: Int = 1,
   setTypeText: String,
   setTypeColor: Color,
   resultsText: String,
@@ -223,6 +244,7 @@ fun SetContent(
   onPercentageTextChanged: (String) -> Unit,
   onRepetitionsTextChanged: (String) -> Unit,
   onRIRTextChanged: (String) -> Unit,
+  onCheckedChange: (Boolean) -> Unit,
 ) {
   Row(
     modifier = Modifier.fillMaxWidth(),
@@ -246,7 +268,9 @@ fun SetContent(
         .wrapContentSize(Alignment.Center)
         .weight(1f, fill = true)
 
-    SetTypeButton(setTypeText, setTypeColor) {}
+//    SetTypeButton(setTypeText, setTypeColor) {}
+    SetNumber(setTypeText)
+
 
     RoundedBox(textfieldModifier.width(84.dp)) {
       Textfield(text = percentageText ?: "", onValueChange = onPercentageTextChanged)
@@ -262,10 +286,47 @@ fun SetContent(
 
 
     Box(modifier = resultsModifier, contentAlignment = Alignment.Center) {
-      Text(fontSize = 4.em, text = resultsText)
+      Text(
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        text = resultsText,
+        textAlign = TextAlign.Center,
+        autoSize = TextAutoSize.StepBased(
+          minFontSize = MaterialTheme.typography.bodySmall.fontSize,
+          maxFontSize = MaterialTheme.typography.bodyMedium.fontSize
+        )
+      )
     }
+
+    val (checked, setChecked) = remember { mutableStateOf(false) }
+    Checkbox(
+      onCheckedChange = {
+        onCheckedChange(it)
+        setChecked(it)
+      },
+      checked = checked,
+      modifier = Modifier.align(Alignment.CenterVertically)
+    )
   }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun SetContentPreview() {
+  SetContent(
+    setNumber = 1,
+    setTypeText = "W",
+    setTypeColor = Color.Yellow,
+    resultsText = "100 x 5 @ 2 RIR",
+    percentageText = "80",
+    repetitionsText = "5",
+    rirText = "2",
+    onPercentageTextChanged = {},
+    onRepetitionsTextChanged = {},
+    onRIRTextChanged = {},
+    onCheckedChange = { }
+  )
+}
+
 
 @Composable
 fun SetsHeaderRow() {
@@ -327,7 +388,7 @@ fun DialogInput(text: String, onValueChange: (String) -> Unit, onImeAction: () -
       Modifier
         //                        .padding(4.dp)
         .clip(RoundedCornerShape(8.dp))
-        .background(MaterialTheme.colorScheme.secondaryContainer)
+        .background(MaterialTheme.colorScheme.tertiaryContainer)
         .fillMaxWidth()
         .wrapContentSize(Alignment.Center),
     contentAlignment = Alignment.Center,
@@ -340,7 +401,7 @@ fun DialogInput(text: String, onValueChange: (String) -> Unit, onImeAction: () -
         TextStyle(
           fontSize = 5.em,
           textAlign = TextAlign.Center,
-          color = MaterialTheme.colorScheme.onSecondaryContainer,
+          color = MaterialTheme.colorScheme.onTertiaryContainer,
         ),
       keyboardOptions =
         KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
@@ -412,7 +473,12 @@ fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -
     },
   ) {
     Card(
-//      colors = , // MaterialTheme.colorScheme.background,
+      colors = CardColors(
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+      ), // MaterialTheme.colorScheme.background,
       shape = RoundedCornerShape(CornerSize(0f)),
     ) {
       SetLayout()
@@ -513,6 +579,7 @@ fun ModernizedLoadRIRHeaderRow(
   modernizedLoadRIRData: List<ModernizedLoadRIR>,
   initialLoadRIR: ModernizedLoadRIR?,
   onLoadRIRChange: (ModernizedLoadRIR?) -> Unit
+
 ) {
   // Early return if no data is available
   if (modernizedLoadRIRData.isEmpty()) {
@@ -537,6 +604,15 @@ fun ModernizedLoadRIRHeaderRow(
   var currentRir by remember { mutableStateOf(initialLoadRIR?.rir) }
   var currentRepsPerformed by remember { mutableStateOf(initialLoadRIR?.repsPerformed) }
   var currentRelativeLoadPercent by remember { mutableStateOf(initialLoadRIR?.relativeLoadPercent) }
+
+  val currentState = ModernizedLoadRIR(
+    repCapacity = currentRepCapacity ?: RepCapacity.Low, // Provide default or handle null
+    rpe = currentRpe ?: 0.0,
+    rir = currentRir ?: 0.0,
+    repsPerformed = currentRepsPerformed ?: 0,
+    relativeLoadPercent = currentRelativeLoadPercent ?: 0.0
+  )
+
 
   // --- Derive options for dropdowns based on current selections ---
   // These are `remember`ed and will re-calculate when their dependent states change.
@@ -618,6 +694,8 @@ fun ModernizedLoadRIRHeaderRow(
     val rirVal = currentRir
     val repsVal = currentRepsPerformed
     val loadVal = currentRelativeLoadPercent
+
+
 
     Log.i(
       "ModernizedLoadRIRHeaderRow.LaunchedEffect",
@@ -797,6 +875,7 @@ fun ModernizedLoadRIRHeaderRow(
     }
   }
 
+  val style = MaterialTheme.typography.bodyMediumEmphasized
   Column(modifier = Modifier.fillMaxWidth()) {
     Text("Modernized Load RIR Editor", style = MaterialTheme.typography.bodyMedium)
     Row(
@@ -859,13 +938,13 @@ fun ModernizedLoadRIRHeaderRow(
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Text("RIR: ${currentRir?.let { "%.1f".format(Locale.US, it) } ?: "NS"}",
-        style = MaterialTheme.typography.bodySmall)
-      Text("RPE: ${currentRpe?.let { "%.1f".format(Locale.US, it) } ?: "NS"}",
-        style = MaterialTheme.typography.bodySmall)
-      Text("Reps: ${currentRepsPerformed ?: "NS"}", style = MaterialTheme.typography.bodySmall)
-      Text("e1RM%: ${currentRelativeLoadPercent?.let { "%.2f%%".format(Locale.US, it) } ?: "NS"}",
-        style = MaterialTheme.typography.bodySmall)
+      Text("RIR: ${currentRir?.let { "%.1f".format(Locale.US, it) } ?: "NA"}",
+        style = style)
+      Text("RPE: ${currentRpe?.let { "%.1f".format(Locale.US, it) } ?: "NA"}",
+        style = style)
+      Text("Reps: ${currentRepsPerformed ?: "NA"}", style = style)
+      Text("e1RM%: ${currentRelativeLoadPercent?.let { "%.2f%%".format(Locale.US, it) } ?: "NA"}",
+        style = style)
     }
     Row(
       modifier = Modifier
@@ -875,8 +954,8 @@ fun ModernizedLoadRIRHeaderRow(
       verticalAlignment = Alignment.CenterVertically
     ) {
       Text(
-        "Rep Capacity: ${currentRepCapacity ?: "NS"}",
-        style = MaterialTheme.typography.bodySmall
+        "Rep Capacity: ${currentRepCapacity ?: "NA"}",
+        style = style
       )
     }
   }
