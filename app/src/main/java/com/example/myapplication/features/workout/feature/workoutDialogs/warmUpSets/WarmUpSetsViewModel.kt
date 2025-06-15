@@ -83,10 +83,29 @@ class WarmUpSetsViewModel(
     }
   }
 
+  fun applySettingsToSelectedSets(
+    sets: List<Set>,
+    modernizedLoadRIRSetting: ModernizedLoadRIR?
+  ) {
+    modernizedLoadRIRSetting?.let { modernlizedLoadRIR ->
+      sets.forEach { set ->
+        _warmUpSets.find { it.uuid == set.uuid }?.let {
+          it.targetRepetitions = modernlizedLoadRIR.repsPerformed
+          it.targetRepetitionsInReserve = modernlizedLoadRIR.rir
+          it.targetRatePerceivedEffort = modernlizedLoadRIR.rpe
+          it.targetPercentage1RM = modernlizedLoadRIR.relativeLoadPercent
+        }
+      }
+    }
+
+    _warmUpSetsFlow.value = _warmUpSets.toList()
+  }
+
   fun addSet() {
 
-    requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
 
+    requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
+// TODO Apply to WorkingSets & EquateVolume
     if (_warmUpSets.isNotEmpty()) {
       _warmUpSets.add(
         Set(
@@ -97,6 +116,10 @@ class WarmUpSetsViewModel(
           ratePerceivedEffort = _warmUpSets.last().ratePerceivedEffort,
           repetitionsInReserve = _warmUpSets.last().repetitionsInReserve,
           setTypeID = _warmUpSets.last().setTypeID,
+          targetRepetitions = _warmUpSets.last().targetRepetitions,
+          targetRatePerceivedEffort = _warmUpSets.last().targetRatePerceivedEffort,
+          targetRepetitionsInReserve = _warmUpSets.last().targetRepetitionsInReserve,
+          targetPercentage1RM = _warmUpSets.last().targetPercentage1RM,
           percentage1RM = _warmUpSets.last().percentage1RM,
           isPublic = false,
           exerciseID = _exerciseSets!!.exercise.id,
@@ -150,7 +173,39 @@ class WarmUpSetsViewModel(
   }
 
   fun updateWarmUpSetReps(uuid: Uuid, newReps: Int) {
-    _warmUpSets.forEach { if (it.uuid == uuid) it.repetitions = newReps }
+    _warmUpSets.forEach {
+      if (it.uuid == uuid) {
+        it.repetitions = newReps
+        it.targetRepetitions = newReps
+      }
+    }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
+  }
+
+  fun updateWarmUpSetPercentage(uuid: Uuid, newPercentage: Double) {
+    _warmUpSets.forEach {
+      if (it.uuid == uuid) it.targetPercentage1RM = newPercentage
+      it.percentage1RM = newPercentage
+      it.weightPounds = it.weightPounds?.times(newPercentage)
+      it.weightKilograms = it.weightKilograms?.times(newPercentage)
+      it.targetWeightPounds = it.targetWeightPounds?.times(newPercentage)
+      it.targetWeightKilograms = it.targetWeightKilograms?.times(newPercentage)
+    }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
+  }
+
+  fun updateWarmUpSetRIR(uuid: Uuid, newRIR: Double?) {
+    _warmUpSets.forEach { if (it.uuid == uuid) it.targetRepetitionsInReserve = newRIR }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
+  }
+
+  fun updateWarmUpSetRPE(uuid: Uuid, newRPE: Double?) {
+    _warmUpSets.forEach { if (it.uuid == uuid) it.targetRatePerceivedEffort = newRPE }
+    _warmUpSetsFlow.value = _warmUpSets.toList()
+  }
+
+  fun updateWarmUpSetType(uuid: Uuid, newType: SetType) {
+    _warmUpSets.forEach { if (it.uuid == uuid) it.setTypeID = newType }
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
