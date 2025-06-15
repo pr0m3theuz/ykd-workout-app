@@ -72,6 +72,7 @@ fun EquateVolumeLayout(
     }
 
     SetContent(
+//        setNumber = setIndex.inc(),
         setTypeText = setIndex.inc().toString(),
         setTypeColor = Color.White, /* TODO to get from SetType */
         resultsText = calculateNewSetResults(
@@ -87,5 +88,6 @@ fun EquateVolumeLayout(
         onPercentageTextChanged = { percentage -> setPercentageText(percentage) },
         onRepetitionsTextChanged = { repetitions -> setRepetitionsText(repetitions) },
         onRIRTextChanged = { rir -> setRIRText(rir) },
+        onCheckedChange = { checked -> setIndex }
     )
 }
