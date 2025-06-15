@@ -64,6 +64,7 @@ fun WorkingSetLayout(
     rirText = "",
     onPercentageTextChanged = { percentage -> setPercentageText(percentage) },
     onRepetitionsTextChanged = { repetitions -> setRepetitionsText(repetitions) },
-    onRIRTextChanged = {}
+    onRIRTextChanged = {},
+    onCheckedChange = { checked -> setIndex }
   )
 }
