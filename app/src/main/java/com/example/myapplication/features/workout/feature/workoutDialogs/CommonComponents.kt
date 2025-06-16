@@ -34,11 +34,12 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -115,17 +116,17 @@ fun calculateNewSetResults(
   val workingWeightXRepetitionsRPE = "%s x %s @ %s RPE"
 
   // Calculate new working weight and round to nearest integer
-  val newWorkingWeight = percentage?.let { weight?.times(it) }
+//  val newWorkingWeight = percentage?.let { weight?.times(it) }
   val roundedNewWorkingWeight = weight?.roundToInt()
 
   // Format new working weight as double with 2 decimal places and round to nearest integer
-  val formattedNewWorkingWeight = "%.2f".format(newWorkingWeight).toDoubleOrNull() ?: 0.0
+  val formattedNewWorkingWeight = "%.2f".format(weight).toDoubleOrNull() ?: 0.0
   val roundedFormattedNewWorkingWeight =
     formattedNewWorkingWeight.roundToInt() // TODO Round to nearest smallest increment
 
   // Choose appropriate values for formatting the string based on calculated results
   return when {
-    newWorkingWeight?.minus(roundedNewWorkingWeight!!) == 0.0 -> {
+    weight?.minus(roundedNewWorkingWeight!!) == 0.0 -> {
       when {
         rirText != null -> {
           workingWeightXRepetitionsRIR.format(roundedNewWorkingWeight, repetitionsText, rirText)
@@ -191,7 +192,7 @@ fun Textfield(text: String, onValueChange: (String) -> Unit) {
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle =
       TextStyle(
-        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onBackground,
       ),
@@ -238,17 +239,20 @@ fun SetContent(
   setTypeText: String,
   setTypeColor: Color,
   resultsText: String,
-  percentageText: String?,
-  repetitionsText: String?,
+  percentageText: String,
+  repetitionsText: String,
   rirText: String?,
   onPercentageTextChanged: (String) -> Unit,
   onRepetitionsTextChanged: (String) -> Unit,
   onRIRTextChanged: (String) -> Unit,
+  isChecked: Boolean = false, // Or any type that can trigger recomposition when changed
   onCheckedChange: (Boolean) -> Unit,
 ) {
   Row(
-    modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.Start,
+    modifier = Modifier
+      .fillMaxWidth()
+      .background(MaterialTheme.colorScheme.background),
+//    horizontalArrangement = Arrangement.Start,
     verticalAlignment = Alignment.CenterVertically,
   ) {
     val textfieldModifier =
@@ -264,20 +268,20 @@ fun SetContent(
       Modifier
         .padding(4.dp)
         .align(Alignment.CenterVertically)
-        .width(96.dp)
+        .width(110.dp)
         .wrapContentSize(Alignment.Center)
-        .weight(1f, fill = true)
+//        .weight(1f, fill = true)
 
 //    SetTypeButton(setTypeText, setTypeColor) {}
     SetNumber(setTypeText)
 
 
     RoundedBox(textfieldModifier.width(84.dp)) {
-      Textfield(text = percentageText ?: "", onValueChange = onPercentageTextChanged)
+      Textfield(text = percentageText, onValueChange = onPercentageTextChanged)
     }
 
     RoundedBox(textfieldModifier.width(60.dp)) {
-      Textfield(text = repetitionsText ?: "", onValueChange = onRepetitionsTextChanged)
+      Textfield(text = repetitionsText, onValueChange = onRepetitionsTextChanged)
     }
 
     RoundedBox(textfieldModifier.width(60.dp)) {
@@ -287,7 +291,7 @@ fun SetContent(
 
     Box(modifier = resultsModifier, contentAlignment = Alignment.Center) {
       Text(
-        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        fontSize = MaterialTheme.typography.bodySmall.fontSize,
         text = resultsText,
         textAlign = TextAlign.Center,
         autoSize = TextAutoSize.StepBased(
@@ -298,6 +302,7 @@ fun SetContent(
     }
 
     val (checked, setChecked) = remember { mutableStateOf(false) }
+
     Checkbox(
       onCheckedChange = {
         onCheckedChange(it)
@@ -307,13 +312,13 @@ fun SetContent(
       modifier = Modifier.align(Alignment.CenterVertically)
     )
   }
+  HorizontalDivider()
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SetContentPreview() {
   SetContent(
-    setNumber = 1,
     setTypeText = "W",
     setTypeColor = Color.Yellow,
     resultsText = "100 x 5 @ 2 RIR",
@@ -323,25 +328,27 @@ fun SetContentPreview() {
     onPercentageTextChanged = {},
     onRepetitionsTextChanged = {},
     onRIRTextChanged = {},
-    onCheckedChange = { }
+    isChecked = false,
+    onCheckedChange = {},
   )
 }
 
 
 @Composable
 fun SetsHeaderRow() {
+  val textStyle = MaterialTheme.typography.labelSmall
   Row(
     modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.Start,
+//    horizontalArrangement = Arrangement.SpaceEvenly,
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Box(
       modifier = Modifier
-        .padding(PaddingValues(horizontal = 4.dp))
-        .width(42.dp),
+//        .padding(PaddingValues(horizontal = 4.dp))
+        .width(25.dp),
       contentAlignment = Alignment.Center,
     ) {
-      Text("Set")
+      Text("Set", style = textStyle, textAlign = TextAlign.Center)
     }
 
     Box(
@@ -350,7 +357,7 @@ fun SetsHeaderRow() {
         .padding(PaddingValues(horizontal = 4.dp)),
       contentAlignment = Alignment.Center,
     ) {
-      Text("Target Percentage", textAlign = TextAlign.Center)
+      Text("Target Percentage", style = textStyle, textAlign = TextAlign.Center)
     }
 
     Box(
@@ -359,7 +366,7 @@ fun SetsHeaderRow() {
         .width(60.dp),
       contentAlignment = Alignment.Center,
     ) {
-      Text("Target Reps", textAlign = TextAlign.Center)
+      Text("Target Reps", style = textStyle, textAlign = TextAlign.Center)
     }
 
     Box(
@@ -368,16 +375,16 @@ fun SetsHeaderRow() {
         .width(60.dp),
       contentAlignment = Alignment.Center,
     ) {
-      Text("Target RIR", textAlign = TextAlign.Center)
+      Text("Target RIR", style = textStyle, textAlign = TextAlign.Center)
     }
 
     // Blank Space
     Box(
       modifier = Modifier
         .padding(PaddingValues(horizontal = 4.dp))
-        .width(60.dp),
+        .width(100.dp),
       contentAlignment = Alignment.Center,
-    ) { Text("Results", textAlign = TextAlign.Center) }
+    ) { Text("Results", style = textStyle, textAlign = TextAlign.Center) }
   }
 }
 
@@ -388,7 +395,7 @@ fun DialogInput(text: String, onValueChange: (String) -> Unit, onImeAction: () -
       Modifier
         //                        .padding(4.dp)
         .clip(RoundedCornerShape(8.dp))
-        .background(MaterialTheme.colorScheme.tertiaryContainer)
+        .background(MaterialTheme.colorScheme.secondaryContainer)
         .fillMaxWidth()
         .wrapContentSize(Alignment.Center),
     contentAlignment = Alignment.Center,
@@ -523,9 +530,9 @@ fun <T> DropdownField(
     onExpandedChange = { if (enabled) expanded = it },
     modifier = modifier
   ) {
-    val type = MenuAnchorType.PrimaryEditable
+    val type = ExposedDropdownMenuAnchorType.PrimaryEditable
     OutlinedTextField(
-      modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+      modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
       // Display the selected option or the null selection text
       value = selectedOption?.let { optionToString(it) }
         ?: (if (allowNullSelection) NULL_SELECTION_TEXT else ""),
@@ -553,7 +560,12 @@ fun <T> DropdownField(
         // Add actual options
         options.forEach { selectionOption ->
           DropdownMenuItem(
-            text = { Text(optionToString(selectionOption)) },
+            text = {
+              Text(
+                optionToString(selectionOption),
+                style = MaterialTheme.typography.bodySmall
+              )
+            },
             onClick = {
               onOptionSelected(selectionOption)
               expanded = false
@@ -876,6 +888,7 @@ fun ModernizedLoadRIRHeaderRow(
   }
 
   val style = MaterialTheme.typography.bodyMediumEmphasized
+  Spacer(modifier = Modifier.height(16.dp))
   Column(modifier = Modifier.fillMaxWidth()) {
     Text("Modernized Load RIR Editor", style = MaterialTheme.typography.bodyMedium)
     Row(
@@ -883,10 +896,10 @@ fun ModernizedLoadRIRHeaderRow(
         .fillMaxWidth(),
 //    horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-      val modifier = Modifier.width(90.dp)
+      val modifier = Modifier
       // RIR Dropdown
       DropdownField(
-        modifier = modifier,
+        modifier = modifier.width(100.dp),
         label = "RIR",
         options = rirOptions,
         selectedOption = currentRir,
@@ -897,7 +910,7 @@ fun ModernizedLoadRIRHeaderRow(
 
       // RPE Dropdown
       DropdownField(
-        modifier = modifier,
+        modifier = modifier.width(95.dp),
         label = "RPE",
         options = rpeOptions,
         selectedOption = currentRpe,
@@ -908,7 +921,7 @@ fun ModernizedLoadRIRHeaderRow(
 
       // Reps Performed Dropdown
       DropdownField(
-        modifier = Modifier.width(85.dp),
+        modifier = Modifier.width(95.dp),
         label = "Reps",
         options = repsPerformedOptions,
         selectedOption = currentRepsPerformed,
@@ -919,7 +932,7 @@ fun ModernizedLoadRIRHeaderRow(
 
       // Relative Load Percent Dropdown
       DropdownField(
-        modifier = Modifier.width(100.dp),
+        modifier = Modifier.width(110.dp),
         label = "% e1RM",
         options = relativeLoadPercentOptions,
         selectedOption = currentRelativeLoadPercent,
