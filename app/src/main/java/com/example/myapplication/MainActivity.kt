@@ -58,6 +58,7 @@ import com.example.myapplication.common.infrastructure.services.AuthenticationSe
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
+import com.example.myapplication.features.AddWarmUpSetsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseDetailsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseNavigableListDetailScreen
 import com.example.myapplication.features.exercises.ui.ExercisesLazyColumn
@@ -100,6 +101,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
+import org.bson.types.ObjectId
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
@@ -427,6 +429,21 @@ private fun NavGraphBuilder.addWorkoutGraph(
       if (workoutID != null) {
         PreviewNextWorkoutScreen(navController = navController, workoutID = workoutID)
       }
+    }
+
+    composable("addWarmUpSets/{exerciseSetsID}") { navBackStackEntry ->
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
+
+      AddWarmUpSetsScreen(
+        workoutViewModel = workoutViewModel,
+        onNavigateBack = { navController.popBackStack() },
+        exerciseSetsID = ObjectId(exerciseSetsID)
+        // workoutViewModel can be koinViewModel() here if not passed from parent
+      )
+
     }
   }
 }
