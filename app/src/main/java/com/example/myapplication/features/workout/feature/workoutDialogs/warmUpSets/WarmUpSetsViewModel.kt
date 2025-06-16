@@ -3,6 +3,7 @@
 package com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets
 
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -58,9 +60,9 @@ class WarmUpSetsViewModel(
     _workingSetWeight.value = newWorkingWeight
   }
 
-  fun getExerciseSets(exerciseSets: ExerciseExerciseSets) {
+  fun setExerciseSets(exerciseSets: ExerciseExerciseSets) {
     _exerciseSets = exerciseSets
-    exerciseWeightUnit = exerciseSets.exercise.weightUnit
+    exerciseWeightUnit = exerciseSets.exercise.weightUnit ?: userDefaultWeightUnit
     _warmUpSets = initWarmUpSets(exerciseSets)
     _warmUpSetsFlow.value = _warmUpSets.toList()
     getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
@@ -87,23 +89,72 @@ class WarmUpSetsViewModel(
     sets: List<Set>,
     modernizedLoadRIRSetting: ModernizedLoadRIR?
   ) {
+    Log.d(
+      "WarmUpSetsViewModel.applySettingsToSelectedSets",
+      "applySettingsToSelectedSets: $modernizedLoadRIRSetting"
+    )
+    Log.d("WarmUpSetsViewModel.applySettingsToSelectedSets", "sets: $sets")
+
     modernizedLoadRIRSetting?.let { modernlizedLoadRIR ->
-      sets.forEach { set ->
-        _warmUpSets.find { it.uuid == set.uuid }?.let {
-          it.targetRepetitions = modernlizedLoadRIR.repsPerformed
-          it.targetRepetitionsInReserve = modernlizedLoadRIR.rir
-          it.targetRatePerceivedEffort = modernlizedLoadRIR.rpe
-          it.targetPercentage1RM = modernlizedLoadRIR.relativeLoadPercent
+      val updatedWarmUpSets = _warmUpSets.map { existingSet ->
+        if (sets.any { it.uuid == existingSet.uuid }) {
+          Log.d(
+            "WarmUpSetsViewModel.applySettingsToSelectedSets",
+            "Updating set: ${existingSet.uuid}"
+          )
+          val relativeLoad = modernlizedLoadRIR.relativeLoadPercent / 100
+          val (newWeightPounds: Double, newWeightKilograms: Double) =
+            when (exerciseWeightUnit) {
+              MassUnit.POUNDS.abbreviation -> {
+                val newPounds: Double = _workingSetWeight.value * relativeLoad
+                val newKilograms: Double = newPounds.convertPoundToKg()
+                Pair(newPounds, newKilograms)
+              }
+
+              MassUnit.KILOGRAMS.abbreviation -> {
+                val newWeightKilograms = _workingSetWeight.value.times(relativeLoad)
+                val newPounds: Double = newWeightKilograms.convertKgToPound()
+                Pair(newPounds, newWeightKilograms)
+              }
+
+              else -> {
+                // Assume Pounds if no unit is specified/default
+                val newPounds: Double = _workingSetWeight.value * relativeLoad
+                val newKilograms: Double = newPounds.convertPoundToKg()
+                Pair(newPounds, newKilograms)
+              }
+            }
+
+          existingSet.copy(
+            targetRepetitions = modernlizedLoadRIR.repsPerformed,
+            targetRepetitionsInReserve = modernlizedLoadRIR.rir,
+            targetRatePerceivedEffort = modernlizedLoadRIR.rpe,
+            targetPercentage1RM = relativeLoad,
+            percentage1RM = relativeLoad,
+            targetWeightPounds = newWeightPounds,
+            weightPounds = newWeightPounds,
+            targetWeightKilograms = newWeightKilograms,
+            weightKilograms = newWeightKilograms
+          )
+        } else {
+          existingSet
         }
       }
+      updatedWarmUpSets.forEach {
+        Log.d(
+          "WarmUpSetsViewModel.applySettingsToSelectedSets",
+          "applySettingsToSelectedSets results for set ${it.setNumber}:\n ${
+            Json.encodeToString(it)
+          }"
+        )
+      }
+      _warmUpSets = updatedWarmUpSets.toMutableList()
+      _warmUpSetsFlow.value = updatedWarmUpSets
     }
-
-    _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
+
   fun addSet() {
-
-
     requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
 // TODO Apply to WorkingSets & EquateVolume
     if (_warmUpSets.isNotEmpty()) {
@@ -214,9 +265,9 @@ class WarmUpSetsViewModel(
     return MutableList(3) { index ->
       Set(
         setNumber = index.plus(1),
-        weightPounds = 100.00,
-        repetitions = 10,
-        percentage1RM = 1.0,
+//        weightPounds = 100.00,
+//        repetitions = 10,
+//        percentage1RM = 1.0,
         setTypeID = SetType.warmUpSet,
         progressionSchemeID =
           ProgressionType.LINEAR_PROGRESSION, // TODO Replace with progressionScheme.progressionSchemeID
