@@ -88,6 +88,7 @@ fun EquateVolumeLayout(
         onPercentageTextChanged = { percentage -> setPercentageText(percentage) },
         onRepetitionsTextChanged = { repetitions -> setRepetitionsText(repetitions) },
         onRIRTextChanged = { rir -> setRIRText(rir) },
-        onCheckedChange = { checked -> setIndex }
+        isChecked = false,
+        onCheckedChange = { checked -> setIndex },
     )
 }
