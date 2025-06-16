@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.features.workout.feature.workoutDialogs.AddSetText
 import com.example.myapplication.features.workout.feature.workoutDialogs.SwipeToDismissBoxListItem
 import com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets.WarmUpSetsViewModel
@@ -25,7 +26,11 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalMaterialApi::class)
 // @Preview
 @Composable
-fun WarmUpSetLazyColumn(warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel()) {
+fun WarmUpSetLazyColumn(
+  warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
+  onCheckedChange: (warmUpSet: Set, isChecked: Boolean) -> Unit,
+//  selectedSets: Map<Set, Boolean>,
+) {
   val listState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
   val coroutineScope = rememberCoroutineScope()
@@ -43,7 +48,14 @@ fun WarmUpSetLazyColumn(warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel
 
       SwipeToDismissBoxListItem(
         removeSet = { warmUpSetsViewModel.remove(warmUpSet.uuid) },
-        SetLayout = { WarmUpSetLayout(setIndex = index, warmUpSet = warmUpSet) },
+        SetLayout = {
+          WarmUpSetLayout(
+            setIndex = index,
+            warmUpSet = warmUpSet,
+//            checked = selectedSets[warmUpSet] ?: false,
+            onCheckedChange = onCheckedChange
+          )
+        },
       )
     }
   }
