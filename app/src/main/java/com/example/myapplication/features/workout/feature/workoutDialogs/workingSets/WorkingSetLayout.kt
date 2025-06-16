@@ -51,7 +51,7 @@ fun WorkingSetLayout(
 
   SetContent(
     setTypeText = setIndex.inc().toString(),
-    setTypeColor = Color.White /* TODO to get from SetType */,
+    setTypeColor = Color.White, /* TODO to get from SetType */
     resultsText = calculateNewSetResults(
       workingWeight,
       workingSetPercentage,
@@ -65,6 +65,7 @@ fun WorkingSetLayout(
     onPercentageTextChanged = { percentage -> setPercentageText(percentage) },
     onRepetitionsTextChanged = { repetitions -> setRepetitionsText(repetitions) },
     onRIRTextChanged = {},
-    onCheckedChange = { checked -> setIndex }
+    isChecked = false,
+    onCheckedChange = { checked -> setIndex },
   )
 }
