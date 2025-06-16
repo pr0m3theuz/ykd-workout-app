@@ -109,20 +109,25 @@ class WorkoutViewModel(
   private val savedStateHandle: SavedStateHandle,
   private val userProfileManager: UserProfileManager
 ) : ViewModel() {
+
+  // region User Profile
   private val user: UserProfile? = userProfileManager.userProfile.value
+
+  val userDefaultWeightUnit: String = manageWorkoutUseCase.userDefaultWeightUnit
+
+  // endregion
 
   private val WARM_UP_SET = SetType.warmUpSet
 
+  // region Workout Count-up Timer
   var isWorkoutActive: Boolean
     get() = savedStateHandle.get<Boolean>(IS_WORKOUT_ACTIVE) ?: false
     set(value) = savedStateHandle.set(IS_WORKOUT_ACTIVE, value)
-
   private val REQUEST_CODE = 0
+
   private val notifyPendingIntent: PendingIntent
 
   private var workoutDuration = MutableStateFlow<Long>(0L)
-//    get() = savedStateHandle.get<Long>(WORKOUT_DURATION) ?: 0L
-//    set(value) = savedStateHandle.set(WORKOUT_DURATION, value)
 
   private var pausedElapsedTime: Long
     get() = savedStateHandle.get<Long>(WORKOUT_PAUSED_ELAPSED_TIME) ?: 0L
@@ -144,8 +149,8 @@ class WorkoutViewModel(
           "$minutes:${seconds.toString().padStart(2, '0')}"
         }
       }
-
   private val _workoutDurationString = MutableStateFlow(_workoutDurationFormatted)
+
   val workoutDurationString: StateFlow<String>
     get() = _workoutDurationString.asStateFlow()
 
@@ -183,25 +188,28 @@ class WorkoutViewModel(
     _isWorkoutCountUpTimerPaused.value = true
   }
 
-  //  Rest Timer
+  // endregion
+
+  // region Notification
   private val notificationManager =
     ContextCompat.getSystemService(application, NotificationManager::class.java)
             as NotificationManager
-
   private val name = getString(application, R.string.notification_channel_id)
   private val descriptionText = getString(application, R.string.notification_channel_id)
+
   private val importance = NotificationManager.IMPORTANCE_DEFAULT
 
   private val channel =
     NotificationChannel(name, name, importance).apply { description = descriptionText }
 
   private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
   private val notifyIntent = Intent(application, AlarmReceiver::class.java)
+
   //  private val notifyIntent = MainActivity.newIntent(application)
 
-  val userDefaultWeightUnit: String = manageWorkoutUseCase.userDefaultWeightUnit
+  //endregion
 
+  // region Init
   init {
     //    startWorkoutTimer()
     // testSaveStateHandle() // Potentially remove or adjust based on DataStore as SOT
@@ -310,6 +318,9 @@ class WorkoutViewModel(
       )
   }
 
+  // endregion
+
+  // region Rest Timer
 
   private fun testSaveStateHandle() {
     savedStateHandle.get<String?>(WORKOUT_DETAILS)
@@ -530,12 +541,12 @@ class WorkoutViewModel(
        * Doesn't allow the new completed set to cancel the timer if one is already running
        */
       if (_state != TimerState.RUNNING) {
-        if (foundExercise!!.warmUpSetRestTimerEnabled && (foundSet!!.setTypeID == WARM_UP_SET)) {
-          _timerDuration = foundExercise!!.warmUpSetRestInWholeMilliseconds
+        if (foundExercise.warmUpSetRestTimerEnabled && (foundSet.setTypeID == WARM_UP_SET)) {
+          _timerDuration = foundExercise.warmUpSetRestInWholeMilliseconds
 
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
-        } else if (foundExercise!!.workingSetRestTimerEnabled && (foundSet!!.setTypeID != WARM_UP_SET)) {
-          _timerDuration = foundExercise!!.workingSetRestInWholeMilliseconds
+        } else if (foundExercise.workingSetRestTimerEnabled && (foundSet.setTypeID != WARM_UP_SET)) {
+          _timerDuration = foundExercise.workingSetRestInWholeMilliseconds
 
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
         }
@@ -591,12 +602,10 @@ class WorkoutViewModel(
       resetTimerState()
     }
   }
+  // endregion
 
-  private var _completedWorkout = MutableStateFlow<Workout?>(null)
-  val completedWorkout
-    get() = _completedWorkout.asStateFlow()
+  // region WorkoutPreviewScreen Data
 
-  //WorkoutPreviewScreen Data
   // The workout plan *before* progression logic ran
   private var originalWorkout: Workout? = null
 
@@ -609,9 +618,158 @@ class WorkoutViewModel(
   val overallProgressionSuccess = mutableStateOf(true)
   val progressionMessage = mutableStateOf("")
 
-  //    Workout
+  @OptIn(ExperimentalUuidApi::class)
+  fun setupWorkoutPreview(
+    workoutToPrepare: Workout,
+    previousWorkout: Workout // Needed for look-back progression
+  ) {
+    originalWorkout = workoutToPrepare.deepCopy() // Store a deep copy of the original state
+
+    // --- Simulate Running Progression Logic (Method B: Look Back) ---
+    // In a real app, this would call your actual WorkoutProgressorB logic
+    val results = mutableMapOf<String, ProgressionResults>()
+    workoutToPrepare.workoutItems.forEach { currentWorkoutItem ->
+      when (currentWorkoutItem) {
+        is ExerciseSets -> {
+          val progressionType =
+            currentWorkoutItem.sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
+          // Simulate progression call (replace with actual call)
+          val previousExerciseSets =
+            previousWorkout.workoutItems.find { (it as? ExerciseSets)?.exerciseID == currentWorkoutItem.exerciseID } as? ExerciseSets
+
+          if (progressionType != null) {
+
+            previousExerciseSets?.sets?.filter { it.setCompleted }
+              ?.let {
+                results[currentWorkoutItem.id.toString()] =
+                  selectProgression(progressionType).invoke(it, currentWorkoutItem.sets)
+              }
+          } else {
+            // No progression for this currentWorkoutItem]
+            results[currentWorkoutItem.id.toString()] = ProgressionResults(
+              // TODO Should this be null if no progression logic applied?
+              // TODO Or should previous workout be shown regardless?
+              completedSets = previousExerciseSets?.sets,
+              currentSets = currentWorkoutItem.sets,
+              outcome = ProgressionOutcome.NULL,
+              message = "No progression logic applied"
+            )
+          }
+        }
+
+        is Superset -> {
+          currentWorkoutItem.exercisesSets.forEach { currentSupersetExerciseSets ->
+            val progressionType =
+              currentSupersetExerciseSets.sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
+            val previousSupersetExerciseSets =
+              previousWorkout.workoutItems.find { (it as? ExerciseSets)?.exerciseID == currentSupersetExerciseSets.exerciseID } as? ExerciseSets
+
+            if (progressionType != null) {
+              previousSupersetExerciseSets?.sets?.filter { it.setCompleted }
+                ?.let {
+                  results[currentSupersetExerciseSets.id.toString()] =
+                    selectProgression(progressionType).invoke(it, currentSupersetExerciseSets.sets)
+                }
+            } else {
+              // No progression for this currentWorkoutItem]
+              results[currentSupersetExerciseSets.id.toString()] = ProgressionResults(
+                // TODO Should this be null if no progression logic applied?
+                // TODO Or should previous workout be shown regardless?
+                completedSets = previousSupersetExerciseSets?.sets,
+                currentSets = currentSupersetExerciseSets.sets,
+                outcome = ProgressionOutcome.NULL,
+                message = "No progression logic applied"
+              ) // No progression for this currentWorkoutItem]
+            }
+          }
+        }
+      }
+    }
+    progressionResults = results
+    // --- End Simulation ---
+
+    // Create the preview data structure
+    previewItems.clear()
+    requireNotNull(originalWorkout) { "Original workout cannot be null" }
+    previewItems.addAll(
+      createWorkoutPreview(
+        previousWorkout,
+        originalWorkout!!,
+        progressionResults
+      )
+    )
+
+    // Determine overall status
+    val failures = previewItems.count {
+      (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.FAILED) ||
+              (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.FAILED })
+    }
+    val successes = previewItems.count {
+      (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.PROGRESSED) ||
+              (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.PROGRESSED })
+    }
+
+    overallProgressionSuccess.value = failures == 0
+    progressionMessage.value = when {
+      failures > 0 -> "Progression failed for $failures exercise(s)."
+      successes > 0 -> "All $successes progression(s) will be applied."
+      else -> "No progressions applied (targets may not have been met)."
+    }
+  }
+
+  fun acceptProgressions() {
+    // Create the final workout object by applying successful progressions
+    val finalWorkoutItems = originalWorkout?.workoutItems?.map { originalItem ->
+      when (originalItem) {
+        is ExerciseSets -> {
+          val preview =
+            previewItems.find { (it as? PreviewExerciseSets)?.originalItem?.id == originalItem.id } as? PreviewExerciseSets
+          if (preview?.overallOutcome == ProgressionOutcome.PROGRESSED || preview?.overallOutcome == ProgressionOutcome.UNCHANGED) {
+            // Apply the progressed sets if success or unchanged
+            originalItem.copy(sets = preview.previewSets.map { it.progressedSet }.toMutableList())
+          } else {
+            // Revert to original if failed or rejected implicitly (or handle explicitly)
+            originalItem // Return original
+          }
+        }
+
+        is Superset -> {
+          originalItem.copy(exercisesSets = originalItem.exercisesSets.map { exSets ->
+            val preview =
+              (previewItems.find { (it as? PreviewSuperset)?.originalItem?.id == originalItem.id } as? PreviewSuperset)
+                ?.previewExerciseSets?.find { it.originalItem.id == exSets.id }
+
+            if (preview?.overallOutcome == ProgressionOutcome.PROGRESSED || preview?.overallOutcome == ProgressionOutcome.UNCHANGED) {
+              exSets.copy(sets = preview.previewSets.map { it.progressedSet }.toMutableList())
+            } else {
+              exSets
+            }
+          }.toMutableList())
+        }
+      }
+    }?.toMutableList()
+
+    if (finalWorkoutItems != null) {
+      originalWorkout?.copy(workoutItems = finalWorkoutItems)
+        ?.let {
+          copyWorkoutFromWorkoutTemplate(it)
+          previewItems.clear()
+        }
+    }
+  }
+
+  fun rejectProgressions() {
+    // Return the original workout plan without any changes
+    originalWorkout?.let { copyWorkoutFromWorkoutTemplate(it) }
+    originalWorkout = null
+    previewItems.clear()
+  }
+
+  // endregion
+
+  // region Workout Data
   private lateinit var initialWorkoutData: Workout
-//  private var _workoutData: Workout = initWorkout()
+  //  private var _workoutData: Workout = initWorkout()
 
   /*
     private var workoutDetails: Workout
@@ -653,7 +811,6 @@ class WorkoutViewModel(
   }
 
   private var autoSaveJob: Job? = null // Keep track of the job
-
 
   private fun startAutoSavingWorkout() {
     Log.d(
@@ -805,6 +962,9 @@ class WorkoutViewModel(
     }
   }
 
+  // endregion
+
+  // region Loading Workout Template
   fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {
     // Similar to getWorkoutByID, this could override DataStore's loaded workout.
     // Ensure this is the desired behavior.
@@ -876,19 +1036,23 @@ class WorkoutViewModel(
     )
   }
 
-// TODO Think out how to get Previous Set from the last time the exercise was performed
-//   and what data structure to store them in
+
+  // TODO Think out how to get Previous Set from the last time the exercise was performed
+  //   and what data structure to store them in
 
   /* private fun copySetsFromPreviousWorkout(previousSets: List<Set>): List<Set> {
     return manageWorkoutUseCase.copySetsFromPreviousWorkout(previousSets)
   }*/
-
   fun populatePreviousSetField(exerciseID: ObjectId, setNumber: Int): Set? {
     return manageWorkoutUseCase.getPreviousSetForExercise(exerciseID, setNumber)
   }
 
-  //  private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
+  // endregion
+
+  // region Workout Notes
   private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
+
+
 //    get() = savedStateHandle.get<MutableList<WorkoutNote>>(WORKOUT_NOTES) ?: mutableListOf() // Removed SavedStateHandle
 //    set(value) = savedStateHandle.set(WORKOUT_NOTES, value)
 
@@ -939,18 +1103,12 @@ class WorkoutViewModel(
     _workoutNotes.value = _workoutNotesData.toList()
   }
 
-  private fun stopWorkoutTimer() {
-    workoutCountUpTimer.stop()
-    workoutDetails!!.workoutEnded = Clock.System.now()
-    workoutDetails!!.workoutDuration = workoutDuration.value
-    _workout.value = workoutDetails
-    // TODO Navigate to Workout Complete Screen & Summary
-  }
+  // endregion
 
-//    ExerciseExerciseSets
-//  private var _exercisesSetsData = mutableListOf<ExerciseExerciseSets>()
+  // region Workout Components
+  //  private var _exercisesSetsData = mutableListOf<ExerciseExerciseSets>()
 
-//  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
+  //  private var _exercisesSets = MutableStateFlow(listOf<ExerciseExerciseSets>())
 
   private var _workoutComponents: MutableList<WorkoutComponent> = mutableListOf() /*=
     savedStateHandle.saveable(
@@ -1077,6 +1235,9 @@ class WorkoutViewModel(
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
+  // endregion
+
+  // region Exercise Notes
   fun addExerciseNote(exerciseSets: ExerciseExerciseSets) {
     exerciseSets.notes.add(
       ExerciseNote().apply {
@@ -1090,11 +1251,14 @@ class WorkoutViewModel(
     updateExercisesNotesData(exerciseSets, exerciseSets.notes)
   }
 
-  fun removeExerciseNote(exerciseSets: ExerciseExerciseSets, exerciseNote: ExerciseNote) {
-    exerciseSets.notes.minusElement(exerciseNote)
-
-    updateExercisesNotesData(exerciseSets, exerciseSets.notes)
-    Log.i("removeExerciseNote", "removeExerciseNote: ${exerciseSets.notes.size}")
+  fun removeExerciseNote(
+    targetExerciseSets: ExerciseExerciseSets,
+    exerciseNoteToRemove: ExerciseNote
+  ) {
+    val updatedNotes = targetExerciseSets.notes.filter { it != exerciseNoteToRemove }
+    targetExerciseSets.notes = updatedNotes.toMutableList()
+    updateExercisesNotesData(targetExerciseSets, targetExerciseSets.notes)
+    Log.i("removeExerciseNote", "removeExerciseNote: ${targetExerciseSets.notes.size}")
   }
 
   fun pinExerciseNote(
@@ -1118,6 +1282,8 @@ class WorkoutViewModel(
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
+  // endregion
+
 //  private fun allSets(exerciseSets: List<ExerciseExerciseSets>): MutableList<Set> {
 //    val setsList = mutableListOf<Set>()
 //    exerciseSets.forEach { exerciseSet ->
@@ -1128,6 +1294,17 @@ class WorkoutViewModel(
 //  fun getSetData(setUUID: RealmUUID): Set {
 //    return allSets().first { it.uuid == setUUID }
 
+  // region Update Exercise Sets Data
+
+  fun replaceExerciseInExerciseSets(exerciseSets: ExerciseExerciseSets, newExercise: Exercise) {
+    setWorkoutComponents(
+      manageWorkoutUseCase.replaceExerciseInExerciseSets(
+        _workoutComponents,
+        exerciseSets,
+        newExercise
+      )
+    )
+  }
   private fun updateExerciseExerciseSetsData(workoutComponent: ExerciseExerciseSets) {
 
     setWorkoutComponents(
@@ -1139,12 +1316,8 @@ class WorkoutViewModel(
     //    _allSets.value = allSets(_exercisesSets.value).toList()
   }
 
-//  }
-
-//  }
-
   fun updateSetWeight(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newWeight: Double?) {
-    val weightUnit = exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit
+    val weightUnit = exerciseSets.exercise.weightUnit ?: userDefaultWeightUnit
     exerciseSets.updateSetWeight(uuid = setUUID, newWeight = newWeight, weightUnit = weightUnit)
 
     updateExerciseExerciseSetsData(exerciseSets)
@@ -1184,7 +1357,7 @@ class WorkoutViewModel(
   fun getWorkingSetWeight(exerciseSets: ExerciseExerciseSets): Double? {
     // TODO Get Previous Working Set if Sets is empty
 
-    return when (exerciseSets.exercise?.weightUnit) {
+    return when (exerciseSets.exercise.weightUnit) {
       MassUnit.KILOGRAMS.abbreviation ->
         exerciseSets.sets.firstOrNull { it.setTypeID != WARM_UP_SET }?.weightKilograms
 
@@ -1271,6 +1444,21 @@ class WorkoutViewModel(
       exercise.workingSetRestTimerEnabled = enable
     }
     viewModelScope.launch { exerciseRepository.updateExercise(exercise) }
+  }
+
+  // endregion
+
+  // region Saving Workout
+  private var _completedWorkout = MutableStateFlow<Workout?>(null)
+  val completedWorkout
+    get() = _completedWorkout.asStateFlow()
+
+  private fun stopWorkoutTimer() {
+    workoutCountUpTimer.stop()
+    workoutDetails!!.workoutEnded = Clock.System.now()
+    workoutDetails!!.workoutDuration = workoutDuration.value
+    _workout.value = workoutDetails
+    // TODO Navigate to Workout Complete Screen & Summary
   }
 
   fun checkAllSetsComplete(): Pair<Int, Int> {
@@ -1385,163 +1573,31 @@ class WorkoutViewModel(
     setWorkoutComponents(manageWorkoutUseCase.removeUncompletedSets(_workoutComponents))
   }
 
-  fun replaceExerciseInExerciseSets(exerciseSets: ExerciseExerciseSets, newExercise: Exercise) {
-    setWorkoutComponents(
-      manageWorkoutUseCase.replaceExerciseInExerciseSets(
-        _workoutComponents,
-        exerciseSets,
-        newExercise
-      )
-    )
-  }
+  // endregion
 
-  @OptIn(ExperimentalUuidApi::class)
-  fun setupWorkoutPreview(
-    workoutToPrepare: Workout,
-    previousWorkout: Workout // Needed for look-back progression
-  ) {
-    originalWorkout = workoutToPrepare.deepCopy() // Store a deep copy of the original state
-
-    // --- Simulate Running Progression Logic (Method B: Look Back) ---
-    // In a real app, this would call your actual WorkoutProgressorB logic
-    val results = mutableMapOf<String, ProgressionResults>()
-    workoutToPrepare.workoutItems.forEach { currentWorkoutItem ->
-      when (currentWorkoutItem) {
-        is ExerciseSets -> {
-          val progressionType =
-            currentWorkoutItem.sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
-          // Simulate progression call (replace with actual call)
-          val previousExerciseSets =
-            previousWorkout.workoutItems.find { (it as? ExerciseSets)?.exerciseID == currentWorkoutItem.exerciseID } as? ExerciseSets
-
-          if (progressionType != null) {
-
-            previousExerciseSets?.sets?.filter { it.setCompleted }
-              ?.let {
-                results[currentWorkoutItem.id.toString()] =
-                  selectProgression(progressionType).invoke(it, currentWorkoutItem.sets)
-              }
-          } else {
-            // No progression for this currentWorkoutItem]
-            results[currentWorkoutItem.id.toString()] = ProgressionResults(
-              // TODO Should this be null if no progression logic applied?
-              // TODO Or should previous workout be shown regardless?
-              completedSets = previousExerciseSets?.sets,
-              currentSets = currentWorkoutItem.sets,
-              outcome = ProgressionOutcome.NULL,
-              message = "No progression logic applied"
-            )
+  // region Utils
+  fun getExerciseSetsByID(exerciseSetsID: ObjectId): ExerciseExerciseSets? {
+    _workoutComponents.forEach {
+      when (it) {
+        is ExerciseExerciseSets -> {
+          if (it.id == exerciseSetsID) {
+            return it
           }
         }
 
-        is Superset -> {
-          currentWorkoutItem.exercisesSets.forEach { currentSupersetExerciseSets ->
-            val progressionType =
-              currentSupersetExerciseSets.sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
-            val previousSupersetExerciseSets =
-              previousWorkout.workoutItems.find { (it as? ExerciseSets)?.exerciseID == currentSupersetExerciseSets.exerciseID } as? ExerciseSets
-
-            if (progressionType != null) {
-              previousSupersetExerciseSets?.sets?.filter { it.setCompleted }
-                ?.let {
-                  results[currentSupersetExerciseSets.id.toString()] =
-                    selectProgression(progressionType).invoke(it, currentSupersetExerciseSets.sets)
-                }
-            } else {
-              // No progression for this currentWorkoutItem]
-              results[currentSupersetExerciseSets.id.toString()] = ProgressionResults(
-                // TODO Should this be null if no progression logic applied?
-                // TODO Or should previous workout be shown regardless?
-                completedSets = previousSupersetExerciseSets?.sets,
-                currentSets = currentSupersetExerciseSets.sets,
-                outcome = ProgressionOutcome.NULL,
-                message = "No progression logic applied"
-              ) // No progression for this currentWorkoutItem]
+        is SupersetExercisesSets -> {
+          it.exercisesSets.forEach { exerciseSets ->
+            if (exerciseSets.id == exerciseSetsID) {
+              return exerciseSets
             }
           }
         }
       }
     }
-    progressionResults = results
-    // --- End Simulation ---
-
-    // Create the preview data structure
-    previewItems.clear()
-    requireNotNull(originalWorkout) { "Original workout cannot be null" }
-    previewItems.addAll(
-      createWorkoutPreview(
-        previousWorkout,
-        originalWorkout!!,
-        progressionResults
-      )
-    )
-
-    // Determine overall status
-    val failures = previewItems.count {
-      (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.FAILED) ||
-              (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.FAILED })
-    }
-    val successes = previewItems.count {
-      (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.PROGRESSED) ||
-              (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.PROGRESSED })
-    }
-
-    overallProgressionSuccess.value = failures == 0
-    progressionMessage.value = when {
-      failures > 0 -> "Progression failed for $failures exercise(s)."
-      successes > 0 -> "All $successes progression(s) will be applied."
-      else -> "No progressions applied (targets may not have been met)."
-    }
+    return null
   }
 
-  fun acceptProgressions() {
-    // Create the final workout object by applying successful progressions
-    val finalWorkoutItems = originalWorkout?.workoutItems?.map { originalItem ->
-      when (originalItem) {
-        is ExerciseSets -> {
-          val preview =
-            previewItems.find { (it as? PreviewExerciseSets)?.originalItem?.id == originalItem.id } as? PreviewExerciseSets
-          if (preview?.overallOutcome == ProgressionOutcome.PROGRESSED || preview?.overallOutcome == ProgressionOutcome.UNCHANGED) {
-            // Apply the progressed sets if success or unchanged
-            originalItem.copy(sets = preview.previewSets.map { it.progressedSet }.toMutableList())
-          } else {
-            // Revert to original if failed or rejected implicitly (or handle explicitly)
-            originalItem // Return original
-          }
-        }
-
-        is Superset -> {
-          originalItem.copy(exercisesSets = originalItem.exercisesSets.map { exSets ->
-            val preview =
-              (previewItems.find { (it as? PreviewSuperset)?.originalItem?.id == originalItem.id } as? PreviewSuperset)
-                ?.previewExerciseSets?.find { it.originalItem.id == exSets.id }
-
-            if (preview?.overallOutcome == ProgressionOutcome.PROGRESSED || preview?.overallOutcome == ProgressionOutcome.UNCHANGED) {
-              exSets.copy(sets = preview.previewSets.map { it.progressedSet }.toMutableList())
-            } else {
-              exSets
-            }
-          }.toMutableList())
-        }
-      }
-    }?.toMutableList()
-
-    if (finalWorkoutItems != null) {
-      originalWorkout?.copy(workoutItems = finalWorkoutItems)
-        ?.let {
-          copyWorkoutFromWorkoutTemplate(it)
-          previewItems.clear()
-        }
-    }
-  }
-
-  fun rejectProgressions() {
-    // Return the original workout plan without any changes
-    originalWorkout?.let { copyWorkoutFromWorkoutTemplate(it) }
-    originalWorkout = null
-    previewItems.clear()
-  }
-
+  // endregion
 }
 
 private fun initWorkout(): Workout {
