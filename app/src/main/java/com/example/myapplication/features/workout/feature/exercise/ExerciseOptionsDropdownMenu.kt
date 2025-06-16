@@ -99,7 +99,10 @@ fun ExerciseOptionsDropdownMenu(
       )
       DropdownMenuItem(
         text = { Text("Add Warm-up Sets") },
-        onClick = { openAddWarmUpSetsDialog = true }
+        onClick = {
+          navController.navigate("addWarmUpSets/${exerciseSets.id.toHexString()}")
+//          openAddWarmUpSetsDialog = true
+        }
       )
       DropdownMenuItem(
         text = { Text("Add Working Sets") },
@@ -188,12 +191,12 @@ fun ExerciseOptionsDropdownMenu(
     )
 
     // TODO Add exerciseSets to each of the below functions
-    if (openAddWarmUpSetsDialog) {
-      AddWarmUpSetsScreen(
-        openDialog = { close -> closeAddWarmUpSetsDialog(close) },
-        exerciseSets = exerciseSets
-      )
-    }
+    /*    if (openAddWarmUpSetsDialog) {
+          AddWarmUpSetsScreen(
+            openDialog = { close -> closeAddWarmUpSetsDialog(close) },
+            exerciseSets = exerciseSets
+          )
+        }*/
     if (openAddWorkingSetsDialog) {
       AddWorkingSetsScreen(
         workoutViewModel = workoutViewModel,
