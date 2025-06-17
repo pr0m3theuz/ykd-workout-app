@@ -273,7 +273,8 @@ class WarmUpSetsViewModel(
   fun updateWarmUpSetReps(uuid: Uuid, newReps: Int) {
     _warmUpSets.forEach {
       if (it.uuid == uuid) {
-        it.repetitions = newReps
+        it.lazyListItemID = newLazyListItemID()
+//        it.repetitions = newReps
         it.targetRepetitions = newReps
       }
     }
@@ -284,7 +285,7 @@ class WarmUpSetsViewModel(
     _warmUpSets.forEach {
       if (it.uuid == uuid) {
         it.targetPercentage1RM = newPercentage
-        it.percentage1RM = newPercentage / 100
+        it.percentage1RM = newPercentage
 //      it.weightPounds = it.weightPounds?.times(newPercentage)
 //      it.weightKilograms = it.weightKilograms?.times(newPercentage)
         it.targetWeightPounds = _workingSetWeight.value.times(newPercentage)
