@@ -11,6 +11,7 @@
 
 package com.example.myapplication.common.domain.model
 
+import android.util.Log
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
@@ -194,29 +195,57 @@ fun ExerciseExerciseSets.updateSetType(uuid: Uuid, setType: SetType) {
 }
 
 fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
-  for (index in warmUpSets.indices) {
-    sets.add(
-      index,
-      //      warmUpSets[index]
-      //      TODO: Check this
-      Set(
-        setNumber = warmUpSets[index].setNumber,
-        weightPounds = warmUpSets[index].weightPounds,
-        weightKilograms = warmUpSets[index].weightKilograms,
-        repetitions = warmUpSets[index].repetitions,
-        ratePerceivedEffort = warmUpSets[index].ratePerceivedEffort,
-        repetitionsInReserve = warmUpSets[index].repetitionsInReserve,
-        setTypeID = warmUpSets[index].setTypeID,
-        percentage1RM = warmUpSets[index].percentage1RM,
-        exerciseID = this@addWarmUpSets.exercise.id,
-        progressionSchemeID = warmUpSets[index].progressionSchemeID,
-        workoutID = this@addWarmUpSets.workoutID,
-        exerciseSetsID = this@addWarmUpSets.id,
-        ownerID = this@addWarmUpSets.ownerID.toString(),
-        isPublic = this@addWarmUpSets.isPublic,
-      ),
+  val TAG = "ExerciseExerciseSets"
+  // Log initial state
+  Log.d(
+    TAG,
+    "addWarmUpSets called. Adding ${warmUpSets.size} warm-up sets to ${this.sets.size} existing sets."
+  )
+
+  // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
+  val newWarmUpSets = warmUpSets.map { warmUpSet ->
+    Set(
+      setNumber = -1, // Placeholder, will be replaced
+      weightPounds = warmUpSet.weightPounds,
+      targetWeightPounds = warmUpSet.targetWeightPounds,
+      weightKilograms = warmUpSet.weightKilograms,
+      targetWeightKilograms = warmUpSet.targetWeightKilograms,
+      repetitions = warmUpSet.repetitions,
+      targetRepetitions = warmUpSet.targetRepetitions,
+      ratePerceivedEffort = warmUpSet.ratePerceivedEffort,
+      targetRatePerceivedEffort = warmUpSet.targetRatePerceivedEffort,
+      repetitionsInReserve = warmUpSet.repetitionsInReserve,
+      targetRepetitionsInReserve = warmUpSet.targetRepetitionsInReserve,
+      setTypeID = warmUpSet.setTypeID,
+      percentage1RM = warmUpSet.percentage1RM,
+      targetPercentage1RM = warmUpSet.targetPercentage1RM,
+      exerciseID = this@addWarmUpSets.exercise.id,
+      progressionSchemeID = warmUpSet.progressionSchemeID,
+      workoutID = this@addWarmUpSets.workoutID,
+      exerciseSetsID = this@addWarmUpSets.id,
+      ownerID = this@addWarmUpSets.ownerID.toString(),
+      isPublic = this@addWarmUpSets.isPublic,
     )
   }
+  Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
+
+  // 2. Combine the new warm-up sets and existing sets into a single list.
+  val allSets = newWarmUpSets + this.sets
+  Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
+
+  // 3. Create the final list by re-numbering every set based on its new index.
+  val renumberedSets = allSets.mapIndexed { index, set ->
+    val newSetNumber = index + 1
+    // Log the change for a specific set (can be verbose, but useful for deep debugging)
+    // To avoid spamming logs, you might enable this only when needed.
+    // Log.d(TAG, "Re-numbering set: Old number ${set.setNumber}, New number: $newSetNumber")
+    set.copy(setNumber = newSetNumber)
+  }
+
+  // 4. Replace the old list with the newly created and re-numbered list.
+  val previousCount = this.sets.size
+  this.sets.clear()
+  this.sets.addAll(renumberedSets)
 }
 
 private val WARM_UP_SET = SetType.warmUpSet
