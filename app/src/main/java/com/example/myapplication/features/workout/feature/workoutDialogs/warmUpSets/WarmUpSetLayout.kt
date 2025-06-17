@@ -47,10 +47,10 @@ fun WarmUpSetLayout(
   var repetitionsText by remember { mutableStateOf(warmUpSet.targetRepetitions?.toString() ?: "") }
   var rirText by remember { mutableStateOf(warmUpSet.targetRepetitionsInReserve?.toString() ?: "") }
 
-  warmUpSetsViewModel.updateWarmUpSetWeight(
-    warmUpSet.uuid,
-    workingWeight.times(warmUpPercentage!!)
-  )
+//  warmUpSetsViewModel.updateWarmUpSetWeight(
+//    warmUpSet.uuid,
+//    workingWeight.times(warmUpPercentage!!)
+//  )
 
   fun setPercentageText(percentage: String) {
     val (text, percent) = calculatePercentage(percentage)
