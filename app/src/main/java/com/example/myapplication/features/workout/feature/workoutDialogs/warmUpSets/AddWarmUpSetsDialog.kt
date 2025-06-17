@@ -11,12 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.checkDoubleInput
@@ -68,7 +65,7 @@ fun AddWarmUpSetsScreen(
   requireNotNull(exerciseSets)
   warmUpSetsViewModel.setExerciseSets(exerciseSets)
 
-  warmUpSetsViewModel.changeWorkingSetWeight(
+  warmUpSetsViewModel.updateWorkingSetWeight(
     workoutViewModel.getWorkingSetWeight(exerciseSets) ?: 0.0
   )
 
@@ -108,32 +105,20 @@ fun AddWarmUpSetsScreen(
   fun clearSelectedSets() {
 //    selectedSets.value = warmUpSets.associateWith { false }
     selectedSets = mutableStateSetOf()
+    // TODO Clear set checkbox. Use a wrapper class to hold the set & checkbox state
   }
 
   fun applySettingsToSelectedSets(modernizedLoadRIR: ModernizedLoadRIR?) {
     Log.d("AddWarmUpSetsScreen", "applySettingsToSelectedSets called")
     Log.d("AddWarmUpSetsScreen", "applySettingsToSelectedSets: $modernizedLoadRIR")
     Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
-    warmUpSetsViewModel.applySettingsToSelectedSets(
+    warmUpSetsViewModel.applyModernizedLoadRIRSettingsToSelectedSets(
       sets = selectedSets.toList(), // selectedSets.value.keys.toList(),
       modernizedLoadRIRSetting = modernizedLoadRIR
     )
     Log.d("AddWarmUpSetsScreen", "selectedSets cleared")
     clearSelectedSets()
   }
-
-  /*  AddWarmUpSetsDialog(
-      openDialog = { close -> openDialog(close) },
-      weightUnit = weightUnit,
-      insertWarmUpSets = { warmUpSets -> workoutViewModel.addWarmUpSets(exerciseSets, warmUpSets) },
-      applySettingsToSelectedSets = { modernizedLoadRIR ->
-        applySettingsToSelectedSets(modernizedLoadRIR)
-      },
-      onCheckedChange = { set, isChecked ->
-        selectSet(set, isChecked)
-        selectedSets.clear()
-      }
-    )*/
 
   AddWarmUpSetsContent(
     warmUpSetsViewModel = warmUpSetsViewModel,
@@ -155,93 +140,6 @@ fun AddWarmUpSetsScreen(
   )
 }
 
-@Composable
-fun AddWarmUpSetsDialog(
-  warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
-  openDialog: (Boolean) -> Unit,
-  weightUnit: String,
-  insertWarmUpSets: (warmUpSets: List<Set>) -> Unit,
-  applySettingsToSelectedSets: (modernizedLoadRIRSetting: ModernizedLoadRIR?) -> Unit = {},
-//  selectedSets: Map<Set, Boolean>,
-  onCheckedChange: (warmUpSet: Set, isChecked: Boolean) -> Unit,
-) {
-  val workingSetWeight by warmUpSetsViewModel.workingSetWeight.collectAsState()
-
-  val warmUpSets by warmUpSetsViewModel.warmUpSets.collectAsState()
-
-  var workingSetWeightText by remember { mutableStateOf(doubleFormatted(workingSetWeight)) }
-
-  val modernizedLoadRIRList by warmUpSetsViewModel.modernizedLoadRIRList.collectAsState()
-  var curentModernizedLoadRIRState by remember { mutableStateOf<ModernizedLoadRIR?>(null) }
-
-  AlertDialog(
-    properties = DialogProperties(usePlatformDefaultWidth = false),
-    onDismissRequest = {
-      // Dismiss the dialog when the user clicks outside the dialog or on the back
-      // button. If you want to disable that functionality, simply use an empty
-      // onDismissRequest.
-      openDialog(false)
-    },
-    title = { Text(text = "Add warm-up sets") },
-    text = {
-      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(text = "Working Set Weight ($weightUnit)") // TODO USE USER SELECTED WEIGHT
-
-        DialogInput(
-          text = workingSetWeightText,
-          onValueChange = {
-            workingSetWeightText =
-              when {
-                it.isBlank() -> ""
-                else -> checkDoubleInput(it.take(7)) ?: workingSetWeightText
-              }
-            warmUpSetsViewModel.changeWorkingSetWeight(
-              checkDoubleInput(workingSetWeightText)?.toDoubleOrNull() ?: 0.0
-            )
-          },
-          onImeAction = {}
-        )
-
-        modernizedLoadRIRList.takeIf { it.isNotEmpty() }?.let { list ->
-          val selectedRir = // TODO Manage Hardcoded Values
-            list.firstOrNull { it.repsPerformed == 10 && it.rir == 5.0 } ?: list.first()
-          ModernizedLoadRIRHeaderRow(
-            list,
-            selectedRir,
-            onLoadRIRChange = { curentModernizedLoadRIRState = it }
-          )
-        }
-
-        TextButton(onClick = {
-          curentModernizedLoadRIRState?.let {
-            applySettingsToSelectedSets(curentModernizedLoadRIRState)
-          }
-        }) {
-          Text("Apply Settings to Selected Sets")
-        }
-
-        SetsHeaderRow()
-        HorizontalDivider()
-
-        WarmUpSetLazyColumn(
-          onCheckedChange = onCheckedChange,
-//          selectedSets = selectedSets
-        )
-      }
-    },
-    confirmButton = {
-      TextButton(
-        onClick = {
-          openDialog(false)
-          insertWarmUpSets(warmUpSets)
-        }
-      ) {
-        Text("Insert")
-      }
-    },
-    dismissButton = { TextButton(onClick = { openDialog(false) }) { Text("Cancel") } }
-  )
-}
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -294,7 +192,7 @@ fun AddWarmUpSetsContent(
               it.isBlank() -> ""
               else -> checkDoubleInput(it.take(7)) ?: workingSetWeightText
             }
-          warmUpSetsViewModel.changeWorkingSetWeight(
+          warmUpSetsViewModel.updateWorkingSetWeight(
             checkDoubleInput(workingSetWeightText)?.toDoubleOrNull() ?: 0.0
           )
         },
