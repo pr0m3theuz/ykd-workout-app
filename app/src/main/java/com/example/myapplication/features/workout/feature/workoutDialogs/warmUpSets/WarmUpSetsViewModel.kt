@@ -17,6 +17,7 @@ import com.example.myapplication.common.infrastructure.persistence.UserRepositor
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.ProgressionType
 import com.example.myapplication.common.util.RepCapacity
+import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,8 +57,10 @@ class WarmUpSetsViewModel(
   val modernizedLoadRIRList: StateFlow<List<ModernizedLoadRIR>>
     get() = _modernizedLoadRIRListFlow.asStateFlow()
 
-  fun changeWorkingSetWeight(newWorkingWeight: Double) {
+  fun updateWorkingSetWeight(newWorkingWeight: Double) {
     _workingSetWeight.value = newWorkingWeight
+    updateSetsOnWorkingSetChange()
+
   }
 
   fun setExerciseSets(exerciseSets: ExerciseExerciseSets) {
@@ -85,7 +88,7 @@ class WarmUpSetsViewModel(
     }
   }
 
-  fun applySettingsToSelectedSets(
+  fun applyModernizedLoadRIRSettingsToSelectedSets(
     sets: List<Set>,
     modernizedLoadRIRSetting: ModernizedLoadRIR?
   ) {
@@ -103,6 +106,8 @@ class WarmUpSetsViewModel(
             "Updating set: ${existingSet.uuid}"
           )
           val relativeLoad = modernlizedLoadRIR.relativeLoadPercent / 100
+
+          // TODO Apply Rounding using User Settings/Preferences
           val (newWeightPounds: Double, newWeightKilograms: Double) =
             when (exerciseWeightUnit) {
               MassUnit.POUNDS.abbreviation -> {
@@ -112,13 +117,13 @@ class WarmUpSetsViewModel(
               }
 
               MassUnit.KILOGRAMS.abbreviation -> {
-                val newWeightKilograms = _workingSetWeight.value.times(relativeLoad)
-                val newPounds: Double = newWeightKilograms.convertKgToPound()
-                Pair(newPounds, newWeightKilograms)
+                val newKilograms = _workingSetWeight.value.times(relativeLoad)
+                val newPounds: Double = newKilograms.convertKgToPound()
+                Pair(newPounds, newKilograms)
               }
 
               else -> {
-                // Assume Pounds if no unit is specified/default
+                // Assume Pounds is the default if no unit is specified/default
                 val newPounds: Double = _workingSetWeight.value * relativeLoad
                 val newKilograms: Double = newPounds.convertPoundToKg()
                 Pair(newPounds, newKilograms)
@@ -132,9 +137,9 @@ class WarmUpSetsViewModel(
             targetPercentage1RM = relativeLoad,
             percentage1RM = relativeLoad,
             targetWeightPounds = newWeightPounds,
-            weightPounds = newWeightPounds,
+//            weightPounds = newWeightPounds,
             targetWeightKilograms = newWeightKilograms,
-            weightKilograms = newWeightKilograms
+//            weightKilograms = newWeightKilograms
           )
         } else {
           existingSet
@@ -153,6 +158,46 @@ class WarmUpSetsViewModel(
     }
   }
 
+  fun updateSetsOnWorkingSetChange() {
+    val updatedWarmUpSets = _warmUpSets.map { existingSet ->
+      val relativeLoad = existingSet.targetPercentage1RM ?: 1.0
+
+      // TODO Apply Rounding using User Settings/Preferences
+      val (newWeightPounds: Double, newWeightKilograms: Double) =
+        when (exerciseWeightUnit) {
+          MassUnit.POUNDS.abbreviation -> {
+            val newPounds: Double = _workingSetWeight.value * relativeLoad
+            val newKilograms: Double = newPounds.convertPoundToKg()
+            Pair(newPounds, newKilograms)
+          }
+
+          MassUnit.KILOGRAMS.abbreviation -> {
+            val newKilograms = _workingSetWeight.value.times(relativeLoad)
+            val newPounds: Double = newKilograms.convertKgToPound()
+            Pair(newPounds, newKilograms)
+          }
+
+          else -> {
+            // Assume Pounds is the default if no unit is specified/default
+            val newPounds: Double = _workingSetWeight.value * relativeLoad
+            val newKilograms: Double = newPounds.convertPoundToKg()
+            Pair(newPounds, newKilograms)
+          }
+        }
+
+      existingSet.copy(
+        lazyListItemID = newLazyListItemID(),
+        targetWeightPounds = newWeightPounds,
+//        weightPounds = newWeightPounds, // Also update actual weight
+        targetWeightKilograms = newWeightKilograms,
+//        weightKilograms = newWeightKilograms // Also update actual weight
+      )
+    }
+
+    _warmUpSets = updatedWarmUpSets.toMutableList()
+    _warmUpSetsFlow.value = updatedWarmUpSets
+  }
+
 
   fun addSet() {
     requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
@@ -162,7 +207,9 @@ class WarmUpSetsViewModel(
         Set(
           setNumber = _warmUpSets.last().setNumber?.plus(1),
           weightPounds = _warmUpSets.last().weightPounds,
+          targetWeightPounds = _warmUpSets.last().targetWeightPounds,
           weightKilograms = _warmUpSets.last().weightKilograms,
+          targetWeightKilograms = _warmUpSets.last().targetWeightKilograms,
           repetitions = _warmUpSets.last().repetitions,
           ratePerceivedEffort = _warmUpSets.last().ratePerceivedEffort,
           repetitionsInReserve = _warmUpSets.last().repetitionsInReserve,
@@ -203,25 +250,25 @@ class WarmUpSetsViewModel(
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
 
-  fun updateWarmUpSetWeight(uuid: Uuid, newWeight: Double) {
-    val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
-    if (weightUnit == MassUnit.POUNDS.abbreviation) {
-      _warmUpSets.forEach {
-        if (it.uuid == uuid) {
-          it.weightPounds = newWeight
-          it.weightKilograms = it.convertPoundToKg()
+  /*  fun updateWarmUpSetWeight(uuid: Uuid, newWeight: Double) {
+      val weightUnit = exerciseWeightUnit ?: userDefaultWeightUnit
+      if (weightUnit == MassUnit.POUNDS.abbreviation) {
+        _warmUpSets.forEach {
+          if (it.uuid == uuid) {
+  //          it.weightPounds = newWeight
+            it.weightKilograms = it.convertPoundToKg()
+          }
+        }
+      } else {
+        _warmUpSets.forEach {
+          if (it.uuid == uuid) {
+  //          it.weightKilograms = newWeight
+            it.weightPounds = it.convertKgToPound()
+          }
         }
       }
-    } else {
-      _warmUpSets.forEach {
-        if (it.uuid == uuid) {
-          it.weightKilograms = newWeight
-          it.weightPounds = it.convertKgToPound()
-        }
-      }
-    }
-    _warmUpSetsFlow.value = _warmUpSets.toList()
-  }
+      _warmUpSetsFlow.value = _warmUpSets.toList()
+    }*/
 
   fun updateWarmUpSetReps(uuid: Uuid, newReps: Int) {
     _warmUpSets.forEach {
@@ -235,12 +282,14 @@ class WarmUpSetsViewModel(
 
   fun updateWarmUpSetPercentage(uuid: Uuid, newPercentage: Double) {
     _warmUpSets.forEach {
-      if (it.uuid == uuid) it.targetPercentage1RM = newPercentage
-      it.percentage1RM = newPercentage
-      it.weightPounds = it.weightPounds?.times(newPercentage)
-      it.weightKilograms = it.weightKilograms?.times(newPercentage)
-      it.targetWeightPounds = it.targetWeightPounds?.times(newPercentage)
-      it.targetWeightKilograms = it.targetWeightKilograms?.times(newPercentage)
+      if (it.uuid == uuid) {
+        it.targetPercentage1RM = newPercentage
+        it.percentage1RM = newPercentage / 100
+//      it.weightPounds = it.weightPounds?.times(newPercentage)
+//      it.weightKilograms = it.weightKilograms?.times(newPercentage)
+        it.targetWeightPounds = _workingSetWeight.value.times(newPercentage)
+        it.targetWeightKilograms = _workingSetWeight.value.times(newPercentage)
+      }
     }
     _warmUpSetsFlow.value = _warmUpSets.toList()
   }
