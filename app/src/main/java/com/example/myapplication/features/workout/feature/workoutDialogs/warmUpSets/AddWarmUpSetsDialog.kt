@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(
+  ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class,
+  ExperimentalUuidApi::class
+)
 
 package com.example.myapplication.features
 
@@ -42,6 +45,7 @@ import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHea
 import com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
+import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Add Target RIR & Target Reps & Use Rep Capacity to determine 1RM%
 //  make these optional
@@ -120,16 +124,30 @@ fun AddWarmUpSetsScreen(
     clearSelectedSets()
   }
 
+  var currentModernizedLoadRIRState by remember { mutableStateOf<ModernizedLoadRIR?>(null) }
+
   AddWarmUpSetsContent(
-    warmUpSetsViewModel = warmUpSetsViewModel,
     onNavigateBack = onNavigateBack,
     weightUnit = weightUnit,
     insertWarmUpSets = { warmUpSets ->
       workoutViewModel.addWarmUpSets(exerciseSets, warmUpSets)
       onNavigateBack() // Navigate back after inserting
     },
-    applySettingsToSelectedSets = { modernizedLoadRIR ->
-      applySettingsToSelectedSets(modernizedLoadRIR)
+    onLoadRIRChange = { currentModernizedLoadRIRState = it },
+    applySettingsToSelectedSetsButton = {
+      Button(
+        onClick = {
+          currentModernizedLoadRIRState?.let {
+            applySettingsToSelectedSets(currentModernizedLoadRIRState)
+          }
+        },
+        shapes = ButtonShapes(
+          shape = MaterialTheme.shapes.small,
+          pressedShape = MaterialTheme.shapes.small
+        )
+      ) {
+        Text("Apply Settings to Selected Sets")
+      }
     },
 //    selectedSets = selectedSets.value,
     onCheckedChange = { set, isChecked ->
@@ -144,13 +162,12 @@ fun AddWarmUpSetsScreen(
 @ExperimentalMaterial3ExpressiveApi
 @Composable
 fun AddWarmUpSetsContent(
-  // Renamed from AddWarmUpSetsDialog
-  warmUpSetsViewModel: WarmUpSetsViewModel, // Removed koinViewModel default as it's passed from AddWarmUpSetsScreen
+  warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
   onNavigateBack: () -> Unit,
   weightUnit: String,
   insertWarmUpSets: (warmUpSets: List<Set>) -> Unit,
-  applySettingsToSelectedSets: (modernizedLoadRIRSetting: ModernizedLoadRIR?) -> Unit = {},
-//  selectedSets: Map<Set, Boolean>,
+  applySettingsToSelectedSetsButton: @Composable () -> Unit,
+  onLoadRIRChange: (ModernizedLoadRIR?) -> Unit,
   onCheckedChange: (warmUpSet: Set, isChecked: Boolean) -> Unit,
 ) {
   val workingSetWeight by warmUpSetsViewModel.workingSetWeight.collectAsState()
@@ -193,7 +210,7 @@ fun AddWarmUpSetsContent(
               else -> checkDoubleInput(it.take(7)) ?: workingSetWeightText
             }
           warmUpSetsViewModel.updateWorkingSetWeight(
-            checkDoubleInput(workingSetWeightText)?.toDoubleOrNull() ?: 0.0
+            checkDoubleInput(workingSetWeightText)?.toDoubleOrNull() ?: 0.0,
           )
         },
         onImeAction = {}
@@ -205,52 +222,55 @@ fun AddWarmUpSetsContent(
         ModernizedLoadRIRHeaderRow(
           list,
           selectedRir,
-          onLoadRIRChange = { currentModernizedLoadRIRState = it }
+          onLoadRIRChange = onLoadRIRChange
         )
       }
 
-      Button(
-        onClick = {
-          currentModernizedLoadRIRState?.let {
-            applySettingsToSelectedSets(currentModernizedLoadRIRState)
-          }
-        },
-        shapes = ButtonShapes(
-          shape = MaterialTheme.shapes.small,
-          pressedShape = MaterialTheme.shapes.small
-        )
-      ) {
-        Text("Apply Settings to Selected Sets")
-      }
+      applySettingsToSelectedSetsButton()
 
       SetsHeaderRow()
 
       WarmUpSetLazyColumn(
         // Make sure WarmUpSetLazyColumn is adapted for a screen context if necessary
-        onCheckedChange = onCheckedChange,
-//        selectedSets = selectedSets,
-      )
-
-      Row(
-        modifier = Modifier
-          .fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
-      ) {
-        TextButton(
-          onClick = { onNavigateBack },
-          modifier = Modifier.padding(8.dp)
-        ) { Text("Cancel", color = MaterialTheme.colorScheme.error) }
-        Button(
-          modifier = Modifier.padding(8.dp),
-          onClick = {
-            insertWarmUpSets(warmUpSets)
-//            onNavigateBack()
+        sets = warmUpSets,
+//        onCheckedChange = onCheckedChange,
+        addSet = warmUpSetsViewModel::addSet,
+        //        selectedSets = selectedSets,
+        warmUpSetItem = { warmUpSet, index, percentageText, repetitionsText, rirText ->
+          WarmUpSetItem(
+            warmUpSet = warmUpSet,
+            index = index,
+            percentageText = percentageText,
+            repetitionsText = repetitionsText,
+            rirText = rirText,
+            onCheckedChange = onCheckedChange,
+            onPercentageChanged = warmUpSetsViewModel::updateWarmUpSetPercentage,
+            onRepetitionsChanged = warmUpSetsViewModel::updateWarmUpSetReps,
+            onRirChanged = warmUpSetsViewModel::updateWarmUpSetRIR,
+            removeSet = warmUpSetsViewModel::remove
+          )
+        },
+        actionRow = {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+          ) {
+            TextButton(
+              onClick = { onNavigateBack },
+              modifier = Modifier.padding(8.dp)
+            ) { Text("Cancel", color = MaterialTheme.colorScheme.error) }
+            Button(
+              modifier = Modifier.padding(8.dp),
+              onClick = {
+                insertWarmUpSets(warmUpSets)
+              }
+            ) {
+              Text("Insert")
+            }
           }
-        ) {
-          Text("Insert")
         }
-
-      }
+      )
     }
   }
 }
