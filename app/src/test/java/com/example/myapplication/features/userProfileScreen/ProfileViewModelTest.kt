@@ -7,15 +7,14 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.myapplication.common.domain.model.UserProfileDataStoreKeys
 import com.example.myapplication.common.domain.model.userProfileDataStore
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -32,7 +31,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.IOException
@@ -123,7 +121,7 @@ class ProfileViewModelTest {
     fun `getRoundingPreference success`() = runTest(testDispatcher) {
         val testPreferenceValue = "Round to nearest 1.0 lb"
         val preferences = mock<Preferences> {
-            on { get(UserProfileDataStoreKeys.ROUNDING_PREFERENCE) } doReturn testPreferenceValue
+            on { get(UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS) } doReturn testPreferenceValue
         }
         whenever(mockContext.userProfileDataStore).thenReturn(mockDataStore) // Assume this works
         whenever(mockDataStore.data).thenReturn(flowOf(preferences))
@@ -136,7 +134,7 @@ class ProfileViewModelTest {
     @Test
     fun `getRoundingPreference default when not set`() = runTest(testDispatcher) {
         val preferences = mock<Preferences> {
-            on { get(UserProfileDataStoreKeys.ROUNDING_PREFERENCE) } doReturn null
+            on { get(UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS) } doReturn null
         }
         whenever(mockContext.userProfileDataStore).thenReturn(mockDataStore)
         whenever(mockDataStore.data).thenReturn(flowOf(preferences))
@@ -294,7 +292,10 @@ class ProfileViewModelTest {
         // This part is tricky due to the suspend lambda execution.
         // If the above `runBlocking` in the mock is an issue, this assertion might be unreliable.
         // Let's assume `capturedPrefs` is correctly populated.
-        assertEquals(newPreference, capturedPrefs?.get(UserProfileDataStoreKeys.ROUNDING_PREFERENCE))
+            assertEquals(
+                newPreference,
+                capturedPrefs?.get(UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS)
+            )
     }
 
 

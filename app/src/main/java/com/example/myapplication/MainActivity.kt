@@ -76,6 +76,7 @@ import com.example.myapplication.features.syncData.ui.ReplicatorConfigView
 import com.example.myapplication.features.syncData.ui.ReplicatorView
 import com.example.myapplication.features.userProfileScreen.ProfileScreen
 import com.example.myapplication.features.userProfileScreen.ProfileScreenV2
+import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.AnalyticsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.CalculatorsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.ChooseUnitsScreen
@@ -652,6 +653,9 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
   navigation("profileScreenV2", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
       Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       ProfileScreen(
 //        navController = navController,
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
@@ -675,7 +679,10 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       )
     }
 
-    composable("profileScreenV2") {
+    composable("profileScreenV2") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       ProfileScreenV2(
         bottomNavigationBar = {
           BottomNavigationBar(
@@ -731,8 +738,12 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       )
     }
 
-    composable("settingsScreen") {
+    composable("settingsScreen") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       SettingsScreen(
+        profileViewModel = profileViewModel,
         onNavigate = { navController.navigate(it) },
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
         bottomNavigationBar = {
@@ -755,11 +766,17 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       )
     }
 
-    composable("profileSettings") {
+    composable("profileSettings") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       EditProfileScreen()
     }
 
-    composable("timerSettings") {
+    composable("timerSettings") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       TimerSettingsScreen(
         onNavigateBack = { navController.popBackStack() },
         bottomNavigationBar = {
@@ -782,7 +799,10 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       )
     }
 
-    composable("calculatorsScreen") {
+    composable("calculatorsScreen") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       CalculatorsScreen(
         onNavigateBack = { navController.popBackStack() },
         onCalculatorSelected = { id -> println("Selected: $id") },
@@ -807,11 +827,17 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       )
     }
 
-    composable("analyticsScreen") {
+    composable("analyticsScreen") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       AnalyticsScreen(onNavigateToDashboardsInfo = {})
     }
 
-    composable("unitsSettings") {
+    composable("unitsSettings") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
       ChooseUnitsScreen(
         onNavigateBack = { navController.popBackStack() },
         bottomNavigationBar = {
@@ -835,8 +861,13 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       )
     }
 
-    composable("roundOffSettings") {
+    composable("roundOffSettings") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
+
       RoundOffScreen(
+        profileViewModel = profileViewModel,
         onNavigateBack = { navController.popBackStack() },
         bottomNavigationBar = {
           BottomNavigationBar(
