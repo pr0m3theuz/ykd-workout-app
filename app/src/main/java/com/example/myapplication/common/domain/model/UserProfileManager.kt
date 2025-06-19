@@ -117,8 +117,7 @@ class UserProfileManager(
             email = preferences[UserProfileDataStoreKeys.USER_EMAIL] ?: "user",
             username = preferences[UserProfileDataStoreKeys.USER_USERNAME] ?: "user",
             password = preferences[UserProfileDataStoreKeys.USER_PASSWORD] ?: "password",
-            defaultWeightUnit = preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT]
-              ?: MassUnit.POUNDS.abbreviation,
+            defaultWeightUnit = MassUnit.fromString(preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT]),
             intensity = preferences[UserProfileDataStoreKeys.DEFAULT_INTENSITY]
               ?: Intensity.RIR.abbreviation,
             roundingPreferencePounds = preferences[UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS]
@@ -156,13 +155,14 @@ class UserProfileManager(
 //    println("UserProfileManager.updateUserProfile(): Existing user profile: ${_userProfile.value}\nUserProfileManager: ${this@UserProfileManager}")
     Log.i("UserProfileManager", "updateUserProfile(): new profile: $newProfile")
 //    println("UserProfileManager.updateUserProfile(): new profile: $newProfile")
-    if (_userProfile.value.isLoggedIn != true) {
+//    if (_userProfile.value.isLoggedIn != true) {
 
+    _userProfile.value = newProfile
       _userProfile.update { newProfile.copy(isLoggedIn = newProfile.authToken != null) } // Ensure isLoggedIn reflects token presence
 
       Log.i(
         "UserProfileManager",
-        "updateUserProfile(): Updated user profile: $newProfile\nUserProfileManager: ${this@UserProfileManager}"
+        "updateUserProfile(): Updated user profile: ${_userProfile.value}\nUserProfileManager: ${this@UserProfileManager}"
       )
 //      println("UserProfileManager.updateUserProfile(): Updated user profile: $newProfile\nUserProfileManager: ${this@UserProfileManager}")
 
@@ -174,7 +174,8 @@ class UserProfileManager(
           preferences[UserProfileDataStoreKeys.USER_EMAIL] = newProfile.email ?: name
           preferences[UserProfileDataStoreKeys.USER_USERNAME] = newProfile.username ?: ""
           preferences[UserProfileDataStoreKeys.USER_PASSWORD] = newProfile.password ?: ""
-          preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT] = newProfile.defaultWeightUnit
+          preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT] =
+            newProfile.defaultWeightUnit.abbreviation
           preferences[UserProfileDataStoreKeys.DEFAULT_INTENSITY] = newProfile.intensity
           preferences[UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS] =
             newProfile.roundingPreferencePounds
@@ -184,7 +185,7 @@ class UserProfileManager(
           preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] = true
         }
       }
-    }
+//    }
     userRepository.updateCurrentUser(newProfile)
   }
 
