@@ -591,8 +591,8 @@ fun ModernizedLoadRIRHeaderRow(
   modernizedLoadRIRData: List<ModernizedLoadRIR>,
   initialLoadRIR: ModernizedLoadRIR?,
   onLoadRIRChange: (ModernizedLoadRIR?) -> Unit
-
 ) {
+  //region Initial State Setup
   // Early return if no data is available
   if (modernizedLoadRIRData.isEmpty()) {
     Text("No chart data available to configure RIR.")
@@ -611,103 +611,286 @@ fun ModernizedLoadRIRHeaderRow(
     }
 
   // --- State variables for each dropdown field, now nullable ---
-  var currentRepCapacity by remember { mutableStateOf(initialLoadRIR?.repCapacity) }
-  var currentRpe by remember { mutableStateOf(initialLoadRIR?.rpe) }
-  var currentRir by remember { mutableStateOf(initialLoadRIR?.rir) }
-  var currentRepsPerformed by remember { mutableStateOf(initialLoadRIR?.repsPerformed) }
-  var currentRelativeLoadPercent by remember { mutableStateOf(initialLoadRIR?.relativeLoadPercent) }
+  /*  var currentRepCapacity by remember { mutableStateOf(initialLoadRIR?.repCapacity) }
 
-  val currentState = ModernizedLoadRIR(
-    repCapacity = currentRepCapacity ?: RepCapacity.Low, // Provide default or handle null
-    rpe = currentRpe ?: 0.0,
-    rir = currentRir ?: 0.0,
-    repsPerformed = currentRepsPerformed ?: 0,
-    relativeLoadPercent = currentRelativeLoadPercent ?: 0.0
-  )
+    var currentRpe by remember { mutableStateOf(initialLoadRIR?.rpe) }
+    var currentRir by remember { mutableStateOf(initialLoadRIR?.rir) }
+    var currentRepsPerformed by remember { mutableStateOf(initialLoadRIR?.repsPerformed) }
+    var currentRelativeLoadPercent by remember { mutableStateOf(initialLoadRIR?.relativeLoadPercent) }
+  */
 
+  /*  val currentState = ModernizedLoadRIR(
+      repCapacity = currentRepCapacity ?: RepCapacity.Low, // Provide default or handle null
+      rpe = currentRpe ?: 0.0,
+      rir = currentRir ?: 0.0,
+      repsPerformed = currentRepsPerformed ?: 0,
+      relativeLoadPercent = currentRelativeLoadPercent ?: 0.0
+    )*/
+  //endregion
 
   // --- Derive options for dropdowns based on current selections ---
   // These are `remember`ed and will re-calculate when their dependent states change.
-  val repCapacityOptions =
-    remember(modernizedLoadRIRData) { getRepCapacityOptions(modernizedLoadRIRData) }
+  /*
+    val repCapacityOptions =
+      remember(modernizedLoadRIRData) { getRepCapacityOptions(modernizedLoadRIRData) }
 
-  val rpeOptions = remember(
-    modernizedLoadRIRData,
-    currentRepCapacity,
-    currentRir,
-    currentRepsPerformed,
-    currentRelativeLoadPercent
-  ) {
-    getRpeOptions(
-      modernizedLoadRIRData, currentRepCapacity,
-      currentRir, currentRepsPerformed, currentRelativeLoadPercent
-    )
-  }
-
-  val rirOptions = remember(
-    modernizedLoadRIRData,
-    currentRepCapacity,
-    currentRpe,
-    currentRepsPerformed,
-    currentRelativeLoadPercent
-  ) {
-    getRirOptions(
-      modernizedLoadRIRData, currentRepCapacity, currentRpe,
-      currentRepsPerformed,
-      currentRelativeLoadPercent
-    )
-  }
-
-  val repsPerformedOptions =
-    remember(
+    val rpeOptions = remember(
       modernizedLoadRIRData,
       currentRepCapacity,
-      currentRpe,
       currentRir,
       currentRepsPerformed,
       currentRelativeLoadPercent
     ) {
-      getRepsPerformedOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
+      getRpeOptions(
+        modernizedLoadRIRData, currentRepCapacity,
+        currentRir, currentRepsPerformed, currentRelativeLoadPercent
+      )
+    }
+
+    val rirOptions = remember(
+      modernizedLoadRIRData,
+      currentRepCapacity,
+      currentRpe,
+      currentRepsPerformed,
+      currentRelativeLoadPercent
+    ) {
+      getRirOptions(
+        modernizedLoadRIRData, currentRepCapacity, currentRpe,
+        currentRepsPerformed,
         currentRelativeLoadPercent
       )
     }
 
-  val relativeLoadPercentOptions = remember(
-    modernizedLoadRIRData,
-    currentRepCapacity,
-    currentRpe,
-    currentRir,
-    currentRepsPerformed
-  ) {
-    getRelativeLoadPercentOptions(
+    val repsPerformedOptions =
+      remember(
+        modernizedLoadRIRData,
+        currentRepCapacity,
+        currentRpe,
+        currentRir,
+        currentRepsPerformed,
+        currentRelativeLoadPercent
+      ) {
+        getRepsPerformedOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRelativeLoadPercent
+        )
+      }
+
+    val relativeLoadPercentOptions = remember(
       modernizedLoadRIRData,
       currentRepCapacity,
       currentRpe,
       currentRir,
       currentRepsPerformed
-    )
+    ) {
+      getRelativeLoadPercentOptions(
+        modernizedLoadRIRData,
+        currentRepCapacity,
+        currentRpe,
+        currentRir,
+        currentRepsPerformed
+      )
+    }
+  */
+
+  //region Selection Handlers
+  // --- Selection Handlers with Cascading Null Logic ---
+  // When a selection changes, subsequent dependent selections are reset to null
+  // if their current value is no longer valid or if the new selection is null.
+
+  /*  val onRepCapacitySelected: (RepCapacity?) -> Unit = { newRepCap ->
+      currentRepCapacity = newRepCap
+      if (newRepCap == null || currentRpe !in getRpeOptions(
+          modernizedLoadRIRData, newRepCap,
+          currentRir, currentRepsPerformed, currentRelativeLoadPercent
+        )
+      ) {
+        currentRpe = null
+      }
+      if (currentRepCapacity == null || currentRpe == null || currentRir !in getRirOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRepsPerformed,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRir = null
+      }
+      if (currentRepCapacity == null || currentRpe == null || currentRir == null || currentRepsPerformed !in getRepsPerformedOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRepsPerformed = null
+      }
+      if (currentRepCapacity == null || currentRpe == null || currentRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRepsPerformed
+        )
+      ) {
+        currentRelativeLoadPercent = null
+      }
+    }
+
+    val onRpeSelected: (Double?) -> Unit = { newRpe ->
+      currentRpe = newRpe
+      if (currentRpe == null || currentRir !in getRirOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRepsPerformed,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRir = null
+      }
+      if (currentRpe == null || currentRir == null || currentRepsPerformed !in getRepsPerformedOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRepsPerformed = null
+      }
+      if (currentRpe == null || currentRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRepsPerformed
+        )
+      ) {
+        currentRelativeLoadPercent = null
+      }
+    }
+
+    val onRirSelected: (Double?) -> Unit = { newRir ->
+      currentRir = newRir
+      if (currentRir == null || currentRpe !in getRpeOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRir,
+          currentRepsPerformed,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRir = null
+      }
+      if (currentRir == null || currentRepsPerformed !in getRepsPerformedOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRepsPerformed = null
+      }
+      if (currentRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRepsPerformed
+        )
+      ) {
+        currentRelativeLoadPercent = null
+      }
+    }
+
+    val onRepsPerformedSelected: (Int?) -> Unit = { newReps ->
+      currentRepsPerformed = newReps
+      if (currentRepsPerformed == null || currentRpe !in getRpeOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRir,
+          currentRepsPerformed,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRpe = null
+      }
+      if (currentRepsPerformed == null || currentRir !in getRirOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRepsPerformed,
+          currentRelativeLoadPercent
+        )
+      ) {
+        currentRir = null
+      }
+      if (currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
+          modernizedLoadRIRData,
+          currentRepCapacity,
+          currentRpe,
+          currentRir,
+          currentRepsPerformed
+        )
+      ) {
+        currentRelativeLoadPercent = null
+      }
+    }
+
+    val onRelativeLoadSelected: (Double?) -> Unit = { newLoad ->
+      currentRelativeLoadPercent = newLoad
+    }*/
+  //endregion
+
+  // Instantiate the manager with the full dataset. `remember` ensures it survives recompositions.
+  val filterManager = remember { FilterManager(modernizedLoadRIRData) }
+
+  // State for the currently selected filter values.
+  var activeFilters by remember { mutableStateOf(FilterManager.ActiveFilters(repCapacity = modernizedLoadRIRData.firstOrNull()?.repCapacity)) }
+
+  // State for the available options in each dropdown and the final filtered list.
+  // This is derived from the activeFilters.
+  var dropdownOptions by remember { mutableStateOf(filterManager.getInitialOptions()) }
+
+  // This is the core logic update.
+  // Whenever a filter changes, this function is called to get new options.
+  val updateFilters = { newFilters: FilterManager.ActiveFilters ->
+    activeFilters = newFilters
+    dropdownOptions = filterManager.applyFilters(newFilters)
   }
 
+  // Helper function for conditional formatting
+  val formatDoubleConditionally: (Double) -> String = { value ->
+    // Check if it's a whole number
+    if (value == value.toInt().toDouble()) {
+      "%.0f".format(Locale.US, value) // Format as integer
+    } else {
+      "%.1f".format(Locale.US, value) // Format with one decimal place
+    }
+  }
+
+  //region LaunchedEffect for onLoadRIRChange
   // Function to update state and notify parent
   // This central effect updates the state and calls the callback when primary selections change.
   LaunchedEffect(
-    currentRepCapacity,
-    currentRpe,
-    currentRir,
-    currentRepsPerformed,
-    currentRelativeLoadPercent
+    activeFilters.repCapacity,
+    activeFilters.rpe,
+    activeFilters.rir,
+    activeFilters.repsPerformed,
+    activeFilters.relativeLoadPercent
   ) {
-    val rc = currentRepCapacity
-    val rpeVal = currentRpe
-    val rirVal = currentRir
-    val repsVal = currentRepsPerformed
-    val loadVal = currentRelativeLoadPercent
-
-
+    val rc = activeFilters.repCapacity
+    val rpeVal = activeFilters.rpe
+    val rirVal = activeFilters.rir
+    val repsVal = activeFilters.repsPerformed
+    val loadVal = activeFilters.relativeLoadPercent
 
     Log.i(
       "ModernizedLoadRIRHeaderRow.LaunchedEffect",
@@ -726,168 +909,11 @@ fun ModernizedLoadRIRHeaderRow(
       onLoadRIRChange(null)
     }
   }
+  //endregion
 
-  // --- Selection Handlers with Cascading Null Logic ---
-  // When a selection changes, subsequent dependent selections are reset to null
-  // if their current value is no longer valid or if the new selection is null.
-
-  val onRepCapacitySelected: (RepCapacity?) -> Unit = { newRepCap ->
-    currentRepCapacity = newRepCap
-    if (newRepCap == null || currentRpe !in getRpeOptions(
-        modernizedLoadRIRData, newRepCap,
-        currentRir, currentRepsPerformed, currentRelativeLoadPercent
-      )
-    ) {
-      currentRpe = null
-    }
-    if (currentRepCapacity == null || currentRpe == null || currentRir !in getRirOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRepsPerformed,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRir = null
-    }
-    if (currentRepCapacity == null || currentRpe == null || currentRir == null || currentRepsPerformed !in getRepsPerformedOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRepsPerformed = null
-    }
-    if (currentRepCapacity == null || currentRpe == null || currentRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
-        currentRepsPerformed
-      )
-    ) {
-      currentRelativeLoadPercent = null
-    }
-  }
-
-  val onRpeSelected: (Double?) -> Unit = { newRpe ->
-    currentRpe = newRpe
-    if (currentRpe == null || currentRir !in getRirOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRepsPerformed,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRir = null
-    }
-    if (currentRpe == null || currentRir == null || currentRepsPerformed !in getRepsPerformedOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRepsPerformed = null
-    }
-    if (currentRpe == null || currentRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
-        currentRepsPerformed
-      )
-    ) {
-      currentRelativeLoadPercent = null
-    }
-  }
-
-  val onRirSelected: (Double?) -> Unit = { newRir ->
-    currentRir = newRir
-    if (currentRir == null || currentRpe !in getRpeOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRir,
-        currentRepsPerformed,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRir = null
-    }
-    if (currentRir == null || currentRepsPerformed !in getRepsPerformedOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRepsPerformed = null
-    }
-    if (currentRir == null || currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
-        currentRepsPerformed
-      )
-    ) {
-      currentRelativeLoadPercent = null
-    }
-  }
-
-  val onRepsPerformedSelected: (Int?) -> Unit = { newReps ->
-    currentRepsPerformed = newReps
-    if (currentRepsPerformed == null || currentRpe !in getRpeOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRir,
-        currentRepsPerformed,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRpe = null
-    }
-    if (currentRepsPerformed == null || currentRir !in getRirOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRepsPerformed,
-        currentRelativeLoadPercent
-      )
-    ) {
-      currentRir = null
-    }
-    if (currentRepsPerformed == null || currentRelativeLoadPercent !in getRelativeLoadPercentOptions(
-        modernizedLoadRIRData,
-        currentRepCapacity,
-        currentRpe,
-        currentRir,
-        currentRepsPerformed
-      )
-    ) {
-      currentRelativeLoadPercent = null
-    }
-  }
-
-  val onRelativeLoadSelected: (Double?) -> Unit = { newLoad ->
-    currentRelativeLoadPercent = newLoad
-  }
-
-  // Helper function for conditional formatting
-  val formatDoubleConditionally: (Double) -> String = { value ->
-    if (value == value.toInt().toDouble()) { // Check if it's a whole number
-      "%.0f".format(Locale.US, value) // Format as integer
-    } else {
-      "%.1f".format(Locale.US, value) // Format with one decimal place
-    }
-  }
-
+  //region UI Layout
   val style = MaterialTheme.typography.bodyMediumEmphasized
+
   Spacer(modifier = Modifier.height(16.dp))
   Column(modifier = Modifier.fillMaxWidth()) {
     Text("Modernized Load RIR Editor", style = MaterialTheme.typography.bodyMedium)
@@ -901,9 +927,9 @@ fun ModernizedLoadRIRHeaderRow(
       DropdownField(
         modifier = modifier.width(100.dp),
         label = "RIR",
-        options = rirOptions,
-        selectedOption = currentRir,
-        onOptionSelected = onRirSelected,
+        options = dropdownOptions.rirOptions,
+        selectedOption = activeFilters.rir,
+        onOptionSelected = { selected -> updateFilters(activeFilters.copy(rir = selected)) },
         optionToString = { formatDoubleConditionally(it) }, // Format to one decimal place
         enabled = true
       )
@@ -912,9 +938,9 @@ fun ModernizedLoadRIRHeaderRow(
       DropdownField(
         modifier = modifier.width(95.dp),
         label = "RPE",
-        options = rpeOptions,
-        selectedOption = currentRpe,
-        onOptionSelected = onRpeSelected,
+        options = dropdownOptions.rpeOptions,
+        selectedOption = activeFilters.rpe,
+        onOptionSelected = { selected -> updateFilters(activeFilters.copy(rpe = selected)) },
         optionToString = { formatDoubleConditionally(it) },
         enabled = true
       )
@@ -923,9 +949,9 @@ fun ModernizedLoadRIRHeaderRow(
       DropdownField(
         modifier = Modifier.width(95.dp),
         label = "Reps",
-        options = repsPerformedOptions,
-        selectedOption = currentRepsPerformed,
-        onOptionSelected = onRepsPerformedSelected,
+        options = dropdownOptions.repsPerformedOptions,
+        selectedOption = activeFilters.repsPerformed,
+        onOptionSelected = { selected -> updateFilters(activeFilters.copy(repsPerformed = selected)) },
         // Default toString for Int is fine
         enabled = true
       )
@@ -934,9 +960,9 @@ fun ModernizedLoadRIRHeaderRow(
       DropdownField(
         modifier = Modifier.width(110.dp),
         label = "% e1RM",
-        options = relativeLoadPercentOptions,
-        selectedOption = currentRelativeLoadPercent,
-        onOptionSelected = onRelativeLoadSelected,
+        options = dropdownOptions.relativeLoadPercentOptions,
+        selectedOption = activeFilters.relativeLoadPercent,
+        onOptionSelected = { selected -> updateFilters(activeFilters.copy(relativeLoadPercent = selected)) },
         optionToString = { formatDoubleConditionally(it) },
         enabled = true
       )
@@ -951,12 +977,20 @@ fun ModernizedLoadRIRHeaderRow(
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Text("RIR: ${currentRir?.let { "%.1f".format(Locale.US, it) } ?: "NA"}",
+      Text("RIR: ${activeFilters.rir?.let { "%.1f".format(Locale.US, it) } ?: "NA"}",
         style = style)
-      Text("RPE: ${currentRpe?.let { "%.1f".format(Locale.US, it) } ?: "NA"}",
+      Text("RPE: ${activeFilters.rpe?.let { "%.1f".format(Locale.US, it) } ?: "NA"}",
         style = style)
-      Text("Reps: ${currentRepsPerformed ?: "NA"}", style = style)
-      Text("e1RM%: ${currentRelativeLoadPercent?.let { "%.2f%%".format(Locale.US, it) } ?: "NA"}",
+      Text("Reps: ${activeFilters.repsPerformed ?: "NA"}", style = style)
+      Text(
+        "e1RM%: ${
+          activeFilters.relativeLoadPercent?.let {
+            "%.2f%%".format(
+              Locale.US,
+              it
+            )
+          } ?: "NA"
+        }",
         style = style)
     }
     Row(
@@ -967,11 +1001,12 @@ fun ModernizedLoadRIRHeaderRow(
       verticalAlignment = Alignment.CenterVertically
     ) {
       Text(
-        "Rep Capacity: ${currentRepCapacity ?: "NA"}",
+        "Rep Capacity: ${activeFilters.repCapacity ?: "NA"}",
         style = style
       )
     }
   }
+  //endregion
 }
 
 // 5. Helper functions to get filtered options
@@ -1010,6 +1045,28 @@ fun getRpeOptions(
   Log.i("getRpeOptions", "RPE Dropdown Items: $list")
 
   return list
+}
+
+@Preview
+@Composable
+fun ModernizedLoadRIRHeaderRowPreview() {
+  val modernizedLoadRIRData = listOf(
+    ModernizedLoadRIR(RepCapacity.Average, 2.0, 8.0, 10, 80.0),
+    ModernizedLoadRIR(RepCapacity.Average, 3.0, 7.0, 8, 75.0),
+    ModernizedLoadRIR(RepCapacity.High, 1.0, 9.0, 12, 85.0),
+    ModernizedLoadRIR(RepCapacity.Low, 4.0, 6.0, 6, 70.0)
+  )
+  val initialLoadRIR = ModernizedLoadRIR(RepCapacity.Average, 2.0, 8.0, 10, 80.0)
+  var selectedLoadRIR by remember { mutableStateOf<ModernizedLoadRIR?>(initialLoadRIR) }
+
+  ModernizedLoadRIRHeaderRow(
+    modernizedLoadRIRData = modernizedLoadRIRData,
+    initialLoadRIR = selectedLoadRIR,
+    onLoadRIRChange = { newLoadRIR ->
+      selectedLoadRIR = newLoadRIR
+      Log.d("ModernizedLoadRIRHeaderRowPreview", "Selected RIR: $newLoadRIR")
+    }
+  )
 }
 
 /**
