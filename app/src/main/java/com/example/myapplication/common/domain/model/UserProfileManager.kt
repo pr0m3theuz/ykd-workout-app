@@ -121,6 +121,10 @@ class UserProfileManager(
               ?: MassUnit.POUNDS.abbreviation,
             intensity = preferences[UserProfileDataStoreKeys.DEFAULT_INTENSITY]
               ?: Intensity.RIR.abbreviation,
+            roundingPreferencePounds = preferences[UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS]
+              ?: 5.0,
+            roundingPreferenceKilograms = preferences[UserProfileDataStoreKeys.ROUNDING_PREFERENCE_KG]
+              ?: 2.5,
             authToken = preferences[UserProfileDataStoreKeys.AUTH_TOKEN],
             isLoggedIn = preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] ?: false
           )
@@ -172,6 +176,10 @@ class UserProfileManager(
           preferences[UserProfileDataStoreKeys.USER_PASSWORD] = newProfile.password ?: ""
           preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT] = newProfile.defaultWeightUnit
           preferences[UserProfileDataStoreKeys.DEFAULT_INTENSITY] = newProfile.intensity
+          preferences[UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS] =
+            newProfile.roundingPreferencePounds
+          preferences[UserProfileDataStoreKeys.ROUNDING_PREFERENCE_KG] =
+            newProfile.roundingPreferenceKilograms
           preferences[UserProfileDataStoreKeys.AUTH_TOKEN] = newProfile.authToken ?: ""
           preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] = true
         }
@@ -195,6 +203,8 @@ class UserProfileManager(
         preferences.remove(UserProfileDataStoreKeys.USER_PASSWORD)
         preferences.remove(UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT)
         preferences.remove(UserProfileDataStoreKeys.DEFAULT_INTENSITY)
+        preferences.remove(UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS)
+        preferences.remove(UserProfileDataStoreKeys.ROUNDING_PREFERENCE_KG)
         preferences.remove(UserProfileDataStoreKeys.AUTH_TOKEN)
         preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] = false // Explicitly set to false
       }

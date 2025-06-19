@@ -33,7 +33,7 @@ data class UserProfile(
   var defaultWeightUnit: String = MassUnit.POUNDS.abbreviation, // TODO have enum class??????
   var intensity: String = Intensity.RIR.abbreviation, // TODO have enum class??????
   var roundingPreferencePounds: Double = 5.0,
-  var roundingPreferenceKilograms: Double = 5.0.convertPoundToKg(),
+  var roundingPreferenceKilograms: Double = 2.5,
   var authToken: String? = null,
   var isLoggedIn: Boolean = false,
   private val type: String = "User"
