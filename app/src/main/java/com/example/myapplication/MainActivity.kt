@@ -760,7 +760,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
       SettingsScreen(
-        profileViewModel = profileViewModel,
+//        profileViewModel = profileViewModel,
         onNavigate = { navController.navigate(it) },
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
         bottomNavigationBar = {
@@ -856,6 +856,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
       ChooseUnitsScreen(
+        profileViewModel = profileViewModel,
         onNavigateBack = { navController.popBackStack() },
         bottomNavigationBar = {
           BottomNavigationBar(
