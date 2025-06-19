@@ -33,10 +33,10 @@ data class ModernizedLoadRIRDao(var ModernizedLoadRIR: ModernizedLoadRIR)
 
 @Serializable
 data class ModernizedLoadRIR(
-  val repCapacity: RepCapacity,
-  val rir: Double, // Relative Load as a percentage (e.g., 80.0)
-  val rpe: Double, // Relative Load as a percentage (e.g., 80.0)
-  val repsPerformed: Int, // Relative Load as a percentage (e.g., 80.0)
+  val repCapacity: RepCapacity, // The rep capacity category (e.g., Average, High, Low)
+  val rir: Double, // Reps in Reserve (e.g., 2.0 for 2 reps left)
+  val rpe: Double, // Rating of Perceived Exertion (e.g., 8.0)
+  val repsPerformed: Int, // Number of repetitions performed in the set (e.g., 10)
   val relativeLoadPercent: Double, // Relative Load as a percentage (e.g., 80.0)
 )
 
