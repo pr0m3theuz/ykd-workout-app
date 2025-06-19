@@ -30,10 +30,10 @@ data class WeightUnit(
   val abbreviation: String,
 )
 
-enum class MassUnit(val abbreviation: String) {
-    POUNDS("lbs"),
-    KILOGRAMS("kg"),
-}
+//enum class MassUnit(val abbreviation: String) {
+//    POUNDS("lbs"),
+//    KILOGRAMS("kg"),
+//}
 
 enum class Intensity(val abbreviation: String) {
     RIR("RIR"),
