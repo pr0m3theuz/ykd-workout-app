@@ -13,6 +13,7 @@ package com.example.myapplication.common.domain.model
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.myapplication.common.util.ObjectIdSerializer
@@ -31,6 +32,8 @@ data class UserProfile(
   var password: String? = null,
   var defaultWeightUnit: String = MassUnit.POUNDS.abbreviation, // TODO have enum class??????
   var intensity: String = Intensity.RIR.abbreviation, // TODO have enum class??????
+  var roundingPreferencePounds: Double = 5.0,
+  var roundingPreferenceKilograms: Double = 5.0.convertPoundToKg(),
   var authToken: String? = null,
   var isLoggedIn: Boolean = false,
   private val type: String = "User"
@@ -45,6 +48,8 @@ object UserProfileDataStoreKeys {
   val USER_PASSWORD = stringPreferencesKey("user_password")
   val DEFAULT_WEIGHT_UNIT = stringPreferencesKey("default_weight_unit")
   val DEFAULT_INTENSITY = stringPreferencesKey("default_intensity")
+  val ROUNDING_PREFERENCE_LBS = doublePreferencesKey("rounding_preference_lbs")
+  val ROUNDING_PREFERENCE_KG = doublePreferencesKey("rounding_preference_kg")
   val AUTH_TOKEN = stringPreferencesKey("auth_token")
   val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
 }

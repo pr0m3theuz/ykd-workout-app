@@ -2,7 +2,6 @@
 
 package com.example.myapplication.features.userProfileScreen.like.strengthLog
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,37 +18,66 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.common.ui.theme.MyApplicationTheme
+import com.example.myapplication.features.userProfileScreen.ProfileViewModel
+import kotlinx.coroutines.launch
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun RoundOffScreenPreview() {
-  MyApplicationTheme {
-    RoundOffScreen(onNavigateBack = {}, bottomNavigationBar = {})
+enum class RoundingOption(val displayText: String, val imperial: Double, val metric: Double?) {
+  ROUND_TO_NEAREST_10_LB("Round to nearest 10 lb / 5 kg", 10.0, 5.0),
+  ROUND_TO_NEAREST_5_LB("Round to nearest 5 lb / 2.5 kg", 5.0, 2.5),
+  ROUND_TO_NEAREST_2_5_LB("Round to nearest 2.5 lb / 1.25 kg", 2.5, 1.25),
+  ROUND_TO_NEAREST_2_LB("Round to nearest 2.0 lb", 2.0, null),
+  ROUND_TO_NEAREST_1_5_LB("Round to nearest 1.5 lb", 1.5, null),
+  ROUND_TO_NEAREST_1_LB("Round to nearest 1 lb / 0.5 kg", 1.0, 0.5),
+  ROUND_TO_NEAREST_0_5_LB("Round to nearest 0.5 lb", 0.5, null);
+
+  companion object {
+    fun fromImperial(value: Double): RoundingOption? {
+      return entries.find { it.imperial == value }
+    }
+
+    fun nearestMetric(ordinal: Int): Double {
+      return when (ordinal) {
+        0 -> 5.0
+        1 -> 2.5
+        2 -> 1.25
+        3 -> 1.25
+        4 -> 0.5
+        5 -> 0.5
+        6 -> 0.5
+        else -> 0.5
+      }
+    }
   }
 }
 
 @Composable
 fun RoundOffScreen(
+  profileViewModel: ProfileViewModel,
   onNavigateBack: () -> Unit,
   bottomNavigationBar: @Composable () -> Unit,
 ) {
-  //TODO add KG equivalents
-  val radioOptions =
-    listOf(
-      "Round to nearest 5.0 lb",
-      "Round to nearest 2.0 lb",
-      "Round to nearest 1.0 lb",
-      "Round to nearest 0.5 lb",
-    )
-  val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+  val scope = rememberCoroutineScope()
+  val radioOptions = RoundingOption.entries
+
+  val currentRoundingPreference by profileViewModel.getRoundingPreference().collectAsState(
+    RoundingOption.ROUND_TO_NEAREST_5_LB
+  )
+
+
+  // Find the RoundingOption that matches the currentRoundingPreference
+  val (selectedOption, onOptionSelected) = remember(currentRoundingPreference) {
+    mutableStateOf(currentRoundingPreference ?: RoundingOption.ROUND_TO_NEAREST_5_LB)
+  }
+
 
   Scaffold(
     topBar = {
@@ -77,23 +105,28 @@ fun RoundOffScreen(
         Text("Choose how calculated weights are rounded off.")
       }
 
-      radioOptions.forEach { text ->
+      radioOptions.forEach { option ->
         Row(
           modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 16.dp)
             .selectable(
-              selected = (text == selectedOption),
-              onClick = { onOptionSelected(text) },
+              selected = (option == selectedOption),
+              onClick = {
+                onOptionSelected(option) // Update local state for immediate UI feedback
+                scope.launch {
+                  profileViewModel.updateRoundingPreference(option)
+                }
+              },
               role = Role.RadioButton
             ),
           verticalAlignment = Alignment.CenterVertically
         ) {
           RadioButton(
-            selected = (text == selectedOption),
+            selected = (option == selectedOption),
             onClick = null // null recommended for accessibility with screen readers
           )
           Text(
-            text = text,
+            text = option.displayText,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(start = 16.dp)
           )

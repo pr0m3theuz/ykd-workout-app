@@ -137,7 +137,7 @@ val commonModule = module {
   viewModel { WorkingSetViewModel(get(), get()) }
   viewModel { WarmUpSetsViewModel(get(), get()) }
   viewModel { HistoryViewModel(get(), get(), get(), get(), get()) }
-  viewModel { ProfileViewModel(get()) }
+  viewModel { ProfileViewModel(get(), get()) }
   viewModel { ReplicatorViewModel(get()) }
   viewModel { ReplicatorConfigViewModel(get()) }
 

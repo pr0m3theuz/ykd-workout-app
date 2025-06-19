@@ -183,7 +183,7 @@ fun SettingsScreen(
         SettingsNavigationItem(
           icon = Icons.Filled.Loop, // Icon for "Round off"
           title = "Round off",
-          subtitle = "5.0 lb",
+          subtitle = "5.0 lb", // TODO replace with actual value
           onClick = { onNavigate("roundOffSettings") }
         )
       }
