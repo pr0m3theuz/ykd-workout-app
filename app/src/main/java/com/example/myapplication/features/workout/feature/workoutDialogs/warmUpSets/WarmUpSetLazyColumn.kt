@@ -113,7 +113,7 @@ fun WarmUpSetLazyColumn(
       ) {
         TextButton(
           onClick = {
-            addSet
+            addSet()
             coroutineScope.launch {
               // Animate scroll to the last item
               listState.animateScrollToItem(index = sets.size.dec())
