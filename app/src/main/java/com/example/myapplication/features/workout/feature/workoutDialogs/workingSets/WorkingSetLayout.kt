@@ -34,7 +34,7 @@ fun WorkingSetLayout(
 
   workingSetViewModel.updateSetWeight(
     workingSet.uuid,
-    workingWeight.times(workingSetPercentage!!)
+    workingWeight
   )
 
   fun setPercentageText(percentage: String) {
