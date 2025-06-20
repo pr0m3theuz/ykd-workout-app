@@ -1,5 +1,6 @@
 package com.example.myapplication.features.userProfileScreen.like.strengthLog
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,8 +46,13 @@ fun ChooseUnitsScreen(
 ) {
   val scope = rememberCoroutineScope()
 
+  val currentUser by profileViewModel.userProfile.collectAsState()
+  Log.i("ChooseUnitsScreen", "currentUser: $currentUser")
+
   val radioOptions = MassUnit.entries.sortedBy { it.displayText }
-  val (selectedOption, onOptionSelected) = remember { mutableStateOf(profileViewModel.currentUser.defaultWeightUnit) }
+  val (selectedOption, onOptionSelected) = remember { mutableStateOf(currentUser.defaultWeightUnit) }
+
+  Log.i("ChooseUnitsScreen", "selectedOption: $selectedOption")
 
   Scaffold(
     topBar = {
