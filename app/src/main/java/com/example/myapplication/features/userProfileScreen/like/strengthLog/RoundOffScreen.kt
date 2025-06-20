@@ -2,6 +2,7 @@
 
 package com.example.myapplication.features.userProfileScreen.like.strengthLog
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,16 +69,19 @@ fun RoundOffScreen(
   val scope = rememberCoroutineScope()
   val radioOptions = RoundingOption.entries
 
-  val currentRoundingPreference by profileViewModel.getRoundingPreference().collectAsState(
-    RoundingOption.ROUND_TO_NEAREST_5_LB
-  )
+  val currentUser by profileViewModel.userProfile.collectAsState()
+  Log.i("RoundOffScreen", "currentUser: $currentUser")
 
+  val currentRoundingPreference by profileViewModel.getRoundingPreference().collectAsState(
+    RoundingOption.fromImperial(currentUser.roundingPreferencePounds)
+  )
 
   // Find the RoundingOption that matches the currentRoundingPreference
   val (selectedOption, onOptionSelected) = remember(currentRoundingPreference) {
     mutableStateOf(currentRoundingPreference ?: RoundingOption.ROUND_TO_NEAREST_5_LB)
   }
 
+  Log.i("RoundOffScreen", "selectedOption: $selectedOption lbs")
 
   Scaffold(
     topBar = {
@@ -105,7 +109,8 @@ fun RoundOffScreen(
         Text("Choose how calculated weights are rounded off.")
       }
 
-      radioOptions.forEach { option ->
+      radioOptions.forEachIndexed { index, option ->
+//        Log.i("RoundOffScreen", "option $index: $option")
         Row(
           modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 16.dp)
