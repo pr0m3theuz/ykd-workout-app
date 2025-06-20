@@ -8,6 +8,9 @@ import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundingOption
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 
@@ -19,11 +22,18 @@ class ProfileViewModel constructor(
 ) : ViewModel() {
   // TODO REWRITE THIS
   //  val currentUser: User = userRepository.getCurrentUser()
-  val currentUser: UserProfile = userProfileManager.getCurrentUser()
+
+  private val _userProfile: MutableStateFlow<UserProfile> =
+    MutableStateFlow(userProfileManager.getCurrentUser())
+  val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
+
+  private val _defaultWeightUnit = MutableStateFlow<MassUnit>(_userProfile.value.defaultWeightUnit)
+  val defaultWeightUnit: StateFlow<MassUnit?> = _defaultWeightUnit.asStateFlow()
+  var _currentUser: UserProfile = userProfileManager.getCurrentUser()
 
   fun getRoundingPreference(): Flow<RoundingOption?> {
     return flow {
-      RoundingOption.fromImperial(currentUser.roundingPreferencePounds)
+      RoundingOption.fromImperial(_currentUser.roundingPreferencePounds)
         ?: RoundingOption.fromImperial(5.0)
     }
   }
@@ -39,11 +49,15 @@ class ProfileViewModel constructor(
       }
 
       userProfileManager.updateUserProfile(
-        currentUser.copy(
+        _currentUser.copy(
           roundingPreferencePounds = roundingOption.imperial,
           roundingPreferenceKilograms = metricValue
         )
       )
+
+      _userProfile.value = userProfileManager.getCurrentUser()
+      _currentUser = userProfileManager.getCurrentUser()
+      _defaultWeightUnit.value = userProfileManager.getCurrentUser().defaultWeightUnit
 
     } catch (exception: IOException) {
       Log.e("ProfileViewModel", "Error updating rounding preference.", exception)
@@ -54,7 +68,7 @@ class ProfileViewModel constructor(
 
   fun updateDefaultWeightUnit(newUnit: MassUnit) {
     userProfileManager.updateUserProfile(
-      currentUser.copy(
+      _currentUser.copy(
         defaultWeightUnit = newUnit,
       )
     )
