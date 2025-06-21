@@ -30,6 +30,7 @@ import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Utility
 import com.example.myapplication.common.domain.model.UtilityDao
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
+import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -401,9 +402,9 @@ class ExercisesRepositoryImpl(
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val mutableDoc = MutableDocument()
+      val mutableDoc = MutableDocument("Exercise:${exercise.id}")
       // TODO Refactor
-      mutableDoc.setString("lazyListItemID", exercise.lazyListItemID.toString())
+      mutableDoc.setString("lazyListItemID", newLazyListItemID().toString())
       mutableDoc.setString("name", exercise.name)
       mutableDoc.setString("exrxExerciseID", exercise.exrxExerciseID)
       mutableDoc.setString("equipmentID", exercise.equipmentID)
