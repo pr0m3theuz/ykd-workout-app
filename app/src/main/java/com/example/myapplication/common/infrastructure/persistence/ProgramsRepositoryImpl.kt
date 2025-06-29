@@ -211,6 +211,8 @@ class ProgramsRepositoryImpl(
 
       program?.mesocycles = mesocycles
 
+      Log.i("ProgramRepositoryImpl.getProgramByID()", "program: $program")
+
       return program
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
@@ -379,7 +381,7 @@ class ProgramsRepositoryImpl(
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val json = Json.encodeToString(program.copy(ownerID = user.id.toHexString() ?: "MISSING_ID"))
-      val document = MutableDocument(program.id.toString(), json)
+      val document = MutableDocument("Program:${program.id}", json)
 
 //      collection.save(document)
       return true
