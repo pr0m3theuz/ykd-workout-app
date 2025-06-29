@@ -85,7 +85,7 @@ class ManageWorkoutUseCase(
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout): Workout {
     return workoutTemplate.copy(
       id = ObjectId(),
-      notes = workoutTemplate.notes.filter { it.pinned }.toMutableList(),
+      notes = workoutTemplate.notes, //.filter { it.pinned }.toMutableList(),
       dateCreated = Clock.System.now(),
       workoutStarted = Clock.System.now(),
       ownerID = userID,
@@ -177,7 +177,7 @@ class ManageWorkoutUseCase(
         workoutID,
         exerciseID = exercise.id
       ),
-      notes = previousExerciseSets.notes.filter { it.pinned }.toMutableList(),
+      notes = previousExerciseSets.notes, //.filter { it.pinned }.toMutableList(),
       workoutID = workoutID,
       microcycleID = previousExerciseSets.microcycleID,
       mesocycleID = previousExerciseSets.mesocycleID,
