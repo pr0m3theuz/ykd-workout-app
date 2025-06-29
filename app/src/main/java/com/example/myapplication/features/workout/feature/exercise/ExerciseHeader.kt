@@ -27,6 +27,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +48,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -77,9 +84,9 @@ fun ExerciseScreen(
   //  Log.i("ExerciseScreen", "$_exerciseSets")
   //  Log.i("ExerciseScreen", "$_exerciseNotes")
 
-//  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
-//  val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
-//  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
+  //  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
+  //  val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
+  //  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
   val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
 
@@ -111,17 +118,16 @@ fun ExerciseScreen(
         removeExerciseSets = { removeExerciseSets() },
         userDefaultWeightUnit = userDefaultWeightUnit,
         exerciseWeightUnit = exerciseWeightUnit,
-        updateExerciseWeightUnit = { weightUnit ->
-          updateExerciseWeightUnit(
-            weightUnit
-          )
-        },
+        updateExerciseWeightUnit = { weightUnit -> updateExerciseWeightUnit(weightUnit) },
         navController = navController,
         workoutComponents = workoutComponents,
-        onCreateSuperset = { selectedExercises ->
-          onCreateSuperset(selectedExercises)
-        },
+        onCreateSuperset = { selectedExercises -> onCreateSuperset(selectedExercises) },
       )
+    },
+    exerciseSetsDescription = {
+      //      if (exerciseSets.description != null) {
+      ExerciseSetDescription(exerciseSets = exerciseSets)
+      //      }
     },
     exerciseNotesList = {
       ExerciseNotesList(
@@ -134,7 +140,7 @@ fun ExerciseScreen(
     exerciseSetsWorkoutSummary = {
       ExerciseSetsWorkoutSummary(exerciseSets = exerciseSets, weightUnit = weightUnit)
     },
-    setContentHeader = { SetContentHeader(weightUnit = weightUnit) }
+    setContentHeader = { SetContentHeader(weightUnit = weightUnit) },
   )
 }
 
@@ -142,6 +148,7 @@ fun ExerciseScreen(
 fun ExerciseHeader(
   titleButton: @Composable (modifier: Modifier) -> Unit,
   exerciseOptionsMenu: @Composable () -> Unit,
+  exerciseSetsDescription: @Composable () -> Unit,
   exerciseNotesList: @Composable () -> Unit,
   exerciseSetsWorkoutSummary: @Composable () -> Unit,
   setContentHeader: @Composable () -> Unit,
@@ -154,16 +161,56 @@ fun ExerciseHeader(
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
       ) {
         titleButton(Modifier.weight(1.0f, fill = true))
 
         exerciseOptionsMenu()
       }
-
+      exerciseSetsDescription()
       exerciseNotesList()
       exerciseSetsWorkoutSummary()
       setContentHeader()
+    }
+  }
+}
+
+@Composable
+private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
+  var visible by remember { mutableStateOf(false) }
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 8.dp),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(text = "Description", style = MaterialTheme.typography.bodyMedium)
+    IconButton(onClick = { visible = !visible }) {
+      Icon(
+        imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
+        contentDescription = if (!visible) "Expand" else "Collapse",
+      )
+    }
+  }
+  AnimatedVisibility(
+    visible = visible,
+    enter = expandVertically(animationSpec = tween(250)),
+    exit = shrinkVertically(animationSpec = tween(250)),
+  ) {
+    Row(modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 16.dp)) {
+      Text(
+        text =
+          AnnotatedString.fromHtml(
+            exerciseSets.description
+              ?: ("<p><strong>Execution Notes:</strong></p><p>1 second pause at the bottom of each rep while maintaining tension on the pecs</p>\n" +
+                      "<p><strong>Protocol Details:</strong></p><ul><li><strong>Rest:</strong> 3-5 min</li><li><strong>Warm-up Sets:</strong> 2-3</li></ul>\n" +
+                      "<p><strong>Substitution Options:</strong></p><ul><li>45° Incline DB Press</li><li>45° Incline Machine Press</li></ul>")
+          ),
+        style = MaterialTheme.typography.bodySmall,
+      )
     }
   }
 }
@@ -173,7 +220,7 @@ private fun ExerciseNotesList(
   notesVisible: Boolean,
   exerciseSets: ExerciseExerciseSets,
   _pinNote: (note: ExerciseNote, pin: Boolean) -> Unit,
-  removeNote: (note: ExerciseNote) -> Unit
+  removeNote: (note: ExerciseNote) -> Unit,
 ) {
   //  Log.i("ExerciseNotesList", "${exerciseSets.notes.size}")
   var visible by remember { mutableStateOf(notesVisible) }
@@ -184,21 +231,36 @@ private fun ExerciseNotesList(
 
   //  Log.i("ExerciseNotesList", "visible: $visible")
 
-  AnimatedVisibility(
-    visible = notesVisible,
-    enter = expandVertically(animationSpec = tween(250)),
-    exit = shrinkVertically(animationSpec = tween(250))
-  ) {}
-
-  exerciseSets.notes.forEach { note ->
-    Log.i("ExerciseNotesList", "Note: $note")
-    SwipeToDismissItem(onDismissRequest = { removeNote(note) }) {
-      ExerciseNotes(
-        exerciseNote = note,
-        _pinNote = { pin -> _pinNote(note, pin) },
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 8.dp),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(text = "Notes", style = MaterialTheme.typography.bodyMedium)
+    IconButton(onClick = { visible = !visible }) {
+      Icon(
+        imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
+        contentDescription = if (!visible) "Expand" else "Collapse",
       )
     }
-    Spacer(modifier = Modifier.height(4.dp))
+  }
+
+  AnimatedVisibility(
+    visible = visible,
+    enter = expandVertically(animationSpec = tween(250)),
+    exit = shrinkVertically(animationSpec = tween(250)),
+  ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+      exerciseSets.notes.forEach { note ->
+        Log.i("ExerciseNotesList", "Note: $note")
+        SwipeToDismissItem(onDismissRequest = { removeNote(note) }) {
+          ExerciseNotes(exerciseNote = note, _pinNote = { pin -> _pinNote(note, pin) })
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+      }
+    }
   }
 }
 
@@ -208,23 +270,21 @@ private fun SetContentHeaderPreview() {
   SetContentHeader(weightUnit = "kg")
 }
 
-
 @Composable
 private fun SetContentHeader(weightUnit: String) {
   Row(
     modifier = Modifier
       .fillMaxWidth()
       .padding(vertical = 8.dp),
-//    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically
+    //    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
   ) {
     val textStyle = MaterialTheme.typography.bodyMedium
 
     Box(
-      modifier = Modifier
-        .width(48.dp),
-//      .weight(0.1f),
-      contentAlignment = Alignment.Center
+      modifier = Modifier.width(48.dp),
+      //      .weight(0.1f),
+      contentAlignment = Alignment.Center,
     ) {
       Text("Set", style = textStyle)
     }
@@ -234,14 +294,14 @@ private fun SetContentHeader(weightUnit: String) {
         Modifier
           // .padding(4.dp)
           .width(110.dp),
-//        .weight(0.22f),
-      contentAlignment = Alignment.Center
+      //        .weight(0.22f),
+      contentAlignment = Alignment.Center,
     ) {
       Text(
         "Previous Set (${weightUnit})",
         style = textStyle,
         maxLines = 1,
-        autoSize = TextAutoSize.StepBased(maxFontSize = textStyle.fontSize)
+        autoSize = TextAutoSize.StepBased(maxFontSize = textStyle.fontSize),
       )
     }
 
@@ -249,8 +309,8 @@ private fun SetContentHeader(weightUnit: String) {
       modifier = Modifier
         .padding(PaddingValues(horizontal = 0.dp))
         .width(105.dp),
-//        .weight(0.20f),
-      contentAlignment = Alignment.Center
+      //        .weight(0.20f),
+      contentAlignment = Alignment.Center,
     ) {
       Text("Weight ($weightUnit)", style = textStyle)
     }
@@ -259,8 +319,8 @@ private fun SetContentHeader(weightUnit: String) {
       modifier = Modifier
         .padding(PaddingValues(horizontal = 0.dp))
         .width(65.dp),
-//        .weight(0.15f),
-      contentAlignment = Alignment.Center
+      //        .weight(0.15f),
+      contentAlignment = Alignment.Center,
     ) {
       Text("Reps", style = textStyle)
     }
@@ -269,8 +329,8 @@ private fun SetContentHeader(weightUnit: String) {
       modifier = Modifier
         .padding(0.dp)
         .width(60.dp),
-//      .weight(0.1f),
-      contentAlignment = Alignment.Center
+      //      .weight(0.1f),
+      contentAlignment = Alignment.Center,
     ) {
       Text("RIR", style = textStyle)
     }
@@ -283,7 +343,7 @@ private fun SetContentHeader(weightUnit: String) {
 private fun ExerciseSetsWorkoutSummary(
   //  workoutViewModel: WorkoutViewModel = koinViewModel(),
   exerciseSets: ExerciseExerciseSets,
-  weightUnit: String
+  weightUnit: String,
 ) {
   // TODO Give option to show either Total Volume or Total Working Volume
   // TODO Update Values on user input, cause keyboard to
@@ -311,12 +371,12 @@ private fun ExerciseSetsWorkoutSummary(
     modifier = Modifier
       .fillMaxWidth()
       .padding(8.dp),
-    horizontalArrangement = Arrangement.SpaceBetween
+    horizontalArrangement = Arrangement.SpaceBetween,
   ) {
     Text(
       // TODO get default value for weight
       text = "Volume: ${df.format(totalVolume)} $weightUnit",
-      style = textStyle
+      style = textStyle,
     )
     Text(text = "Total Reps: $totalRepetitions", style = textStyle)
     Text(text = "Avg Weight: ${df.format(averageWeight)}", style = textStyle)
@@ -335,7 +395,7 @@ fun ExerciseTitleButton(
   border: BorderStroke? = null,
   colors: ButtonColors = ButtonDefaults.textButtonColors(),
   contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
-  content: @Composable RowScope.() -> Unit
+  content: @Composable RowScope.() -> Unit,
 ) {
   val contentColor by colors.contentColor(enabled)
   Surface(
@@ -355,12 +415,12 @@ fun ExerciseTitleButton(
           Modifier
             .defaultMinSize(
               minWidth = ButtonDefaults.MinWidth,
-              minHeight = ButtonDefaults.MinHeight
+              minHeight = ButtonDefaults.MinHeight,
             )
             .padding(contentPadding),
           horizontalArrangement = Arrangement.Start,
           verticalAlignment = Alignment.CenterVertically,
-          content = content
+          content = content,
         )
       }
     }
