@@ -51,7 +51,6 @@ enum class ProgressionType(val progression: String) {
   DOUBLE_PROGRESSION("double"),
   DYNAMIC_DOUBLE_PROGRESSION("dynamic double"),
   WAVE_PROGRESSION("wave"),
-
   AMRAP_PROGRESSION("amrap");
 
   companion object {
