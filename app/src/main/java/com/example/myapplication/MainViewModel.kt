@@ -100,7 +100,7 @@ class MainViewModel(
     Log.i("MainViewModel", "closeDatabase called")
     viewModelScope.launch(Dispatchers.IO) {
       replicatorService.stopReplication()
-      databaseManager.closeDatabases()
+//      databaseManager.closeDatabases()
     }
   }
 }
