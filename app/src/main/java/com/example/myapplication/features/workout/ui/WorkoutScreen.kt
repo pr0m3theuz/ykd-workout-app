@@ -38,7 +38,6 @@ import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.ExercisesSetsScreen
 import com.example.myapplication.features.workout.feature.setRestTimer.RestTimerButton
-import org.bson.types.ObjectId
 
 // TODO Takes a Workout Object
 
@@ -53,11 +52,15 @@ fun WorkoutScreen(
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
-  if (!workoutID.isNullOrBlank() && !copyWorkoutFromPreviousWorkout) {
-    workoutViewModel.getWorkoutByID(ObjectId(workoutID))
-  } else if (!workoutID.isNullOrBlank() && copyWorkoutFromPreviousWorkout) {
-    workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
-  }
+//  LaunchedEffect(workoutID) {
+//    if (!workoutID.isNullOrBlank() && !copyWorkoutFromPreviousWorkout) {
+//      Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
+//      workoutViewModel.getWorkoutByID(ObjectId(workoutID))
+//    } else if (!workoutID.isNullOrBlank() && copyWorkoutFromPreviousWorkout) {
+//      workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
+//    }
+//  }
+
   /*else {
     workoutViewModel.initWorkoutData()
   }*/
