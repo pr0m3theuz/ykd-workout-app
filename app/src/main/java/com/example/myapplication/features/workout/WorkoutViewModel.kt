@@ -2,7 +2,7 @@
 
 package com.example.myapplication.features.workout
 
-//import com.example.myapplication.data.model.ListExerciseExerciseSets
+// import com.example.myapplication.data.model.ListExerciseExerciseSets
 import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationChannel
@@ -51,6 +51,7 @@ import com.example.myapplication.common.domain.model.addWarmUpSets
 import com.example.myapplication.common.domain.model.completeSet
 import com.example.myapplication.common.domain.model.createWorkoutPreview
 import com.example.myapplication.common.domain.model.deepCopy
+import com.example.myapplication.common.domain.model.replaceWarmUpSets
 import com.example.myapplication.common.domain.model.updateSetRIR
 import com.example.myapplication.common.domain.model.updateSetRPE
 import com.example.myapplication.common.domain.model.updateSetReps
@@ -89,7 +90,6 @@ import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-
 const val WORKOUT_DURATION = "WORKOUT_DURATION"
 const val WORKOUT_PAUSED_ELAPSED_TIME = "WORKOUT_PAUSED_ELAPSED_TIME"
 const val TIMER_DURATION = "TIMER_DURATION"
@@ -107,7 +107,7 @@ class WorkoutViewModel(
   private val exerciseRepository: ExercisesRepository,
   private val workoutDatastore: WorkoutDatastore, // Added WorkoutDatastore
   private val savedStateHandle: SavedStateHandle,
-  private val userProfileManager: UserProfileManager
+  private val userProfileManager: UserProfileManager,
 ) : ViewModel() {
 
   // region User Profile
@@ -123,6 +123,7 @@ class WorkoutViewModel(
   var isWorkoutActive: Boolean
     get() = savedStateHandle.get<Boolean>(IS_WORKOUT_ACTIVE) ?: false
     set(value) = savedStateHandle.set(IS_WORKOUT_ACTIVE, value)
+
   private val REQUEST_CODE = 0
 
   private val notifyPendingIntent: PendingIntent
@@ -139,16 +140,16 @@ class WorkoutViewModel(
     get() = _isWorkoutCountUpTimerPaused
 
   private var _workoutDurationFormatted =
-    workoutDuration.value.toDuration(DurationUnit.MILLISECONDS)
-      .toComponents { hours, minutes, seconds, _
-        ->
-        if (hours > 0) {
-          "$hours:" + minutes.toString().padStart(2, '0') + ":" + seconds.toString()
-            .padStart(2, '0')
-        } else {
-          "$minutes:${seconds.toString().padStart(2, '0')}"
-        }
+    workoutDuration.value.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                               minutes,
+                                                                               seconds,
+                                                                               _ ->
+      if (hours > 0) {
+        "$hours:" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0')
+      } else {
+        "$minutes:${seconds.toString().padStart(2, '0')}"
       }
+    }
   private val _workoutDurationString = MutableStateFlow(_workoutDurationFormatted)
 
   val workoutDurationString: StateFlow<String>
@@ -207,7 +208,7 @@ class WorkoutViewModel(
 
   //  private val notifyIntent = MainActivity.newIntent(application)
 
-  //endregion
+  // endregion
 
   // region Init
   init {
@@ -216,25 +217,27 @@ class WorkoutViewModel(
     Log.d("WorkoutViewModel", "WorkoutViewModel init ${this@WorkoutViewModel}")
     Log.d(
       "WorkoutViewModel",
-      "is initialWorkoutData.isInitialized : ${this::initialWorkoutData.isInitialized}"
+      "is initialWorkoutData.isInitialized : ${this::initialWorkoutData.isInitialized}",
     )
-
 
     // TODO there is a race condition between getWorkoutByID and load from DataStore
     // Load from DataStore first
     viewModelScope.launch {
-      // This triggered each item the current workout is saved to the DataStore due to collecting the updated activeWorkout
-//      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
+      // This triggered each item the current workout is saved to the DataStore due to collecting
+      // the updated activeWorkout
+      //      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
       val activeWorkout = workoutDatastore.getActiveWorkout.first()
 
       Log.d("WorkoutViewModel", "is _workout.value null: ${_workout.value == null}")
       Log.d("WorkoutViewModel", "_workout.name: ${_workout.value?.name}")
       Log.d("WorkoutViewModel", "isWorkoutActive: $isWorkoutActive")
-//        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}")
-//      Log.d(
-//        "WorkoutViewModel",
-//        "activeWorkout == getDefaultInstance(): ${activeWorkout != ActiveWorkout.getDefaultInstance()}"
-//      )
+      //        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance():
+      // ${ActiveWorkout.getDefaultInstance()}")
+      //      Log.d(
+      //        "WorkoutViewModel",
+      //        "activeWorkout == getDefaultInstance(): ${activeWorkout !=
+      // ActiveWorkout.getDefaultInstance()}"
+      //      )
 
       if (activeWorkout != ActiveWorkout.getDefaultInstance() && !isWorkoutActive) {
         val domainWorkout = activeWorkout.toDomainWorkout()
@@ -245,46 +248,54 @@ class WorkoutViewModel(
         _workoutNotes.value = _workoutNotesData.toList()
 
         // Map WorkoutItemProto list to domain WorkoutComponent list
-        val domainWorkoutComponents = domainWorkout.workoutItems.map { workoutItem ->
-          // This mapping logic depends on how WorkoutItem is structured in your domain
-          // and how it corresponds to ExerciseSets/Superset after mapping from proto.
-          // The WorkoutItem.toDomain() from mappers should handle this.
-          // For now, we assume workoutItem.toDomain() from mappers correctly returns ExerciseSets or Superset
-          // which are subclasses of WorkoutComponent.
-          // If WorkoutItem itself is not a WorkoutComponent, adjust this mapping.
-          workoutItem // Assuming toDomain() in mappers produces correct WorkoutComponent types
-        }
+        val domainWorkoutComponents =
+          domainWorkout.workoutItems.map { workoutItem ->
+            // This mapping logic depends on how WorkoutItem is structured in your domain
+            // and how it corresponds to ExerciseSets/Superset after mapping from proto.
+            // The WorkoutItem.toDomain() from mappers should handle this.
+            // For now, we assume workoutItem.toDomain() from mappers correctly returns ExerciseSets
+            // or Superset
+            // which are subclasses of WorkoutComponent.
+            // If WorkoutItem itself is not a WorkoutComponent, adjust this mapping.
+            workoutItem // Assuming toDomain() in mappers produces correct WorkoutComponent types
+          }
         setWorkoutComponents(
           loadWorkoutComponentsFromPreviousWorkout(
-            previousWorkoutItems = domainWorkoutComponents,
-//              _workoutID = domainWorkout.id
+            previousWorkoutItems = domainWorkoutComponents
+            //              _workoutID = domainWorkout.id
           )
         )
-
 
         // Update timer states if needed from the loaded workout
         workoutDuration.value = domainWorkout.workoutDuration
         pausedElapsedTime =
           domainWorkout.workoutDuration // If workout was paused, resume from its duration
         _workoutDurationString.value =
-          workoutDuration.value.toDuration(DurationUnit.MILLISECONDS)
-            .toComponents { hours, minutes, seconds, _ ->
-              if (hours > 0) "$hours:${minutes.toString().padStart(2, '0')}:${
+          workoutDuration.value.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
+                                                                                     minutes,
+                                                                                     seconds,
+                                                                                     _ ->
+            if (hours > 0)
+              "$hours:${minutes.toString().padStart(2, '0')}:${
                 seconds.toString().padStart(2, '0')
               }"
-              else "$minutes:${seconds.toString().padStart(2, '0')}"
-            }
+            else "$minutes:${seconds.toString().padStart(2, '0')}"
+          }
         Log.d(
           "WorkoutViewModel",
-          "Loaded workout duration from DataStore: ${domainWorkout.workoutDuration}"
+          "Loaded workout duration from DataStore: ${domainWorkout.workoutDuration}",
         )
 
         Log.d(
           "WorkoutViewModel",
-          "Loaded workout duration from DataStore: ${_workoutDurationString.value}"
+          "Loaded workout duration from DataStore: ${_workoutDurationString.value}",
         )
 
-        if (!domainWorkout.isCompleted && domainWorkout.workoutStarted != null && domainWorkout.workoutEnded == null) {
+        if (
+          !domainWorkout.isCompleted &&
+          domainWorkout.workoutStarted != null &&
+          domainWorkout.workoutEnded == null
+        ) {
           isWorkoutActive = true
           // If the workout was active and not paused, timer might need to be restarted
           // or its state restored more carefully. For now, setting pausedElapsedTime.
@@ -299,14 +310,17 @@ class WorkoutViewModel(
         // if DataStore is empty.
         Log.d(
           "WorkoutViewModel",
-          "No active workout in DataStore, using SavedStateHandle or init new."
+          "No active workout in DataStore, using SavedStateHandle or init new.",
         )
         testSaveStateHandle() // Fallback to SavedStateHandle logic
-        if (_workout.value == null || _workout.value?.name == initWorkout().name) { // Check if it's still default/uninitialized
-          initWorkoutData() // Or specific logic to init new if not relying on this func for DataStore load
+        if (
+          _workout.value == null || _workout.value?.name == initWorkout().name
+        ) { // Check if it's still default/uninitialized
+          initWorkoutData() // Or specific logic to init new if not relying on this func for
+          // DataStore load
         }
       }
-//      }
+      //      }
     }
 
     notifyPendingIntent =
@@ -491,7 +505,7 @@ class WorkoutViewModel(
 
   @RequiresApi(Build.VERSION_CODES.S)
   fun startSetCompletedTimer(
-//    workoutComponent: WorkoutComponent, // Removed - We find the context from setUUID
+    //    workoutComponent: WorkoutComponent, // Removed - We find the context from setUUID
     setUUID: Uuid,
     setLazyListItemID: Long,
   ) {
@@ -535,7 +549,9 @@ class WorkoutViewModel(
     }
 
     // Only allows new completed sets to start the timer once
-    if (completedSets.add(setLazyListItemID)) { // Use add() which returns true if added (wasn't present)
+    if (
+      completedSets.add(setLazyListItemID)
+    ) { // Use add() which returns true if added (wasn't present)
 
       /*
        * Doesn't allow the new completed set to cancel the timer if one is already running
@@ -545,7 +561,9 @@ class WorkoutViewModel(
           _timerDuration = foundExercise.warmUpSetRestInWholeMilliseconds
 
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
-        } else if (foundExercise.workingSetRestTimerEnabled && (foundSet.setTypeID != WARM_UP_SET)) {
+        } else if (
+          foundExercise.workingSetRestTimerEnabled && (foundSet.setTypeID != WARM_UP_SET)
+        ) {
           _timerDuration = foundExercise.workingSetRestInWholeMilliseconds
 
           startRestTimer(_timerDuration.toDuration(DurationUnit.MILLISECONDS))
@@ -602,6 +620,7 @@ class WorkoutViewModel(
       resetTimerState()
     }
   }
+
   // endregion
 
   // region WorkoutPreviewScreen Data
@@ -621,7 +640,7 @@ class WorkoutViewModel(
   @OptIn(ExperimentalUuidApi::class)
   fun setupWorkoutPreview(
     workoutToPrepare: Workout,
-    previousWorkout: Workout // Needed for look-back progression
+    previousWorkout: Workout, // Needed for look-back progression
   ) {
     originalWorkout = workoutToPrepare.deepCopy() // Store a deep copy of the original state
 
@@ -632,54 +651,68 @@ class WorkoutViewModel(
       when (currentWorkoutItem) {
         is ExerciseSets -> {
           val progressionType =
-            currentWorkoutItem.sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
+            currentWorkoutItem.sets
+              .firstOrNull { it.setTypeID != SetType.warmUpSet }
+              ?.progressionSchemeID
           // Simulate progression call (replace with actual call)
           val previousExerciseSets =
-            previousWorkout.workoutItems.find { (it as? ExerciseSets)?.exerciseID == currentWorkoutItem.exerciseID } as? ExerciseSets
+            previousWorkout.workoutItems.find {
+              (it as? ExerciseSets)?.exerciseID == currentWorkoutItem.exerciseID
+            } as? ExerciseSets
 
           if (progressionType != null) {
 
-            previousExerciseSets?.sets?.filter { it.setCompleted }
+            previousExerciseSets
+              ?.sets
+              ?.filter { it.setCompleted }
               ?.let {
                 results[currentWorkoutItem.id.toString()] =
                   selectProgression(progressionType).invoke(it, currentWorkoutItem.sets)
               }
           } else {
             // No progression for this currentWorkoutItem]
-            results[currentWorkoutItem.id.toString()] = ProgressionResults(
-              // TODO Should this be null if no progression logic applied?
-              // TODO Or should previous workout be shown regardless?
-              completedSets = previousExerciseSets?.sets,
-              currentSets = currentWorkoutItem.sets,
-              outcome = ProgressionOutcome.NULL,
-              message = "No progression logic applied"
-            )
+            results[currentWorkoutItem.id.toString()] =
+              ProgressionResults(
+                // TODO Should this be null if no progression logic applied?
+                // TODO Or should previous workout be shown regardless?
+                completedSets = previousExerciseSets?.sets,
+                currentSets = currentWorkoutItem.sets,
+                outcome = ProgressionOutcome.NULL,
+                message = "No progression logic applied",
+              )
           }
         }
 
         is Superset -> {
           currentWorkoutItem.exercisesSets.forEach { currentSupersetExerciseSets ->
             val progressionType =
-              currentSupersetExerciseSets.sets.firstOrNull { it.setTypeID != SetType.warmUpSet }?.progressionSchemeID
+              currentSupersetExerciseSets.sets
+                .firstOrNull { it.setTypeID != SetType.warmUpSet }
+                ?.progressionSchemeID
             val previousSupersetExerciseSets =
-              previousWorkout.workoutItems.find { (it as? ExerciseSets)?.exerciseID == currentSupersetExerciseSets.exerciseID } as? ExerciseSets
+              previousWorkout.workoutItems.find {
+                (it as? ExerciseSets)?.exerciseID == currentSupersetExerciseSets.exerciseID
+              } as? ExerciseSets
 
             if (progressionType != null) {
-              previousSupersetExerciseSets?.sets?.filter { it.setCompleted }
+              previousSupersetExerciseSets
+                ?.sets
+                ?.filter { it.setCompleted }
                 ?.let {
                   results[currentSupersetExerciseSets.id.toString()] =
                     selectProgression(progressionType).invoke(it, currentSupersetExerciseSets.sets)
                 }
             } else {
               // No progression for this currentWorkoutItem]
-              results[currentSupersetExerciseSets.id.toString()] = ProgressionResults(
-                // TODO Should this be null if no progression logic applied?
-                // TODO Or should previous workout be shown regardless?
-                completedSets = previousSupersetExerciseSets?.sets,
-                currentSets = currentSupersetExerciseSets.sets,
-                outcome = ProgressionOutcome.NULL,
-                message = "No progression logic applied"
-              ) // No progression for this currentWorkoutItem]
+              results[currentSupersetExerciseSets.id.toString()] =
+                ProgressionResults(
+                  // TODO Should this be null if no progression logic applied?
+                  // TODO Or should previous workout be shown regardless?
+                  completedSets = previousSupersetExerciseSets?.sets,
+                  currentSets = currentSupersetExerciseSets.sets,
+                  outcome = ProgressionOutcome.NULL,
+                  message = "No progression logic applied",
+                ) // No progression for this currentWorkoutItem]
             }
           }
         }
@@ -692,75 +725,104 @@ class WorkoutViewModel(
     previewItems.clear()
     requireNotNull(originalWorkout) { "Original workout cannot be null" }
     previewItems.addAll(
-      createWorkoutPreview(
-        previousWorkout,
-        originalWorkout!!,
-        progressionResults
-      )
+      createWorkoutPreview(previousWorkout, originalWorkout!!, progressionResults)
     )
 
     // Determine overall status
-    val failures = previewItems.count {
-      (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.FAILED) ||
-              (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.FAILED })
-    }
-    val successes = previewItems.count {
-      (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.PROGRESSED) ||
-              (it is PreviewSuperset && it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.PROGRESSED })
-    }
+    val failures =
+      previewItems.count {
+        (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.FAILED) ||
+                (it is PreviewSuperset &&
+                        it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.FAILED })
+      }
+    val successes =
+      previewItems.count {
+        (it is PreviewExerciseSets && it.overallOutcome == ProgressionOutcome.PROGRESSED) ||
+                (it is PreviewSuperset &&
+                        it.previewExerciseSets.any { p -> p.overallOutcome == ProgressionOutcome.PROGRESSED })
+      }
 
     overallProgressionSuccess.value = failures == 0
-    progressionMessage.value = when {
-      failures > 0 -> "Progression failed for $failures exercise(s)."
-      successes > 0 -> "All $successes progression(s) will be applied."
-      else -> "No progressions applied (targets may not have been met)."
-    }
+    progressionMessage.value =
+      when {
+        failures > 0 -> "Progression failed for $failures exercise(s)."
+        successes > 0 -> "All $successes progression(s) will be applied."
+        else -> "No progressions applied (targets may not have been met)."
+      }
   }
 
   fun acceptProgressions() {
     // Create the final workout object by applying successful progressions
-    val finalWorkoutItems = originalWorkout?.workoutItems?.map { originalItem ->
-      when (originalItem) {
-        is ExerciseSets -> {
-          val preview =
-            previewItems.find { (it as? PreviewExerciseSets)?.originalItem?.id == originalItem.id } as? PreviewExerciseSets
-          if (preview?.overallOutcome == ProgressionOutcome.PROGRESSED || preview?.overallOutcome == ProgressionOutcome.UNCHANGED) {
-            // Apply the progressed sets if success or unchanged
-            originalItem.copy(sets = preview.previewSets.map { it.progressedSet }.toMutableList())
-          } else {
-            // Revert to original if failed or rejected implicitly (or handle explicitly)
-            originalItem // Return original
+    val finalWorkoutItems =
+      originalWorkout
+        ?.workoutItems
+        ?.map { originalItem ->
+          when (originalItem) {
+            is ExerciseSets -> {
+              val preview =
+                previewItems.find {
+                  (it as? PreviewExerciseSets)?.originalItem?.id == originalItem.id
+                } as? PreviewExerciseSets
+              if (
+                preview?.overallOutcome == ProgressionOutcome.PROGRESSED ||
+                preview?.overallOutcome == ProgressionOutcome.UNCHANGED
+              ) {
+                // Apply the progressed sets if success or unchanged
+                originalItem.copy(
+                  sets = preview.previewSets.map { it.progressedSet }.toMutableList()
+                )
+              } else {
+                // Revert to original if failed or rejected implicitly (or handle explicitly)
+                originalItem // Return original
+              }
+            }
+
+            is Superset -> {
+              originalItem.copy(
+                exercisesSets =
+                  originalItem.exercisesSets
+                    .map { exSets ->
+                      val preview =
+                        (previewItems.find {
+                          (it as? PreviewSuperset)?.originalItem?.id == originalItem.id
+                        } as? PreviewSuperset)
+                          ?.previewExerciseSets
+                          ?.find { it.originalItem.id == exSets.id }
+
+                      if (
+                        preview?.overallOutcome == ProgressionOutcome.PROGRESSED ||
+                        preview?.overallOutcome == ProgressionOutcome.UNCHANGED
+                      ) {
+                        exSets.copy(
+                          sets = preview.previewSets.map { it.progressedSet }.toMutableList()
+                        )
+                      } else {
+                        exSets
+                      }
+                    }
+                    .toMutableList()
+              )
+            }
           }
         }
-
-        is Superset -> {
-          originalItem.copy(exercisesSets = originalItem.exercisesSets.map { exSets ->
-            val preview =
-              (previewItems.find { (it as? PreviewSuperset)?.originalItem?.id == originalItem.id } as? PreviewSuperset)
-                ?.previewExerciseSets?.find { it.originalItem.id == exSets.id }
-
-            if (preview?.overallOutcome == ProgressionOutcome.PROGRESSED || preview?.overallOutcome == ProgressionOutcome.UNCHANGED) {
-              exSets.copy(sets = preview.previewSets.map { it.progressedSet }.toMutableList())
-            } else {
-              exSets
-            }
-          }.toMutableList())
-        }
-      }
-    }?.toMutableList()
+        ?.toMutableList()
 
     if (finalWorkoutItems != null) {
-      originalWorkout?.copy(workoutItems = finalWorkoutItems)
-        ?.let {
-          copyWorkoutFromWorkoutTemplate(it)
-          previewItems.clear()
-        }
+      originalWorkout?.copy(workoutItems = finalWorkoutItems)?.let {
+        Log.d("WorkoutViewModel", "Applying progressions to workout")
+        Log.d("WorkoutViewModel", "acceptProgressions() calling copyWorkoutFromWorkoutTemplate")
+        copyWorkoutFromWorkoutTemplate(it)
+        previewItems.clear()
+      }
     }
   }
 
   fun rejectProgressions() {
     // Return the original workout plan without any changes
-    originalWorkout?.let { copyWorkoutFromWorkoutTemplate(it) }
+    originalWorkout?.let {
+      Log.d("WorkoutViewModel", "rejectProgressions() calling copyWorkoutFromWorkoutTemplate")
+      copyWorkoutFromWorkoutTemplate(it)
+    }
     originalWorkout = null
     previewItems.clear()
   }
@@ -815,66 +877,78 @@ class WorkoutViewModel(
   private fun startAutoSavingWorkout() {
     Log.d(
       "WorkoutViewModel",
-      "autoSaveJob?.isActive ${autoSaveJob?.isActive == true}\nautoSaveJob: $autoSaveJob"
+      "autoSaveJob?.isActive ${autoSaveJob?.isActive == true}\nautoSaveJob: $autoSaveJob",
     )
     // Cancel any previous auto-save job to avoid duplicates if called multiple times
-//    autoSaveJob?.cancel()
+    //    autoSaveJob?.cancel()
     if (autoSaveJob?.isActive != true) {
-      autoSaveJob = viewModelScope.launch {
-        combine(
-          _workout,
-          _workoutNotes,
-          _workoutComponentFlow,
-          workoutDuration
-        ) { workout, notes, components, duration ->
-          Quadruple(workout, notes, components, duration)
-        }
-          .debounce(1000.milliseconds)
-          .collect { (latestWorkout, latestNotes, latestComponents, latestDuration) ->
-            runCatching {
-              if (latestWorkout != null) {
-                Log.d("WorkoutViewModel", "Auto-saving workout to DataStore: ${latestWorkout.name}")
-                Log.d("WorkoutViewModel", "latestDuration: $latestDuration")
-                Log.d(
-                  "WorkoutViewModel",
-                  "autoSaveJob._workoutDurationString: ${_workoutDurationString.value}"
-                )
-                // Ensure latestNotes and latestComponents are correctly reflected in latestWorkout instance
-                // if they are not already part of its direct state.
-                // The mappers expect Workout.notes and Workout.workoutItems to be up-to-date.
-                // Let's assume _workout.value (which is latestWorkout) is the source of truth and
-                // its 'notes' and 'workoutItems' are updated elsewhere when latestNotes/latestComponents change.
-                // If not, we might need to create a new Workout instance here:
-                val workoutToSave = latestWorkout.copy(
-                  workoutDuration = latestDuration,
-                  notes = latestNotes, // Assuming Workout data class has notes: List<WorkoutNote>
-                  workoutItems = manageWorkoutUseCase.convertWorkoutComponentsToWorkoutItems(
-                    latestComponents
-                  ) // Assuming Workout data class has workoutItems: List<WorkoutItem>
-                  // and WorkoutComponent can be filtered/mapped to WorkoutItem.
-                  // This needs to be correct based on your domain model structure.
-                  // If WorkoutComponent IS a WorkoutItem, then just `latestComponents` might be fine.
-                )
-                // TODO: Verify that latestWorkout actually contains the most up-to-date lists for notes and items,
-                // or reconstruct it properly here before mapping.
-                // For now, assuming latestWorkout is sufficiently up-to-date for toProtoActiveWorkout()
-                val activeWorkoutProto = workoutToSave.toProtoActiveWorkout()
-                workoutDatastore.saveActiveWorkout(activeWorkoutProto)
-                Log.d("WorkoutViewModel", "Successfully auto-saved workout to DataStore.")
-
-                // Optionally, keep the old repository call if it serves other purposes,
-                // or remove if DataStore is the sole persistence for active workouts.
-                // manageWorkoutUseCase.saveInProgressWorkout(
-                //   workout = latestWorkout,
-                //   workoutNotes = latestNotes,
-                //   workoutComponents = latestComponents
-                // )
-              }
-            }.onFailure { error ->
-              Log.e("WorkoutViewModel", "Error auto-saving workout to DataStore", error)
-            }
+      autoSaveJob =
+        viewModelScope.launch {
+          combine(_workout, _workoutNotes, _workoutComponentFlow, workoutDuration) { workout,
+                                                                                     notes,
+                                                                                     components,
+                                                                                     duration ->
+            Quadruple(workout, notes, components, duration)
           }
-      }
+            .debounce(1000.milliseconds)
+            .collect { (latestWorkout, latestNotes, latestComponents, latestDuration) ->
+              runCatching {
+                if (latestWorkout != null) {
+                  Log.d(
+                    "WorkoutViewModel",
+                    "Auto-saving workout to DataStore: ${latestWorkout.name}",
+                  )
+                  Log.d("WorkoutViewModel", "latestDuration: $latestDuration")
+                  Log.d(
+                    "WorkoutViewModel",
+                    "autoSaveJob._workoutDurationString: ${_workoutDurationString.value}",
+                  )
+                  // Ensure latestNotes and latestComponents are correctly reflected in
+                  // latestWorkout instance
+                  // if they are not already part of its direct state.
+                  // The mappers expect Workout.notes and Workout.workoutItems to be up-to-date.
+                  // Let's assume _workout.value (which is latestWorkout) is the source of truth
+                  // and
+                  // its 'notes' and 'workoutItems' are updated elsewhere when
+                  // latestNotes/latestComponents change.
+                  // If not, we might need to create a new Workout instance here:
+                  val workoutToSave =
+                    latestWorkout.copy(
+                      workoutDuration = latestDuration,
+                      notes =
+                        latestNotes, // Assuming Workout data class has notes: List<WorkoutNote>
+                      workoutItems =
+                        manageWorkoutUseCase.convertWorkoutComponentsToWorkoutItems(
+                          latestComponents
+                        ), // Assuming Workout data class has workoutItems: List<WorkoutItem>
+                      // and WorkoutComponent can be filtered/mapped to WorkoutItem.
+                      // This needs to be correct based on your domain model structure.
+                      // If WorkoutComponent IS a WorkoutItem, then just `latestComponents` might
+                      // be fine.
+                    )
+                  // TODO: Verify that latestWorkout actually contains the most up-to-date lists
+                  // for notes and items,
+                  // or reconstruct it properly here before mapping.
+                  // For now, assuming latestWorkout is sufficiently up-to-date for
+                  // toProtoActiveWorkout()
+                  val activeWorkoutProto = workoutToSave.toProtoActiveWorkout()
+                  workoutDatastore.saveActiveWorkout(activeWorkoutProto)
+                  Log.d("WorkoutViewModel", "Successfully auto-saved workout to DataStore.")
+
+                  // Optionally, keep the old repository call if it serves other purposes,
+                  // or remove if DataStore is the sole persistence for active workouts.
+                  // manageWorkoutUseCase.saveInProgressWorkout(
+                  //   workout = latestWorkout,
+                  //   workoutNotes = latestNotes,
+                  //   workoutComponents = latestComponents
+                  // )
+                }
+              }
+                .onFailure { error ->
+                  Log.e("WorkoutViewModel", "Error auto-saving workout to DataStore", error)
+                }
+            }
+        }
       Log.d("ViewModelLifecycle", "Auto-save job started.")
     }
   }
@@ -896,10 +970,12 @@ class WorkoutViewModel(
     // This initWorkoutData might need adjustment.
     // If DataStore has data, it's already loaded.
     // This should primarily handle the case where DataStore is empty and we need a fresh start.
-    if (!isWorkoutActive && (_workout.value == null || _workout.value?.name == initWorkout().name)) {
+    if (
+      !isWorkoutActive && (_workout.value == null || _workout.value?.name == initWorkout().name)
+    ) {
       Log.d(
         "WorkoutViewModel",
-        "initWorkoutData: Initializing new workout as DataStore was empty or workout not active."
+        "initWorkoutData: Initializing new workout as DataStore was empty or workout not active.",
       )
       initialWorkoutData = initWorkout()
       workoutDetails = initialWorkoutData
@@ -915,7 +991,7 @@ class WorkoutViewModel(
     } else {
       Log.d(
         "WorkoutViewModel",
-        "initWorkoutData: Workout loaded from DataStore, not re-initializing."
+        "initWorkoutData: Workout loaded from DataStore, not re-initializing.",
       )
     }
     // testSaveStateHandle() // Consider if this is needed here anymore
@@ -925,39 +1001,50 @@ class WorkoutViewModel(
     return manageWorkoutUseCase.getExerciseByID(exerciseID)
   }
 
+  val workoutIDsLoaded = mutableSetOf<ObjectId>()
   fun getWorkoutByID(workoutID: ObjectId) {
-//    Log.i("WorkoutViewModel.getWorkoutByID() ", "called. WorkoutID: $workoutID")
+    Log.d("WorkoutViewModel ", "WorkoutViewModel.getWorkoutByID() called. WorkoutID: $workoutID")
     // This function loads a workout template or a specific workout by ID,
     // potentially overriding what was loaded from DataStore if called explicitly.
     // If it's intended to be the primary way to start a *new* workout from template/existing,
     // it should probably clear DataStore first or handle the merge carefully.
-
-    if (!isWorkoutActive || _workout.value?.id != workoutID) { // Only load if not already active with same ID
+    Log.d("WorkoutViewModel", "WorkoutViewModel.isWorkoutActive: $isWorkoutActive")
+    Log.d("WorkoutViewModel", "WorkoutViewModel.workoutID: ${_workout.value?.id}")
+//    Log.d("WorkoutViewModel", "WorkoutViewModel.workout hashedSignature: ${_workout.value?.hashedSignature}")
+    workoutIDsLoaded.add(workoutID)
+    if (
+      !isWorkoutActive || !workoutIDsLoaded.contains(workoutID)
+    ) { // Only load if not already active with same ID
       Log.d(
         "WorkoutViewModel",
-        "WorkoutViewModel.getWorkoutByID: Loading workout $workoutID explicitly."
+        "WorkoutViewModel.getWorkoutByID: Loading workout $workoutID explicitly.",
       )
       Log.d("WorkoutViewModel", "WorkoutViewModel.getWorkoutByID: $this")
-      val loadedWorkout = manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
-        managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
-          ?.let { previousWorkout ->
+
+      val loadedWorkout =
+        manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
+          managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
+            ?.let { previousWorkout ->
             setupWorkoutPreview(
               workoutToPrepare = currentWorkout,
-              previousWorkout = previousWorkout
+              previousWorkout = previousWorkout,
             )
           }
-        currentWorkout
-      } ?: initWorkout()
+          currentWorkout
+        } ?: initWorkout()
 
       initialWorkoutData = loadedWorkout
-      copyWorkoutFromWorkoutTemplate(initialWorkoutData) // This sets _workout.value and other states
+      Log.d("WorkoutViewModel", "getWorkoutByID() calling copyWorkoutFromWorkoutTemplate")
+      copyWorkoutFromWorkoutTemplate(
+        initialWorkoutData
+      ) // This sets _workout.value and other states
       isWorkoutActive = true
       startAutoSavingWorkout() // Ensure auto-saving starts for this explicitly loaded workout
       // testSaveStateHandle() // Consider if this is needed
     } else {
       Log.d(
         "WorkoutViewModel",
-        "getWorkoutByID: Workout $workoutID already active or loaded, not reloading."
+        "getWorkoutByID: Workout $workoutID already active or loaded, not reloading.",
       )
     }
   }
@@ -974,6 +1061,7 @@ class WorkoutViewModel(
       _workout.value = workoutDetails
 
       getPinnedWorkoutNotes(workout.uuid, workout.id)
+      Log.d("WorkoutViewModel", "loadWorkoutFromPreviousWorkout: calling setWorkoutComponents")
       setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.workoutItems))
     }
   }
@@ -987,7 +1075,7 @@ class WorkoutViewModel(
     _workout.value = workoutDetails
 
     getPinnedWorkoutNotes(workoutTemplate.uuid, newWorkout.id)
-
+    Log.d("WorkoutViewModel", "copyWorkoutFromWorkoutTemplate: calling setWorkoutComponents")
     setWorkoutComponents(
       copyWorkoutItemsFromPreviousWorkout(workoutTemplate.workoutItems, newWorkout.id).toList()
     )
@@ -996,9 +1084,9 @@ class WorkoutViewModel(
   /**
    * Copies workout data from a previously completed workout or a workout template.
    *
-   * This function retrieves a completed workout by its ID, creates a new workout
-   * based on it, and updates the ViewModel's state with the new workout's details.
-   * This includes the workout name, notes, and its constituent exercises and sets.
+   * This function retrieves a completed workout by its ID, creates a new workout based on it, and
+   * updates the ViewModel's state with the new workout's details. This includes the workout name,
+   * notes, and its constituent exercises and sets.
    *
    * @param previousWorkout The [ObjectId] of the previously completed workout to copy from.
    */
@@ -1011,6 +1099,7 @@ class WorkoutViewModel(
       _workout.value = workoutDetails
 
       getPinnedWorkoutNotes(newWorkout.uuid, newWorkout.id)
+      Log.d("WorkoutViewModel", "copyWorkoutFromPreviousWorkout: calling setWorkoutComponents")
       setWorkoutComponents(
         copyWorkoutItemsFromPreviousWorkout(newWorkout.workoutItems, newWorkout.id).toList()
       )
@@ -1036,7 +1125,6 @@ class WorkoutViewModel(
     )
   }
 
-
   // TODO Think out how to get Previous Set from the last time the exercise was performed
   //   and what data structure to store them in
 
@@ -1052,9 +1140,9 @@ class WorkoutViewModel(
   // region Workout Notes
   private var _workoutNotesData: MutableList<WorkoutNote> = mutableListOf()
 
-
-//    get() = savedStateHandle.get<MutableList<WorkoutNote>>(WORKOUT_NOTES) ?: mutableListOf() // Removed SavedStateHandle
-//    set(value) = savedStateHandle.set(WORKOUT_NOTES, value)
+  //    get() = savedStateHandle.get<MutableList<WorkoutNote>>(WORKOUT_NOTES) ?: mutableListOf() //
+  // Removed SavedStateHandle
+  //    set(value) = savedStateHandle.set(WORKOUT_NOTES, value)
 
   private var _workoutNotes: MutableStateFlow<List<WorkoutNote>> =
     MutableStateFlow(_workoutNotesData.toList())
@@ -1136,11 +1224,15 @@ class WorkoutViewModel(
     _workoutComponentFlow.value = workoutComponents
     Log.i(
       "WorkoutViewModel.setWorkoutComponents",
-      "WorkoutViewModel.setWorkoutComponents.workoutViewModel: $this"
+      "WorkoutViewModel.setWorkoutComponents.workoutViewModel: $this",
     )
     Log.i(
       "WorkoutViewModel.setWorkoutComponents",
-      "WorkoutViewModel.setWorkoutComponents._workoutComponents: ${workoutComponents.size}"
+      "WorkoutViewModel.setWorkoutComponents._workoutComponents: ${workoutComponents.size}",
+    )
+    Log.d(
+      "WorkoutViewModel.setWorkoutComponents",
+      "WorkoutViewModel.setWorkoutComponents: ${_workoutComponents.toString().replace("\n", "")}",
     )
     //    savedStateHandle[EXERCISE_EXERCISE_SETS] = exercisesSets.toMutableList()
   }
@@ -1148,11 +1240,11 @@ class WorkoutViewModel(
   val workoutComponents: StateFlow<List<WorkoutComponent>>
     get() = _workoutComponentFlow.asStateFlow()
 
-//  TODO What is this used for or purpose, Workout Summary?
-//  private var _allSetsData: MutableList<Set> = allSets(_exercisesSets.value)
-//  private var _allSets = MutableStateFlow(_allSetsData.toList())
-//  val allSets
-//    get() = _allSets.asStateFlow()
+  //  TODO What is this used for or purpose, Workout Summary?
+  //  private var _allSetsData: MutableList<Set> = allSets(_exercisesSets.value)
+  //  private var _allSets = MutableStateFlow(_allSetsData.toList())
+  //  val allSets
+  //    get() = _allSets.asStateFlow()
 
   fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
     return manageWorkoutUseCase.getWeightUnit(exerciseSets)
@@ -1161,19 +1253,16 @@ class WorkoutViewModel(
   fun createSupersetFromExercise(exercises: List<Exercise>) {
     requireNotNull(_workout.value) { "Workout details cannot be null" }
     _workout.value?.let { workout ->
-      val temporaryWorkoutComponents = manageWorkoutUseCase.createSupersetFromExercise(
-        _workoutComponents,
-        exercises,
-        workout,
-      )
-
+      val temporaryWorkoutComponents =
+        manageWorkoutUseCase.createSupersetFromExercise(_workoutComponents, exercises, workout)
+      Log.d("WorkoutViewModel", "createSupersetFromExercise: calling setWorkoutComponents")
       setWorkoutComponents(temporaryWorkoutComponents.toList())
     }
-
   }
 
   fun createSupersetFromExercisesSets(exercisesSets: List<ExerciseExerciseSets>) {
     requireNotNull(_workout.value) { "Workout details cannot be null" }
+    Log.d("WorkoutViewModel", "createSupersetFromExercisesSets: calling setWorkoutComponents")
     _workout.value?.let { workout ->
       setWorkoutComponents(
         manageWorkoutUseCase.createSupersetFromExercisesSets(
@@ -1195,6 +1284,7 @@ class WorkoutViewModel(
       )
 
     //    _exercisesSetsData = temporaryExerciseExerciseSets
+    Log.d("WorkoutViewModel", "addMultipleEmptyExerciseSets: calling setWorkoutComponents")
     setWorkoutComponents(temporaryExerciseExerciseSets.toList())
   }
 
@@ -1204,19 +1294,19 @@ class WorkoutViewModel(
   }
 
   fun addSet(
-//    workoutComponent: List<WorkoutComponent>, // Input: immutable list
+    //    workoutComponent: List<WorkoutComponent>, // Input: immutable list
     supersetUuid: Uuid?, // ID of the Superset component
-    targetExSetsUuid: Uuid // ID of the ExerciseExerciseSets within the Superset
+    targetExSetsUuid: Uuid, // ID of the ExerciseExerciseSets within the Superset
   ) {
     setWorkoutComponents(
       manageWorkoutUseCase.addSetToExerciseExerciseSet(
         workoutComponent = _workoutComponents,
         supersetUuid = supersetUuid,
-        targetExSetsUuid = targetExSetsUuid
+        targetExSetsUuid = targetExSetsUuid,
       )
     )
-//    val temporarySets: List<Set> = manageWorkoutUseCase.addSet(workoutComponent)
-//    updateExercisesSetsData (workoutComponent, temporarySets)
+    //    val temporarySets: List<Set> = manageWorkoutUseCase.addSet(workoutComponent)
+    //    updateExercisesSetsData (workoutComponent, temporarySets)
 
   }
 
@@ -1253,7 +1343,7 @@ class WorkoutViewModel(
 
   fun removeExerciseNote(
     targetExerciseSets: ExerciseExerciseSets,
-    exerciseNoteToRemove: ExerciseNote
+    exerciseNoteToRemove: ExerciseNote,
   ) {
     val updatedNotes = targetExerciseSets.notes.filter { it != exerciseNoteToRemove }
     targetExerciseSets.notes = updatedNotes.toMutableList()
@@ -1284,29 +1374,31 @@ class WorkoutViewModel(
 
   // endregion
 
-//  private fun allSets(exerciseSets: List<ExerciseExerciseSets>): MutableList<Set> {
-//    val setsList = mutableListOf<Set>()
-//    exerciseSets.forEach { exerciseSet ->
-//      exerciseSet.sets.forEach { set -> setsList.add(set) }
-//    }
-//
-//    return setsList
-//  fun getSetData(setUUID: RealmUUID): Set {
-//    return allSets().first { it.uuid == setUUID }
+  //  private fun allSets(exerciseSets: List<ExerciseExerciseSets>): MutableList<Set> {
+  //    val setsList = mutableListOf<Set>()
+  //    exerciseSets.forEach { exerciseSet ->
+  //      exerciseSet.sets.forEach { set -> setsList.add(set) }
+  //    }
+  //
+  //    return setsList
+  //  fun getSetData(setUUID: RealmUUID): Set {
+  //    return allSets().first { it.uuid == setUUID }
 
   // region Update Exercise Sets Data
 
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseExerciseSets, newExercise: Exercise) {
+    Log.d("WorkoutViewModel", "replaceExerciseInExerciseSets: calling setWorkoutComponents")
     setWorkoutComponents(
       manageWorkoutUseCase.replaceExerciseInExerciseSets(
         _workoutComponents,
         exerciseSets,
-        newExercise
+        newExercise,
       )
     )
   }
-  private fun updateExerciseExerciseSetsData(workoutComponent: ExerciseExerciseSets) {
 
+  private fun updateExerciseExerciseSetsData(workoutComponent: ExerciseExerciseSets) {
+    Log.d("WorkoutViewModel", "updateExerciseExerciseSetsData: calling setWorkoutComponents")
     setWorkoutComponents(
       manageWorkoutUseCase.refreshWorkoutComponentLazyListItemID(
         workoutComponents = _workoutComponents,
@@ -1350,6 +1442,12 @@ class WorkoutViewModel(
 
   fun addWarmUpSets(exerciseSets: ExerciseExerciseSets, warmUpSets: List<Set>) {
     exerciseSets.addWarmUpSets(warmUpSets)
+
+    updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+  }
+
+  fun replaceWarmUpSets(exerciseSets: ExerciseExerciseSets, warmUpSets: List<Set>) {
+    exerciseSets.replaceWarmUpSets(warmUpSets)
 
     updateExercisesSetsData(exerciseSets, exerciseSets.sets)
   }
@@ -1509,7 +1607,6 @@ class WorkoutViewModel(
         manageWorkoutUseCase.saveWorkout(workoutDetails, _workoutNotesData, _workoutComponents)
       }
     }
-
   }
 
   fun getCompletedWorkout(workoutID: ObjectId) {
@@ -1577,6 +1674,10 @@ class WorkoutViewModel(
 
   // region Utils
   fun getExerciseSetsByID(exerciseSetsID: ObjectId): ExerciseExerciseSets? {
+    Log.d("getExerciseSetsByID", "WorkoutViewModel: $this")
+    Log.d("getExerciseSetsByID", "exerciseSetsID: $exerciseSetsID")
+//    Log.d("getExerciseSetsByID", _workoutComponents.toString().replace("\n", ""))
+
     _workoutComponents.forEach {
       when (it) {
         is ExerciseExerciseSets -> {
@@ -1609,7 +1710,7 @@ private fun initWorkout(): Workout {
         name = "Morning Workout",
         dateCreated = Clock.System.now(),
         workoutStarted = Clock.System.now(),
-        isPublic = false
+        isPublic = false,
       )
     }
 
