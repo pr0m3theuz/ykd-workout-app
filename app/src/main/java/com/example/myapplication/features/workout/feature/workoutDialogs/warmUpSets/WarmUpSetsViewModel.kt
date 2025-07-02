@@ -41,6 +41,8 @@ class WarmUpSetsViewModel(
   val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
 
   private var _exerciseSets: ExerciseExerciseSets? = null
+  val exerciseSets
+    get() = MutableStateFlow(_exerciseSets).asStateFlow()
   private var exerciseWeightUnit: String? = null
 
   private var _workingSetWeight = MutableStateFlow(100.0)
@@ -66,14 +68,15 @@ class WarmUpSetsViewModel(
   fun setExerciseSets(exerciseSets: ExerciseExerciseSets) {
     _exerciseSets = exerciseSets
     exerciseWeightUnit = exerciseSets.exercise.weightUnit ?: userDefaultWeightUnit
-    _warmUpSets = initWarmUpSets(exerciseSets)
+    _warmUpSets = exerciseSets.sets.filter { it.setTypeID == SetType.warmUpSet }.toMutableList()
+      .takeIf { it.isNotEmpty() } ?: initWarmUpSets(exerciseSets)
     _warmUpSetsFlow.value = _warmUpSets.toList()
     getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
   }
 
-  fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
-    return if (exerciseSets.exercise.weightUnit != null) {
-      exerciseSets.exercise.weightUnit ?: MassUnit.POUNDS.abbreviation
+  fun getWeightUnit(): String {
+    return if (_exerciseSets?.exercise?.weightUnit != null) {
+      _exerciseSets?.exercise?.weightUnit ?: MassUnit.POUNDS.abbreviation
     } else {
       userDefaultWeightUnit
     }
