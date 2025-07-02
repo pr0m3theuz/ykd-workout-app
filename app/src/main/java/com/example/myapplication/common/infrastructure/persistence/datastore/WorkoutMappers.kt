@@ -128,11 +128,20 @@ fun Set.toProto(): SetProto {
     builder.setTypeID = this.setTypeID.toProtoString() // Assuming SetType has a 'name' or similar property
     this.percentage1RM?.let { builder.percentage1RM = it }
     builder.setCompleted = this.setCompleted
+    this.targetRepetitions?.let { builder.targetRepetitions = it }
+    this.targetWeightPounds?.let { builder.targetWeightPounds = it }
+    this.targetWeightKilograms?.let { builder.targetWeightKilograms = it }
+    this.targetRatePerceivedEffort?.let { builder.targetRatePerceivedEffort = it }
+    this.targetRepetitionsInReserve?.let { builder.targetRepetitionsInReserve = it }
+    this.targetPercentage1RM?.let { builder.targetPercentage1RM = it }
     // restTimerInSeconds not in domain Set, default or map if available elsewhere
     // notes (String) not in domain Set, default or map if available elsewhere
     builder.exerciseID = this.exerciseID?.toProtoString() ?: "" // Proto expects non-null string
     builder.exerciseSetsID = this.exerciseSetsID.toProtoString()
     builder.workoutID = this.workoutID.toProtoString()
+    this.microcycleID?.let { builder.microcycleID = it.toProtoString() }
+    this.mesocycleID?.let { builder.mesocycleID = it.toProtoString() }
+    this.programID?.let { builder.programID = it.toProtoString() }
     builder.ownerID = this.ownerID
     // order is in proto but not in domain Set
     return builder.build()
@@ -148,6 +157,7 @@ fun SetProto.toDomain(): Set {
         ownerID = this.ownerID
     )
     if (this.hasSetNumber()) domain.setNumber = this.setNumber
+    // TODO Add Target
     if (this.hasWeightPounds()) domain.weightPounds = this.weightPounds
     if (this.hasWeightKilograms()) domain.weightKilograms = this.weightKilograms
     if (this.hasRepetitions()) domain.repetitions = this.repetitions
@@ -161,6 +171,17 @@ fun SetProto.toDomain(): Set {
     // restTimerInSeconds not in domain Set
     // notes (String) not in domain Set
     // order not in domain Set
+    if (this.hasTargetRepetitions()) domain.targetRepetitions = this.targetRepetitions
+    if (this.hasTargetWeightPounds()) domain.targetWeightPounds = this.targetWeightPounds
+    if (this.hasTargetWeightKilograms()) domain.targetWeightKilograms = this.targetWeightKilograms
+    if (this.hasTargetRatePerceivedEffort()) domain.targetRatePerceivedEffort =
+        this.targetRatePerceivedEffort
+    if (this.hasTargetRepetitionsInReserve()) domain.targetRepetitionsInReserve =
+        this.targetRepetitionsInReserve
+    if (this.hasTargetPercentage1RM()) domain.targetPercentage1RM = this.targetPercentage1RM
+    if (this.hasMicrocycleID()) domain.microcycleID = this.microcycleID.toDomainObjectId()
+    if (this.hasMesocycleID()) domain.mesocycleID = this.mesocycleID.toDomainObjectId()
+    if (this.hasProgramID()) domain.programID = this.programID.toDomainObjectId()
     return domain
 }
 
@@ -173,6 +194,7 @@ fun ExerciseSets.toProto(): ExerciseSetsProto {
     builder.uuid = this.exSetsUUID.toProtoString() // Domain uses exSetsUUID
     builder.exerciseID = this.exerciseID.toProtoString()
     builder.workoutID = this.workoutID.toProtoString()
+    this.description?.let { builder.description = it }
     builder.addAllNotes(this.notes.map { it.toProto() })
     builder.addAllSets(this.sets.map { it.toProto() })
     builder.ownerID = this.ownerID
@@ -190,6 +212,7 @@ fun ExerciseSetsProto.toDomain(): ExerciseSets {
         exSetsUUID = this.uuid.toDomainUuid(), // Proto uses uuid
         exerciseID = this.exerciseID.toDomainObjectId(),
         workoutID = this.workoutID.toDomainObjectId(),
+        description = this.description,
         notes = this.notesList.map { it.toDomain() }.toMutableList(),
         sets = this.setsList.map { it.toDomain() }.toMutableList(),
         ownerID = this.ownerID,
