@@ -80,6 +80,7 @@ fun ExerciseScreen(
   workoutComponents: List<WorkoutComponent> = listOf(),
   onCreateSuperset: (List<ExerciseExerciseSets>) -> Unit = {},
 ) {
+
   val exerciseSets by remember { mutableStateOf(_exerciseSets) }
   //  Log.i("ExerciseScreen", "$_exerciseSets")
   //  Log.i("ExerciseScreen", "$_exerciseNotes")
@@ -87,6 +88,9 @@ fun ExerciseScreen(
   //  val weightUnit = workoutViewModel.getWeightUnit(exerciseSets)
   //  val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
   //  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
+
+//  Log.i("ExerciseScreen", "_exerciseSets: $_exerciseSets".replace("\n",""))
+//  Log.i("ExerciseScreen", "exerciseSets: ${exerciseSets}")
 
   val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
 
@@ -178,39 +182,44 @@ fun ExerciseHeader(
 @Composable
 private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
   var visible by remember { mutableStateOf(false) }
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = 8.dp),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(text = "Description", style = MaterialTheme.typography.bodyMedium)
-    IconButton(onClick = { visible = !visible }) {
-      Icon(
-        imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
-        contentDescription = if (!visible) "Expand" else "Collapse",
-      )
-    }
+  if (exerciseSets.description == null) {
+    visible = false
   }
-  AnimatedVisibility(
-    visible = visible,
-    enter = expandVertically(animationSpec = tween(250)),
-    exit = shrinkVertically(animationSpec = tween(250)),
-  ) {
-    Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = 16.dp)) {
-      Text(
-        text =
-          AnnotatedString.fromHtml(
-            exerciseSets.description
-              ?: ("<p><strong>Execution Notes:</strong></p><p>1 second pause at the bottom of each rep while maintaining tension on the pecs</p>\n" +
-                      "<p><strong>Protocol Details:</strong></p><ul><li><strong>Rest:</strong> 3-5 min</li><li><strong>Warm-up Sets:</strong> 2-3</li></ul>\n" +
-                      "<p><strong>Substitution Options:</strong></p><ul><li>45° Incline DB Press</li><li>45° Incline Machine Press</li></ul>")
-          ),
-        style = MaterialTheme.typography.bodySmall,
-      )
+//  Log.i("ExerciseSetDescription", "exerciseSets.description: ${exerciseSets.description}")
+  exerciseSets.description?.let {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 8.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(text = "Description", style = MaterialTheme.typography.bodyMedium)
+      IconButton(onClick = { visible = !visible }) {
+        Icon(
+          imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
+          contentDescription = if (!visible) "Expand" else "Collapse",
+        )
+      }
+    }
+    AnimatedVisibility(
+      visible = visible,
+      enter = expandVertically(animationSpec = tween(250)),
+      exit = shrinkVertically(animationSpec = tween(250)),
+    ) {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp)
+      ) {
+        Text(
+          text =
+            AnnotatedString.fromHtml(
+              it
+            ),
+          style = MaterialTheme.typography.bodySmall,
+        )
+      }
     }
   }
 }
