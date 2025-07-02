@@ -207,7 +207,7 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
   // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
   val newWarmUpSets = warmUpSets.map { warmUpSet ->
     Set(
-      setNumber = -1, // Placeholder, will be replaced
+//      setNumber = -1, // Placeholder, will be replaced
       weightPounds = warmUpSet.weightPounds,
       targetWeightPounds = warmUpSet.targetWeightPounds,
       weightKilograms = warmUpSet.weightKilograms,
@@ -225,7 +225,10 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
       progressionSchemeID = warmUpSet.progressionSchemeID,
       workoutID = this@addWarmUpSets.workoutID,
       exerciseSetsID = this@addWarmUpSets.id,
-      ownerID = this@addWarmUpSets.ownerID.toString(),
+      microcycleID = this@addWarmUpSets.microcycleID,
+      mesocycleID = this@addWarmUpSets.mesocycleID,
+      programID = this@addWarmUpSets.programID,
+      ownerID = this@addWarmUpSets.ownerID,
       isPublic = this@addWarmUpSets.isPublic,
     )
   }
@@ -233,6 +236,69 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
 
   // 2. Combine the new warm-up sets and existing sets into a single list.
   val allSets = newWarmUpSets + this.sets
+  Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
+
+  // 3. Create the final list by re-numbering every set based on its new index.
+  val renumberedSets = allSets.mapIndexed { index, set ->
+    val newSetNumber = index + 1
+    // Log the change for a specific set (can be verbose, but useful for deep debugging)
+    // To avoid spamming logs, you might enable this only when needed.
+    // Log.d(TAG, "Re-numbering set: Old number ${set.setNumber}, New number: $newSetNumber")
+    set.copy(setNumber = newSetNumber)
+  }
+
+  // 4. Replace the old list with the newly created and re-numbered list.
+  val previousCount = this.sets.size
+  this.sets.clear()
+  this.sets.addAll(renumberedSets)
+}
+
+fun ExerciseExerciseSets.replaceWarmUpSets(warmUpSets: List<Set>) {
+  val TAG = "ExerciseExerciseSets"
+  // Log initial state
+  Log.d(
+    TAG,
+    "replaceWarmUpSets called. Replacing warm-up sets to ${this.sets.size} existing sets."
+  )
+
+  // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
+  val newWarmUpSets = warmUpSets.map { warmUpSet ->
+    Set(
+      lazyListItemID = newLazyListItemID(),
+//      setNumber = -1, // Placeholder, will be replaced
+      weightPounds = warmUpSet.weightPounds,
+      targetWeightPounds = warmUpSet.targetWeightPounds,
+      weightKilograms = warmUpSet.weightKilograms,
+      targetWeightKilograms = warmUpSet.targetWeightKilograms,
+      repetitions = warmUpSet.repetitions,
+      targetRepetitions = warmUpSet.targetRepetitions,
+      ratePerceivedEffort = warmUpSet.ratePerceivedEffort,
+      targetRatePerceivedEffort = warmUpSet.targetRatePerceivedEffort,
+      repetitionsInReserve = warmUpSet.repetitionsInReserve,
+      targetRepetitionsInReserve = warmUpSet.targetRepetitionsInReserve,
+      setTypeID = warmUpSet.setTypeID,
+      percentage1RM = warmUpSet.percentage1RM,
+      targetPercentage1RM = warmUpSet.targetPercentage1RM,
+      exerciseID = this@replaceWarmUpSets.exercise.id,
+      progressionSchemeID = warmUpSet.progressionSchemeID,
+      workoutID = this@replaceWarmUpSets.workoutID,
+      exerciseSetsID = this@replaceWarmUpSets.id,
+      microcycleID = this@replaceWarmUpSets.microcycleID,
+      mesocycleID = this@replaceWarmUpSets.mesocycleID,
+      programID = this@replaceWarmUpSets.programID,
+      ownerID = this@replaceWarmUpSets.ownerID,
+      isPublic = this@replaceWarmUpSets.isPublic,
+    )
+  }
+  Log.d(TAG, "replaceWarmUpSets: set.id - ${newWarmUpSets.firstOrNull()?.id}.")
+  Log.d(
+    TAG,
+    "replaceWarmUpSets: set.targetWeightPounds - ${newWarmUpSets.firstOrNull()?.targetWeightPounds}."
+  )
+  Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
+
+  // 2. Combine the new warm-up sets and existing sets into a single list.
+  val allSets = newWarmUpSets + this.sets.filter { it.setTypeID != WARM_UP_SET }
   Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
 
   // 3. Create the final list by re-numbering every set based on its new index.
