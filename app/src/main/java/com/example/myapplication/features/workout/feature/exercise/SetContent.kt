@@ -76,6 +76,9 @@ fun SetContent(
   setComplete: (Boolean) -> Unit,
   startSetCompletedTimer: () -> Unit,
 ) {
+//  Log.d("SetContent", "set.id: ${set.id}")
+//  Log.d("SetContent", "set.targetWeightPounds: ${set.targetWeightPounds}")
+
   val checkedState = remember { mutableStateOf(set.setCompleted) }
   val weightUnit = getWeightUnit()
 
