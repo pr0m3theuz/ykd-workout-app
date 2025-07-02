@@ -90,6 +90,8 @@ class ManageWorkoutUseCase(
       workoutStarted = Clock.System.now(),
       ownerID = userID,
       isPublic = false,
+      signature = workoutTemplate.signature,
+      hashedSignature = workoutTemplate.hashedSignature
     )
   }
 
@@ -111,6 +113,8 @@ class ManageWorkoutUseCase(
         programID = previousWorkout.programID,
         ownerID = userID, // TODO Replace currentUser.id
         isPublic = false,
+        signature = previousWorkout.signature,
+        hashedSignature = previousWorkout.hashedSignature
       )
     return newWorkout
   }
@@ -166,6 +170,7 @@ class ManageWorkoutUseCase(
     requireNotNull(exercise) { "Exercise not found." }
 
     val exerciseSetsID = ObjectId()
+    Log.d("createNewExerciseExerciseSetsFromPreviousWorkout", "exerciseSetsID: $exerciseSetsID")
 
     return ExerciseExerciseSets(
       id = exerciseSetsID,
@@ -177,6 +182,7 @@ class ManageWorkoutUseCase(
         workoutID,
         exerciseID = exercise.id
       ),
+      description = previousExerciseSets.description,
       notes = previousExerciseSets.notes, //.filter { it.pinned }.toMutableList(),
       workoutID = workoutID,
       microcycleID = previousExerciseSets.microcycleID,
@@ -209,6 +215,7 @@ class ManageWorkoutUseCase(
           targetRepetitions = set.targetRepetitions,
           targetRatePerceivedEffort = set.targetRatePerceivedEffort,
           targetRepetitionsInReserve = set.targetRepetitionsInReserve,
+          targetPercentage1RM = set.targetPercentage1RM,
           percentage1RM = set.percentage1RM,
           setTypeID = set.setTypeID,
           progressionSchemeID = set.progressionSchemeID,
@@ -218,10 +225,10 @@ class ManageWorkoutUseCase(
           ownerID = userID, // TODO Replace currentUser.id
         )
       newSets.add(newSet)
-      Log.i(
-        "createNewSetsFromPreviousWorkout",
-        "setNumber: ${set.setNumber}, set.exerciseID: ${set.exerciseID}"
-      )
+//      Log.i(
+//        "createNewSetsFromPreviousWorkout",
+//        "setNumber: ${set.setNumber}, set.exerciseID: ${set.exerciseID}"
+//      )
       if (set.setNumber != null) {
         set.exerciseID?.let { exerciseID ->
           val previousSet =
