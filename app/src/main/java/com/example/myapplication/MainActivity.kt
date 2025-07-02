@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -278,6 +279,18 @@ private fun NavGraphBuilder.addWorkoutGraph(
 //      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
+
+      LaunchedEffect(workoutID) {
+        Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
+        Log.d("WorkoutNavGraph", "workoutID: $workoutID")
+        if (!workoutID.isNullOrBlank() && !copyWorkoutFromPreviousWorkout) {
+          Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
+          workoutViewModel.getWorkoutByID(ObjectId(workoutID))
+        } else if (!workoutID.isNullOrBlank() && copyWorkoutFromPreviousWorkout) {
+          workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
+        }
+      }
+
       WorkoutScreen(
         // TODO This is an anti-pattern
         // https://developer.android.com/guide/navigation/use-graph/navigate
@@ -437,7 +450,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
-
+      Log.d("AddWarmUpSetsScreen", "exerciseSetsID: $exerciseSetsID")
       AddWarmUpSetsScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
