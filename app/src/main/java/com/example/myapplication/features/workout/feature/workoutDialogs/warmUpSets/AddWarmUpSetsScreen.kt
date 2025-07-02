@@ -1,6 +1,7 @@
 @file:OptIn(
-  ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class,
-  ExperimentalUuidApi::class
+  ExperimentalMaterial3ExpressiveApi::class,
+  ExperimentalMaterial3Api::class,
+  ExperimentalUuidApi::class,
 )
 
 package com.example.myapplication.features
@@ -55,43 +56,58 @@ import kotlin.uuid.ExperimentalUuidApi
 fun AddWarmUpSetsScreen(
   workoutViewModel: WorkoutViewModel,
   warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
-//  openDialog: (Boolean) -> Unit,
+  //  openDialog: (Boolean) -> Unit,
   onNavigateBack: () -> Unit,
   exerciseSetsID: ObjectId,
 ) {
-  val exerciseSets = workoutViewModel.getExerciseSetsByID(exerciseSetsID)
+//  workoutViewModel.workoutComponents.collectAsState().value.forEachIndexed { index, workoutComponent
+//    ->
+//    when (workoutComponent) {
+//      is ExerciseExerciseSets -> {
+//        Log.d("AddWarmUpSetsScreen.Workout", "workout component: ${workoutComponent.id}")
+//      }
+//
+//      is SupersetExercisesSets -> {
+//        workoutComponent.exercisesSets.forEach { exerciseSets ->
+//          Log.d("AddWarmUpSetsScreen.Workout", "workout component: ${exerciseSets.id}")
+//        }
+//      }
+//    }
+//  }
 
-  if (exerciseSets == null) {
-    Log.d("AddWarmUpSetsScreen", "ExerciseSets ${exerciseSetsID.toHexString()} could not be found.")
-    onNavigateBack()
+
+  val _exerciseSets = workoutViewModel.getExerciseSetsByID(exerciseSetsID)
+  _exerciseSets?.let {
+    warmUpSetsViewModel.setExerciseSets(it)
+    warmUpSetsViewModel.updateWorkingSetWeight(
+      workoutViewModel.getWorkingSetWeight(it) ?: 0.0
+    )
   }
 
-  requireNotNull(exerciseSets)
-  warmUpSetsViewModel.setExerciseSets(exerciseSets)
 
-  warmUpSetsViewModel.updateWorkingSetWeight(
-    workoutViewModel.getWorkingSetWeight(exerciseSets) ?: 0.0
-  )
+  val exerciseSets = warmUpSetsViewModel.exerciseSets.collectAsState().value
 
-  val weightUnit = warmUpSetsViewModel.getWeightUnit(exerciseSets)
+  val weightUnit = warmUpSetsViewModel.getWeightUnit()
+
+
 
   /*  val a = warmUpSets.associateWith { false }.toMutableMap()
-    val selectedSets = remember { mutableStateSetOf(warmUpSets.associateWith { false }) }
+  val selectedSets = remember { mutableStateSetOf(warmUpSets.associateWith { false }) }
 
-    fun selectSet(set: Set, isSelected: Boolean) {
-      if (isSelected) {
-        Log.d("AddWarmUpSetsScreen", "selectSet add set: $set")
-        selectedSets.value = selectedSets.value.toMutableMap().apply {
-          this[set] = true // Or put(set, isSelected)
-        }
-        Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
-      } else {
-        Log.d("AddWarmUpSetsScreen", "selectSet remove set: $set")
-        selectedSets.value = selectedSets.value.toMutableMap().apply {
-          this[set] = false // Or put(set, isSelected)
-        }
+  fun selectSet(set: Set, isSelected: Boolean) {
+    if (isSelected) {
+      Log.d("AddWarmUpSetsScreen", "selectSet add set: $set")
+      selectedSets.value = selectedSets.value.toMutableMap().apply {
+        this[set] = true // Or put(set, isSelected)
       }
-    }*/
+      Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
+    } else {
+      Log.d("AddWarmUpSetsScreen", "selectSet remove set: $set")
+      selectedSets.value = selectedSets.value.toMutableMap().apply {
+        this[set] = false // Or put(set, isSelected)
+      }
+    }
+  }*/
 
   var selectedSets = remember { mutableStateSetOf<Set>() }
 
@@ -107,7 +123,7 @@ fun AddWarmUpSetsScreen(
   }
 
   fun clearSelectedSets() {
-//    selectedSets.value = warmUpSets.associateWith { false }
+    //    selectedSets.value = warmUpSets.associateWith { false }
     selectedSets = mutableStateSetOf()
     // TODO Clear set checkbox. Use a wrapper class to hold the set & checkbox state
   }
@@ -118,7 +134,7 @@ fun AddWarmUpSetsScreen(
     Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
     warmUpSetsViewModel.applyModernizedLoadRIRSettingsToSelectedSets(
       sets = selectedSets.toList(), // selectedSets.value.keys.toList(),
-      modernizedLoadRIRSetting = modernizedLoadRIR
+      modernizedLoadRIRSetting = modernizedLoadRIR,
     )
     Log.d("AddWarmUpSetsScreen", "selectedSets cleared")
     clearSelectedSets()
@@ -130,8 +146,12 @@ fun AddWarmUpSetsScreen(
     onNavigateBack = onNavigateBack,
     weightUnit = weightUnit,
     insertWarmUpSets = { warmUpSets ->
-      workoutViewModel.addWarmUpSets(exerciseSets, warmUpSets)
+      exerciseSets?.let { workoutViewModel.addWarmUpSets(it, warmUpSets) }
       onNavigateBack() // Navigate back after inserting
+    },
+    replaceWarmUpSets = { warmUpSets ->
+      exerciseSets?.let { workoutViewModel.replaceWarmUpSets(it, warmUpSets) }
+      onNavigateBack()
     },
     onLoadRIRChange = { currentModernizedLoadRIRState = it },
     applySettingsToSelectedSetsButton = {
@@ -141,23 +161,24 @@ fun AddWarmUpSetsScreen(
             applySettingsToSelectedSets(currentModernizedLoadRIRState)
           }
         },
-        shapes = ButtonShapes(
-          shape = MaterialTheme.shapes.small,
-          pressedShape = MaterialTheme.shapes.small
-        )
+        shapes =
+          ButtonShapes(
+            shape = MaterialTheme.shapes.small,
+            pressedShape = MaterialTheme.shapes.small,
+          ),
       ) {
         Text("Apply Settings to Selected Sets")
       }
     },
-//    selectedSets = selectedSets.value,
+    //    selectedSets = selectedSets.value,
     onCheckedChange = { set, isChecked ->
       selectSet(set, isChecked)
       // Consider if you still need to clear selectedSets here
-      // selectedSets.clear() // This might be too aggressive if you allow multiple selections before applying
-    }
+      // selectedSets.clear() // This might be too aggressive if you allow multiple selections
+      // before applying
+    },
   )
 }
-
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -166,6 +187,7 @@ fun AddWarmUpSetsContent(
   onNavigateBack: () -> Unit,
   weightUnit: String,
   insertWarmUpSets: (warmUpSets: List<Set>) -> Unit,
+  replaceWarmUpSets: (warmUpSets: List<Set>) -> Unit,
   applySettingsToSelectedSetsButton: @Composable () -> Unit,
   onLoadRIRChange: (ModernizedLoadRIR?) -> Unit,
   onCheckedChange: (warmUpSet: Set, isChecked: Boolean) -> Unit,
@@ -182,26 +204,25 @@ fun AddWarmUpSetsContent(
         title = { Text(text = "Add Warm-up Sets") },
         navigationIcon = {
           IconButton(onClick = onNavigateBack) {
-            Icon(
-              imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-              contentDescription = "Back"
-            )
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
           }
         },
-        actions = {}
+        actions = {},
       )
     }
   ) { paddingValues ->
     Column(
-      modifier = Modifier
-        .padding(paddingValues)
-        .padding(16.dp) // Add some padding around the content
-        .fillMaxSize(),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
+      modifier =
+        Modifier
+          .padding(paddingValues)
+          .padding(16.dp) // Add some padding around the content
+          .fillMaxSize(),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
       Text(text = "Working Set Weight ($weightUnit)") // TODO USE USER SELECTED WEIGHT
 
-      DialogInput( // You might want to rename DialogInput if it's no longer exclusively for dialogs
+      DialogInput(
+        // You might want to rename DialogInput if it's no longer exclusively for dialogs
         text = workingSetWeightText,
         onValueChange = {
           workingSetWeightText =
@@ -210,21 +231,19 @@ fun AddWarmUpSetsContent(
               else -> checkDoubleInput(it.take(7)) ?: workingSetWeightText
             }
           warmUpSetsViewModel.updateWorkingSetWeight(
-            checkDoubleInput(workingSetWeightText)?.toDoubleOrNull() ?: 0.0,
+            checkDoubleInput(workingSetWeightText)?.toDoubleOrNull() ?: 0.0
           )
         },
-        onImeAction = {}
+        onImeAction = {},
       )
 
-      modernizedLoadRIRList.takeIf { it.isNotEmpty() }?.let { list ->
-        val selectedRir = // TODO Manage Hardcoded Values
-          list.firstOrNull { it.repsPerformed == 10 && it.rir == 5.0 } ?: list.first()
-        ModernizedLoadRIRHeaderRow(
-          list,
-          selectedRir,
-          onLoadRIRChange = onLoadRIRChange
-        )
-      }
+      modernizedLoadRIRList
+        .takeIf { it.isNotEmpty() }
+        ?.let { list ->
+          val selectedRir = // TODO Manage Hardcoded Values
+            list.firstOrNull { it.repsPerformed == 10 && it.rir == 5.0 } ?: list.first()
+          ModernizedLoadRIRHeaderRow(list, selectedRir, onLoadRIRChange = onLoadRIRChange)
+        }
 
       applySettingsToSelectedSetsButton()
 
@@ -233,7 +252,7 @@ fun AddWarmUpSetsContent(
       WarmUpSetLazyColumn(
         // Make sure WarmUpSetLazyColumn is adapted for a screen context if necessary
         sets = warmUpSets,
-//        onCheckedChange = onCheckedChange,
+        //        onCheckedChange = onCheckedChange,
         addSet = warmUpSetsViewModel::addSet,
         //        selectedSets = selectedSets,
         warmUpSetItem = { warmUpSet, index, percentageText, repetitionsText, rirText ->
@@ -247,29 +266,32 @@ fun AddWarmUpSetsContent(
             onPercentageChanged = warmUpSetsViewModel::updateWarmUpSetPercentage,
             onRepetitionsChanged = warmUpSetsViewModel::updateWarmUpSetReps,
             onRirChanged = warmUpSetsViewModel::updateWarmUpSetRIR,
-            removeSet = warmUpSetsViewModel::remove
+            removeSet = warmUpSetsViewModel::remove,
           )
         },
         actionRow = {
-          Row(
-            modifier = Modifier
-              .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-          ) {
-            TextButton(
-              onClick = { onNavigateBack },
-              modifier = Modifier.padding(8.dp)
-            ) { Text("Cancel", color = MaterialTheme.colorScheme.error) }
-            Button(
-              modifier = Modifier.padding(8.dp),
-              onClick = {
-                insertWarmUpSets(warmUpSets)
+          Column(modifier = Modifier.fillMaxWidth()) {
+            Row {
+              TextButton(
+                onClick = { replaceWarmUpSets(warmUpSets) },
+                modifier = Modifier.padding(8.dp),
+              ) {
+                Text("Update Existing Warm Up Set")
               }
-            ) {
-              Text("Insert")
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+              TextButton(onClick = { onNavigateBack }, modifier = Modifier.padding(8.dp)) {
+                Text("Cancel", color = MaterialTheme.colorScheme.error)
+              }
+              Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { insertWarmUpSets(warmUpSets) },
+              ) {
+                Text("Insert")
+              }
             }
           }
-        }
+        },
       )
     }
   }
