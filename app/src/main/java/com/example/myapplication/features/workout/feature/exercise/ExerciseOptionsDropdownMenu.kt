@@ -100,6 +100,10 @@ fun ExerciseOptionsDropdownMenu(
       DropdownMenuItem(
         text = { Text("Add Warm-up Sets") },
         onClick = {
+//          Log.i("ExerciseOptionsDropdownMenu", "ExerciseOptionsDropdownMenu exerciseSets: $workoutViewModel")
+//          Log.i("ExerciseOptionsDropdownMenu", "ExerciseOptionsDropdownMenu exerciseSets: ${exerciseSets.id}")
+//          Log.i("ExerciseOptionsDropdownMenu", "ExerciseOptionsDropdownMenu exerciseSets: ${exerciseSets.toString().replace("\n", "")}")
+
           navController.navigate("addWarmUpSets/${exerciseSets.id.toHexString()}")
 //          openAddWarmUpSetsDialog = true
         }
