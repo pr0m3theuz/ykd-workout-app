@@ -60,6 +60,7 @@ message ExerciseSetsProto {
   optional string microcycleID = 10;
   optional string mesocycleID = 11;
   optional string programID = 12;
+  optional string description = 13;
 }
 
 message SupersetProto {
@@ -106,4 +107,13 @@ message SetProto {
   string workoutID = 17;
   string ownerID = 18;
   int32 order = 19;
+  optional string microcycleID = 20;
+  optional string mesocycleID = 21;
+  optional string programID = 22;
+  optional int32 targetRepetitions = 23;
+  optional double targetWeightPounds = 24;
+  optional double targetWeightKilograms = 25;
+  optional double targetRatePerceivedEffort = 26;
+  optional double targetRepetitionsInReserve = 27;
+  optional double targetPercentage1RM = 28;
 }
