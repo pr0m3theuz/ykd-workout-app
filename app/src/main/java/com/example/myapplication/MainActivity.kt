@@ -714,6 +714,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
       ProfileScreenV2(
+        profileViewModel = profileViewModel,
         bottomNavigationBar = {
           BottomNavigationBar(
             currentDestination = navController.currentBackStackEntry?.destination,
@@ -800,7 +801,18 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       val profileViewModel: ProfileViewModel =
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
-      EditProfileScreen()
+      EditProfileScreen(
+        profileViewModel = profileViewModel,
+        onSaveChanges = { name, username, email, password ->
+          profileViewModel.updateName(name)
+          profileViewModel.updateUsername(username)
+          profileViewModel.updateEmail(email)
+          if (password.isNotBlank()) { // Only update password if something is entered
+            profileViewModel.updatePassword(password)
+          }
+          // Persist changes
+          profileViewModel.saveUserProfile()
+        })
     }
 
     composable("timerSettings") { navBackStackEntry ->
