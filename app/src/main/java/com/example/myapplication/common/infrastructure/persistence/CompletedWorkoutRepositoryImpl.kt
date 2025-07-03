@@ -360,7 +360,7 @@ class CompletedWorkoutRepositoryImpl(
         completedSets.forEach { set ->
           val setIdStr = "Set:${set.id}"
           try {
-            val setJsonContent = Json.encodeToString(set)
+            val setJsonContent = withUnknownKeys.encodeToString(set)
             completedSetsCollection.getDocument(setIdStr)?.toMutable()?.let {
               it.setJSON(setJsonContent)
               Log.i(
@@ -405,7 +405,7 @@ class CompletedWorkoutRepositoryImpl(
         }
       })
 
-      val workoutJson = Json.encodeToString(newWorkout)
+      val workoutJson = withUnknownKeys.encodeToString(newWorkout)
       completedWorkoutsCollection.getDocument(workoutIDStr)?.toMutable()?.let {
         it.setJSON(workoutJson)
         Log.i(
@@ -419,10 +419,7 @@ class CompletedWorkoutRepositoryImpl(
       )
       completedWorkoutsCollection.save(MutableDocument(workoutIDStr, workoutJson))
 
-
       // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
-
-//      collection.save(document)
 
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
