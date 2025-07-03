@@ -47,17 +47,13 @@ import com.example.myapplication.common.ui.theme.MyApplicationTheme
 @Preview(showBackground = true)
 @Composable
 fun EditProfileScreenPreview() {
-  MyApplicationTheme {
-    EditProfileScreen()
-  }
+  MyApplicationTheme { EditProfileScreen() }
 }
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun EditProfileScreenPreviewDarkMode() {
-  MyApplicationTheme {
-    EditProfileScreen()
-  }
+  MyApplicationTheme { EditProfileScreen() }
 }
 
 @Composable
@@ -90,10 +86,15 @@ fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
         title = { Text("Edit Profile") },
         navigationIcon = {},
         actions = {
-          TextButton(onClick = { onSaveChanges() }) {
+          TextButton(
+            onClick = {
+              onSaveChanges()
+              // TODO: Add navigation back or success message (e.g., using a Snackbar)
+            }
+          ) {
             Text("Save")
           }
-        }
+        },
       )
     }
   ) { padding ->
@@ -102,47 +103,50 @@ fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
         .padding(padding)
         .padding(16.dp)
         .fillMaxWidth(),
-      verticalArrangement = Arrangement.spacedBy(16.dp)
+      verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Box {
+          // TODO: Load actual profile picture, e.g., from userProfileState?.profilePictureUri
           if (true) {
             Image(
-              painterResource(R.drawable.guy_fawkes_mask),
+              painterResource(R.drawable.guy_fawkes_mask), // Placeholder
               modifier = Modifier
                 .padding(8.dp)
                 .size(200.dp)
                 .clip(shape = CircleShape),
-              contentDescription = "profile picture"
+              contentDescription = "profile picture",
             )
           } else {
             Icon(
               imageVector = Icons.Filled.AccountCircle,
               tint = MaterialTheme.colorScheme.outlineVariant,
-              modifier = Modifier
-//                .padding(8.dp)
-                .size(200.dp)
-                .clip(shape = CircleShape)
-//                .background(color = MaterialTheme.colorScheme.outlineVariant)
-              ,
-              contentDescription = "profile picture"
+              modifier =
+                Modifier
+                  //                .padding(8.dp)
+                  .size(200.dp)
+                  .clip(shape = CircleShape),
+              //                .background(color = MaterialTheme.colorScheme.outlineVariant)
+              contentDescription = "profile picture",
             )
           }
           IconButton(
             onClick = { selectImage() },
-            modifier = Modifier
-              .align(Alignment.BottomEnd)
-              .padding(8.dp)
-              .background(MaterialTheme.colorScheme.primary, CircleShape)
+            modifier =
+              Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+                .background(MaterialTheme.colorScheme.primary, CircleShape),
           ) {
             Icon(
-              imageVector = if (true) {
-                Icons.Filled.Edit
-              } else {
-                Icons.Filled.AddPhotoAlternate
-              },
+              imageVector =
+                if (true) {
+                  Icons.Filled.Edit
+                } else {
+                  Icons.Filled.AddPhotoAlternate
+                },
               contentDescription = "Edit profile picture",
-              tint = MaterialTheme.colorScheme.onPrimary
+              tint = MaterialTheme.colorScheme.onPrimary,
             )
           }
         }
@@ -150,11 +154,9 @@ fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
       Row {
         OutlinedTextField(
           value = name,
-          onValueChange = {
-            name = it
-          },
+          onValueChange = { name = it },
           label = { Text("Name") },
-          modifier = Modifier.weight(1f)
+          modifier = Modifier.fillMaxWidth(),
         )
       }
       Row {
@@ -162,7 +164,7 @@ fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
           value = username,
           onValueChange = { username = it },
           label = { Text("Username") },
-          modifier = Modifier.weight(1f)
+          modifier = Modifier.fillMaxWidth(),
         )
       }
       Row {
@@ -170,15 +172,15 @@ fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
           value = email,
           onValueChange = { email = it },
           label = { Text("Email") },
-          modifier = Modifier.weight(1f)
+          modifier = Modifier.fillMaxWidth(),
         )
       }
       Row {
         OutlinedTextField(
           value = password,
           onValueChange = { password = it },
-          label = { Text("Password") },
-          modifier = Modifier.weight(1f)
+          label = { Text("New Password") },
+          modifier = Modifier.fillMaxWidth(),
         )
       }
     }
