@@ -44,28 +44,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 
 @Preview(showBackground = true)
 @Composable
 fun EditProfileScreenPreview() {
-  MyApplicationTheme {
-    EditProfileScreen()
-  }
+//  MyApplicationTheme { EditProfileScreen() }
 }
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun EditProfileScreenPreviewDarkMode() {
-  MyApplicationTheme {
-    EditProfileScreen()
-  }
+//  MyApplicationTheme { EditProfileScreen() }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(profileViewModel: ProfileViewModel, onSaveChanges: () -> Unit = {}) {
+fun EditProfileScreen(
+  profileViewModel: ProfileViewModel,
+  onSaveChanges: (name: String, username: String, email: String, password: String) -> Unit =
+    { _, _, _, _ ->
+    },
+) {
 
   val pickMedia =
     rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -84,22 +84,22 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, onSaveChanges: () -> U
     pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
   }
 
-    val userProfileState by profileViewModel.userProfile.collectAsState()
+  val userProfileState by profileViewModel.userProfile.collectAsState()
 
-    var name by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") } // For entering new password or changing
+  var name by remember { mutableStateOf("") }
+  var username by remember { mutableStateOf("") }
+  var email by remember { mutableStateOf("") }
+  var password by remember { mutableStateOf("") } // For entering new password or changing
 
-    LaunchedEffect(userProfileState) {
-        userProfileState?.let { profile ->
-            name = profile.name ?: ""
-            username = profile.username ?: ""
-            email = profile.email ?: ""
-            // Password field is for entry, so we don't prefill it from the profile's current password
-            // password = profile.password ?: "" // Typically, do not pre-fill password
-        }
+  LaunchedEffect(userProfileState) {
+    userProfileState.let { profile ->
+      name = profile.name ?: ""
+      username = profile.username ?: ""
+      email = profile.email ?: ""
+      // Password field is for entry, so we don't prefill it from the profile's current password
+      // password = profile.password ?: "" // Typically, do not pre-fill password
     }
+  }
 
   Scaffold(
     topBar = {
@@ -109,7 +109,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, onSaveChanges: () -> U
         actions = {
           TextButton(
             onClick = {
-              onSaveChanges()
+              onSaveChanges(name, username, email, password)
               // TODO: Add navigation back or success message (e.g., using a Snackbar)
             }
           ) {
