@@ -47,7 +47,7 @@ private const val COLLECTION_IS_NULL_TEMPLATE =
 
 class ProgramsRepositoryImpl(
   private val databaseManager: DatabaseManager,
-  private val userProfileManager: UserProfileManager
+  private val userProfileManager: UserProfileManager,
 ) : ProgramsRepository {
   // Room executes all queries on a separate thread.
   // Observed Flow will notify the observer when the data has changed.
@@ -58,7 +58,10 @@ class ProgramsRepositoryImpl(
   // TODO Decide if I should create a repository for user data
   val userDatabase: Database? = databaseManager.userDatabase
 
-  private val withUnknownKeys = Json { ignoreUnknownKeys = true }
+  private val withUnknownKeys = Json {
+    encodeDefaults = true
+    ignoreUnknownKeys = true
+  }
 
   override fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
     try {
@@ -157,46 +160,53 @@ class ProgramsRepositoryImpl(
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(programCollection))
           .where(Expression.property("id").equalTo(Expression.string(programID.toString())))
-          .execute().allResults().firstOrNull()?.toJSON()?.let {
-            withUnknownKeys.decodeFromString<ProgramDao>(it.toString()).Program
-          }
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.toJSON()
+          ?.let { withUnknownKeys.decodeFromString<ProgramDao>(it.toString()).Program }
 
       val mesocyclesResult =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(mesocycleCollection))
           .where(Expression.property("programID").equalTo(Expression.string(programID.toString())))
           .orderBy(Ordering.property("order").ascending())
-          .execute().allResults()
+          .execute()
+          .allResults()
 
-
-      val mesocycles = mesocyclesResult.map { result ->
-        val json = result.toJSON()
-        withUnknownKeys.decodeFromString<MesocycleDao>(json).Mesocycle
-      }
+      val mesocycles =
+        mesocyclesResult.map { result ->
+          val json = result.toJSON()
+          withUnknownKeys.decodeFromString<MesocycleDao>(json).Mesocycle
+        }
 
       val microcyclesResult =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(microcycleCollection))
           .where(Expression.property("programID").equalTo(Expression.string(programID.toString())))
           .orderBy(Ordering.property("order").ascending())
-          .execute().allResults()
+          .execute()
+          .allResults()
 
-      val microcycles = microcyclesResult.map { result ->
-        val json = result.toJSON()
-        withUnknownKeys.decodeFromString<MicrocycleDao>(json).Microcycle
-      }
+      val microcycles =
+        microcyclesResult.map { result ->
+          val json = result.toJSON()
+          withUnknownKeys.decodeFromString<MicrocycleDao>(json).Microcycle
+        }
 
       val workoutsResult =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(workoutCollection))
           .where(Expression.property("programID").equalTo(Expression.string(programID.toString())))
           .orderBy(Ordering.property("day").ascending())
-          .execute().allResults()
+          .execute()
+          .allResults()
 
-      val workouts = workoutsResult.map { result ->
-        val json = result.toJSON()
-        withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
-      }
+      val workouts =
+        workoutsResult.map { result ->
+          val json = result.toJSON()
+          withUnknownKeys.decodeFromString<WorkoutDao>(json).Workout
+        }
 
       microcycles.forEach { microcycle ->
         microcycle.workouts =
@@ -205,13 +215,15 @@ class ProgramsRepositoryImpl(
 
       mesocycles.forEach { mesocycle ->
         mesocycle.microcycles =
-          microcycles.filter { it.mesocycleID == mesocycle.id }.sortedBy { it.order }
+          microcycles
+            .filter { it.mesocycleID == mesocycle.id }
+            .sortedBy { it.order }
             .toMutableList()
       }
 
       program?.mesocycles = mesocycles
 
-//      Log.i("ProgramRepositoryImpl.getProgramByID()", "program: $program")
+      //      Log.i("ProgramRepositoryImpl.getProgramByID()", "program: $program")
 
       return program
     } catch (e: Exception) {
@@ -237,9 +249,7 @@ class ProgramsRepositoryImpl(
           .where(
             Expression.property("isActive")
               .equalTo(Expression.booleanValue(true))
-              .and(
-                Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
-              )
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
 
       val flow =
@@ -270,9 +280,7 @@ class ProgramsRepositoryImpl(
           .where(
             Expression.property("uuid")
               .equalTo(Expression.string(programUUID.toString()))
-              .and(
-                Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
-              )
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
@@ -286,8 +294,8 @@ class ProgramsRepositoryImpl(
   }
 
   override suspend fun createActiveProgram(program: Program): Boolean {
-//    database.copyProgramFromTemplate(program)
-//    TODO("Implement copyProgramFromTemplate")
+    //    database.copyProgramFromTemplate(program)
+    //    TODO("Implement copyProgramFromTemplate")
     // TODO copy program to UserDatabase
     // TODO Copy programs workouts to CompletedWorkouts
     // TODO
@@ -296,73 +304,63 @@ class ProgramsRepositoryImpl(
 
       val completedProgramsCollection = db.getCollection("CompletedPrograms")
       requireNotNull(completedProgramsCollection) {
-        String.format(
-          COLLECTION_IS_NULL_TEMPLATE,
-          "CompletedPrograms"
-        )
+        String.format(COLLECTION_IS_NULL_TEMPLATE, "CompletedPrograms")
       }
 
       val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
       requireNotNull(completedWorkoutsCollection) {
-        String.format(
-          COLLECTION_IS_NULL_TEMPLATE,
-          "CompletedWorkouts"
-        )
+        String.format(COLLECTION_IS_NULL_TEMPLATE, "CompletedWorkouts")
       }
 
       val completedSetsCollection = db.getCollection("CompletedSets")
       requireNotNull(completedSetsCollection) {
-        String.format(
-          COLLECTION_IS_NULL_TEMPLATE,
-          "CompletedSets"
-        )
+        String.format(COLLECTION_IS_NULL_TEMPLATE, "CompletedSets")
       }
 
       // TODO Refactor using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
-      val (newProgram: Program, newProgramWorkouts: List<Workout>, newProgramSets: List<Set>) = duplicateProgramStructure(
-        program,
-        user
-      )
+      val (newProgram: Program, newProgramWorkouts: List<Workout>, newProgramSets: List<Set>) =
+        duplicateProgramStructure(program, user)
 
       val newProgramJson = Json.encodeToString(newProgram)
       val newProgramDocument = MutableDocument(newProgram.id.toString(), newProgramJson)
+      Log.i("ProgramRepositoryImpl.createActiveProgram()", "newProgramJson: $newProgramJson")
       Log.i(
         "ProgramRepositoryImpl.createActiveProgram()",
-        "newProgramJson: $newProgramJson"
-      )
-      Log.i(
-        "ProgramRepositoryImpl.createActiveProgram()",
-        "newProgramDocument: $newProgramDocument"
+        "newProgramDocument: $newProgramDocument",
       )
       completedProgramsCollection.save(newProgramDocument)
 
-      db.inBatch(UnitOfWork {
-        newProgramWorkouts.forEach { workout ->
-          val workoutJson = Json.encodeToString(workout)
-          val newProgramWorkoutsDocument = MutableDocument(workout.id.toString(), workoutJson)
-          Log.i(
-            "ProgramRepositoryImpl.createActiveProgram()",
-            "newProgramWorkoutsDocument: $newProgramWorkoutsDocument"
-          )
-          completedWorkoutsCollection.save(newProgramWorkoutsDocument)
+      db.inBatch(
+        UnitOfWork {
+          newProgramWorkouts.forEach { workout ->
+            val workoutJson = Json.encodeToString(workout)
+            val newProgramWorkoutsDocument = MutableDocument(workout.id.toString(), workoutJson)
+            Log.i(
+              "ProgramRepositoryImpl.createActiveProgram()",
+              "newProgramWorkoutsDocument: $newProgramWorkoutsDocument",
+            )
+            completedWorkoutsCollection.save(newProgramWorkoutsDocument)
+          }
         }
-      })
+      )
 
-      db.inBatch(UnitOfWork {
-        newProgramSets.forEach { set ->
-          Log.i("ProgramRepositoryImpl.createActiveProgram()", "set: $set")
+      db.inBatch(
+        UnitOfWork {
+          newProgramSets.forEach { set ->
+            Log.i("ProgramRepositoryImpl.createActiveProgram()", "set: $set")
 
-          val setJson = Json.encodeToString(set)
-          Log.i("ProgramRepositoryImpl.createActiveProgram()", "setJson: $setJson")
+            val setJson = Json.encodeToString(set)
+            Log.i("ProgramRepositoryImpl.createActiveProgram()", "setJson: $setJson")
 
-          val newProgramSetsDocument = MutableDocument(newProgram.id.toString(), setJson)
-          Log.i(
-            "ProgramRepositoryImpl.createActiveProgram()",
-            "newProgramSetsDocument: $newProgramSetsDocument"
-          )
-          completedSetsCollection.save(newProgramSetsDocument)
+            val newProgramSetsDocument = MutableDocument(newProgram.id.toString(), setJson)
+            Log.i(
+              "ProgramRepositoryImpl.createActiveProgram()",
+              "newProgramSetsDocument: $newProgramSetsDocument",
+            )
+            completedSetsCollection.save(newProgramSetsDocument)
+          }
         }
-      })
+      )
 
       return true
     } catch (e: Exception) {
@@ -372,7 +370,7 @@ class ProgramsRepositoryImpl(
   }
 
   override suspend fun insertProgram(program: Program): Boolean {
-//    TODO("What calls insertProgram")
+    //    TODO("What calls insertProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -383,7 +381,7 @@ class ProgramsRepositoryImpl(
       val json = Json.encodeToString(program.copy(ownerID = user.id.toHexString() ?: "MISSING_ID"))
       val document = MutableDocument("Program:${program.id}", json)
 
-//      collection.save(document)
+      //      collection.save(document)
       return true
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
@@ -392,8 +390,8 @@ class ProgramsRepositoryImpl(
   }
 
   override suspend fun updateProgram(program: Program): Boolean {
-//    database.updateProgram(program)
-//    TODO("What calls updateProgram")
+    //    database.updateProgram(program)
+    //    TODO("What calls updateProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -410,8 +408,6 @@ class ProgramsRepositoryImpl(
         collection.save(document)
         return true
       }
-
-
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -419,8 +415,8 @@ class ProgramsRepositoryImpl(
   }
 
   override suspend fun deleteProgram(program: Program): Boolean {
-//    database.deleteProgram(program)
-//    TODO("What calls deleteProgram")
+    //    database.deleteProgram(program)
+    //    TODO("What calls deleteProgram")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -440,7 +436,7 @@ class ProgramsRepositoryImpl(
   }
 
   override suspend fun deleteActiveProgram(program: Program): Boolean {
-//    database.deleteActiveProgram(program)
+    //    database.deleteActiveProgram(program)
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -460,65 +456,70 @@ class ProgramsRepositoryImpl(
             Expression.property("id")
               .equalTo(Expression.string(program.id.toHexString()))
               .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
-//              .and(Expression.property("active").equalTo(Expression.booleanValue(true)))
-          ).limit(Expression.intValue(1))
+            //
+            // .and(Expression.property("active").equalTo(Expression.booleanValue(true)))
+          )
+          .limit(Expression.intValue(1))
 
       val result = completedProgramQuery.execute().allResults().firstOrNull()?.getString("id")
 
       val document = result?.let { completedProgramsCollection.getDocument(it) }
-//      requireNotNull(document) { "Program Repository: Program does not exist!" }
+      //      requireNotNull(document) { "Program Repository: Program does not exist!" }
       Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "program: $program")
       Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "deleted document: $document")
-//      completedProgramsCollection.delete(document)
+      //      completedProgramsCollection.delete(document)
 
-      val completedWorkoutsQuery = QueryBuilder
-        .select(SelectResult.property("id"))
-        .from(DataSource.collection(completedWorkoutsCollection))
-        .where(
-          Expression.property("programID")
-            .equalTo(Expression.string(program.id.toHexString())).and(
-              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
-            )
-        )
-
-      val completedWorkoutsResult = completedWorkoutsQuery.execute().allResults().mapNotNull {
-        it.getString("id")
-      }
-
-      db.inBatch(UnitOfWork {
-        completedWorkoutsResult.forEach { workoutID ->
-          val workoutDocument = completedWorkoutsCollection.getDocument(workoutID)
-          requireNotNull(workoutDocument) { "Program Repository: Workout does not exist!" }
-          Log.i(
-            "ProgramRepositoryImpl.deleteActiveProgram()",
-            "deleted workoutDocument: $workoutDocument"
+      val completedWorkoutsQuery =
+        QueryBuilder.select(SelectResult.property("id"))
+          .from(DataSource.collection(completedWorkoutsCollection))
+          .where(
+            Expression.property("programID")
+              .equalTo(Expression.string(program.id.toHexString()))
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
-//          completedWorkoutsCollection.delete(workoutDocument)
-        }
-      })
 
-      val completedSetsQuery = QueryBuilder
-        .select(SelectResult.property("id"))
-        .from(DataSource.collection(completedSetsCollection))
-        .where(
-          Expression.property("programID")
-            .equalTo(Expression.string(program.id.toHexString())).and(
-              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
+      val completedWorkoutsResult =
+        completedWorkoutsQuery.execute().allResults().mapNotNull { it.getString("id") }
+
+      db.inBatch(
+        UnitOfWork {
+          completedWorkoutsResult.forEach { workoutID ->
+            val workoutDocument = completedWorkoutsCollection.getDocument(workoutID)
+            requireNotNull(workoutDocument) { "Program Repository: Workout does not exist!" }
+            Log.i(
+              "ProgramRepositoryImpl.deleteActiveProgram()",
+              "deleted workoutDocument: $workoutDocument",
             )
-        )
-
-      val completedSetsResult = completedSetsQuery.execute().allResults().mapNotNull {
-        it.getString("id")
-      }
-
-      db.inBatch(UnitOfWork {
-        completedSetsResult.forEach { setID ->
-          val setDocument = completedSetsCollection.getDocument(setID)
-          requireNotNull(setDocument) { "Program Repository: Set does not exist!" }
-          Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "deleted setDocument: $setDocument")
-//          completedSetsCollection.delete(setDocument)
+            //          completedWorkoutsCollection.delete(workoutDocument)
+          }
         }
-      })
+      )
+
+      val completedSetsQuery =
+        QueryBuilder.select(SelectResult.property("id"))
+          .from(DataSource.collection(completedSetsCollection))
+          .where(
+            Expression.property("programID")
+              .equalTo(Expression.string(program.id.toHexString()))
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+          )
+
+      val completedSetsResult =
+        completedSetsQuery.execute().allResults().mapNotNull { it.getString("id") }
+
+      db.inBatch(
+        UnitOfWork {
+          completedSetsResult.forEach { setID ->
+            val setDocument = completedSetsCollection.getDocument(setID)
+            requireNotNull(setDocument) { "Program Repository: Set does not exist!" }
+            Log.i(
+              "ProgramRepositoryImpl.deleteActiveProgram()",
+              "deleted setDocument: $setDocument",
+            )
+            //          completedSetsCollection.delete(setDocument)
+          }
+        }
+      )
 
       return true
     } catch (e: Exception) {
@@ -528,7 +529,7 @@ class ProgramsRepositoryImpl(
   }
 
   override fun getAllMesocycles(): Flow<List<Mesocycle>> {
-//    return database.getAllMesocycles()
+    //    return database.getAllMesocycles()
     TODO("Not yet implemented")
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -558,9 +559,8 @@ class ProgramsRepositoryImpl(
     return flow {}
   }
 
-
   override fun getMesocycleById(mesocycleID: ObjectId): Mesocycle? {
-//    return database.getMesocycleByID(mesocycleID)
+    //    return database.getMesocycleByID(mesocycleID)
 
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -576,7 +576,9 @@ class ProgramsRepositoryImpl(
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<MesocycleDao>(result.toString()).Mesocycle }
+      return result?.let {
+        withUnknownKeys.decodeFromString<MesocycleDao>(result.toString()).Mesocycle
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -585,7 +587,7 @@ class ProgramsRepositoryImpl(
   }
 
   override fun getMesocyclesByProgram(programID: ObjectId): Flow<List<Mesocycle>> {
-//    return database.getMesocyclesByProgramID(programID)
+    //    return database.getMesocyclesByProgramID(programID)
 
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -616,7 +618,7 @@ class ProgramsRepositoryImpl(
   }
 
   override suspend fun insertMesocycle(mesocycle: Mesocycle): Boolean {
-//    database.insertMesocycle(mesocycle)
+    //    database.insertMesocycle(mesocycle)
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -716,7 +718,9 @@ class ProgramsRepositoryImpl(
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<MicrocycleDao>(result.toString()).Microcycle }
+      return result?.let {
+        withUnknownKeys.decodeFromString<MicrocycleDao>(result.toString()).Microcycle
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -847,7 +851,8 @@ class ProgramsRepositoryImpl(
   }
 
   // TODO Current Implementation is inadequate for getting next workout
-//  @Deprecated("Current Implementation is inadequate for getting next workout", replaceWith = ReplaceWith("WorkoutRepository.getNextWorkoutInProgram()")
+  //  @Deprecated("Current Implementation is inadequate for getting next workout", replaceWith =
+  // ReplaceWith("WorkoutRepository.getNextWorkoutInProgram()")
   override fun getNextWorkoutByProgramID(programID: ObjectId): Workout? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -856,15 +861,16 @@ class ProgramsRepositoryImpl(
 
       requireNotNull(collection) { COLLECTION_IS_NULL.format("CompletedWorkouts") }
 
-      val query = QueryBuilder
-        .selectDistinct(SelectResult.all())
-        .from(DataSource.collection(collection))
-        .where(
-          Expression.property("programID").equalTo(Expression.string(programID.toString()))
-            .and(Expression.property("workoutEnded").isNotValued)
-            .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
-        )
-        .limit(Expression.intValue(1))
+      val query =
+        QueryBuilder.selectDistinct(SelectResult.all())
+          .from(DataSource.collection(collection))
+          .where(
+            Expression.property("programID")
+              .equalTo(Expression.string(programID.toString()))
+              .and(Expression.property("workoutEnded").isNotValued)
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+          )
+          .limit(Expression.intValue(1))
 
       val result = query.execute().allResults().firstOrNull()?.toJSON()
 
