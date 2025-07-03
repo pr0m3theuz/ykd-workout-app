@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.example.myapplication.features.workout.feature.exercise
 
 import android.util.Log
@@ -6,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.ButtonColors
@@ -30,8 +34,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,8 +93,8 @@ fun ExerciseScreen(
   //  val exerciseWeightUnit = exerciseSets.exercise?.weightUnit
   //  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
-//  Log.i("ExerciseScreen", "_exerciseSets: $_exerciseSets".replace("\n",""))
-//  Log.i("ExerciseScreen", "exerciseSets: ${exerciseSets}")
+  //  Log.i("ExerciseScreen", "_exerciseSets: $_exerciseSets".replace("\n",""))
+  //  Log.i("ExerciseScreen", "exerciseSets: ${exerciseSets}")
 
   val (notesVisible, setNotesVisible) = remember { mutableStateOf(false) }
 
@@ -185,18 +189,24 @@ private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
   if (exerciseSets.description == null) {
     visible = false
   }
-//  Log.i("ExerciseSetDescription", "exerciseSets.description: ${exerciseSets.description}")
+  //  Log.i("ExerciseSetDescription", "exerciseSets.description: ${exerciseSets.description}")
   exerciseSets.description?.let {
     Row(
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 8.dp),
+        .clickable(onClick = { visible = !visible })
+        .fillMaxWidth(),
+      //        .padding(horizontal = 8.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      Text(text = "Description", style = MaterialTheme.typography.bodyMedium)
-      IconButton(onClick = { visible = !visible }) {
+      Text(
+        text = "Description",
+        style = MaterialTheme.typography.bodyMediumEmphasized,
+        modifier = Modifier.padding(horizontal = 8.dp),
+      )
+      Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
         Icon(
+          //          modifier = Modifier.padding(8.dp).size(24.dp),
           imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
           contentDescription = if (!visible) "Expand" else "Collapse",
         )
@@ -207,18 +217,10 @@ private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
       enter = expandVertically(animationSpec = tween(250)),
       exit = shrinkVertically(animationSpec = tween(250)),
     ) {
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp)
-      ) {
-        Text(
-          text =
-            AnnotatedString.fromHtml(
-              it
-            ),
-          style = MaterialTheme.typography.bodySmall,
-        )
+      Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)) {
+        Text(text = AnnotatedString.fromHtml(it), style = MaterialTheme.typography.bodyMedium)
       }
     }
   }
@@ -240,34 +242,43 @@ private fun ExerciseNotesList(
 
   //  Log.i("ExerciseNotesList", "visible: $visible")
 
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = 8.dp),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(text = "Notes", style = MaterialTheme.typography.bodyMedium)
-    IconButton(onClick = { visible = !visible }) {
-      Icon(
-        imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
-        contentDescription = if (!visible) "Expand" else "Collapse",
+  if (exerciseSets.notes.isNotEmpty()) {
+    Row(
+      modifier =
+        Modifier
+          .clickable(onClick = { visible = !visible })
+          .fillMaxWidth(),
+      //        .height(40.dp)
+//          .padding(horizontal = 8.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        text = "Notes",
+        style = MaterialTheme.typography.bodyMediumEmphasized,
+        modifier = Modifier.padding(horizontal = 8.dp)
       )
+      Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+        Icon(
+          imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
+          contentDescription = if (!visible) "Expand" else "Collapse",
+        )
+      }
     }
-  }
 
-  AnimatedVisibility(
-    visible = visible,
-    enter = expandVertically(animationSpec = tween(250)),
-    exit = shrinkVertically(animationSpec = tween(250)),
-  ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-      exerciseSets.notes.forEach { note ->
-        Log.i("ExerciseNotesList", "Note: $note")
-        SwipeToDismissItem(onDismissRequest = { removeNote(note) }) {
-          ExerciseNotes(exerciseNote = note, _pinNote = { pin -> _pinNote(note, pin) })
+    AnimatedVisibility(
+      visible = visible,
+      enter = expandVertically(animationSpec = tween(250)),
+      exit = shrinkVertically(animationSpec = tween(250)),
+    ) {
+      Column(modifier = Modifier.fillMaxWidth()) {
+        exerciseSets.notes.forEach { note ->
+          Log.i("ExerciseNotesList", "Note: $note")
+          SwipeToDismissItem(onDismissRequest = { removeNote(note) }) {
+            ExerciseNotes(exerciseNote = note, _pinNote = { pin -> _pinNote(note, pin) })
+          }
+          Spacer(modifier = Modifier.height(4.dp))
         }
-        Spacer(modifier = Modifier.height(4.dp))
       }
     }
   }
