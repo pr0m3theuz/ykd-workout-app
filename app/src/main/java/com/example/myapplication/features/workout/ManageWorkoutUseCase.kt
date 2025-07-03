@@ -287,6 +287,7 @@ class ManageWorkoutUseCase(
       workoutID = previousExerciseSets.workoutID,
       order = previousExerciseSets.order,
       exercise = exercise,
+      description = previousExerciseSets.description,
       sets = previousExerciseSets.sets,
       notes = previousExerciseSets.notes,
       datePerformed = previousExerciseSets.datePerformed,
@@ -483,19 +484,20 @@ class ManageWorkoutUseCase(
         ExerciseSets(
           id = _exerciseSets.id,
           exSetsUUID = _exerciseSets.exSetsUUID,
-          workoutID = _exerciseSets.workoutID,
           order = _exerciseSets.order,
           exerciseID = _exerciseSets.exercise.id,
           sets = _exerciseSets.sets,
+          description = _exerciseSets.description,
           notes = _exerciseSets.notes,
           datePerformed = _exerciseSets.datePerformed,
           totalVolumeInPounds = _exerciseSets.totalVolumeInPounds(),
           totalVolumeInKilograms = _exerciseSets.totalVolumeInKilograms(),
-          isPublic = false,
+          workoutID = _exerciseSets.workoutID,
           microcycleID = _exerciseSets.microcycleID,
           mesocycleID = _exerciseSets.mesocycleID,
           programID = _exerciseSets.programID,
           ownerID = userID, // TODO Replace currentUser.id
+          isPublic = false,
         )
       )
     }
@@ -520,6 +522,7 @@ class ManageWorkoutUseCase(
               order = it.order,
               exerciseID = it.exercise.id,
               sets = it.sets,
+              description = it.description,
               notes = it.notes,
               datePerformed = it.datePerformed,
               totalVolumeInPounds = it.totalVolumeInPounds(),
