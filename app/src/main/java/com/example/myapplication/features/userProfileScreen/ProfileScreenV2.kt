@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,32 +37,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.history.ui.HistoryLazyColumn
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.LifetimeStatsCard
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.WeeklyReportCard
-import org.bson.types.ObjectId
 
 @Preview(showBackground = true)
 @Composable
 private fun SettingsScreenPreview() {
   MyApplicationTheme {
-    ProfileScreenV2(
-      navigateToReplicatorScreen = {},
-      bottomNavigationBar = {},
-      navigateToAnalyticsScreen = {},
-      navigateToSettingsScreen = {},
-      navigateToHistoryScreen = {},
-      navigateToWorkoutOverview = {}
-    )
+//    ProfileScreenV2(
+//      navigateToReplicatorScreen = {},
+//      bottomNavigationBar = {},
+//      navigateToAnalyticsScreen = {},
+//      navigateToSettingsScreen = {},
+//      navigateToHistoryScreen = {},
+//      navigateToWorkoutOverview = {}
+//    )
   }
 }
 
 @Composable
 fun ProfileScreenV2(
-//  profileViewModel: ProfileViewModel = koinViewModel(),
+  profileViewModel: ProfileViewModel,
   bottomNavigationBar: @Composable () -> Unit,
   navigateToReplicatorScreen: () -> Unit,
   navigateToAnalyticsScreen: () -> Unit,
@@ -71,7 +70,7 @@ fun ProfileScreenV2(
 ) {
 
   // TODO REWRITE THIS
-//  val user = profileViewModel.currentUser
+  val user by profileViewModel.userProfile.collectAsState()
 //  val userEmail = user?.profileAsBsonDocument()!!["email"]?.asString()?.value ?: "anon@anon.anon"
 
 //  val user = "Anonymous"
@@ -79,7 +78,7 @@ fun ProfileScreenV2(
 //  val user = userProfileManager.userProfile.collectAsState().value
 //  val userEmail = "TEMP@anon.anon"
 
-  val user = UserProfile(ObjectId())
+//  val user = UserProfile(ObjectId())
 
   Scaffold(
     modifier = Modifier.imePadding(),
