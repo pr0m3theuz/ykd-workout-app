@@ -48,7 +48,10 @@ class CompletedWorkoutRepositoryImpl(
   // TODO Decide if I should create a repository for user data
   val user = userProfileManager.getCurrentUser()
 
-  private val withUnknownKeys = Json { ignoreUnknownKeys = true }
+  private val withUnknownKeys = Json {
+    encodeDefaults = true
+    ignoreUnknownKeys = true
+  }
 
   private fun mapQueryChangeToSet(queryChange: QueryChange): List<Set> {
     val sets = mutableListOf<Set>() // 1
@@ -351,12 +354,14 @@ class CompletedWorkoutRepositoryImpl(
 
       if (completedSets.isEmpty()) return
 
+      val workoutIDStr = "Workout:${workout.id}"
+
       db.inBatch(UnitOfWork {
         completedSets.forEach { set ->
-          val setIdStr = set.id.toHexString()
+          val setIdStr = "Set:${set.id}"
           try {
             val setJsonContent = Json.encodeToString(set)
-            completedSetsCollection.getDocument(set.id.toHexString())?.toMutable()?.let {
+            completedSetsCollection.getDocument(setIdStr)?.toMutable()?.let {
               it.setJSON(setJsonContent)
               Log.i(
                 "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
@@ -367,16 +372,16 @@ class CompletedWorkoutRepositoryImpl(
               "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
               "Saving set $setJsonContent"
             )
-            completedSetsCollection.save(MutableDocument(set.id.toHexString(), setJsonContent))
+            completedSetsCollection.save(MutableDocument(setIdStr, setJsonContent))
           } catch (e: kotlinx.serialization.SerializationException) {
             Log.e(
-              "Failed to serialize set $setIdStr for workout ${workout.id}",
+              "Failed to serialize set: $setIdStr for workout: $workoutIDStr",
               e.stackTraceToString()
             )
 //            throw e // Or handle as per your strategy
           } catch (e: Exception) { // Catch generic exception from DB for now
             Log.e(
-              "Failed to save set $setIdStr for workout ${workout.id} to DB",
+              "Failed to save set: $setIdStr for workout: $workoutIDStr to DB",
               e.stackTraceToString()
             )
 //            throw ("Failed to save set $setIdStr", e) // Wrap in custom exception
@@ -401,7 +406,7 @@ class CompletedWorkoutRepositoryImpl(
       })
 
       val workoutJson = Json.encodeToString(newWorkout)
-      completedWorkoutsCollection.getDocument(workout.id.toHexString())?.toMutable()?.let {
+      completedWorkoutsCollection.getDocument(workoutIDStr)?.toMutable()?.let {
         it.setJSON(workoutJson)
         Log.i(
           "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
@@ -412,7 +417,7 @@ class CompletedWorkoutRepositoryImpl(
         "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
         "Saving workout $workoutJson"
       )
-      completedWorkoutsCollection.save(MutableDocument(workout.id.toHexString(), workoutJson))
+      completedWorkoutsCollection.save(MutableDocument(workoutIDStr, workoutJson))
 
 
       // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
@@ -445,20 +450,20 @@ class CompletedWorkoutRepositoryImpl(
         }
       }
 
-      completedWorkoutsCollection.getDocument(workout.id.toHexString())?.let {
+      completedWorkoutsCollection.getDocument("Workout:${workout.id}")?.let {
         completedWorkoutsCollection.delete(it)
         Log.d(
           "CompletedWorkoutRepositoryImpl.deleteCompletedWorkout()",
-          "Deleted workout: ${workout.id.toHexString()}"
+          "Deleted workout: Workout:${workout.id}"
         )
       }
 
       completedSets.forEach { set ->
-        completedSetsCollection.getDocument(set.id.toHexString())?.let { setDocument ->
+        completedSetsCollection.getDocument("Set:${set.id}")?.let { setDocument ->
           completedSetsCollection.delete(setDocument)
           Log.d(
             "CompletedWorkoutRepositoryImpl.deleteCompletedWorkout()",
-            "Deleted set: ${set.id.toHexString()}"
+            "Deleted set: Set:${set.id}"
           )
         }
       }
