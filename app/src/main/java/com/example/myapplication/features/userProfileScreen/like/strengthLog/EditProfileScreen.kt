@@ -31,6 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,21 +45,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
+import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 
 @Preview(showBackground = true)
 @Composable
 fun EditProfileScreenPreview() {
-  MyApplicationTheme { EditProfileScreen() }
+  MyApplicationTheme {
+    EditProfileScreen()
+  }
 }
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun EditProfileScreenPreviewDarkMode() {
-  MyApplicationTheme { EditProfileScreen() }
+  MyApplicationTheme {
+    EditProfileScreen()
+  }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
+fun EditProfileScreen(profileViewModel: ProfileViewModel, onSaveChanges: () -> Unit = {}) {
 
   val pickMedia =
     rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -66,6 +74,7 @@ fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
       if (uri != null) {
         Log.d("PhotoPicker", "Selected URI: $uri")
         // TODO save the selected image URI or image bitmap to app data
+        //   Potentially: profileViewModel.updateProfilePicture(uri)
       } else {
         Log.d("PhotoPicker", "No media selected")
       }
@@ -75,10 +84,22 @@ fun EditProfileScreen(onSaveChanges: () -> Unit = {}) {
     pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
   }
 
-  var name by remember { mutableStateOf("") }
-  var username by remember { mutableStateOf("") }
-  var email by remember { mutableStateOf("") }
-  var password by remember { mutableStateOf("") }
+    val userProfileState by profileViewModel.userProfile.collectAsState()
+
+    var name by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") } // For entering new password or changing
+
+    LaunchedEffect(userProfileState) {
+        userProfileState?.let { profile ->
+            name = profile.name ?: ""
+            username = profile.username ?: ""
+            email = profile.email ?: ""
+            // Password field is for entry, so we don't prefill it from the profile's current password
+            // password = profile.password ?: "" // Typically, do not pre-fill password
+        }
+    }
 
   Scaffold(
     topBar = {
