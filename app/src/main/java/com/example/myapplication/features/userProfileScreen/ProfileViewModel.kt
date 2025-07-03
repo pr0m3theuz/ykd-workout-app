@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
-import androidx.lifecycle.viewModelScope
-import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundingOption
 import kotlinx.coroutines.flow.Flow
@@ -15,14 +13,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
-import java.io.IOException
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.bson.types.ObjectId // Required for default UserProfile
+import org.bson.types.ObjectId
+import java.io.IOException
 
-class ProfileViewModel constructor(
+class ProfileViewModel
+constructor(
   private val userProfileManager: UserProfileManager,
   private val userRepository: UserRepository,
 ) : ViewModel() {
@@ -35,49 +31,44 @@ class ProfileViewModel constructor(
 
   private val _defaultWeightUnit = MutableStateFlow<MassUnit>(_userProfile.value.defaultWeightUnit)
   val defaultWeightUnit: StateFlow<MassUnit?> = _defaultWeightUnit.asStateFlow()
-  var _currentUser: UserProfile = userProfileManager.getCurrentUser()
+//  var _currentUser: UserProfile = userProfileManager.getCurrentUser()
 
   fun getRoundingPreference(): Flow<RoundingOption?> {
     return flow {
-      RoundingOption.fromImperial(_currentUser.roundingPreferencePounds)
+      RoundingOption.fromImperial(_userProfile.value.roundingPreferencePounds)
         ?: RoundingOption.fromImperial(5.0)
     }
   }
 
   suspend fun updateRoundingPreference(roundingOption: RoundingOption) {
     try {
-      val metricValue = when {
-        (roundingOption.metric == null) -> {
-          RoundingOption.nearestMetric(roundingOption.ordinal)
+      val metricValue =
+        when {
+          (roundingOption.metric == null) -> {
+            RoundingOption.nearestMetric(roundingOption.ordinal)
+          }
+
+          else -> roundingOption.metric
         }
 
-        else -> roundingOption.metric
-      }
-
       userProfileManager.updateUserProfile(
-        _currentUser.copy(
+        _userProfile.value.copy(
           roundingPreferencePounds = roundingOption.imperial,
-          roundingPreferenceKilograms = metricValue
+          roundingPreferenceKilograms = metricValue,
         )
       )
 
       _userProfile.value = userProfileManager.getCurrentUser()
-      _currentUser = userProfileManager.getCurrentUser()
+      _userProfile.value = userProfileManager.getCurrentUser()
       _defaultWeightUnit.value = userProfileManager.getCurrentUser().defaultWeightUnit
-
     } catch (exception: IOException) {
       Log.e("ProfileViewModel", "Error updating rounding preference.", exception)
       // Optionally, rethrow or handle as per specific app requirements
     }
   }
 
-
   fun updateDefaultWeightUnit(newUnit: MassUnit) {
-    userProfileManager.updateUserProfile(
-      _currentUser.copy(
-        defaultWeightUnit = newUnit,
-      )
-    )
+    userProfileManager.updateUserProfile(_userProfile.value.copy(defaultWeightUnit = newUnit))
   }
 
   // Placeholder for other functions that might have existed or will be added.
@@ -94,7 +85,8 @@ class ProfileViewModel constructor(
 
   // Initialize with a default or empty UserProfile if needed, or load it
   // For now, we'll provide a function to load it based on an ID.
-  // Consider creating a default UserProfile with a placeholder ID for initialization if UI needs it.
+  // Consider creating a default UserProfile with a placeholder ID for initialization if UI needs
+  // it.
   // init {
   //     _userProfile.value = UserProfile(id = ObjectId(), username = "Guest") // Example default
   // }
@@ -106,47 +98,49 @@ class ProfileViewModel constructor(
       // For this example, we'll create a UserProfile object with the given ID to pass.
       // This part might need adjustment based on the exact signature of userRepository.getUser()
       val userToFetch = UserProfile(id = ObjectId(userId)) // Construct UserProfile with ID
-      val fetchedProfile = userRepository.getUser(userToFetch) // Or userRepository.getUserById(userId)
+      val fetchedProfile =
+        userRepository.getUser(userToFetch) // Or userRepository.getUserById(userId)
       if (fetchedProfile != null) {
         _userProfile.value = fetchedProfile
       }
     }
   }
 
-    fun updateUsername(username: String) {
-        _userProfile.value?.let { currentUserProfile ->
-            _userProfile.value = currentUserProfile.copy(username = username)
-        }
+  fun updateUsername(username: String) {
+    _userProfile.value.let { currentUserProfile ->
+      _userProfile.value = currentUserProfile.copy(username = username)
     }
+  }
 
-    fun updateName(name: String) {
-        _userProfile.value?.let { currentUserProfile ->
-            _userProfile.value = currentUserProfile.copy(name = name)
-        }
+  fun updateName(name: String) {
+    _userProfile.value.let { currentUserProfile ->
+      _userProfile.value = currentUserProfile.copy(name = name)
     }
+  }
 
-    fun updateEmail(email: String) {
-        _userProfile.value?.let { currentUserProfile ->
-            _userProfile.value = currentUserProfile.copy(email = email)
-        }
+  fun updateEmail(email: String) {
+    _userProfile.value.let { currentUserProfile ->
+      _userProfile.value = currentUserProfile.copy(email = email)
     }
+  }
 
-    fun updatePassword(password: String) {
-        _userProfile.value?.let { currentUserProfile ->
-            _userProfile.value = currentUserProfile.copy(password = password)
-        }
+  fun updatePassword(password: String) {
+    _userProfile.value.let { currentUserProfile ->
+      _userProfile.value = currentUserProfile.copy(password = password)
     }
+  }
 
-    fun saveUserProfile() {
-        viewModelScope.launch {
-            _userProfile.value?.let { profileToSave ->
-                try {
-                    userRepository.updateCurrentUser(profileToSave)
-                    // Optionally, handle success (e.g., show a message)
-                } catch (e: Exception) {
-                    // Handle error (e.g., show an error message)
-                }
-            }
+  fun saveUserProfile() {
+    viewModelScope.launch {
+      _userProfile.value.let { profileToSave ->
+        try {
+          //  userRepository.updateCurrentUser(profileToSave)
+          userProfileManager.updateUserProfile(profileToSave)
+          // Optionally, handle success (e.g., show a message)
+        } catch (e: Exception) {
+          // Handle error (e.g., show an error message)
         }
+      }
     }
+  }
 }
