@@ -211,7 +211,7 @@ class ProgramsRepositoryImpl(
 
       program?.mesocycles = mesocycles
 
-      Log.i("ProgramRepositoryImpl.getProgramByID()", "program: $program")
+//      Log.i("ProgramRepositoryImpl.getProgramByID()", "program: $program")
 
       return program
     } catch (e: Exception) {
