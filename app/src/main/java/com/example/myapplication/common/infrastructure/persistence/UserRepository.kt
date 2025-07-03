@@ -18,7 +18,9 @@ private const val COLLECTION_IS_NULL =
 
 interface UserRepository {
   fun createUser(user: UserProfile)
+
   fun updateCurrentUser(user: UserProfile)
+
   fun deleteCurrentUser(user: UserProfile)
 
   fun getUser(user: UserProfile): UserProfile?
@@ -26,7 +28,10 @@ interface UserRepository {
 
 class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRepository {
   val db: Database? = databaseManager.database
-  private val withUnknownKeys = Json { ignoreUnknownKeys = true }
+  private val withUnknownKeys = Json {
+    encodeDefaults = true
+    ignoreUnknownKeys = true
+  }
 
   override fun createUser(user: UserProfile) {
     try {
@@ -35,16 +40,9 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       val collection = db.getCollection("Users")
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val document = MutableDocument()
-      document.setString("id", user.id.toHexString())
-      document.setString("name", user.name)
-      document.setString("email", user.email)
-      document.setString("password", user.password)
-      document.setString("weightUnit", user.defaultWeightUnit.abbreviation)
-      document.setString("intensity", user.intensity)
-      document.setString("type", "User")
-      document.setString("authToken", user.authToken)
-//      document.setString("lengthUnit", user.defaultLengthUnit)
+      val userIDStr = "User:${user.id}"
+      val userJson = withUnknownKeys.encodeToString(user)
+      val document = MutableDocument(userIDStr, userJson)
 
       collection.save(document)
     } catch (e: Exception) {
@@ -58,16 +56,13 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
 
       val collection = db.getCollection("Users")
       requireNotNull(collection) { COLLECTION_IS_NULL }
-      val document = user.id.let { collection.getDocument(it.toHexString())?.toMutable() }
+
+      val userIDStr = "User:${user.id}"
+      val document = user.id.let { collection.getDocument(userIDStr)?.toMutable() }
       requireNotNull(document) { "User Repository: User does not exist!" }
 
-      document.setString("name", user.name)
-      document.setString("email", user.email)
-      document.setString("password", user.password)
-      document.setString("weightUnit", user.defaultWeightUnit.abbreviation)
-      document.setString("intensity", user.intensity)
-      document.setString("authToken", user.authToken)
-//      document.setString("lengthUnit", user.defaultLengthUnit)
+      val userJson = withUnknownKeys.encodeToString(user)
+      document.setJSON(userJson)
 
       collection.save(document)
     } catch (e: Exception) {
@@ -98,9 +93,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       val queryBuilder =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-          .where(
-            Expression.property("id").equalTo(Expression.string(user.id.toHexString()))
-          )
+          .where(Expression.property("id").equalTo(Expression.string(user.id.toHexString())))
           .limit(Expression.intValue(1))
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
@@ -117,5 +110,4 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
     }
     return null
   }
-
 }
