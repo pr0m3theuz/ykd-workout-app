@@ -88,15 +88,18 @@ fun ExercisesSetsScreen(
         exerciseSets = exerciseSets,
         set = set,
         index = index,
+        addSet = { /* TODO */ },
         removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
         setContent = {
+          // TODO Why is SetLazyListItem() nested?
           val setUUID = set.uuid
-          SetLazyListItem(
-            exerciseSets = exerciseSets,
-            set = set,
-            index = index,
-            removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
-            setContent = {
+//          SetLazyListItem(
+//            exerciseSets = exerciseSets,
+//            set = set,
+//            index = index,
+//            addSet = { /* TODO */ },
+//            removeSet = { /*workoutViewModel.removeSet(exerciseSets, set)*/ },
+//            setContent = {
               SetContent(
                 setIndex = index,
                 set = set,
@@ -151,8 +154,8 @@ fun ExercisesSetsScreen(
                   )
                 },
               )
-            },
-          )
+//            },
+//          )
         },
       )
     },
