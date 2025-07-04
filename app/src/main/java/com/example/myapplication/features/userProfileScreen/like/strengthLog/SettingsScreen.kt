@@ -45,11 +45,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 
 // Placeholder for your R.drawable.ic_flag_uk or similar
@@ -185,6 +187,13 @@ fun SettingsScreen(
           title = "Round off",
           subtitle = "5.0 lb", // TODO replace with actual value
           onClick = { onNavigate("roundOffSettings") }
+        )
+      }
+      item { // New item
+        SettingsNavigationItem(
+          icon = ImageVector.vectorResource(R.drawable.weight_fill1_wght400_grad0_opsz24), // Icon for "Round off"
+          title = "Equipment Profiles",
+          onClick = { onNavigate("equipmentProfileSettings") }
         )
       }
       /*      item { // New item
