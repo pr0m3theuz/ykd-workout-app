@@ -33,14 +33,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.FitnessCenter
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,8 +44,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -82,7 +75,6 @@ import androidx.core.graphics.toColorInt
 import com.example.myapplication.common.ui.theme.IBMColorBlindPalette
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
-import com.example.myapplication.features.userProfileScreen.bad.BottomNavItem
 import com.example.myapplication.common.domain.model.Barbell as DomainBarbell
 import com.example.myapplication.common.domain.model.Collar as DomainCollar
 import com.example.myapplication.common.domain.model.Plate as DomainPlate
@@ -131,7 +123,8 @@ val plateUiColors =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EquipmentProfileScreen(
-  viewModel: ProfileViewModel, // Added ViewModel parameter
+  profileViewModel: ProfileViewModel, // Added ViewModel parameter
+  bottomNavigationBar: @Composable () -> Unit,
   onNavigateBack: () -> Unit,
   onEditProfile: () -> Unit = {}, // Keep these for now, might be wired to VM later
   onDeleteProfile: () -> Unit = {}, // Keep these for now
@@ -140,13 +133,13 @@ fun EquipmentProfileScreen(
     mutableIntStateOf(4)
   } // Assuming settings/profile is last
 
-  val userProfileState by viewModel.userProfile.collectAsState()
-  val platesList by viewModel.plates.collectAsState()
-  val barbellsList by viewModel.barbells.collectAsState()
-  val collarsList by viewModel.collars.collectAsState()
+  val userProfileState by profileViewModel.userProfile.collectAsState()
+  val platesList by profileViewModel.plates.collectAsState()
+  val barbellsList by profileViewModel.barbells.collectAsState()
+  val collarsList by profileViewModel.collars.collectAsState()
 
-  val currentProfileName = userProfileState?.name ?: "User"
-  val currentUnitSystem = userProfileState?.defaultWeightUnit ?: "lb"
+//  val currentProfileName = userProfileState?.name ?: "User"
+  val currentUnitSystem = userProfileState.defaultWeightUnit.abbreviation
 
   // --- Dialog States ---
   var showAddPlateDialog by remember { mutableStateOf(false) }
@@ -156,7 +149,7 @@ fun EquipmentProfileScreen(
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text("$currentProfileName: $currentUnitSystem") }, // Use ViewModel state
+        title = { Text("Profile: $currentUnitSystem") }, // Use ViewModel state
         navigationIcon = {
           IconButton(onClick = onNavigateBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
         },
@@ -169,25 +162,8 @@ fun EquipmentProfileScreen(
       )
     },
     bottomBar = {
+      bottomNavigationBar()
       // Assuming BottomNavItem data class is available or defined elsewhere
-      NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
-        val items =
-          listOf(
-            BottomNavItem(Icons.Filled.Home, "Home", "home"),
-            BottomNavItem(Icons.Filled.BarChart, "Stats", "stats"),
-            BottomNavItem(Icons.Filled.AddCircleOutline, "Add", "add"),
-            BottomNavItem(Icons.Filled.FitnessCenter, "Workouts", "workouts"),
-            BottomNavItem(Icons.Filled.Settings, "Settings", "settings"),
-          )
-        items.forEachIndexed { index, item ->
-          NavigationBarItem(
-            icon = { Icon(item.icon, contentDescription = item.label) },
-            label = { Text(item.label) },
-            selected = selectedBottomNavItem == index,
-            onClick = { selectedBottomNavItem = index /* TODO: Handle nav */ },
-          )
-        }
-      }
     },
   ) { paddingValues ->
     LazyColumn(
@@ -202,7 +178,7 @@ fun EquipmentProfileScreen(
         PlateItemRow(
           plate = plate,
           unit = currentUnitSystem,
-          onRemove = { viewModel.removePlate(plate.id) },
+          onRemove = { profileViewModel.removePlate(plate.id) },
         )
         HorizontalDivider()
       }
@@ -214,7 +190,7 @@ fun EquipmentProfileScreen(
         BarbellItemRow(
           barbell = barbell,
           unit = currentUnitSystem,
-          onRemove = { viewModel.removeBarbell(barbell.id) },
+          onRemove = { profileViewModel.removeBarbell(barbell.id) },
         )
         HorizontalDivider()
       }
@@ -226,7 +202,7 @@ fun EquipmentProfileScreen(
         CollarItemRow(
           collar = collar,
           unit = currentUnitSystem,
-          onRemove = { viewModel.removeCollar(collar.id) },
+          onRemove = { profileViewModel.removeCollar(collar.id) },
         )
         HorizontalDivider()
       }
@@ -242,7 +218,7 @@ fun EquipmentProfileScreen(
       onAddPlate = { weight, count, uiColor -> // uiColor is Jetpack Compose Color
         // Convert uiColor to hex string for domain model
         val colorHexString = uiColor.toHexString()
-        viewModel.addPlate(
+        profileViewModel.addPlate(
           DomainPlate(
             weight = weight,
             count = count,
@@ -259,7 +235,7 @@ fun EquipmentProfileScreen(
       unit = currentUnitSystem, // Use ViewModel state
       onDismiss = { showAddBarbellDialog = false },
       onAddBarbell = { weight ->
-        viewModel.addBarbell(DomainBarbell(weight = weight, unit = currentUnitSystem))
+        profileViewModel.addBarbell(DomainBarbell(weight = weight, unit = currentUnitSystem))
         showAddBarbellDialog = false
       },
     )
@@ -269,7 +245,7 @@ fun EquipmentProfileScreen(
       unit = currentUnitSystem, // Use ViewModel state
       onDismiss = { showAddCollarDialog = false },
       onAddCollar = { weight ->
-        viewModel.addCollar(DomainCollar(weight = weight, unit = currentUnitSystem))
+        profileViewModel.addCollar(DomainCollar(weight = weight, unit = currentUnitSystem))
         showAddCollarDialog = false
       },
     )
