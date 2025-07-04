@@ -1,6 +1,8 @@
 package com.example.myapplication.features.userProfileScreen
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.Barbell
@@ -11,7 +13,7 @@ import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundingOption
-import java.io.IOException
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.toHexString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
+import java.io.IOException
 
 class ProfileViewModel
 constructor(
@@ -70,13 +73,42 @@ constructor(
     }
   }
 
-  private val _plates = MutableStateFlow<List<Plate>>(emptyList())
+  private val plateColors =
+    listOf(
+      Color.Red,
+      Color.hsl(224.9f, 1f, 0.5f), // Blue
+      Color.Yellow,
+      Color.hsl(130f, 0.76f, 0.31f), // Green
+      Color.White, // Often used for smaller plates, with black text
+    )
+
+  private val platesList =
+    mutableStateListOf(
+      Plate(weight = 55f, count = null, color = plateColors[0].toHexString()),
+      Plate(weight = 45f, count = null, color = plateColors[1].toHexString()),
+      Plate(weight = 35f, count = null, color = plateColors[2].toHexString()),
+      Plate(weight = 25f, count = null, color = plateColors[3].toHexString()),
+      Plate(weight = 10f, count = null, color = plateColors[4].toHexString()),
+      Plate(weight = 5f, count = null, color = plateColors[0].toHexString()),
+      Plate(weight = 2.5f, count = null, color = plateColors[3].toHexString()),
+      Plate(weight = 1f, count = null, color = plateColors[4].toHexString()),
+    )
+
+  private val barbellsList =
+    mutableStateListOf(
+      Barbell(weight = 65f), Barbell(weight = 52f), Barbell(weight = 45f), Barbell(weight = 44f),
+      Barbell(weight = 35f), Barbell(weight = 25f), Barbell(weight = 22f), Barbell(weight = 17f)
+    )
+
+  private val collarsList = mutableStateListOf(Collar(weight = 5.5f))
+
+  private val _plates = MutableStateFlow<List<Plate>>(platesList)
   val plates: StateFlow<List<Plate>> = _plates.asStateFlow()
 
-  private val _barbells = MutableStateFlow<List<Barbell>>(emptyList())
+  private val _barbells = MutableStateFlow<List<Barbell>>(barbellsList)
   val barbells: StateFlow<List<Barbell>> = _barbells.asStateFlow()
 
-  private val _collars = MutableStateFlow<List<Collar>>(emptyList())
+  private val _collars = MutableStateFlow<List<Collar>>(collarsList)
   val collars: StateFlow<List<Collar>> = _collars.asStateFlow()
 
   fun updateDefaultWeightUnit(newUnit: MassUnit) {
