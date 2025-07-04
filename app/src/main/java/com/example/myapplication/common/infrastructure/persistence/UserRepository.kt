@@ -12,7 +12,6 @@ import com.example.myapplication.common.domain.model.Collar
 import com.example.myapplication.common.domain.model.Plate
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 private const val DATABASE_IS_NULL = "User Repository: Database does not exist."
@@ -108,8 +107,8 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
 
       val result = queryBuilder.execute().allResults().firstOrNull()
 
-      return result?. { doc ->
-        withUnknownKeys.decodeFromString<UserProfile>(doc)
+      return result?.let { doc ->
+        withUnknownKeys.decodeFromString<UserProfile>(doc.toJSON())
       }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
