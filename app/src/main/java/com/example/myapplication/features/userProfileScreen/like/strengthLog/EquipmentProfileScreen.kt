@@ -424,7 +424,11 @@ private fun AddPlateDialog(
   infiniteTransitionRotation.animateFloat(
     initialValue = 0f,
     targetValue = 360f,
-    animationSpec = infiniteRepeatable(animation = tween(8000, easing = LinearEasing)),
+    animationSpec =
+      infiniteRepeatable(
+        animation = tween(10000, easing = LinearEasing)
+        //  repeatMode = RepeatMode.Reverse,
+      ),
     label = "RotatingBorderAnimation",
   )
 
@@ -484,22 +488,26 @@ private fun AddPlateDialog(
       val colorGradient = IBMColorBlindPalette.colors
       plateUiColors.forEachIndexed { index, color -> // Use plateUiColors
         val colors =
-          colorGradient.plus(Color.White)//.plus(IBMColorBlindPalette.colors.reversed()).toMutableList()
-//        repeat(1) {colors.addAll(colors)}
+          colorGradient.plus(
+            Color.White
+          ) // .plus(IBMColorBlindPalette.colors.reversed()).toMutableList()
+        //        repeat(1) {colors.addAll(colors)}
         val sweepBrush = Brush.sweepGradient(colors)
         val infiniteTransition = rememberInfiniteTransition()
-        val offset by infiniteTransition.animateFloat(
+        val offset by
+        infiniteTransition.animateFloat(
           initialValue = 0f,
           targetValue = currentFontSizeDoublePx,
-          animationSpec = infiniteRepeatable(tween(2000, easing = LinearEasing))
+          animationSpec = infiniteRepeatable(tween(2000, easing = LinearEasing)),
         )
 
-        val linearBrush = Brush.linearGradient(
-          colors,
-          start = Offset(offset, offset),
-          end = Offset(offset + currentFontSizePx, offset + currentFontSizePx),
-          tileMode = TileMode.Mirror
-        )
+        val linearBrush =
+          Brush.linearGradient(
+            colors,
+            start = Offset(offset, offset),
+            end = Offset(offset + currentFontSizePx, offset + currentFontSizePx),
+            tileMode = TileMode.Mirror,
+          )
 
         val animatedSize by
         animateDpAsState(
@@ -509,19 +517,27 @@ private fun AddPlateDialog(
         Box(
           contentAlignment = Alignment.Center,
           // TODO Animate size from 36.dp to 40.dp
-          modifier =
-            Modifier
-              .size(40.dp)
-              .clickable { selectedColorIndex = index }
-              .clip(CircleShape),
+          modifier = Modifier
+            .size(40.dp)
+            .clickable { selectedColorIndex = index }
+            .clip(CircleShape),
         ) {
           if (selectedColorIndex == index) {
             Canvas(
               Modifier
                 .size(animatedSize)
-                .rotate(rotation) // rotation
+                .rotate(rotation)
+//                .blur(
+//                radiusX = 4.dp,
+//                radiusY = 4.dp,
+//                edgeTreatment = BlurredEdgeTreatment.Unbounded
+//              ) // rotation
             ) {
-              drawCircle(brush = linearBrush, radius = size.minDimension / 2f, center = center)
+              drawCircle(
+                brush = linearBrush,
+                radius = size.minDimension / 2f,
+                center = center,
+              )
             }
           } else {
             Box(
@@ -530,14 +546,15 @@ private fun AddPlateDialog(
                 .clip(CircleShape)
                 .background(
                   Color.LightGray
-//                  MaterialTheme.colorScheme.surfaceTint
+                  //                  MaterialTheme.colorScheme.surfaceTint
                 ) // Fallback background if not selected
             )
           }
+          val alpha = if (selectedColorIndex != index) 1f else 1f
           Box(Modifier
             .size(32.dp)
             .clip(CircleShape)
-            .background(color))
+            .background(color.copy(alpha = alpha)))
         }
       }
     }
