@@ -22,6 +22,33 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.bson.types.ObjectId
+import java.util.UUID
+
+@Serializable
+data class Plate(
+  @SerialName("_id") val id: String = UUID.randomUUID().toString(),
+  val weight: Float,
+  val unit: String = "lb",
+  var count: Int?, // Nullable for "unlimited"
+  val color: String // Storing color as hex string e.g., "#FF0000" for Red
+) {
+  val displayCount: String
+    get() = count?.toString() ?: "∞"
+}
+
+@Serializable
+data class Barbell(
+  @SerialName("_id") val id: String = UUID.randomUUID().toString(),
+  val weight: Float,
+  val unit: String = "lb"
+)
+
+@Serializable
+data class Collar(
+  @SerialName("_id") val id: String = UUID.randomUUID().toString(),
+  val weight: Float,
+  val unit: String = "lb"
+)
 
 @Serializable
 data class UserProfile(
@@ -36,6 +63,9 @@ data class UserProfile(
   var roundingPreferenceKilograms: Double = 2.5,
   var authToken: String? = null,
   var isLoggedIn: Boolean = false,
+  val plates: List<Plate> = emptyList(),
+  val barbells: List<Barbell> = emptyList(),
+  val collars: List<Collar> = emptyList(),
   private val type: String = "User"
 )
 
@@ -50,6 +80,9 @@ object UserProfileDataStoreKeys {
   val DEFAULT_INTENSITY = stringPreferencesKey("default_intensity")
   val ROUNDING_PREFERENCE_LBS = doublePreferencesKey("rounding_preference_lbs")
   val ROUNDING_PREFERENCE_KG = doublePreferencesKey("rounding_preference_kg")
+  val PLATES_JSON = stringPreferencesKey("plates_json")
+  val BARBELLS_JSON = stringPreferencesKey("barbells_json")
+  val COLLARS_JSON = stringPreferencesKey("collars_json")
   val AUTH_TOKEN = stringPreferencesKey("auth_token")
   val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
 }

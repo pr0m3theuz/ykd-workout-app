@@ -7,8 +7,12 @@ import com.couchbase.lite.Expression
 import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.SelectResult
+import com.example.myapplication.common.domain.model.Barbell
+import com.example.myapplication.common.domain.model.Collar
+import com.example.myapplication.common.domain.model.Plate
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 private const val DATABASE_IS_NULL = "User Repository: Database does not exist."
@@ -22,8 +26,14 @@ interface UserRepository {
   fun updateCurrentUser(user: UserProfile)
 
   fun deleteCurrentUser(user: UserProfile)
-
   fun getUser(user: UserProfile): UserProfile?
+
+  fun addPlate(userId: String, plate: Plate)
+  fun removePlate(userId: String, plateId: String)
+  fun addBarbell(userId: String, barbell: Barbell)
+  fun removeBarbell(userId: String, barbellId: String)
+  fun addCollar(userId: String, collar: Collar)
+  fun removeCollar(userId: String, collarId: String)
 }
 
 class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRepository {
@@ -31,7 +41,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
   private val withUnknownKeys = Json {
     encodeDefaults = true
     ignoreUnknownKeys = true
-  }
+  } // Added encodeDefaults for empty lists
 
   override fun createUser(user: UserProfile) {
     try {
@@ -96,18 +106,145 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
           .where(Expression.property("id").equalTo(Expression.string(user.id.toHexString())))
           .limit(Expression.intValue(1))
 
-      val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
+      val result = queryBuilder.execute().allResults().firstOrNull()
 
-      val dbUser = withUnknownKeys.decodeFromString<UserProfile>(result.toString())
+      return result?. { doc ->
+        withUnknownKeys.decodeFromString<UserProfile>(doc)
+      }
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+      return null // Return null on error
+    }
+  }
 
-      return if (dbUser.id == user.id) {
-        dbUser
+  // Helper function to get user document
+  private fun getUserDocument(userId: String, collection: com.couchbase.lite.Collection): MutableDocument? {
+    return collection.getDocument(userId)?.toMutable()
+  }
+
+  override fun addPlate(userId: String, plate: Plate) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("Users")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val document = getUserDocument(userId, collection)
+      requireNotNull(document) { "User Repository: User with ID $userId does not exist!" }
+
+      val platesJson = document.getString("plates")
+      val platesList = if (platesJson != null) {
+        withUnknownKeys.decodeFromString<MutableList<Plate>>(platesJson)
       } else {
-        null
+        mutableListOf()
+      }
+      platesList.add(plate)
+      document.setString("plates", withUnknownKeys.encodeToString(platesList))
+      collection.save(document)
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+  }
+
+  override fun removePlate(userId: String, plateId: String) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("Users")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val document = getUserDocument(userId, collection)
+      requireNotNull(document) { "User Repository: User with ID $userId does not exist!" }
+
+      val platesJson = document.getString("plates")
+      if (platesJson != null) {
+        val platesList = withUnknownKeys.decodeFromString<MutableList<Plate>>(platesJson)
+        platesList.removeAll { it.id == plateId }
+        document.setString("plates", withUnknownKeys.encodeToString(platesList))
+        collection.save(document)
       }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
-    return null
+  }
+
+  override fun addBarbell(userId: String, barbell: Barbell) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("Users")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val document = getUserDocument(userId, collection)
+      requireNotNull(document) { "User Repository: User with ID $userId does not exist!" }
+
+      val barbellsJson = document.getString("barbells")
+      val barbellsList = if (barbellsJson != null) {
+        withUnknownKeys.decodeFromString<MutableList<Barbell>>(barbellsJson)
+      } else {
+        mutableListOf()
+      }
+      barbellsList.add(barbell)
+      document.setString("barbells", withUnknownKeys.encodeToString(barbellsList))
+      collection.save(document)
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+  }
+
+  override fun removeBarbell(userId: String, barbellId: String) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("Users")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val document = getUserDocument(userId, collection)
+      requireNotNull(document) { "User Repository: User with ID $userId does not exist!" }
+
+      val barbellsJson = document.getString("barbells")
+      if (barbellsJson != null) {
+        val barbellsList = withUnknownKeys.decodeFromString<MutableList<Barbell>>(barbellsJson)
+        barbellsList.removeAll { it.id == barbellId }
+        document.setString("barbells", withUnknownKeys.encodeToString(barbellsList))
+        collection.save(document)
+      }
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+  }
+
+  override fun addCollar(userId: String, collar: Collar) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("Users")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val document = getUserDocument(userId, collection)
+      requireNotNull(document) { "User Repository: User with ID $userId does not exist!" }
+
+      val collarsJson = document.getString("collars")
+      val collarsList = if (collarsJson != null) {
+        withUnknownKeys.decodeFromString<MutableList<Collar>>(collarsJson)
+      } else {
+        mutableListOf()
+      }
+      collarsList.add(collar)
+      document.setString("collars", withUnknownKeys.encodeToString(collarsList))
+      collection.save(document)
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+  }
+
+  override fun removeCollar(userId: String, collarId: String) {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("Users")
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      val document = getUserDocument(userId, collection)
+      requireNotNull(document) { "User Repository: User with ID $userId does not exist!" }
+
+      val collarsJson = document.getString("collars")
+      if (collarsJson != null) {
+        val collarsList = withUnknownKeys.decodeFromString<MutableList<Collar>>(collarsJson)
+        collarsList.removeAll { it.id == collarId }
+        document.setString("collars", withUnknownKeys.encodeToString(collarsList))
+        collection.save(document)
+      }
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
   }
 }
