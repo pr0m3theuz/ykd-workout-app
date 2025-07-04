@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 
 class UserProfileManager(
@@ -28,6 +30,8 @@ class UserProfileManager(
 
   private val _userProfile = MutableStateFlow(UserProfile(ObjectId())) // Default empty profile
   val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
+
+  val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
   val name = listOf(
     "James",
@@ -47,7 +51,7 @@ class UserProfileManager(
     "Joseph",
     "Jessica",
     "Lisa"
-  ).random()
+  )
 
   // Use a dedicated scope for DataStore operations that outlive viewModelScope
   private val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -91,6 +95,33 @@ class UserProfileManager(
           }
         }
         .map { preferences ->
+          val platesList: List<Plate> = try {
+            preferences[UserProfileDataStoreKeys.PLATES_JSON]?.let {
+              json.decodeFromString<List<Plate>>(it)
+            } ?: emptyList()
+          } catch (e: SerializationException) {
+            // Handle corrupted data by returning an empty list
+            emptyList()
+          }
+
+          // Deserialize Barbells list
+          val barbellsList: List<Barbell> = try {
+            preferences[UserProfileDataStoreKeys.BARBELLS_JSON]?.let {
+              json.decodeFromString<List<Barbell>>(it)
+            } ?: emptyList()
+          } catch (e: SerializationException) {
+            emptyList()
+          }
+
+          // Deserialize Collars list
+          val collarsList: List<Collar> = try {
+            preferences[UserProfileDataStoreKeys.COLLARS_JSON]?.let {
+              json.decodeFromString<List<Collar>>(it)
+            } ?: emptyList()
+          } catch (e: SerializationException) {
+            emptyList()
+          }
+
           UserProfile(
             id = if (preferences[UserProfileDataStoreKeys.USER_ID] != null) {
               Log.i(
@@ -121,6 +152,9 @@ class UserProfileManager(
               ?: MassUnit.POUNDS.abbreviation,
             intensity = preferences[UserProfileDataStoreKeys.DEFAULT_INTENSITY]
               ?: Intensity.RIR.abbreviation,
+            plates = platesList,
+            barbells = barbellsList,
+            collars = collarsList,
             authToken = preferences[UserProfileDataStoreKeys.AUTH_TOKEN],
             isLoggedIn = preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] ?: false
           )
@@ -166,12 +200,17 @@ class UserProfileManager(
       dataStoreScope.launch {
         context.userProfileDataStore.edit { preferences ->
           preferences[UserProfileDataStoreKeys.USER_ID] = newProfile.id.toHexString() ?: ""
-          preferences[UserProfileDataStoreKeys.USER_NAME] = newProfile.name ?: name
-          preferences[UserProfileDataStoreKeys.USER_EMAIL] = newProfile.email ?: name
+          preferences[UserProfileDataStoreKeys.USER_NAME] = newProfile.name ?: name.random()
+          preferences[UserProfileDataStoreKeys.USER_EMAIL] = newProfile.email ?: name.random()
           preferences[UserProfileDataStoreKeys.USER_USERNAME] = newProfile.username ?: ""
           preferences[UserProfileDataStoreKeys.USER_PASSWORD] = newProfile.password ?: ""
           preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT] = newProfile.defaultWeightUnit
           preferences[UserProfileDataStoreKeys.DEFAULT_INTENSITY] = newProfile.intensity
+          preferences[UserProfileDataStoreKeys.PLATES_JSON] = json.encodeToString(newProfile.plates)
+          preferences[UserProfileDataStoreKeys.BARBELLS_JSON] =
+            json.encodeToString(newProfile.barbells)
+          preferences[UserProfileDataStoreKeys.COLLARS_JSON] =
+            json.encodeToString(newProfile.collars)
           preferences[UserProfileDataStoreKeys.AUTH_TOKEN] = newProfile.authToken ?: ""
           preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] = true
         }
@@ -195,6 +234,9 @@ class UserProfileManager(
         preferences.remove(UserProfileDataStoreKeys.USER_PASSWORD)
         preferences.remove(UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT)
         preferences.remove(UserProfileDataStoreKeys.DEFAULT_INTENSITY)
+        preferences.remove(UserProfileDataStoreKeys.PLATES_JSON)
+        preferences.remove(UserProfileDataStoreKeys.BARBELLS_JSON)
+        preferences.remove(UserProfileDataStoreKeys.COLLARS_JSON)
         preferences.remove(UserProfileDataStoreKeys.AUTH_TOKEN)
         preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] = false // Explicitly set to false
       }

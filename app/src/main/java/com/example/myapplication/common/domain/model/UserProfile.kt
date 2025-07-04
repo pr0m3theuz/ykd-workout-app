@@ -75,6 +75,9 @@ object UserProfileDataStoreKeys {
   val USER_PASSWORD = stringPreferencesKey("user_password")
   val DEFAULT_WEIGHT_UNIT = stringPreferencesKey("default_weight_unit")
   val DEFAULT_INTENSITY = stringPreferencesKey("default_intensity")
+  val PLATES_JSON = stringPreferencesKey("plates_json")
+  val BARBELLS_JSON = stringPreferencesKey("barbells_json")
+  val COLLARS_JSON = stringPreferencesKey("collars_json")
   val AUTH_TOKEN = stringPreferencesKey("auth_token")
   val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
 }
