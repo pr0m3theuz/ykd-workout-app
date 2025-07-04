@@ -83,6 +83,7 @@ import com.example.myapplication.features.userProfileScreen.like.boostcamp.Analy
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.CalculatorsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.ChooseUnitsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.EditProfileScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.EquipmentProfileScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundOffScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.SettingsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.TimerSettingsScreen
@@ -930,6 +931,29 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
             }
           )
         }
+      )
+    }
+
+
+    composable("equipmentProfileSettings") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
+      EquipmentProfileScreen(
+        profileViewModel = profileViewModel,
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+              }
+            }
+          )
+        },
+        onNavigateBack = { navController.popBackStack() }
       )
     }
 
