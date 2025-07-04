@@ -163,7 +163,7 @@ class UserProfileManager(private val context: Context, private val userRepositor
             barbells = barbellsList,
             collars = collarsList,
             authToken = preferences[UserProfileDataStoreKeys.AUTH_TOKEN],
-            isLoggedIn = preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] ?: false,
+            isLoggedIn = preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] ?: false
           )
         }
         .distinctUntilChanged() // Only emit if the profile actually changed
