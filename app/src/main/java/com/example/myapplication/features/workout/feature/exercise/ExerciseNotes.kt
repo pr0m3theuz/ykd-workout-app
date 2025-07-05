@@ -160,19 +160,11 @@ fun SwipeToDismissItem(
     }
   }
 
-  fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
-    openDialog.value = open
-  }
 
   if (dismissState.isDismissed(DismissDirection.EndToStart)) {
     Log.i("SwipeToDismissItem()", "onDismissRequest() called")
     onDismissRequest()
-  } /*else if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-      ConfirmCompletedSetDeletionDialog(
-        { open -> openConfirmCompletedSetDeletionDialog(open) },
-        { delete -> deleteCompletedSet(delete) }
-      )
-    }*/
+  }
 
   SwipeToDismiss(
     state = dismissState,
