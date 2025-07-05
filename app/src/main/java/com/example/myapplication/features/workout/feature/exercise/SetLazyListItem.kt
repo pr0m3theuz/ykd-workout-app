@@ -2,34 +2,36 @@ package com.example.myapplication.features.workout.feature.exercise
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.WorkoutComponent
@@ -43,107 +45,132 @@ fun SetLazyListItem(
   exerciseSets: WorkoutComponent,
   index: Int,
   set: Set,
-  addSet: () -> Unit = {},
-  removeSet: () -> Unit = {},
-  setContent: @Composable () -> Unit,
+  addSetAtIndex: () -> Unit = {},
+  removeSet: () -> Unit,
+  setContent: @Composable (/*exerciseSets: ExerciseExerciseSets, setIndex: Int, set: Set*/) -> Unit,
 ) {
   //    Log.i("SetColumn()", "$set")
 
   val coroutineScope = rememberCoroutineScope()
   val setCompletedState by remember { mutableStateOf(set.setCompleted) }
-  var openDialog by remember { mutableStateOf(false) }
+  val openDialog = remember { mutableStateOf(true) }
 
-  val swipeToDismissBoxState =
-    rememberSwipeToDismissBoxState(
-      confirmValueChange = {
+  val dismissState =
+    rememberDismissState(
+      confirmStateChange = {
         when (it) {
-          SwipeToDismissBoxValue.Settled -> {}
-          SwipeToDismissBoxValue.StartToEnd -> {
-            addSet()
+          DismissValue.DismissedToStart -> {
+            //        openDialog.value = true
+            true
           }
 
-          SwipeToDismissBoxValue.EndToStart -> {
-            when (setCompletedState) {
-              true -> {
-                openDialog = true
-              }
-
-              false -> {
-                removeSet()
-              }
-            }
+          DismissValue.DismissedToEnd -> {
+            addSetAtIndex()
+            false
           }
+
+          DismissValue.Default -> false
         }
-        it != SwipeToDismissBoxValue.StartToEnd
       }
     )
-
-  swipeToDismissBoxState
 
   fun deleteCompletedSet(delete: Boolean) {
     if (delete) {
       removeSet()
     } else {
       coroutineScope.launch {
-        swipeToDismissBoxState.dismiss(SwipeToDismissBoxValue.Settled)
+        dismissState.animateTo(targetValue = DismissValue.Default, anim = TweenSpec())
       }
     }
   }
 
-  if (openDialog) {
-    ConfirmCompletedSetDeletionDialog(
-      { openDialog = it },
-      { delete -> deleteCompletedSet(delete) },
-    )
+  fun openConfirmCompletedSetDeletionDialog(open: Boolean) {
+    openDialog.value = open
   }
 
-  SwipeToDismissBox(
-    state = swipeToDismissBoxState,
-    enableDismissFromStartToEnd = false, // TODO
-    enableDismissFromEndToStart = true,
-    backgroundContent = {
-      val scale by
-      animateFloatAsState(
-        if (swipeToDismissBoxState.dismissDirection != SwipeToDismissBoxValue.Settled) 1.2f else 0.8f,
-        label = "Icon Scale",
+  if (!setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
+    removeSet()
+  } else if (setCompletedState and dismissState.isDismissed(DismissDirection.EndToStart)) {
+    ConfirmCompletedSetDeletionDialog(
+      { open -> openConfirmCompletedSetDeletionDialog(open) },
+      { delete -> deleteCompletedSet(delete) },
+    )
+  } else if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+    addSetAtIndex()
+  }
+
+  // TODO Replace Fractional Threshold with Swipeable
+  SwipeToDismiss(
+    state = dismissState,
+    directions = setOf(DismissDirection.EndToStart, DismissDirection.StartToEnd),
+    dismissThresholds = { dismissDirection ->
+      FractionalThreshold(
+        when (dismissDirection) {
+          DismissDirection.EndToStart -> 0.66f
+          else -> 0.5f
+        }
+      )
+    },
+    background = {
+      val color by
+      animateColorAsState(
+        when (dismissState.targetValue) {
+          DismissValue.Default -> MaterialTheme.colorScheme.primary
+          DismissValue.DismissedToStart -> MaterialTheme.colorScheme.error
+          DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
+        },
+        label = "Background Color",
+      )
+      val iconTint by
+      animateColorAsState(
+        when (dismissState.targetValue) {
+          DismissValue.Default -> MaterialTheme.colorScheme.onPrimary
+          DismissValue.DismissedToStart -> MaterialTheme.colorScheme.onError
+          DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.onPrimary
+        },
+        label = "Icon Color",
       )
 
-      when (swipeToDismissBoxState.dismissDirection) {
-        SwipeToDismissBoxValue.Settled -> {}
-        SwipeToDismissBoxValue.EndToStart -> {
-          val initialColor = MaterialTheme.colorScheme.surface
-          val targetColor = MaterialTheme.colorScheme.error
-          Icon(
-            Icons.Filled.Delete,
-            tint = MaterialTheme.colorScheme.onError,
-            contentDescription = "Delete Set",
-            modifier =
-              Modifier
-                .fillMaxSize()
-                .background(lerp(initialColor, targetColor, swipeToDismissBoxState.progress))
-                .wrapContentSize(Alignment.CenterEnd)
-                .padding(horizontal = 12.dp),
-          )
+      val alignment =
+        when (dismissState.dismissDirection) {
+          DismissDirection.EndToStart -> Alignment.CenterEnd
+          DismissDirection.StartToEnd -> Alignment.CenterStart
+          else -> Alignment.CenterEnd
         }
 
-        SwipeToDismissBoxValue.StartToEnd -> {
-          val initialColor = MaterialTheme.colorScheme.surface
-          val targetColor = MaterialTheme.colorScheme.primary
-
-          Icon(
-            Icons.Filled.Add,
-            tint = MaterialTheme.colorScheme.onPrimary,
-            contentDescription = "Add Set",
-            modifier =
-              Modifier
-                .fillMaxSize()
-                .drawBehind {
-                  drawRect(lerp(initialColor, targetColor, swipeToDismissBoxState.progress))
-                }
-                .wrapContentSize(Alignment.CenterStart)
-                .padding(horizontal = 12.dp),
-          )
+      val icon =
+        when (dismissState.dismissDirection) {
+          DismissDirection.StartToEnd -> Icons.Default.Add
+          DismissDirection.EndToStart -> Icons.Default.Delete
+          else -> Icons.Default.Delete
         }
+      val scale by
+      animateFloatAsState(
+        // TODO Animatiton Spec: Spring?
+        if (dismissState.targetValue == DismissValue.Default) 1f else 1.33f,
+        label = "Delete Icon Scale",
+      )
+
+      val contentDescription =
+        when (dismissState.dismissDirection) {
+          DismissDirection.StartToEnd -> "Add Set"
+          DismissDirection.EndToStart -> "Delete Set"
+          else -> "Delete Set"
+        }
+
+      Box(
+        Modifier
+          .fillMaxSize()
+          .background(color)
+          .padding(horizontal = 12.dp),
+        contentAlignment = alignment,
+      ) {
+        Icon(
+          icon,
+          tint = iconTint,
+          contentDescription = contentDescription,
+          modifier = Modifier.scale(scale),
+        )
       }
     },
   ) {
@@ -159,7 +186,8 @@ fun SetLazyListItem(
         },
       shape = RoundedCornerShape(CornerSize(0f)),
     ) {
-      setContent()
+      setContent(/*exerciseSets, index, set*/)
+      //      SetContent(exerciseSets = exerciseSets, index, set)
     }
   }
 }
