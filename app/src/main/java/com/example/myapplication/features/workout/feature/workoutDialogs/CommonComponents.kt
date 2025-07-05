@@ -4,6 +4,7 @@ package com.example.myapplication.features.workout.feature.workoutDialogs
 
 import android.util.Log
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,8 +26,14 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -41,15 +48,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -424,43 +429,46 @@ fun AddSetText() {
   androidx.compose.material.Text("Add Set", color = MaterialTheme.colorScheme.primary)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -> Unit) {
-  val threshold = 0.5f
-  val dismissState =
-    rememberSwipeToDismissBoxState(
-      positionalThreshold = { distance -> distance * threshold },
-      confirmValueChange = { swipeToDismissBoxValue ->
-        if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
-          removeSet()
-          true
-        } else {
-          false
-        }
-      },
-    )
 
-  SwipeToDismissBox(
+  val coroutineScope = rememberCoroutineScope()
+  //  val setCompletedState by remember { mutableStateOf(set.setCompleted) }
+  val openDialog = remember { mutableStateOf(true) }
+
+  val dismissState = rememberDismissState(confirmStateChange = { true })
+
+  if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+    Log.i("SwipeToDismissItem()", "onDismissRequest() called")
+    removeSet()
+  }
+
+  SwipeToDismiss(
     state = dismissState,
-    enableDismissFromEndToStart = true,
-    enableDismissFromStartToEnd = false,
-    backgroundContent = {
+    directions = setOf(DismissDirection.EndToStart),
+    dismissThresholds = { dismissDirection ->
+      FractionalThreshold(if (dismissDirection == DismissDirection.EndToStart) 0.66f else 1f)
+    },
+    background = {
       val color by
       animateColorAsState(
-        when (dismissState.dismissDirection) {
-          SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.primary
-          SwipeToDismissBoxValue.EndToStart -> Color.Red
-          SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
-        }
+        targetValue =
+          when (dismissState.targetValue) {
+            DismissValue.Default -> MaterialTheme.colorScheme.primary
+            DismissValue.DismissedToStart -> Color.Red
+            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
+          },
+        animationSpec = TweenSpec(durationMillis = 1000),
+        label = "Background Color"
       )
-
       val alignment = Alignment.CenterEnd
-
       val icon = Icons.Filled.Delete
       val scale by
       animateFloatAsState(
-        if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.8f else 1.2f
+        if (dismissState.targetValue == DismissValue.Default) 1f else 1.33f,
+        animationSpec = TweenSpec(500),
+        label = "Delete Icon Scale"
       )
 
       Box(
@@ -468,16 +476,16 @@ fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -
           .fillMaxSize()
           .background(color)
           .padding(horizontal = 12.dp),
-        contentAlignment = alignment,
+        contentAlignment = alignment
       ) {
         Icon(
           icon,
           tint = White,
           contentDescription = "Localized description",
-          modifier = Modifier.scale(scale),
+          modifier = Modifier.scale(scale)
         )
       }
-    },
+    }
   ) {
     Card(
       colors = CardColors(
@@ -491,6 +499,73 @@ fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -
       SetLayout()
     }
   }
+
+  /*
+    val threshold = 0.5f
+    val dismissState =
+      rememberSwipeToDismissBoxState(
+        positionalThreshold = { distance -> distance * threshold },
+        confirmValueChange = { swipeToDismissBoxValue ->
+          if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
+            removeSet()
+            true
+          } else {
+            false
+          }
+        },
+      )
+  */
+
+  /*  SwipeToDismissBox(
+      state = dismissState,
+      enableDismissFromEndToStart = true,
+      enableDismissFromStartToEnd = false,
+      backgroundContent = {
+        val color by
+        animateColorAsState(
+          when (dismissState.dismissDirection) {
+            SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.primary
+            SwipeToDismissBoxValue.EndToStart -> Color.Red
+            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+          }
+        )
+
+        val alignment = Alignment.CenterEnd
+
+        val icon = Icons.Filled.Delete
+        val scale by
+        animateFloatAsState(
+          if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.8f else 1.2f
+        )
+
+        Box(
+          Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(horizontal = 12.dp),
+          contentAlignment = alignment,
+        ) {
+          Icon(
+            icon,
+            tint = White,
+            contentDescription = "Localized description",
+            modifier = Modifier.scale(scale),
+          )
+        }
+      },
+    ) {
+      Card(
+        colors = CardColors(
+          containerColor = MaterialTheme.colorScheme.surface,
+          contentColor = MaterialTheme.colorScheme.onSurface,
+          disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+          disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ), // MaterialTheme.colorScheme.background,
+        shape = RoundedCornerShape(CornerSize(0f)),
+      ) {
+        SetLayout()
+      }
+    }*/
 }
 
 /**
