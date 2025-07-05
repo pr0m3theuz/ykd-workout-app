@@ -309,7 +309,7 @@ fun EditNextWorkoutScreen(
                 workoutViewModel = workoutViewModel,
               )
             },
-            SetItem = { exerciseSets, set, index ->
+            SetItem = { supersetUuid, exerciseSets, set, index ->
               val setUUID = set.uuid
               SetLazyListItem(
                 exerciseSets = exerciseSets,
