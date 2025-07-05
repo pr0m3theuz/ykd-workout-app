@@ -83,12 +83,18 @@ fun ExercisesSetsScreen(
         workoutViewModel = workoutViewModel,
       )
     },
-    SetItem = { exerciseSets, set, index ->
+    SetItem = { supersetUuid, exerciseSets, set, index ->
       SetLazyListItem(
         exerciseSets = exerciseSets,
         set = set,
         index = index,
-        addSet = { /* TODO */ },
+        addSetAtIndex = {
+          workoutViewModel.addSetAtIndex(
+            supersetUuid,
+            exerciseSets.exSetsUUID,
+            index
+          )
+        },
         removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
         setContent = {
           // TODO Why is SetLazyListItem() nested?
@@ -189,7 +195,7 @@ fun ExerciseSetLazyColumn(
   WorkoutNoteItem: @Composable (workoutNote: WorkoutNote) -> Unit,
 //  SupersetItem: @Composable (superset: SupersetExercisesSets) -> Unit,
   ExerciseItem: @Composable (exerciseSets: ExerciseExerciseSets) -> Unit,
-  SetItem: @Composable (exerciseSets: ExerciseExerciseSets, set: Set, index: Int) -> Unit,
+  SetItem: @Composable (supersetUuid: Uuid?, exerciseSets: ExerciseExerciseSets, set: Set, index: Int) -> Unit,
   AddSet: @Composable (supersetUuid: Uuid?, targetExSetsUuid: Uuid) -> Unit,
   AddExercise: @Composable () -> Unit,
   CancelWorkout: @Composable () -> Unit,
@@ -230,7 +236,7 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
           key(component.lazyListItemID) { ExerciseItem(component) }
 
           component.sets.forEachIndexed { index: Int, set: Set ->
-            key(set.lazyListItemID) { SetItem(component, set, index) }
+            key(set.lazyListItemID) { SetItem(null, component, set, index) }
           }
 
           AddSet(null, component.exSetsUUID)
@@ -262,6 +268,7 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
                 exerciseSets.sets.forEachIndexed { setIndex: Int, set: Set ->
                   key(set.lazyListItemID) {
                     SetItem(
+                      component.uuid,
                       exerciseSets,
                       set,
                       setIndex
