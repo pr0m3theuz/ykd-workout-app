@@ -407,7 +407,8 @@ private fun SetTypeComposable(
 ) {
   var expandedSetTypeOptionsDropdownMenu by remember { mutableStateOf(false) }
 
-  val iconText by remember {
+
+  var iconText by remember {
     mutableStateOf(
       when (setType) {
         SetType.normalSet -> setIndex
@@ -425,6 +426,16 @@ private fun SetTypeComposable(
     )
   }
 
+  val warmUpSetBackground = MaterialTheme.colorScheme.tertiary
+  val amrapSetBackground = MaterialTheme.colorScheme.error
+  val failureSetBackground = MaterialTheme.colorScheme.error
+  val everythingElseBackground = MaterialTheme.colorScheme.primary
+
+  val warmUpSetTextColor = MaterialTheme.colorScheme.onSecondary
+  val amrapSetTextColor = MaterialTheme.colorScheme.onError
+  val failureSetTextColor = MaterialTheme.colorScheme.onError
+  val textColor = MaterialTheme.colorScheme.onPrimary
+
   val buttonBackgroundColor =
     when (setType) {
       SetType.warmUpSet -> MaterialTheme.colorScheme.tertiary
@@ -440,6 +451,38 @@ private fun SetTypeComposable(
       SetType.failureSet -> MaterialTheme.colorScheme.onError
       else -> MaterialTheme.colorScheme.onPrimary
     }
+
+  /*  LaunchedEffect(setType, setIndex) {
+      iconText = when (setType) {
+        SetType.normalSet -> setIndex
+        SetType.warmUpSet -> "W"
+        SetType.dropSet -> "D"
+        SetType.myoRepSet -> "M"
+        SetType.myoRepMatchSet -> "MM"
+        SetType.giantSet -> "G"
+        SetType.amrapSet -> "A"
+        SetType.failureSet -> "F"
+        else -> {
+          setIndex
+        }
+      }
+
+      buttonBackgroundColor =
+        when (setType) {
+          SetType.warmUpSet -> warmUpSetBackground
+          SetType.amrapSet -> amrapSetBackground
+          SetType.failureSet -> failureSetBackground
+          else -> everythingElseBackground
+        }
+
+      iconColor =
+      when (setType) {
+        SetType.warmUpSet -> warmUpSetTextColor
+        SetType.amrapSet -> amrapSetTextColor
+        SetType.failureSet -> failureSetTextColor
+        else -> textColor
+      }
+    }*/
 
   Box(modifier = Modifier.wrapContentSize(Alignment.Center), propagateMinConstraints = true) {
     Button(
@@ -457,7 +500,7 @@ private fun SetTypeComposable(
     SetTypeOptionsMenu(
       expandMenu = { expandedSetTypeOptionsDropdownMenu },
       onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
-      updateSetType = { setTypeID -> updateSetType(setType) },
+      updateSetType = { setTypeID -> updateSetType(SetType.getSetType(setTypeID)) },
       changeIconText = { abbreviation ->
         //        iconText = abbreviation
         //        Log.i("setTypeAbbreviation", "setType iconText: $iconText")
