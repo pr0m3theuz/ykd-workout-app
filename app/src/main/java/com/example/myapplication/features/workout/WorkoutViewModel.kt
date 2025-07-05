@@ -1002,6 +1002,7 @@ class WorkoutViewModel(
   }
 
   val workoutIDsLoaded = mutableSetOf<ObjectId>()
+
   fun getWorkoutByID(workoutID: ObjectId) {
     Log.d("WorkoutViewModel ", "WorkoutViewModel.getWorkoutByID() called. WorkoutID: $workoutID")
     // This function loads a workout template or a specific workout by ID,
@@ -1010,7 +1011,8 @@ class WorkoutViewModel(
     // it should probably clear DataStore first or handle the merge carefully.
     Log.d("WorkoutViewModel", "WorkoutViewModel.isWorkoutActive: $isWorkoutActive")
     Log.d("WorkoutViewModel", "WorkoutViewModel.workoutID: ${_workout.value?.id}")
-//    Log.d("WorkoutViewModel", "WorkoutViewModel.workout hashedSignature: ${_workout.value?.hashedSignature}")
+    //    Log.d("WorkoutViewModel", "WorkoutViewModel.workout hashedSignature:
+    // ${_workout.value?.hashedSignature}")
     workoutIDsLoaded.add(workoutID)
     if (
       !isWorkoutActive || !workoutIDsLoaded.contains(workoutID)
@@ -1246,10 +1248,6 @@ class WorkoutViewModel(
   //  val allSets
   //    get() = _allSets.asStateFlow()
 
-  fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
-    return manageWorkoutUseCase.getWeightUnit(exerciseSets)
-  }
-
   fun createSupersetFromExercise(exercises: List<Exercise>) {
     requireNotNull(_workout.value) { "Workout details cannot be null" }
     _workout.value?.let { workout ->
@@ -1291,38 +1289,6 @@ class WorkoutViewModel(
   fun removeExerciseSets(exerciseSets: WorkoutComponent) {
     setWorkoutComponents(_workoutComponents.filter { it != exerciseSets }.toMutableList())
     //    _exercisesSets.value = _exercisesSetsData
-  }
-
-  fun addSet(
-    //    workoutComponent: List<WorkoutComponent>, // Input: immutable list
-    supersetUuid: Uuid?, // ID of the Superset component
-    targetExSetsUuid: Uuid, // ID of the ExerciseExerciseSets within the Superset
-  ) {
-    setWorkoutComponents(
-      manageWorkoutUseCase.addSetToExerciseExerciseSet(
-        workoutComponent = _workoutComponents,
-        supersetUuid = supersetUuid,
-        targetExSetsUuid = targetExSetsUuid,
-      )
-    )
-    //    val temporarySets: List<Set> = manageWorkoutUseCase.addSet(workoutComponent)
-    //    updateExercisesSetsData (workoutComponent, temporarySets)
-
-  }
-
-  fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set) {
-    val temporarySets = manageWorkoutUseCase.removeSet(exerciseSets, set)
-
-    updateExercisesSetsData(exerciseSets, temporarySets)
-  }
-
-  private fun updateExercisesSetsData(
-    exerciseSets: ExerciseExerciseSets,
-    temporarySets: List<Set>,
-  ) {
-    exerciseSets.sets = temporarySets.toMutableList()
-
-    updateExerciseExerciseSetsData(exerciseSets)
   }
 
   // endregion
@@ -1385,6 +1351,53 @@ class WorkoutViewModel(
   //    return allSets().first { it.uuid == setUUID }
 
   // region Update Exercise Sets Data
+
+  fun addSet(
+    //    workoutComponent: List<WorkoutComponent>, // Input: immutable list
+    supersetUuid: Uuid?, // ID of the Superset component
+    targetExSetsUuid: Uuid, // ID of the ExerciseExerciseSets within the Superset
+  ) {
+    setWorkoutComponents(
+      manageWorkoutUseCase.addSetToExerciseExerciseSet(
+        workoutComponent = _workoutComponents,
+        supersetUuid = supersetUuid,
+        targetExSetsUuid = targetExSetsUuid,
+      )
+    )
+    //    val temporarySets: List<Set> = manageWorkoutUseCase.addSet(workoutComponent)
+    //    updateExercisesSetsData (workoutComponent, temporarySets)
+
+  }
+
+  fun addSetAtIndex(
+    supersetUuid: Uuid?, // ID of the Superset component
+    targetExSetsUuid: Uuid, // ID of the ExerciseExerciseSets within the Superset
+    index: Int,
+  ) {
+    setWorkoutComponents(
+      manageWorkoutUseCase.addSetAtIndexToExerciseExerciseSet(
+        workoutComponent = _workoutComponents,
+        supersetUuid = supersetUuid,
+        targetExSetsUuid = targetExSetsUuid,
+        index = index,
+      )
+    )
+  }
+
+  fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set) {
+    val temporarySets = manageWorkoutUseCase.removeSet(exerciseSets, set)
+
+    updateExercisesSetsData(exerciseSets, temporarySets)
+  }
+
+  private fun updateExercisesSetsData(
+    exerciseSets: ExerciseExerciseSets,
+    temporarySets: List<Set>,
+  ) {
+    exerciseSets.sets = temporarySets.toMutableList()
+
+    updateExerciseExerciseSetsData(exerciseSets)
+  }
 
   fun replaceExerciseInExerciseSets(exerciseSets: ExerciseExerciseSets, newExercise: Exercise) {
     Log.d("WorkoutViewModel", "replaceExerciseInExerciseSets: calling setWorkoutComponents")
@@ -1676,7 +1689,7 @@ class WorkoutViewModel(
   fun getExerciseSetsByID(exerciseSetsID: ObjectId): ExerciseExerciseSets? {
     Log.d("getExerciseSetsByID", "WorkoutViewModel: $this")
     Log.d("getExerciseSetsByID", "exerciseSetsID: $exerciseSetsID")
-//    Log.d("getExerciseSetsByID", _workoutComponents.toString().replace("\n", ""))
+    //    Log.d("getExerciseSetsByID", _workoutComponents.toString().replace("\n", ""))
 
     _workoutComponents.forEach {
       when (it) {
@@ -1696,6 +1709,10 @@ class WorkoutViewModel(
       }
     }
     return null
+  }
+
+  fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
+    return manageWorkoutUseCase.getWeightUnit(exerciseSets)
   }
 
   // endregion
