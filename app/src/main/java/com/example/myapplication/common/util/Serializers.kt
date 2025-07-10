@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.util
 
@@ -10,6 +10,8 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.bson.types.ObjectId
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -62,5 +64,18 @@ object SetTypeSerializer : KSerializer<SetType> {
 
   override fun serialize(encoder: Encoder, value: SetType) {
     encoder.encodeInt(value.setTypeID)
+  }
+}
+
+object InstantSerializer : KSerializer<Instant> {
+  override val descriptor: SerialDescriptor =
+    PrimitiveSerialDescriptor("kotlin.time.Instant", PrimitiveKind.STRING)
+
+  override fun deserialize(decoder: Decoder): Instant {
+    return Instant.parse(decoder.decodeString())
+  }
+
+  override fun serialize(encoder: Encoder, value: Instant) {
+    encoder.encodeString(value.toString())
   }
 }

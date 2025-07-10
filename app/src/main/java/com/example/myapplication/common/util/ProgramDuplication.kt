@@ -13,9 +13,12 @@ import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutItem
 import org.bson.types.ObjectId
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "ProgramDuplication"
+
+@OptIn(ExperimentalTime::class)
 fun duplicateProgramStructure(
   originalProgram: Program,
   user: UserProfile

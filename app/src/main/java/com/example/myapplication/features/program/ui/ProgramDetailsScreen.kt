@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.features.program.ui
 
@@ -104,6 +104,7 @@ import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.program.ProgramsViewModel
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 @Composable

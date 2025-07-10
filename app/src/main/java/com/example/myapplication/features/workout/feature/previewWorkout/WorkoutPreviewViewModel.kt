@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.features.workout.feature.previewWorkout
 
@@ -16,6 +16,7 @@ import com.example.myapplication.common.domain.model.deepCopy
 import com.example.myapplication.common.util.ProgressionOutcome
 import com.example.myapplication.common.util.ProgressionResults
 import com.example.myapplication.common.util.selectProgression
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 class WorkoutPreviewViewModel : ViewModel() {
