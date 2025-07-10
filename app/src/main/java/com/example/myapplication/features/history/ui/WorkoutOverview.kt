@@ -1,5 +1,6 @@
 package com.example.myapplication.features.history.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,18 +23,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.features.history.HistoryViewModel
 import org.bson.types.ObjectId
-import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
 @Composable
 fun WorkoutOverview(
-  historyViewModel: HistoryViewModel = koinViewModel(),
+  historyViewModel: HistoryViewModel,
   workoutID: String,
   //  getExercise: (exerciseID: ObjectId) -> Exercise?,
+  navigateUp: () -> Unit,
   popBackStack: () -> Unit,
   workoutOverviewContent: @Composable (workout: Workout, setOpenDeleteWorkoutDialog: () -> Unit) -> Unit
 ) {
+
+  BackHandler(enabled = true) {
+    navigateUp()
+  }
+
   val toastMessage = historyViewModel.toastMessage.collectAsStateWithLifecycle("")
 
   if (toastMessage.value.isNotEmpty()) {

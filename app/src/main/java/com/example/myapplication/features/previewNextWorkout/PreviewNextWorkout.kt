@@ -42,12 +42,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.history.ui.ConfirmChangesToWorkout
 import com.example.myapplication.features.history.ui.NoWorkoutFound
-import com.example.myapplication.features.history.ui.WorkoutOverview
-import com.example.myapplication.features.history.ui.WorkoutOverviewContent
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.AddSet
 import com.example.myapplication.features.workout.feature.exercise.ExerciseScreen
@@ -66,14 +62,16 @@ import kotlin.uuid.ExperimentalUuidApi
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
+fun PreviewNextWorkoutScreen(
+  navController: NavController,
+  workoutID: String,
+  WorkoutOverview: @Composable () -> Unit,
+) {
   val coroutineScope = rememberCoroutineScope()
   val scaffoldNavigator = rememberSupportingPaneScaffoldNavigator()
 
   BackHandler(scaffoldNavigator.canNavigateBack()) {
-    coroutineScope.launch {
-      scaffoldNavigator.navigateBack()
-    }
+    coroutineScope.launch { scaffoldNavigator.navigateBack() }
   }
 
   Surface {
@@ -98,9 +96,7 @@ fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
                   modifier = Modifier.wrapContentSize(),
                   onClick = {
                     coroutineScope.launch {
-                      scaffoldNavigator.navigateTo(
-                        SupportingPaneScaffoldRole.Supporting
-                      )
+                      scaffoldNavigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
                     }
                   },
                 ) {
@@ -115,7 +111,7 @@ fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
               workoutID = workoutID,
               navController = navController,
               editable = true,
-              workoutViewModel = koinViewModel()
+              workoutViewModel = koinViewModel(),
             )
           }
         }
@@ -134,33 +130,7 @@ fun PreviewNextWorkoutScreen(navController: NavController, workoutID: String) {
               Text("Previous Workout")
             }
 
-            val historyViewModel = koinViewModel<HistoryViewModel>()
-
-            WorkoutOverview(
-              workoutID = workoutID,
-              popBackStack = { navController.popBackStack() },
-              workoutOverviewContent = { workout, setOpenDeleteWorkoutDialog ->
-                WorkoutOverviewContent(
-                  workout = workout,
-                  setOpenDeleteWorkoutDialog = { setOpenDeleteWorkoutDialog },
-                  performAgain = true,
-                  userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
-                  workoutComponents = historyViewModel.workoutComponents.collectAsState().value,
-                  navigateUp = { navController.navigateUp() },
-                  navigateToEditWorkout = { workout -> navController.navigate("history?editWorkout=${workout.id.toHexString()}") },
-                  navigateToWorkout = { workout ->
-                    navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true") {
-                      popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                      // Avoid multiple copies of the same destination when
-                      // reselecting the same item
-                      launchSingleTop = true
-                      // Restore state when reselecting a previously selected item
-                      restoreState = true
-                    }
-                  }
-                )
-              }
-            )
+            WorkoutOverview()
           }
         }
       },
@@ -235,10 +205,7 @@ fun EditNextWorkoutScreen(
       },
       bottomBar = { /*BottomNavigationBar(navController = navController) */ },
     ) { contentPadding ->
-      Column(
-        Modifier.padding(contentPadding),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-      ) {
+      Column(Modifier.padding(contentPadding), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         /*Row(
           modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
@@ -284,11 +251,7 @@ fun EditNextWorkoutScreen(
                 weightUnit = workoutViewModel.getWeightUnit(exerciseSets),
                 exerciseWeightUnit = exerciseSets.exercise.weightUnit,
                 userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit,
-                removeExerciseSets = {
-                  workoutViewModel.removeExerciseSets(
-                    exerciseSets
-                  )
-                },
+                removeExerciseSets = { workoutViewModel.removeExerciseSets(exerciseSets) },
                 addExerciseNote = {
                   workoutViewModel.addExerciseNote(exerciseSets /*, itWorkout._id*/)
                 },
@@ -299,10 +262,7 @@ fun EditNextWorkoutScreen(
                   workoutViewModel.pinExerciseNote(exerciseSets, note, pinned)
                 },
                 updateExerciseWeightUnit = {
-                  workoutViewModel.updateExerciseWeightUnit(
-                    exerciseSets.exercise,
-                    it
-                  )
+                  workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, it)
                 },
                 workoutComponents = workoutComponents,
                 onCreateSuperset = { /* TODO */ },
@@ -320,11 +280,7 @@ fun EditNextWorkoutScreen(
                   SetContent(
                     setIndex = index,
                     set = set,
-                    getWeightUnit = {
-                      workoutViewModel.getWeightUnit(
-                        exerciseSets
-                      )
-                    },
+                    getWeightUnit = { workoutViewModel.getWeightUnit(exerciseSets) },
                     populatePreviousSetField = {
                       exerciseSets.exercise.let { exercise ->
                         set.setNumber?.let { setNumber ->
@@ -376,12 +332,14 @@ fun EditNextWorkoutScreen(
               )
             },
             AddSet = { supersetUuid, targetExSetsUuid ->
-              AddSet(addSet = {
-                workoutViewModel.addSet(
-                  supersetUuid = supersetUuid,
-                  targetExSetsUuid = targetExSetsUuid
-                )
-              })
+              AddSet(
+                addSet = {
+                  workoutViewModel.addSet(
+                    supersetUuid = supersetUuid,
+                    targetExSetsUuid = targetExSetsUuid,
+                  )
+                }
+              )
             },
             AddExercise = { AddExercise(navController = navController) },
             CancelWorkout = {},
