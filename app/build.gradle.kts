@@ -150,7 +150,7 @@ dependencies {
 //  implementation("androidx.navigation3:navigation3:1.0.0-alpha01")
 //  implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:1.0.0-alpha01")
 
-  implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+  implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
   implementation("com.google.dagger:hilt-android:2.56.2")
   //    testImplementation "junit:junit:4.13.2"
   //    testImplementation "org.robolectric:robolectric:4.10.3"
@@ -260,7 +260,7 @@ dependencies {
   implementation("com.patrykandpatrick.vico:compose:2.1.3")
 
   // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
-  implementation("com.patrykandpatrick.vico:compose-m3:2.1.2")
+  implementation("com.patrykandpatrick.vico:compose-m3:2.1.3")
 
   // Houses the core logic for charts and other elements. Included in all other modules.
   implementation("com.patrykandpatrick.vico:core:2.1.3")
