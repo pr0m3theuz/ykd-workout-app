@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -29,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -89,7 +89,7 @@ fun WorkoutContent(
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
-  val workoutName by workoutViewModel.workoutName.collectAsState()
+  val workout = workoutViewModel.workout.collectAsState()
 
   //  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
 
@@ -200,7 +200,7 @@ fun WorkoutContent(
       TopAppBar(
         title = {
           WorkoutNameTextField(
-            workoutName ?: "Workout",
+            workout.value?.name ?: "Workout",
             setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) },
           )
         },
@@ -220,7 +220,7 @@ fun WorkoutContent(
             enableWorkoutNameTextfield = { setEditable(!editable) },
             workoutNameDialog = { dismissWorkoutNameDialog ->
               WorkoutNameDialog(
-                workoutName = workoutName ?: "",
+                workoutName = workout.value?.name ?: "",
                 dismissWorkoutNameDialog = { dismissWorkoutNameDialog() },
                 setWorkoutName = { workoutViewModel.setWorkoutName(it) },
               )
@@ -292,15 +292,18 @@ private fun WorkoutDuration(workoutViewModel: WorkoutViewModel) {
 private fun WorkoutNameTextField(workoutName: String, setWorkoutName: (String) -> Unit) {
   var name by remember { mutableStateOf(workoutName) }
 
+  LaunchedEffect(workoutName) {
+    name = workoutName
+  }
+
   BasicTextField(
     enabled = false,
     modifier = Modifier.padding(PaddingValues(4.dp)),
-    textStyle =
-      TextStyle(
-        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onBackground,
-      ),
+    textStyle = MaterialTheme.typography.titleLarge.copy(
+      fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.2),
+      textAlign = TextAlign.Center,
+      color = MaterialTheme.colorScheme.onBackground,
+    ),
     value = name,
     onValueChange = {
       name = it

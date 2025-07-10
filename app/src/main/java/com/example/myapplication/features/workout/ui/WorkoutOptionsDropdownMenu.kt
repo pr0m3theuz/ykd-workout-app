@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,7 +44,7 @@ fun WorkoutOptionsDropdownMenu(
       Icon(
         Icons.Outlined.MoreVert,
         contentDescription = "Workout Options and Settings",
-        tint = MaterialTheme.colorScheme.primary
+        tint = MaterialTheme.colorScheme.primary,
       )
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -53,20 +53,20 @@ fun WorkoutOptionsDropdownMenu(
         onClick = {
           setOpenWorkoutNameDialog(true)
           expanded = false
-        }
+        },
       )
       DropdownMenuItem(
         text = { Text("Add Workout Note") },
         onClick = {
           addWorkoutNote()
           expanded = false
-        }
+        },
       )
       DropdownMenuItem(
         text = { Text("Adjust Start/End Time") },
         onClick = { /* TODO */
           expanded = false
-        }
+        },
       )
     }
   }
@@ -81,7 +81,7 @@ fun EditWorkoutOptionsDropdownMenu(
   editWorkout: () -> Unit,
   deleteWorkout: () -> Unit,
   saveWorkoutAsTemplate: () -> Unit,
-//  workoutNameDialog: @Composable (dismissWorkoutNameDialog: () -> Unit) -> Unit,
+  //  workoutNameDialog: @Composable (dismissWorkoutNameDialog: () -> Unit) -> Unit,
   //  workoutName: String,
   //  setWorkoutName: (String) -> Unit,
 ) {
@@ -94,7 +94,7 @@ fun EditWorkoutOptionsDropdownMenu(
       Icon(
         Icons.Outlined.MoreVert,
         contentDescription = "Workout Options and Settings",
-        tint = MaterialTheme.colorScheme.primary
+        tint = MaterialTheme.colorScheme.primary,
       )
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -104,9 +104,9 @@ fun EditWorkoutOptionsDropdownMenu(
     }
   }
 
-//  if (openWorkoutNameDialog) {
-//    workoutNameDialog { setOpenWorkoutNameDialog(false) }
-//  }
+  //  if (openWorkoutNameDialog) {
+  //    workoutNameDialog { setOpenWorkoutNameDialog(false) }
+  //  }
 }
 
 @Composable
@@ -120,12 +120,17 @@ fun WorkoutNameDialog(
   AlertDialog(
     shape = MaterialTheme.shapes.large,
     onDismissRequest = { dismissWorkoutNameDialog() },
+    dismissButton = {
+      TextButton(onClick = { dismissWorkoutNameDialog() }) {
+        Text("Cancel", color = MaterialTheme.colorScheme.error)
+      }
+    },
     confirmButton = {
       TextButton(
         onClick = {
           setWorkoutName(newName)
           dismissWorkoutNameDialog()
-        },
+        }
       ) {
         Text("Confirm")
       }
@@ -146,11 +151,15 @@ fun WorkoutNameDialog(
                 .fillMaxWidth(),
               value = newName,
               onValueChange = { newName = it },
-              textStyle = TextStyle(fontSize = MaterialTheme.typography.bodyLarge.fontSize),
+              textStyle =
+                TextStyle(
+                  fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                  color = MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
             )
           }
         }
       }
-    }
+    },
   )
 }

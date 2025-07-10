@@ -190,7 +190,7 @@ fun WorkoutOverviewContent(
                         text =
                         "${
                           if (set.setTypeID == SetType.normalSet) {
-                            set.setNumber?.plus(1).toString()
+                            set.setNumber
                           } else {
                             set.setTypeID.abbreviation
                           }

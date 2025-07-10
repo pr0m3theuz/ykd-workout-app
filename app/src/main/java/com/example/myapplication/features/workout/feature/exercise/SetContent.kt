@@ -252,6 +252,18 @@ fun SetContentFrame(
 
   val textFieldBackgroundColor = MaterialTheme.colorScheme.secondaryContainer
 
+  val textStyle =
+    TextStyle(
+      fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+      textAlign = TextAlign.Center,
+      color = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+
+  val placeholderTextStyle = MaterialTheme.colorScheme.onSecondary
+
+  val cursorBrush = SolidColor(MaterialTheme.colorScheme.onSecondaryContainer)
+
+
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceBetween,
@@ -272,16 +284,7 @@ fun SetContentFrame(
         .wrapContentSize(Alignment.Center)
     val textFieldModifier: Modifier = Modifier
 
-    val textStyle =
-      TextStyle(
-        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onBackground,
-      )
-
     val modifier = textFieldModifier.padding(PaddingValues(8.dp))
-
-    val cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground)
 
     // Weight TextField
     Box(
@@ -309,7 +312,7 @@ fun SetContentFrame(
         if (!targetWeight.isNullOrBlank() && exerciseWeightText.isBlank()) {
           Text(
             text = targetWeight,
-            color = MaterialTheme.colorScheme.outline
+            color = placeholderTextStyle
           )
         }
       }
@@ -339,7 +342,7 @@ fun SetContentFrame(
         horizontalArrangement = Arrangement.Center
       ) {
         if (!targetReps.isNullOrBlank() && repetitionsText.isBlank()) {
-          Text(text = targetReps, color = MaterialTheme.colorScheme.outline)
+          Text(text = targetReps, color = placeholderTextStyle)
         }
       }
     }
@@ -386,7 +389,7 @@ fun SetContentFrame(
             horizontalArrangement = Arrangement.Center
           ) {
             if (!targetRIR.isNullOrBlank() && repetitionsInReserveText.isBlank()) {
-              Text(text = targetRIR, color = MaterialTheme.colorScheme.outline)
+              Text(text = targetRIR, color = placeholderTextStyle)
             }
           }
           innerTextField()
