@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 fun TimerText(time: String) {
     val timeTextSize = 48.sp
     val timeDisabledTextColor = Color.LightGray
-    val timeEnabledTextColor = MaterialTheme.colorScheme.onSurface
+    val timeEnabledTextColor = MaterialTheme.colorScheme.secondary
     val timeUnitTextSize = 24.sp
 
     Row {

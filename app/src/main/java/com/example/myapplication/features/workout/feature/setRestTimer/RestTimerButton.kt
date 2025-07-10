@@ -51,7 +51,7 @@ import com.example.myapplication.features.workout.WorkoutViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalTextApi::class)
-//@Preview
+// @Preview
 @Composable
 fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
   var progress by remember { mutableFloatStateOf(1f) }
@@ -100,7 +100,8 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
     //        TODO openTimerClockDialog
     TimerScreen(
       workoutViewModel = workoutViewModel,
-      openDialog = { close -> closeTimerScreen(close) })
+      openDialog = { close -> closeTimerScreen(close) },
+    )
   }
 
   var openEnterTimeScreen by remember { mutableStateOf(false) }
@@ -112,7 +113,8 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
   if (openEnterTimeScreen) {
     ManualRestTimerScreen(
       workoutViewModel = workoutViewModel,
-      openDialog = { close -> closeEnterTimeScreen(close) })
+      openDialog = { close -> closeEnterTimeScreen(close) },
+    )
   }
 
   val timerIconModifier = Modifier.size(30.dp)
@@ -125,7 +127,7 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
       Modifier
         .size(height = 40.dp, width = animatedBoxWidth)
         .clip(RoundedCornerShape(25))
-        .background(MaterialTheme.colorScheme.secondaryContainer)
+        .background(MaterialTheme.colorScheme.primaryContainer)
         .clickable(
           onClick = {
             if (timerState == TimerState.RUNNING) {
@@ -155,7 +157,7 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
           Icons.Outlined.Timer,
           contentScale = ContentScale.Crop,
           contentDescription = "Localized description",
-          colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+          colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
           modifier = timerIconModifier,
         )
 
@@ -169,7 +171,7 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
             fontSize = remainingTimeTextFontSize,
             maxLines = 1,
             overflow = TextOverflow.Clip,
-            style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.primary),
+            style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onPrimary),
             modifier = Modifier.padding(start = 4.dp),
           )
         }
