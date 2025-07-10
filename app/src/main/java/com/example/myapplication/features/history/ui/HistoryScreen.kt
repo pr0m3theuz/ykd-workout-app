@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalMaterial3ExpressiveApi::class)
+@file:OptIn(
+  ExperimentalUuidApi::class, ExperimentalMaterial3ExpressiveApi::class,
+  ExperimentalTime::class
+)
 
 package com.example.myapplication.features.history.ui
 
@@ -19,7 +22,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Search
@@ -49,9 +51,11 @@ import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.workout.ui.WorkoutSummaryCard
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toJavaInstant
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.toKotlinTimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.bson.types.ObjectId
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -149,11 +153,9 @@ fun HistoryScreen(
           workouts = workouts,
           userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
           getExerciseByExerciseID = { exerciseID ->
-            historyViewModel.getExerciseByExerciseID(
-              exerciseID
-            )
+            historyViewModel.getExerciseByExerciseID(exerciseID)
           },
-          navigateToWorkoutOverview = { navigateToWorkoutOverview(it) }
+          navigateToWorkoutOverview = { navigateToWorkoutOverview(it) },
         )
       }
     },
@@ -177,9 +179,7 @@ fun NoWorkoutsPerformed() {
         .padding(top = 24.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      Text(
-        "No Workouts Performed!",
-      )
+      Text("No Workouts Performed!")
     }
   }
 }
@@ -192,13 +192,16 @@ fun HistoryLazyColumn(
   getExerciseByExerciseID: (exerciseID: ObjectId?) -> Exercise?,
   navigateToWorkoutOverview: (Workout) -> Unit,
 ) {
+  val defaultTimeZone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
+
   val groupedWorkouts =
     workouts.groupBy {
-      java.time.YearMonth.from(
-        Instant.fromEpochSeconds(it.workoutEnded?.epochSeconds!!)
-          .toJavaInstant()
-      )
+      val workoutEnded = it.workoutEnded?.toLocalDateTime(defaultTimeZone)
+      YearMonth(workoutEnded!!.year, workoutEnded.month)
     }
+//      .mapValues { (_, workouts) ->
+//        workouts.groupBy { it.workoutEnded?.toLocalDateTime(defaultTimeZone)?.monthNumber }
+//      }
 
   Log.i("HistoryLazyColumn", "workout count: ${workouts.size}")
 
@@ -210,6 +213,7 @@ fun HistoryLazyColumn(
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       groupedWorkouts.forEach { (yearMonth, monthWorkouts) ->
+
         stickyHeader {
           Row(
             modifier = Modifier
@@ -228,13 +232,14 @@ fun HistoryLazyColumn(
         // TODO Implement Search & Filtering of Workouts & Programs
         // items(count = workouts.size, key = { index: Int -> workouts[index].lazyListItemID }) {
         // index,
-        items(monthWorkouts) { workout ->
+
+
+        items(workouts.size, key = { index: Int -> monthWorkouts[index].lazyListItemID }) { index ->
+          val workout = monthWorkouts[index]
           Box(
             modifier =
               Modifier.clickable(
-                onClick = {
-                  navigateToWorkoutOverview(workout)
-                },
+                onClick = { navigateToWorkoutOverview(workout) },
                 enabled = true,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = LocalIndication.current,
@@ -251,4 +256,3 @@ fun HistoryLazyColumn(
     }
   }
 }
-

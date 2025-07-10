@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.infrastructure.persistence
 
@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import org.koin.java.KoinJavaComponent.inject
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val DATABASE_IS_NULL = "Completed Repository: Database does not exist."
@@ -49,8 +50,11 @@ class CompletedWorkoutRepositoryImpl(
   val user = userProfileManager.getCurrentUser()
 
   private val withUnknownKeys = Json {
-    encodeDefaults = true
     ignoreUnknownKeys = true
+  }
+
+  private val withDefaults = Json {
+    encodeDefaults = true
   }
 
   private fun mapQueryChangeToSet(queryChange: QueryChange): List<Set> {
@@ -85,7 +89,7 @@ class CompletedWorkoutRepositoryImpl(
       val collection = db.getCollection("CompletedSets")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
-
+// TODO Missing ownerID = user.id.toHexString()
       val queryBuilder =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
@@ -180,9 +184,10 @@ class CompletedWorkoutRepositoryImpl(
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(workoutCollection)) // Replace with your database instance
           .where(
-            Expression.property("isCompleted").equalTo(Expression.booleanValue(true)).and(
-              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
-            )
+            Expression.property("isCompleted").equalTo(Expression.booleanValue(true))
+//              .and(
+//              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
+//            )
           )
 //          .orderBy(Ordering.property("workoutEnded").descending())
 
@@ -197,8 +202,8 @@ class CompletedWorkoutRepositoryImpl(
       val workoutIDClause = workoutIds.joinToString(",") { "'$it'" }.let { "[$it]" }
 
       val setsQuery = "SELECT * FROM `CompletedSets` " +
-              "WHERE workoutID IN $workoutIDClause" +
-              " AND ownerID = '${user.id.toHexString()}'"
+              "WHERE workoutID IN $workoutIDClause" // +
+//              " AND ownerID = '${user.id.toHexString()}'"
 
       val setsResult = db.createQuery(setsQuery).execute().allResults()
       val sets = setsResult.mapNotNull {
@@ -354,13 +359,21 @@ class CompletedWorkoutRepositoryImpl(
 
       if (completedSets.isEmpty()) return
 
+      val workoutID = workout.id
       val workoutIDStr = "Workout:${workout.id}"
+
+      val TAG = "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout():"
+
+      require(completedSets.all { set -> set.workoutID == workoutID }) {
+        "$TAG All sets workoutIDs does not match Workout.id!"
+      }
 
       db.inBatch(UnitOfWork {
         completedSets.forEach { set ->
+          require(set.workoutID == workoutID) { "$TAG Set workoutID does not match Workout.id!" }
           val setIdStr = "Set:${set.id}"
           try {
-            val setJsonContent = withUnknownKeys.encodeToString(set)
+            val setJsonContent = withDefaults.encodeToString(set)
             completedSetsCollection.getDocument(setIdStr)?.toMutable()?.let {
               it.setJSON(setJsonContent)
               Log.i(
@@ -405,7 +418,7 @@ class CompletedWorkoutRepositoryImpl(
         }
       })
 
-      val workoutJson = withUnknownKeys.encodeToString(newWorkout)
+      val workoutJson = withDefaults.encodeToString(newWorkout)
       completedWorkoutsCollection.getDocument(workoutIDStr)?.toMutable()?.let {
         it.setJSON(workoutJson)
         Log.i(
