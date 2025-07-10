@@ -1,6 +1,7 @@
 package com.example.myapplication.features.workout.feature.addExercisesList
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -74,6 +75,14 @@ fun AddExercisesScreen(
   val exercises by
   exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
 
+  val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsState()
+  val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsState()
+  val movementTypesChecked = exercisesViewModel.movementTypesChecked
+
+  val musclesChecked = muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }
+  val selectedEquipment = equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }
+  val selectedMovementTypes = movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }
+
   val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
 
   fun getMuscleGroups() {
@@ -99,11 +108,11 @@ fun AddExercisesScreen(
     }
   }
 
-//  TODO EDGE TO EDGE isn't working
+  //  TODO EDGE TO EDGE isn't working
   Scaffold(
     topBar = {
       TopAppBar(
-//        windowInsets = WindowInsets.statusBars,
+        //        windowInsets = WindowInsets.statusBars,
         title = {
           Text(
             text = "Add Exercises",
@@ -129,7 +138,7 @@ fun AddExercisesScreen(
             )
           }*/
         },
-//        scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+        //        scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
         actions = {
           val iconColors = IconButtonDefaults.iconButtonColors()
           IconButton(
@@ -149,7 +158,7 @@ fun AddExercisesScreen(
       )
     },
     bottomBar = {
-//      NavigationBar {  }
+      //      NavigationBar {  }
     },
     floatingActionButton = {
       FloatingActionButton(
@@ -157,14 +166,14 @@ fun AddExercisesScreen(
         onClick = {
           Log.i(
             "AddExercisesScreen.WorkoutViewModel",
-            "AddExercisesScreen.WorkoutViewModel: $workoutViewModel"
+            "AddExercisesScreen.WorkoutViewModel: $workoutViewModel",
           )
           workoutViewModel.addMultipleEmptyExerciseSets(
             exercisesSelectedToBeAddedToWorkout.toList()
           )
-//          setOpenDialog(false)
+          //          setOpenDialog(false)
           navController.navigateUp()
-        }
+        },
       ) {
         // TODO Figure out right icon for this
         Icon(
@@ -176,17 +185,14 @@ fun AddExercisesScreen(
       }
     },
     content = { contentPadding ->
-      Column(
-        Modifier
-          .padding(contentPadding)
-          .fillMaxWidth()
-      ) {
+      Column(Modifier
+        .padding(contentPadding)
+        .fillMaxWidth()) {
         TextFieldDefaults.colors(
           unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
           unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
         )
-        val searchBarColors =
-          colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+        val searchBarColors = colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
 
         val onActiveChange = { _active: Boolean -> active = _active }
         SearchBar(
@@ -225,7 +231,28 @@ fun AddExercisesScreen(
           colors = searchBarColors,
         ) {}
 
-        SelectedFiltersLazyRow(exercisesViewModel)
+        val visible =
+          muscleGroupsChecked.isNotEmpty() ||
+                  selectedEquipment.isNotEmpty() ||
+                  selectedMovementTypes.isNotEmpty()
+        AnimatedVisibility(visible) {
+          if (
+            musclesChecked.isNotEmpty() ||
+            selectedEquipment.isNotEmpty() ||
+            selectedMovementTypes.isNotEmpty()
+          ) {
+
+            SelectedFiltersLazyRow(
+              exercisesViewModel,
+              muscleGroupsChecked,
+              equipmentsChecked,
+              movementTypesChecked,
+              musclesChecked,
+              selectedEquipment,
+              selectedMovementTypes,
+            )
+          }
+        }
 
         when {
           exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
@@ -234,8 +261,9 @@ fun AddExercisesScreen(
             ExercisesLazyList(
               exercises = exercises,
               muscleGroups = muscleGroups,
-//              selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
-//              navController = navController,
+              //              selectExercise = { _exercise, isSelected -> selectExercise(_exercise,
+              // isSelected) },
+              //              navController = navController,
             ) { exercise, muscleGroupName ->
               ToggleableExerciseItem(
                 exercise = exercise,
@@ -245,7 +273,6 @@ fun AddExercisesScreen(
                 navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
               )
             }
-
           }
 
           exercises.isEmpty() && query.isBlank() -> {
@@ -263,7 +290,6 @@ fun AddExercisesScreen(
             }
           }
         }
-
       }
     },
   )
@@ -296,9 +322,9 @@ fun NoResultsFound(query: String) {
 private fun ExercisesLazyList(
   exercises: List<Exercise>,
   muscleGroups: List<MuscleGroup>,
-//  selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
-//  navController: NavController,
-  exerciseItem: @Composable (exercise: Exercise, muscleGroupName: String?) -> Unit
+  //  selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
+  //  navController: NavController,
+  exerciseItem: @Composable (exercise: Exercise, muscleGroupName: String?) -> Unit,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -320,17 +346,16 @@ private fun ExercisesLazyList(
       val exercise: Exercise = exercises[index]
       val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
 
-//      ToggleableExerciseItem(
-//        exercise = exercise,
-//        muscleGroupName = muscleGroupName,
-//        navController = navController,
-//        selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
-//        navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
-//
-//      )
+      //      ToggleableExerciseItem(
+      //        exercise = exercise,
+      //        muscleGroupName = muscleGroupName,
+      //        navController = navController,
+      //        selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
+      //        navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
+      //
+      //      )
 
       exerciseItem(exercise, muscleGroupName)
     }
   }
 }
-

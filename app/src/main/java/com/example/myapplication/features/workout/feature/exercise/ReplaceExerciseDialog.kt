@@ -1,8 +1,9 @@
-package com.example.myapplication.features
+package com.example.myapplication.features.workout.feature.exercise
 
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 
 // TODO Complete this Feature
@@ -13,9 +14,7 @@ fun ReplaceExerciseDialog(
   openDialog: (Boolean) -> Unit,
   closeMenu: () -> Unit,
   openReplaceExerciseScreen: (Boolean) -> Unit,
-  //    confirmReplaceExercise: (Boolean) -> Unit
 ) {
-
 
   AlertDialog(
     onDismissRequest = {
@@ -24,21 +23,28 @@ fun ReplaceExerciseDialog(
       // onCloseRequest.
       openDialog(false)
     },
-    title = { Text(text = "Replace Exercise?") },
-    text = { Text("The set that you've already added to this exercise will be replaced.") },
+    title = { Text(text = "Replace Exercise?", color = MaterialTheme.colorScheme.onSurface) },
+    text = {
+      Text(
+        "The sets that you've already added to this exercise will be replaced.",
+        color = MaterialTheme.colorScheme.onSurface,
+      )
+    },
     confirmButton = {
       TextButton(
         onClick = {
           openDialog(false)
           closeMenu()
           openReplaceExerciseScreen(true)
-          //                    TODO Create Replace Exercise Dialog
-          //                    confirmReplaceExercise(true)
         }
       ) {
-        Text("Replace")
+        Text("Replace", color = MaterialTheme.colorScheme.primary)
       }
     },
-    dismissButton = { TextButton(onClick = { openDialog(false) }) { Text("Cancel") } }
+    dismissButton = {
+      TextButton(onClick = { openDialog(false) }) {
+        Text("Cancel", color = MaterialTheme.colorScheme.error)
+      }
+    },
   )
 }

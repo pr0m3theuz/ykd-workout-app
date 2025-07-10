@@ -140,6 +140,9 @@ fun ExercisesFilterMenu(
         Column {
           muscleGroupsChecked.toSortedMap(compareBy<MuscleGroup> { it.name }).forEach { muscleGroup
             ->
+            val boolean: Boolean = muscleGroup.value
+
+            val (checked, onCheckedChange) = remember { mutableStateOf(boolean) }
             Row() {
               DropdownMenuItem(
                 text = {
@@ -148,23 +151,23 @@ fun ExercisesFilterMenu(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                   ) {
-                    Text(text = muscleGroup.key.name ?: "Unknown")
-
-                    val boolean: Boolean = muscleGroup.value
-
-                    val (checked, onCheckedChange) = remember { mutableStateOf(boolean) }
+                    Text(text = muscleGroup.key.name)
 
                     Checkbox(
                       checked = checked,
                       onCheckedChange = {
-                        onCheckedChange(it)
-                        setMuscleGroupsChecked(muscleGroup.key, it)
-                        exercisesViewModel.filterExercises()
+//                        onCheckedChange(it)
+//                        setMuscleGroupsChecked(muscleGroup.key, it)
+//                        exercisesViewModel.filterExercises()
                       },
                     )
                   }
                 },
-                onClick = {},
+                onClick = {
+                  onCheckedChange(!checked)
+                  setMuscleGroupsChecked(muscleGroup.key, !checked)
+                  exercisesViewModel.filterExercises()
+                },
               )
             }
           }
@@ -204,31 +207,36 @@ fun ExercisesFilterMenu(
       ) {
         Column {
           equipmentsChecked.toSortedMap(compareBy<Equipment> { it.name }).forEach { equipment ->
+            val boolean: Boolean = equipment.value
+
+            val (checked, onCheckedChange) = remember { mutableStateOf(boolean) }
             Row {
               DropdownMenuItem(
                 text = {
+
+
                   Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                   ) {
-                    Text(text = equipment.key.name ?: "Unknown")
-
-                    val boolean: Boolean = equipment.value
-
-                    val (checked, onCheckedChange) = remember { mutableStateOf(boolean) }
+                    Text(text = equipment.key.name)
 
                     Checkbox(
                       checked = checked,
                       onCheckedChange = {
-                        onCheckedChange(it)
-                        setEquipmentsChecked(equipment.key, it)
-                        exercisesViewModel.filterExercises()
+//                        onCheckedChange(it)
+//                        setEquipmentsChecked(equipment.key, it)
+//                        exercisesViewModel.filterExercises()
                       },
                     )
                   }
                 },
-                onClick = {},
+                onClick = {
+                  onCheckedChange(!checked)
+                  setEquipmentsChecked(equipment.key, !checked)
+                  exercisesViewModel.filterExercises()
+                },
               )
             }
           }
@@ -270,13 +278,13 @@ fun ExercisesFilterMenu(
             Row {
               DropdownMenuItem(
                 text = {
+                  val (checked, onCheckedChange) = remember { mutableStateOf(false) }
                   Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                   ) {
                     Text(text = movementType.printableName)
-                    val (checked, onCheckedChange) = remember { mutableStateOf(false) }
 
                     Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
                   }

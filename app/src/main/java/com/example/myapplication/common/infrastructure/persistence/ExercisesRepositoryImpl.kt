@@ -681,8 +681,6 @@ class ExercisesRepositoryImpl(
 
       sqlQuery.execute()
 
-//      Log.i("ExercisesRepositoryImpl.filterExercises()", whereQueryExpression.toString())
-
       return flow
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())

@@ -1,5 +1,6 @@
 package com.example.myapplication.features.addExercisesList
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -48,14 +49,14 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.myapplication.features.workout.WorkoutViewModel
-import com.example.myapplication.features.exercises.ui.ExerciseOptionsDropdownMenu
-import com.example.myapplication.features.exercises.ui.ExercisesFilterMenu
-import com.example.myapplication.features.exercises.ExercisesViewModel
-import com.example.myapplication.features.exercises.ui.SelectedFiltersLazyRow
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.MuscleGroup
+import com.example.myapplication.features.exercises.ExercisesViewModel
+import com.example.myapplication.features.exercises.ui.ExerciseOptionsDropdownMenu
+import com.example.myapplication.features.exercises.ui.ExercisesFilterMenu
+import com.example.myapplication.features.exercises.ui.SelectedFiltersLazyRow
+import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.addExercisesList.NoResultsFound
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -74,6 +75,14 @@ fun ReplaceExerciseScreen(
   val exercises by
   exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
 
+  val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsState()
+  val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsState()
+  val movementTypesChecked = exercisesViewModel.movementTypesChecked
+
+  val musclesChecked = muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }
+  val selectedEquipment = equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }
+  val selectedMovementTypes = movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }
+
   val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
 
   fun filterExercises(search: String) {
@@ -85,15 +94,15 @@ fun ReplaceExerciseScreen(
   var active by remember { mutableStateOf(false) }
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
-    val exerciseSelectedToBeAddedToWorkout = remember { mutableStateListOf<Exercise>() }
+  val exerciseSelectedToBeAddedToWorkout = remember { mutableStateListOf<Exercise>() }
 
-    fun selectExercise(exercise: Exercise, isSelected: Boolean) {
-        if (isSelected && exerciseSelectedToBeAddedToWorkout.size == 1) {
-            exerciseSelectedToBeAddedToWorkout[0] = exercise
-        } else if (isSelected && exerciseSelectedToBeAddedToWorkout.size == 0) {
-            exerciseSelectedToBeAddedToWorkout.add(exercise)
-        }
+  fun selectExercise(exercise: Exercise, isSelected: Boolean) {
+    if (isSelected && exerciseSelectedToBeAddedToWorkout.size == 1) {
+      exerciseSelectedToBeAddedToWorkout[0] = exercise
+    } else if (isSelected && exerciseSelectedToBeAddedToWorkout.size == 0) {
+      exerciseSelectedToBeAddedToWorkout.add(exercise)
     }
+  }
 
   val dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
 
@@ -110,7 +119,7 @@ fun ReplaceExerciseScreen(
               textAlign = TextAlign.Center,
               // modifier = Modifier.align(Alignment.CenterVertically),
               maxLines = 1,
-              overflow = TextOverflow.Ellipsis
+              overflow = TextOverflow.Ellipsis,
             )
           },
           navigationIcon = {
@@ -118,12 +127,12 @@ fun ReplaceExerciseScreen(
               onClick = {
                 setOpenDialog(false)
                 // workoutViewModel.cancelExerciseSelection()
-              },
+              }
             ) {
               Icon(
                 imageVector = Icons.Outlined.Close,
                 tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = "Go to the previous screen"
+                contentDescription = "Go to the previous screen",
               )
             }
           },
@@ -132,12 +141,12 @@ fun ReplaceExerciseScreen(
             IconButton(
               onClick = { setSearchBarVisibility(!searchBarVisibility) },
               enabled = true,
-              colors = iconColors
+              colors = iconColors,
             ) {
               Icon(
                 imageVector = Icons.Outlined.Search,
                 tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = "Search Exercises"
+                contentDescription = "Search Exercises",
               )
             }
             ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
@@ -152,7 +161,7 @@ fun ReplaceExerciseScreen(
             if (exerciseSelectedToBeAddedToWorkout.isNotEmpty()) {
               workoutViewModel.replaceExerciseInExerciseSets(
                 exerciseSets = exerciseSets,
-                newExercise = exerciseSelectedToBeAddedToWorkout.first()
+                newExercise = exerciseSelectedToBeAddedToWorkout.first(),
               )
             }
 
@@ -164,7 +173,7 @@ fun ReplaceExerciseScreen(
             modifier = Modifier.size(24.dp),
             imageVector = Icons.Filled.Check,
             tint = MaterialTheme.colorScheme.primary,
-            contentDescription = "Add Selected Exercises"
+            contentDescription = "Add Selected Exercises",
           )
         }
       },
@@ -174,10 +183,10 @@ fun ReplaceExerciseScreen(
             SearchBarDefaults.colors(
               containerColor = MaterialTheme.colorScheme.secondaryContainer,
               inputFieldColors =
-              TextFieldDefaults.colors(
-                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary
-              )
+                TextFieldDefaults.colors(
+                  unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                  unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             )
 
           SearchBar(
@@ -197,15 +206,36 @@ fun ReplaceExerciseScreen(
               Icon(
                 Icons.Default.Search,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
               )
             },
             modifier = Modifier
               .fillMaxWidth()
-              .padding(horizontal = 8.dp)
+              .padding(horizontal = 8.dp),
           ) {}
 
-          SelectedFiltersLazyRow(exercisesViewModel)
+          val visible =
+            muscleGroupsChecked.isNotEmpty() ||
+                    selectedEquipment.isNotEmpty() ||
+                    selectedMovementTypes.isNotEmpty()
+          AnimatedVisibility(visible) {
+            if (
+              musclesChecked.isNotEmpty() ||
+              selectedEquipment.isNotEmpty() ||
+              selectedMovementTypes.isNotEmpty()
+            ) {
+
+              SelectedFiltersLazyRow(
+                exercisesViewModel,
+                muscleGroupsChecked,
+                equipmentsChecked,
+                movementTypesChecked,
+                musclesChecked,
+                selectedEquipment,
+                selectedMovementTypes,
+              )
+            }
+          }
 
           when {
             exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
@@ -224,18 +254,18 @@ fun ReplaceExerciseScreen(
                 modifier = Modifier
                   .fillMaxWidth()
                   .padding(top = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
               ) {
                 LinearProgressIndicator(
                   modifier = Modifier
                     .semantics(mergeDescendants = true) {}
-                    .padding(10.dp),
+                    .padding(10.dp)
                 )
               }
             }
           }
         }
-      }
+      },
     )
   }
 }
@@ -267,8 +297,8 @@ private fun ExercisesLazyList(
   ) {
     items(count = exercises.size, key = { index: Int -> exercises[index].lazyListItemID }) { index
       ->
-        var selectedExerciseModel by remember { mutableStateOf(false) }
-        val exercise: Exercise = exercises[index]
+      var selectedExerciseModel by remember { mutableStateOf(false) }
+      val exercise: Exercise = exercises[index]
       val muscleGroupName: String? = muscleGroups.find { it.id == exercise.muscleGroupID }?.name
       selectedExerciseModel = selectedExercise == exercise
       SelectableExerciseItem(

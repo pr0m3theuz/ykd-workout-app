@@ -98,7 +98,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
 
     return coroutineScope {
       exercisesRepository.getAllExercises().collect { list ->
-        _exercises.value = list
+        _exercises.value = list.sortedBy { exercise -> exercise.name }
 //        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
       }
     }
@@ -165,11 +165,26 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   }
 
   fun updateMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
-    _muscleGroupsChecked.value[muscleGroup] = checked
+//    val temp = _muscleGroupsChecked.value.apply {  }
+//    temp[muscleGroup] = checked
+    _muscleGroupsChecked.value = _muscleGroupsChecked.value.apply { this[muscleGroup] = checked }
+
+    Log.i(
+      "ExercisesViewModel",
+      "updateMuscleGroupsChecked(): ${
+        _muscleGroupsChecked.value.toSortedMap { o1, o2 ->
+          o1.name.compareTo(o2.name)
+        }
+      }"
+    )
   }
 
   fun updateEquipmentsChecked(equipment: Equipment, checked: Boolean) {
+    val temp = _equipmentsChecked.value
     _equipmentsChecked.value[equipment] = checked
+    _equipmentsChecked.value = temp
+
+    Log.i("ExercisesViewModel", "updateEquipmentsChecked(): ${_equipmentsChecked.value}")
   }
 
   private var _searchExerciseName = ""
@@ -244,7 +259,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
           equipmentIDs = selectedEquipments.toList(),
           //                movementTypes = selectedMovementTypes.toList()
         )
-        .collect() { _exercises.value = it }
+        .collect() { _exercises.value = it.sortedBy { exercise -> exercise.name } }
     }
   }
 
