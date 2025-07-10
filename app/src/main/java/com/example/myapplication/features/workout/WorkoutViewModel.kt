@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class, FlowPreview::class)
+@file:OptIn(ExperimentalUuidApi::class, FlowPreview::class, ExperimentalTime::class)
 
 package com.example.myapplication.features.workout
 
@@ -52,6 +52,7 @@ import com.example.myapplication.common.domain.model.completeSet
 import com.example.myapplication.common.domain.model.createWorkoutPreview
 import com.example.myapplication.common.domain.model.deepCopy
 import com.example.myapplication.common.domain.model.replaceWarmUpSets
+import com.example.myapplication.common.domain.model.replaceWorkingSets
 import com.example.myapplication.common.domain.model.updateSetRIR
 import com.example.myapplication.common.domain.model.updateSetRPE
 import com.example.myapplication.common.domain.model.updateSetReps
@@ -79,13 +80,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import java.time.LocalTime
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -912,6 +914,31 @@ class WorkoutViewModel(
                   // its 'notes' and 'workoutItems' are updated elsewhere when
                   // latestNotes/latestComponents change.
                   // If not, we might need to create a new Workout instance here:
+
+                  val allSets = latestComponents.flatMap { component ->
+                    when (component) {
+                      is ExerciseExerciseSets -> component.sets
+                      is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+                    }
+                  }
+
+                  val TAG = "WorkoutViewModel: "
+                  require(allSets.all { set -> set.workoutID == latestWorkout.id }) {
+                    "$TAG All sets workoutIDs does not match Workout.id!"
+                  }
+
+                  val allSuperSets = latestComponents.filterIsInstance<SupersetExercisesSets>()
+
+                  require(allSuperSets.all { superset -> superset.workoutID == latestWorkout.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+                  require(
+                    latestComponents.all { component ->
+                      when (component) {
+                        is ExerciseExerciseSets -> component.workoutID == latestWorkout.id
+                        is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == latestWorkout.id }
+                      }
+                    }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+
                   val workoutToSave =
                     latestWorkout.copy(
                       workoutDuration = latestDuration,
@@ -1464,6 +1491,13 @@ class WorkoutViewModel(
 
     updateExercisesSetsData(exerciseSets, exerciseSets.sets)
   }
+
+  fun replaceWorkingSets(exerciseSets: ExerciseExerciseSets, sets: List<Set>) {
+    exerciseSets.replaceWorkingSets(sets)
+
+    updateExercisesSetsData(exerciseSets, exerciseSets.sets)
+  }
+
 
   fun getWorkingSetWeight(exerciseSets: ExerciseExerciseSets): Double? {
     // TODO Get Previous Working Set if Sets is empty

@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.features.workout
 
@@ -34,11 +34,12 @@ import com.example.myapplication.common.infrastructure.persistence.UserRepositor
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import com.example.myapplication.common.util.newLazyListItemID
-import kotlinx.datetime.Clock
 import org.bson.types.ObjectId
 import kotlin.math.min
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -417,6 +418,30 @@ class ManageWorkoutUseCase(
     workoutNotes: List<WorkoutNote>,
     workoutComponents: List<WorkoutComponent>,
   ) {
+    val TAG = "ManageWorkoutUseCase: "
+    val allSets = workoutComponents.flatMap { component ->
+      when (component) {
+        is ExerciseExerciseSets -> component.sets
+        is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+      }
+    }
+
+    require(allSets.all { set -> set.workoutID == workout.id }) {
+      "$TAG All sets workoutIDs does not match Workout.id!"
+    }
+
+    val allSuperSets = workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+    require(allSuperSets.all { superset -> superset.workoutID == workout.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+    require(
+      workoutComponents.all { component ->
+        when (component) {
+          is ExerciseExerciseSets -> component.workoutID == workout.id
+          is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workout.id }
+        }
+      }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+
     //    TODO Implement this
     workout.notes = workoutNotes.toMutableList()
 
