@@ -6,11 +6,15 @@
     RealmListKSerializer::class,
     RealmSetKSerializer::class,
     RealmUUIDKSerializer::class,*/
+  InstantSerializer::class,
+  UuidSerializer::class,
+  ObjectIdSerializer::class,
 )
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.domain.model
 
+import com.example.myapplication.common.util.InstantSerializer
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.ProgressionType
 import com.example.myapplication.common.util.ProgressionTypeSerializer
@@ -18,12 +22,13 @@ import com.example.myapplication.common.util.SetTypeSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.common.util.newLazyListItemID
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.bson.types.ObjectId
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -35,7 +40,7 @@ data class CompletedSetsDao(var CompletedSets: Set)
 
 @Serializable
 data class Set(
-  @SerialName("id") @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
+  @SerialName("id") var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var setNumber: Int? = 1,
@@ -59,12 +64,12 @@ data class Set(
   var setCompleted: Boolean = false,
   var setVolumeInPounds: Double? = null,
   var setVolumeInKilograms: Double? = null,
-  @Serializable(ObjectIdSerializer::class) var workoutID: ObjectId,
-  @Serializable(ObjectIdSerializer::class) var exerciseID: ObjectId? = null,
-  @Serializable(ObjectIdSerializer::class) var exerciseSetsID: ObjectId,
-  @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId? = null,
-  @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId? = null,
-  @Serializable(ObjectIdSerializer::class) var programID: ObjectId? = null,
+  var workoutID: ObjectId,
+  var exerciseID: ObjectId? = null,
+  var exerciseSetsID: ObjectId,
+  var microcycleID: ObjectId? = null,
+  var mesocycleID: ObjectId? = null,
+  var programID: ObjectId? = null,
   @Serializable(SetTypeSerializer::class) var setTypeID: SetType = SetType.normalSet,
   @Serializable(ProgressionTypeSerializer::class) var progressionSchemeID: ProgressionType? = null,
   //    To use in query for previous sets
@@ -162,9 +167,9 @@ fun Set.getWeight(weightUnit: String?) {
 data class Sets(val sets: List<Set>)
 
 fun Double.convertPoundToKg(): Double {
-  return this.times(0.45359237) ?: 0.0
+  return this.times(0.45359237)
 }
 
 fun Double.convertKgToPound(): Double {
-  return this.times(2.2046226218) ?: 0.0
+  return this.times(2.2046226218)
 }

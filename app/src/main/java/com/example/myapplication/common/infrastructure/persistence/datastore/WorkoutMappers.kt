@@ -1,11 +1,11 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.infrastructure.persistence.datastore
 
 import com.example.myapplication.common.domain.model.ExerciseNote
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Set
-import com.example.myapplication.common.domain.model.SetType // Assuming SetType has a 'name' or similar property
+import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutItem
@@ -18,9 +18,10 @@ import com.example.myapplication.datastore.SupersetProto
 import com.example.myapplication.datastore.WorkoutItemProto
 import com.example.myapplication.datastore.WorkoutNoteProto
 import org.bson.types.ObjectId
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import kotlinx.datetime.Instant as KotlinxInstant
 
 // --- Primitive Type Mappers ---
 
@@ -30,8 +31,8 @@ fun String.toDomainObjectId(): ObjectId = ObjectId(this)
 fun Uuid.toProtoString(): String = this.toString()
 fun String.toDomainUuid(): Uuid = Uuid.parse(this)
 
-fun KotlinxInstant.toProtoLong(): Long = this.toEpochMilliseconds()
-fun Long.toDomainInstant(): KotlinxInstant = KotlinxInstant.fromEpochMilliseconds(this)
+fun Instant.toProtoLong(): Long = this.toEpochMilliseconds()
+fun Long.toDomainInstant(): Instant = Instant.fromEpochMilliseconds(this)
 
 // --- Enum Mappers (Example for SetType) ---
 // Assuming SetType has a 'name' property or similar unique string identifier.

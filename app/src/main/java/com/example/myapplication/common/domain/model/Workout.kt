@@ -6,17 +6,21 @@
   //  RealmListKSerializer::class,
   //  RealmSetKSerializer::class,
   //  RealmUUIDKSerializer::class,
+  InstantSerializer::class,
+  UuidSerializer::class,
+  ObjectIdSerializer::class,
 )
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.domain.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.example.myapplication.common.util.InstantSerializer
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
-import kotlinx.datetime.Clock
+
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
@@ -28,8 +32,10 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -46,7 +52,7 @@ data class ActiveWorkoutDao(var ActiveWorkout: Workout)
 @Serializable
 data class Workout(
   @SerialName("id")
-  @Serializable(ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
+  var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String, // TODO make name default = User
@@ -54,18 +60,18 @@ data class Workout(
   var notes: List<WorkoutNote> = emptyList(),
   var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds,
   var workoutType: String? = null,
-  var dateCreated: kotlinx.datetime.Instant = Clock.System.now(), // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
-  var workoutStarted: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
-  var workoutEnded: kotlinx.datetime.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var dateCreated: kotlin.time.Instant = Clock.System.now(), // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var workoutStarted: kotlin.time.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var workoutEnded: kotlin.time.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var isCompleted: Boolean = false,
   var day: Int? = null,
   @Serializable(with = WorkoutItemListSerializer::class) var workoutItems: List<WorkoutItem> = emptyList(),
   var totalVolumeInPounds: Double? = 0.0,
   var totalVolumeInKilograms: Double? = 0.0,
 //  var order: Int? = null, // For sorting workouts in a program
-  @Serializable(ObjectIdSerializer::class) var programID: ObjectId? = null,
-  @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId? = null,
-  @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId? = null,
+  var programID: ObjectId? = null,
+  var mesocycleID: ObjectId? = null,
+  var microcycleID: ObjectId? = null,
   var ownerID: String = "",
   var isPublic: Boolean = false,
   var signature: String? = null,

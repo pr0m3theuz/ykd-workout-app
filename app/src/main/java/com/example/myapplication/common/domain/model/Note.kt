@@ -1,17 +1,19 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.domain.model
 
+import com.example.myapplication.common.util.InstantSerializer
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.fakeULID
 import com.example.myapplication.common.util.newLazyListItemID
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -29,6 +31,8 @@ class ExerciseNote() {
   var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
+
+  @Serializable(InstantSerializer::class)
   var dateCreated: Instant = Clock.System.now()
   @Serializable(ObjectIdSerializer::class)
   var exercise: ObjectId? = null
@@ -59,6 +63,8 @@ class SupersetNote() {
   var uuid: Uuid = Uuid.random()
   var note: String? = null
   var pinned: Boolean = false
+
+  @Serializable(InstantSerializer::class)
   var dateCreated: Instant = Clock.System.now()
 
   @Serializable(ObjectIdSerializer::class)

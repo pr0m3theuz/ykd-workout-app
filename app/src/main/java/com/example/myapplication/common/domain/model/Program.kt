@@ -1,25 +1,23 @@
 @file:UseSerializers(
-  //  MutableRealmIntKSerializer::class,
-  //  RealmAnyKSerializer::class,
-  //  RealmDictionaryKSerializer::class,
-  //  RealmInstantKSerializer::class,
-  //  RealmListKSerializer::class,
-  //  RealmSetKSerializer::class,
-  //  RealmUUIDKSerializer::class,
+  InstantSerializer::class,
+  UuidSerializer::class,
+  ObjectIdSerializer::class,
 )
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.domain.model
 
+import com.example.myapplication.common.util.InstantSerializer
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.bson.types.ObjectId
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -29,12 +27,8 @@ import kotlin.uuid.Uuid
 // TODO Add Image URI property to Program
 @Serializable
 data class Program(
-  @SerialName("id")
-  @Serializable(with = ObjectIdSerializer::class)
-  var id: ObjectId = ObjectId(),
+  @SerialName("id") var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
-
-  @Serializable(UuidSerializer::class)
   var uuid: Uuid = Uuid.random(),
   var name: String? = null,
   var author: String? = null,
@@ -79,9 +73,9 @@ data class MesocycleDao(val Mesocycle: Mesocycle)
 
 @Serializable
 data class Mesocycle(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
+  @SerialName("id") var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
-  @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
+  var uuid: Uuid = Uuid.random(),
   var name: String? = null,
   var description: String? = null,
   var dateCreated: Instant = Clock.System.now(),
@@ -89,7 +83,7 @@ data class Mesocycle(
   var endDate: Instant? = null,
   var order: Int = 0,
   //    var tags: String // TODO Should be a List<String>,
-  @Serializable(with = ObjectIdSerializer::class) var programID: ObjectId? = null,
+  var programID: ObjectId? = null,
   var microcycles: List<Microcycle> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
@@ -101,7 +95,7 @@ data class MicrocycleDao(val Microcycle: Microcycle)
 
 @Serializable
 data class Microcycle(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
+  @SerialName("id") var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String? = null,
@@ -111,12 +105,10 @@ data class Microcycle(
   var endDate: Instant? = null,
   var order: Int = 0,
   //    var tags: String // TODO Should be a List<String>,
-  @Serializable(with = ObjectIdSerializer::class) var programID: ObjectId? = null,
-  @Serializable(with = ObjectIdSerializer::class) var mesocycleID: ObjectId? = null,
+  var programID: ObjectId? = null,
+  var mesocycleID: ObjectId? = null,
   var workouts: List<Workout> = emptyList(),
   var ownerID: String = "PUBLIC",
   var isPublic: Boolean = false,
   private val type: String = "Microcycle",
 )
-
-
