@@ -1,16 +1,17 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.deserialization.util
 
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutDao
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import net.jqwik.api.Example
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertNotNull
 import java.io.File
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 
 class WorkoutDeserializationTest {

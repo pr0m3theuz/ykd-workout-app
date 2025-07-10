@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.features.workout
 
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 class DoubleProgressionTest {

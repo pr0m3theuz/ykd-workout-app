@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.features.workout
 
@@ -14,6 +14,7 @@ import net.jqwik.api.Example
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 private fun applyProgressionToNextWorkout(
