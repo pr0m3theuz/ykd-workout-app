@@ -1,27 +1,21 @@
-@file:UseSerializers(
-  //  MutableRealmIntKSerializer::class,
-  //  RealmAnyKSerializer::class,
-  //  RealmDictionaryKSerializer::class,
-  //  RealmInstantKSerializer::class,
-  //  RealmListKSerializer::class,
-  //  RealmSetKSerializer::class,
-  //  RealmUUIDKSerializer::class,
-)
-@file:OptIn(ExperimentalUuidApi::class)
+@file:UseSerializers(InstantSerializer::class, UuidSerializer::class, ObjectIdSerializer::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.common.domain.model
 
 import android.util.Log
+import com.example.myapplication.common.util.InstantSerializer
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.bson.types.ObjectId
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -35,36 +29,43 @@ import kotlin.uuid.Uuid
 data class ExerciseSetsDao(val ExerciseSets: ExerciseSets)
 
 /**
- * Represents a collection of sets for a specific exercise, linked by exercise ID.
- * This class focuses on storing set data and linking it to hierarchical structures
- * (workout, microcycle, mesocycle, program) via ObjectIds. It's a more normalized
- * representation, requiring a separate lookup to retrieve full Exercise details.
+ * Represents a collection of sets for a specific exercise, linked by exercise ID. This class
+ * focuses on storing set data and linking it to hierarchical structures (workout, microcycle,
+ * mesocycle, program) via ObjectIds. It's a more normalized representation, requiring a separate
+ * lookup to retrieve full Exercise details.
  *
  * @property id The unique identifier for this set collection (using ObjectId).
- * @property lazyListItemID An ID used for efficiently updating items in a LazyColumn (UI component).
+ * @property lazyListItemID An ID used for efficiently updating items in a LazyColumn (UI
+ *   component).
  * @property exSetsUUID A universally unique identifier for this set collection.
  * @property order The order of this set collection within a sequence (e.g., within a workout).
  * @property exerciseID The ID of the exercise this set collection belongs to (foreign key).
  * @property sets A mutable list of [Set] objects, representing the individual sets performed.
  * @property notes A mutable list of [ExerciseNote] objects, for any notes related to the sets.
- * @property datePerformed The date and time when the exercise sets were performed (nullable, defaults to null).
- * @property totalVolumeInPounds The total volume lifted in pounds across all sets (nullable, defaults to 0.0).
- * @property totalVolumeInKilograms The total volume lifted in kilograms across all sets (nullable, defaults to 0.0).
+ * @property datePerformed The date and time when the exercise sets were performed (nullable,
+ *   defaults to null).
+ * @property totalVolumeInPounds The total volume lifted in pounds across all sets (nullable,
+ *   defaults to 0.0).
+ * @property totalVolumeInKilograms The total volume lifted in kilograms across all sets (nullable,
+ *   defaults to 0.0).
  * @property ownerID The ID of the user who owns this set collection.
  * @property isPublic Indicates whether this set collection is publicly visible.
  * @property workoutID The ID of the workout this set collection belongs to (foreign key).
- * @property microcycleID The ID of the microcycle this set collection belongs to (nullable, foreign key).
- * @property mesocycleID The ID of the mesocycle this set collection belongs to (nullable, foreign key).
+ * @property microcycleID The ID of the microcycle this set collection belongs to (nullable, foreign
+ *   key).
+ * @property mesocycleID The ID of the mesocycle this set collection belongs to (nullable, foreign
+ *   key).
  * @property programID The ID of the program this set collection belongs to (nullable, foreign key).
  */
 @ExperimentalUuidApi
 @Serializable
 data class ExerciseSets(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) override var id: ObjectId = ObjectId(),
-  @SerialName("exSetsLazyListItemID") val lazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
+  @SerialName("id") override var id: ObjectId = ObjectId(),
+  @SerialName("exSetsLazyListItemID")
+  val lazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
   @Serializable(with = UuidSerializer::class) val exSetsUUID: Uuid = Uuid.random(),
   override val order: Int = 1,
-  @Serializable(with = ObjectIdSerializer::class) val exerciseID: ObjectId,
+  val exerciseID: ObjectId,
   var sets: MutableList<Set> = mutableListOf(),
   var description: String? = null,
   val notes: MutableList<ExerciseNote> = mutableListOf(),
@@ -74,32 +75,42 @@ data class ExerciseSets(
   override var ownerID: String,
   override var isPublic: Boolean = false,
   override val type: String = "ExerciseSets",
-  @Serializable(with = ObjectIdSerializer::class) var workoutID: ObjectId, // External Primary Key
-  @Serializable(with = ObjectIdSerializer::class) var microcycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) var mesocycleID: ObjectId?,
-  @Serializable(with = ObjectIdSerializer::class) var programID: ObjectId?,
+  var workoutID: ObjectId, // External Primary Key
+  var microcycleID: ObjectId?,
+  var mesocycleID: ObjectId?,
+  var programID: ObjectId?,
 ) : WorkoutItem()
 
 /**
- * Represents a collection of sets along with the *embedded* Exercise object itself.
- * This class provides a richer, self-contained representation, including both set data
- * and the complete exercise details. It's denormalized for easier access without
- * requiring extra lookups.
+ * Represents a collection of sets along with the *embedded* Exercise object itself. This class
+ * provides a richer, self-contained representation, including both set data and the complete
+ * exercise details. It's denormalized for easier access without requiring extra lookups.
  *
  * @property id The unique identifier for this set and exercise combination (using ObjectId).
- * @property lazyListItemID An ID used for efficiently updating items in a LazyColumn (UI component).  This is mutable.
- * @property exSetsUUID A universally unique identifier for this set and exercise combination. This is mutable.
+ * @property lazyListItemID An ID used for efficiently updating items in a LazyColumn (UI
+ *   component). This is mutable.
+ * @property exSetsUUID A universally unique identifier for this set and exercise combination. This
+ *   is mutable.
  * @property ownerID The ID of the user who owns this set and exercise combination.
  * @property isPublic Indicates whether this set and exercise combination is publicly visible.
- * @property order The order of this set and exercise combination within a sequence (e.g., within a workout). This is mutable.
- * @property exercise The full [Exercise] object, embedded directly within this class. This is mutable.
- * @property sets A mutable list of [Set] objects, representing the individual sets performed. This is mutable.
- * @property notes A mutable list of [ExerciseNote] objects, for any notes related to the sets. This is mutable.
- * @property datePerformed The date and time when the exercise sets were performed (defaults to the current time). This is mutable.
- * @property workoutID The ID of the workout this set and exercise combination belongs to. This is mutable.
- * @property microcycleID The ID of the microcycle this set and exercise belongs to (nullable).  This is mutable.
- * @property mesocycleID The ID of the mesocycle this set and exercise belongs to (nullable). This is mutable.
- * @property programID The ID of the program this set and exercise belongs to (nullable). This is mutable.
+ * @property order The order of this set and exercise combination within a sequence (e.g., within a
+ *   workout). This is mutable.
+ * @property exercise The full [Exercise] object, embedded directly within this class. This is
+ *   mutable.
+ * @property sets A mutable list of [Set] objects, representing the individual sets performed. This
+ *   is mutable.
+ * @property notes A mutable list of [ExerciseNote] objects, for any notes related to the sets. This
+ *   is mutable.
+ * @property datePerformed The date and time when the exercise sets were performed (defaults to the
+ *   current time). This is mutable.
+ * @property workoutID The ID of the workout this set and exercise combination belongs to. This is
+ *   mutable.
+ * @property microcycleID The ID of the microcycle this set and exercise belongs to (nullable). This
+ *   is mutable.
+ * @property mesocycleID The ID of the mesocycle this set and exercise belongs to (nullable). This
+ *   is mutable.
+ * @property programID The ID of the program this set and exercise belongs to (nullable). This is
+ *   mutable.
  */
 @OptIn(ExperimentalUuidApi::class)
 @Serializable
@@ -114,16 +125,14 @@ data class ExerciseExerciseSets(
   var sets: MutableList<Set> = mutableListOf(),
   var description: String? = null,
   var notes: MutableList<ExerciseNote> = mutableListOf(),
-  var datePerformed: Instant? = Clock.System.now(),
-//  @Contextual var exerciseID: ObjectId,
+  @Serializable(InstantSerializer::class) var datePerformed: Instant? = Clock.System.now(),
+  //  @Contextual var exerciseID: ObjectId,
   @Serializable(ObjectIdSerializer::class) var workoutID: ObjectId, // TODO May be useless
   @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId?,
   @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId?,
   @Serializable(ObjectIdSerializer::class) var programID: ObjectId?,
-  override val type: String = "ExerciseExerciseSets"
+  override val type: String = "ExerciseExerciseSets",
 ) : WorkoutComponent()
-
-
 
 /*fun ExerciseSets.addSet() {
 if (sets.isNotEmpty()) {
@@ -201,37 +210,38 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
   // Log initial state
   Log.d(
     TAG,
-    "addWarmUpSets called. Adding ${warmUpSets.size} warm-up sets to ${this.sets.size} existing sets."
+    "addWarmUpSets called. Adding ${warmUpSets.size} warm-up sets to ${this.sets.size} existing sets.",
   )
 
   // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
-  val newWarmUpSets = warmUpSets.map { warmUpSet ->
-    Set(
-//      setNumber = -1, // Placeholder, will be replaced
-      weightPounds = warmUpSet.weightPounds,
-      targetWeightPounds = warmUpSet.targetWeightPounds,
-      weightKilograms = warmUpSet.weightKilograms,
-      targetWeightKilograms = warmUpSet.targetWeightKilograms,
-      repetitions = warmUpSet.repetitions,
-      targetRepetitions = warmUpSet.targetRepetitions,
-      ratePerceivedEffort = warmUpSet.ratePerceivedEffort,
-      targetRatePerceivedEffort = warmUpSet.targetRatePerceivedEffort,
-      repetitionsInReserve = warmUpSet.repetitionsInReserve,
-      targetRepetitionsInReserve = warmUpSet.targetRepetitionsInReserve,
-      setTypeID = warmUpSet.setTypeID,
-      percentage1RM = warmUpSet.percentage1RM,
-      targetPercentage1RM = warmUpSet.targetPercentage1RM,
-      exerciseID = this@addWarmUpSets.exercise.id,
-      progressionSchemeID = warmUpSet.progressionSchemeID,
-      workoutID = this@addWarmUpSets.workoutID,
-      exerciseSetsID = this@addWarmUpSets.id,
-      microcycleID = this@addWarmUpSets.microcycleID,
-      mesocycleID = this@addWarmUpSets.mesocycleID,
-      programID = this@addWarmUpSets.programID,
-      ownerID = this@addWarmUpSets.ownerID,
-      isPublic = this@addWarmUpSets.isPublic,
-    )
-  }
+  val newWarmUpSets =
+    warmUpSets.map { warmUpSet ->
+      Set(
+        //      setNumber = -1, // Placeholder, will be replaced
+        weightPounds = warmUpSet.weightPounds,
+        targetWeightPounds = warmUpSet.targetWeightPounds,
+        weightKilograms = warmUpSet.weightKilograms,
+        targetWeightKilograms = warmUpSet.targetWeightKilograms,
+        repetitions = warmUpSet.repetitions,
+        targetRepetitions = warmUpSet.targetRepetitions,
+        ratePerceivedEffort = warmUpSet.ratePerceivedEffort,
+        targetRatePerceivedEffort = warmUpSet.targetRatePerceivedEffort,
+        repetitionsInReserve = warmUpSet.repetitionsInReserve,
+        targetRepetitionsInReserve = warmUpSet.targetRepetitionsInReserve,
+        setTypeID = warmUpSet.setTypeID,
+        percentage1RM = warmUpSet.percentage1RM,
+        targetPercentage1RM = warmUpSet.targetPercentage1RM,
+        exerciseID = this@addWarmUpSets.exercise.id,
+        progressionSchemeID = warmUpSet.progressionSchemeID,
+        workoutID = this@addWarmUpSets.workoutID,
+        exerciseSetsID = this@addWarmUpSets.id,
+        microcycleID = this@addWarmUpSets.microcycleID,
+        mesocycleID = this@addWarmUpSets.mesocycleID,
+        programID = this@addWarmUpSets.programID,
+        ownerID = this@addWarmUpSets.ownerID,
+        isPublic = this@addWarmUpSets.isPublic,
+      )
+    }
   Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
 
   // 2. Combine the new warm-up sets and existing sets into a single list.
@@ -239,13 +249,14 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
   Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
 
   // 3. Create the final list by re-numbering every set based on its new index.
-  val renumberedSets = allSets.mapIndexed { index, set ->
-    val newSetNumber = index + 1
-    // Log the change for a specific set (can be verbose, but useful for deep debugging)
-    // To avoid spamming logs, you might enable this only when needed.
-    // Log.d(TAG, "Re-numbering set: Old number ${set.setNumber}, New number: $newSetNumber")
-    set.copy(setNumber = newSetNumber)
-  }
+  val renumberedSets =
+    allSets.mapIndexed { index, set ->
+      val newSetNumber = index + 1
+      // Log the change for a specific set (can be verbose, but useful for deep debugging)
+      // To avoid spamming logs, you might enable this only when needed.
+      // Log.d(TAG, "Re-numbering set: Old number ${set.setNumber}, New number: $newSetNumber")
+      set.copy(setNumber = newSetNumber)
+    }
 
   // 4. Replace the old list with the newly created and re-numbered list.
   val previousCount = this.sets.size
@@ -256,44 +267,42 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
 fun ExerciseExerciseSets.replaceWarmUpSets(warmUpSets: List<Set>) {
   val TAG = "ExerciseExerciseSets"
   // Log initial state
-  Log.d(
-    TAG,
-    "replaceWarmUpSets called. Replacing warm-up sets to ${this.sets.size} existing sets."
-  )
+  Log.d(TAG, "replaceWarmUpSets called. Replacing warm-up sets to ${this.sets.size} existing sets.")
 
   // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
-  val newWarmUpSets = warmUpSets.map { warmUpSet ->
-    Set(
-      lazyListItemID = newLazyListItemID(),
-//      setNumber = -1, // Placeholder, will be replaced
-      weightPounds = warmUpSet.weightPounds,
-      targetWeightPounds = warmUpSet.targetWeightPounds,
-      weightKilograms = warmUpSet.weightKilograms,
-      targetWeightKilograms = warmUpSet.targetWeightKilograms,
-      repetitions = warmUpSet.repetitions,
-      targetRepetitions = warmUpSet.targetRepetitions,
-      ratePerceivedEffort = warmUpSet.ratePerceivedEffort,
-      targetRatePerceivedEffort = warmUpSet.targetRatePerceivedEffort,
-      repetitionsInReserve = warmUpSet.repetitionsInReserve,
-      targetRepetitionsInReserve = warmUpSet.targetRepetitionsInReserve,
-      setTypeID = warmUpSet.setTypeID,
-      percentage1RM = warmUpSet.percentage1RM,
-      targetPercentage1RM = warmUpSet.targetPercentage1RM,
-      exerciseID = this@replaceWarmUpSets.exercise.id,
-      progressionSchemeID = warmUpSet.progressionSchemeID,
-      workoutID = this@replaceWarmUpSets.workoutID,
-      exerciseSetsID = this@replaceWarmUpSets.id,
-      microcycleID = this@replaceWarmUpSets.microcycleID,
-      mesocycleID = this@replaceWarmUpSets.mesocycleID,
-      programID = this@replaceWarmUpSets.programID,
-      ownerID = this@replaceWarmUpSets.ownerID,
-      isPublic = this@replaceWarmUpSets.isPublic,
-    )
-  }
+  val newWarmUpSets =
+    warmUpSets.map { warmUpSet ->
+      Set(
+        lazyListItemID = newLazyListItemID(),
+        //      setNumber = -1, // Placeholder, will be replaced
+        weightPounds = warmUpSet.weightPounds,
+        targetWeightPounds = warmUpSet.targetWeightPounds,
+        weightKilograms = warmUpSet.weightKilograms,
+        targetWeightKilograms = warmUpSet.targetWeightKilograms,
+        repetitions = warmUpSet.repetitions,
+        targetRepetitions = warmUpSet.targetRepetitions,
+        ratePerceivedEffort = warmUpSet.ratePerceivedEffort,
+        targetRatePerceivedEffort = warmUpSet.targetRatePerceivedEffort,
+        repetitionsInReserve = warmUpSet.repetitionsInReserve,
+        targetRepetitionsInReserve = warmUpSet.targetRepetitionsInReserve,
+        setTypeID = warmUpSet.setTypeID,
+        percentage1RM = warmUpSet.percentage1RM,
+        targetPercentage1RM = warmUpSet.targetPercentage1RM,
+        exerciseID = this@replaceWarmUpSets.exercise.id,
+        progressionSchemeID = warmUpSet.progressionSchemeID,
+        workoutID = this@replaceWarmUpSets.workoutID,
+        exerciseSetsID = this@replaceWarmUpSets.id,
+        microcycleID = this@replaceWarmUpSets.microcycleID,
+        mesocycleID = this@replaceWarmUpSets.mesocycleID,
+        programID = this@replaceWarmUpSets.programID,
+        ownerID = this@replaceWarmUpSets.ownerID,
+        isPublic = this@replaceWarmUpSets.isPublic,
+      )
+    }
   Log.d(TAG, "replaceWarmUpSets: set.id - ${newWarmUpSets.firstOrNull()?.id}.")
   Log.d(
     TAG,
-    "replaceWarmUpSets: set.targetWeightPounds - ${newWarmUpSets.firstOrNull()?.targetWeightPounds}."
+    "replaceWarmUpSets: set.targetWeightPounds - ${newWarmUpSets.firstOrNull()?.targetWeightPounds}.",
   )
   Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
 
@@ -302,13 +311,79 @@ fun ExerciseExerciseSets.replaceWarmUpSets(warmUpSets: List<Set>) {
   Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
 
   // 3. Create the final list by re-numbering every set based on its new index.
-  val renumberedSets = allSets.mapIndexed { index, set ->
-    val newSetNumber = index + 1
-    // Log the change for a specific set (can be verbose, but useful for deep debugging)
-    // To avoid spamming logs, you might enable this only when needed.
-    // Log.d(TAG, "Re-numbering set: Old number ${set.setNumber}, New number: $newSetNumber")
-    set.copy(setNumber = newSetNumber)
-  }
+  val renumberedSets =
+    allSets.mapIndexed { index, set ->
+      val newSetNumber = index + 1
+      // Log the change for a specific set (can be verbose, but useful for deep debugging)
+      // To avoid spamming logs, you might enable this only when needed.
+      // Log.d(TAG, "Re-numbering set: Old number ${set.setNumber}, New number: $newSetNumber")
+      set.copy(setNumber = newSetNumber)
+    }
+
+  // 4. Replace the old list with the newly created and re-numbered list.
+  val previousCount = this.sets.size
+  this.sets.clear()
+  this.sets.addAll(renumberedSets)
+}
+
+fun ExerciseExerciseSets.replaceWorkingSets(newSets: List<Set>) {
+  val TAG = "ExerciseExerciseSets"
+  // Log initial state
+  Log.d(
+    TAG,
+    "replaceWorkingSets called. Replacing warm-up sets to ${this.sets.size} existing sets.",
+  )
+
+  // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
+  val newWorkingSets =
+    newSets.map { workingSet ->
+      Set(
+        lazyListItemID = newLazyListItemID(),
+        //      setNumber = -1, // Placeholder, will be replaced
+        weightPounds = workingSet.weightPounds,
+        targetWeightPounds = workingSet.targetWeightPounds,
+        weightKilograms = workingSet.weightKilograms,
+        targetWeightKilograms = workingSet.targetWeightKilograms,
+        repetitions = workingSet.repetitions,
+        targetRepetitions = workingSet.targetRepetitions,
+        ratePerceivedEffort = workingSet.ratePerceivedEffort,
+        targetRatePerceivedEffort = workingSet.targetRatePerceivedEffort,
+        repetitionsInReserve = workingSet.repetitionsInReserve,
+        targetRepetitionsInReserve = workingSet.targetRepetitionsInReserve,
+        setTypeID = workingSet.setTypeID,
+        percentage1RM = workingSet.percentage1RM,
+        targetPercentage1RM = workingSet.targetPercentage1RM,
+        exerciseID = this@replaceWorkingSets.exercise.id,
+        progressionSchemeID = workingSet.progressionSchemeID,
+        workoutID = this@replaceWorkingSets.workoutID,
+        exerciseSetsID = this@replaceWorkingSets.id,
+        microcycleID = this@replaceWorkingSets.microcycleID,
+        mesocycleID = this@replaceWorkingSets.mesocycleID,
+        programID = this@replaceWorkingSets.programID,
+        ownerID = this@replaceWorkingSets.ownerID,
+        isPublic = this@replaceWorkingSets.isPublic,
+      )
+    }
+  Log.d(TAG, "replaceWorkingSets: set.id - ${newWorkingSets.firstOrNull()?.id}.")
+  Log.d(
+    TAG,
+    "replaceWorkingSets: set.targetWeightPounds - ${newWorkingSets.firstOrNull()?.targetWeightPounds}.",
+  )
+  Log.d(TAG, "Mapped ${newWorkingSets.size} working sets with new context IDs.")
+
+  // 2. Combine the new warm-up sets and existing sets into a single list.
+  val allSets = this.sets.filter { it.setTypeID == WARM_UP_SET } + newWorkingSets
+  Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
+
+  // 3. Create the final list by re-numbering every set based on its new index.
+  val renumberedSets =
+    allSets.mapIndexed { index, set ->
+      val newSetNumber = index + 1
+      // Log the change for a specific set (can be verbose, but useful for deep debugging)
+      // To avoid spamming logs, you might enable this only when needed.
+      // Log.d(TAG, "Re-numbering set: Old number ${set.setNumber}, New number: $newSetNumber")
+      set.copy(setNumber = newSetNumber)
+    }
 
   // 4. Replace the old list with the newly created and re-numbered list.
   val previousCount = this.sets.size
@@ -398,7 +473,7 @@ data class ExercisesSets(
 
 @Serializable
 data class SerializableExerciseSets(
-  @SerialName("id") @Serializable(with = ObjectIdSerializer::class) var id: ObjectId = ObjectId(),
+  @SerialName("id") var id: ObjectId = ObjectId(),
   var exSetsLazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
   @Contextual var exSetsUUID: Uuid = Uuid.random(),
   @Contextual val workout: ObjectId = ObjectId(),
