@@ -59,7 +59,6 @@ import com.example.myapplication.common.infrastructure.services.AuthenticationSe
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
-import com.example.myapplication.features.AddWarmUpSetsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseDetailsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseNavigableListDetailScreen
 import com.example.myapplication.features.exercises.ui.ExercisesLazyColumn
@@ -91,6 +90,7 @@ import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExercisesScreen
 import com.example.myapplication.features.workout.feature.previewWorkout.WorkoutPreviewScreen
+import com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets.AddWarmUpSetsScreen
 import com.example.myapplication.features.workout.ui.WorkoutScreen
 import com.example.myapplication.features.workout.ui.WorkoutSummaryScreen
 import com.google.firebase.Firebase
@@ -604,6 +604,9 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
 
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
+
+  // TODO Fix Bug:  java.lang.IllegalStateException: You cannot access the NavBackStackEntry's ViewModels after the NavBackStackEntry is destroyed.
+
   navigation("historyScreen", route = Screens.History.baseRoute) {
     composable("historyScreen") { navBackStackEntry ->
       Log.d("HistoryNavGraph", "Navigated to History Screen")
