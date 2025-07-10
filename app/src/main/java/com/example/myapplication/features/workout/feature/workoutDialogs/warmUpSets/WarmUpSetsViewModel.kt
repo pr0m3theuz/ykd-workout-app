@@ -1,7 +1,6 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets
-
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -10,39 +9,36 @@ import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.convertKgToPound
 import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
-import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.ProgressionType
 import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.newLazyListItemID
+import com.example.myapplication.features.workout.feature.workoutDialogs.applyModernizedLoadRIRSettingsToSets
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import org.bson.types.ObjectId
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class WarmUpSetsViewModel(
-  private val userRepository: UserRepository,
-  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory
+  private val userProfileManager: UserProfileManager,
+  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory,
 ) : ViewModel() {
-// TODO REWRITE THIS
-//  val currentUser = userRepository.getCurrentUser()
-//  val userDefaultWeightUnit: String =
-//    userRepository.getCurrentUser()?.customDataAsBsonDocument()?.getString("weightUnit")?.value
-//      ?: MassUnit.POUNDS.abbreviation
 
-  private val tempOwnerId = ObjectId().toString()
-  val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
+  val currentUser = userProfileManager.userProfile.value
+
+  val userDefaultWeightUnit: String = currentUser.defaultWeightUnit.abbreviation
 
   private var _exerciseSets: ExerciseExerciseSets? = null
   val exerciseSets
     get() = MutableStateFlow(_exerciseSets).asStateFlow()
+
   private var exerciseWeightUnit: String? = null
 
   private var _workingSetWeight = MutableStateFlow(100.0)
@@ -61,15 +57,17 @@ class WarmUpSetsViewModel(
 
   fun updateWorkingSetWeight(newWorkingWeight: Double) {
     _workingSetWeight.value = newWorkingWeight
-    updateSetsOnWorkingSetChange()
-
+    updateSetsOnWorkingSetWeightChange()
   }
 
   fun setExerciseSets(exerciseSets: ExerciseExerciseSets) {
     _exerciseSets = exerciseSets
     exerciseWeightUnit = exerciseSets.exercise.weightUnit ?: userDefaultWeightUnit
-    _warmUpSets = exerciseSets.sets.filter { it.setTypeID == SetType.warmUpSet }.toMutableList()
-      .takeIf { it.isNotEmpty() } ?: initWarmUpSets(exerciseSets)
+    _warmUpSets =
+      exerciseSets.sets
+        .filter { it.setTypeID == SetType.warmUpSet }
+        .toMutableList()
+        .takeIf { it.isNotEmpty() } ?: initWarmUpSets(exerciseSets)
     _warmUpSetsFlow.value = _warmUpSets.toList()
     getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
   }
@@ -93,118 +91,130 @@ class WarmUpSetsViewModel(
 
   fun applyModernizedLoadRIRSettingsToSelectedSets(
     sets: List<Set>,
-    modernizedLoadRIRSetting: ModernizedLoadRIR?
+    modernizedLoadRIRSetting: ModernizedLoadRIR?,
   ) {
     Log.d(
       "WarmUpSetsViewModel.applySettingsToSelectedSets",
-      "applySettingsToSelectedSets: $modernizedLoadRIRSetting"
+      "applySettingsToSelectedSets: $modernizedLoadRIRSetting",
     )
     Log.d("WarmUpSetsViewModel.applySettingsToSelectedSets", "sets: $sets")
 
-    modernizedLoadRIRSetting?.let { modernlizedLoadRIR ->
-      val updatedWarmUpSets = _warmUpSets.map { existingSet ->
-        if (sets.any { it.uuid == existingSet.uuid }) {
-          Log.d(
-            "WarmUpSetsViewModel.applySettingsToSelectedSets",
-            "Updating set: ${existingSet.uuid}"
-          )
-          val relativeLoad = modernlizedLoadRIR.relativeLoadPercent / 100
+    modernizedLoadRIRSetting?.let { modernizedLoadRIR ->
+      val updatedWarmUpSets =
+        applyModernizedLoadRIRSettingsToSets(
+          _workingSetWeight.value,
+          exerciseWeightUnit,
+          _warmUpSets,
+          sets,
+          modernizedLoadRIR,
+          roundingPreferencePounds = currentUser.roundingPreferencePounds,
+          roundingPreferenceKilograms = currentUser.roundingPreferenceKilograms,
+        )
 
-          // TODO Apply Rounding using User Settings/Preferences
-          val (newWeightPounds: Double, newWeightKilograms: Double) =
-            when (exerciseWeightUnit) {
-              MassUnit.POUNDS.abbreviation -> {
-                val newPounds: Double = _workingSetWeight.value * relativeLoad
-                val newKilograms: Double = newPounds.convertPoundToKg()
-                Pair(newPounds, newKilograms)
-              }
+      /*        _warmUpSets.map { existingSet ->
+              if (sets.any { it.uuid == existingSet.uuid }) {
+                Log.d(
+                  "WarmUpSetsViewModel.applySettingsToSelectedSets",
+                  "Updating set: ${existingSet.uuid}"
+                )
+                val relativeLoad = modernlizedLoadRIR.relativeLoadPercent / 100
 
-              MassUnit.KILOGRAMS.abbreviation -> {
-                val newKilograms = _workingSetWeight.value.times(relativeLoad)
-                val newPounds: Double = newKilograms.convertKgToPound()
-                Pair(newPounds, newKilograms)
-              }
+                // TODO Apply Rounding using User Settings/Preferences
+                val (newWeightPounds: Double, newWeightKilograms: Double) =
+                  when (exerciseWeightUnit) {
+                    MassUnit.POUNDS.abbreviation -> {
+                      val newPounds: Double = _workingSetWeight.value * relativeLoad
+                      val newKilograms: Double = newPounds.convertPoundToKg()
+                      Pair(newPounds, newKilograms)
+                    }
 
-              else -> {
-                // Assume Pounds is the default if no unit is specified/default
-                val newPounds: Double = _workingSetWeight.value * relativeLoad
-                val newKilograms: Double = newPounds.convertPoundToKg()
-                Pair(newPounds, newKilograms)
+                    MassUnit.KILOGRAMS.abbreviation -> {
+                      val newKilograms = _workingSetWeight.value.times(relativeLoad)
+                      val newPounds: Double = newKilograms.convertKgToPound()
+                      Pair(newPounds, newKilograms)
+                    }
+
+                    else -> {
+                      // Assume Pounds is the default if no unit is specified/default
+                      val newPounds: Double = _workingSetWeight.value * relativeLoad
+                      val newKilograms: Double = newPounds.convertPoundToKg()
+                      Pair(newPounds, newKilograms)
+                    }
+                  }
+
+                existingSet.copy(
+                  targetRepetitions = modernlizedLoadRIR.repsPerformed,
+                  targetRepetitionsInReserve = modernlizedLoadRIR.rir,
+                  targetRatePerceivedEffort = modernlizedLoadRIR.rpe,
+                  targetPercentage1RM = relativeLoad,
+                  percentage1RM = relativeLoad,
+                  targetWeightPounds = newWeightPounds,
+      //            weightPounds = newWeightPounds,
+                  targetWeightKilograms = newWeightKilograms,
+      //            weightKilograms = newWeightKilograms
+                )
+              } else {
+                existingSet
               }
             }
+            updatedWarmUpSets.forEach {
+              Log.d(
+                "WarmUpSetsViewModel.applySettingsToSelectedSets",
+                "applySettingsToSelectedSets results for set ${it.setNumber}:\n ${
+                  Json.encodeToString(it)
+                }"
+              )
+            }*/
 
-          existingSet.copy(
-            targetRepetitions = modernlizedLoadRIR.repsPerformed,
-            targetRepetitionsInReserve = modernlizedLoadRIR.rir,
-            targetRatePerceivedEffort = modernlizedLoadRIR.rpe,
-            targetPercentage1RM = relativeLoad,
-            percentage1RM = relativeLoad,
-            targetWeightPounds = newWeightPounds,
-//            weightPounds = newWeightPounds,
-            targetWeightKilograms = newWeightKilograms,
-//            weightKilograms = newWeightKilograms
-          )
-        } else {
-          existingSet
-        }
-      }
-      updatedWarmUpSets.forEach {
-        Log.d(
-          "WarmUpSetsViewModel.applySettingsToSelectedSets",
-          "applySettingsToSelectedSets results for set ${it.setNumber}:\n ${
-            Json.encodeToString(it)
-          }"
-        )
-      }
       _warmUpSets = updatedWarmUpSets.toMutableList()
       _warmUpSetsFlow.value = updatedWarmUpSets
     }
   }
 
-  fun updateSetsOnWorkingSetChange() {
-    val updatedWarmUpSets = _warmUpSets.map { existingSet ->
-      val relativeLoad = existingSet.targetPercentage1RM ?: 1.0
+  private fun updateSetsOnWorkingSetWeightChange() {
+    val updatedWarmUpSets =
+      _warmUpSets.map { existingSet ->
+        val relativeLoad = existingSet.targetPercentage1RM ?: 1.0
 
-      // TODO Apply Rounding using User Settings/Preferences
-      val (newWeightPounds: Double, newWeightKilograms: Double) =
-        when (exerciseWeightUnit) {
-          MassUnit.POUNDS.abbreviation -> {
-            val newPounds: Double = _workingSetWeight.value * relativeLoad
-            val newKilograms: Double = newPounds.convertPoundToKg()
-            Pair(newPounds, newKilograms)
+        // TODO Apply Rounding using User Settings/Preferences
+        val (newWeightPounds: Double, newWeightKilograms: Double) =
+          when (exerciseWeightUnit) {
+            MassUnit.POUNDS.abbreviation -> {
+              val newPounds: Double = _workingSetWeight.value * relativeLoad
+              val newKilograms: Double = newPounds.convertPoundToKg()
+              Pair(newPounds, newKilograms)
+            }
+
+            MassUnit.KILOGRAMS.abbreviation -> {
+              val newKilograms = _workingSetWeight.value.times(relativeLoad)
+              val newPounds: Double = newKilograms.convertKgToPound()
+              Pair(newPounds, newKilograms)
+            }
+
+            else -> {
+              // Assume Pounds is the default if no unit is specified/default
+              val newPounds: Double = _workingSetWeight.value * relativeLoad
+              val newKilograms: Double = newPounds.convertPoundToKg()
+              Pair(newPounds, newKilograms)
+            }
           }
 
-          MassUnit.KILOGRAMS.abbreviation -> {
-            val newKilograms = _workingSetWeight.value.times(relativeLoad)
-            val newPounds: Double = newKilograms.convertKgToPound()
-            Pair(newPounds, newKilograms)
-          }
-
-          else -> {
-            // Assume Pounds is the default if no unit is specified/default
-            val newPounds: Double = _workingSetWeight.value * relativeLoad
-            val newKilograms: Double = newPounds.convertPoundToKg()
-            Pair(newPounds, newKilograms)
-          }
-        }
-
-      existingSet.copy(
-        lazyListItemID = newLazyListItemID(),
-        targetWeightPounds = newWeightPounds,
-//        weightPounds = newWeightPounds, // Also update actual weight
-        targetWeightKilograms = newWeightKilograms,
-//        weightKilograms = newWeightKilograms // Also update actual weight
-      )
-    }
+        existingSet.copy(
+          lazyListItemID = newLazyListItemID(),
+          targetWeightPounds = newWeightPounds,
+          //        weightPounds = newWeightPounds, // Also update actual weight
+          targetWeightKilograms = newWeightKilograms,
+          //        weightKilograms = newWeightKilograms // Also update actual weight
+        )
+      }
 
     _warmUpSets = updatedWarmUpSets.toMutableList()
     _warmUpSetsFlow.value = updatedWarmUpSets
   }
 
-
   fun addSet() {
     requireNotNull(_exerciseSets) { "ExerciseSets cannot be null." }
-// TODO Apply to WorkingSets & EquateVolume
+    // TODO Apply to WorkingSets & EquateVolume
     if (_warmUpSets.isNotEmpty()) {
       _warmUpSets.add(
         Set(
@@ -277,7 +287,7 @@ class WarmUpSetsViewModel(
     _warmUpSets.forEach {
       if (it.uuid == uuid) {
         it.lazyListItemID = newLazyListItemID()
-//        it.repetitions = newReps
+        //        it.repetitions = newReps
         it.targetRepetitions = newReps
       }
     }
@@ -289,8 +299,8 @@ class WarmUpSetsViewModel(
       if (it.uuid == uuid) {
         it.targetPercentage1RM = newPercentage
         it.percentage1RM = newPercentage
-//      it.weightPounds = it.weightPounds?.times(newPercentage)
-//      it.weightKilograms = it.weightKilograms?.times(newPercentage)
+        //      it.weightPounds = it.weightPounds?.times(newPercentage)
+        //      it.weightKilograms = it.weightKilograms?.times(newPercentage)
         it.targetWeightPounds = _workingSetWeight.value.times(newPercentage)
         it.targetWeightKilograms = _workingSetWeight.value.times(newPercentage)
       }
@@ -318,12 +328,13 @@ class WarmUpSetsViewModel(
     return MutableList(3) { index ->
       Set(
         setNumber = index.plus(1),
-//        weightPounds = 100.00,
-//        repetitions = 10,
-//        percentage1RM = 1.0,
+        //        weightPounds = 100.00,
+        //        repetitions = 10,
+        //        percentage1RM = 1.0,
         setTypeID = SetType.warmUpSet,
         progressionSchemeID =
-          ProgressionType.LINEAR_PROGRESSION, // TODO Replace with progressionScheme.progressionSchemeID
+          ProgressionType
+            .LINEAR_PROGRESSION, // TODO Replace with progressionScheme.progressionSchemeID
         exerciseID = exerciseSets.exercise.id,
         exerciseSetsID = exerciseSets.id,
         workoutID = exerciseSets.workoutID,

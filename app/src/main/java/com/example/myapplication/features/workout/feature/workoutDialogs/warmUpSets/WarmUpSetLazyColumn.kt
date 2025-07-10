@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class)
 
-package com.example.myapplication.features
+package com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.features.WarmUpSetLayout
 import com.example.myapplication.features.workout.feature.workoutDialogs.AddSetText
 import com.example.myapplication.features.workout.feature.workoutDialogs.SwipeToDismissBoxListItem
 import com.example.myapplication.features.workout.feature.workoutDialogs.getFormattedPercentageText
@@ -28,6 +29,7 @@ fun WarmUpSetItem(
   percentageText: String,
   repetitionsText: String,
   rirText: String,
+  rpeText: String,
   onCheckedChange: (warmUpSet: Set, isChecked: Boolean) -> Unit,
   onPercentageChanged: (uuid: Uuid, percentage: Double) -> Unit,
   onRepetitionsChanged: (uuid: Uuid, reps: Int) -> Unit,
@@ -56,17 +58,14 @@ fun WarmUpSetItem(
 // @Preview
 @Composable
 fun WarmUpSetLazyColumn(
-//  warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),
   sets: List<Set>,
   addSet: () -> Unit,
-  warmUpSetItem: @Composable (warmUpSet: Set, index: Int, percentageText: String, repetitionsText: String, rirText: String) -> Unit,
+  warmUpSetItem: @Composable (warmUpSet: Set, index: Int, percentageText: String, repetitionsText: String, rirText: String, rpeText: String) -> Unit,
   actionRow: @Composable () -> Unit,
 ) {
   val listState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
   val coroutineScope = rememberCoroutineScope()
-
-//  val warmUpSets by warmUpSetsViewModel.warmUpSets.collectAsState()
 
   LazyColumn(
     state = listState,
@@ -77,32 +76,14 @@ fun WarmUpSetLazyColumn(
     items(count = sets.size, key = { index -> sets[index].lazyListItemID }) { index ->
       val warmUpSet = sets[index]
 
-//      val percentageText by remember {
-//        mutableStateOf(
-//          getFormattedPercentageText(
-//            warmUpSet.targetPercentage1RM ?: 1.0
-//          )
-//        )
-//      }
-//      val repetitionsText by remember { mutableStateOf(warmUpSet.targetRepetitions?.toString() ?: "") }
-//      val rirText by remember { mutableStateOf(warmUpSet.targetRepetitionsInReserve?.toString() ?: "") }
-
       warmUpSetItem(
         warmUpSet,
         index,
         getFormattedPercentageText(warmUpSet.targetPercentage1RM ?: 1.0),
         warmUpSet.targetRepetitions?.toString() ?: "",
-        warmUpSet.targetRepetitionsInReserve?.toString() ?: ""
+        warmUpSet.targetRepetitionsInReserve?.toString() ?: "",
+        warmUpSet.targetRatePerceivedEffort?.toString() ?: ""
       )
-      /*      WarmUpSetItem(
-              warmUpSet = warmUpSet,
-              index = index,
-              onCheckedChange = onCheckedChange,
-              onPercentageChanged = warmUpSetsViewModel::updateWarmUpSetPercentage,
-              onRepetitionsChanged = warmUpSetsViewModel::updateWarmUpSetReps,
-              onRirChanged = warmUpSetsViewModel::updateWarmUpSetRIR,
-              removeSet = warmUpSetsViewModel::remove
-            )*/
     }
 
     item {

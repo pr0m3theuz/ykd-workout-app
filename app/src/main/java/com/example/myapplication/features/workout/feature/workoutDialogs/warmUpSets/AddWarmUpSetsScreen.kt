@@ -4,7 +4,7 @@
   ExperimentalUuidApi::class,
 )
 
-package com.example.myapplication.features
+package com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +43,6 @@ import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.workoutDialogs.DialogInput
 import com.example.myapplication.features.workout.feature.workoutDialogs.ModernizedLoadRIRHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHeaderRow
-import com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets.WarmUpSetsViewModel
 import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
@@ -75,7 +74,6 @@ fun AddWarmUpSetsScreen(
 //    }
 //  }
 
-
   val _exerciseSets = workoutViewModel.getExerciseSetsByID(exerciseSetsID)
   _exerciseSets?.let {
     warmUpSetsViewModel.setExerciseSets(it)
@@ -83,7 +81,6 @@ fun AddWarmUpSetsScreen(
       workoutViewModel.getWorkingSetWeight(it) ?: 0.0
     )
   }
-
 
   val exerciseSets = warmUpSetsViewModel.exerciseSets.collectAsState().value
 
@@ -255,13 +252,14 @@ fun AddWarmUpSetsContent(
         //        onCheckedChange = onCheckedChange,
         addSet = warmUpSetsViewModel::addSet,
         //        selectedSets = selectedSets,
-        warmUpSetItem = { warmUpSet, index, percentageText, repetitionsText, rirText ->
+        warmUpSetItem = { warmUpSet, index, percentageText, repetitionsText, rirText, rpeText ->
           WarmUpSetItem(
             warmUpSet = warmUpSet,
             index = index,
             percentageText = percentageText,
             repetitionsText = repetitionsText,
             rirText = rirText,
+            rpeText = rpeText,
             onCheckedChange = onCheckedChange,
             onPercentageChanged = warmUpSetsViewModel::updateWarmUpSetPercentage,
             onRepetitionsChanged = warmUpSetsViewModel::updateWarmUpSetReps,
