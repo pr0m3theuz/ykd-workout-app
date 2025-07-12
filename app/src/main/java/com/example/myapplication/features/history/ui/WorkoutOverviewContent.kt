@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
@@ -194,8 +195,9 @@ fun WorkoutOverviewContent(
                           } else {
                             set.setTypeID.abbreviation
                           }
-                        }   ${set.setSummaryRIR(userDefaultWeightUnit)}",
+                        }.   ${set.setSummaryRIR(userDefaultWeightUnit)}",
                         style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = FontFamily.Monospace
                       )
                     }
                   }

@@ -1,11 +1,11 @@
 @file:UseSerializers(
   /*  MutableRealmIntKSerializer::class,
-    RealmAnyKSerializer::class,
-    RealmDictionaryKSerializer::class,
-    RealmInstantKSerializer::class,
-    RealmListKSerializer::class,
-    RealmSetKSerializer::class,
-    RealmUUIDKSerializer::class,*/
+  RealmAnyKSerializer::class,
+  RealmDictionaryKSerializer::class,
+  RealmInstantKSerializer::class,
+  RealmListKSerializer::class,
+  RealmSetKSerializer::class,
+  RealmUUIDKSerializer::class,*/
   InstantSerializer::class,
   UuidSerializer::class,
   ObjectIdSerializer::class,
@@ -78,23 +78,27 @@ data class Set(
   //    var mesocycleUUID: Uuid? = null
   //    var microcycleUUID: Uuid? = null
   // TODO Copies Strong App - Allows different rest intervals between sets
-//  var setRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
-//  var setRestTimerEnabled: Boolean = false,
+  //  var setRestInWholeMilliseconds: Long = 1.toDuration(DurationUnit.MINUTES).inWholeMilliseconds,
+  //  var setRestTimerEnabled: Boolean = false,
   var hashedSetSignature: String? = null,
   var hashedWorkoutSignature: String? = null,
   var ownerID: String,
   var isPublic: Boolean = false,
-  private val type: String = "Set"
+  private val type: String = "Set",
 )
 
 fun Set.setVolume(weightUnit: String): Double {
   return if (
-    this.weightPounds != null && this.repetitions != null && weightUnit == MassUnit.POUNDS.abbreviation
+    this.weightPounds != null &&
+    this.repetitions != null &&
+    weightUnit == MassUnit.POUNDS.abbreviation
   ) {
     this.setVolumeInPounds = this.weightPounds!!.times(this.repetitions!!)
     weightPounds!!.times(this.repetitions!!)
   } else if (
-    this.weightKilograms != null && this.repetitions != null && weightUnit == MassUnit.KILOGRAMS.abbreviation
+    this.weightKilograms != null &&
+    this.repetitions != null &&
+    weightUnit == MassUnit.KILOGRAMS.abbreviation
   ) {
     this.setVolumeInKilograms = this.weightKilograms!!.times(this.repetitions!!)
     this.weightKilograms!!.times(this.repetitions!!)
@@ -104,13 +108,21 @@ fun Set.setVolume(weightUnit: String): Double {
 }
 
 fun Set.setSummaryRIR(weightUnit: String): String {
-// TODO get user default weight unit or exercise specific weight unit
-  return "${doubleFormatted(this.weightPounds)} $weightUnit × ${this.repetitions} reps${
+  // TODO get user default weight unit or exercise specific weight unit
+
+  return "${
+    if (MassUnit.POUNDS.abbreviation == weightUnit) {
+      doubleFormatted(this.weightPounds)
+    } else {
+      doubleFormatted(this.weightKilograms)
+    }
+  } $weightUnit × ${this.repetitions} reps${
     if (this.repetitionsInReserve != null)
       " @ ${doubleFormatted(this.repetitionsInReserve)} RIR"
     else ""
   }"
 }
+
 //  ${doubleFormatted(weightKilograms)} × $repetitions ${
 //    if (repetitionsInReserve != null) "@ ${
 //      doubleFormatted(
@@ -120,7 +132,7 @@ fun Set.setSummaryRIR(weightUnit: String): String {
 //  }"
 
 fun Set.previousSetSummaryRIR(weightUnit: String): String {
-// TODO get user default weight unit or exercise specific weight unit
+  // TODO get user default weight unit or exercise specific weight unit
   return "${doubleFormatted(this.weightPounds)} × ${this.repetitions} ${
     if (this.repetitionsInReserve != null)
       " @ ${doubleFormatted(this.repetitionsInReserve)} RIR"
@@ -129,13 +141,14 @@ fun Set.previousSetSummaryRIR(weightUnit: String): String {
 }
 
 fun Set.setTargetSummaryRIR(weightUnit: String): String {
-// TODO get user default weight unit or exercise specific weight unit
-  return "${doubleFormatted(this.targetWeightPounds).ifBlank { "–" }} $weightUnit".plus(" × ")
-    .plus("${this.targetRepetitions ?: "–"} reps").plus(
+  // TODO get user default weight unit or exercise specific weight unit
+  return "${doubleFormatted(this.targetWeightPounds).ifBlank { "–" }} $weightUnit"
+    .plus(" × ")
+    .plus("${this.targetRepetitions ?: "–"} reps")
+    .plus(
       if (this.targetRepetitionsInReserve != null)
         " @ ${doubleFormatted(this.targetRepetitionsInReserve)} RIR"
       else ""
-
     )
 }
 

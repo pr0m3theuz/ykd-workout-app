@@ -1,16 +1,24 @@
+@file:OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
+
 package com.example.myapplication.features.exercises.ui
 
 import android.content.Intent
-import android.net.Uri
+import android.icu.util.LocaleData
+import android.icu.util.ULocale
+import android.os.Build
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -39,19 +47,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Exercise
+import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.Program
+import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.SetType
+import com.example.myapplication.common.domain.model.Superset
+import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.domain.model.formatWorkoutDate
+import com.example.myapplication.common.domain.model.setSummaryRIR
+import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.exercises.ExercisesViewModel
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toKotlinTimeZone
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.ExperimentalTime
+import kotlin.uuid.ExperimentalUuidApi
 
 @Composable
 fun ExerciseDetailsScreen(
@@ -62,19 +87,38 @@ fun ExerciseDetailsScreen(
 ) {
   val tabState by exercisesViewModel.exerciseDetailsLayoutTabState.collectAsStateWithLifecycle()
 
+  val defaultTimeZone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
+
   if (exerciseID.contentEquals("Select an exercise")) {
     NoExerciseDetailContent(exerciseID)
   } else {
     exercisesViewModel.getExerciseDetails(exerciseID)
     val exercise by exercisesViewModel.selectedExerciseDetails.collectAsStateWithLifecycle()
 
-    exercise?.let {
+    exercise?.let { it ->
+      val completedSetsByExercise = exercisesViewModel.getCompletedSetsByExercise(it)
       ExerciseDetailsLayout(
         navController,
-        it,
-        tabState,
+        exercise = it,
+        tabState = tabState,
         setTabState = { state -> exercisesViewModel.setExerciseDetailsLayoutTabState(state) },
-        onClick,
+        navigateToListPane = onClick,
+        historyTab = {
+          completedSetsByExercise?.let { (programs, workoutSetsMap) ->
+            HistoryTab(
+              programs = programs,
+              workoutSetsMap = workoutSetsMap.toList(),
+              workoutCard = { workout, sets, program ->
+                WorkoutCard(
+                  workout = workout,
+                  sets = sets,
+                  program = program,
+                  defaultTimeZone = defaultTimeZone,
+                )
+              },
+            )
+          } ?: NoHistoryTab() // TODO Replace with No History Content
+        },
       )
     }
   }
@@ -118,6 +162,7 @@ private fun ExerciseDetailsLayout(
   tabState: Int = 0,
   setTabState: (Int) -> Unit = {},
   navigateToListPane: () -> Unit,
+  historyTab: @Composable () -> Unit = {},
 ) {
   //    val exercise = _exercise.firstOrNull()
 
@@ -179,13 +224,12 @@ private fun ExerciseDetailsLayout(
         }
       }
 
-      Column(
-        Modifier
-          .padding(8.dp)
-          .fillMaxWidth()) {
+      Column(Modifier
+        .padding(8.dp)
+        .fillMaxWidth()) {
         when (tabState) {
           0 -> AboutTab(exercise.name)
-          1 -> HistoryTab()
+          1 -> historyTab()
           2 -> ChartTab(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
           3 -> RecordsTab()
         }
@@ -209,7 +253,7 @@ fun ExerciseDetailsOptionsDropdownMenu() {
       )
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-//      if (exercise.ownerID == user.id.toHexString()))
+      //      if (exercise.ownerID == user.id.toHexString()))
       DropdownMenuItem(
         text = { Text("Edit Exercise", color = onSurface) },
         onClick = { /* TODO Navigate to Create Exercise Screen*/ },
@@ -233,7 +277,7 @@ fun AboutTab(_exerciseName: String) {
   val exerciseName: String = _exerciseName.replace(" ", "+")
   val youtubeSearchQuery = "https://www.youtube.com/results?search_query=$exerciseName"
 
-  val intent = Intent(Intent.ACTION_VIEW, Uri.parse(youtubeSearchQuery))
+  val intent = Intent(Intent.ACTION_VIEW, youtubeSearchQuery.toUri())
 
   val context = LocalContext.current
 
@@ -261,9 +305,67 @@ fun AboutTab(_exerciseName: String) {
 
 @Preview
 @Composable
-fun HistoryTab() {
+fun NoHistoryTab() {
+  Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+    Spacer(modifier = Modifier.size(32.dp))
+    Box(modifier = Modifier.size(300.dp)) {
+      Image(
+        painterResource(R.drawable.one_punch_man_ok),
+        contentDescription = "One Punch Man",
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.FillWidth,
+      )
+
+      //      AsyncImage(
+      //        contentScale = ContentScale.FillWidth,
+      //        alignment = Alignment.Center,
+      //        model = "https://assets.stickpng.com/images/58582c39f034562c58220601.png",
+      //        contentDescription = null,
+      //        //        colorFilter = ColorFilter.tint(Color.LightGray, BlendMode.Modulate),
+      //      )
+    }
+    //    Spacer(modifier = Modifier.size(24.dp))
+    Text(
+      //      modifier = Modifier.padding(16.dp),
+      text = "Perform your first set!",
+      color = MaterialTheme.colorScheme.onSurface,
+      //      fontWeight = FontWeight.Bold,
+    )
+  }
+}
+
+@Composable
+fun HistoryTab(
+  workoutSetsMap: List<Pair<Workout, List<Set>>> = listOf(),
+  programs: List<Program> = listOf(),
+  workoutCard: @Composable (workout: Workout, sets: List<Set>, program: Program?) -> Unit =
+    { _, _, _ ->
+    },
+) {
   //    TODO Write query to get Workout Data for an Exercise, return a List
   //    TODO Change to LazyColumn
+  LazyColumn {
+    items(
+      workoutSetsMap.count(),
+      key = { index -> workoutSetsMap[index].first.lazyListItemID }) { index ->
+      val workout = workoutSetsMap[index].first
+
+      workoutCard(
+        workout,
+        workoutSetsMap[index].second,
+        programs.firstOrNull { it.id == workout.programID },
+      )
+    }
+  }
+}
+
+@Composable
+private fun WorkoutCard(
+  workout: Workout,
+  sets: List<Set>,
+  program: Program?,
+  defaultTimeZone: TimeZone,
+) {
   val cardColors =
     CardDefaults.cardColors(
       containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
@@ -279,19 +381,75 @@ fun HistoryTab() {
     border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outlineVariant),
   ) {
     Column(Modifier.padding(16.dp)) {
-      Text(text = "Workout Name", style = MaterialTheme.typography.titleMedium, color = onSurface)
-      Text(text = "Program Name", style = MaterialTheme.typography.bodyMedium, color = subtitle)
+      Text(text = workout.name, style = MaterialTheme.typography.titleMedium, color = onSurface)
+      program?.let { prog ->
+        prog.name?.let { text ->
+          Text(text = text, style = MaterialTheme.typography.bodyMedium, color = subtitle)
+        }
+
+        prog.mesocycles
+          .firstOrNull { it.id == workout.mesocycleID }
+          ?.let { mesocycle ->
+            mesocycle.name?.let { text ->
+              Text(text = text, style = MaterialTheme.typography.bodyMedium, color = subtitle)
+            }
+            mesocycle.microcycles
+              .firstOrNull { it.id == workout.microcycleID }
+              ?.let { microcycle ->
+                microcycle.name?.let { text ->
+                  Text(text = text, style = MaterialTheme.typography.bodyMedium, color = subtitle)
+                }
+              }
+          }
+      }
+
       Text(
-        text = "Mesocycle/Microcycle",
+        text = workout.formatWorkoutDate(),
         style = MaterialTheme.typography.bodyMedium,
         color = subtitle,
       )
-      Text(
-        text = "Workout Date & Time",
-        style = MaterialTheme.typography.bodyMedium,
-        color = subtitle,
-      )
-      Text(text = "Total Volume: 9000 kg", color = onSurface)
+
+      val exerciseSets =
+        workout.workoutItems.firstOrNull {
+          when (it) {
+            is ExerciseSets -> it.id == sets.first().exerciseSetsID
+            is Superset ->
+              it.exercisesSets.firstOrNull { it.id == sets.first().exerciseSetsID } != null
+          }
+        } as ExerciseSets?
+
+      exerciseSets?.let {
+        // TODO move to MainActivity and prefer the user default
+        Text(
+          text =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+              val measurmentSystem = LocaleData.getMeasurementSystem(ULocale.getDefault())
+              when (measurmentSystem) {
+                LocaleData.MeasurementSystem.US -> {
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)}"
+                }
+
+                LocaleData.MeasurementSystem.UK -> {
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)}"
+                }
+
+                LocaleData.MeasurementSystem.SI -> {
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)}"
+                }
+
+                else -> {
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)}"
+                }
+              }
+            } else {
+              // Default
+              "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)}"
+            },
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium,
+        )
+      }
+
       Row(Modifier.padding(vertical = 8.dp)) {
         Text(
           text = "Sets performed",
@@ -299,24 +457,39 @@ fun HistoryTab() {
           color = onSurface,
         )
       }
-      Row() {
-        Text(text = "List of Sets", style = MaterialTheme.typography.bodyMedium, color = subtitle)
+
+      sets.forEach { set ->
+        // TODO use user.intensity and user's preferred mass units
+        Row() {
+          Text(
+            text =
+              "${
+                if (set.setTypeID == SetType.normalSet) {
+                  set.setNumber
+                } else {
+                  set.setTypeID.abbreviation
+                }
+              }.   ${set.setSummaryRIR(MassUnit.POUNDS.abbreviation)}",
+            style = MaterialTheme.typography.bodyMedium,
+            fontFamily = FontFamily.Monospace,
+            color = onSurface,
+          )
+        }
       }
     }
   }
 }
-
 
 @Composable
 fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
   val state = rememberScrollState()
   Column(modifier = Modifier.verticalScroll(state)) {
     Text(text = "Chart Name")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = { }) }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = {}) }
     Text(text = "Estimated 1RM")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = { }) }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = {}) }
     Text(text = "Volume")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = { }) }
+    Row() { ChartWrapper(navigateToFullscreenChartScreen = {}) }
   }
 }
 
@@ -334,10 +507,9 @@ fun RecordsTab() {
       contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
     )
 
-  Column(
-    Modifier
-      .padding(4.dp)
-      .fillMaxWidth()) {
+  Column(Modifier
+    .padding(4.dp)
+    .fillMaxWidth()) {
     Row(Modifier.padding(rowPadding)) {
       Text("Personal Records", color = onSurface, style = MaterialTheme.typography.titleMedium)
     }
@@ -368,10 +540,9 @@ fun RecordsTab() {
       Text("Max Weight", color = onSurface)
       Text("13 lbs", color = onSurface)
     }
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+    Row(Modifier
+      .padding(rowPadding)
+      .fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
       Button(onClick = { /* TODO Navigate Records History */ }, colors = buttonColors) {
         Text(text = "View Records History", color = onSurface)
       }

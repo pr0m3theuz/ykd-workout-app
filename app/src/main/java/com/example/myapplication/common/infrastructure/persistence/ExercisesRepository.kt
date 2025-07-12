@@ -6,8 +6,10 @@ import com.example.myapplication.common.domain.model.Force
 import com.example.myapplication.common.domain.model.Mechanic
 import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.domain.model.MuscleRoleFunction
+import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.Utility
+import com.example.myapplication.common.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 import org.bson.types.ObjectId
 
@@ -65,7 +67,8 @@ interface ExercisesRepository {
 
   fun getExerciseByName(exerciseName: String): ObjectId?
 
-  fun getCompletedSetsByExercise(exercise: Exercise): Flow<List<Set>>
+  // Alternatively, getExerciseHistory
+  fun getCompletedSetsByExercise(exercise: Exercise): Pair<List<Program>, Map<Workout, List<Set>>>?
 
   fun createExercise(exercise: Exercise): Boolean
 }

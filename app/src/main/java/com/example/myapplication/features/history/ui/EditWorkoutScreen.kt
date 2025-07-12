@@ -1,6 +1,7 @@
 package com.example.myapplication.features.history.ui
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +63,10 @@ fun EditWorkoutScreen(
   editable: Boolean,
   //  exerciseExerciseSets: List<ExerciseExerciseSets>
 ) {
+  BackHandler(enabled = true) {
+    navController.navigateUp()
+  }
+
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
   if (workoutID.isNotBlank()) {

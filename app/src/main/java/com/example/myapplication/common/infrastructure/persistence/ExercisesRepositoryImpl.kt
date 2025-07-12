@@ -11,6 +11,9 @@ import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.QueryChange
 import com.couchbase.lite.SelectResult
 import com.couchbase.lite.queryChangeFlow
+import com.example.myapplication.common.domain.model.CompletedProgramsDao
+import com.example.myapplication.common.domain.model.CompletedSetsDao
+import com.example.myapplication.common.domain.model.CompletedWorkoutsDao
 import com.example.myapplication.common.domain.model.Equipment
 import com.example.myapplication.common.domain.model.EquipmentDao
 import com.example.myapplication.common.domain.model.Exercise
@@ -23,12 +26,14 @@ import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.domain.model.MuscleGroupDao
 import com.example.myapplication.common.domain.model.MuscleRoleFunction
 import com.example.myapplication.common.domain.model.MuscleRoleFunctionDao
+import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetDao
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Utility
 import com.example.myapplication.common.domain.model.UtilityDao
+import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +54,7 @@ private const val COLLECTION_IS_NULL =
 
 class ExercisesRepositoryImpl(
   private val databaseManager: DatabaseManager,
-  userProfileManager: UserProfileManager
+  userProfileManager: UserProfileManager,
 ) : ExercisesRepository {
   // Room executes all queries on a separate thread.
   // Observed Flow will notify the observer when the data has changed.
@@ -68,7 +73,7 @@ class ExercisesRepositoryImpl(
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-//          .where(Expression.all())
+          //          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       val flow =
@@ -110,7 +115,7 @@ class ExercisesRepositoryImpl(
         equipments.add(equipment)
       }
     }
-//    Log.i("ExercisesRepositoryImpl.mapQueryChangeToEquipment()", equipments.toString())
+    //    Log.i("ExercisesRepositoryImpl.mapQueryChangeToEquipment()", equipments.toString())
     return equipments
   }
 
@@ -124,7 +129,7 @@ class ExercisesRepositoryImpl(
         muscleGroups.add(muscleGroup)
       }
     }
-//    Log.i("ExercisesRepositoryImpl.mapQueryChangeToMuscleGroups()", muscleGroups.toString())
+    //    Log.i("ExercisesRepositoryImpl.mapQueryChangeToMuscleGroups()", muscleGroups.toString())
     return muscleGroups
   }
 
@@ -171,7 +176,9 @@ class ExercisesRepositoryImpl(
   }
 
   // Version for MuscleRoleFunctions
-  private fun mapQueryChangeToMuscleRoleFunctions(queryChange: QueryChange): List<MuscleRoleFunction> {
+  private fun mapQueryChangeToMuscleRoleFunctions(
+    queryChange: QueryChange
+  ): List<MuscleRoleFunction> {
     val muscleRoleFunctions = mutableListOf<MuscleRoleFunction>()
 
     queryChange.results?.let { results ->
@@ -197,7 +204,7 @@ class ExercisesRepositoryImpl(
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-//          .where(Expression.all())
+          //          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       // loop through results and add to list
@@ -209,7 +216,6 @@ class ExercisesRepositoryImpl(
 
       query.execute() // <4>
       return flow // <5>
-
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -229,7 +235,7 @@ class ExercisesRepositoryImpl(
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-//          .where(Expression.all())
+          //          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       val flow =
@@ -258,7 +264,7 @@ class ExercisesRepositoryImpl(
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-//              .where(Expression.all())
+          //              .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       val flow =
@@ -286,7 +292,7 @@ class ExercisesRepositoryImpl(
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-//          .where(Expression.all())
+          //          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       // loop through results and add to list
@@ -317,7 +323,7 @@ class ExercisesRepositoryImpl(
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-//          .where(Expression.all())
+          //          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       val flow =
@@ -346,7 +352,7 @@ class ExercisesRepositoryImpl(
       val query =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
-//          .where(Expression.all())
+          //          .where(Expression.all())
           .orderBy(Ordering.property("name").ascending())
 
       val flow =
@@ -389,9 +395,9 @@ class ExercisesRepositoryImpl(
     return result
   }
 
-// By default Room runs suspend queries off the main thread, therefore, we don't need to
-// implement anything else to ensure we're not doing long running database work
-// off the main thread.
+  // By default Room runs suspend queries off the main thread, therefore, we don't need to
+  // implement anything else to ensure we're not doing long running database work
+  // off the main thread.
 
   // TODO Use function when inserting new exercises
   // TODO Feature to clone Exercises
@@ -637,20 +643,22 @@ class ExercisesRepositoryImpl(
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val value = when {
-        exercise.isEmpty() -> "%"
-        exercise.isBlank() -> "%"
-        else -> "%${exercise.lowercase()}%"
-      }
+      val value =
+        when {
+          exercise.isEmpty() -> "%"
+          exercise.isBlank() -> "%"
+          else -> "%${exercise.lowercase()}%"
+        }
 
-//        "SELECT * FROM `Exercise` WHERE isPublic = true AND LOWER(name) LIKE '$value' AND muscleGroupID IN $muscleGroupIDs AND equipmentID IN $equipmentIDs;"
+      //        "SELECT * FROM `Exercise` WHERE isPublic = true AND LOWER(name) LIKE '$value' AND
+      // muscleGroupID IN $muscleGroupIDs AND equipmentID IN $equipmentIDs;"
 
       val muscleGroupInClause =
-        muscleGroupIDs.joinToString(", ") { "'$it'" } // Join with comma and space
+        muscleGroupIDs
+          .joinToString(", ") { "'$it'" } // Join with comma and space
           .let { "[$it]" } // Wrap in parentheses
 
-      val equipmentInClause = equipmentIDs.joinToString(", ") { "'$it'" }
-        .let { "[$it]" }
+      val equipmentInClause = equipmentIDs.joinToString(", ") { "'$it'" }.let { "[$it]" }
 
       // Basic handling for potentially empty lists (IN () is often invalid)
       // A real implementation might need more robust logic here depending on desired behavior
@@ -660,14 +668,15 @@ class ExercisesRepositoryImpl(
       Log.i("ExercisesRepositoryImpl.filterExercises()", "muscleCondition: $muscleCondition")
       Log.i("ExercisesRepositoryImpl.filterExercises()", "equipmentCondition: $equipmentCondition")
 
-      val queryExpression = "SELECT *" +
-              " FROM `Exercise`" +
-              " WHERE isPublic = true" +
-              " AND LOWER(name) LIKE '$value'" +
-              muscleCondition +
-              equipmentCondition
-//              " AND muscleGroupID IN $muscleGroupIDs" +
-//              " AND equipmentID IN $equipmentIDs;"
+      val queryExpression =
+        "SELECT *" +
+                " FROM `Exercise`" +
+                " WHERE isPublic = true" +
+                " AND LOWER(name) LIKE '$value'" +
+                muscleCondition +
+                equipmentCondition
+      //              " AND muscleGroupID IN $muscleGroupIDs" +
+      //              " AND equipmentID IN $equipmentIDs;"
 
       Log.i("ExercisesRepositoryImpl.filterExercises()", "queryExpression: $queryExpression")
 
@@ -707,7 +716,9 @@ class ExercisesRepositoryImpl(
           val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
           val exercise =
-            result?.let { xercise -> withUnknownKeys.decodeFromString<ExerciseDao>(xercise).Exercise }
+            result?.let { xercise ->
+              withUnknownKeys.decodeFromString<ExerciseDao>(xercise).Exercise
+            }
           return exercise?.id
         }
       }
@@ -730,36 +741,101 @@ class ExercisesRepositoryImpl(
     return sets
   }
 
-  override fun getCompletedSetsByExercise(exercise: Exercise): Flow<List<Set>> {
+  override fun getCompletedSetsByExercise(
+    exercise: Exercise
+  ): Pair<List<Program>, Map<Workout, List<Set>>>? {
     try {
-//      TODO("Not yet implemented")
+      //      TODO("Not yet implemented")
       requireNotNull(db) { DATABASE_IS_NULL }
 
       val collection = db.getCollection("CompletedSets")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val query =
-        QueryBuilder.select(SelectResult.all())
-          .from(DataSource.collection(collection)) // Replace with your database instance
-          .where(
-            Expression.property("exerciseID").equalTo(Expression.string(exercise.id.toString()))
+      //      val queryExpression = "SELECT * FROM `CompletedSets` " +
+      //      "WHERE exerciseID = '${exercise.id}' " +
+      //              "ORDER BY DATE_FORMAT_STR(dateCreated, 'YYYY-MM-DD') DESC, setNumber ASC"
+
+      val sets =
+        db
+          .createQuery(
+            "SELECT * FROM `CompletedSets` " +
+                    "WHERE exerciseID = '${exercise.id}' " +
+                    "ORDER BY dateCreated"
           )
-      // .orderBy(Ordering.property("dateCreated").ascending()) TODO Sort by date. Would this work?
+          .execute()
+          .allResults()
+          .mapNotNull {
+            try {
+              withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
+            } catch (e: Exception) {
+              Log.e(e.message, e.stackTraceToString())
+              null
+            }
+          }
 
-      val flow =
-        query
-          .queryChangeFlow()
-          .map { queryChange: QueryChange -> mapQueryChangeToSet(queryChange) }
-          .flowOn(Dispatchers.IO)
+      if (sets.isEmpty()) {
+        return null
+      }
 
-      query.execute()
+      val workoutIDClause =
+        sets
+          .map { it.workoutID.toString() }
+          .distinct()
+          .joinToString(",") { "'$it'" }
+          .let { "[$it]" }
 
-      return flow
+      val completedWorkouts =
+        db
+          .createQuery("SELECT * FROM `CompletedWorkouts` WHERE id IN $workoutIDClause")
+          .execute()
+          .allResults()
+          .mapNotNull {
+            try {
+              withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it.toJSON()).CompletedWorkouts
+            } catch (e: Exception) {
+              Log.e(e.message, e.stackTraceToString())
+              null
+            }
+          }
+
+      val workoutSetsMap =
+        sets
+          .groupBy { it.workoutID }
+          .map { (workoutID, sets) -> completedWorkouts.first { it.id == workoutID } to sets }
+          .toMap()
+
+      val programIDs = completedWorkouts.map { it.programID.toString() }
+
+      val programIDsClause = if (programIDs.isEmpty()) {
+        null
+      } else {
+        programIDs.distinct().joinToString(",") { "'$it'" }.let { "[$it]" }
+      }
+
+      val completedPrograms =
+        programIDsClause?.let { it ->
+          db
+            .createQuery("SELECT * FROM `CompletedPrograms` WHERE id IN $it")
+            .execute()
+            .allResults()
+            .mapNotNull {
+              try {
+                withUnknownKeys
+                  .decodeFromString<CompletedProgramsDao>(it.toJSON())
+                  .CompletedPrograms
+              } catch (e: Exception) {
+                Log.e(e.message, e.stackTraceToString())
+                null
+              }
+            }
+        } ?: listOf()
+
+      return Pair(completedPrograms, workoutSetsMap)
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
-    return flow {}
+    return null
   }
 
   override fun createExercise(exercise: Exercise): Boolean {

@@ -10,7 +10,10 @@ import com.example.myapplication.common.domain.model.Force
 import com.example.myapplication.common.domain.model.Mechanic
 import com.example.myapplication.common.domain.model.MovementType
 import com.example.myapplication.common.domain.model.MuscleGroup
+import com.example.myapplication.common.domain.model.Program
+import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.Utility
+import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -282,5 +285,9 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
           exercisesRepository.getExerciseDetails(exerciseID = ObjectId(exerciseID))
       }
     }
+  }
+
+  fun getCompletedSetsByExercise(exercise: Exercise): Pair<List<Program>, Map<Workout, List<Set>>>? {
+    return exercisesRepository.getCompletedSetsByExercise(exercise)
   }
 }
