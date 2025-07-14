@@ -259,7 +259,7 @@ fun SetContentFrame(
       color = MaterialTheme.colorScheme.onSecondaryContainer,
     )
 
-  val placeholderTextStyle = MaterialTheme.colorScheme.onSecondary
+  val placeholderTextStyle = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.66f)
 
   val cursorBrush = SolidColor(MaterialTheme.colorScheme.onSecondaryContainer)
 
@@ -288,7 +288,7 @@ fun SetContentFrame(
 
     // Weight TextField
     Box(
-      modifier = boxModifier.width(96.dp),
+      modifier = boxModifier.width(80.dp),
       propagateMinConstraints = true,
       contentAlignment = Alignment.Center,
     ) {
@@ -347,14 +347,14 @@ fun SetContentFrame(
       }
     }
 
-    val uneditedTextColor = MaterialTheme.colorScheme.onSecondaryContainer.copy()
-    var textColor by remember { mutableStateOf(uneditedTextColor) }
-
-    var changeTextColor by remember { mutableStateOf(false) }
-
-    if (changeTextColor) {
-      textColor = MaterialTheme.colorScheme.onBackground
-    }
+//    val uneditedTextColor = MaterialTheme.colorScheme.onSecondaryContainer.copy()
+//    var textColor by remember { mutableStateOf(uneditedTextColor) }
+//
+//    var changeTextColor by remember { mutableStateOf(false) }
+//
+//    if (changeTextColor) {
+//      textColor = MaterialTheme.colorScheme.onBackground
+//    }
 
     // RIR/RPE TextField
     Box(
@@ -364,12 +364,12 @@ fun SetContentFrame(
     ) {
       BasicTextField(
         modifier = modifier,
-        textStyle =
-          TextStyle(
-            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-            textAlign = TextAlign.Center,
-            color = textColor,
-          ),
+        textStyle = textStyle,
+//          TextStyle(
+//            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+//            textAlign = TextAlign.Center,
+//            color = textColor,
+//          )
         singleLine = true,
         maxLines = 1,
         keyboardOptions =
