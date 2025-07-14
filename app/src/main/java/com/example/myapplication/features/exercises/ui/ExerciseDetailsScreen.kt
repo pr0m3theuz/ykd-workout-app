@@ -6,7 +6,6 @@ import android.content.Intent
 import android.icu.util.LocaleData
 import android.icu.util.ULocale
 import android.os.Build
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -96,7 +95,7 @@ fun ExerciseDetailsScreen(
     val exercise by exercisesViewModel.selectedExerciseDetails.collectAsStateWithLifecycle()
 
     exercise?.let { it ->
-      val completedSetsByExercise = exercisesViewModel.getCompletedSetsByExercise(it)
+      val completedSetsByExercise = exercisesViewModel.getCompletedSetsByWorkout(it)
       ExerciseDetailsLayout(
         navController,
         exercise = it,
@@ -114,6 +113,8 @@ fun ExerciseDetailsScreen(
                   sets = sets,
                   program = program,
                   defaultTimeZone = defaultTimeZone,
+                  // TODO navigate to workout screen or workout overview screen
+                  navigateToWorkoutScreen = { navController.navigate("history?editWorkout=${workout.id}") }
                 )
               },
             )
@@ -365,6 +366,7 @@ private fun WorkoutCard(
   sets: List<Set>,
   program: Program?,
   defaultTimeZone: TimeZone,
+  navigateToWorkoutScreen: () -> Unit = {},
 ) {
   val cardColors =
     CardDefaults.cardColors(
@@ -375,10 +377,11 @@ private fun WorkoutCard(
   val onSurface = MaterialTheme.colorScheme.onSurface
 
   Card(
-    // colors = cardColors,
+    onClick = { navigateToWorkoutScreen() },
     modifier = Modifier.fillMaxWidth(),
+    // colors = cardColors,
     //            .padding(8.dp)
-    border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outlineVariant),
+//    border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outlineVariant),
   ) {
     Column(Modifier.padding(16.dp)) {
       Text(text = workout.name, style = MaterialTheme.typography.titleMedium, color = onSurface)

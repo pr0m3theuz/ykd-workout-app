@@ -287,7 +287,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     }
   }
 
-  fun getCompletedSetsByExercise(exercise: Exercise): Pair<List<Program>, Map<Workout, List<Set>>>? {
+  fun getCompletedSetsByWorkout(exercise: Exercise): Pair<List<Program>, Map<Workout, List<Set>>>? {
     return exercisesRepository.getCompletedSetsByExercise(exercise)
   }
 }
