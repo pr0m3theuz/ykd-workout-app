@@ -115,9 +115,9 @@ data class ExerciseSets(
 @OptIn(ExperimentalUuidApi::class)
 @Serializable
 data class ExerciseExerciseSets(
-  @SerialName("id") @Serializable(ObjectIdSerializer::class) override val id: ObjectId = ObjectId(),
+  @SerialName("id") override val id: ObjectId = ObjectId(),
   override val lazyListItemID: Long = newLazyListItemID(), // Used for LazyColumn
-  @Serializable(UuidSerializer::class) var exSetsUUID: Uuid = Uuid.random(),
+  var exSetsUUID: Uuid = Uuid.random(),
   override val ownerID: String,
   override val isPublic: Boolean = false,
   override var order: Int = 1,
@@ -125,13 +125,13 @@ data class ExerciseExerciseSets(
   var sets: MutableList<Set> = mutableListOf(),
   var description: String? = null,
   var notes: MutableList<ExerciseNote> = mutableListOf(),
-  @Serializable(InstantSerializer::class) var datePerformed: Instant? = Clock.System.now(),
+  var datePerformed: Instant? = Clock.System.now(),
   //  @Contextual var exerciseID: ObjectId,
-  @Serializable(ObjectIdSerializer::class) var workoutID: ObjectId, // TODO May be useless
-  @Serializable(ObjectIdSerializer::class) var microcycleID: ObjectId?,
-  @Serializable(ObjectIdSerializer::class) var mesocycleID: ObjectId?,
-  @Serializable(ObjectIdSerializer::class) var programID: ObjectId?,
-  override val type: String = "ExerciseExerciseSets",
+  var workoutID: ObjectId, // TODO May be useless
+  var microcycleID: ObjectId?,
+  var mesocycleID: ObjectId?,
+  var programID: ObjectId?,
+  @SerialName("workoutComponentType") override val type: String = "ExerciseExerciseSets",
 ) : WorkoutComponent()
 
 /*fun ExerciseSets.addSet() {
