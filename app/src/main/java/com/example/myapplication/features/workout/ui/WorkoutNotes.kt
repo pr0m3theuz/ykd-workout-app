@@ -26,14 +26,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.common.domain.model.WorkoutNote
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutNoteTextField(
   workoutNote: WorkoutNote,
-  workoutViewModel: WorkoutViewModel,
+  setWorkoutNote: (WorkoutNote, String) -> Unit,
+  pinWorkoutNote: (WorkoutNote, Boolean) -> Unit,
   placeholder: String = "Write a note",
 ) {
   //        TODO Refactor this to workoutNotes
@@ -83,13 +83,13 @@ fun WorkoutNoteTextField(
         value = note,
         onValueChange = {
             note = it
-            workoutViewModel.setWorkoutNote(workoutNote, it.text)
+          setWorkoutNote(workoutNote, it.text)
         },
         trailingIcon = {
             Button(
                 onClick = {
                     onPin(!pinned)
-                    workoutViewModel.pinWorkoutNote(workoutNote, !workoutNote.pinned)
+                  pinWorkoutNote(workoutNote, !workoutNote.pinned)
                 },
                 shape = MaterialTheme.shapes.small,
                 contentPadding = PaddingValues(0.dp),

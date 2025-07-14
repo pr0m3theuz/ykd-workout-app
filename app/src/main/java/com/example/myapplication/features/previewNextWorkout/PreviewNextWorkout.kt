@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Save
@@ -33,6 +34,7 @@ import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,8 +44,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.myapplication.common.domain.model.ExerciseExerciseSets
+import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.features.ExerciseOptionsDropdownMenu
 import com.example.myapplication.features.history.ui.ConfirmChangesToWorkout
-import com.example.myapplication.features.history.ui.NoWorkoutFound
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.AddSet
 import com.example.myapplication.features.workout.feature.exercise.ExerciseScreen
@@ -54,7 +59,6 @@ import com.example.myapplication.features.workout.feature.exercise.SwipeToDismis
 import com.example.myapplication.features.workout.ui.AddExercise
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
-import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Call conditionally
@@ -64,6 +68,7 @@ import kotlin.uuid.ExperimentalUuidApi
 @Composable
 fun PreviewNextWorkoutScreen(
   navController: NavController,
+  workoutViewModel: WorkoutViewModel,
   workoutID: String,
   WorkoutOverview: @Composable () -> Unit,
 ) {
@@ -107,11 +112,17 @@ fun PreviewNextWorkoutScreen(
                 }*/
             }
 
-            EditNextWorkoutScreen(
+            val workout by workoutViewModel.workout.collectAsState(null)
+            val workoutComponents by workoutViewModel.workoutComponents.collectAsState()
+            val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
+            val workoutName by workoutViewModel.workoutName.collectAsState()
+
+            EditNextWorkoutScreenStateHolder(
+              workoutViewModel = workoutViewModel,
               workoutID = workoutID,
               navController = navController,
               editable = true,
-              workoutViewModel = koinViewModel(),
+
             )
           }
         }
@@ -141,35 +152,83 @@ fun PreviewNextWorkoutScreen(
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun EditNextWorkoutScreen(
+fun EditNextWorkoutScreenStateHolder(
   workoutViewModel: WorkoutViewModel,
   workoutID: String,
-  //  getExercise: (exerciseID: ObjectId) -> Exercise?,
   navController: NavController,
   editable: Boolean,
-  //  exerciseExerciseSets: List<ExerciseExerciseSets>
+  // workout: Workout? = null, // These are now part of UiState
+  // workoutName: String? = null,
+  // workoutNotes: List<WorkoutNote> = emptyList(),
+  // workoutComponents: List<WorkoutComponent> = emptyList(),
 ) {
-  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
+  // Collect the UI state from the ViewModel
+  val uiState by workoutViewModel.uiState.collectAsState()
 
-  if (workoutID.isNotBlank()) {
-    // TODO implement load workout from template workout
-    // TODO implement function to get next workout in program
-    workoutViewModel.loadWorkoutFromPreviousWorkout(ObjectId(workoutID))
-  } else {
-    NoWorkoutFound()
+  // Trigger initial load when the composable enters the composition
+  LaunchedEffect(workoutID) {
+    if (workoutID.isNotBlank()) {
+      workoutViewModel.onEvent(EditNextWorkoutUiEvent.LoadWorkout(ObjectId(workoutID)))
+    } else {
+      // Handle case where workoutID is blank, e.g., navigate back or show error
+      // For now, we'll let NoWorkoutFound handle it in the content.
+    }
   }
 
-  val workout by workoutViewModel.workout.collectAsState(null)
-  val workoutComponents by workoutViewModel.workoutComponents.collectAsState()
-  val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
-  val workoutName by workoutViewModel.workoutName.collectAsState()
+  // Pass the collected state and the event handler to the content composable
+  EditNextWorkoutScreenContent(
+    uiState = uiState,
+    onEvent = workoutViewModel::onEvent, // Pass the event handler
+    navController = navController,
+    editable = editable,
+    populatePreviousSetField = workoutViewModel::populatePreviousSetField,
+    ExerciseOptionsDropdownMenu = { exerciseSets, addNotes ->
+      ExerciseOptionsDropdownMenu(
+        workoutViewModel = workoutViewModel,
+        exerciseSets = exerciseSets,
+        addNotes = { addNotes() },
+        removeExerciseSets = { workoutViewModel.removeExerciseSets(exerciseSets) },
+        userDefaultWeightUnit = uiState.userDefaultWeightUnit, /*TODO Replace with user default */
+        exerciseWeightUnit = exerciseSets.exercise.weightUnit,
+        updateExerciseWeightUnit = { weightUnit ->
+          workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, weightUnit)
+        },
+        navController = navController,
+        workoutComponents = uiState.workoutComponents,
+        onCreateSuperset = { selectedExercises -> /*TODO*/ },
+      )
+    }
+  )
+}
+
+
+@RequiresApi(Build.VERSION_CODES.S)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun EditNextWorkoutScreenContent(
+  navController: NavController,
+  uiState: EditNextWorkoutUiState,
+  onEvent: (EditNextWorkoutUiEvent) -> Unit,
+  editable: Boolean,
+  populatePreviousSetField: (exerciseID: ObjectId, setNumber: Int) -> Set?,
+  ExerciseOptionsDropdownMenu: @Composable (exerciseSets: ExerciseExerciseSets, addNotes: () -> Unit) -> Unit,
+) {
+
+  // Destructure uiState for easier access
+  val workout = uiState.workout
+  val workoutComponents = uiState.workoutComponents
+  val workoutNotes = uiState.workoutNotes
+  val workoutName = uiState.workoutName
+  val isLoading = uiState.isLoading
+  val errorMessage = uiState.errorMessage
+  val userDefaultWeightUnit = uiState.userDefaultWeightUnit
 
   val (openSaveChangesDialog, setOpenSaveChangesDialog) = remember { mutableStateOf(false) }
 
   if (openSaveChangesDialog) {
     ConfirmChangesToWorkout(
       onDismissRequest = { setOpenSaveChangesDialog(false) },
-      saveWorkout = { workoutViewModel.saveWorkout() },
+      saveWorkout = { onEvent(EditNextWorkoutUiEvent.SaveWorkout) },
     )
   }
 
@@ -177,7 +236,16 @@ fun EditNextWorkoutScreen(
     Scaffold(
       topBar = {
         TopAppBar(
-          title = { workoutName?.let { workoutName -> Text(workoutName) } },
+          title = {
+            workoutName?.let { workoutName ->
+              Text(
+                workoutName, autoSize = TextAutoSize.StepBased(
+                  MaterialTheme.typography.titleSmall.fontSize,
+                  MaterialTheme.typography.titleLarge.fontSize
+                )
+              )
+            }
+          },
           navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {
               Icon(
@@ -239,91 +307,128 @@ fun EditNextWorkoutScreen(
             enableCancelWorkout = true,
             WorkoutNoteItem = { workoutNote ->
               SwipeToDismissWorkoutNote(
-                workoutViewModel = workoutViewModel,
                 workoutNote = workoutNote,
-                removeWorkoutNote = { workoutViewModel.removeWorkoutNote(workoutNote) },
+                pinWorkoutNote = { note, pinned ->
+                  onEvent(EditNextWorkoutUiEvent.PinWorkoutNote(note, pinned))
+                },
+                updateWorkoutNote = { note, text ->
+                  onEvent(EditNextWorkoutUiEvent.UpdateWorkoutNote(note, text))
+                },
+                removeWorkoutNote = { onEvent(EditNextWorkoutUiEvent.RemoveWorkoutNote(workoutNote)) },
               )
             },
             ExerciseItem = { exerciseSets ->
+
+              /*TODO Replace with user default */
+              val weightUnit = exerciseSets.exercise.weightUnit ?: MassUnit.POUNDS.abbreviation
+
               ExerciseScreen(
                 navController,
                 _exerciseSets = exerciseSets,
-                weightUnit = workoutViewModel.getWeightUnit(exerciseSets),
+                weightUnit = weightUnit,
                 exerciseWeightUnit = exerciseSets.exercise.weightUnit,
-                userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit,
-                removeExerciseSets = { workoutViewModel.removeExerciseSets(exerciseSets) },
+                userDefaultWeightUnit = weightUnit,
+                removeExerciseSets = {
+                  onEvent(
+                    EditNextWorkoutUiEvent.RemoveExerciseSets(
+                      exerciseSets
+                    )
+                  )
+                },
                 addExerciseNote = {
-                  workoutViewModel.addExerciseNote(exerciseSets /*, itWorkout._id*/)
+                  onEvent(EditNextWorkoutUiEvent.AddExerciseNote(exerciseSets /*, itWorkout._id*/))
                 },
                 removeExerciseNote = { note ->
-                  workoutViewModel.removeExerciseNote(exerciseSets, note)
+                  onEvent(EditNextWorkoutUiEvent.RemoveExerciseNote(exerciseSets, note))
                 },
                 pinExerciseNote = { note, pinned ->
-                  workoutViewModel.pinExerciseNote(exerciseSets, note, pinned)
+                  onEvent(EditNextWorkoutUiEvent.PinExerciseNote(exerciseSets, note, pinned))
                 },
                 updateExerciseWeightUnit = {
-                  workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, it)
+                  onEvent(
+                    EditNextWorkoutUiEvent.UpdateExerciseWeightUnit(
+                      exerciseSets.exercise,
+                      it
+                    )
+                  )
                 },
                 workoutComponents = workoutComponents,
                 onCreateSuperset = { /* TODO */ },
-                workoutViewModel = workoutViewModel,
+//                workoutViewModel = workoutViewModel,
+                ExerciseOptionsDropdownMenu = { addNotes ->
+                  ExerciseOptionsDropdownMenu(exerciseSets, addNotes)
+                }
               )
             },
             SetItem = { supersetUuid, exerciseSets, set, index ->
               val setUUID = set.uuid
+
+              /*TODO Replace with user default */
+              val weightUnit = exerciseSets.exercise.weightUnit ?: MassUnit.POUNDS.abbreviation
+
               SetLazyListItem(
                 exerciseSets = exerciseSets,
                 set = set,
                 index = index,
-                removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
+                removeSet = { onEvent(EditNextWorkoutUiEvent.RemoveSet(exerciseSets, set)) },
                 setContent = {
                   SetContent(
                     setIndex = index,
                     set = set,
-                    getWeightUnit = { workoutViewModel.getWeightUnit(exerciseSets) },
+                    getWeightUnit = { weightUnit },
                     populatePreviousSetField = {
                       exerciseSets.exercise.let { exercise ->
                         set.setNumber?.let { setNumber ->
-                          workoutViewModel.populatePreviousSetField(
+                          populatePreviousSetField(
                             exercise.id,
-                            setNumber = setNumber,
+                            setNumber
                           )
                         }
                       }
                     },
                     updateSetReps = { reps ->
-                      workoutViewModel.updateSetReps(
+                      onEvent(
+                        EditNextWorkoutUiEvent.UpdateSetReps(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
                         newReps = reps.toIntOrNull(),
+                        )
                       )
                     },
                     updateSetRIR = { rir ->
-                      workoutViewModel.updateSetRIR(
+                      onEvent(
+                        EditNextWorkoutUiEvent.UpdateSetRIR(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
                         newRIR = rir.toDoubleOrNull(),
+                        )
                       )
                     },
                     updateSetWeight = { weight ->
-                      workoutViewModel.updateSetWeight(
+                      onEvent(
+                        EditNextWorkoutUiEvent.UpdateSetWeight(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
                         newWeight = weight.toDoubleOrNull(),
+                        )
                       )
                     },
                     updateSetType = { setType ->
-                      workoutViewModel.updateSetType(
+                      onEvent(
+                        EditNextWorkoutUiEvent.UpdateSetType(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
                         setType = setType,
+                        )
                       )
                     },
                     setComplete = { setComplete ->
-                      workoutViewModel.completeSet(
+                      onEvent(
+                        EditNextWorkoutUiEvent.CompleteSet(
                         exerciseSets = exerciseSets,
                         setUUID = setUUID,
                         completed = setComplete,
+                        )
                       )
                     },
                     startSetCompletedTimer = {},
@@ -334,9 +439,11 @@ fun EditNextWorkoutScreen(
             AddSet = { supersetUuid, targetExSetsUuid ->
               AddSet(
                 addSet = {
-                  workoutViewModel.addSet(
+                  onEvent(
+                    EditNextWorkoutUiEvent.AddSet(
                     supersetUuid = supersetUuid,
                     targetExSetsUuid = targetExSetsUuid,
+                    )
                   )
                 }
               )

@@ -33,6 +33,7 @@ import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.WorkoutNote
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.IBMColorBlindPalette
+import com.example.myapplication.features.ExerciseOptionsDropdownMenu
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.ui.AddExercise
 import com.example.myapplication.features.workout.ui.CancelWorkout
@@ -55,7 +56,8 @@ fun ExercisesSetsScreen(
     enableCancelWorkout = true,
     WorkoutNoteItem = { workoutNote ->
       SwipeToDismissWorkoutNote(
-        workoutViewModel = workoutViewModel,
+        pinWorkoutNote = { note, pinned -> workoutViewModel.pinWorkoutNote(note, pinned) },
+        updateWorkoutNote = { note, text -> workoutViewModel.setWorkoutNote(note, text) },
         removeWorkoutNote = { workoutViewModel.removeWorkoutNote(workoutNote) },
         workoutNote = workoutNote,
       )
@@ -80,7 +82,23 @@ fun ExercisesSetsScreen(
         onCreateSuperset = { selectedExercises ->
           workoutViewModel.createSupersetFromExercisesSets(selectedExercises)
         },
-        workoutViewModel = workoutViewModel,
+//        workoutViewModel = workoutViewModel,
+        ExerciseOptionsDropdownMenu = { addNotes ->
+          ExerciseOptionsDropdownMenu(
+            workoutViewModel = workoutViewModel,
+            exerciseSets = exerciseSets,
+            addNotes = { addNotes() },
+            removeExerciseSets = { workoutViewModel.removeExerciseSets(exerciseSets) },
+            userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit,
+            exerciseWeightUnit = exerciseSets.exercise.weightUnit,
+            updateExerciseWeightUnit = { weightUnit ->
+              workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, weightUnit)
+            },
+            navController = navController,
+            workoutComponents = workoutComponents,
+            onCreateSuperset = { selectedExercises -> /*TODO*/ },
+          )
+        }
       )
     },
     SetItem = { supersetUuid, exerciseSets, set, index ->
@@ -298,14 +316,16 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
 
 @Composable
 fun SwipeToDismissWorkoutNote(
-  workoutViewModel: WorkoutViewModel,
   workoutNote: WorkoutNote,
+  pinWorkoutNote: (WorkoutNote, Boolean) -> Unit,
+  updateWorkoutNote: (WorkoutNote, String) -> Unit,
   removeWorkoutNote: () -> Unit
 ) {
   SwipeToDismissItem(onDismissRequest = { removeWorkoutNote() }, dismissStateBoolean = true) {
     WorkoutNoteTextField(
-      workoutViewModel = workoutViewModel,
       workoutNote = workoutNote,
+      pinWorkoutNote = { note, pinned -> pinWorkoutNote(note, pinned) },
+      setWorkoutNote = { note, text -> updateWorkoutNote(note, text) },
       placeholder = "Workout Note"
     )
   }

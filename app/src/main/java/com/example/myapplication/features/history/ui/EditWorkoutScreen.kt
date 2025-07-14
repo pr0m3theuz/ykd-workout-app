@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.formatLongWorkoutStarted
 import com.example.myapplication.common.domain.model.formatWorkoutDuration
+import com.example.myapplication.features.ExerciseOptionsDropdownMenu
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.AddSet
 import com.example.myapplication.features.workout.feature.exercise.ExerciseScreen
@@ -51,8 +52,9 @@ import kotlin.uuid.ExperimentalUuidApi
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(
-  ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
-  ExperimentalUuidApi::class
+  ExperimentalMaterial3Api::class,
+  ExperimentalFoundationApi::class,
+  ExperimentalUuidApi::class,
 )
 @Composable
 fun EditWorkoutScreen(
@@ -63,11 +65,7 @@ fun EditWorkoutScreen(
   editable: Boolean,
   //  exerciseExerciseSets: List<ExerciseExerciseSets>
 ) {
-  BackHandler(enabled = true) {
-    navController.navigateUp()
-  }
-
-  val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
+  BackHandler(enabled = true) { navController.navigateUp() }
 
   if (workoutID.isNotBlank()) {
     workoutViewModel.loadWorkoutFromPreviousWorkout(ObjectId(workoutID))
@@ -79,6 +77,14 @@ fun EditWorkoutScreen(
   val workoutComponents by workoutViewModel.workoutComponents.collectAsState()
   val workoutNotes by workoutViewModel.workoutNotes.collectAsState()
   val workoutName by workoutViewModel.workoutName.collectAsState()
+
+//  File(LocalContext.current.filesDir.absolutePath + "/workout.json").writeText(
+//    Json.encodeToString(workout)
+//  )
+//
+//  File(LocalContext.current.filesDir.absolutePath + "/workoutComponents.json").writeText(
+//    Json.encodeToString(workoutComponents)
+//  )
 
   val (openSaveChangesDialog, setOpenSaveChangesDialog) = remember { mutableStateOf(false) }
 
@@ -100,9 +106,9 @@ fun EditWorkoutScreen(
                 enabled = editable,
                 value = workoutName,
                 textStyle =
-                MaterialTheme.typography.titleLarge.merge(
-                  color = MaterialTheme.colorScheme.onSurface
-                ),
+                  MaterialTheme.typography.titleLarge.merge(
+                    color = MaterialTheme.colorScheme.onSurface
+                  ),
                 onValueChange = { newName -> workoutViewModel.setWorkoutName(newName) },
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
               )
@@ -173,8 +179,11 @@ fun EditWorkoutScreen(
             enableCancelWorkout = true,
             WorkoutNoteItem = { workoutNote ->
               SwipeToDismissWorkoutNote(
-                workoutViewModel = workoutViewModel,
                 workoutNote = workoutNote,
+                pinWorkoutNote = { note, pinned -> workoutViewModel.pinWorkoutNote(note, pinned) },
+                updateWorkoutNote = { note, newNote ->
+                  workoutViewModel.setWorkoutNote(note, newNote)
+                },
                 removeWorkoutNote = { workoutViewModel.removeWorkoutNote(workoutNote) },
               )
             },
@@ -199,8 +208,23 @@ fun EditWorkoutScreen(
                   workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, it)
                 },
                 workoutComponents = workoutComponents,
-                onCreateSuperset = {},
-                workoutViewModel = workoutViewModel,
+//                workoutViewModel = workoutViewModel,
+                ExerciseOptionsDropdownMenu = { addNotes ->
+                  ExerciseOptionsDropdownMenu(
+                    workoutViewModel = workoutViewModel,
+                    exerciseSets = exerciseSets,
+                    addNotes = { addNotes() },
+                    removeExerciseSets = { workoutViewModel.removeExerciseSets(exerciseSets) },
+                    userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit,
+                    exerciseWeightUnit = exerciseSets.exercise.weightUnit,
+                    updateExerciseWeightUnit = { weightUnit ->
+                      workoutViewModel.updateExerciseWeightUnit(exerciseSets.exercise, weightUnit)
+                    },
+                    navController = navController,
+                    workoutComponents = workoutComponents,
+                    onCreateSuperset = { selectedExercises -> /*TODO*/ },
+                  )
+                },
               )
             },
             SetItem = { supersetUuid, exerciseSets, set, index ->
@@ -266,12 +290,14 @@ fun EditWorkoutScreen(
               )
             },
             AddSet = { supersetUuid, targetExSetsUuid ->
-              AddSet(addSet = {
-                workoutViewModel.addSet(
-                  supersetUuid = supersetUuid,
-                  targetExSetsUuid = targetExSetsUuid
-                )
-              })
+              AddSet(
+                addSet = {
+                  workoutViewModel.addSet(
+                    supersetUuid = supersetUuid,
+                    targetExSetsUuid = targetExSetsUuid,
+                  )
+                }
+              )
             },
             AddExercise = { AddExercise(navController = navController) },
             CancelWorkout = {},

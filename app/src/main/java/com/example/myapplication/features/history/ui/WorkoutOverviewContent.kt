@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -56,7 +57,16 @@ fun WorkoutOverviewContent(
     topBar = {
       TopAppBar(
         title = {
-          Text(text = workout.name, style = MaterialTheme.typography.titleLarge)
+          Text(
+            text = workout.name,
+            style = MaterialTheme.typography.titleLarge,
+            autoSize = TextAutoSize.StepBased(
+              minFontSize = MaterialTheme.typography.titleSmall.fontSize,
+              maxFontSize = MaterialTheme.typography.titleLarge.fontSize
+            ),
+            maxLines = 1
+
+          )
         },
         navigationIcon = {
           IconButton(onClick = { navigateUp() }) {

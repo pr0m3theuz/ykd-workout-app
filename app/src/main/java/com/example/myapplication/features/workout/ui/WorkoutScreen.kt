@@ -89,7 +89,7 @@ fun WorkoutContent(
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
-  val workout = workoutViewModel.workout.collectAsState()
+  val workout by workoutViewModel.workout.collectAsState()
 
   //  var openFinishWorkoutDialog by remember { mutableStateOf(false) }
 
@@ -176,6 +176,18 @@ fun WorkoutContent(
   val workoutDurationString by workoutViewModel.workoutDurationString.collectAsState()
   val isWorkoutCountUpTimerPaused by workoutViewModel.isWorkoutCountUpTimerPaused.collectAsState()
 
+
+//  workout?.let{
+//    File(LocalContext.current.filesDir.absolutePath + "/workout.json").writeText(
+//      Json.encodeToString(Workout.serializer(), it)
+//    )
+//  }
+//
+//
+//  File(LocalContext.current.filesDir.absolutePath + "/workoutComponents.json").writeText(
+//    Json.encodeToString(exercisesSets)
+//  )
+
   BackHandler(enabled = true) {
     if (exercisesSets.isEmpty() && isWorkoutCountUpTimerPaused) {
       navController.navigateUp()
@@ -200,7 +212,7 @@ fun WorkoutContent(
       TopAppBar(
         title = {
           WorkoutNameTextField(
-            workout.value?.name ?: "Workout",
+            workout?.name ?: "Workout",
             setWorkoutName = { name -> workoutViewModel.setWorkoutName(name) },
           )
         },
@@ -220,7 +232,7 @@ fun WorkoutContent(
             enableWorkoutNameTextfield = { setEditable(!editable) },
             workoutNameDialog = { dismissWorkoutNameDialog ->
               WorkoutNameDialog(
-                workoutName = workout.value?.name ?: "",
+                workoutName = workout?.name ?: "",
                 dismissWorkoutNameDialog = { dismissWorkoutNameDialog() },
                 setWorkoutName = { workoutViewModel.setWorkoutName(it) },
               )
@@ -300,7 +312,7 @@ private fun WorkoutNameTextField(workoutName: String, setWorkoutName: (String) -
     enabled = false,
     modifier = Modifier.padding(PaddingValues(4.dp)),
     textStyle = MaterialTheme.typography.titleLarge.copy(
-      fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.2),
+      fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
       textAlign = TextAlign.Center,
       color = MaterialTheme.colorScheme.onBackground,
     ),
