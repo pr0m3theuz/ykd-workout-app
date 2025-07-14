@@ -10,7 +10,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -127,13 +129,10 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-//    enableEdgeToEdge()
+    enableEdgeToEdge()
 
-    WindowCompat.getInsetsController(window, window.decorView)
-      .isAppearanceLightStatusBars = true
 
     crashlytics = Firebase.crashlytics
-    crashlytics.log("onCreate")
 
     // Log the onCreate event, this will also be printed in logcat
     crashlytics.log("onCreate")
@@ -159,7 +158,7 @@ class MainActivity : ComponentActivity() {
     val authService: AuthenticationService by inject()
     // TODO Add User Profile Manager here by injecting it
     //      val userProfileRepository: KeyValueRepository by inject()
-//    val userProfileManager: UserProfileManager by inject()
+    //    val userProfileManager: UserProfileManager by inject()
 
     applicationScope.launch {
       userProfileManager.userProfile
@@ -167,20 +166,23 @@ class MainActivity : ComponentActivity() {
         .collect { profile ->
           println("MyApplication: UserProfile loaded, initializing ReplicatorServiceImpl.")
           if (replicatorService == null) { // Ensure it's initialized only once
-            replicatorService = ReplicatorServiceImpl(
-              userProfileManager = userProfileManager,
-              databaseManager = get(),
-            )
+            replicatorService =
+              ReplicatorServiceImpl(
+                userProfileManager = userProfileManager,
+                databaseManager = get(),
+              )
           }
         }
     }
 
-//    val replicatorService: ReplicatorService by inject()
+    //    val replicatorService: ReplicatorService by inject()
 
     setContent {
-
       val mainViewModel = getViewModel<MainViewModel>()
       replicatorService?.updateAuthentication(isReset = false)
+
+      WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars =
+        !isSystemInDarkTheme()
 
       MyApplicationTheme {
         //        TestScreen()
@@ -188,26 +190,28 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         // <<< --- ADD LOGGING FOR getCurrentBackStackEntryFlow() HERE --- >>>
         LaunchedEffect(navController) {
-                  navController.currentBackStackEntryFlow.onEach {
-                     navBackStackEntry ->
-                      Log.d(
-                        "BackStackFlow",
-                        "Current NavBackStackEntry: ${navBackStackEntry.destination.route}, ID: ${navBackStackEntry.id}"
-                      )
-                    }
-                    .launchIn(this) // Launch collection in the LaunchedEffect's scope
+          navController.currentBackStackEntryFlow
+            .onEach { navBackStackEntry ->
+              Log.d(
+                "BackStackFlow",
+                "Current NavBackStackEntry: ${navBackStackEntry.destination.route}, ID: ${navBackStackEntry.id}",
+              )
+            }
+            .launchIn(this) // Launch collection in the LaunchedEffect's scope
 
-                  // Optional: Log the entire back stack whenever the current entry changes
-                  // This can be verbose but very helpful for debugging popUpTo issues.
-                  navController.currentBackStack.collect { backStack ->
-                    Log.d("BackStackFlow", "Current full back stack:")
-                    backStack.forEachIndexed { index, entry ->
-                      Log.d("BackStackFlow", "  [$index] Route: ${entry.destination.route}, ID: ${entry.id}, Args: ${entry.arguments}")
-                    }
-                  }
+          // Optional: Log the entire back stack whenever the current entry changes
+          // This can be verbose but very helpful for debugging popUpTo issues.
+          navController.currentBackStack.collect { backStack ->
+            Log.d("BackStackFlow", "Current full back stack:")
+            backStack.forEachIndexed { index, entry ->
+              Log.d(
+                "BackStackFlow",
+                "  [$index] Route: ${entry.destination.route}, ID: ${entry.id}, Args: ${entry.arguments}",
+              )
+            }
+          }
         }
         // <<< --- END OF LOGGING --- >>>
-
 
         MainView(mainViewModel.startDatabase, mainViewModel.closeDatabase)
 
@@ -238,22 +242,20 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavBackStackEntry.rememberParentEntry(
   navController: NavController,
-  graphRoute: String
+  graphRoute: String,
 ): NavBackStackEntry {
   // NavBackStackEntry is the owner of the composable, remember based on it
-  return remember(this) {
-    navController.getBackStackEntry(graphRoute)
-  }
+  return remember(this) { navController.getBackStackEntry(graphRoute) }
 }
 
 @Composable
-inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController):
-        T {
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
+  navController: NavController
+): T {
   val navGraphRoute = destination.parent?.route ?: return koinViewModel()
   val parentEntry = remember(this) { navController.getBackStackEntry(navGraphRoute) }
   return koinViewModel(viewModelStoreOwner = parentEntry)
 }
-
 
 // TODO rewrite shared viewmodel & consider using koin scope
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -266,12 +268,12 @@ private fun NavGraphBuilder.addWorkoutGraph(
   navigation(
     "workoutScreen?workoutID={workoutID}/copyWorkoutFromPreviousWorkout={copyWorkoutFromPreviousWorkout}",
     route = "workout",
-//    arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
+    //    arguments = listOf(navArgument("workoutID") { type = NavType.StringType }),
   ) {
-
-    composable("workoutScreen?workoutID={workoutID}/copyWorkoutFromPreviousWorkout={copyWorkoutFromPreviousWorkout}")
-    { navBackStackEntry ->
-//      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
+    composable(
+      "workoutScreen?workoutID={workoutID}/copyWorkoutFromPreviousWorkout={copyWorkoutFromPreviousWorkout}"
+    ) { navBackStackEntry ->
+      //      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
 
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
@@ -280,7 +282,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
       val copyWorkoutFromPreviousWorkout =
         navBackStackEntry.arguments?.getBoolean("copyWorkoutFromPreviousWorkout") ?: false
 
-//      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
+      //      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel:
+      // $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
 
@@ -316,12 +319,12 @@ private fun NavGraphBuilder.addWorkoutGraph(
             // Restore state when reselecting a previously selected item
             restoreState = true
           }
-        }
+        },
       )
     }
 
     composable("previewWorkoutScreen") { navBackStackEntry ->
-//      Log.d("WorkoutNavGraph", "Navigated to Preview Workout Screen")
+      //      Log.d("WorkoutNavGraph", "Navigated to Preview Workout Screen")
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
@@ -335,7 +338,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         onReject = {
           workoutViewModel.rejectProgressions()
           navController.navigate("workoutScreen?workoutID=${it.id}")
-        }
+        },
       )
     }
 
@@ -363,13 +366,14 @@ private fun NavGraphBuilder.addWorkoutGraph(
         }*/
 
     composable("workoutSummary/{workoutID}/{workoutCount}") { navBackStackEntry ->
-//      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
+      //      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
-//      val workoutViewModel: WorkoutViewModel = koinViewModel(
-//        viewModelStoreOwner = navBackStackEntry.rememberParentEntry(navController, Screens.Workout.baseRoute)
-//      )
+      //      val workoutViewModel: WorkoutViewModel = koinViewModel(
+      //        viewModelStoreOwner = navBackStackEntry.rememberParentEntry(navController,
+      // Screens.Workout.baseRoute)
+      //      )
 
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
@@ -398,7 +402,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
               // Restore state when reselecting a previously selected item
               restoreState = true
             }
-          }
+          },
         )
       }
     }
@@ -407,7 +411,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
       "exerciseDetails/{exerciseID}",
       arguments = listOf(navArgument("exerciseID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
-//      Log.d("WorkoutNavGraph", "Navigated to Exercise Details Screen")
+      //      Log.d("WorkoutNavGraph", "Navigated to Exercise Details Screen")
       navBackStackEntry.arguments?.getString("exerciseID")?.let {
         ExerciseDetailsScreen(
           // TODO This is an anti-pattern
@@ -423,7 +427,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
-//      Log.d("WorkoutNavGraph:AddExercise", "AddExercise.WorkoutViewModel: $workoutViewModel")
+      //      Log.d("WorkoutNavGraph:AddExercise", "AddExercise.WorkoutViewModel:
+      // $workoutViewModel")
 
       AddExerciseNavigableListDetailScreen(
         exerciseListPane = { onClick ->
@@ -446,42 +451,36 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       if (workoutID != null) {
 
+        val workoutViewModel: WorkoutViewModel =
+          navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
         val historyViewModel: HistoryViewModel =
           navBackStackEntry.sharedViewModel<HistoryViewModel>(navController)
 
         PreviewNextWorkoutScreen(
           navController = navController,
+          workoutViewModel = workoutViewModel,
           workoutID = workoutID,
           WorkoutOverview = {
             WorkoutOverview(
               historyViewModel = historyViewModel,
               workoutID = workoutID,
-              navigateUp = { navController.navigateUp() },
-              popBackStack = { navController.popBackStack() },
+              navigateUp = { },
+              popBackStack = { },
               workoutOverviewContent = { workout, setOpenDeleteWorkoutDialog ->
                 WorkoutOverviewContent(
                   workout = workout,
-                  setOpenDeleteWorkoutDialog = { setOpenDeleteWorkoutDialog },
-                  performAgain = true,
+                  setOpenDeleteWorkoutDialog = { },
+                  performAgain = false,
                   userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
                   workoutComponents = historyViewModel.workoutComponents.collectAsState().value,
-                  navigateUp = { navController.navigateUp() },
-                  navigateToEditWorkout = { workout ->
-                    navController.navigate("history?editWorkout=${workout.id.toHexString()}")
-                  },
-                  navigateToWorkout = { workout ->
-                    navController.navigate(
-                      "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true"
-                    ) {
-                      popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                      launchSingleTop = true
-                      restoreState = true
-                    }
-                  },
+                  navigateUp = { },
+                  navigateToEditWorkout = { workout -> },
+                  navigateToWorkout = { workout -> },
                 )
               },
             )
-          }
+          },
         )
       }
     }
@@ -495,10 +494,9 @@ private fun NavGraphBuilder.addWorkoutGraph(
       AddWarmUpSetsScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
-        exerciseSetsID = ObjectId(exerciseSetsID)
+        exerciseSetsID = ObjectId(exerciseSetsID),
         // workoutViewModel can be koinViewModel() here if not passed from parent
       )
-
     }
   }
 }
@@ -528,7 +526,7 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            }
+            },
           )
         },
         exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
@@ -537,15 +535,15 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
       )
     }
 
-//    composable("exerciseChart") { FullScreenChart(navigateUp = { navController.navigateUp() }) }
+    //    composable("exerciseChart") { FullScreenChart(navigateUp = { navController.navigateUp() })
+    // }
   }
 }
 
 private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 
   navigation("programsScreen", route = "programs") {
-
-  composable("programsScreen") {
+    composable("programsScreen") {
       ProgramsScreen(
         navController,
         currentDestination = navController.currentBackStackEntry?.destination,
@@ -561,14 +559,14 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
             // Restore state when reselecting a previously selected item
             restoreState = true
           }
-        })
+        },
+      )
     }
 
     composable(
       "programDetails/{programID}/isProgramActive={isProgramActive}",
       arguments = listOf(navArgument("programID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
-
       val programID = navBackStackEntry.arguments?.getString("programID")
       val isProgramActive = navBackStackEntry.arguments?.getBoolean("isProgramActive") ?: false
 
@@ -593,7 +591,7 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
             // Restore state when reselecting a previously selected item
             restoreState = true
           }
-        }
+        },
       )
     }
 
@@ -605,17 +603,14 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController) {
   navigation(startDestination = "workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
-
     composable("workoutSummary/workoutID/workoutCount") { navBackStackEntry ->
+      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
 
-    Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
-
-      val workoutViewModel: WorkoutViewModel = koinViewModel(
-        viewModelStoreOwner = navBackStackEntry.rememberParentEntry(
-          navController,
-          Screens.Workout.baseRoute
+      val workoutViewModel: WorkoutViewModel =
+        koinViewModel(
+          viewModelStoreOwner =
+            navBackStackEntry.rememberParentEntry(navController, Screens.Workout.baseRoute)
         )
-      )
 
       // TODO to keep or to not keep?
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
@@ -640,7 +635,7 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
               // Restore state when reselecting a previously selected item
               restoreState = true
             }
-          }
+          },
         )
       }
     }
@@ -650,14 +645,12 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
 @RequiresApi(Build.VERSION_CODES.S)
 private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 
-  // TODO Fix Bug:  java.lang.IllegalStateException: You cannot access the NavBackStackEntry's ViewModels after the NavBackStackEntry is destroyed.
+  // TODO Fix Bug:  java.lang.IllegalStateException: You cannot access the NavBackStackEntry's
+  // ViewModels after the NavBackStackEntry is destroyed.
 
   navigation("historyScreen", route = Screens.History.baseRoute) {
-
     composable("historyScreen") { navBackStackEntry ->
-
       Log.d("HistoryNavGraph", "Navigated to History Screen")
-
 
       val historyViewModel: HistoryViewModel =
         navBackStackEntry.sharedViewModel<HistoryViewModel>(navController)
@@ -673,17 +666,17 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
                 launchSingleTop = true
                 restoreState = true
               }
-            })
+            },
+          )
         },
         navigateToWorkoutOverview = {
           navController.navigate("history?workoutOverview=${it.id.toHexString()}")
-        }
+        },
       )
     }
 
     composable(route = "history?workoutOverview={workoutID}") { navBackStackEntry ->
       navBackStackEntry.arguments?.getString("workoutID")?.let {
-
         val historyViewModel: HistoryViewModel =
           navBackStackEntry.sharedViewModel<HistoryViewModel>(navController)
 
@@ -700,16 +693,20 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
               userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
               workoutComponents = historyViewModel.workoutComponents.collectAsState().value,
               navigateUp = { navController.navigateUp() },
-              navigateToEditWorkout = { workout -> navController.navigate("history?editWorkout=${workout.id.toHexString()}") },
+              navigateToEditWorkout = { workout ->
+                navController.navigate("history?editWorkout=${workout.id.toHexString()}")
+              },
               navigateToWorkout = { workout ->
-                navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true") {
+                navController.navigate(
+                  "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true"
+                ) {
                   popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                   launchSingleTop = true
                   restoreState = true
                 }
-              }
+              },
             )
-          }
+          },
         )
       }
     }
@@ -731,7 +728,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
       ProfileScreen(
-//        navController = navController,
+        //        navController = navController,
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
         bottomNavigationBar = {
           BottomNavigationBar(
@@ -748,7 +745,8 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            })
+            },
+          )
         },
       )
     }
@@ -774,18 +772,21 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            })
+            },
+          )
         },
         navigateToReplicatorScreen = {},
         navigateToAnalyticsScreen = { navController.navigate("analyticsScreen") },
         navigateToSettingsScreen = { navController.navigate("settingsScreen") },
         navigateToHistoryScreen = { navController.navigate(Screens.History.route) },
-        navigateToWorkoutOverview = { workout -> "history?workoutOverview=${workout.id.toHexString()}" }
+        navigateToWorkoutOverview = { workout ->
+          "history?workoutOverview=${workout.id.toHexString()}"
+        },
       )
     }
 
     composable("replicatorScreen") {
-//      Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
+      //      Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
         viewModel = koinViewModel<ReplicatorViewModel>(),
         replicatorConfigNav = { navController.navigate("configScreen") },
@@ -802,7 +803,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
             // Restore state when reselecting a previously selected item
             restoreState = true
           }
-        }
+        },
       )
     }
 
@@ -818,7 +819,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
       SettingsScreen(
-//        profileViewModel = profileViewModel,
+        //        profileViewModel = profileViewModel,
         onNavigate = { navController.navigate(it) },
         navigateToReplicatorScreen = { navController.navigate("replicatorScreen") },
         bottomNavigationBar = {
@@ -836,8 +837,9 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            })
-        }
+            },
+          )
+        },
       )
     }
 
@@ -856,7 +858,8 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
           }
           // Persist changes
           profileViewModel.saveUserProfile()
-        })
+        },
+      )
     }
 
     composable("timerSettings") { navBackStackEntry ->
@@ -880,8 +883,9 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            })
-        }
+            },
+          )
+        },
       )
     }
 
@@ -908,8 +912,9 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            })
-        }
+            },
+          )
+        },
       )
     }
 
@@ -942,16 +947,15 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            }
+            },
           )
-        }
+        },
       )
     }
 
     composable("roundOffSettings") { navBackStackEntry ->
       val profileViewModel: ProfileViewModel =
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
-
 
       RoundOffScreen(
         profileViewModel = profileViewModel,
@@ -971,12 +975,11 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 // Restore state when reselecting a previously selected item
                 restoreState = true
               }
-            }
+            },
           )
-        }
+        },
       )
     }
-
 
     composable("equipmentProfileSettings") { navBackStackEntry ->
       val profileViewModel: ProfileViewModel =
@@ -993,13 +996,12 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
                 launchSingleTop = true
                 restoreState = true
               }
-            }
+            },
           )
         },
-        onNavigateBack = { navController.popBackStack() }
+        onNavigateBack = { navController.popBackStack() },
       )
     }
-
   }
 }
 
@@ -1023,7 +1025,7 @@ private fun NavGraphBuilder.addReplicatorGraph(navController: NavController) {
             // Restore state when reselecting a previously selected item
             restoreState = true
           }
-        }
+        },
       )
     }
   }
@@ -1057,11 +1059,9 @@ private fun TestScreen() {
 
       val fontFamily = FontFamily(Font(googleFont = fontName, fontProvider = provider))
 
-      Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(250.dp), contentAlignment = Alignment.Center
-      ) {
+      Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(250.dp), contentAlignment = Alignment.Center) {
         AsyncImage(
           contentScale = ContentScale.FillWidth,
           alignment = Alignment.TopCenter,
