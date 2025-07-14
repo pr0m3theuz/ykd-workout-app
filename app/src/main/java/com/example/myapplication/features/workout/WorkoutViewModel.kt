@@ -70,15 +70,19 @@ import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.common.util.selectProgression
 import com.example.myapplication.common.util.sendNotification
 import com.example.myapplication.datastore.ActiveWorkout
+import com.example.myapplication.features.previewNextWorkout.EditNextWorkoutUiEvent
+import com.example.myapplication.features.previewNextWorkout.EditNextWorkoutUiState
 import com.example.myapplication.features.workout.feature.setRestTimer.TimerState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
@@ -243,6 +247,7 @@ class WorkoutViewModel(
 
       if (activeWorkout != ActiveWorkout.getDefaultInstance() && !isWorkoutActive) {
         val domainWorkout = activeWorkout.toDomainWorkout()
+        workoutDetails = domainWorkout
         _workout.value = domainWorkout
         _workoutName.value = domainWorkout.name
         _workoutNotesData =
@@ -267,6 +272,29 @@ class WorkoutViewModel(
             //              _workoutID = domainWorkout.id
           )
         )
+
+        val TAG = "WorkoutViewModel.init(): "
+        val allSets = _workoutComponents.flatMap { component ->
+          when (component) {
+            is ExerciseExerciseSets -> component.sets
+            is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+          }
+        }
+        require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
+          "$TAG All sets workoutIDs does not match Workout.id!"
+        }
+
+        val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+        require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+        require(
+          _workoutComponents.all { component ->
+            when (component) {
+              is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
+              is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+            }
+          }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
 
         // Update timer states if needed from the loaded workout
         workoutDuration.value = domainWorkout.workoutDuration
@@ -305,7 +333,9 @@ class WorkoutViewModel(
         }
 
         Log.d("WorkoutViewModel", "Loaded workout from DataStore: ${domainWorkout.name}")
+
         startAutoSavingWorkout() // Start auto-save after loading from DataStore
+
       } else {
         // No active workout in DataStore, try SavedStateHandle or initialize new
         // This part preserves existing logic for SavedStateHandle or new workout initialization
@@ -1092,6 +1122,29 @@ class WorkoutViewModel(
       getPinnedWorkoutNotes(workout.uuid, workout.id)
       Log.d("WorkoutViewModel", "loadWorkoutFromPreviousWorkout: calling setWorkoutComponents")
       setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.workoutItems))
+
+      val TAG = "WorkoutViewModel.loadWorkoutFromPreviousWorkout(): "
+      val allSets = _workoutComponents.flatMap { component ->
+        when (component) {
+          is ExerciseExerciseSets -> component.sets
+          is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+        }
+      }
+      require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
+        "$TAG All sets workoutIDs does not match Workout.id!"
+      }
+
+      val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+      require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+      require(
+        _workoutComponents.all { component ->
+          when (component) {
+            is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
+            is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+          }
+        }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
     }
   }
 
@@ -1132,6 +1185,29 @@ class WorkoutViewModel(
       setWorkoutComponents(
         copyWorkoutItemsFromPreviousWorkout(newWorkout.workoutItems, newWorkout.id).toList()
       )
+
+      val TAG = "WorkoutViewModel.copyWorkoutFromPreviousWorkout(): "
+      val allSets = _workoutComponents.flatMap { component ->
+        when (component) {
+          is ExerciseExerciseSets -> component.sets
+          is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+        }
+      }
+      require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
+        "$TAG All sets workoutIDs does not match Workout.id!"
+      }
+
+      val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+      require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+      require(
+        _workoutComponents.all { component ->
+          when (component) {
+            is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
+            is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+          }
+        }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
     }
     //    _exercisesSets.value = _exercisesSetsData.toList()
   }
@@ -1748,6 +1824,109 @@ class WorkoutViewModel(
   fun getWeightUnit(exerciseSets: ExerciseExerciseSets): String {
     return manageWorkoutUseCase.getWeightUnit(exerciseSets)
   }
+
+  // endregion
+
+  // region UiState & OnEvent
+  // Combined UI state for the screen.
+  // This combines all individual StateFlows into a single UI state object,
+  // which the Composable will collect. This minimizes recompositions.
+  private val _uiState = MutableStateFlow(EditNextWorkoutUiState(isLoading = true))
+  val uiState: StateFlow<EditNextWorkoutUiState> =
+    combine(
+      _workout,
+      _workoutComponentFlow,
+      _workoutNotes,
+      _workoutName,
+    ) { workout, workoutComponents, workoutNotes, workoutName ->
+      EditNextWorkoutUiState(
+        workout = workout,
+        workoutComponents = workoutComponents,
+        workoutNotes = workoutNotes,
+        workoutName = workoutName,
+        isLoading = false, // Data loaded
+        errorMessage = null, // Clear any previous error
+//        userDefaultWeightUnit = userDefaultWeightUnit
+      )
+    }.stateIn(
+      viewModelScope,
+      SharingStarted.WhileSubscribed(5000),
+      EditNextWorkoutUiState(isLoading = true)
+    )
+
+  /**
+   * Handles all incoming UI events from the Composable.
+   * This is the single entry point for UI interactions into the ViewModel.
+   *
+   * @param event The UI event to process.
+   */
+  fun onEvent(event: EditNextWorkoutUiEvent) {
+    when (event) {
+      is EditNextWorkoutUiEvent.LoadWorkout -> loadWorkoutFromPreviousWorkout(event.workoutId)
+      EditNextWorkoutUiEvent.SaveWorkout -> saveWorkout()
+      EditNextWorkoutUiEvent.AddWorkoutNote -> addWorkoutNote()
+      is EditNextWorkoutUiEvent.PinWorkoutNote -> pinWorkoutNote(event.workoutNote, event.pinned)
+      is EditNextWorkoutUiEvent.UpdateWorkoutNote -> setWorkoutNote(
+        event.workoutNote,
+        event.newText
+      )
+
+      is EditNextWorkoutUiEvent.RemoveWorkoutNote -> removeWorkoutNote(event.workoutNote)
+      is EditNextWorkoutUiEvent.RemoveExerciseSets -> removeExerciseSets(event.exerciseSets)
+      is EditNextWorkoutUiEvent.AddExerciseNote -> addExerciseNote(event.exerciseSets /*, event.workoutId*/)
+      is EditNextWorkoutUiEvent.RemoveExerciseNote -> removeExerciseNote(
+        event.exerciseSets,
+        event.note
+      )
+
+      is EditNextWorkoutUiEvent.PinExerciseNote -> pinExerciseNote(
+        event.exerciseSets,
+        event.note,
+        event.pinned
+      )
+
+      is EditNextWorkoutUiEvent.UpdateExerciseWeightUnit -> updateExerciseWeightUnit(
+        event.exercise,
+        event.newUnit
+      )
+
+      is EditNextWorkoutUiEvent.RemoveSet -> removeSet(event.exerciseSets, event.set)
+//      is EditNextWorkoutUiEvent.PopulatePreviousSetField -> populatePreviousSetField(event.exerciseId, event.setNumber)
+      is EditNextWorkoutUiEvent.UpdateSetReps -> updateSetReps(
+        event.exerciseSets,
+        event.setUUID,
+        event.newReps
+      )
+
+      is EditNextWorkoutUiEvent.UpdateSetRIR -> updateSetRIR(
+        event.exerciseSets,
+        event.setUUID,
+        event.newRIR
+      )
+
+      is EditNextWorkoutUiEvent.UpdateSetWeight -> updateSetWeight(
+        event.exerciseSets,
+        event.setUUID,
+        event.newWeight
+      )
+
+      is EditNextWorkoutUiEvent.UpdateSetType -> updateSetType(
+        event.exerciseSets,
+        event.setUUID,
+        event.setType
+      )
+
+      is EditNextWorkoutUiEvent.CompleteSet -> completeSet(
+        event.exerciseSets,
+        event.setUUID,
+        event.completed
+      )
+
+      is EditNextWorkoutUiEvent.AddSet -> addSet(event.supersetUuid, event.targetExSetsUuid)
+      is EditNextWorkoutUiEvent.GetWeightUnit -> getWeightUnit(event.exerciseSets)
+    }
+  }
+
 
   // endregion
 }
