@@ -16,6 +16,7 @@ package com.example.myapplication.common.domain.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.compose.ui.text.intl.Locale
 import com.example.myapplication.common.util.InstantSerializer
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.UuidSerializer
@@ -124,6 +125,7 @@ fun Workout.formatWorkoutDate(): String {
 
 fun Workout.formatLongWorkoutStarted(): String {
   val dayTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a")
+    .withLocale(Locale.current.platformLocale)
   val offset = ZoneId.systemDefault().rules.getOffset(Instant.now())
   //  TODO Confirm if UTC or local
   return if (workoutStarted != null) {
