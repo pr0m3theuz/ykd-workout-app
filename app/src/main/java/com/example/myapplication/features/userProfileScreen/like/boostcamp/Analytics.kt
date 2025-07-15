@@ -662,7 +662,7 @@ fun WorkoutSummaryContent(
 
       val boxModifier = Modifier
         .fillMaxWidth()
-        .aspectRatio(16f / 9f)
+        .aspectRatio(1f / 1f)
       Text(text = "Workout Frequency", style = MaterialTheme.typography.titleMedium)
 
       Row(modifier = boxModifier) {
