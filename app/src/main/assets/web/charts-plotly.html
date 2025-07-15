@@ -4,7 +4,7 @@
 <head>
     <title>Plotly.js Charts</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta content="width=device-width" name="viewport">
     <!-- Load Plotly.js from local assets -->
     <script src="./plotly-3.0.1.min.js" type="text/javascript"></script>
     <style>
@@ -21,14 +21,16 @@
 
 <body>
 <!-- Plotly uses simple div containers -->
-<div id="frequencyChart" class="chart-container"></div>
-<div id="volumeChart" class="chart-container"></div>
+<div class="chart-container" id="frequencyChart"></div>
+<div class="chart-container" id="volumeChart"></div>
 
 <script type="text/javascript">
-    function displayFrequencyChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillcolor) {
+    function displayFrequencyChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillColor, paper_bgcolor, plot_bgcolor, axes_color, gridcolor) {
 
         const element = document.getElementById("volumeChart");
         element.remove();
+
+        console.log(JSON.stringify(rawData));
 
         // 1. Define the data trace for the bar chart
         const trace = {
@@ -43,16 +45,24 @@
         // 2. Define the layout of the chart
         const layout = {
             title: 'Workouts',
+            paper_bgcolor: paper_bgcolor,
+            plot_bgcolor: plot_bgcolor,
             margin: { t: 30, b: 30, l: 30, r: 10 }, // top, bottom, left, right
             xaxis: {
                 automargin: true,
-                minallowed: -1,
-                maxallowed: rawData.labels.length
+                minallowed: 0,
+                maxallowed: rawData.labels.length,
+                type: 'category',
+                color: axes_color,
+                gridcolor: gridcolor
             },
             yaxis: {
                 automargin: true,
                 minallowed: 0,
-                maxallowed: yMaxAllowed
+                maxallowed: yMaxAllowed,
+                color: axes_color,
+                gridcolor: gridcolor,
+                separatethousands: true
             }
         };
 
@@ -70,10 +80,12 @@
         Plotly.newPlot('frequencyChart', [trace], layout, config);
     }
 
-    function displayVolumeChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillcolor) {
+    function displayVolumeChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillColor, paper_bgcolor, plot_bgcolor, axes_color, gridcolor) {
         // 1. Define the data trace for the line chart
         const element = document.getElementById("frequencyChart");
         element.remove();
+
+        console.log(JSON.stringify(rawData));
 
         const trace = {
             x: rawData.labels,
@@ -85,22 +97,30 @@
                 color: color,
                 width: 2
             },
-            fillcolor: fillcolor,
+            fillcolor: fillColor,
         };
 
         // 2. Define the layout
         const layout = {
-            title: 'Total Training Volume',
+            // title: 'Total Training Volume',
+            paper_bgcolor: paper_bgcolor,
+            plot_bgcolor: plot_bgcolor,
             margin: { t: 30, b: 30, l: 50, r: 10 },
             xaxis: {
                 automargin: true,
-                minallowed: -1,
-                maxallowed: rawData.labels.length
+                minallowed: 0,
+                maxallowed: rawData.labels.length,
+                type: 'category',
+                color: axes_color,
+                gridcolor: gridcolor
             },
             yaxis: {
                 automargin: true,
                 minallowed: 0,
-                maxallowed: yMaxAllowed
+                maxallowed: yMaxAllowed,
+                color: axes_color,
+                gridcolor: gridcolor,
+                separatethousands: true
             }
         };
 
