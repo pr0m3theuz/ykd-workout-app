@@ -19,6 +19,7 @@ import com.example.myapplication.common.domain.model.CompletedWorkoutsDao
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.Superset
+import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutAnalytics
@@ -527,17 +528,17 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
       requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL }
 
-//      val start: Date = Date(startDate.year, startDate.month.ordinal, startDate.day)
-//      val end: Date = Date(endDate.year, endDate.month.ordinal, endDate.day)
+      //      val start: Date = Date(startDate.year, startDate.month.ordinal, startDate.day)
+      //      val end: Date = Date(endDate.year, endDate.month.ordinal, endDate.day)
 
       // TODO Add type if needed
 
+      val query = "SELECT Count(*) as count " +
+              "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
+
       val workoutCount =
         db
-          .createQuery(
-            "SELECT Count(*) as count " +
-                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
-          )
+          .createQuery(query)
           .execute()
           .allResults()
           .firstOrNull()
@@ -556,20 +557,20 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
         db
           .createQuery(
             "SELECT SUM(workoutDuration) as duration " +
-                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
+                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
           )
           .execute()
           .allResults()
           .firstOrNull()
           ?.getInt("duration")
-          ?.toDuration(DurationUnit.MILLISECONDS)?.inWholeMinutes
-          ?: 0.toDuration(DurationUnit.MINUTES).inWholeMinutes
+          ?.toDuration(DurationUnit.MILLISECONDS)
+          ?.inWholeMinutes ?: 0.toDuration(DurationUnit.MINUTES).inWholeMinutes
 
       val totalVolumeInPounds =
         db
           .createQuery(
             "SELECT SUM(totalVolumeInPounds) as totalVolumeInPounds " +
-                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
+                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
           )
           .execute()
           .allResults()
@@ -580,7 +581,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
         db
           .createQuery(
             "SELECT SUM(totalVolumeInKilograms) as totalVolumeInKilograms  " +
-                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
+                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
           )
           .execute()
           .allResults()
@@ -610,10 +611,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       val workoutCount =
         db
-          .createQuery(
-            "SELECT Count(*) as count " +
-                    "FROM `CompletedWorkouts`"
-          )
+          .createQuery("SELECT Count(*) as count " + "FROM `CompletedWorkouts`")
           .execute()
           .allResults()
           .firstOrNull()
@@ -621,22 +619,18 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       val totalDuration =
         db
-          .createQuery(
-            "SELECT SUM(workoutDuration) as duration " +
-                    "FROM `CompletedWorkouts`"
-          )
+          .createQuery("SELECT SUM(workoutDuration) as duration " + "FROM `CompletedWorkouts`")
           .execute()
           .allResults()
           .firstOrNull()
           ?.getInt("duration")
-          ?.toDuration(DurationUnit.MILLISECONDS)?.inWholeMinutes
-          ?: 0.toDuration(DurationUnit.MINUTES).inWholeMinutes
+          ?.toDuration(DurationUnit.MILLISECONDS)
+          ?.inWholeMinutes ?: 0.toDuration(DurationUnit.MINUTES).inWholeMinutes
 
       val totalVolumeInPounds =
         db
           .createQuery(
-            "SELECT SUM(totalVolumeInPounds) as totalVolumeInPounds " +
-                    "FROM `CompletedWorkouts`"
+            "SELECT SUM(totalVolumeInPounds) as totalVolumeInPounds " + "FROM `CompletedWorkouts`"
           )
           .execute()
           .allResults()
@@ -667,7 +661,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return null
   }
 
-  override fun getWorkoutAnalyticsChartData(): WorkoutAnalytics? {
+  override fun getTotalVolumeData(): List<TotalWorkoutVolume> {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
@@ -675,67 +669,41 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       // TODO Add type if needed
 
-      val workoutEndedDateTimes =
-        db
-          .createQuery(
-            "SELECT workoutEnded as workoutEnded " +
-                    "FROM `CompletedWorkouts` ORDER BY workoutEnded DESC"
-          )
-          .execute()
-          .allResults().map { result ->
-            result.getDate("workoutEnded")?.toInstant()?.toKotlinInstant()
-//          ?.toLocalDateTime(java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone())
-          }
+      val query = "SELECT totalVolumeInPounds, totalVolumeInKilograms, workoutEnded " +
+              "FROM `CompletedWorkouts`"
 
-      val totalVolumeInPounds =
+      val totalVolume =
         db
-          .createQuery(
-            "SELECT totalVolumeInPounds as totalVolumeInPounds, workoutEnded as workoutEnded " +
-                    "FROM `CompletedWorkouts`"
-          )
+          .createQuery(query)
           .execute()
-          .allResults().associate { result ->
-            (result.getDate("workoutEnded")?.toInstant()
-              ?.toKotlinInstant() to result.getDouble("totalVolumeInPounds"))
-          }
+          .allResults()
+          .map { result ->
+            val workoutEnded = result.getDate("workoutEnded")?.toInstant()?.toKotlinInstant()
+            val totalVolumeInPounds = result.getDouble("totalVolumeInPounds")
+            val totalVolumeInKilograms = result.getDouble("totalVolumeInKilograms")
 
-      val totalVolumeInKilograms =
-        db
-          .createQuery(
-            "SELECT totalVolumeInKilograms as totalVolumeInKilograms, workoutEnded as workoutEnded " +
-                    "FROM `CompletedWorkouts`"
-          )
-          .execute()
-          .allResults().associate { result ->
-            (result.getDate("workoutEnded")?.toInstant()
-              ?.toKotlinInstant() to result.getDouble("totalVolumeInKilograms"))
-          }
+            return@map if (workoutEnded != null) {
+              TotalWorkoutVolume(
+                workoutEnded,
+                totalVolumeInPounds,
+                totalVolumeInKilograms,
+              )
+            } else {
+              null
+            }
+          }.filterNotNull()
 
-      val totalVolumeInKilograms =
-        db
-          .createQuery(
-            "SELECT totalVolumeInKilograms as totalVolumeInKilograms, workoutEnded as workoutEnded " +
-                    "FROM `CompletedWorkouts`"
-          )
-          .execute()
-          .allResults().associate { result ->
-            (result.getDate("workoutEnded")?.toInstant()
-              ?.toKotlinInstant() to result.getDouble("totalVolumeInKilograms"))
-          }
+      if (totalVolume.isEmpty()) {
+        return emptyList()
+      }
 
-      return WorkoutAnalytics(
-        workoutCount,
-        totalDuration,
-        totalVolumeInPounds,
-        totalVolumeInKilograms,
-      )
+      return totalVolume
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
 
-    return null
+    return emptyList()
   }
-
 
   override fun getWorkoutStreakWeek(): Int? {
     try {
@@ -745,13 +713,20 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       val timezone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
 
-      val startDate = LocalDate.now().with(
-        TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
-      ).atStartOfDay().toKotlinLocalDateTime().toInstant(timezone)
+      val startDate =
+        LocalDate.now()
+          .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+          .atStartOfDay()
+          .toKotlinLocalDateTime()
+          .toInstant(timezone)
 
-      val endDate = LocalDate.now().with(
-        TemporalAdjusters.next(DayOfWeek.MONDAY)
-      ).atStartOfDay().minusNanos(1).toKotlinLocalDateTime().toInstant(timezone)
+      val endDate =
+        LocalDate.now()
+          .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+          .atStartOfDay()
+          .minusNanos(1)
+          .toKotlinLocalDateTime()
+          .toInstant(timezone)
 
       // TODO Add type if needed
 
@@ -762,9 +737,11 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
                     "FROM `CompletedWorkouts` ORDER BY workoutEnded DESC"
           )
           .execute()
-          .allResults().map { result ->
+          .allResults()
+          .map { result ->
             result.getDate("workoutEnded")?.toInstant()?.toKotlinInstant()
-//          ?.toLocalDateTime(java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone())
+            //
+            // ?.toLocalDateTime(java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone())
           }
 
       val workoutWeekStreakMap: MutableMap<ClosedRange<Instant>, Int> = mutableMapOf()
@@ -780,10 +757,11 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
         dateRange = dateRange.start.minus(7.days)..dateRange.endInclusive.minus(7.days)
       }
 
-//      val workoutWeekStreakCount = workoutWeekStreakMap.count()
-//
-//      var workoutWeekStreak = 0
-//      workoutWeekStreakMap.forEach { if (it.value > 0) workoutWeekStreak++ else return@forEach }
+      //      val workoutWeekStreakCount = workoutWeekStreakMap.count()
+      //
+      //      var workoutWeekStreak = 0
+      //      workoutWeekStreakMap.forEach { if (it.value > 0) workoutWeekStreak++ else
+      // return@forEach }
 
       return workoutWeekStreakMap.count()
     } catch (e: Exception) {

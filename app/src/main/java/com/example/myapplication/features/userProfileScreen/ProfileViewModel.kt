@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.example.myapplication.features.userProfileScreen
 
 import android.util.Log
@@ -9,6 +11,7 @@ import com.example.myapplication.common.domain.model.Barbell
 import com.example.myapplication.common.domain.model.Collar
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Plate
+import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.WorkoutAnalytics
@@ -25,12 +28,13 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.bson.types.ObjectId
 import java.io.IOException
+import kotlin.time.ExperimentalTime
 
 class ProfileViewModel
 constructor(
   private val userProfileManager: UserProfileManager,
   private val userRepository: UserRepository,
-  private val completedWorkoutRepository: CompletedWorkoutRepository
+  private val completedWorkoutRepository: CompletedWorkoutRepository,
 ) : ViewModel() {
   // TODO REWRITE THIS
   //  val currentUser: User = userRepository.getCurrentUser()
@@ -100,8 +104,14 @@ constructor(
 
   private val barbellsList =
     mutableStateListOf(
-      Barbell(weight = 65f), Barbell(weight = 52f), Barbell(weight = 45f), Barbell(weight = 44f),
-      Barbell(weight = 35f), Barbell(weight = 25f), Barbell(weight = 22f), Barbell(weight = 17f)
+      Barbell(weight = 65f),
+      Barbell(weight = 52f),
+      Barbell(weight = 45f),
+      Barbell(weight = 44f),
+      Barbell(weight = 35f),
+      Barbell(weight = 25f),
+      Barbell(weight = 22f),
+      Barbell(weight = 17f),
     )
 
   private val collarsList = mutableStateListOf(Collar(weight = 5.5f))
@@ -202,9 +212,8 @@ constructor(
       Log.e("ProfileViewModel", "Cannot add plate: User ID is null.")
       return
     }
-    _userProfile.value.let { currentUserProfile ->
+    _userProfile.value.let { currentUserProfile -> }
 
-    }
     viewModelScope.launch {
       try {
         userRepository.addPlate(currentUserId, plate)
@@ -294,7 +303,7 @@ constructor(
   }
 
   fun removeCollar(collarId: String) {
-    val currentUserId = _userProfile.value?.id?.toHexString()
+    val currentUserId = _userProfile.value.id.toHexString()
     if (currentUserId == null) {
       Log.e("ProfileViewModel", "Cannot remove collar: User ID is null.")
       return
@@ -322,9 +331,22 @@ constructor(
     return completedWorkoutRepository.getWorkoutAnalyticsForPeriod(startDate, endDate)
   }
 
-  fun getWorkoutAnalyticsForLifetime(
-  ): WorkoutAnalytics? {
+  fun getWorkoutAnalyticsForLifetime(): WorkoutAnalytics? {
     return completedWorkoutRepository.getWorkoutAnalyticsForLifetime()
+  }
+
+  fun getTotalVolumeData(): List<TotalWorkoutVolume> /*ChartData*/ {
+    return completedWorkoutRepository.getTotalVolumeData()
+
+//    val labels = mutableListOf<String>()
+//    val values = mutableListOf<Number>()
+
+//    completedWorkoutRepository.getTotalVolumePoundsData()?.forEach { (key, value) ->
+//      labels.add(key?.toLocalDateTime(TimeZone.currentSystemDefault())?.date.toString())
+//      values.add(value)
+//    }
+//
+//    return ChartData(labels.toList(), values.toList())
   }
 
   fun getWorkoutStreakWeek(): Int? {

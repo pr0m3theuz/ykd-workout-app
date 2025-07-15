@@ -3,6 +3,7 @@
 package com.example.myapplication.common.infrastructure.persistence
 
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutAnalytics
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,8 @@ interface CompletedWorkoutRepository {
   ): WorkoutAnalytics?
 
   fun getWorkoutAnalyticsForLifetime(): WorkoutAnalytics?
+
+  fun getTotalVolumeData(): List<TotalWorkoutVolume>
 
   fun getWorkoutStreakWeek(): Int?
 }
