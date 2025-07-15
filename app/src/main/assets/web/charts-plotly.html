@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en-EN">
+
+<head>
+    <title>Plotly.js Charts</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <!-- Load Plotly.js from local assets -->
+    <script src="./plotly-3.0.1.min.js" type="text/javascript"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .chart-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Plotly uses simple div containers -->
+<div id="frequencyChart" class="chart-container"></div>
+<div id="volumeChart" class="chart-container"></div>
+
+<script type="text/javascript">
+    function displayFrequencyChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillcolor) {
+
+        const element = document.getElementById("volumeChart");
+        element.remove();
+
+        // 1. Define the data trace for the bar chart
+        const trace = {
+            x: rawData.labels,
+            y: rawData.values,
+            type: 'bar',
+            marker: {
+                color: color
+            }
+        };
+
+        // 2. Define the layout of the chart
+        const layout = {
+            title: 'Workouts',
+            margin: { t: 30, b: 30, l: 30, r: 10 }, // top, bottom, left, right
+            xaxis: {
+                automargin: true,
+                minallowed: -1,
+                maxallowed: rawData.labels.length
+            },
+            yaxis: {
+                automargin: true,
+                minallowed: 0,
+                maxallowed: yMaxAllowed
+            }
+        };
+
+        // 3. Configuration options
+        const config = {
+            displayModeBar: false, // Hides the floating mode bar
+            responsive: true, // Makes the chart responsive to container size
+            staticPlot: staticPlot,
+            editable: false,
+            scrollZoom: false,
+
+        };
+
+        // 4. Create the plot
+        Plotly.newPlot('frequencyChart', [trace], layout, config);
+    }
+
+    function displayVolumeChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillcolor) {
+        // 1. Define the data trace for the line chart
+        const element = document.getElementById("frequencyChart");
+        element.remove();
+
+        const trace = {
+            x: rawData.labels,
+            y: rawData.values,
+            type: 'scatter', // 'scatter' is used for line charts in Plotly
+            mode: 'lines+markers',
+            fill: 'tozeroy', // Fills the area under the line to the y-axis
+            line: {
+                color: color,
+                width: 2
+            },
+            fillcolor: fillcolor,
+        };
+
+        // 2. Define the layout
+        const layout = {
+            title: 'Total Training Volume',
+            margin: { t: 30, b: 30, l: 50, r: 10 },
+            xaxis: {
+                automargin: true,
+                minallowed: -1,
+                maxallowed: rawData.labels.length
+            },
+            yaxis: {
+                automargin: true,
+                minallowed: 0,
+                maxallowed: yMaxAllowed
+            }
+        };
+
+        // 3. Configuration options
+        const config = {
+            displayModeBar: false,
+            responsive: true,
+            editable: false,
+            scrollZoom: false,
+            staticPlot: staticPlot
+        };
+
+        // 4. Create the plot
+        Plotly.newPlot('volumeChart', [trace], layout, config);
+    }
+    // --- MOCK DATA ---
+    //    const frequencyData = {
+    //         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+    //         values: [5, 7, 6, 8, 5, 9]
+    //     };
+    //     displayFrequencyChart(frequencyData);
+
+    //     const volumeData = {
+    //         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+    //         values: [12000, 15000, 14000, 18000, 17000, 22000]
+    //     };
+    //     displayVolumeChart(volumeData);
+    // --- END MOCK DATA ---
+</script>
+</body>
+
+</html>

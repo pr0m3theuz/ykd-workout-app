@@ -42,19 +42,23 @@ import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.history.ui.HistoryLazyColumn
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.LifetimeStatsCard
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.WeeklyReportCard
+import kotlinx.datetime.toKotlinLocalDateTime
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 
 @Preview(showBackground = true)
 @Composable
 private fun SettingsScreenPreview() {
   MyApplicationTheme {
-//    ProfileScreenV2(
-//      navigateToReplicatorScreen = {},
-//      bottomNavigationBar = {},
-//      navigateToAnalyticsScreen = {},
-//      navigateToSettingsScreen = {},
-//      navigateToHistoryScreen = {},
-//      navigateToWorkoutOverview = {}
-//    )
+    //    ProfileScreenV2(
+    //      navigateToReplicatorScreen = {},
+    //      bottomNavigationBar = {},
+    //      navigateToAnalyticsScreen = {},
+    //      navigateToSettingsScreen = {},
+    //      navigateToHistoryScreen = {},
+    //      navigateToWorkoutOverview = {}
+    //    )
   }
 }
 
@@ -67,18 +71,36 @@ fun ProfileScreenV2(
   navigateToSettingsScreen: () -> Unit,
   navigateToHistoryScreen: () -> Unit,
   navigateToWorkoutOverview: (workout: Workout) -> Unit,
+  navigateToWeeklyReport: () -> Unit,
 ) {
-
   // TODO REWRITE THIS
   val user by profileViewModel.userProfile.collectAsState()
-//  val userEmail = user?.profileAsBsonDocument()!!["email"]?.asString()?.value ?: "anon@anon.anon"
 
-//  val user = "Anonymous"
-//  val userProfileManager by inject<UserProfileManager>(UserProfileManager::class.java)
-//  val user = userProfileManager.userProfile.collectAsState().value
-//  val userEmail = "TEMP@anon.anon"
+  val startDate =
+    LocalDate.now()
+      .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+      .atStartOfDay()
+      .toKotlinLocalDateTime()
 
-//  val user = UserProfile(ObjectId())
+  val endDate =
+    LocalDate.now()
+      .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+      .atStartOfDay()
+      .minusNanos(1)
+      .toKotlinLocalDateTime()
+
+  val weeklyWorkoutAnalytics =
+    profileViewModel.getWorkoutAnalyticsForPeriod(startDate = startDate, endDate = endDate)
+
+  val lifetimeWorkoutAnalytics = profileViewModel.getWorkoutAnalyticsForLifetime()
+
+  val weeklyWorkoutStreak = profileViewModel.getWorkoutStreakWeek() ?: 0
+  //  val user = "Anonymous"
+  //  val userProfileManager by inject<UserProfileManager>(UserProfileManager::class.java)
+  //  val user = userProfileManager.userProfile.collectAsState().value
+  //  val userEmail = "TEMP@anon.anon"
+
+  //  val user = UserProfile(ObjectId())
 
   Scaffold(
     modifier = Modifier.imePadding(),
@@ -86,9 +108,7 @@ fun ProfileScreenV2(
       TopAppBar(
         title = { Text(text = "Profile") },
         actions = {
-          IconButton(onClick = {
-            navigateToSettingsScreen()
-          }) {
+          IconButton(onClick = { navigateToSettingsScreen() }) {
             Icon(imageVector = Icons.Default.Settings, contentDescription = null)
           }
         },
@@ -100,24 +120,20 @@ fun ProfileScreenV2(
         Modifier
           .fillMaxWidth()
           .padding(paddingValues),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        verticalArrangement = Arrangement.spacedBy(0.dp),
       ) {
-        Column(
-          Modifier.fillMaxWidth(),
-          horizontalAlignment = Alignment.CenterHorizontally,
-        )
-        {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
           Image(
             painterResource(R.drawable.guy_fawkes_mask),
             modifier = Modifier
               .padding(8.dp)
               .size(200.dp)
               .clip(shape = CircleShape),
-            contentDescription = "profile picture"
+            contentDescription = "profile picture",
           )
           Text(
             text = user.name ?: "MISSING",
-            fontSize = MaterialTheme.typography.titleLarge.fontSize
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
           )
         }
 
@@ -126,69 +142,76 @@ fun ProfileScreenV2(
         var selectedTabIndex by remember { mutableStateOf(0) }
         val tabs = listOf("Activity", "Stats")
 
-        SecondaryTabRow(selectedTabIndex)
-        {
+        SecondaryTabRow(selectedTabIndex) {
           tabs.forEachIndexed { index, title ->
             Tab(
               selected = selectedTabIndex == index,
               onClick = { selectedTabIndex = index },
               text = {
                 Text(
-                  text = title, style = MaterialTheme.typography.bodyMedium,
-                  textAlign = TextAlign.Center
+                  text = title,
+                  style = MaterialTheme.typography.bodyMedium,
+                  textAlign = TextAlign.Center,
                 )
-              }
+              },
             )
           }
         }
 
         when (selectedTabIndex) {
-          0 -> ActivityContent(
-            navigateToHistoryScreen = {
-              navigateToHistoryScreen()
-            },
-            content = {
-              HistoryLazyColumn(
-//    modifier = Modifier.padding(horizontal = 16.dp),
-                workouts = emptyList(),
-                getExerciseByExerciseID = { exerciseID -> null },
-                navigateToWorkoutOverview = {
-                  navigateToWorkoutOverview(it)
-                }
-              )
-            }
-          )
+          0 ->
+            ActivityContent(
+              navigateToHistoryScreen = { navigateToHistoryScreen() },
+              content = {
+                HistoryLazyColumn(
+                  //    modifier = Modifier.padding(horizontal = 16.dp),
+                  workouts = emptyList(),
+                  getExerciseByExerciseID = { exerciseID -> null },
+                  navigateToWorkoutOverview = { navigateToWorkoutOverview(it) },
+                )
+              },
+            )
 
-          1 -> StatsContent(
-            navigateToAnalyticsScreen = {
-              navigateToAnalyticsScreen()
-            }
-          )
+          1 ->
+            StatsContent(
+              navigateToAnalyticsScreen = { navigateToAnalyticsScreen() },
+              weeklyReportCard = {
+                WeeklyReportCard(
+                  workoutAnalytics = weeklyWorkoutAnalytics,
+                  startDate = startDate,
+                  endDate = endDate,
+                  userMassUnit = user.defaultWeightUnit,
+                  navigateToWeeklyReport = { navigateToWeeklyReport() },
+                )
+              },
+              lifetimeStatsCard = {
+                LifetimeStatsCard(
+                  workoutAnalytics = lifetimeWorkoutAnalytics,
+                  weeklyWorkoutStreak = weeklyWorkoutStreak,
+                  userMassUnit = user.defaultWeightUnit,
+                )
+              },
+            )
         }
       }
-    }
+    },
   )
 }
 
 @Composable
 private fun SectionTitle(title: String) {
   Text(
-    text = title, fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
+    text = title,
+    fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
     color = MaterialTheme.colorScheme.primary,
-    modifier = Modifier.padding(horizontal = 16.dp)
+    modifier = Modifier.padding(horizontal = 16.dp),
   )
 }
 
 @Composable
-private fun ActivityContent(
-  navigateToHistoryScreen: () -> Unit,
-  content: @Composable () -> Unit
-) {
+private fun ActivityContent(navigateToHistoryScreen: () -> Unit, content: @Composable () -> Unit) {
   // TODO if (!workouts.isEmpty()){} else {}
-  Row(
-    modifier = Modifier.padding(horizontal = 16.dp),
-    horizontalArrangement = Arrangement.Start
-  ) {
+  Row(modifier = Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.Start) {
     TextButton(onClick = { navigateToHistoryScreen }) { Text("View All Workouts") }
   }
   content()
@@ -197,23 +220,14 @@ private fun ActivityContent(
 @Composable
 private fun StatsContent(
   navigateToAnalyticsScreen: () -> Unit,
+  weeklyReportCard: @Composable () -> Unit = {},
+  lifetimeStatsCard: @Composable () -> Unit = {},
 ) {
-  Row(
-    modifier = Modifier.padding(horizontal = 16.dp),
-    horizontalArrangement = Arrangement.Start
-  )
-  {
-    TextButton(onClick = { navigateToAnalyticsScreen }) { Text("View All Stats") }
+  Row(modifier = Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.Start) {
+    TextButton(onClick = { navigateToAnalyticsScreen() }) { Text("View All Stats") }
   }
-  Column(
-    modifier = Modifier.padding(16.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp),
-  ) {
-    WeeklyReportCard()
-    LifetimeStatsCard()
+  Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    weeklyReportCard()
+    lifetimeStatsCard()
   }
-
 }
-
-
-

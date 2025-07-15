@@ -42,6 +42,7 @@ import androidx.compose.material3.getSelectedEndDate
 import androidx.compose.material3.getSelectedStartDate
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,19 +50,86 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.WorkoutAnalytics
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
+import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.userProfileScreen.ProfileViewModel
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalDateTime
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
+@Composable
+fun AnalyticsScreen(
+  profileViewModel: ProfileViewModel,
+  onNavigateToDashboardsInfo: () -> Unit,
+  onNavigateToWeeklyReport: () -> Unit
+) {
+  val user by profileViewModel.userProfile.collectAsState()
+
+  val startDate =
+    LocalDate.now()
+      .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+      .atStartOfDay()
+      .toKotlinLocalDateTime()
+
+  val endDate =
+    LocalDate.now()
+      .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+      .atStartOfDay()
+      .minusNanos(1)
+      .toKotlinLocalDateTime()
+
+  val weeklyWorkoutAnalytics =
+    profileViewModel.getWorkoutAnalyticsForPeriod(startDate = startDate, endDate = endDate)
+
+  val lifetimeWorkoutAnalytics = profileViewModel.getWorkoutAnalyticsForLifetime()
+
+  val weeklyWorkoutStreak = profileViewModel.getWorkoutStreakWeek() ?: 0
+
+  AnalyticsScreenContent(
+    onNavigateToDashboardsInfo = { onNavigateToDashboardsInfo() },
+    weeklyReportCard = {
+      WeeklyReportCard(
+        workoutAnalytics = weeklyWorkoutAnalytics,
+        startDate = startDate,
+        endDate = endDate,
+        userMassUnit = user.defaultWeightUnit,
+        navigateToWeeklyReport = { onNavigateToWeeklyReport() },
+      )
+    },
+    lifetimeStatsCard = {
+      LifetimeStatsCard(
+        workoutAnalytics = lifetimeWorkoutAnalytics,
+        weeklyWorkoutStreak = weeklyWorkoutStreak,
+        userMassUnit = user.defaultWeightUnit,
+      )
+    },
+    muscleTrackerContent = {
+      MuscleTrackerContent(
+        startDate = startDate,
+        endDate = endDate,
+      )
+    },
+  )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnalyticsScreen(onNavigateToDashboardsInfo: () -> Unit) {
+fun AnalyticsScreenContent(
+  onNavigateToDashboardsInfo: () -> Unit,
+  weeklyReportCard: @Composable () -> Unit = {},
+  lifetimeStatsCard: @Composable () -> Unit = {},
+  muscleTrackerContent: @Composable () -> Unit = {},
+) {
   var selectedTabIndex by remember { mutableStateOf(0) }
   val tabs = listOf("Muscle Engagement", "Workout Summary")
 
@@ -70,7 +138,9 @@ fun AnalyticsScreen(onNavigateToDashboardsInfo: () -> Unit) {
       TopAppBar(
         title = { Text("Analytics") },
         actions = {
-          /* TODO OutlinedButton(onClick = { *//* TODO Handle Exercises click *//* }) {
+          /* TODO OutlinedButton(onClick = { */
+          /* TODO Handle Exercises click */
+          /* }) {
             Text("Exercises",
               style = MaterialTheme.typography.bodySmallEmphasized)
           }*/
@@ -79,17 +149,17 @@ fun AnalyticsScreen(onNavigateToDashboardsInfo: () -> Unit) {
     },
     // In a real app, you would have a proper BottomNavigationView here.
     // For this example, it's omitted as per the screenshot focus.
-    bottomBar = {}
+    bottomBar = {},
   ) { paddingValues ->
     Column(
       modifier = Modifier
         .padding(paddingValues)
         .fillMaxSize()
         .padding(16.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp)
+      verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      LifetimeStatsCard()
-      WeeklyReportCard()
+      weeklyReportCard()
+      lifetimeStatsCard()
 
       // Tab Layout
       SecondaryTabRow(selectedTabIndex = selectedTabIndex) {
@@ -99,18 +169,23 @@ fun AnalyticsScreen(onNavigateToDashboardsInfo: () -> Unit) {
             onClick = { selectedTabIndex = index },
             text = {
               Text(
-                text = title, style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
               )
-            }
+            },
           )
         }
       }
 
       // Content based on selected tab
       when (selectedTabIndex) {
-        0 -> MuscleTrackerContent()
-        1 -> WorkoutSummaryContent() // Placeholder
+        0 -> muscleTrackerContent()
+        1 -> WorkoutSummaryContent(
+          workoutFrequencyData = emptyList(),
+          totalTrainingVolumeData = emptyList(),
+          totalRepsData = emptyList(),
+        ) // Placeholder
         2 -> ExerciseAnalyticsContent(onNavigateToDashboardsInfo)
       }
     }
@@ -118,80 +193,137 @@ fun AnalyticsScreen(onNavigateToDashboardsInfo: () -> Unit) {
 }
 
 @Composable
-fun LifetimeStatsCard() {
-  Card(
-    modifier = Modifier.fillMaxWidth(),
-  ) {
+fun LifetimeStatsCard(
+  workoutAnalytics: WorkoutAnalytics?,
+  weeklyWorkoutStreak: Int = 0,
+  userMassUnit: MassUnit = MassUnit.POUNDS,
+) {
+  Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(16.dp)) {
-      Text(" Lifetime Totals", style = MaterialTheme.typography.titleMedium)
+      Text("Lifetime Totals", style = MaterialTheme.typography.titleMedium)
       Spacer(Modifier.height(16.dp))
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround
-      ) {
-        StatItem(value = "0", label = "Workouts")
-        StatItem(value = "0", label = "Minutes")
-        StatItem(value = "0", label = "lbs Lifted")
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        val boxModifier = Modifier.weight(1f)
+        Box(modifier = boxModifier, contentAlignment = Alignment.Center) {
+          StatItem(value = (workoutAnalytics?.workoutCount ?: 0).toString(), label = "Workouts")
+        }
+        Box(modifier = boxModifier, contentAlignment = Alignment.Center) {
+          StatItem(value = (workoutAnalytics?.totalDuration ?: 0).toString(), label = "Minutes")
+        }
+
+        val currentLocale = Locale.current.platformLocale
+
+        val weightLiftedValue =
+          if (userMassUnit == MassUnit.POUNDS) {
+            if (currentLocale.country == "US") {
+              workoutAnalytics?.let { doubleFormatted(it.totalVolumeInPounds?.div(2000)) }
+                ?: 0.toString()
+            } else {
+              workoutAnalytics?.let { doubleFormatted(it.totalVolumeInPounds?.div(2240)) }
+                ?: 0.toString()
+            }
+          } else {
+            workoutAnalytics?.let { doubleFormatted(it.totalVolumeInKilograms?.div(1000)) }
+              ?: 0.toString()
+          }
+
+        val weightLiftedLabel =
+          if (userMassUnit == MassUnit.POUNDS) {
+            if (currentLocale.country == "US") {
+              "US Tons Lifted"
+            } else {
+              "Imperial Tons Lifted"
+            }
+          } else {
+            "Metric Tons Lifted"
+          }
+
+        Box(modifier = boxModifier, contentAlignment = Alignment.Center) {
+          StatItem(value = weightLiftedValue, label = weightLiftedLabel)
+        }
       }
-      Spacer(Modifier.height(8.dp))
-      Text(
-        "0 Week Streak",
-        modifier = Modifier.align(Alignment.CenterHorizontally),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-      )
     }
+//    Spacer(Modifier.height(8.dp))
+    Text(
+      "$weeklyWorkoutStreak Week Streak",
+      modifier = Modifier
+        .align(Alignment.CenterHorizontally)
+        .padding(bottom = 16.dp),
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+//    Spacer(Modifier.height(16.dp))
   }
 }
 
 @Composable
 fun WeeklyReportCard(
-  workoutCount: Int = 0,
-  minutes: Int = 0,
-  weightLifted: Int = 0,
-  weightUnit: String = "lbs",
-  navigateToWeeklyReport: () -> Unit = {}
+  workoutAnalytics: WorkoutAnalytics?,
+  startDate: LocalDateTime,
+  endDate: LocalDateTime,
+  userMassUnit: MassUnit,
+  navigateToWeeklyReport: () -> Unit = {},
 ) {
-  Card(
-    modifier = Modifier.fillMaxWidth(),
-  ) {
-
+  Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(16.dp)) {
       Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
       ) {
-        val startDate = LocalDate.now().with(
-          TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
-        ).atStartOfDay().toKotlinLocalDateTime()
-        val endDate = LocalDate.now().with(
-          TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)
-        ).atStartOfDay().toKotlinLocalDateTime()
+        val startDateString = "${startDate.date.month.name.substring(0, 3)} ${startDate.date.day}"
+        val endDateString = "${endDate.date.month.name.substring(0, 3)} ${endDate.date.day}"
 
-        val startDateString =
-          "${startDate.date.month.name.substring(0, 3)} ${startDate.date.dayOfMonth}"
-        val endDateString = "${endDate.date.month.name.substring(0, 3)} ${endDate.date.dayOfMonth}"
+        Text("$startDateString – $endDateString", style = MaterialTheme.typography.titleMedium)
 
-        Text(
-          " $startDateString – $endDateString",
-          style = MaterialTheme.typography.titleMedium
-        )
         TextButton(onClick = { navigateToWeeklyReport() }) {
           Text("Weekly Report")
           Icon(
             Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = "View weekly report"
+            contentDescription = "View weekly report",
           )
         }
       }
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround
-      ) {
-        StatItem(value = workoutCount.toString(), label = "Workouts")
-        StatItem(value = minutes.toString(), label = "Minutes")
-        StatItem(value = weightLifted.toString(), label = "$weightUnit Lifted")
+
+      Row(modifier = Modifier.fillMaxWidth()) {
+        val boxModifier = Modifier.weight(1f)
+        Box(modifier = boxModifier, contentAlignment = Alignment.Center) {
+          StatItem(value = (workoutAnalytics?.workoutCount ?: 0).toString(), label = "Workouts")
+        }
+        Box(modifier = boxModifier, contentAlignment = Alignment.Center) {
+          StatItem(value = (workoutAnalytics?.totalDuration ?: 0).toString(), label = "Minutes")
+        }
+
+        val currentLocale = Locale.current.platformLocale
+
+        val weightLiftedValue =
+          if (userMassUnit == MassUnit.POUNDS) {
+            if (currentLocale.country == "US") {
+              workoutAnalytics?.let { doubleFormatted(it.totalVolumeInPounds?.div(2000)) }
+                ?: 0.toString()
+            } else {
+              workoutAnalytics?.let { doubleFormatted(it.totalVolumeInPounds?.div(2240)) }
+                ?: 0.toString()
+            }
+          } else {
+            workoutAnalytics?.let { doubleFormatted(it.totalVolumeInKilograms?.div(1000)) }
+              ?: 0.toString()
+          }
+
+        val weightLiftedLabel =
+          if (userMassUnit == MassUnit.POUNDS) {
+            if (currentLocale.country == "US") {
+              "US Tons Lifted"
+            } else {
+              "Imperial Tons Lifted"
+            }
+          } else {
+            "Metric Tons Lifted"
+          }
+
+        Box(modifier = boxModifier, contentAlignment = Alignment.Center) {
+          StatItem(value = weightLiftedValue, label = weightLiftedLabel)
+        }
       }
     }
   }
@@ -203,45 +335,34 @@ fun StatItem(value: String, label: String) {
     Text(
       text = value,
       style = MaterialTheme.typography.headlineMedium,
-      fontWeight = FontWeight.Bold
+      fontWeight = FontWeight.Bold,
     )
     Text(
       text = label,
       style = MaterialTheme.typography.bodySmall,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
   }
 }
 
 @Composable
-fun MuscleTrackerContent() {
+fun MuscleTrackerContent(
+  startDate: LocalDateTime,
+  endDate: LocalDateTime,
+) {
   var showDatePicker by remember { mutableStateOf(false) }
 
-  val startDate = LocalDate.now().with(
-    TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
-  ).atStartOfDay().toLocalDate()
-  val endDate = LocalDate.now().with(
-    TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)
-  ).atStartOfDay().toLocalDate().minusDays(1)
-
-  val state = rememberDateRangePickerState(
-    initialSelectedStartDate = startDate,
-    initialSelectedEndDate = endDate
-  )
+  val state =
+    rememberDateRangePickerState(
+      initialSelectedStartDate = startDate.toJavaLocalDateTime().toLocalDate(),
+      initialSelectedEndDate = endDate.toJavaLocalDateTime().toLocalDate(),
+    )
 
   if (showDatePicker) {
     DatePickerDialog(
       onDismissRequest = { showDatePicker = false },
-      confirmButton = {
-        TextButton(onClick = { showDatePicker = false }) {
-          Text("OK")
-        }
-      },
-      dismissButton = {
-        TextButton(onClick = { showDatePicker = false }) {
-          Text("Cancel")
-        }
-      }
+      confirmButton = { TextButton(onClick = { showDatePicker = false }) { Text("OK") } },
+      dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } },
     ) {
       DateRangePicker(state = state, modifier = Modifier.weight(1f))
     }
@@ -251,32 +372,32 @@ fun MuscleTrackerContent() {
     Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(4.dp),
-    )
-    {
+    ) {
       Box(
-        modifier = Modifier
-          .padding(horizontal = 0.dp)
-          .clickable(
-            onClick = { showDatePicker = true },
-          ),
-
-        ) {
-        val startDateString = "${
+        modifier =
+          Modifier
+            .padding(horizontal = 0.dp)
+            .clickable(onClick = { showDatePicker = true })
+      ) {
+        val startDateString =
+          "${
           state.getSelectedStartDate()?.toKotlinLocalDate()?.month?.name?.substring(0, 3)
         }" +
-                " ${state.getSelectedStartDate()?.toKotlinLocalDate()?.dayOfMonth}"
+                  " ${state.getSelectedStartDate()?.toKotlinLocalDate()?.day}"
 
-        val endDateString = "${
+        val endDateString =
+          "${
           state.getSelectedEndDate()?.toKotlinLocalDate()?.month?.name?.substring(0, 3)
         }" +
-                " ${state.getSelectedEndDate()?.toKotlinLocalDate()?.dayOfMonth}"
+                  " ${state.getSelectedEndDate()?.toKotlinLocalDate()?.day}"
 
         TextButton(
           onClick = { showDatePicker = true },
-          modifier = Modifier.padding(horizontal = 0.dp)
-        ) { Text("$startDateString – $endDateString", style = MaterialTheme.typography.bodyMedium) }
+          modifier = Modifier.padding(horizontal = 0.dp),
+        ) {
+          Text("$startDateString – $endDateString", style = MaterialTheme.typography.bodyMedium)
+        }
       }
-
     }
     MuscleEngagementContent()
   }
@@ -288,12 +409,19 @@ fun MuscleEngagementContent() {
 }
 
 @Composable
-fun WorkoutSummaryContent() {
+fun WorkoutSummaryContent(
+  workoutFrequencyData: List<ChartData>,
+  totalTrainingVolumeData: List<ChartData>,
+  totalRepsData: List<ChartData>,
+  workoutFrequencyChart: @Composable () -> Unit = {},
+  totalTrainingVolumeChart: @Composable () -> Unit = {},
+  totalRepsChart: @Composable () -> Unit = {},
+) {
   // TODO Placeholder content for the second tab
-//  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//    Text("Workout Summary Content", style = MaterialTheme.typography.titleLarge)
-//  }
-  val periods = listOf("Daily", "Weekly", "Monthly")
+  //  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+  //    Text("Workout Summary Content", style = MaterialTheme.typography.titleLarge)
+  //  }
+  val periods = listOf("Daily", "Weekly", "Monthly") // TODO replace with enum
   var selectedPeriod by remember { mutableStateOf(periods.first()) }
 
   Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -301,10 +429,11 @@ fun WorkoutSummaryContent() {
       FilterChip(
         selected = period == selectedPeriod,
         onClick = { selectedPeriod = period },
-        label = { Text(period) }
+        label = { Text(period) },
       )
     }
   }
+
 
   // TODO Workout Frequency per Week Chart
   // TODO Total Training Volume per Week Chart
@@ -314,27 +443,25 @@ fun WorkoutSummaryContent() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseAnalyticsContent(onNavigateToDashboardsInfo: () -> Unit) {
-  val options = listOf(
-    "Estimated 1RM using Brzycki Method",
-    "Estimated 1RM using RPE",
-    "Best Set",
-    "Total Training Volume",
-    "Max Consecutive Reps"
-  )
+  val options =
+    listOf(
+      "Estimated 1RM using Brzycki Method",
+      "Estimated 1RM using RPE",
+      "Best Set",
+      "Total Training Volume",
+      "Max Consecutive Reps",
+    )
   val newItems = setOf("Best Set", "Max Consecutive Reps")
   var expanded by remember { mutableStateOf(false) }
   var selectedOptionText by remember { mutableStateOf(options[0]) }
 
-  Column(
-    modifier = Modifier.fillMaxWidth(),
-    verticalArrangement = Arrangement.spacedBy(16.dp)
-  ) {
+  Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
       // Dropdown Menu
       ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        modifier = Modifier.weight(1f)
+        modifier = Modifier.weight(1f),
       ) {
         OutlinedTextField(
           readOnly = true,
@@ -343,15 +470,13 @@ fun ExerciseAnalyticsContent(onNavigateToDashboardsInfo: () -> Unit) {
           onValueChange = {},
           trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
           colors = ExposedDropdownMenuDefaults.textFieldColors(),
-          modifier = Modifier.menuAnchor(
-            type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-            enabled = true
-          )
+          modifier =
+            Modifier.menuAnchor(
+              type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+              enabled = true,
+            ),
         )
-        ExposedDropdownMenu(
-          expanded = expanded,
-          onDismissRequest = { expanded = false }
-        ) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
           options.forEach { selectionOption ->
             DropdownMenuItem(
               text = {
@@ -366,7 +491,7 @@ fun ExerciseAnalyticsContent(onNavigateToDashboardsInfo: () -> Unit) {
               onClick = {
                 selectedOptionText = selectionOption
                 expanded = false
-              }
+              },
             )
           }
         }
@@ -388,19 +513,15 @@ fun NewTag() {
     text = "NEW",
     color = MaterialTheme.colorScheme.onError,
     style = MaterialTheme.typography.labelSmall,
-    modifier = Modifier
-      .background(
-        color = MaterialTheme.colorScheme.error,
-        shape = RoundedCornerShape(4.dp)
-      )
-      .padding(horizontal = 4.dp, vertical = 2.dp)
+    modifier =
+      Modifier
+        .background(color = MaterialTheme.colorScheme.error, shape = RoundedCornerShape(4.dp))
+        .padding(horizontal = 4.dp, vertical = 2.dp),
   )
 }
 
 @Preview(showBackground = true, widthDp = 380)
 @Composable
 fun AnalyticsScreenPreview() {
-  MyApplicationTheme {
-    AnalyticsScreen(onNavigateToDashboardsInfo = {})
-  }
+  MyApplicationTheme { AnalyticsScreenContent(onNavigateToDashboardsInfo = {}) }
 }

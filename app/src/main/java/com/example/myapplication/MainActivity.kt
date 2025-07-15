@@ -81,6 +81,7 @@ import com.example.myapplication.features.userProfileScreen.ProfileScreen
 import com.example.myapplication.features.userProfileScreen.ProfileScreenV2
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.AnalyticsScreen
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.WeeklyReportScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.CalculatorsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.ChooseUnitsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.EditProfileScreen
@@ -782,6 +783,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
         navigateToWorkoutOverview = { workout ->
           "history?workoutOverview=${workout.id.toHexString()}"
         },
+        navigateToWeeklyReport = { navController.navigate("weeklyReportScreen") },
       )
     }
 
@@ -922,7 +924,21 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       val profileViewModel: ProfileViewModel =
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
-      AnalyticsScreen(onNavigateToDashboardsInfo = {})
+      AnalyticsScreen(
+        profileViewModel = profileViewModel,
+        onNavigateToDashboardsInfo = {},
+        onNavigateToWeeklyReport = { navController.navigate("weeklyReportScreen") },
+      )
+    }
+
+    composable("weeklyReportScreen") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
+      WeeklyReportScreen(
+        profileViewModel = profileViewModel,
+        onBackClick = { navController.navigateUp() },
+      )
     }
 
     composable("unitsSettings") { navBackStackEntry ->

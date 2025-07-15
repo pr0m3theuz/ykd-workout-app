@@ -11,6 +11,8 @@ import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Plate
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
+import com.example.myapplication.common.domain.model.WorkoutAnalytics
+import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundingOption
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.toHexString
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import org.bson.types.ObjectId
 import java.io.IOException
 
@@ -27,6 +30,7 @@ class ProfileViewModel
 constructor(
   private val userProfileManager: UserProfileManager,
   private val userRepository: UserRepository,
+  private val completedWorkoutRepository: CompletedWorkoutRepository
 ) : ViewModel() {
   // TODO REWRITE THIS
   //  val currentUser: User = userRepository.getCurrentUser()
@@ -308,5 +312,22 @@ constructor(
         )
       }
     }
+  }
+
+  fun getWorkoutAnalyticsForPeriod(
+    // TODO Confirm DateTime is adjusted for user timezone
+    startDate: LocalDateTime,
+    endDate: LocalDateTime,
+  ): WorkoutAnalytics? {
+    return completedWorkoutRepository.getWorkoutAnalyticsForPeriod(startDate, endDate)
+  }
+
+  fun getWorkoutAnalyticsForLifetime(
+  ): WorkoutAnalytics? {
+    return completedWorkoutRepository.getWorkoutAnalyticsForLifetime()
+  }
+
+  fun getWorkoutStreakWeek(): Int? {
+    return completedWorkoutRepository.getWorkoutStreakWeek()
   }
 }

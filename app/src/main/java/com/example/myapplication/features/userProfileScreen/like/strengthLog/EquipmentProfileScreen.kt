@@ -109,6 +109,18 @@ fun Color.toHexString(): String {
   )
 }
 
+// Helper function to convert Color to hex string (ARGB)
+fun Color.toRGBAString(): String {
+  return String.format(
+    "#%02X%02X%02X%02X",
+    (this.red * 255).toInt(),
+    (this.green * 255).toInt(),
+    (this.blue * 255).toInt(),
+    (this.alpha * 255).toInt(),
+  )
+}
+
+
 // --- Predefined Colors for Plates (example) ---
 val plateUiColors =
   listOf(

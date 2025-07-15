@@ -21,16 +21,29 @@ import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.domain.model.WorkoutAnalytics
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toKotlinLocalDateTime
+import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import org.koin.java.KoinJavaComponent.inject
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
+import kotlin.time.Duration.Companion.days
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.toDuration
+import kotlin.time.toKotlinInstant
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val DATABASE_IS_NULL = "Completed Repository: Database does not exist."
@@ -38,9 +51,7 @@ private const val DATABASE_IS_NULL = "Completed Repository: Database does not ex
 private const val COLLECTION_IS_NULL =
   "Completed Repository: Completed * Collection does not exist in the Database."
 
-class CompletedWorkoutRepositoryImpl(
-  databaseManager: DatabaseManager
-) :
+class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
   CompletedWorkoutRepository {
   val userProfileManager: UserProfileManager by inject(UserProfileManager::class.java)
 
@@ -49,13 +60,9 @@ class CompletedWorkoutRepositoryImpl(
   // TODO Decide if I should create a repository for user data
   val user = userProfileManager.getCurrentUser()
 
-  private val withUnknownKeys = Json {
-    ignoreUnknownKeys = true
-  }
+  private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 
-  private val withDefaults = Json {
-    encodeDefaults = true
-  }
+  private val withDefaults = Json { encodeDefaults = true }
 
   private fun mapQueryChangeToSet(queryChange: QueryChange): List<Set> {
     val sets = mutableListOf<Set>() // 1
@@ -89,12 +96,13 @@ class CompletedWorkoutRepositoryImpl(
       val collection = db.getCollection("CompletedSets")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
-// TODO Missing ownerID = user.id.toHexString()
+      // TODO Missing ownerID = user.id.toHexString()
       val queryBuilder =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
           .where(
-            Expression.property("exerciseID").equalTo(Expression.string(exerciseID.toString()))
+            Expression.property("exerciseID")
+              .equalTo(Expression.string(exerciseID.toString()))
               .and(Expression.property("setNumber").equalTo(Expression.intValue(setNumber)))
               .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
           )
@@ -123,12 +131,13 @@ class CompletedWorkoutRepositoryImpl(
         )
           .from(DataSource.collection(collection))
           .where(
-            Expression.property("isCompleted").equalTo(Expression.booleanValue(true)).and(
-              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
-            )
+            Expression.property("isCompleted")
+              .equalTo(Expression.booleanValue(true))
+              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
 
-//      val query = QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
+      //      val query =
+      // QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
 
       val results = query.execute().allResults()
       return results[0].getInt("count")
@@ -150,15 +159,15 @@ class CompletedWorkoutRepositoryImpl(
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
           .where(
-            Expression.property("exerciseID").equalTo(Expression.string(exerciseID.toString()))
+            Expression.property("exerciseID")
+              .equalTo(Expression.string(exerciseID.toString()))
               .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
           )
           .orderBy(Ordering.property("dateCreated").descending()) // Get latest set
           .limit(Expression.intValue(1))
 
-      val flow = queryBuilder.queryChangeFlow().map {
-        mapQueryChangeToSet(it)
-      }.flowOn(Dispatchers.IO)
+      val flow =
+        queryBuilder.queryChangeFlow().map { mapQueryChangeToSet(it) }.flowOn(Dispatchers.IO)
 
       queryBuilder.execute()
 
@@ -185,14 +194,15 @@ class CompletedWorkoutRepositoryImpl(
           .from(DataSource.collection(workoutCollection)) // Replace with your database instance
           .where(
             Expression.property("isCompleted").equalTo(Expression.booleanValue(true))
-//              .and(
-//              Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
-//            )
+            //              .and(
+            //
+            // Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString()))
+            //            )
           )
-//          .orderBy(Ordering.property("workoutEnded").descending())
+      //          .orderBy(Ordering.property("workoutEnded").descending())
 
-      val workouts = completedWorkoutQuery.execute().allResults()
-        .map {
+      val workouts =
+        completedWorkoutQuery.execute().allResults().map {
           Log.d("CompletedWorkoutRepositoryImpl.getCompletedWorkouts()", it.toJSON())
           withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it.toJSON()).CompletedWorkouts
         }
@@ -201,19 +211,19 @@ class CompletedWorkoutRepositoryImpl(
 
       val workoutIDClause = workoutIds.joinToString(",") { "'$it'" }.let { "[$it]" }
 
-      val setsQuery = "SELECT * FROM `CompletedSets` " +
-              "WHERE workoutID IN $workoutIDClause" // +
-//              " AND ownerID = '${user.id.toHexString()}'"
+      val setsQuery = "SELECT * FROM `CompletedSets` " + "WHERE workoutID IN $workoutIDClause" // +
+      //              " AND ownerID = '${user.id.toHexString()}'"
 
       val setsResult = db.createQuery(setsQuery).execute().allResults()
-      val sets = setsResult.mapNotNull {
-        try {
-          withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
-        } catch (e: Exception) {
-          Log.e(e.message, e.stackTraceToString())
-          null
+      val sets =
+        setsResult.mapNotNull {
+          try {
+            withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
+          } catch (e: Exception) {
+            Log.e(e.message, e.stackTraceToString())
+            null
+          }
         }
-      }
 
       val setsByWorkoutID = sets.groupBy { it.workoutID }
 
@@ -225,16 +235,18 @@ class CompletedWorkoutRepositoryImpl(
         workout.workoutItems.forEach { workoutItem ->
           when (workoutItem) {
             is ExerciseSets -> {
-              workoutItem.sets = (setsByExerciseSetsID[workoutItem.id] ?: emptyList())
-                .sortedBy { it.setNumber }
-                .toMutableList() // Or toList() if immutability is preferred
+              workoutItem.sets =
+                (setsByExerciseSetsID[workoutItem.id] ?: emptyList())
+                  .sortedBy { it.setNumber }
+                  .toMutableList() // Or toList() if immutability is preferred
             }
 
             is Superset -> {
               workoutItem.exercisesSets.forEach { exerciseSets ->
-                exerciseSets.sets = (setsByExerciseSetsID[exerciseSets.id] ?: emptyList())
-                  .sortedBy { it.setNumber }
-                  .toMutableList() // Or toList()
+                exerciseSets.sets =
+                  (setsByExerciseSetsID[exerciseSets.id] ?: emptyList())
+                    .sortedBy { it.setNumber }
+                    .toMutableList() // Or toList()
               }
             }
           }
@@ -261,39 +273,45 @@ class CompletedWorkoutRepositoryImpl(
       val completedWorkoutQueryBuilder =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(workoutCollection)) // Replace with your database instance
-          .where(
-            Expression.property("id").equalTo(Expression.string(workoutID.toString()))
-          )
+          .where(Expression.property("id").equalTo(Expression.string(workoutID.toString())))
 
       val completedSetsQueryBuilder =
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(setCollection)) // Replace with your database instance
-          .where(
-            Expression.property("workoutID").equalTo(Expression.string(workoutID.toString()))
-          )
+          .where(Expression.property("workoutID").equalTo(Expression.string(workoutID.toString())))
 
       val workoutResult =
         completedWorkoutQueryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
       val workout =
-        workoutResult?.let { withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts }
+        workoutResult?.let {
+          withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts
+        }
 
       val setsResult = completedSetsQueryBuilder.execute().allResults()
       val sets =
-        setsResult.map { withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets }
+        setsResult.map {
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
+        }
 
       workout?.let {
         it.workoutItems.forEach { workoutItem ->
           when (workoutItem) {
             is ExerciseSets -> {
-              workoutItem.sets = sets.filter { set -> set.exerciseSetsID == workoutItem.id }
-                .sortedBy { set -> set.setNumber }.toMutableList()
+              workoutItem.sets =
+                sets
+                  .filter { set -> set.exerciseSetsID == workoutItem.id }
+                  .sortedBy { set -> set.setNumber }
+                  .toMutableList()
             }
 
             is Superset -> {
               workoutItem.exercisesSets.forEach { exerciseSets ->
-                exerciseSets.sets = sets.filter { set -> set.exerciseSetsID == exerciseSets.id }
-                  .sortedBy { set -> set.setNumber }.toMutableList()
+                exerciseSets.sets =
+                  sets
+                    .filter { set -> set.exerciseSetsID == exerciseSets.id }
+                    .sortedBy { set -> set.setNumber }
+                    .toMutableList()
               }
             }
           }
@@ -333,7 +351,9 @@ class CompletedWorkoutRepositoryImpl(
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts }
+      return result?.let {
+        withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -350,12 +370,13 @@ class CompletedWorkoutRepositoryImpl(
       val completedSetsCollection = db.getCollection("CompletedSets")
       requireNotNull(completedSetsCollection) { COLLECTION_IS_NULL }
 
-      val completedSets = workout.workoutItems.flatMap { workoutItem ->
-        when (workoutItem) {
-          is ExerciseSets -> workoutItem.sets
-          is Superset -> workoutItem.exercisesSets.flatMap { it.sets }
+      val completedSets =
+        workout.workoutItems.flatMap { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> workoutItem.sets
+            is Superset -> workoutItem.exercisesSets.flatMap { it.sets }
+          }
         }
-      }
 
       if (completedSets.isEmpty()) return
 
@@ -368,68 +389,78 @@ class CompletedWorkoutRepositoryImpl(
         "$TAG All sets workoutIDs does not match Workout.id!"
       }
 
-      db.inBatch(UnitOfWork {
-        completedSets.forEach { set ->
-          require(set.workoutID == workoutID) { "$TAG Set workoutID does not match Workout.id!" }
-          val setIdStr = "Set:${set.id}"
-          try {
-            val setJsonContent = withDefaults.encodeToString(set)
-            completedSetsCollection.getDocument(setIdStr)?.toMutable()?.let {
-              it.setJSON(setJsonContent)
-              Log.i(
-                "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
-                "Updating set $setJsonContent"
+      db.inBatch(
+        UnitOfWork {
+          completedSets.forEach { set ->
+            require(set.workoutID == workoutID) { "$TAG Set workoutID does not match Workout.id!" }
+            val setIdStr = "Set:${set.id}"
+            try {
+              val setJsonContent = withDefaults.encodeToString(set)
+              completedSetsCollection.getDocument(setIdStr)?.toMutable()?.let {
+                it.setJSON(setJsonContent)
+                Log.i(
+                  "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
+                  "Updating set $setJsonContent",
+                )
+                completedSetsCollection.save(it)
+              }
+                ?: Log.i(
+                  "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
+                  "Saving set $setJsonContent",
+                )
+              completedSetsCollection.save(MutableDocument(setIdStr, setJsonContent))
+            } catch (e: kotlinx.serialization.SerializationException) {
+              Log.e(
+                "Failed to serialize set: $setIdStr for workout: $workoutIDStr",
+                e.stackTraceToString(),
               )
-              completedSetsCollection.save(it)
-            } ?: Log.i(
-              "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
-              "Saving set $setJsonContent"
-            )
-            completedSetsCollection.save(MutableDocument(setIdStr, setJsonContent))
-          } catch (e: kotlinx.serialization.SerializationException) {
-            Log.e(
-              "Failed to serialize set: $setIdStr for workout: $workoutIDStr",
-              e.stackTraceToString()
-            )
-//            throw e // Or handle as per your strategy
-          } catch (e: Exception) { // Catch generic exception from DB for now
-            Log.e(
-              "Failed to save set: $setIdStr for workout: $workoutIDStr to DB",
-              e.stackTraceToString()
-            )
-//            throw ("Failed to save set $setIdStr", e) // Wrap in custom exception
+              //            throw e // Or handle as per your strategy
+            } catch (e: Exception) { // Catch generic exception from DB for now
+              Log.e(
+                "Failed to save set: $setIdStr for workout: $workoutIDStr to DB",
+                e.stackTraceToString(),
+              )
+              //            throw ("Failed to save set $setIdStr", e) // Wrap in custom exception
+            }
           }
-
         }
-      })
+      )
 
       // Create a new workout instance with all set data cleared,
-      val newWorkout = workout.copy(workoutItems = workout.workoutItems.map { workoutItem ->
-        when (workoutItem) {
-          is ExerciseSets -> {
-            workoutItem.copy(sets = mutableListOf<Set>())
-          }
+      val newWorkout =
+        workout.copy(
+          workoutItems =
+            workout.workoutItems.map { workoutItem ->
+              when (workoutItem) {
+                is ExerciseSets -> {
+                  workoutItem.copy(sets = mutableListOf<Set>())
+                }
 
-          is Superset -> {
-            workoutItem.copy(exercisesSets = workoutItem.exercisesSets.map { exerciseSets ->
-              exerciseSets.copy(sets = mutableListOf<Set>())
-            })
-          }
-        }
-      })
+                is Superset -> {
+                  workoutItem.copy(
+                    exercisesSets =
+                      workoutItem.exercisesSets.map { exerciseSets ->
+                        exerciseSets.copy(sets = mutableListOf<Set>())
+                      }
+                  )
+                }
+              }
+            }
+        )
 
       val workoutJson = withDefaults.encodeToString(newWorkout)
       completedWorkoutsCollection.getDocument(workoutIDStr)?.toMutable()?.let {
         it.setJSON(workoutJson)
         Log.i(
           "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
-          "Updating workout $workoutJson"
+          "Updating workout $workoutJson",
         )
         completedWorkoutsCollection.save(it)
-      } ?: Log.i(
-        "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
-        "Saving workout $workoutJson"
-      )
+      }
+        ?: Log.i(
+          "CompletedWorkoutRepositoryImpl.upsertCompletedWorkout()",
+          "Saving workout $workoutJson",
+        )
       completedWorkoutsCollection.save(MutableDocument(workoutIDStr, workoutJson))
 
       // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
@@ -437,7 +468,6 @@ class CompletedWorkoutRepositoryImpl(
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
-
   }
 
   override suspend fun deleteCompletedWorkout(workout: Workout): Boolean {
@@ -449,22 +479,24 @@ class CompletedWorkoutRepositoryImpl(
       val completedSetsCollection = db.getCollection("CompletedSets")
       requireNotNull(completedSetsCollection) { COLLECTION_IS_NULL }
 
-      val workoutQuery = QueryBuilder.select(SelectResult.all())
-        .from(DataSource.collection(completedWorkoutsCollection))
-        .where(Expression.property("id").equalTo(Expression.string(workout.id.toHexString())))
+      val workoutQuery =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(completedWorkoutsCollection))
+          .where(Expression.property("id").equalTo(Expression.string(workout.id.toHexString())))
 
-      val completedSets = workout.workoutItems.flatMap { workoutItem ->
-        when (workoutItem) {
-          is ExerciseSets -> workoutItem.sets
-          is Superset -> workoutItem.exercisesSets.flatMap { it.sets }
+      val completedSets =
+        workout.workoutItems.flatMap { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> workoutItem.sets
+            is Superset -> workoutItem.exercisesSets.flatMap { it.sets }
+          }
         }
-      }
 
       completedWorkoutsCollection.getDocument("Workout:${workout.id}")?.let {
         completedWorkoutsCollection.delete(it)
         Log.d(
           "CompletedWorkoutRepositoryImpl.deleteCompletedWorkout()",
-          "Deleted workout: Workout:${workout.id}"
+          "Deleted workout: Workout:${workout.id}",
         )
       }
 
@@ -473,7 +505,7 @@ class CompletedWorkoutRepositoryImpl(
           completedSetsCollection.delete(setDocument)
           Log.d(
             "CompletedWorkoutRepositoryImpl.deleteCompletedWorkout()",
-            "Deleted set: Set:${set.id}"
+            "Deleted set: Set:${set.id}",
           )
         }
       }
@@ -484,5 +516,279 @@ class CompletedWorkoutRepositoryImpl(
     }
     return false
   }
-}
 
+  override fun getWorkoutAnalyticsForPeriod(
+    // TODO Confirm DateTime is adjusted for user timezone
+    startDate: LocalDateTime,
+    endDate: LocalDateTime,
+  ): WorkoutAnalytics? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL }
+
+//      val start: Date = Date(startDate.year, startDate.month.ordinal, startDate.day)
+//      val end: Date = Date(endDate.year, endDate.month.ordinal, endDate.day)
+
+      // TODO Add type if needed
+
+      val workoutCount =
+        db
+          .createQuery(
+            "SELECT Count(*) as count " +
+                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getInt("count") ?: 0
+
+      //        QueryBuilder.select(
+      //            SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+      //          )
+      //          .from(DataSource.collection(completedWorkoutsCollection))
+      //          .where(
+      //            Expression.property("dateCreated").between(Expression.date(start),
+      // Expression.date(end))
+      //          ).execute().allResults().firstOrNull()?.getInt("count")
+
+      val totalDuration =
+        db
+          .createQuery(
+            "SELECT SUM(workoutDuration) as duration " +
+                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getInt("duration")
+          ?.toDuration(DurationUnit.MILLISECONDS)?.inWholeMinutes
+          ?: 0.toDuration(DurationUnit.MINUTES).inWholeMinutes
+
+      val totalVolumeInPounds =
+        db
+          .createQuery(
+            "SELECT SUM(totalVolumeInPounds) as totalVolumeInPounds " +
+                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getDouble("totalVolumeInPounds") ?: 0.0
+
+      val totalVolumeInKilograms =
+        db
+          .createQuery(
+            "SELECT SUM(totalVolumeInKilograms) as totalVolumeInKilograms  " +
+                    "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN $startDate AND $endDate"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getDouble("totalVolumeInKilograms") ?: 0.0
+
+      return WorkoutAnalytics(
+        workoutCount,
+        totalDuration,
+        totalVolumeInPounds,
+        totalVolumeInKilograms,
+      )
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return null
+  }
+
+  override fun getWorkoutAnalyticsForLifetime(): WorkoutAnalytics? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL }
+
+      // TODO Add type if needed
+
+      val workoutCount =
+        db
+          .createQuery(
+            "SELECT Count(*) as count " +
+                    "FROM `CompletedWorkouts`"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getInt("count") ?: 0
+
+      val totalDuration =
+        db
+          .createQuery(
+            "SELECT SUM(workoutDuration) as duration " +
+                    "FROM `CompletedWorkouts`"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getInt("duration")
+          ?.toDuration(DurationUnit.MILLISECONDS)?.inWholeMinutes
+          ?: 0.toDuration(DurationUnit.MINUTES).inWholeMinutes
+
+      val totalVolumeInPounds =
+        db
+          .createQuery(
+            "SELECT SUM(totalVolumeInPounds) as totalVolumeInPounds " +
+                    "FROM `CompletedWorkouts`"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getDouble("totalVolumeInPounds") ?: 0.0
+
+      val totalVolumeInKilograms =
+        db
+          .createQuery(
+            "SELECT SUM(totalVolumeInKilograms) as totalVolumeInKilograms  " +
+                    "FROM `CompletedWorkouts`"
+          )
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getDouble("totalVolumeInKilograms") ?: 0.0
+
+      return WorkoutAnalytics(
+        workoutCount,
+        totalDuration,
+        totalVolumeInPounds,
+        totalVolumeInKilograms,
+      )
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return null
+  }
+
+  override fun getWorkoutAnalyticsChartData(): WorkoutAnalytics? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL }
+
+      // TODO Add type if needed
+
+      val workoutEndedDateTimes =
+        db
+          .createQuery(
+            "SELECT workoutEnded as workoutEnded " +
+                    "FROM `CompletedWorkouts` ORDER BY workoutEnded DESC"
+          )
+          .execute()
+          .allResults().map { result ->
+            result.getDate("workoutEnded")?.toInstant()?.toKotlinInstant()
+//          ?.toLocalDateTime(java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone())
+          }
+
+      val totalVolumeInPounds =
+        db
+          .createQuery(
+            "SELECT totalVolumeInPounds as totalVolumeInPounds, workoutEnded as workoutEnded " +
+                    "FROM `CompletedWorkouts`"
+          )
+          .execute()
+          .allResults().associate { result ->
+            (result.getDate("workoutEnded")?.toInstant()
+              ?.toKotlinInstant() to result.getDouble("totalVolumeInPounds"))
+          }
+
+      val totalVolumeInKilograms =
+        db
+          .createQuery(
+            "SELECT totalVolumeInKilograms as totalVolumeInKilograms, workoutEnded as workoutEnded " +
+                    "FROM `CompletedWorkouts`"
+          )
+          .execute()
+          .allResults().associate { result ->
+            (result.getDate("workoutEnded")?.toInstant()
+              ?.toKotlinInstant() to result.getDouble("totalVolumeInKilograms"))
+          }
+
+      val totalVolumeInKilograms =
+        db
+          .createQuery(
+            "SELECT totalVolumeInKilograms as totalVolumeInKilograms, workoutEnded as workoutEnded " +
+                    "FROM `CompletedWorkouts`"
+          )
+          .execute()
+          .allResults().associate { result ->
+            (result.getDate("workoutEnded")?.toInstant()
+              ?.toKotlinInstant() to result.getDouble("totalVolumeInKilograms"))
+          }
+
+      return WorkoutAnalytics(
+        workoutCount,
+        totalDuration,
+        totalVolumeInPounds,
+        totalVolumeInKilograms,
+      )
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return null
+  }
+
+
+  override fun getWorkoutStreakWeek(): Int? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedWorkoutsCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(completedWorkoutsCollection) { COLLECTION_IS_NULL }
+
+      val timezone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
+
+      val startDate = LocalDate.now().with(
+        TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
+      ).atStartOfDay().toKotlinLocalDateTime().toInstant(timezone)
+
+      val endDate = LocalDate.now().with(
+        TemporalAdjusters.next(DayOfWeek.MONDAY)
+      ).atStartOfDay().minusNanos(1).toKotlinLocalDateTime().toInstant(timezone)
+
+      // TODO Add type if needed
+
+      val workoutEndedDateTimes =
+        db
+          .createQuery(
+            "SELECT workoutEnded as workoutEnded " +
+                    "FROM `CompletedWorkouts` ORDER BY workoutEnded DESC"
+          )
+          .execute()
+          .allResults().map { result ->
+            result.getDate("workoutEnded")?.toInstant()?.toKotlinInstant()
+//          ?.toLocalDateTime(java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone())
+          }
+
+      val workoutWeekStreakMap: MutableMap<ClosedRange<Instant>, Int> = mutableMapOf()
+
+      var dateRange = startDate.minus(7.days)..endDate.minus(7.days)
+
+      while (true) {
+        val workoutCountForWeek = workoutEndedDateTimes.filterNotNull().count { it in dateRange }
+
+        if (workoutCountForWeek == 0) break
+        workoutWeekStreakMap.put(dateRange, workoutCountForWeek)
+
+        dateRange = dateRange.start.minus(7.days)..dateRange.endInclusive.minus(7.days)
+      }
+
+//      val workoutWeekStreakCount = workoutWeekStreakMap.count()
+//
+//      var workoutWeekStreak = 0
+//      workoutWeekStreakMap.forEach { if (it.value > 0) workoutWeekStreak++ else return@forEach }
+
+      return workoutWeekStreakMap.count()
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return null
+  }
+}
