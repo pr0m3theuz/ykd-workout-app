@@ -207,6 +207,8 @@ fun AnalyticsScreenContent(
         1 -> WorkoutSummaryContent(totalTrainingVolumeData = totalTrainingVolumeData) // Placeholder
         2 -> ExerciseAnalyticsContent(onNavigateToDashboardsInfo)
       }
+
+      Spacer(Modifier.height(16.dp))
     }
   }
 }
@@ -506,8 +508,6 @@ fun WorkoutSummaryContent(
 
       val workoutEndedDateTimes = totalTrainingVolumeData.map { it.workoutEnded }
 
-      //  val workoutWeekStreakMap: MutableMap<ClosedRange<Instant>, Int> = mutableMapOf()
-
       val dateSequence =
         generateSequence(
           seed =
@@ -529,10 +529,6 @@ fun WorkoutSummaryContent(
               )
 
             Period.MONTHLY -> {
-              //            startDateMonthlyJava = startDateMonthlyJava.minus(1,
-              // ChronoUnit.MONTHS)
-              //            endDateMonthlyJava = endDateMonthlyJava.minus(1, ChronoUnit.MONTHS)
-
               currentRange.start
                 .toLocalDateTime(timezone)
                 .toJavaLocalDateTime()
@@ -544,11 +540,6 @@ fun WorkoutSummaryContent(
                 .minus(1, ChronoUnit.MONTHS)
                 .toKotlinLocalDateTime()
                 .toInstant(timezone)
-
-              //
-              // startDateMonthlyJava.toKotlinLocalDateTime().toInstant(timezone)..endDateMonthlyJava
-              //                .toKotlinLocalDateTime()
-              //                .toInstant(timezone)
             }
           }
         }
@@ -561,57 +552,37 @@ fun WorkoutSummaryContent(
         when (selectedPeriod) {
           Period.DAILY -> {
             workoutFrequencyData.keys.mapNotNull {
-//              val startDateString =
-//               it.start.toLocalDateTime(timezone).date.toString()
-
               val dateFormatter =
                 DateTimeFormatter.ofPattern("MMM d").withLocale(Locale.current.platformLocale)
-              //              startDateString // "$startDateString - $endDateString"
 
-              val startDateString =
                 it.start.toLocalDateTime(timezone).toJavaLocalDateTime().format(dateFormatter)
-              startDateString
             }
           }
 
           Period.WEEKLY -> {
             workoutFrequencyData.keys.mapNotNull {
-//              val startDateString =
-//               it.start.toLocalDateTime(timezone).date.toString()
-              //              val endDateString =
-              // it.endInclusive.toLocalDateTime(timezone).date.toString()
-              //              startDateString // "$startDateString - $endDateString"
-
               val dateFormatter =
                 DateTimeFormatter.ofPattern("MMM d yyyy").withLocale(Locale.current.platformLocale)
-              //              startDateString // "$startDateString - $endDateString"
 
-              val startDateString =
-                it.start.toLocalDateTime(timezone).toJavaLocalDateTime().format(dateFormatter)
-              startDateString
+
+              it.start.toLocalDateTime(timezone).toJavaLocalDateTime().format(dateFormatter)
+
             }
           }
 
           Period.MONTHLY -> {
             workoutFrequencyData.keys.mapNotNull {
-//              val startDateString =
-//               it.start.toLocalDateTime(timezone).date.toString()
-              //              val endDateString =
-              // it.endInclusive.toLocalDateTime(timezone).date.toString()
               val dateFormatter =
                 DateTimeFormatter.ofPattern("MMM yyyy").withLocale(Locale.current.platformLocale)
-              //              startDateString // "$startDateString - $endDateString"
 
-              val startDateString =
                 it.start.toLocalDateTime(timezone).toJavaLocalDateTime().format(dateFormatter)
-              startDateString
+
             }
           }
         }
 
       val valuesReversed = workoutFrequencyData.values.toList().asReversed()
 
-      // TODO
       val firstNonZeroIndex = valuesReversed.indexOfFirst { it != 0 }.minus(1).coerceAtLeast(0)
 
       val labelsReversed = labels.asReversed().subList(firstNonZeroIndex, labels.size)
@@ -651,28 +622,12 @@ fun WorkoutSummaryContent(
             .subList(firstNonZeroIndex, valuesReversed.size),
         )
 
-      //      val workoutWeekStreakCount = workoutWeekStreakMap.count()
-      //
-      //      var workoutWeekStreak = 0
-      //      workoutWeekStreakMap.forEach { if (it.value > 0) workoutWeekStreak++ else
-      // return@forEach
-      // }
-
-      // TODO Workout Frequency per Week Chart
-
       val boxModifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1f / 1f)
       Text(text = "Workout Frequency", style = MaterialTheme.typography.titleMedium)
 
       Row(modifier = boxModifier) {
-        //        Image(
-        //          painterResource(R.drawable.one_punch_man_ok),
-        //          contentDescription = "One Punch Man",
-        //          modifier = Modifier.fillMaxSize(),
-        //          contentScale = ContentScale.FillWidth,
-        //        )
-
         WebViewChart(
           workoutFrequencyChartData,
           ChartType.FREQUENCY,
@@ -681,19 +636,11 @@ fun WorkoutSummaryContent(
         )
       }
 
-      // TODO Total Training Volume per Week Chart
-
       Text(
         text = "Total Training Volume (${userMassUnit.abbreviation})",
         style = MaterialTheme.typography.titleSmall,
       )
       Row(modifier = boxModifier) {
-        //        Image(
-        //          painterResource(R.drawable.one_punch_man_ok),
-        //          contentDescription = "One Punch Man",
-        //          modifier = Modifier.fillMaxSize(),
-        //          contentScale = ContentScale.FillWidth,
-        //        )
         if (userMassUnit == MassUnit.POUNDS) {
           WebViewChart(
             totalTrainingVolumePoundsChartData,
