@@ -442,8 +442,8 @@ fun WorkoutSummaryContent(
   //  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
   //    Text("Workout Summary Content", style = MaterialTheme.typography.titleLarge)
   //  }
-  Column {
-    var selectedPeriod by remember { mutableStateOf(Period.DAILY) }
+
+  var selectedPeriod by remember { mutableStateOf(Period.DAILY) }
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       Period.entries.forEach { period ->
@@ -658,7 +658,7 @@ fun WorkoutSummaryContent(
         }
       }
     }
-  }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

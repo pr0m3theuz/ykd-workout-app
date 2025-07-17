@@ -21,14 +21,18 @@
 
 <body>
 <!-- Plotly uses simple div containers -->
-<div class="chart-container" id="frequencyChart"></div>
-<div class="chart-container" id="volumeChart"></div>
+<div class="chart-container" id="frequencyChart" style="display: none;"></div>
+<div class="chart-container" id="volumeChart" style="display: none;"></div>
 
 <script type="text/javascript">
     function displayFrequencyChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillColor, paper_bgcolor, plot_bgcolor, axes_color, gridcolor) {
 
-        const element = document.getElementById("volumeChart");
-        element.remove();
+        // Show frequency chart
+        const frequencyElement = document.getElementById("frequencyChart");
+        frequencyElement.style.display = 'block';
+
+        const volumeElement = document.getElementById("volumeChart");
+        volumeElement.style.display = 'none';
 
         console.log(JSON.stringify(rawData));
 
@@ -82,8 +86,13 @@
 
     function displayVolumeChart(rawData, xMinAllowed, xMaxAllowed, yMinAllowed, yMaxAllowed, staticPlot, color, fillColor, paper_bgcolor, plot_bgcolor, axes_color, gridcolor) {
         // 1. Define the data trace for the line chart
-        const element = document.getElementById("frequencyChart");
-        element.remove();
+        // Hide volume chart instead of removing it
+        // Show frequency chart
+        const volumeElement = document.getElementById("volumeChart");
+        volumeElement.style.display = 'block';
+
+        const frequencyElement = document.getElementById("frequencyChart");
+        frequencyElement.style.display = 'none';
 
         console.log(JSON.stringify(rawData));
 
