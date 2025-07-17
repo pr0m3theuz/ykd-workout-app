@@ -53,6 +53,7 @@ fun ExercisesFilterMenu(
 
   val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsStateWithLifecycle()
   val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsStateWithLifecycle()
+  // TODO Implement this
   val movementTypesChecked = remember { exercisesViewModel.movementTypesChecked }
 
   fun expandMuscleGroups() {
@@ -149,18 +150,18 @@ fun ExercisesFilterMenu(
                   Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    horizontalArrangement = Arrangement.SpaceBetween,
                   ) {
-                    Text(text = muscleGroup.key.name)
-
                     Checkbox(
                       checked = checked,
+//                      enabled = false,
                       onCheckedChange = {
-//                        onCheckedChange(it)
-//                        setMuscleGroupsChecked(muscleGroup.key, it)
-//                        exercisesViewModel.filterExercises()
+                        onCheckedChange(it)
+                        setMuscleGroupsChecked(muscleGroup.key, it)
+                        exercisesViewModel.filterExercises()
                       },
                     )
+                    Text(text = muscleGroup.key.name)
                   }
                 },
                 onClick = {
@@ -218,18 +219,17 @@ fun ExercisesFilterMenu(
                   Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    horizontalArrangement = Arrangement.SpaceBetween,
                   ) {
-                    Text(text = equipment.key.name)
-
                     Checkbox(
                       checked = checked,
                       onCheckedChange = {
-//                        onCheckedChange(it)
-//                        setEquipmentsChecked(equipment.key, it)
-//                        exercisesViewModel.filterExercises()
+                        onCheckedChange(it)
+                        setEquipmentsChecked(equipment.key, it)
+                        exercisesViewModel.filterExercises()
                       },
                     )
+                    Text(text = equipment.key.name)
                   }
                 },
                 onClick = {
@@ -282,11 +282,10 @@ fun ExercisesFilterMenu(
                   Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    horizontalArrangement = Arrangement.SpaceBetween,
                   ) {
-                    Text(text = movementType.printableName)
-
                     Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
+                    Text(text = movementType.printableName)
                   }
                 },
                 onClick = {},
