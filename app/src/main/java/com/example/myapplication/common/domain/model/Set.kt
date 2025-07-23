@@ -60,6 +60,9 @@ data class Set(
   var targetRepetitionsInReserve: Double? = null,
   var percentage1RM: Double? = null,
   var estimated1RM: Double? = null, // TODO implement functions to update
+  // TODO Add to Proto schema
+//  var estimated1RMPounds: Double? = null, // TODO implement functions to update
+//  var estimated1RMKilograms: Double? = null, // TODO implement functions to update
   var targetPercentage1RM: Double? = null, // for progression scheme & utils
   var setCompleted: Boolean = false,
   var setVolumeInPounds: Double? = null,
