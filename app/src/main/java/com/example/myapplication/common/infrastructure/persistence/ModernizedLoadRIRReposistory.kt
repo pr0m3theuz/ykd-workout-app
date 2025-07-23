@@ -30,7 +30,9 @@ interface ModernizedLoadRIRReposistory {
     estimated1RMPercent: Double,
   ): LoadRepCapacity?
 
-  fun getAllModernizedLoadRIR(repCapacity: RepCapacity): Flow<List<ModernizedLoadRIR>>
+  fun getRepCapacityModernizedLoadRIR(repCapacity: RepCapacity): Flow<List<ModernizedLoadRIR>>
+
+  fun getAllModernizedLoadRIR(): Flow<List<ModernizedLoadRIR>>
 
   fun getModernizedLoadRIR(
     repCapacity: RepCapacity,

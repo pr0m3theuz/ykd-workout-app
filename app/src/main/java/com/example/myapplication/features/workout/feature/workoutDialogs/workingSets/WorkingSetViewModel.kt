@@ -82,7 +82,7 @@ class WorkingSetViewModel(
 
   private fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
     viewModelScope.launch {
-      modernizedLoadRIRReposistory.getAllModernizedLoadRIR(repCapacity).collect {
+      modernizedLoadRIRReposistory.getRepCapacityModernizedLoadRIR(repCapacity).collect {
         _modernizedLoadRIRList = it
         _modernizedLoadRIRListFlow.value = _modernizedLoadRIRList
       }

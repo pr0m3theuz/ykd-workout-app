@@ -191,7 +191,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     return null
   }
 
-  override fun getAllModernizedLoadRIR(repCapacity: RepCapacity): Flow<List<ModernizedLoadRIR>> {
+  override fun getRepCapacityModernizedLoadRIR(repCapacity: RepCapacity): Flow<List<ModernizedLoadRIR>> {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("ModernizedLoadRIR")
@@ -202,6 +202,33 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection))
           .where(Expression.property("repCapacity").equalTo(Expression.string(repCapacity.name)))
+
+      val flow =
+        query
+          .queryChangeFlow()
+          .map { queryChange -> mapQueryChangeToModernizedLoadRIR(queryChange) }
+          .flowOn(Dispatchers.IO)
+
+      query.execute() // <4>
+      return flow
+
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return flow {}
+  }
+
+  override fun getAllModernizedLoadRIR(): Flow<List<ModernizedLoadRIR>> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val collection = db.getCollection("ModernizedLoadRIR")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val query =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection))
 
       val flow =
         query
