@@ -602,6 +602,10 @@ class WorkoutViewModel(
         }
         // If neither condition is met (e.g., rest timer disabled for the set type), no timer starts
       }
+
+      if (_isWorkoutCountUpTimerPaused.value) {
+        startWorkoutTimer()
+      }
     }
     // If completedSets.add() returns false, it means this ID was already processed, so do nothing.
   }
