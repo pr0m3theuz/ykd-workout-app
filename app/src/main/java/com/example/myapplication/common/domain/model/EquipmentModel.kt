@@ -44,6 +44,7 @@ enum class ProgressionSchemeEnum {
 // }
 
 enum class MovementType(val printableName: String) {
+    // TODO Implement in Database
     COMPOUND("Compound"),
     ISOLATION("Isolation"),
     ISOMETRIC("Isometric"),

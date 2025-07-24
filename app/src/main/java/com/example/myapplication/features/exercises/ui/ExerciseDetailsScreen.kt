@@ -39,6 +39,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,10 +73,15 @@ import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.formatWorkoutDate
 import com.example.myapplication.common.domain.model.setSummaryRIR
 import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.exercises.ExercisesUiEvent
+import com.example.myapplication.features.exercises.ExercisesUiState
 import com.example.myapplication.features.exercises.ExercisesViewModel
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinTimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
+import java.time.format.DateTimeFormatter
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -86,6 +94,8 @@ fun ExerciseDetailsScreen(
 ) {
   val tabState by exercisesViewModel.exerciseDetailsLayoutTabState.collectAsStateWithLifecycle()
 
+  val exerciseUiState by exercisesViewModel.uiState.collectAsStateWithLifecycle()
+
   val defaultTimeZone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
 
   if (exerciseID.contentEquals("Select an exercise")) {
@@ -96,6 +106,11 @@ fun ExerciseDetailsScreen(
 
     exercise?.let { it ->
       val completedSetsByExercise = exercisesViewModel.getCompletedSetsByWorkout(it)
+
+      LaunchedEffect(it.name) {
+        exercisesViewModel.onEvent(ExercisesUiEvent.GetExerciseRecords(it))
+      }
+
       ExerciseDetailsLayout(
         navController,
         exercise = it,
@@ -114,12 +129,15 @@ fun ExerciseDetailsScreen(
                   program = program,
                   defaultTimeZone = defaultTimeZone,
                   // TODO navigate to workout screen or workout overview screen
-                  navigateToWorkoutScreen = { navController.navigate("history?editWorkout=${workout.id}") }
+                  navigateToWorkoutScreen = {
+                    navController.navigate("history?editWorkout=${workout.id}")
+                  },
                 )
               },
             )
           } ?: NoHistoryTab() // TODO Replace with No History Content
         },
+        recordsTab = { RecordsTab(exerciseUiState) },
       )
     }
   }
@@ -164,6 +182,7 @@ private fun ExerciseDetailsLayout(
   setTabState: (Int) -> Unit = {},
   navigateToListPane: () -> Unit,
   historyTab: @Composable () -> Unit = {},
+  recordsTab: @Composable () -> Unit = {},
 ) {
   //    val exercise = _exercise.firstOrNull()
 
@@ -184,7 +203,7 @@ private fun ExerciseDetailsLayout(
             maxLines = 2,
             overflow = TextOverflow.Visible,
             color = onSurface,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
           )
         },
@@ -232,7 +251,7 @@ private fun ExerciseDetailsLayout(
           0 -> AboutTab(exercise.name)
           1 -> historyTab()
           2 -> ChartTab(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
-          3 -> RecordsTab()
+          3 -> recordsTab()
         }
       }
     }
@@ -345,7 +364,7 @@ fun HistoryTab(
 ) {
   //    TODO Write query to get Workout Data for an Exercise, return a List
   //    TODO Change to LazyColumn
-  LazyColumn {
+  LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
     items(
       workoutSetsMap.count(),
       key = { index -> workoutSetsMap[index].first.lazyListItemID }) { index ->
@@ -376,12 +395,14 @@ private fun WorkoutCard(
   val subtitle = MaterialTheme.colorScheme.onSurfaceVariant
   val onSurface = MaterialTheme.colorScheme.onSurface
 
+  // TODO Add notes & descriptions
+
   Card(
     onClick = { navigateToWorkoutScreen() },
     modifier = Modifier.fillMaxWidth(),
     // colors = cardColors,
     //            .padding(8.dp)
-//    border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outlineVariant),
+    //    border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outlineVariant),
   ) {
     Column(Modifier.padding(16.dp)) {
       Text(text = workout.name, style = MaterialTheme.typography.titleMedium, color = onSurface)
@@ -423,6 +444,7 @@ private fun WorkoutCard(
 
       exerciseSets?.let {
         // TODO move to MainActivity and prefer the user default
+        // TODO Simplify
         Text(
           text =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -496,9 +518,11 @@ fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
   }
 }
 
-@Preview(showBackground = true)
+// @Preview(showBackground = true)
 @Composable
-fun RecordsTab() {
+fun RecordsTab(uiState: ExercisesUiState) {
+  val exerciseRecords = uiState.exerciseRecords
+
   val rowPadding = 4.dp
 
   val onSurface = MaterialTheme.colorScheme.onSurface
@@ -510,122 +534,192 @@ fun RecordsTab() {
       contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
     )
 
-  Column(Modifier
-    .padding(4.dp)
-    .fillMaxWidth()) {
-    Row(Modifier.padding(rowPadding)) {
-      Text("Personal Records", color = onSurface, style = MaterialTheme.typography.titleMedium)
-    }
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      Text("Estimated 1RM", color = onSurface)
-      Text("13 lbs", color = onSurface)
-    }
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      Text("Max Volume", color = onSurface)
-      Text("1,300 lbs", color = onSurface)
-    }
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      Text("Max Weight", color = onSurface)
-      Text("13 lbs", color = onSurface)
-    }
-    Row(Modifier
-      .padding(rowPadding)
-      .fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-      Button(onClick = { /* TODO Navigate Records History */ }, colors = buttonColors) {
-        Text(text = "View Records History", color = onSurface)
+  LazyColumn(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(rowPadding)) {
+    item {
+      Row {
+        Text("Personal Records", color = onSurface, style = MaterialTheme.typography.titleMedium)
       }
     }
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      Text("Reps", color = onSurface, modifier = Modifier.weight(1f))
-      Text(
-        "Best Performance",
-        color = onSurface,
-        modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center,
-      )
-      Text(
-        "Estimated 1RM",
-        color = onSurface,
-        modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center,
-      )
+
+    item {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text("Estimated 1RM", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        // TODO Add Kilograms
+        Text(
+          "${
+            exerciseRecords?.bestPerformanceByRepetitions?.firstOrNull()
+              ?.let { doubleFormatted(it.estimated1RMPounds) }?.ifEmpty { "-" }
+          } lbs",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium,
+        )
+      }
+    }
+
+    item {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text("Max Volume", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        // TODO Add Kilograms
+        Text(
+          "${exerciseRecords?.maxVolumePounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium,
+        )
+      }
+    }
+
+    item {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text("Max Weight", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        // TODO Add Kilograms
+        Text(
+          "${exerciseRecords?.maxWeightLiftedPounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium,
+        )
+      }
+    }
+
+    item {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        Button(onClick = { /* TODO Navigate Records History */ }, colors = buttonColors) {
+          Text(
+            text = "View Records History",
+            color = onSurface,
+            style = MaterialTheme.typography.bodyMedium,
+          )
+        }
+      }
+    }
+
+    item {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(
+          "Reps",
+          color = onSurface,
+          modifier = Modifier.weight(1f),
+          style = MaterialTheme.typography.bodyMedium,
+          fontWeight = FontWeight.Bold,
+        )
+        Text(
+          "Best Performance",
+          color = onSurface,
+          modifier = Modifier.weight(1f),
+          textAlign = TextAlign.Center,
+          style = MaterialTheme.typography.bodyMedium,
+          fontWeight = FontWeight.Bold,
+        )
+        Text(
+          "Estimated RM",
+          color = onSurface,
+          modifier = Modifier.weight(1f),
+          textAlign = TextAlign.Center,
+          style = MaterialTheme.typography.bodyMedium,
+          fontWeight = FontWeight.Bold,
+        )
+      }
     }
 
     // TODO Refoctor to List
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Text(text = "1", color = onSurface, modifier = Modifier.weight(1f))
+    // TODO handle missing data, i.e. where there is no actual performance data
+    exerciseRecords?.bestPerformanceByRepetitions?.forEach { set ->
+      item {
+        Row(
+          Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+            text = "${set?.repetitions}",
+            color = onSurface,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyMedium,
+          )
 
-      Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-        Text(text = "85 lbs (# of Reps)", color = onSurface, textAlign = TextAlign.Center)
+          Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+          ) {
+            Text(
+              text =
+                "${set?.weightPounds?.let { doubleFormatted(it) } ?: "-"} lbs (${set?.repetitionsPerformed ?: "-"} Reps)",
+              color = onSurface,
+              textAlign = TextAlign.Center,
+              style = MaterialTheme.typography.bodyMedium,
+            )
+
+            val dateFormatter =
+              DateTimeFormatter.ofPattern("MMMM d yyyy").withLocale(Locale.current.platformLocale)
+
+            val timezone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
+            val dateCreated =
+              set
+                ?.datePerformed
+                ?.toLocalDateTime(timezone)
+                ?.toJavaLocalDateTime()
+                ?.format(dateFormatter)
+
+            Text(
+              text = dateCreated ?: "-",
+              color = subtitle,
+              style = MaterialTheme.typography.bodySmall,
+              textAlign = TextAlign.Center,
+            )
+          }
+
+          Text(
+            text = "${set?.estimated1RMPounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+            color = onSurface,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium,
+          )
+        }
+      }
+    }
+
+    item {
+      Row(Modifier.padding(vertical = 16.dp)) {
         Text(
-          text = "Date",
+          text =
+            "Estimated Rep Maxes are calculated using Data Driven Strength's Modernized Load/RIR " +
+                    "tables if Rate of Perceived Effort (RPE) or Repetitions In Reserve (RIR) were recorded for the set and uses the Repetition Capacity of the exercise. " +
+                    "1RM Percentage selected for Rep Max calculation uses RPE is 10 and RIR is 0." +
+                    "Alternatively, Brzyckyi's formuala is used to calculate estimated rep maxes if RPE or RIR were not recorded. " +
+                    "Actual Rep Maxes show your best performance for each rep.",
           color = subtitle,
           style = MaterialTheme.typography.bodySmall,
-          textAlign = TextAlign.Center,
         )
       }
-
-      Text(
-        text = "1RM",
-        color = onSurface,
-        modifier = Modifier.weight(1f),
-        textAlign = TextAlign.Center,
-      )
     }
 
-    Row(Modifier.padding(rowPadding)) {
-      Text(
-        text = "Estimate RMs are generated using ...",
-        color = subtitle,
-        style = MaterialTheme.typography.bodySmall,
-      )
+    item {
+      Row {
+        Text("Lifetime Stats", color = onSurface, style = MaterialTheme.typography.titleMedium)
+      }
     }
-    Row(Modifier.padding(rowPadding)) {
-      Text("Lifetime Stats", color = onSurface, style = MaterialTheme.typography.titleMedium)
+
+    item {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text("Total Reps", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        Text(
+          text = "${exerciseRecords?.totalReps?.let { doubleFormatted(it.toDouble()) } ?: "-"} reps",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium,
+        )
+      }
     }
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      Text("Total Reps", color = onSurface)
-      Text(text = "1,305", color = onSurface)
-    }
-    Row(
-      Modifier
-        .padding(rowPadding)
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      Text("Total Volume", color = onSurface)
-      Text("13,405 lbs", color = onSurface)
+
+    item {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text("Total Volume", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        // TODO Add Kilograms
+        Text(
+          "${exerciseRecords?.totalVolumePounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium,
+        )
+      }
     }
   }
 }

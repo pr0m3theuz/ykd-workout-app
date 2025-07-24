@@ -64,6 +64,8 @@ fun estimateOneRepMaxModernized(
   getRelativeLoadPercentage: (RepCapacity, Double, Double, Int) -> Double?,
 ): Double? {
   if (weight <= 0 || reps <= 0 || rir < 0 || rir > 10 || rpe < 0 || rpe > 10) return null
+
+
   // Get the percentage of 1RM from the selected chart with interpolation
   val percentage = getRelativeLoadPercentage(
     repCapacity,
@@ -78,6 +80,50 @@ fun estimateOneRepMaxModernized(
   } else {
     null // Unable to estimate 1RM
   }
+}
+
+fun estimateTargetOneRepMaxModernized(
+  weight: Double,
+  repsPerformed: Int,
+  targetReps: Int,
+  rir: Double,
+  rpe: Double,
+  repCapacity: RepCapacity = RepCapacity.Average,
+  getRelativeLoadPercentage: (RepCapacity, Double, Double, Int) -> Double?,
+): Double? {
+  if (weight <= 0 || repsPerformed <= 0 || rir < 0 || rir > 10 || rpe < 0 || rpe > 10) return null
+
+
+  // Get the percentage of 1RM from the selected chart with interpolation
+  val percentageActualPerformed = getRelativeLoadPercentage(
+    repCapacity,
+    rpe,
+    rir,
+    repsPerformed
+  )// ?.relativeLoadPercent
+
+  val percentageTargetReps = getRelativeLoadPercentage(
+    repCapacity,
+    10.0,
+    0.0,
+    targetReps
+  )// ?.relativeLoadPercent
+
+  // Calculate estimated 1RM if percentage is found and is greater than 0
+  val estimated1RMBasedOnActual =
+    if (percentageActualPerformed != null && percentageActualPerformed > 0) {
+      weight.div(percentageActualPerformed.div(100))
+    } else {
+      null // Unable to estimate 1RM
+    }
+
+  // Calculate estimated 1RM if percentage is found and is greater than 0
+  val estimated1RMBasedOnTarget = if (percentageTargetReps != null && percentageTargetReps > 0) {
+    estimated1RMBasedOnActual?.times(percentageTargetReps.div(100))
+  } else {
+    null // Unable to estimate 1RM
+  }
+  return estimated1RMBasedOnTarget
 }
 
 /**

@@ -508,11 +508,15 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
   navigation("exercisesList", route = "exercises") {
     //    composable("exercisesScreen") { ExercisesScreen() }
 
-    composable("exercisesList") {
+    composable("exercisesList") { navBackStackEntry ->
+//      val exercisesViewModel: ExercisesViewModel =
+//        navBackStackEntry.sharedViewModel<ExercisesViewModel>(navController)
+
       ExerciseNavigableListDetailScreen(
         navController = navController,
         exerciseListPane = { onClick ->
           ExercisesLazyColumn(
+//            exercisesViewModel = exercisesViewModel,
             navigateToDetailPane = onClick,
             currentDestination = navController.currentBackStackEntry?.destination,
             onNavigateBottomBar = { route ->
@@ -522,7 +526,7 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
                 // on the back stack as users select items
                 popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                 // Avoid multiple copies of the same destination when
-                // reselecting the same item
+                // reselecting the same itemFat Pointers
                 launchSingleTop = true
                 // Restore state when reselecting a previously selected item
                 restoreState = true
@@ -531,7 +535,7 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
           )
         },
         exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
-          ExerciseDetailsScreen(navController, exerciseID, onClick)
+          ExerciseDetailsScreen(navController, exerciseID, onClick /*exercisesViewModel*/)
         },
       )
     }

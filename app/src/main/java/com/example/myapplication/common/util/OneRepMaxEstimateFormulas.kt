@@ -15,13 +15,16 @@ object OneRepMaxEstimateFormulas {
    */
   fun calculateOneRepMax(weight: Double, reps: Int, formula: Formula = Formula.Epley): Double? {
     if (weight <= 0.0) {
-      throw IllegalArgumentException("Weight must be greater than 0.")
+      // Or throw IllegalArgumentException("Weight must be greater than 0.")
+      return null
     }
     if (reps <= 0) {
-      throw IllegalArgumentException("Reps must be greater than 0.")
+      // Or throw IllegalArgumentException("Reps must be greater than 0.")
+      return null
     }
-    if (reps > 30) {
-      return null //Return null for reps outside a reasonable estimation range
+    if (reps >= 30) {
+      // Or throw IllegalArgumentException("Reps must be less than 30.")
+      return null
     }
 
     return when (formula) {

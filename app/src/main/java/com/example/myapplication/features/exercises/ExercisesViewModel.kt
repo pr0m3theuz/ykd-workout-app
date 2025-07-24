@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.example.myapplication.features.exercises
 
 import android.util.Log
@@ -14,26 +16,95 @@ import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.Utility
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
+import com.example.myapplication.common.util.ModernizedLoadRIR
+import com.example.myapplication.common.util.OneRepMaxEstimateFormulas
+import com.example.myapplication.common.util.RepCapacity
+import com.example.myapplication.common.util.estimateTargetOneRepMaxModernized
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 // TODO Implement Clone Exercise Feature
 
-class ExercisesViewModel constructor(private val exercisesRepository: ExercisesRepository) :
-  ViewModel() {
+sealed class ExercisesUiEvent {
+  data class SetExpand(val value: Boolean) : ExercisesUiEvent()
+
+  data class SetExerciseDetailsLayoutTabState(val value: Int) : ExercisesUiEvent()
+
+  data class UpdateMuscleGroupsChecked(val muscleGroup: MuscleGroup, val checked: Boolean) :
+    ExercisesUiEvent()
+
+  data class UpdateEquipmentsChecked(val equipment: Equipment, val checked: Boolean) :
+    ExercisesUiEvent()
+
+  data class SetSearchExerciseName(val value: String) : ExercisesUiEvent()
+
+  data object FilterExercises : ExercisesUiEvent()
+
+  data class GetExerciseDetails(val exerciseID: String?) : ExercisesUiEvent()
+
+  data class GetExerciseRecords(val exercise: Exercise) : ExercisesUiEvent()
+
+  data class SetMovementTypesChecked(val movementType: MovementType, val checked: Boolean) :
+    ExercisesUiEvent()
+}
+
+data class ExercisesUiState(
+  val expand: Boolean = false,
+  val exerciseDetailsLayoutTabState: Int = 0,
+  val exercises: List<Exercise> = emptyList(), // Filtered list of exercises shown in UI
+  val allExercises: List<Exercise> = emptyList(), // Full list of exercises from repository
+  val equipment: List<Equipment> = emptyList(),
+  val muscleGroup: List<MuscleGroup> = emptyList(),
+  val utility: List<Utility> = emptyList(),
+  val force: List<Force> = emptyList(),
+  val mechanic: List<Mechanic> = emptyList(),
+  val muscleGroupsChecked: Map<MuscleGroup, Boolean> = emptyMap(),
+  val equipmentsChecked: Map<Equipment, Boolean> = emptyMap(),
+  val movementTypesChecked: Map<MovementType, Boolean> = emptyMap(),
+  val searchExerciseName: String = "",
+  val selectedExerciseDetails: Exercise? = null,
+  val exerciseRecords: ExerciseRecords? = null,
+)
+
+data class ExerciseRecords(
+  val maxVolumePounds: Double? = null,
+  val maxVolumeKilograms: Double? = null,
+  val maxWeightLiftedPounds: Double? = null,
+  val maxWeightLiftedKilograms: Double? = null,
+  val totalReps: Int? = null,
+  val totalVolumePounds: Double? = null,
+  val totalVolumeKilograms: Double? = null,
+  val bestPerformanceByRepetitions: List<BestPerformanceByRepetitions?> = emptyList(),
+)
+
+class ExercisesViewModel
+constructor(
+  private val exercisesRepository: ExercisesRepository,
+  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory,
+) : ViewModel() {
 
   private var _expand: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val expand: StateFlow<Boolean>
     get() = _expand.asStateFlow()
 
+  private val _uiState = MutableStateFlow(ExercisesUiState())
+  val uiState: StateFlow<ExercisesUiState> = _uiState.asStateFlow()
+
   fun setExpand(value: Boolean) {
     _expand.value = value
   }
+
+  private var _modernizedLoadRIRItems: List<ModernizedLoadRIR>? = null
 
   private var _exerciseDetailsLayoutTabState: MutableStateFlow<Int> = MutableStateFlow(0)
   val exerciseDetailsLayoutTabState: StateFlow<Int>
@@ -42,6 +113,8 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   fun setExerciseDetailsLayoutTabState(value: Int) {
     _exerciseDetailsLayoutTabState.value = value
   }
+
+  private var allExercises = emptyList<Exercise>()
 
   private val _exercises: MutableStateFlow<List<Exercise>> = MutableStateFlow(emptyList())
   val exercises: StateFlow<List<Exercise>>
@@ -81,18 +154,88 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
 
   init {
     viewModelScope.launch {
-//      Log.i("ExercisesViewModel", "init: getAllExercises")
+      //      Log.i("ExercisesViewModel", "init: getAllExercises")
       getAllExercises()
     }
 
     viewModelScope.launch {
-//      Log.i("ExercisesViewModel", "init: getEquipment")
+      //      Log.i("ExercisesViewModel", "init: getEquipment")
       getEquipment()
     }
 
     viewModelScope.launch {
-//      Log.i("ExercisesViewModel", "init: getMuscleGroups")
+      //      Log.i("ExercisesViewModel", "init: getMuscleGroups")
       getMuscleGroups()
+    }
+
+    viewModelScope.launch { getAllModernizedLoadRIR() }
+  }
+
+  /**
+   * Central event handler for all UI interactions. This function receives [ExercisesUiEvent]s and
+   * updates the [_uiState] accordingly. Using a single entry point for events simplifies state
+   * management and debugging.
+   */
+  fun onEvent(event: ExercisesUiEvent) {
+    when (event) {
+      is ExercisesUiEvent.SetExpand -> {
+        _uiState.update { it.copy(expand = event.value) }
+      }
+
+      is ExercisesUiEvent.SetExerciseDetailsLayoutTabState -> {
+        _uiState.update { it.copy(exerciseDetailsLayoutTabState = event.value) }
+      }
+
+      is ExercisesUiEvent.UpdateMuscleGroupsChecked -> {
+        _uiState.update { currentState ->
+          // Create a mutable copy of the map to update, then copy back to immutable
+          val updatedMap = currentState.muscleGroupsChecked.toMutableMap()
+          updatedMap[event.muscleGroup] = event.checked
+          currentState.copy(muscleGroupsChecked = updatedMap)
+        }
+        // Log the updated state for debugging purposes
+        Log.i(
+          "ExercisesViewModel",
+          "updateMuscleGroupsChecked(): ${
+            uiState.value.muscleGroupsChecked.toSortedMap { o1, o2 ->
+              o1.name.compareTo(o2.name)
+            }
+          }",
+        )
+      }
+
+      is ExercisesUiEvent.UpdateEquipmentsChecked -> {
+        _uiState.update { currentState ->
+          val updatedMap = currentState.equipmentsChecked.toMutableMap()
+          updatedMap[event.equipment] = event.checked
+          currentState.copy(equipmentsChecked = updatedMap)
+        }
+        Log.i("ExercisesViewModel", "updateEquipmentsChecked(): ${uiState.value.equipmentsChecked}")
+      }
+
+      is ExercisesUiEvent.SetMovementTypesChecked -> {
+        _uiState.update { currentState ->
+          val updatedMap = currentState.movementTypesChecked.toMutableMap()
+          updatedMap[event.movementType] = event.checked
+          currentState.copy(movementTypesChecked = updatedMap)
+        }
+      }
+
+      is ExercisesUiEvent.SetSearchExerciseName -> {
+        _uiState.update { it.copy(searchExerciseName = event.value) }
+      }
+
+      is ExercisesUiEvent.FilterExercises -> {
+        filterExercises()
+      }
+
+      is ExercisesUiEvent.GetExerciseDetails -> {
+        getExerciseDetails(event.exerciseID)
+      }
+
+      is ExercisesUiEvent.GetExerciseRecords -> {
+        getExerciseRecords(event.exercise)
+      }
     }
   }
 
@@ -102,49 +245,58 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     return coroutineScope {
       exercisesRepository.getAllExercises().collect { list ->
         _exercises.value = list.sortedBy { exercise -> exercise.name }
-//        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
+        allExercises = list.sortedBy { exercise -> exercise.name }
+        //        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
       }
     }
   }
 
   private suspend fun getEquipment() {
-//    Log.i("ExercisesViewModel", "getEquipment")
+    //    Log.i("ExercisesViewModel", "getEquipment")
     return coroutineScope {
       exercisesRepository.getAllEquipment().collect {
         _equipment.value = it
-//        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
+        //        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
 
         _equipmentsChecked.value =
           it.map { equipment -> equipment to false }.toMutableStateMap().toMutableMap()
         /*        Log.i(
-                  "ExercisesViewModel",
-                  "init _equipmentsChecked: ${_equipmentsChecked.value.keys.toList()}"
-                )*/
+          "ExercisesViewModel",
+          "init _equipmentsChecked: ${_equipmentsChecked.value.keys.toList()}"
+        )*/
       }
     }
   }
 
   private suspend fun getMuscleGroups() {
-//    Log.i("ExercisesViewModel", "getMuscleGroups")
+    //    Log.i("ExercisesViewModel", "getMuscleGroups")
     return coroutineScope {
       exercisesRepository.getAllMuscleGroups().collect {
         _muscleGroup.value = it
-//        Log.i("ExercisesViewModel", "getMuscleGroups() $it")
+        //        Log.i("ExercisesViewModel", "getMuscleGroups() $it")
 
         _muscleGroupsChecked.value =
           it.map { muscleGroup -> muscleGroup to false }.toMutableStateMap().toMutableMap()
         /*        Log.i(
-                  "ExercisesViewModel",
-                  "init _muscleGroupsChecked: ${_muscleGroupsChecked.value.keys.toList()}"
-                )*/
+          "ExercisesViewModel",
+          "init _muscleGroupsChecked: ${_muscleGroupsChecked.value.keys.toList()}"
+        )*/
+      }
+    }
+  }
+
+  private suspend fun getAllModernizedLoadRIR() {
+    //    Log.i("ExercisesViewModel", "getEquipment")
+    return coroutineScope {
+      modernizedLoadRIRReposistory.getAllModernizedLoadRIR().collect {
+        _modernizedLoadRIRItems = it
+        //        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
       }
     }
   }
 
   fun getAllUtilities() {
-    viewModelScope.launch {
-      exercisesRepository.getAllUtilities()
-    }
+    viewModelScope.launch { exercisesRepository.getAllUtilities() }
   }
 
   fun getAllForces() {
@@ -152,9 +304,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   }
 
   fun getAllMechanics() {
-    viewModelScope.launch {
-      exercisesRepository.getAllMechanics()
-    }
+    viewModelScope.launch { exercisesRepository.getAllMechanics() }
   }
 
   fun getMuscleGroupNameByID(muscleGroupID: String): String? {
@@ -168,8 +318,8 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   }
 
   fun updateMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
-//    val temp = _muscleGroupsChecked.value.apply {  }
-//    temp[muscleGroup] = checked
+    //    val temp = _muscleGroupsChecked.value.apply {  }
+    //    temp[muscleGroup] = checked
     _muscleGroupsChecked.value = _muscleGroupsChecked.value.apply { this[muscleGroup] = checked }
 
     Log.i(
@@ -178,7 +328,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
         _muscleGroupsChecked.value.toSortedMap { o1, o2 ->
           o1.name.compareTo(o2.name)
         }
-      }"
+      }",
     )
   }
 
@@ -201,6 +351,7 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
 
   fun filterExercises() {
 
+    val currentState = _uiState.value
     //    if (searchExerciseName.isEmpty()) {
     //      _searchExerciseName = ".*"
     //    }
@@ -248,22 +399,40 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
     }
     */
 
+    // Start with all exercises and apply filters sequentially
+    var filteredList = currentState.allExercises
+
     Log.i("ExercisesViewModel", "filterExercises().selectedMuscleGroups: $selectedMuscleGroups")
     Log.i("ExercisesViewModel", "filterExercises().selectedEquipments: $selectedEquipments")
-//    Log.i("ExercisesViewModel", "filterExercises().selectedMovementTypes: $selectedMovementTypes")
+    //    Log.i("ExercisesViewModel", "filterExercises().selectedMovementTypes:
+    // $selectedMovementTypes")
     Log.i("ExercisesViewModel", "filterExercises()._searchExerciseName: $_searchExerciseName")
 
     // TODO If _exercises is empty, display "No results" Message
-    viewModelScope.launch {
-      exercisesRepository
-        .filterExercises(
-          exercise = searchExerciseName,
-          muscleGroupIDs = selectedMuscleGroups.toList(),
-          equipmentIDs = selectedEquipments.toList(),
-          //                movementTypes = selectedMovementTypes.toList()
-        )
-        .collect() { _exercises.value = it.sortedBy { exercise -> exercise.name } }
-    }
+    // TODO replace with _exercises.value.filter { exercise ->
+    // exercise.name.contains(_searchExerciseName) }
+    //  see Gemini/AIStudio for implementation in a test
+
+    _exercises.value =
+      allExercises
+        .filter { exercise -> exercise.name.contains(_searchExerciseName, ignoreCase = true) }
+        .filter { exercise -> selectedMuscleGroups.contains(exercise.muscleGroupID) }
+        .filter { exercise -> selectedEquipments.contains(exercise.equipmentID) }
+    //      .filter { exercise -> selectedMovementTypes.contains(exercise.movementType) }
+
+    // Update the UI state with the filtered list
+    _uiState.update { it.copy(exercises = filteredList.sortedBy { exercise -> exercise.name }) }
+
+    //    viewModelScope.launch {
+    //      exercisesRepository
+    //        .filterExercises(
+    //          exercise = searchExerciseName,
+    //          muscleGroupIDs = selectedMuscleGroups.toList(),
+    //          equipmentIDs = selectedEquipments.toList(),
+    //          //                movementTypes = selectedMovementTypes.toList()
+    //        )
+    //        .collect() { _exercises.value = it.sortedBy { exercise -> exercise.name } }
+    //    }
   }
 
   // TODO Get Exercise Details
@@ -281,13 +450,150 @@ class ExercisesViewModel constructor(private val exercisesRepository: ExercisesR
   fun getExerciseDetails(exerciseID: String?) {
     if (exerciseID != null) {
       viewModelScope.launch {
-        _exercise.value =
-          exercisesRepository.getExerciseDetails(exerciseID = ObjectId(exerciseID))
+        _exercise.value = exercisesRepository.getExerciseDetails(exerciseID = ObjectId(exerciseID))
       }
     }
   }
 
+  fun getRelativeLoadPercentage(
+    repCapacity: RepCapacity,
+    rpe: Double,
+    rir: Double?,
+    repsPerformed: Int,
+  ): Double? {
+    var resultList =
+      _modernizedLoadRIRItems
+        ?.filter { it.repCapacity == repCapacity }
+        ?.filter { it.repsPerformed == repsPerformed }
+
+    resultList = resultList?.filter { it.rir == rir }?.filter { it.rpe == rpe }
+
+    val result = resultList?.firstOrNull()?.relativeLoadPercent
+
+    return result
+  }
+
   fun getCompletedSetsByWorkout(exercise: Exercise): Pair<List<Program>, Map<Workout, List<Set>>>? {
+    // TODO store in viewmodel
     return exercisesRepository.getCompletedSetsByExercise(exercise)
   }
+
+  fun getExerciseRecords(exercise: Exercise) {
+    // TODO use List<Set> from getCompletedSetsByWorkout()
+    // TODO max volume in 1 workout, max weight lifted, total reps, total volume,
+    //   estimated 1RM based on ModernizedLoadRIR or a 1RM formula.
+    //   List of best performance by reps & weight. calculate estimated 1RM for each performance
+
+    val sets = exercisesRepository.getCompletedSetsByExercise(exercise)?.second?.values?.flatten()
+    val maxVolumePounds = sets?.mapNotNull { it.setVolumeInPounds }?.max()
+    val maxVolumeKilograms = sets?.mapNotNull { it.setVolumeInKilograms }?.max()
+    val maxWeightLiftedPounds = sets?.mapNotNull { it.weightPounds }?.max()
+    val maxWeightLiftedKilograms = sets?.mapNotNull { it.weightKilograms }?.max()
+
+    val totalReps = sets?.mapNotNull { it.repetitions }?.sum()
+    val totalVolumePounds = sets?.mapNotNull { it.setVolumeInPounds }?.sum()
+    val totalVolumeKilograms = sets?.mapNotNull { it.setVolumeInKilograms }?.sum()
+
+    val bestPerformanceByRepetitions: MutableList<BestPerformanceByRepetitions> = mutableListOf()
+
+    val repsPerformed = sets?.mapNotNull { it.repetitions }?.distinct()
+
+    // TODO handle missing data, i.e. where there is no actual performance data
+    for (reps in 1..15) {
+      val bestPerformanceByRepetitionsItem =
+        BestPerformanceByRepetitions(
+          reps,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        )
+
+      val sortedSets =
+        sets?.sortedWith(compareByDescending(Set::weightPounds).thenByDescending(Set::repetitions))
+
+      var set = sortedSets
+        ?.filter { it.repetitions!! >= reps }
+        ?.maxByOrNull { it.weightPounds ?: 0.0 }
+      // TODO Calculate 1RM based on ModernizedLoadRIR or a 1RM formula when saving workouts
+      // TODO Calculate 1RM based on ModernizedLoadRIR or a 1RM formula.
+
+      if (set == null) {
+        set = sortedSets?.firstOrNull { it.repetitions != null && it.repetitions!! >= reps }
+        if (set == null) {
+          set = sortedSets?.firstOrNull { it.repetitions != null && it.repetitions!! <= reps }
+        }
+      }
+
+      bestPerformanceByRepetitionsItem.repetitionsPerformed = set?.repetitions
+      bestPerformanceByRepetitionsItem.weightPounds = set?.weightPounds
+      bestPerformanceByRepetitionsItem.weightKilograms = set?.weightKilograms
+      bestPerformanceByRepetitionsItem.datePerformed = set?.dateCreated
+      bestPerformanceByRepetitionsItem.repetitionsInReserve = set?.repetitionsInReserve
+      bestPerformanceByRepetitionsItem.ratePerceivedEffort = set?.ratePerceivedEffort
+
+      val estimated1RMPounds =
+        if (
+          bestPerformanceByRepetitionsItem.ratePerceivedEffort != null ||
+          bestPerformanceByRepetitionsItem.repetitionsInReserve != null
+        ) {
+          estimateTargetOneRepMaxModernized(
+            bestPerformanceByRepetitionsItem.weightPounds ?: 0.0,
+            bestPerformanceByRepetitionsItem.repetitionsPerformed ?: 0,
+            targetReps = reps,
+            bestPerformanceByRepetitionsItem.repetitionsInReserve
+              ?: 10.0.minus(bestPerformanceByRepetitionsItem.ratePerceivedEffort!!),
+            bestPerformanceByRepetitionsItem.ratePerceivedEffort
+              ?: 10.0.minus(bestPerformanceByRepetitionsItem.repetitionsInReserve!!),
+            repCapacity = exercise.repCapacity,
+            getRelativeLoadPercentage = ::getRelativeLoadPercentage,
+          )
+        } else {
+          OneRepMaxEstimateFormulas.calculateOneRepMax(
+            bestPerformanceByRepetitionsItem.weightPounds ?: 0.0,
+            bestPerformanceByRepetitionsItem.repetitions,
+            OneRepMaxEstimateFormulas.Formula.Brzycki,
+          )
+        }
+
+      bestPerformanceByRepetitionsItem.estimated1RMPounds = estimated1RMPounds
+      bestPerformanceByRepetitionsItem.estimated1RMKilograms =
+        estimated1RMPounds?.convertPoundToKg()
+
+      bestPerformanceByRepetitions.add(bestPerformanceByRepetitionsItem)
+    }
+
+    _uiState.update {
+      it.copy(
+        exerciseRecords =
+          ExerciseRecords(
+            maxVolumePounds = maxVolumePounds,
+            maxVolumeKilograms = maxVolumeKilograms,
+            maxWeightLiftedPounds = maxWeightLiftedPounds,
+            maxWeightLiftedKilograms = maxWeightLiftedKilograms,
+            totalReps = totalReps,
+            totalVolumePounds = totalVolumePounds,
+            totalVolumeKilograms = totalVolumeKilograms,
+            bestPerformanceByRepetitions =
+              bestPerformanceByRepetitions.sortedBy { set -> set.repetitions },
+          )
+      )
+    }
+  }
 }
+
+data class BestPerformanceByRepetitions(
+  var repetitions: Int,
+  var repetitionsPerformed: Int?,
+  var repetitionsInReserve: Double?,
+  var ratePerceivedEffort: Double?,
+  var weightPounds: Double?,
+  var weightKilograms: Double?,
+  var datePerformed: Instant?,
+  var estimated1RMPounds: Double?,
+  var estimated1RMKilograms: Double?,
+)

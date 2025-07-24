@@ -343,6 +343,7 @@ fun SelectedFiltersLazyRow(
   selectedEquipment: List<Equipment>,
   selectedMovementTypes: List<MovementType>,
 ) {
+  // TODO add clear all filters
   val labelSmall = MaterialTheme.typography.labelLarge
 
   val filterChipColors =
