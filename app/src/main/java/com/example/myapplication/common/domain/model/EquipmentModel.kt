@@ -43,16 +43,16 @@ enum class ProgressionSchemeEnum {
 //
 // }
 
-enum class MovementType(val printableName: String) {
+enum class MovementType(val printableName: String, val databaseName: String) {
     // TODO Implement in Database
-    COMPOUND("Compound"),
-    ISOLATION("Isolation"),
-    ISOMETRIC("Isometric"),
-    CARDIO("Cardio"),
-    STRETCH("Stretch"),
-    UNILATERAL("Unilateral"),
-    BILATERAL("Bilateral"),
-    PLYOMETRIC("Plyometric"),
-    OLYMPIC("Olympic"),
+    COMPOUND("Compound", "compound"),
+    ISOLATION("Isolation", "isolated"),
+    ISOMETRIC("Isometric", "isometric"),
+    CARDIO("Cardio", "cardio"),
+    STRETCH("Stretch", "stretch"),
+    UNILATERAL("Unilateral", "unilateral"),
+    BILATERAL("Bilateral", "bilateral"),
+    PLYOMETRIC("Plyometric", "plyometric"),
+    OLYMPIC("Olympic", "olympic"),
 }
 

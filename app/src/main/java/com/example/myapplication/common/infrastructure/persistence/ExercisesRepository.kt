@@ -4,6 +4,7 @@ import com.example.myapplication.common.domain.model.Equipment
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.Force
 import com.example.myapplication.common.domain.model.Mechanic
+import com.example.myapplication.common.domain.model.MuscleExerciseWithMuscle
 import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.domain.model.MuscleRoleFunction
 import com.example.myapplication.common.domain.model.Program
@@ -44,6 +45,8 @@ interface ExercisesRepository {
 
   fun getExerciseDetails(exerciseID: ObjectId): Exercise?
 
+  fun getMuscleExercise(exerciseExRxID: String): List<MuscleExerciseWithMuscle>
+
   fun getExercise(exerciseID: ObjectId?): Exercise?
 
   suspend fun updateExercise(exercise: Exercise): Boolean
@@ -71,4 +74,5 @@ interface ExercisesRepository {
   fun getCompletedSetsByExercise(exercise: Exercise): Pair<List<Program>, Map<Workout, List<Set>>>?
 
   fun createExercise(exercise: Exercise): Boolean
+
 }

@@ -39,6 +39,11 @@ data class MuscleExercise(
 //    var type: String? = null,
 )
 
+data class MuscleExerciseWithMuscle(
+    val muscleExercise: MuscleExercise,
+    val muscle: Muscle,
+)
+
 /**
  * Represents a muscle's role or function in an exercise. This class is used to store information
  * about the roles or functions a muscle can have in an exercise.

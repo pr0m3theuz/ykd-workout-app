@@ -22,6 +22,10 @@ import com.example.myapplication.common.domain.model.Force
 import com.example.myapplication.common.domain.model.ForceDao
 import com.example.myapplication.common.domain.model.Mechanic
 import com.example.myapplication.common.domain.model.MechanicDao
+import com.example.myapplication.common.domain.model.MuscleDao
+import com.example.myapplication.common.domain.model.MuscleExercise
+import com.example.myapplication.common.domain.model.MuscleExerciseDao
+import com.example.myapplication.common.domain.model.MuscleExerciseWithMuscle
 import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.domain.model.MuscleGroupDao
 import com.example.myapplication.common.domain.model.MuscleRoleFunction
@@ -190,6 +194,22 @@ class ExercisesRepositoryImpl(
       }
     }
     return muscleRoleFunctions
+  }
+
+  private fun mapQueryChangeToMuscleExercise(
+    queryChange: QueryChange
+  ): List<MuscleExercise> {
+    val muscleExerciseList = mutableListOf<MuscleExercise>()
+
+    queryChange.results?.let { results ->
+      results.forEach { result ->
+        val json = result.toJSON()
+        val muscleExercise =
+          withUnknownKeys.decodeFromString<MuscleExerciseDao>(json).MuscleExercise
+        muscleExerciseList.add(muscleExercise)
+      }
+    }
+    return muscleExerciseList
   }
 
   override fun getAllEquipment(): Flow<List<Equipment>> {
@@ -470,6 +490,63 @@ class ExercisesRepositoryImpl(
     }
 
     return null
+  }
+
+  override fun getMuscleExercise(exerciseExRxID: String): List<MuscleExerciseWithMuscle> {
+    try {
+      db?.let { database ->
+        val muscleExerciseCollection = database.getCollection("MuscleExercise")
+        requireNotNull(muscleExerciseCollection) { COLLECTION_IS_NULL }
+
+        val muscleCollection = database.getCollection("Muscle")
+        requireNotNull(muscleCollection) { COLLECTION_IS_NULL }
+
+        muscleExerciseCollection.let { muscleExerciseColl ->
+          val muscleExerciseWithMuscleList = mutableListOf<MuscleExerciseWithMuscle>()
+
+          val muscleExerciseQuery = QueryBuilder.select(SelectResult.all())
+            .from(DataSource.collection(muscleExerciseColl))
+            .where(
+              Expression.property("exerciseID").equalTo(
+                Expression.string(
+                  exerciseExRxID
+                )
+              )
+            )
+
+          val muscleExerciseResult = muscleExerciseQuery.execute().allResults().mapNotNull {
+            try {
+              withUnknownKeys.decodeFromString<MuscleExerciseDao>(it.toJSON()).MuscleExercise
+            } catch (e: Exception) {
+              Log.e(e.message, e.stackTraceToString())
+              null
+            }
+          }
+
+          muscleExerciseResult.forEach { muscleExercise ->
+            val muscleQuery = QueryBuilder.select(SelectResult.all())
+              .from(DataSource.collection(muscleCollection))
+              .where(Expression.property("id").equalTo(Expression.string(muscleExercise.muscleID)))
+
+            val result = muscleQuery.execute().allResults().firstOrNull()?.toJSON()?.let {
+              withUnknownKeys.decodeFromString<MuscleDao>(it).Muscle
+            }
+
+            result?.let {
+              muscleExerciseWithMuscleList.add(
+                MuscleExerciseWithMuscle(muscleExercise, it)
+              )
+            }
+          }
+
+          return muscleExerciseWithMuscleList.sortedWith(compareByDescending { it.muscleExercise.roleFunction })
+        }
+      }
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return emptyList()
   }
 
   override fun getExercise(exerciseID: ObjectId?): Exercise? {

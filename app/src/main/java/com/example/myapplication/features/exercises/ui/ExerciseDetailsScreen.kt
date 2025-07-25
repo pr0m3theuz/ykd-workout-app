@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -62,19 +63,27 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.common.domain.model.Equipment
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.Force
 import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.Mechanic
+import com.example.myapplication.common.domain.model.Muscle
+import com.example.myapplication.common.domain.model.MuscleExerciseWithMuscle
+import com.example.myapplication.common.domain.model.MuscleGroup
+import com.example.myapplication.common.domain.model.MuscleRoleFunction
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
+import com.example.myapplication.common.domain.model.Utility
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.formatWorkoutDate
 import com.example.myapplication.common.domain.model.setSummaryRIR
 import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.exercises.ExerciseDetailsUiState
 import com.example.myapplication.features.exercises.ExercisesUiEvent
-import com.example.myapplication.features.exercises.ExercisesUiState
 import com.example.myapplication.features.exercises.ExercisesViewModel
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
@@ -95,6 +104,8 @@ fun ExerciseDetailsScreen(
   val tabState by exercisesViewModel.exerciseDetailsLayoutTabState.collectAsStateWithLifecycle()
 
   val exerciseUiState by exercisesViewModel.uiState.collectAsStateWithLifecycle()
+  val exerciseDetailsUiState by
+  exercisesViewModel.exerciseDetailsUiState.collectAsStateWithLifecycle()
 
   val defaultTimeZone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
 
@@ -102,9 +113,8 @@ fun ExerciseDetailsScreen(
     NoExerciseDetailContent(exerciseID)
   } else {
     exercisesViewModel.getExerciseDetails(exerciseID)
-    val exercise by exercisesViewModel.selectedExerciseDetails.collectAsStateWithLifecycle()
 
-    exercise?.let { it ->
+    exerciseDetailsUiState.selectedExerciseDetails?.let { it ->
       val completedSetsByExercise = exercisesViewModel.getCompletedSetsByWorkout(it)
 
       LaunchedEffect(it.name) {
@@ -117,6 +127,19 @@ fun ExerciseDetailsScreen(
         tabState = tabState,
         setTabState = { state -> exercisesViewModel.setExerciseDetailsLayoutTabState(state) },
         navigateToListPane = onClick,
+        aboutTab = {
+          AboutTab(
+            exercise = it,
+            utilityList = exerciseDetailsUiState.utility,
+            equipmentList = exerciseDetailsUiState.equipment,
+            forceList = exerciseDetailsUiState.force,
+            mechanicList = exerciseDetailsUiState.mechanic,
+            musclesList = exerciseDetailsUiState.muscles,
+            muscleRoleFunctionList = exerciseDetailsUiState.muscleRoleFunctions,
+            muscleGroupList = exerciseDetailsUiState.muscleGroup,
+            muscleExerciseList = exerciseDetailsUiState.musclesExerciseList,
+          )
+        },
         historyTab = {
           completedSetsByExercise?.let { (programs, workoutSetsMap) ->
             HistoryTab(
@@ -137,7 +160,7 @@ fun ExerciseDetailsScreen(
             )
           } ?: NoHistoryTab() // TODO Replace with No History Content
         },
-        recordsTab = { RecordsTab(exerciseUiState) },
+        recordsTab = { RecordsTab(exerciseDetailsUiState) },
       )
     }
   }
@@ -181,6 +204,7 @@ private fun ExerciseDetailsLayout(
   tabState: Int = 0,
   setTabState: (Int) -> Unit = {},
   navigateToListPane: () -> Unit,
+  aboutTab: @Composable () -> Unit = {},
   historyTab: @Composable () -> Unit = {},
   recordsTab: @Composable () -> Unit = {},
 ) {
@@ -248,7 +272,7 @@ private fun ExerciseDetailsLayout(
         .padding(8.dp)
         .fillMaxWidth()) {
         when (tabState) {
-          0 -> AboutTab(exercise.name)
+          0 -> aboutTab()
           1 -> historyTab()
           2 -> ChartTab(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
           3 -> recordsTab()
@@ -293,8 +317,18 @@ fun ExerciseDetailsOptionsDropdownMenu() {
 
 // @Preview
 @Composable
-fun AboutTab(_exerciseName: String) {
-  val exerciseName: String = _exerciseName.replace(" ", "+")
+fun AboutTab(
+  exercise: Exercise,
+  utilityList: List<Utility>,
+  equipmentList: List<Equipment>,
+  forceList: List<Force>,
+  mechanicList: List<Mechanic>,
+  musclesList: List<Muscle>,
+  muscleRoleFunctionList: List<MuscleRoleFunction>,
+  muscleGroupList: List<MuscleGroup>,
+  muscleExerciseList: List<MuscleExerciseWithMuscle>,
+) {
+  val exerciseName: String = exercise.name.replace(" ", "+")
   val youtubeSearchQuery = "https://www.youtube.com/results?search_query=$exerciseName"
 
   val intent = Intent(Intent.ACTION_VIEW, youtubeSearchQuery.toUri())
@@ -309,16 +343,135 @@ fun AboutTab(_exerciseName: String) {
       contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
     )
 
-  Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-    Row() {
+  // TODO Replace with a LazyColumn
+  Column(modifier = Modifier.fillMaxWidth()) {
+    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
       Icon(
         imageVector = Icons.Outlined.BrokenImage,
         contentDescription = "Missing Image",
         tint = MaterialTheme.colorScheme.primary,
       )
     }
+
+    Spacer(Modifier.height(8.dp))
+
     Button(onClick = { startActivity(context, intent, null) }, colors = buttonColors) {
       Text(text = "Search Exercise on Youtube", color = onSurface)
+    }
+
+    Spacer(Modifier.height(8.dp))
+
+    Text(
+      text = "Exercise Description",
+      modifier = Modifier.padding(vertical = 8.dp),
+      color = onSurface,
+      style = MaterialTheme.typography.titleMedium,
+    )
+
+    exercise.equipmentID?.let { equipmentID ->
+      val name = equipmentList.first { it.id == equipmentID }.name
+      Row {
+        Text(text = "Equipment: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    exercise.primaryMuscleID?.let { muscle ->
+      // val name = muscleGroupList.first { it.id == muscle }.exrxName
+
+      Row {
+        Text(
+          text = "Primary Muscle: ",
+          color = onSurface,
+          style = MaterialTheme.typography.titleSmall,
+        )
+        Text(text = muscle, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    exercise.muscleGroupID?.let { muscle ->
+      val name = muscleGroupList.first { it.id == muscle }.exrxName
+      Row {
+        Text(
+          text = "Muscle Group: ",
+          color = onSurface,
+          style = MaterialTheme.typography.titleSmall,
+        )
+        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    exercise.utilityID?.let { utility ->
+      val name = utilityList.first { it.id == utility }.name
+
+      Row {
+        Text(text = "Utility: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    exercise.mechanicsID?.let { mechanics ->
+      val name = mechanicList.first { it.id == mechanics }.name
+
+      Row {
+        Text(text = "Mechanics: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    exercise.force?.let { force ->
+      val name = forceList.first { it.id == force }.name
+      Row {
+        Text(text = "Force: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    exercise.functionID?.let {
+      Row {
+        Text(text = "Function: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+        Text(text = it, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    exercise.intensityID?.let {
+      Row {
+        Text(text = "Intensity: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+        Text(text = it, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+      }
+    }
+
+    if (muscleExerciseList.isNotEmpty()) {
+
+      Text(
+        text = "Target Muscles: Role",
+        color = onSurface,
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(vertical = 8.dp),
+      )
+      muscleExerciseList.forEach { muscleExercise ->
+        Row {
+          Text(
+            text =
+              "${muscleExercise.muscle.name}: ${muscleExercise.muscleExercise.roleFunction.replaceFirstChar { it.titlecase() }}",
+            color = onSurface,
+            style = MaterialTheme.typography.bodyMedium,
+          )
+        }
+      }
+    }
+
+    Row(modifier = Modifier.padding(vertical = 8.dp)) {
+      Text(
+        text = "Repetition Capacity: ",
+        color = onSurface,
+        style = MaterialTheme.typography.titleSmall,
+      )
+      Text(
+        text = exercise.repCapacity.name,
+        color = onSurface,
+        style = MaterialTheme.typography.bodyMedium,
+      )
     }
   }
 }
@@ -520,7 +673,7 @@ fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
 
 // @Preview(showBackground = true)
 @Composable
-fun RecordsTab(uiState: ExercisesUiState) {
+fun RecordsTab(uiState: ExerciseDetailsUiState) {
   val exerciseRecords = uiState.exerciseRecords
 
   val rowPadding = 4.dp
@@ -703,7 +856,8 @@ fun RecordsTab(uiState: ExercisesUiState) {
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text("Total Reps", color = onSurface, style = MaterialTheme.typography.bodyMedium)
         Text(
-          text = "${exerciseRecords?.totalReps?.let { doubleFormatted(it.toDouble()) } ?: "-"} reps",
+          text =
+            "${exerciseRecords?.totalReps?.let { doubleFormatted(it.toDouble()) } ?: "-"} reps",
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,
         )
