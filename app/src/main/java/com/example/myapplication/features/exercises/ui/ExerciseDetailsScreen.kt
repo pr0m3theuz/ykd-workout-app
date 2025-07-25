@@ -604,24 +604,24 @@ private fun WorkoutCard(
               val measurmentSystem = LocaleData.getMeasurementSystem(ULocale.getDefault())
               when (measurmentSystem) {
                 LocaleData.MeasurementSystem.US -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)}"
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)} lbs"
                 }
 
                 LocaleData.MeasurementSystem.UK -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)}"
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)} kg"
                 }
 
                 LocaleData.MeasurementSystem.SI -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)}"
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)} kg"
                 }
 
                 else -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)}"
+                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)} lbs"
                 }
               }
             } else {
               // Default
-              "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)}"
+              "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)} lbs"
             },
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,

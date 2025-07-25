@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.example.myapplication.common.infrastructure.persistence
 
 import android.util.Log
@@ -47,6 +49,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
+import kotlin.time.ExperimentalTime
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
@@ -881,6 +884,7 @@ class ExercisesRepositoryImpl(
           .groupBy { it.workoutID }
           .map { (workoutID, sets) -> completedWorkouts.first { it.id == workoutID } to sets }
           .toMap()
+          .toSortedMap(compareByDescending { it.workoutEnded })
 
       val programIDs = completedWorkouts.map { it.programID.toString() }
 
