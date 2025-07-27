@@ -536,7 +536,19 @@ constructor(
     if (exerciseID != null) {
       viewModelScope.launch {
         _exercise.value = exercisesRepository.getExerciseDetails(exerciseID = ObjectId(exerciseID))
-        _exerciseDetailsUiState.update { it.copy(selectedExerciseDetails = _exercise.value) }
+        _exerciseDetailsUiState.update {
+          it.copy(
+            selectedExerciseDetails = _exercise.value,
+            bestSetEstimatedOneRepMaxPoundsChartData = null,
+            bestSetEstimatedOneRepMaxKilogramsChartData = null,
+            bestSetMaxWeightPoundsLiftedChartData = null,
+            bestSetMaxWeightKilogramsLiftedChartData = null,
+            bestSetTotalVolumePoundsChartData = null,
+            bestSetTotalVolumeKilogramsChartData = null,
+            bestSetRepetitionsChartData = null,
+          )
+
+        }
 
         _exercise.value?.exrxExerciseID?.let { exrxExerciseID ->
           _exerciseDetailsUiState.update {
@@ -699,18 +711,7 @@ constructor(
       generateSequence(seed = startDate..endDate) { currentRange ->
         currentRange.start.minus(day)..currentRange.endInclusive.minus(day)
       }
-        .take(180)
-
-    val labels =
-      dateSequence.map { date ->
-        date.start
-          .toLocalDateTime(timezone)
-          .toJavaLocalDateTime()
-          .toLocalDate()
-          .format(dateFormatter)
-      }
-
-    val labelsReversed = labels.toList().reversed()
+        .take(90)
 
     var bestSetEstimated1RMPounds: MutableMap<String, Double> = mutableMapOf()
     var bestSetEstimated1RMKilograms: MutableMap<String, Double> = mutableMapOf()
@@ -724,14 +725,23 @@ constructor(
       val filteredSets =
         sets.filter { set -> set.dateCreated?.let { date -> date in dateRange } == true }
 
-      if (filteredSets.isEmpty()) return@forEach
-
       val label =
         dateRange.start
           .toLocalDateTime(timezone)
           .toJavaLocalDateTime()
           .toLocalDate()
           .format(dateFormatter)
+
+      if (filteredSets.isEmpty()) {
+        return@forEach
+//        bestSetMaxWeightPoundsLifted.put(label, null)
+//        bestSetMaxWeightKilogramsLifted.put(label, null)
+//        bestSetEstimated1RMPounds.put(label, null)
+//        bestSetEstimated1RMKilograms.put(label, null)
+//        bestSetTotalVolumePounds.put(label, null)
+//        bestSetTotalVolumeKilograms.put(label, null)
+//        bestSetRepetitions.put(label, null)
+      }
 
       bestSetMaxWeightPoundsLifted.put(label, filteredSets.maxOf { it.weightPounds ?: 0.0 })
       bestSetMaxWeightKilogramsLifted.put(label, filteredSets.maxOf { it.weightKilograms ?: 0.0 })

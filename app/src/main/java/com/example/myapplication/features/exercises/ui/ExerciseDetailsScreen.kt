@@ -758,7 +758,7 @@ fun ChartTab(
       } else {
         PlaceholderChart()
       }
-    }
+    } ?: PlaceholderChart()
 
     Text(
       text =
@@ -780,7 +780,7 @@ fun ChartTab(
       } else {
         PlaceholderChart()
       }
-    }
+    } ?: PlaceholderChart()
 
     Text(
       text = "Total Volume (${exerciseDetailsUiState.userDefaultWeightUnit.abbreviation})",
@@ -802,7 +802,7 @@ fun ChartTab(
       } else {
         PlaceholderChart()
       }
-    }
+    } ?: PlaceholderChart()
 
     Text(text = "Best Set (Repetitions)", modifier = textModifier)
     exerciseDetailsUiState.bestSetRepetitionsChartData?.let { chartData ->
@@ -817,7 +817,7 @@ fun ChartTab(
       } else {
         PlaceholderChart()
       }
-    }
+    } ?: PlaceholderChart()
   }
 }
 
