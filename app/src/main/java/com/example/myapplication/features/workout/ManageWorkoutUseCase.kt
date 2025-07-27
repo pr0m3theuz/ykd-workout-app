@@ -29,11 +29,16 @@ import com.example.myapplication.common.domain.model.updateSetWeight
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
-import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
+import com.example.myapplication.common.util.ModernizedLoadRIR
+import com.example.myapplication.common.util.OneRepMaxEstimateFormulas
+import com.example.myapplication.common.util.RepCapacity
+import com.example.myapplication.common.util.estimateTargetOneRepMaxModernized
 import com.example.myapplication.common.util.newLazyListItemID
+import kotlinx.coroutines.coroutineScope
 import org.bson.types.ObjectId
 import kotlin.math.min
 import kotlin.time.Clock
@@ -51,10 +56,10 @@ class ManageWorkoutUseCase(
   private val exercisesRepository: ExercisesRepository,
   private val workoutNotesRepository: WorkoutNotesRepository,
   private val exerciseNotesRepository: ExerciseNotesRepository,
-  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
   private val completedWorkoutRepository: CompletedWorkoutRepository,
   private val userRepository: UserRepository,
   private val userProfileManager: UserProfileManager,
+  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory,
 ) {
 
   // TODO rewrite
@@ -451,6 +456,27 @@ class ManageWorkoutUseCase(
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     //    removeUncompletedSets(exercisesSets.toMutableList())
 
+    workoutComponents.forEach { workoutItem ->
+      when (workoutItem) {
+        is ExerciseExerciseSets -> {
+          workoutItem.sets.forEach { set ->
+            set.estimated1RMPounds = calculateEstimated1RM(set, workoutItem.exercise.repCapacity)
+            set.estimated1RMKilograms = calculateEstimated1RM(set, workoutItem.exercise.repCapacity)
+          }
+        }
+
+        is SupersetExercisesSets -> {
+          workoutItem.exercisesSets.forEach { exerciseSets ->
+            exerciseSets.sets.forEach { set ->
+              set.estimated1RMPounds = calculateEstimated1RM(set, exerciseSets.exercise.repCapacity)
+              set.estimated1RMKilograms =
+                calculateEstimated1RM(set, exerciseSets.exercise.repCapacity)
+            }
+          }
+        }
+      }
+    }
+
     workout.workoutItems =
       convertWorkoutComponentsToWorkoutItems(
         workoutComponents
@@ -458,6 +484,7 @@ class ManageWorkoutUseCase(
       )
 
     workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
+
     //    workout.calculateTotalVolumeInPounds()
     //    workout.calculateTotalVolumeInKilograms()
 
@@ -468,37 +495,63 @@ class ManageWorkoutUseCase(
     //  Sets need to be SetType.Failure and rir = 0 or rpe = 10.
 
     completedWorkoutRepository.upsertCompletedWorkout(workout)
-    val isInsertSuccess: Boolean = workoutRepository.insertWorkout(workout)
-    if (isInsertSuccess) {
-      deleteInProgressWorkout(workout.id)
-    } else {
-      throw Exception("Workout could not be saved.")
+
+  }
+
+  private var modernizedLoadRIRItems: List<ModernizedLoadRIR>? = null
+
+  private suspend fun getAllModernizedLoadRIR() {
+    return coroutineScope {
+      modernizedLoadRIRReposistory.getAllModernizedLoadRIR().collect {
+        modernizedLoadRIRItems = it
+      }
     }
   }
 
-  suspend fun saveInProgressWorkout(
-    workout: Workout,
-    workoutNotes: List<WorkoutNote>,
-    workoutComponents: List<WorkoutComponent>,
-  ) {
-    workout.notes = workoutNotes.toMutableList()
+  fun getRelativeLoadPercentage(
+    repCapacity: RepCapacity,
+    rpe: Double,
+    rir: Double?,
+    repsPerformed: Int,
+  ): Double? {
+    var resultList =
+      modernizedLoadRIRItems
+        ?.filter { it.repCapacity == repCapacity }
+        ?.filter { it.repsPerformed == repsPerformed }
 
-    // TODO Change to WorkoutComponents
-    workout.workoutItems =
-      convertWorkoutComponentsToWorkoutItems(
-        workoutComponents
-        //        userDefaultWeightUnit,
-      )
+    resultList = resultList?.filter { it.rir == rir }?.filter { it.rpe == rpe }
 
-    // Note: Decide if calculating total volume should be done
-    // workout.calculateTotalVolume(userDefaultWeightUnit = userDefaultWeightUnit)
+    val result = resultList?.firstOrNull()?.relativeLoadPercent
 
-    //    inProgressWorkoutRepository.saveInProgressWorkout(workout)
+    return result
   }
 
-  fun deleteInProgressWorkout(workoutID: ObjectId) {
-    inProgressWorkoutRepository.deleteActiveWorkout(workoutID)
-    inProgressWorkoutRepository.deleteAllWorkouts()
+  private fun calculateEstimated1RM(set: Set, repCapacity: RepCapacity): Double? {
+    return if (
+      set.ratePerceivedEffort != null ||
+      set.repetitionsInReserve != null &&
+      set.repetitions != null
+    ) {
+      estimateTargetOneRepMaxModernized(
+        set.weightPounds ?: 0.0,
+        set.repetitions ?: 0,
+        targetReps = 1,
+        set.repetitionsInReserve
+          ?: 10.0.minus(set.ratePerceivedEffort!!),
+        set.ratePerceivedEffort
+          ?: 10.0.minus(set.repetitionsInReserve!!),
+        repCapacity = repCapacity,
+        getRelativeLoadPercentage = ::getRelativeLoadPercentage,
+      )
+    } else if (set.repetitions != null) {
+      OneRepMaxEstimateFormulas.calculateOneRepMax(
+        set.weightPounds ?: 0.0,
+        set.repetitions!!,
+        OneRepMaxEstimateFormulas.Formula.Brzycki,
+      )
+    } else {
+      null
+    }
   }
 
   private fun convertExerciseExerciseSetsToExerciseSets(

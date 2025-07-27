@@ -121,7 +121,7 @@ val commonModule = module {
 
   viewModel { MainViewModel(get(), get(), get()) }
   viewModel { ProgramsViewModel(get(), get(), get(), get()) }
-  viewModel { ExercisesViewModel(get(), get()) }
+  viewModel { ExercisesViewModel(get(), get(), get()) }
   viewModel {
     WorkoutViewModel(
       get(),

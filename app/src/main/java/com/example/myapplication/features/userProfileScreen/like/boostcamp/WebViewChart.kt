@@ -16,8 +16,46 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.toRGBAString
 import com.newrelic.com.google.gson.Gson
+import kotlinx.datetime.toKotlinTimeZone
+import java.time.format.DateTimeFormatter
+import kotlin.random.Random
+import kotlin.time.ExperimentalTime
 
+// TODO Add hover text
 data class ChartData(val labels: List<String>, val values: List<Number>)
+
+@ExperimentalTime
+fun generateRandomExerciseVolumeData(): ChartData {
+  val labels = mutableListOf<String>()
+  val values = mutableListOf<Number>()
+
+  val timezone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
+  val endDate = java.time.LocalDate.now()
+  // Clock.System.now().toLocalDateTime(timezone).date // Get today's date
+  val startDate = endDate.minusDays(90) // Get the date 6 days ago for a week's data
+
+  var currentDate = startDate
+  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+  // Adjustable probability for a day to have exercise data (e.g., 0.7 for 70% chance)
+  val probabilityOfExercise = 0.45 // Let's say 65% chance of having an exercise entry
+
+  while (!currentDate.isAfter(endDate)) {
+    // Decide if this day should have exercise data based on probability
+    if (Random.nextDouble() < probabilityOfExercise) {
+      labels.add(currentDate.format(formatter))
+
+      // Generate a random volume in kilograms (e.g., between 5000 kg and 20000 kg)
+      val volume = Random.nextInt(500, 5001)
+      values.add(volume)
+    }
+    // If the condition is false, this day is simply skipped (no data added)
+
+    currentDate = currentDate.plusDays(1)
+  }
+
+  return ChartData(labels, values)
+}
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -26,7 +64,7 @@ fun WebViewChart(
   chartType: ChartType,
   yMaxAllowed: Number,
   staticPlot: Boolean = false,
-  period: Period,
+  //  period: Period,
 ) {
   // TODO Add locale to the chart
   val gson = Gson()
@@ -36,7 +74,7 @@ fun WebViewChart(
   val yMinAllowed = 0
 
   val color = MaterialTheme.colorScheme.primary.toRGBAString()
-  val fillColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.40f).toRGBAString()
+  val fillColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.20f).toRGBAString()
 
   val paperBGColor = MaterialTheme.colorScheme.surface.toRGBAString()
   val axesColor = MaterialTheme.colorScheme.onSurface.toRGBAString()

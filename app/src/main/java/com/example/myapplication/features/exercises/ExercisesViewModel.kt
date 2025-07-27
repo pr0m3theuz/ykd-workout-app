@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.Equipment
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.Force
+import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Mechanic
 import com.example.myapplication.common.domain.model.MovementType
 import com.example.myapplication.common.domain.model.Muscle
@@ -17,6 +18,7 @@ import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.domain.model.MuscleRoleFunction
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Utility
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.convertPoundToKg
@@ -26,15 +28,26 @@ import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.OneRepMaxEstimateFormulas
 import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.estimateTargetOneRepMaxModernized
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.ChartData
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toKotlinLocalDateTime
+import kotlinx.datetime.toKotlinTimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.bson.types.ObjectId
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.TimeZone
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlin.time.toDuration
 
 // TODO Implement Clone Exercise Feature
 
@@ -55,7 +68,7 @@ sealed class ExercisesUiEvent {
 
   data class GetExerciseDetails(val exerciseID: String?) : ExercisesUiEvent()
 
-  data class GetExerciseRecords(val exercise: Exercise) : ExercisesUiEvent()
+  //  data class GetExerciseRecords(val exercise: Exercise) : ExercisesUiEvent()
 
   data class SetMovementTypesChecked(val movementType: MovementType, val checked: Boolean) :
     ExercisesUiEvent()
@@ -75,7 +88,9 @@ data class ExercisesUiState(
 )
 
 data class ExerciseDetailsUiState(
+  val userDefaultWeightUnit: MassUnit = MassUnit.POUNDS,
   val exercise: Exercise? = null,
+  val exerciseHistory: Pair<List<Program>, Map<Workout, List<Set>>>? = null,
   val equipment: List<Equipment> = emptyList(),
   val muscles: List<Muscle> = emptyList(),
   val musclesExerciseList: List<MuscleExerciseWithMuscle> = emptyList(),
@@ -84,9 +99,15 @@ data class ExerciseDetailsUiState(
   val utility: List<Utility> = emptyList(),
   val force: List<Force> = emptyList(),
   val mechanic: List<Mechanic> = emptyList(),
-  val searchExerciseName: String = "",
   val selectedExerciseDetails: Exercise? = null,
   val exerciseRecords: ExerciseRecords? = null,
+  val bestSetEstimatedOneRepMaxPoundsChartData: ChartData? = null,
+  val bestSetEstimatedOneRepMaxKilogramsChartData: ChartData? = null,
+  val bestSetMaxWeightPoundsLiftedChartData: ChartData? = null,
+  val bestSetMaxWeightKilogramsLiftedChartData: ChartData? = null,
+  val bestSetTotalVolumePoundsChartData: ChartData? = null,
+  val bestSetTotalVolumeKilogramsChartData: ChartData? = null,
+  val bestSetRepetitionsChartData: ChartData? = null,
 )
 
 data class ExerciseRecords(
@@ -102,9 +123,11 @@ data class ExerciseRecords(
 
 class ExercisesViewModel
 constructor(
+  private val userProfileManager: UserProfileManager,
   private val exercisesRepository: ExercisesRepository,
   private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory,
 ) : ViewModel() {
+  private val userProfile = userProfileManager.userProfile.value
 
   private var _expand: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val expand: StateFlow<Boolean>
@@ -194,6 +217,10 @@ constructor(
     viewModelScope.launch { getAllUtilities() }
 
     viewModelScope.launch { getAllModernizedLoadRIR() }
+
+    _exerciseDetailsUiState.update {
+      it.copy(userDefaultWeightUnit = userProfile.defaultWeightUnit)
+    }
   }
 
   /**
@@ -258,9 +285,9 @@ constructor(
         getExerciseDetails(event.exerciseID)
       }
 
-      is ExercisesUiEvent.GetExerciseRecords -> {
-        getExerciseRecords(event.exercise)
-      }
+      //      is ExercisesUiEvent.GetExerciseRecords -> {
+      //        getExerciseRecords(event.exercise)
+      //      }
     }
   }
 
@@ -499,9 +526,6 @@ constructor(
   // TODO Get Exercise Details
   private var _exercise: MutableStateFlow<Exercise?> = MutableStateFlow(null)
 
-  val selectedExerciseDetails: StateFlow<Exercise?>
-    get() = _exercise.asStateFlow()
-
   /**
    * Retrieves the detailed information of an exercise from the repository.
    *
@@ -517,6 +541,14 @@ constructor(
         _exercise.value?.exrxExerciseID?.let { exrxExerciseID ->
           _exerciseDetailsUiState.update {
             it.copy(musclesExerciseList = exercisesRepository.getMuscleExercise(exrxExerciseID))
+          }
+        }
+
+        _exercise.value?.let { exercise ->
+          val exerciseHistory = getCompletedSetsByWorkout(exercise)
+          exerciseHistory?.second?.values?.flatten()?.let { sets ->
+            getExerciseRecords(sets, exercise)
+            generateChartData(sets)
           }
         }
       }
@@ -543,90 +575,89 @@ constructor(
 
   fun getCompletedSetsByWorkout(exercise: Exercise): Pair<List<Program>, Map<Workout, List<Set>>>? {
     // TODO store in viewmodel
-    return exercisesRepository.getCompletedSetsByExercise(exercise)
+    val result = exercisesRepository.getCompletedSetsByExercise(exercise)
+
+    _exerciseDetailsUiState.update { it.copy(exerciseHistory = result) }
+
+    return result
   }
 
-  fun getExerciseRecords(exercise: Exercise) {
+  private fun getExerciseRecords(sets: List<Set>, exercise: Exercise) {
     // TODO use List<Set> from getCompletedSetsByWorkout()
     // TODO max volume in 1 workout, max weight lifted, total reps, total volume,
     //   estimated 1RM based on ModernizedLoadRIR or a 1RM formula.
     //   List of best performance by reps & weight. calculate estimated 1RM for each performance
 
-    val sets = exercisesRepository.getCompletedSetsByExercise(exercise)?.second?.values?.flatten()
-    val maxVolumePounds = sets?.mapNotNull { it.setVolumeInPounds }?.max()
-    val maxVolumeKilograms = sets?.mapNotNull { it.setVolumeInKilograms }?.max()
-    val maxWeightLiftedPounds = sets?.mapNotNull { it.weightPounds }?.max()
-    val maxWeightLiftedKilograms = sets?.mapNotNull { it.weightKilograms }?.max()
+    val maxVolumePounds = sets.mapNotNull { it.setVolumeInPounds }.max()
+    val maxVolumeKilograms = sets.mapNotNull { it.setVolumeInKilograms }.max()
+    val maxWeightLiftedPounds = sets.mapNotNull { it.weightPounds }.max()
+    val maxWeightLiftedKilograms = sets.mapNotNull { it.weightKilograms }.max()
 
-    val totalReps = sets?.mapNotNull { it.repetitions }?.sum()
-    val totalVolumePounds = sets?.mapNotNull { it.setVolumeInPounds }?.sum()
-    val totalVolumeKilograms = sets?.mapNotNull { it.setVolumeInKilograms }?.sum()
+    val totalReps = sets.mapNotNull { it.repetitions }.sum()
+    val totalVolumePounds = sets.mapNotNull { it.setVolumeInPounds }.sum()
+    val totalVolumeKilograms = sets.mapNotNull { it.setVolumeInKilograms }.sum()
 
     val bestPerformanceByRepetitions: MutableList<BestPerformanceByRepetitions> = mutableListOf()
 
-    val repsPerformed = sets?.mapNotNull { it.repetitions }?.distinct()
-
     // TODO handle missing data, i.e. where there is no actual performance data
-    if (repsPerformed != null) {
-      for (reps in 1..15) {
-        val bestPerformanceByRepetitionsItem =
-          BestPerformanceByRepetitions(reps, null, null, null, null, null, null, null, null)
 
-        val sortedSets =
-          sets?.sortedWith(
-            compareByDescending(Set::weightPounds).thenByDescending(Set::repetitions)
-          )
+    for (reps in 1..15) {
+      val bestPerformanceByRepetitionsItem =
+        BestPerformanceByRepetitions(reps, null, null, null, null, null, null, null, null)
 
-        var set =
-          sortedSets?.filter { it.repetitions!! >= reps }?.maxByOrNull { it.weightPounds ?: 0.0 }
-        // TODO Calculate 1RM based on ModernizedLoadRIR or a 1RM formula when saving workouts
-        // TODO Calculate 1RM based on ModernizedLoadRIR or a 1RM formula.
+      val sortedSets =
+        sets.sortedWith(compareByDescending(Set::weightPounds).thenByDescending(Set::repetitions))
 
+      var set =
+        sortedSets.filter { it.repetitions!! >= reps }.maxByOrNull { it.weightPounds ?: 0.0 }
+      // TODO Calculate 1RM based on ModernizedLoadRIR or a 1RM formula when saving workouts
+      // TODO Calculate 1RM based on ModernizedLoadRIR or a 1RM formula.
+
+      if (set == null) {
+        set = sortedSets.firstOrNull { it.repetitions != null && it.repetitions!! >= reps }
         if (set == null) {
-          set = sortedSets?.firstOrNull { it.repetitions != null && it.repetitions!! >= reps }
-          if (set == null) {
-            set = sortedSets?.firstOrNull { it.repetitions != null && it.repetitions!! <= reps }
-          }
+          set = sortedSets.firstOrNull { it.repetitions != null && it.repetitions!! <= reps }
+        }
+      }
+
+      bestPerformanceByRepetitionsItem.repetitionsPerformed = set?.repetitions
+      bestPerformanceByRepetitionsItem.weightPounds = set?.weightPounds
+      bestPerformanceByRepetitionsItem.weightKilograms = set?.weightKilograms
+      bestPerformanceByRepetitionsItem.datePerformed = set?.dateCreated
+      bestPerformanceByRepetitionsItem.repetitionsInReserve = set?.repetitionsInReserve
+      bestPerformanceByRepetitionsItem.ratePerceivedEffort = set?.ratePerceivedEffort
+
+      val estimated1RMPounds =
+        if (
+          bestPerformanceByRepetitionsItem.ratePerceivedEffort != null ||
+            bestPerformanceByRepetitionsItem.repetitionsInReserve != null
+        ) {
+          estimateTargetOneRepMaxModernized(
+            bestPerformanceByRepetitionsItem.weightPounds ?: 0.0,
+            bestPerformanceByRepetitionsItem.repetitionsPerformed ?: 0,
+            targetReps = reps,
+            bestPerformanceByRepetitionsItem.repetitionsInReserve
+              ?: 10.0.minus(bestPerformanceByRepetitionsItem.ratePerceivedEffort!!),
+            bestPerformanceByRepetitionsItem.ratePerceivedEffort
+              ?: 10.0.minus(bestPerformanceByRepetitionsItem.repetitionsInReserve!!),
+            repCapacity = exercise.repCapacity,
+            getRelativeLoadPercentage = ::getRelativeLoadPercentage,
+          )
+        } else {
+          OneRepMaxEstimateFormulas.calculateOneRepMax(
+            bestPerformanceByRepetitionsItem.weightPounds ?: 0.0,
+            bestPerformanceByRepetitionsItem.repetitions,
+            OneRepMaxEstimateFormulas.Formula.Brzycki,
+          )
         }
 
-        bestPerformanceByRepetitionsItem.repetitionsPerformed = set?.repetitions
-        bestPerformanceByRepetitionsItem.weightPounds = set?.weightPounds
-        bestPerformanceByRepetitionsItem.weightKilograms = set?.weightKilograms
-        bestPerformanceByRepetitionsItem.datePerformed = set?.dateCreated
-        bestPerformanceByRepetitionsItem.repetitionsInReserve = set?.repetitionsInReserve
-        bestPerformanceByRepetitionsItem.ratePerceivedEffort = set?.ratePerceivedEffort
+      bestPerformanceByRepetitionsItem.estimated1RMPounds = estimated1RMPounds
+      bestPerformanceByRepetitionsItem.estimated1RMKilograms =
+        estimated1RMPounds?.convertPoundToKg()
 
-        val estimated1RMPounds =
-          if (
-            bestPerformanceByRepetitionsItem.ratePerceivedEffort != null ||
-            bestPerformanceByRepetitionsItem.repetitionsInReserve != null
-          ) {
-            estimateTargetOneRepMaxModernized(
-              bestPerformanceByRepetitionsItem.weightPounds ?: 0.0,
-              bestPerformanceByRepetitionsItem.repetitionsPerformed ?: 0,
-              targetReps = reps,
-              bestPerformanceByRepetitionsItem.repetitionsInReserve
-                ?: 10.0.minus(bestPerformanceByRepetitionsItem.ratePerceivedEffort!!),
-              bestPerformanceByRepetitionsItem.ratePerceivedEffort
-                ?: 10.0.minus(bestPerformanceByRepetitionsItem.repetitionsInReserve!!),
-              repCapacity = exercise.repCapacity,
-              getRelativeLoadPercentage = ::getRelativeLoadPercentage,
-            )
-          } else {
-            OneRepMaxEstimateFormulas.calculateOneRepMax(
-              bestPerformanceByRepetitionsItem.weightPounds ?: 0.0,
-              bestPerformanceByRepetitionsItem.repetitions,
-              OneRepMaxEstimateFormulas.Formula.Brzycki,
-            )
-          }
-
-        bestPerformanceByRepetitionsItem.estimated1RMPounds = estimated1RMPounds
-        bestPerformanceByRepetitionsItem.estimated1RMKilograms =
-          estimated1RMPounds?.convertPoundToKg()
-
-        bestPerformanceByRepetitions.add(bestPerformanceByRepetitionsItem)
-      }
+      bestPerformanceByRepetitions.add(bestPerformanceByRepetitionsItem)
     }
+
     _exerciseDetailsUiState.update {
       it.copy(
         exerciseRecords =
@@ -641,6 +672,126 @@ constructor(
             bestPerformanceByRepetitions =
               bestPerformanceByRepetitions.sortedBy { set -> set.repetitions },
           )
+      )
+    }
+  }
+
+  private val timezone = TimeZone.getDefault().toZoneId().toKotlinTimeZone()
+
+  private fun generateChartData(sets: List<Set>) {
+    // TODO Add hover text
+
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+    val startDate = LocalDate.now().atStartOfDay().toKotlinLocalDateTime().toInstant(timezone)
+
+    val endDate =
+      LocalDate.now()
+        .plusDays(1)
+        .atStartOfDay()
+        .minusNanos(1)
+        .toKotlinLocalDateTime()
+        .toInstant(timezone)
+
+    val day = 1.toDuration(DurationUnit.DAYS)
+
+    val dateSequence =
+      generateSequence(seed = startDate..endDate) { currentRange ->
+        currentRange.start.minus(day)..currentRange.endInclusive.minus(day)
+      }
+        .take(180)
+
+    val labels =
+      dateSequence.map { date ->
+        date.start
+          .toLocalDateTime(timezone)
+          .toJavaLocalDateTime()
+          .toLocalDate()
+          .format(dateFormatter)
+      }
+
+    val labelsReversed = labels.toList().reversed()
+
+    var bestSetEstimated1RMPounds: MutableMap<String, Double> = mutableMapOf()
+    var bestSetEstimated1RMKilograms: MutableMap<String, Double> = mutableMapOf()
+    var bestSetMaxWeightPoundsLifted: MutableMap<String, Double> = mutableMapOf()
+    var bestSetMaxWeightKilogramsLifted: MutableMap<String, Double> = mutableMapOf()
+    var bestSetTotalVolumePounds: MutableMap<String, Double> = mutableMapOf()
+    var bestSetTotalVolumeKilograms: MutableMap<String, Double> = mutableMapOf()
+    var bestSetRepetitions: MutableMap<String, Int> = mutableMapOf()
+
+    dateSequence.forEach { dateRange ->
+      val filteredSets =
+        sets.filter { set -> set.dateCreated?.let { date -> date in dateRange } == true }
+
+      if (filteredSets.isEmpty()) return@forEach
+
+      val label =
+        dateRange.start
+          .toLocalDateTime(timezone)
+          .toJavaLocalDateTime()
+          .toLocalDate()
+          .format(dateFormatter)
+
+      bestSetMaxWeightPoundsLifted.put(label, filteredSets.maxOf { it.weightPounds ?: 0.0 })
+      bestSetMaxWeightKilogramsLifted.put(label, filteredSets.maxOf { it.weightKilograms ?: 0.0 })
+      bestSetEstimated1RMPounds.put(label, filteredSets.maxOf { it.estimated1RMPounds ?: 0.0 })
+      bestSetEstimated1RMKilograms.put(
+        label,
+        filteredSets.maxOf { it.estimated1RMKilograms ?: 0.0 },
+      )
+      bestSetTotalVolumePounds.put(label, filteredSets.sumOf { it.setVolumeInPounds ?: 0.0 })
+      bestSetTotalVolumeKilograms.put(label, filteredSets.sumOf { it.setVolumeInKilograms ?: 0.0 })
+      bestSetRepetitions.put(label, filteredSets.maxOf { it.repetitions ?: 0 })
+    }
+
+    bestSetMaxWeightPoundsLifted =
+      bestSetMaxWeightPoundsLifted.filterNot { it.value == 0.0 }.toMutableMap()
+    bestSetMaxWeightKilogramsLifted =
+      bestSetMaxWeightKilogramsLifted.filterNot { it.value == 0.0 }.toMutableMap()
+    bestSetEstimated1RMPounds =
+      bestSetEstimated1RMPounds.filterNot { it.value == 0.0 }.toMutableMap()
+    bestSetEstimated1RMKilograms =
+      bestSetEstimated1RMKilograms.filterNot { it.value == 0.0 }.toMutableMap()
+    bestSetTotalVolumePounds = bestSetTotalVolumePounds.filterNot { it.value == 0.0 }.toMutableMap()
+    bestSetTotalVolumeKilograms =
+      bestSetTotalVolumeKilograms.filterNot { it.value == 0.0 }.toMutableMap()
+    bestSetRepetitions = bestSetRepetitions.filterNot { it.value == 0 }.toMutableMap()
+
+    _exerciseDetailsUiState.update {
+      it.copy(
+        bestSetEstimatedOneRepMaxPoundsChartData =
+          ChartData(
+            bestSetEstimated1RMPounds.keys.toList(),
+            bestSetEstimated1RMPounds.values.toList(),
+          ),
+        bestSetEstimatedOneRepMaxKilogramsChartData =
+          ChartData(
+            bestSetEstimated1RMKilograms.keys.toList(),
+            bestSetEstimated1RMKilograms.values.toList(),
+          ),
+        bestSetMaxWeightPoundsLiftedChartData =
+          ChartData(
+            bestSetMaxWeightPoundsLifted.keys.toList(),
+            bestSetMaxWeightPoundsLifted.values.toList(),
+          ),
+        bestSetMaxWeightKilogramsLiftedChartData =
+          ChartData(
+            bestSetMaxWeightKilogramsLifted.keys.toList(),
+            bestSetMaxWeightKilogramsLifted.values.toList(),
+          ),
+        bestSetTotalVolumePoundsChartData =
+          ChartData(
+            bestSetTotalVolumePounds.keys.toList(),
+            bestSetTotalVolumePounds.values.toList(),
+          ),
+        bestSetTotalVolumeKilogramsChartData =
+          ChartData(
+            bestSetTotalVolumeKilograms.keys.toList(),
+            bestSetTotalVolumeKilograms.values.toList(),
+          ),
+        bestSetRepetitionsChartData =
+          ChartData(bestSetRepetitions.keys.toList(), bestSetRepetitions.values.toList()),
       )
     }
   }

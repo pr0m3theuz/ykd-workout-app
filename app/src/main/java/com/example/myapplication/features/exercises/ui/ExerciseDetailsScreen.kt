@@ -6,12 +6,14 @@ import android.content.Intent
 import android.icu.util.LocaleData
 import android.icu.util.ULocale
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,7 +42,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -62,6 +64,10 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Equipment
 import com.example.myapplication.common.domain.model.Exercise
@@ -69,10 +75,8 @@ import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Force
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Mechanic
-import com.example.myapplication.common.domain.model.Muscle
 import com.example.myapplication.common.domain.model.MuscleExerciseWithMuscle
 import com.example.myapplication.common.domain.model.MuscleGroup
-import com.example.myapplication.common.domain.model.MuscleRoleFunction
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
@@ -83,8 +87,10 @@ import com.example.myapplication.common.domain.model.formatWorkoutDate
 import com.example.myapplication.common.domain.model.setSummaryRIR
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.exercises.ExerciseDetailsUiState
-import com.example.myapplication.features.exercises.ExercisesUiEvent
 import com.example.myapplication.features.exercises.ExercisesViewModel
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.ChartType
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.WebViewChart
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.generateRandomExerciseVolumeData
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinTimeZone
@@ -109,20 +115,19 @@ fun ExerciseDetailsScreen(
 
   val defaultTimeZone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
 
+  fun navigateToFullscreenChartScreen() {
+    navController.navigate("exerciseChart")
+  }
+
   if (exerciseID.contentEquals("Select an exercise")) {
     NoExerciseDetailContent(exerciseID)
   } else {
     exercisesViewModel.getExerciseDetails(exerciseID)
 
     exerciseDetailsUiState.selectedExerciseDetails?.let { it ->
-      val completedSetsByExercise = exercisesViewModel.getCompletedSetsByWorkout(it)
-
-      LaunchedEffect(it.name) {
-        exercisesViewModel.onEvent(ExercisesUiEvent.GetExerciseRecords(it))
-      }
+      val completedSetsByExercise = exerciseDetailsUiState.exerciseHistory
 
       ExerciseDetailsLayout(
-        navController,
         exercise = it,
         tabState = tabState,
         setTabState = { state -> exercisesViewModel.setExerciseDetailsLayoutTabState(state) },
@@ -134,8 +139,6 @@ fun ExerciseDetailsScreen(
             equipmentList = exerciseDetailsUiState.equipment,
             forceList = exerciseDetailsUiState.force,
             mechanicList = exerciseDetailsUiState.mechanic,
-            musclesList = exerciseDetailsUiState.muscles,
-            muscleRoleFunctionList = exerciseDetailsUiState.muscleRoleFunctions,
             muscleGroupList = exerciseDetailsUiState.muscleGroup,
             muscleExerciseList = exerciseDetailsUiState.musclesExerciseList,
           )
@@ -159,6 +162,12 @@ fun ExerciseDetailsScreen(
               },
             )
           } ?: NoHistoryTab() // TODO Replace with No History Content
+        },
+        chartTab = {
+          ChartTab(
+            exerciseDetailsUiState = exerciseDetailsUiState,
+            navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() },
+          )
         },
         recordsTab = { RecordsTab(exerciseDetailsUiState) },
       )
@@ -199,22 +208,15 @@ private fun NoExerciseDetailContent(exerciseID: String) {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun ExerciseDetailsLayout(
-  navController: NavController,
   exercise: Exercise,
   tabState: Int = 0,
   setTabState: (Int) -> Unit = {},
   navigateToListPane: () -> Unit,
   aboutTab: @Composable () -> Unit = {},
   historyTab: @Composable () -> Unit = {},
+  chartTab: @Composable () -> Unit = {},
   recordsTab: @Composable () -> Unit = {},
 ) {
-  //    val exercise = _exercise.firstOrNull()
-
-  fun navigateToFullscreenChartScreen() {
-    navController.navigate("exerciseChart")
-  }
-
-  val context = LocalContext.current
   val titles = listOf("About", "History", "Charts", "Records")
   val onSurface = MaterialTheme.colorScheme.onSurface
 
@@ -269,12 +271,12 @@ private fun ExerciseDetailsLayout(
       }
 
       Column(Modifier
-        .padding(8.dp)
+        .padding(16.dp)
         .fillMaxWidth()) {
         when (tabState) {
           0 -> aboutTab()
           1 -> historyTab()
-          2 -> ChartTab(navigateToFullscreenChartScreen = { navigateToFullscreenChartScreen() })
+          2 -> chartTab()
           3 -> recordsTab()
         }
       }
@@ -323,8 +325,6 @@ fun AboutTab(
   equipmentList: List<Equipment>,
   forceList: List<Force>,
   mechanicList: List<Mechanic>,
-  musclesList: List<Muscle>,
-  muscleRoleFunctionList: List<MuscleRoleFunction>,
   muscleGroupList: List<MuscleGroup>,
   muscleExerciseList: List<MuscleExerciseWithMuscle>,
 ) {
@@ -659,15 +659,165 @@ private fun WorkoutCard(
 }
 
 @Composable
-fun ChartTab(navigateToFullscreenChartScreen: () -> Unit) {
+fun PlaceholderChart() {
+  val boxModifier = Modifier
+    .fillMaxWidth()
+    .aspectRatio(16f / 9f)
+    .padding(bottom = 16.dp)
+
+  val workoutFrequencyChartData = generateRandomExerciseVolumeData()
+
+  val gifEnabledLoader =
+    ImageLoader.Builder(LocalContext.current)
+      .components {
+        if (SDK_INT >= 28) {
+          add(ImageDecoderDecoder.Factory())
+        } else {
+          add(GifDecoder.Factory())
+        }
+      }
+      .build()
+
+  Row(modifier = boxModifier) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+      //      WebViewChart(
+      //        workoutFrequencyChartData,
+      //        ChartType.VOLUME,
+      //        yMaxAllowed = workoutFrequencyChartData.values.maxBy { it.toInt() }.toInt(),
+      //      )
+
+      val gifs =
+        listOf(
+          "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWVzcW1nbXU4ZDZ0b3d3M3g4M2l2NjNzam8xcHo5YXFhZWk5Ym4yeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/G2tytrXJjiZjO/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTVrdmY0dmo0NDd3NXc0NnJmcXBkZ3AzdjRzOHFxMGh5MjN1Z2p3ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l1J9FwSQMezfQrPJ6/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTVrdmY0dmo0NDd3NXc0NnJmcXBkZ3AzdjRzOHFxMGh5MjN1Z2p3ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3ohhwkOPJalh5ar1cI/giphy.gif",
+          "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHNmYjAwb252bDJ4MXQ2MjltZ2ZvOTc2b2VlYXZmM2kxZXNsM2RrNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g01ZnwAUvutuK8GIQn/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3Yng2ZTV0d25pN2VjMDR3aHVuaHBqbHdpazhya3Vuc2RyNzl3ZHh2NSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3vjUhay98FYRRWfiNZ/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjNyNTB5bmk2OHZ3ZDFpMzloYzltdnNsOHdyMWx0bnp4czJhdTJseSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9PgxlC8MA5Nq69Vh4W/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTc5aWM4MmE4aGk2YmFhd3AyaG0xdmpocnI3M2RtbXRldDYzYTlwdiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UqZ4imFIoljlr5O2sM/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmR5ZHFmdXI2a2FqZ3I2dTJ3Nmg0bmc5cG14dXpwYW1ldzk0dGhpZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9PgxlC8MA5Nq69Vh4W/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bnF2aGx6eXVvaXdiZnBnOXF3M3gwdjAxcWh1Z3lnbjRkeW1mMnRxMCZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/GHpqx8F4t9ciI/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWM1dGdxOGpxZWxmZnFoeWVjMWRobW1naWtvZTU0aXl4eGV2M2dhMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/J9UXcyVW6OYN2fH0Sr/giphy.gif",
+          "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdTdtaWt5cGl2eDdmdzNoY2M3YTVzbGxua25pMXJyNW5odTZtZ2NkYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L6LPsHa8bqMfTerzX1/giphy.gif",
+          "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHZqZmxuNm9mN2wxNm96b3p4bjFwc2F6MHhzMDQ3M28xaWR2cGlxMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/NnKbYrjEWde7XZxcgJ/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3eWNzcnh1YWxrOHlpb3lqemlnemtjODV4dnF2dmVmOXlkNHVsdWp1dSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/YsOQGFLy6l6aIqZ0ru/giphy.gif",
+        )
+
+      AsyncImage(
+        model = gifs.random(),
+        imageLoader = gifEnabledLoader,
+        contentDescription = null,
+        alpha = 1f,
+        modifier = Modifier.fillMaxWidth(),
+        //        contentScale = ContentScale.,
+      )
+
+      Text(
+        "No Data Available!",
+        color = Color.White,
+        modifier = Modifier
+          .align(Alignment.TopCenter)
+          .padding(vertical = 8.dp),
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.ExtraBold,
+      )
+    }
+  }
+}
+
+@Composable
+fun ChartTab(
+  exerciseDetailsUiState: ExerciseDetailsUiState,
+  navigateToFullscreenChartScreen: () -> Unit,
+) {
   val state = rememberScrollState()
+
+  val boxModifier = Modifier
+    .fillMaxWidth()
+    .aspectRatio(1f / 1f)
+  val textModifier = Modifier.padding(vertical = 8.dp)
+
   Column(modifier = Modifier.verticalScroll(state)) {
-    Text(text = "Chart Name")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = {}) }
-    Text(text = "Estimated 1RM")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = {}) }
-    Text(text = "Volume")
-    Row() { ChartWrapper(navigateToFullscreenChartScreen = {}) }
+    Text(
+      text =
+        "Best Set (Estimated 1RM) (${exerciseDetailsUiState.userDefaultWeightUnit.abbreviation})",
+      modifier = textModifier,
+    )
+    when (exerciseDetailsUiState.userDefaultWeightUnit) {
+      MassUnit.POUNDS -> exerciseDetailsUiState.bestSetEstimatedOneRepMaxPoundsChartData
+      MassUnit.KILOGRAMS -> exerciseDetailsUiState.bestSetEstimatedOneRepMaxKilogramsChartData
+    }?.let { chartData ->
+      if (chartData.values.isNotEmpty()) {
+        Row(modifier = boxModifier) {
+          WebViewChart(
+            chartData,
+            ChartType.VOLUME,
+            yMaxAllowed = chartData.values.maxBy { it.toInt() }.toInt().times(1.2),
+          )
+        }
+      } else {
+        PlaceholderChart()
+      }
+    }
+
+    Text(
+      text =
+        "Best Set (Max Weight Lifted) (${exerciseDetailsUiState.userDefaultWeightUnit.abbreviation})",
+      modifier = textModifier,
+    )
+    when (exerciseDetailsUiState.userDefaultWeightUnit) {
+      MassUnit.POUNDS -> exerciseDetailsUiState.bestSetMaxWeightPoundsLiftedChartData
+      MassUnit.KILOGRAMS -> exerciseDetailsUiState.bestSetMaxWeightKilogramsLiftedChartData
+    }?.let { chartData ->
+      if (chartData.values.isNotEmpty()) {
+        Row(modifier = boxModifier) {
+          WebViewChart(
+            chartData,
+            ChartType.VOLUME,
+            yMaxAllowed = chartData.values.maxBy { it.toInt() }.toInt().times(1.2),
+          )
+        }
+      } else {
+        PlaceholderChart()
+      }
+    }
+
+    Text(
+      text = "Total Volume (${exerciseDetailsUiState.userDefaultWeightUnit.abbreviation})",
+      modifier = textModifier,
+    )
+
+    when (exerciseDetailsUiState.userDefaultWeightUnit) {
+      MassUnit.POUNDS -> exerciseDetailsUiState.bestSetTotalVolumePoundsChartData
+      MassUnit.KILOGRAMS -> exerciseDetailsUiState.bestSetTotalVolumeKilogramsChartData
+    }?.let { chartData ->
+      if (chartData.values.isNotEmpty()) {
+        Row(modifier = boxModifier) {
+          WebViewChart(
+            chartData,
+            ChartType.VOLUME,
+            yMaxAllowed = chartData.values.maxBy { it.toInt() }.toInt().times(1.2),
+          )
+        }
+      } else {
+        PlaceholderChart()
+      }
+    }
+
+    Text(text = "Best Set (Repetitions)", modifier = textModifier)
+    exerciseDetailsUiState.bestSetRepetitionsChartData?.let { chartData ->
+      if (chartData.values.isNotEmpty()) {
+        Row(modifier = boxModifier) {
+          WebViewChart(
+            chartData,
+            ChartType.VOLUME,
+            yMaxAllowed = chartData.values.maxBy { it.toInt() }.toInt().plus(5),
+          )
+        }
+      } else {
+        PlaceholderChart()
+      }
+    }
   }
 }
 

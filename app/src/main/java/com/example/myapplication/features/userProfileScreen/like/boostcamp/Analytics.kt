@@ -632,7 +632,7 @@ fun WorkoutSummaryContent(
           workoutFrequencyChartData,
           ChartType.FREQUENCY,
           yMaxAllowed = workoutFrequencyData.values.toList().max().times(1.1),
-          period = selectedPeriod,
+//          period = selectedPeriod,
         )
       }
 
@@ -646,14 +646,14 @@ fun WorkoutSummaryContent(
             totalTrainingVolumePoundsChartData,
             ChartType.FREQUENCY,
             yMaxAllowed = totalTrainingVolumePoundsData.values.toList().max().times(1.1),
-            period = selectedPeriod,
+//            period = selectedPeriod,
           )
         } else {
           WebViewChart(
             totalTrainingVolumeKilogramsChartData,
             ChartType.VOLUME,
             yMaxAllowed = totalTrainingVolumeKilogramsData.values.toList().max().times(1.1),
-            period = selectedPeriod,
+//            period = selectedPeriod,
           )
         }
       }

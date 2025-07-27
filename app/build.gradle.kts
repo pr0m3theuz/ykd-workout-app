@@ -255,6 +255,7 @@ dependencies {
   implementation("com.google.firebase:firebase-analytics")
 
   implementation("io.coil-kt:coil-compose:2.7.0")
+  implementation("io.coil-kt:coil-gif:2.7.0")
 
   // For Jetpack Compose.
   implementation("com.patrykandpatrick.vico:compose:2.1.3")
