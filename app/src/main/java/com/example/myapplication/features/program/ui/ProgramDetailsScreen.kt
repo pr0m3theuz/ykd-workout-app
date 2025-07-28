@@ -71,6 +71,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -79,6 +80,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
@@ -624,16 +626,17 @@ fun ProgramDescriptionCard(program: Program) {
         SelectionContainer {
           Column(modifier = Modifier.animateContentSize(animationSpec = tween(100))) {
             program.description?.let { description ->
+              val text = AnnotatedString.fromHtml(description, textLinkStyles)
+
               if (expanded) {
                 // Text(text = description, style = bodyMedium)
                 Text(
-                  text = createAnnotatedLinkString(description, textLinkStyles),
+                  text = text, // createAnnotatedLinkString(description, textLinkStyles),
                   style = bodyMedium,
                 )
               } else {
-
                 Text(
-                  text = createAnnotatedLinkString(description, textLinkStyles),
+                  text = text,
                   style = bodyMedium,
                   maxLines = 20,
                   overflow = TextOverflow.Ellipsis,
