@@ -460,17 +460,20 @@ class ManageWorkoutUseCase(
       when (workoutItem) {
         is ExerciseExerciseSets -> {
           workoutItem.sets.forEach { set ->
-            set.estimated1RMPounds = calculateEstimated1RM(set, workoutItem.exercise.repCapacity)
-            set.estimated1RMKilograms = calculateEstimated1RM(set, workoutItem.exercise.repCapacity)
+            set.estimated1RMPounds =
+              calculateEstimated1RMPounds(set, workoutItem.exercise.repCapacity)
+            set.estimated1RMKilograms =
+              calculateEstimated1RMKilograms(set, workoutItem.exercise.repCapacity)
           }
         }
 
         is SupersetExercisesSets -> {
           workoutItem.exercisesSets.forEach { exerciseSets ->
             exerciseSets.sets.forEach { set ->
-              set.estimated1RMPounds = calculateEstimated1RM(set, exerciseSets.exercise.repCapacity)
+              set.estimated1RMPounds =
+                calculateEstimated1RMPounds(set, exerciseSets.exercise.repCapacity)
               set.estimated1RMKilograms =
-                calculateEstimated1RM(set, exerciseSets.exercise.repCapacity)
+                calculateEstimated1RMKilograms(set, exerciseSets.exercise.repCapacity)
             }
           }
         }
@@ -526,7 +529,7 @@ class ManageWorkoutUseCase(
     return result
   }
 
-  private fun calculateEstimated1RM(set: Set, repCapacity: RepCapacity): Double? {
+  private fun calculateEstimated1RMPounds(set: Set, repCapacity: RepCapacity): Double? {
     return if (
       set.ratePerceivedEffort != null ||
       set.repetitionsInReserve != null &&
@@ -546,6 +549,34 @@ class ManageWorkoutUseCase(
     } else if (set.repetitions != null) {
       OneRepMaxEstimateFormulas.calculateOneRepMax(
         set.weightPounds ?: 0.0,
+        set.repetitions!!,
+        OneRepMaxEstimateFormulas.Formula.Brzycki,
+      )
+    } else {
+      null
+    }
+  }
+
+  private fun calculateEstimated1RMKilograms(set: Set, repCapacity: RepCapacity): Double? {
+    return if (
+      set.ratePerceivedEffort != null ||
+      set.repetitionsInReserve != null &&
+      set.repetitions != null
+    ) {
+      estimateTargetOneRepMaxModernized(
+        set.weightKilograms ?: 0.0,
+        set.repetitions ?: 0,
+        targetReps = 1,
+        set.repetitionsInReserve
+          ?: 10.0.minus(set.ratePerceivedEffort!!),
+        set.ratePerceivedEffort
+          ?: 10.0.minus(set.repetitionsInReserve!!),
+        repCapacity = repCapacity,
+        getRelativeLoadPercentage = ::getRelativeLoadPercentage,
+      )
+    } else if (set.repetitions != null) {
+      OneRepMaxEstimateFormulas.calculateOneRepMax(
+        set.weightKilograms ?: 0.0,
         set.repetitions!!,
         OneRepMaxEstimateFormulas.Formula.Brzycki,
       )

@@ -134,7 +134,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
           .where(
             Expression.property("isCompleted")
               .equalTo(Expression.booleanValue(true))
-              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+//              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
 
       //      val query =
