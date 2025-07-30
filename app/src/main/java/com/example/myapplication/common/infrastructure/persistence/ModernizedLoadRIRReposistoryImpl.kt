@@ -37,7 +37,8 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     queryChange.results?.let { results -> // 2
       results.forEach { result -> // 3
         val json = result.toJSON() // 4
-//        Log.i("mapQueryChangeToModernizedLoadRIR.JSON", "mapQueryChangeToModernizedLoadRIR $json")
+        //        Log.i("mapQueryChangeToModernizedLoadRIR.JSON", "mapQueryChangeToModernizedLoadRIR
+        // $json")
         val modernizedLoadRIR =
           withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(json).ModernizedLoadRIR // 5
         list.add(modernizedLoadRIR) // 6
@@ -63,7 +64,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     repCapacity: RepCapacity,
     rir: Double,
     rpe: Double,
-    repsPerformed: Int
+    repsPerformed: Int,
   ): ModernizedLoadRIR? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -75,7 +76,8 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
           .where(
-            Expression.property("repCapacity").equalTo(Expression.string(repCapacity.name))
+            Expression.property("repCapacity")
+              .equalTo(Expression.string(repCapacity.name))
               .and(Expression.property("rir").equalTo(Expression.string(rir.toString())))
               .and(
                 Expression.property("repsPerformed")
@@ -87,7 +89,9 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR }
+      return result?.let {
+        withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -97,7 +101,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
   override fun getRIRRPE(
     repCapacity: RepCapacity,
     repsPerformed: Int,
-    relativeLoadPercent: Double
+    relativeLoadPercent: Double,
   ): ModernizedLoadRIR? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -109,7 +113,8 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
           .where(
-            Expression.property("repCapacity").equalTo(Expression.string(repCapacity.name))
+            Expression.property("repCapacity")
+              .equalTo(Expression.string(repCapacity.name))
               .and(
                 Expression.property("repsPerformed")
                   .equalTo(Expression.string(repsPerformed.toString()))
@@ -123,7 +128,9 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR }
+      return result?.let {
+        withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -134,7 +141,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     repCapacity: RepCapacity,
     rir: Double,
     rpe: Double,
-    relativeLoadPercent: Double
+    relativeLoadPercent: Double,
   ): ModernizedLoadRIR? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -146,7 +153,8 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
         QueryBuilder.select(SelectResult.all())
           .from(DataSource.collection(collection)) // Replace with your database instance
           .where(
-            Expression.property("repCapacity").equalTo(Expression.string(repCapacity.name))
+            Expression.property("repCapacity")
+              .equalTo(Expression.string(repCapacity.name))
               .and(Expression.property("rir").equalTo(Expression.string(rir.toString())))
               .and(
                 Expression.property("relativeLoadPercent")
@@ -158,16 +166,16 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR }
+      return result?.let {
+        withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
 
-  override fun getRepCapacity(
-    estimated1RMPercent: Double,
-  ): LoadRepCapacity? {
+  override fun getRepCapacity(estimated1RMPercent: Double): LoadRepCapacity? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("RepCapacityLookup")
@@ -184,14 +192,18 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
-      return result?.let { withUnknownKeys.decodeFromString<LoadRepCapacityDao>(it).LoadRepCapacity }
+      return result?.let {
+        withUnknownKeys.decodeFromString<LoadRepCapacityDao>(it).LoadRepCapacity
+      }
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
 
-  override fun getRepCapacityModernizedLoadRIR(repCapacity: RepCapacity): Flow<List<ModernizedLoadRIR>> {
+  override fun getRepCapacityModernizedLoadRIR(
+    repCapacity: RepCapacity
+  ): Flow<List<ModernizedLoadRIR>> {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("ModernizedLoadRIR")
@@ -211,7 +223,6 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
       query.execute() // <4>
       return flow
-
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -219,31 +230,26 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     return flow {}
   }
 
-  override fun getAllModernizedLoadRIR(): Flow<List<ModernizedLoadRIR>> {
+  override fun getAllModernizedLoadRIR(): List<ModernizedLoadRIR> {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
       val collection = db.getCollection("ModernizedLoadRIR")
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val query =
-        QueryBuilder.select(SelectResult.all())
-          .from(DataSource.collection(collection))
+      val query = QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
 
-      val flow =
-        query
-          .queryChangeFlow()
-          .map { queryChange -> mapQueryChangeToModernizedLoadRIR(queryChange) }
-          .flowOn(Dispatchers.IO)
+      val result = query.execute().allResults().map {
+        val json = it.toJSON()
+        withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(json).ModernizedLoadRIR
+      }
 
-      query.execute() // <4>
-      return flow
-
+      return result
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
 
-    return flow {}
+    return emptyList()
   }
 
   override fun getModernizedLoadRIR(
@@ -251,7 +257,7 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
     targetPercentage: Double?,
     targetRIR: Double?,
     targetRPE: Double?,
-    targetReps: Int?
+    targetReps: Int?,
   ): List<ModernizedLoadRIR>? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -259,28 +265,28 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val percentageExpression = targetPercentage?.let {
-        "relativeLoadPercent = $it"
-      }
+      val percentageExpression = targetPercentage?.let { "relativeLoadPercent = $it" }
 
       val targetRIRExpression = targetRIR?.let { "rir = $it" }
       val targetRPEExpression = targetRPE?.let { "rpe = $it" }
 
-      val targetRepsExpression = targetReps?.let { reps ->
-        "repsPerformed = $reps".takeIf { reps in 1..30 }
-      }
+      val targetRepsExpression =
+        targetReps?.let { reps -> "repsPerformed = $reps".takeIf { reps in 1..30 } }
 
-      val whereClause = listOfNotNull(
-        percentageExpression,
-        targetRIRExpression,
-        targetRPEExpression,
-        targetRepsExpression
-      ).joinToString(separator = " AND ") { it }
+      val whereClause =
+        listOfNotNull(
+          percentageExpression,
+          targetRIRExpression,
+          targetRPEExpression,
+          targetRepsExpression,
+        )
+          .joinToString(separator = " AND ") { it }
 
-      val queryExpression = "SELECT * FROM `ModernizedLoadRIR`" +
-              "WHERE type = \"ModernizedLoadRIR\"" +
-              "AND repCapacity = ${repCapacity.name}" +
-              if (whereClause.isNotEmpty()) " AND $whereClause" else ""
+      val queryExpression =
+        "SELECT * FROM `ModernizedLoadRIR`" +
+                "WHERE type = \"ModernizedLoadRIR\"" +
+                "AND repCapacity = ${repCapacity.name}" +
+                if (whereClause.isNotEmpty()) " AND $whereClause" else ""
 
       val sqlQeury = db.createQuery(queryExpression)
 
@@ -290,7 +296,6 @@ class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseMana
         val json = it.toJSON()
         withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(json).ModernizedLoadRIR
       }
-
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }

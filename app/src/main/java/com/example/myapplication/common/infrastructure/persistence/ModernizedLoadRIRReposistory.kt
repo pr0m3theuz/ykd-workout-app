@@ -32,7 +32,7 @@ interface ModernizedLoadRIRReposistory {
 
   fun getRepCapacityModernizedLoadRIR(repCapacity: RepCapacity): Flow<List<ModernizedLoadRIR>>
 
-  fun getAllModernizedLoadRIR(): Flow<List<ModernizedLoadRIR>>
+  fun getAllModernizedLoadRIR(): List<ModernizedLoadRIR>
 
   fun getModernizedLoadRIR(
     repCapacity: RepCapacity,

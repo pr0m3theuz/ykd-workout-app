@@ -310,7 +310,7 @@ constructor(
     return coroutineScope {
       exercisesRepository.getAllEquipment().collect {
         _equipment.value = it
-        _exerciseDetailsUiState.update { it.copy(equipment = _equipment.value) }
+        _exerciseDetailsUiState.update { state -> state.copy(equipment = it) }
         //        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
 
         _equipmentsChecked.value =
@@ -344,10 +344,8 @@ constructor(
   private suspend fun getAllModernizedLoadRIR() {
     //    Log.i("ExercisesViewModel", "getEquipment")
     return coroutineScope {
-      modernizedLoadRIRReposistory.getAllModernizedLoadRIR().collect {
-        _modernizedLoadRIRItems = it
-        //        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
-      }
+      _modernizedLoadRIRItems = modernizedLoadRIRReposistory.getAllModernizedLoadRIR()
+      //        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
     }
   }
 
@@ -547,7 +545,6 @@ constructor(
             bestSetTotalVolumeKilogramsChartData = null,
             bestSetRepetitionsChartData = null,
           )
-
         }
 
         _exercise.value?.exrxExerciseID?.let { exrxExerciseID ->
@@ -734,13 +731,13 @@ constructor(
 
       if (filteredSets.isEmpty()) {
         return@forEach
-//        bestSetMaxWeightPoundsLifted.put(label, null)
-//        bestSetMaxWeightKilogramsLifted.put(label, null)
-//        bestSetEstimated1RMPounds.put(label, null)
-//        bestSetEstimated1RMKilograms.put(label, null)
-//        bestSetTotalVolumePounds.put(label, null)
-//        bestSetTotalVolumeKilograms.put(label, null)
-//        bestSetRepetitions.put(label, null)
+        //        bestSetMaxWeightPoundsLifted.put(label, null)
+        //        bestSetMaxWeightKilogramsLifted.put(label, null)
+        //        bestSetEstimated1RMPounds.put(label, null)
+        //        bestSetEstimated1RMKilograms.put(label, null)
+        //        bestSetTotalVolumePounds.put(label, null)
+        //        bestSetTotalVolumeKilograms.put(label, null)
+        //        bestSetRepetitions.put(label, null)
       }
 
       bestSetMaxWeightPoundsLifted.put(label, filteredSets.maxOf { it.weightPounds ?: 0.0 })
