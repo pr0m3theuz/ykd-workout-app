@@ -6,7 +6,6 @@ import android.util.Log
 import com.couchbase.lite.DataSource
 import com.couchbase.lite.Database
 import com.couchbase.lite.Expression
-import com.couchbase.lite.Function
 import com.couchbase.lite.MutableDocument
 import com.couchbase.lite.Ordering
 import com.couchbase.lite.QueryBuilder
@@ -126,22 +125,29 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
-      val query =
-        QueryBuilder.select(
-          SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
-        )
-          .from(DataSource.collection(collection))
-          .where(
-            Expression.property("isCompleted")
-              .equalTo(Expression.booleanValue(true))
+      val query = "SELECT Count(*) as count FROM `CompletedWorkouts` WHERE isCompleted = true"
+//        QueryBuilder.select(
+//          SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+//        )
+//          .from(DataSource.collection(collection))
+//          .where(
+//            Expression.property("isCompleted")
+//              .equalTo(Expression.booleanValue(true))
 //              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
-          )
+//          )
 
       //      val query =
       // QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
 
-      val results = query.execute().allResults()
-      return results[0].getInt("count")
+      val workoutCount =
+        db
+          .createQuery(query)
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.getInt("count") ?: 0
+
+      return workoutCount
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }

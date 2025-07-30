@@ -388,7 +388,6 @@ private fun NavGraphBuilder.addWorkoutGraph(
           // https://developer.android.com/guide/navigation/use-graph/navigate
           navController = navController,
           workoutID = workoutID,
-          workoutsCount = workoutsCount,
           workoutViewModel = workoutViewModel,
           currentDestination = navController.currentBackStackEntry?.destination,
           onNavigateBottomBar = { route ->
@@ -625,7 +624,6 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
         WorkoutSummaryScreen(
           navController = navController,
           workoutID = workoutID,
-          workoutsCount = workoutsCount,
           workoutViewModel = workoutViewModel,
           currentDestination = navController.currentBackStackEntry?.destination,
           onNavigateBottomBar = { route ->
@@ -693,7 +691,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
           workoutOverviewContent = { workout, setOpenDeleteWorkoutDialog ->
             WorkoutOverviewContent(
               workout = workout,
-              setOpenDeleteWorkoutDialog = { setOpenDeleteWorkoutDialog },
+              setOpenDeleteWorkoutDialog = { setOpenDeleteWorkoutDialog() },
               performAgain = true,
               userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
               workoutComponents = historyViewModel.workoutComponents.collectAsState().value,
