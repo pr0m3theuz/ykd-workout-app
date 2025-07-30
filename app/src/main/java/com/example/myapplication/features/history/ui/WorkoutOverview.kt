@@ -72,7 +72,7 @@ fun WorkoutOverview(
     null -> NoWorkoutFound()
     else ->
       workout?.let {
-        workoutOverviewContent(it, { setOpenDeleteWorkoutDialog(false) })
+        workoutOverviewContent(it, { setOpenDeleteWorkoutDialog(true) })
       }
   }
 }

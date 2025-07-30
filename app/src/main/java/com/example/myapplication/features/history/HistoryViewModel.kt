@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import kotlin.time.ExperimentalTime
@@ -93,9 +94,11 @@ class HistoryViewModel(
       }
 
       // Update workouts list
-      _workouts.value =
-        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
+      _workouts.update {
+        completedWorkoutRepository.getCompletedWorkouts()
+          ?.sortedByDescending { workout -> workout.workoutEnded }
           ?: emptyList()
+      }
     }
   }
 }

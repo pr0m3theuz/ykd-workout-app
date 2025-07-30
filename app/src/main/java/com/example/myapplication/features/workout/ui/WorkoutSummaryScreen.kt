@@ -69,11 +69,11 @@ fun WorkoutSummaryScreen(
   navController: NavController,
   workoutViewModel: WorkoutViewModel,
   workoutID: String,
-  workoutsCount: Int,
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
   workoutViewModel.getCompletedWorkout(ObjectId(workoutID))
+  val totalWorkoutCount = workoutViewModel.getWorkoutsCount()
   val completedWorkout by workoutViewModel.completedWorkout.collectAsStateWithLifecycle()
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
@@ -124,7 +124,7 @@ fun WorkoutSummaryScreen(
       if (completedWorkout != null) {
         WorkoutSummaryContent(
           completedWorkout = completedWorkout!!,
-          workoutsCount,
+          totalWorkoutCount,
           userDefaultWeightUnit,
           workoutViewModel,
         )
