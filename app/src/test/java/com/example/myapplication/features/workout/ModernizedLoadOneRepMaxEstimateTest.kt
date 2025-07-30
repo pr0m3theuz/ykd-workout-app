@@ -19,6 +19,27 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.File
 import java.io.InputStream
 
+fun readCsv(inputStream: InputStream): List<ModernizedLoadRIR> {
+  val reader = inputStream.bufferedReader()
+  val header = reader.readLine()
+  return reader.lineSequence()
+    .filter { it.isNotBlank() }
+    .map {
+      val (repCapacity, rpe, rir, repsPerformed, loadPercent) = it.split(
+        ',',
+        ignoreCase = false,
+        limit = 5
+      )
+      ModernizedLoadRIR(
+        RepCapacity.valueOf(repCapacity.trim()),
+        rir.trim().toDouble(),
+        rpe.trim().toDouble(),
+        repsPerformed.trim().toInt(),
+        loadPercent.trim().toDouble()
+      )
+    }.toList()
+}
+
 
 // Enable edge case generation by jqwik
 class ModernizedLoadOneRepMaxEstimateTest {
@@ -26,33 +47,14 @@ class ModernizedLoadOneRepMaxEstimateTest {
   // Define a tolerance for comparing Double values due to potential floating-point inaccuracies
   private val doubleTolerance = 0.0001
 
-  fun readCsv(inputStream: InputStream): List<ModernizedLoadRIR> {
-    val reader = inputStream.bufferedReader()
-    val header = reader.readLine()
-    return reader.lineSequence()
-      .filter { it.isNotBlank() }
-      .map {
-        val (repCapacity, rpe, rir, repsPerformed, loadPercent) = it.split(
-          ',',
-          ignoreCase = false,
-          limit = 5
-        )
-        ModernizedLoadRIR(
-          RepCapacity.valueOf(repCapacity.trim()),
-          rpe.trim().toDouble(),
-          rir.trim().toDouble(),
-          repsPerformed.trim().toInt(),
-          loadPercent.trim().toDouble()
-        )
-      }.toList()
-  }
+
 
   val filename =
     "/home/pablo/Downloads/Modernized Load_RIR Chart - Combined Rep Capacity_processed copy.csv"
 
   val modernizedLoadRIRItems = readCsv(File(filename).inputStream())
 
-  fun getRelativeLoadPercentage(
+  private fun getRelativeLoadPercentage(
     repCapacity: RepCapacity,
     rpe: Double,
     rir: Double?,
