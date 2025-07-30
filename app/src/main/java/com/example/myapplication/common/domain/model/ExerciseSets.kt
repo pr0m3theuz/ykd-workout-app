@@ -187,12 +187,29 @@ fun ExerciseExerciseSets.updateSetReps(uuid: Uuid, newReps: Int?) {
 
 @OptIn(ExperimentalUuidApi::class)
 fun ExerciseExerciseSets.updateSetRIR(uuid: Uuid, newRIR: Double?) {
-  sets.forEach { if (it.uuid == uuid) it.repetitionsInReserve = newRIR }
+  sets.forEach { set ->
+    if (set.uuid == uuid) {
+      set.repetitionsInReserve = newRIR
+      Log.d("ExerciseExerciseSets", "updateSetRIR: $newRIR")
+      println("updateSetRIR: ${set.repetitionsInReserve}")
+      // TODO Why does this not work?
+      newRIR?.let { set.ratePerceivedEffort = 10.0 - it }
+      Log.d("ExerciseExerciseSets", "updateSetRIR: ${set.ratePerceivedEffort}")
+    }
+  }
 }
 
 @OptIn(ExperimentalUuidApi::class)
 fun ExerciseExerciseSets.updateSetRPE(uuid: Uuid, newRPE: Double?) {
-  sets.forEach { if (it.uuid == uuid) it.ratePerceivedEffort = newRPE }
+  sets.forEach { set ->
+    if (set.uuid == uuid) {
+      set.ratePerceivedEffort = newRPE
+      Log.d("ExerciseExerciseSets", "updateSetRPE: $newRPE")
+      newRPE?.let { set.repetitionsInReserve = 10.0 - it }
+      // TODO Why does this not work?
+      Log.d("ExerciseExerciseSets", "updateSetRPE: ${set.repetitionsInReserve}")
+    }
+  }
 }
 
 @OptIn(ExperimentalUuidApi::class)

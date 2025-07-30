@@ -38,7 +38,6 @@ import com.example.myapplication.common.util.OneRepMaxEstimateFormulas
 import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.estimateTargetOneRepMaxModernized
 import com.example.myapplication.common.util.newLazyListItemID
-import kotlinx.coroutines.coroutineScope
 import org.bson.types.ObjectId
 import kotlin.math.min
 import kotlin.time.Clock
@@ -424,12 +423,13 @@ class ManageWorkoutUseCase(
     workoutComponents: List<WorkoutComponent>,
   ) {
     val TAG = "ManageWorkoutUseCase: "
-    val allSets = workoutComponents.flatMap { component ->
-      when (component) {
-        is ExerciseExerciseSets -> component.sets
-        is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+    val allSets =
+      workoutComponents.flatMap { component ->
+        when (component) {
+          is ExerciseExerciseSets -> component.sets
+          is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+        }
       }
-    }
 
     require(allSets.all { set -> set.workoutID == workout.id }) {
       "$TAG All sets workoutIDs does not match Workout.id!"
@@ -437,7 +437,9 @@ class ManageWorkoutUseCase(
 
     val allSuperSets = workoutComponents.filterIsInstance<SupersetExercisesSets>()
 
-    require(allSuperSets.all { superset -> superset.workoutID == workout.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+    require(allSuperSets.all { superset -> superset.workoutID == workout.id }) {
+      "$TAG All Supersets workoutIDs does not match Workout.id!"
+    }
 
     require(
       workoutComponents.all { component ->
@@ -445,7 +447,10 @@ class ManageWorkoutUseCase(
           is ExerciseExerciseSets -> component.workoutID == workout.id
           is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workout.id }
         }
-      }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+      }
+    ) {
+      "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!"
+    }
 
     //    TODO Implement this
     workout.notes = workoutNotes.toMutableList()
@@ -455,6 +460,8 @@ class ManageWorkoutUseCase(
 
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     //    removeUncompletedSets(exercisesSets.toMutableList())
+
+    modernizedLoadRIRItems = modernizedLoadRIRReposistory.getAllModernizedLoadRIR()
 
     workoutComponents.forEach { workoutItem ->
       when (workoutItem) {
@@ -498,18 +505,9 @@ class ManageWorkoutUseCase(
     //  Sets need to be SetType.Failure and rir = 0 or rpe = 10.
 
     completedWorkoutRepository.upsertCompletedWorkout(workout)
-
   }
 
   private var modernizedLoadRIRItems: List<ModernizedLoadRIR>? = null
-
-  private suspend fun getAllModernizedLoadRIR() {
-    return coroutineScope {
-      modernizedLoadRIRReposistory.getAllModernizedLoadRIR().collect {
-        modernizedLoadRIRItems = it
-      }
-    }
-  }
 
   fun getRelativeLoadPercentage(
     repCapacity: RepCapacity,
@@ -531,18 +529,14 @@ class ManageWorkoutUseCase(
 
   private fun calculateEstimated1RMPounds(set: Set, repCapacity: RepCapacity): Double? {
     return if (
-      set.ratePerceivedEffort != null ||
-      set.repetitionsInReserve != null &&
-      set.repetitions != null
+      set.ratePerceivedEffort != null || set.repetitionsInReserve != null && set.repetitions != null
     ) {
       estimateTargetOneRepMaxModernized(
         set.weightPounds ?: 0.0,
         set.repetitions ?: 0,
         targetReps = 1,
-        set.repetitionsInReserve
-          ?: 10.0.minus(set.ratePerceivedEffort!!),
-        set.ratePerceivedEffort
-          ?: 10.0.minus(set.repetitionsInReserve!!),
+        set.repetitionsInReserve ?: 10.0.minus(set.ratePerceivedEffort!!),
+        set.ratePerceivedEffort ?: 10.0.minus(set.repetitionsInReserve!!),
         repCapacity = repCapacity,
         getRelativeLoadPercentage = ::getRelativeLoadPercentage,
       )
@@ -559,18 +553,14 @@ class ManageWorkoutUseCase(
 
   private fun calculateEstimated1RMKilograms(set: Set, repCapacity: RepCapacity): Double? {
     return if (
-      set.ratePerceivedEffort != null ||
-      set.repetitionsInReserve != null &&
-      set.repetitions != null
+      set.ratePerceivedEffort != null || set.repetitionsInReserve != null && set.repetitions != null
     ) {
       estimateTargetOneRepMaxModernized(
         set.weightKilograms ?: 0.0,
         set.repetitions ?: 0,
         targetReps = 1,
-        set.repetitionsInReserve
-          ?: 10.0.minus(set.ratePerceivedEffort!!),
-        set.ratePerceivedEffort
-          ?: 10.0.minus(set.repetitionsInReserve!!),
+        set.repetitionsInReserve ?: 10.0.minus(set.ratePerceivedEffort!!),
+        set.ratePerceivedEffort ?: 10.0.minus(set.repetitionsInReserve!!),
         repCapacity = repCapacity,
         getRelativeLoadPercentage = ::getRelativeLoadPercentage,
       )

@@ -1542,11 +1542,13 @@ class WorkoutViewModel(
 
   fun updateSetRIR(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newRIR: Double?) {
     exerciseSets.updateSetRIR(uuid = setUUID, newRIR = newRIR)
+    newRIR?.let { exerciseSets.updateSetRPE(uuid = setUUID, newRPE = 10.0 - it) }
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
   fun updateSetRPE(exerciseSets: ExerciseExerciseSets, setUUID: Uuid, newRPE: Double?) {
     exerciseSets.updateSetRPE(uuid = setUUID, newRPE = newRPE)
+    newRPE?.let { exerciseSets.updateSetRIR(uuid = setUUID, newRIR = 10.0 - it) }
     updateExerciseExerciseSetsData(exerciseSets)
   }
 
