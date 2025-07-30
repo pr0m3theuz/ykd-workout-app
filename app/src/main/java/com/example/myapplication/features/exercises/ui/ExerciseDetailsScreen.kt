@@ -367,12 +367,13 @@ fun AboutTab(
       color = onSurface,
       style = MaterialTheme.typography.titleMedium,
     )
-
-    exercise.equipmentID?.let { equipmentID ->
-      val name = equipmentList.first { it.id == equipmentID }.name
-      Row {
-        Text(text = "Equipment: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
-        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+    if (equipmentList.isNotEmpty()) {
+      exercise.equipmentID?.let { equipmentID ->
+        val name = equipmentList.first { it.id == equipmentID }.name
+        Row {
+          Text(text = "Equipment: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+          Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        }
       }
     }
 
@@ -389,41 +390,50 @@ fun AboutTab(
       }
     }
 
-    exercise.muscleGroupID?.let { muscle ->
-      val name = muscleGroupList.first { it.id == muscle }.exrxName
-      Row {
-        Text(
-          text = "Muscle Group: ",
-          color = onSurface,
-          style = MaterialTheme.typography.titleSmall,
-        )
-        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+
+    if (muscleGroupList.isNotEmpty()) {
+      exercise.muscleGroupID?.let { muscle ->
+        val name = muscleGroupList.first { it.id == muscle }.exrxName
+        Row {
+          Text(
+            text = "Muscle Group: ",
+            color = onSurface,
+            style = MaterialTheme.typography.titleSmall,
+          )
+          Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        }
       }
     }
 
-    exercise.utilityID?.let { utility ->
-      val name = utilityList.first { it.id == utility }.name
+    if (utilityList.isNotEmpty()) {
+      exercise.utilityID?.let { utility ->
+        val name = utilityList.first { it.id == utility }.name
 
-      Row {
-        Text(text = "Utility: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
-        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        Row {
+          Text(text = "Utility: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+          Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        }
       }
     }
 
-    exercise.mechanicsID?.let { mechanics ->
-      val name = mechanicList.first { it.id == mechanics }.name
+    if (mechanicList.isNotEmpty()) {
+      exercise.mechanicsID?.let { mechanics ->
+        val name = mechanicList.first { it.id == mechanics }.name
 
-      Row {
-        Text(text = "Mechanics: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
-        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        Row {
+          Text(text = "Mechanics: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+          Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        }
       }
     }
 
-    exercise.force?.let { force ->
-      val name = forceList.first { it.id == force }.name
-      Row {
-        Text(text = "Force: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
-        Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+    if (forceList.isNotEmpty()) {
+      exercise.force?.let { force ->
+        val name = forceList.first { it.id == force }.name
+        Row {
+          Text(text = "Force: ", color = onSurface, style = MaterialTheme.typography.titleSmall)
+          Text(text = name, color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        }
       }
     }
 
@@ -442,7 +452,6 @@ fun AboutTab(
     }
 
     if (muscleExerciseList.isNotEmpty()) {
-
       Text(
         text = "Target Muscles: Role",
         color = onSurface,
