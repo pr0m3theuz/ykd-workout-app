@@ -80,10 +80,14 @@ data class ExercisesUiState(
   val exercises: List<Exercise> = emptyList(), // Filtered list of exercises shown in UI
   val allExercises: List<Exercise> = emptyList(), // Full list of exercises from repository
   val equipment: List<Equipment> = emptyList(),
+  val muscleGroups: List<MuscleGroup> = emptyList(),
   val muscles: List<Muscle> = emptyList(),
   val muscleGroupsChecked: Map<MuscleGroup, Boolean> = emptyMap(),
+  val selectedMuscleGroups: List<MuscleGroup> = emptyList(),
   val equipmentsChecked: Map<Equipment, Boolean> = emptyMap(),
+  val selectedEquipments: List<Equipment> = emptyList(),
   val movementTypesChecked: Map<MovementType, Boolean> = emptyMap(),
+  val selectedMovementTypes: List<MovementType> = emptyList(),
   val searchExerciseName: String = "",
 )
 
@@ -298,6 +302,9 @@ constructor(
       exercisesRepository.getAllExercises().collect { list ->
         _exercises.value = list.sortedBy { exercise -> exercise.name }
         allExercises = list.sortedBy { exercise -> exercise.name }
+
+        _uiState.update { it.copy(exercises = _exercises.value, allExercises = allExercises) }
+
         //        _uiState.update { it.copy(exercises = _exercises.value, allExercises =
         // allExercises) }
         //        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
@@ -308,13 +315,21 @@ constructor(
   private suspend fun getAllEquipment() {
     //    Log.i("ExercisesViewModel", "getEquipment")
     return coroutineScope {
-      exercisesRepository.getAllEquipment().collect {
-        _equipment.value = it
-        _exerciseDetailsUiState.update { state -> state.copy(equipment = it) }
+      exercisesRepository.getAllEquipment().collect { equipment ->
+        _equipment.value = equipment
+
+        _uiState.update { it.copy(equipment = equipment) }
+        _exerciseDetailsUiState.update { state -> state.copy(equipment = equipment) }
         //        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
 
+        _uiState.update {
+          it.copy(
+            equipmentsChecked =
+              equipment.map { equipment -> equipment to false }.toMutableStateMap().toMutableMap()
+          )
+        }
         _equipmentsChecked.value =
-          it.map { equipment -> equipment to false }.toMutableStateMap().toMutableMap()
+          equipment.map { equipment -> equipment to false }.toMutableStateMap().toMutableMap()
         /*        Log.i(
           "ExercisesViewModel",
           "init _equipmentsChecked: ${_equipmentsChecked.value.keys.toList()}"
@@ -326,13 +341,23 @@ constructor(
   private suspend fun getAllMuscleGroups() {
     //    Log.i("ExercisesViewModel", "getMuscleGroups")
     return coroutineScope {
-      exercisesRepository.getAllMuscleGroups().collect {
-        _muscleGroup.value = it
-        _exerciseDetailsUiState.update { it.copy(muscleGroup = _muscleGroup.value) }
+      exercisesRepository.getAllMuscleGroups().collect { muscleGroups ->
+        _muscleGroup.value = muscleGroups
+        _exerciseDetailsUiState.update { it.copy(muscleGroup = muscleGroups) }
         //        Log.i("ExercisesViewModel", "getMuscleGroups() $it")
 
+        _uiState.update { it.copy(muscleGroups = muscleGroups) }
+
+        _uiState.update {
+          it.copy(muscleGroupsChecked = muscleGroups.map { muscleGroup ->
+            muscleGroup to false
+          }.toMutableStateMap().toMutableMap())
+        }
+
+
         _muscleGroupsChecked.value =
-          it.map { muscleGroup -> muscleGroup to false }.toMutableStateMap().toMutableMap()
+          muscleGroups.map { muscleGroup -> muscleGroup to false }.toMutableStateMap()
+            .toMutableMap()
         /*        Log.i(
           "ExercisesViewModel",
           "init _muscleGroupsChecked: ${_muscleGroupsChecked.value.keys.toList()}"
@@ -397,7 +422,15 @@ constructor(
   fun updateMuscleGroupsChecked(muscleGroup: MuscleGroup, checked: Boolean) {
     //    val temp = _muscleGroupsChecked.value.apply {  }
     //    temp[muscleGroup] = checked
-    _muscleGroupsChecked.value = _muscleGroupsChecked.value.apply { this[muscleGroup] = checked }
+    _muscleGroupsChecked.update { currentState ->
+      currentState.apply { this[muscleGroup] = checked }
+    }
+
+    _uiState.update { currentState ->
+      currentState.copy(
+        muscleGroupsChecked = _muscleGroupsChecked.value,
+        selectedMuscleGroups = _muscleGroupsChecked.value.filterValues { it }.keys.sortedBy { it.name })
+    }
 
     Log.i(
       "ExercisesViewModel",
@@ -410,9 +443,18 @@ constructor(
   }
 
   fun updateEquipmentsChecked(equipment: Equipment, checked: Boolean) {
-    val temp = _equipmentsChecked.value
-    _equipmentsChecked.value[equipment] = checked
-    _equipmentsChecked.value = temp
+    //    val temp = _equipmentsChecked.value
+    //    _equipmentsChecked.value[equipment] = checked
+    //    _equipmentsChecked.value = temp
+
+    _equipmentsChecked.update { currentState -> currentState.apply { this[equipment] = checked } }
+
+    _uiState.update { currentState ->
+      currentState.copy(
+        equipmentsChecked = _equipmentsChecked.value,
+        selectedEquipments = _equipmentsChecked.value.filterValues { it }.keys.sortedBy { it.name })
+
+    }
 
     Log.i("ExercisesViewModel", "updateEquipmentsChecked(): ${_equipmentsChecked.value}")
   }

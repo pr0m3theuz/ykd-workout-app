@@ -47,7 +47,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.MuscleGroup
@@ -72,22 +71,19 @@ fun AddExercisesScreen(
   navController: NavController,
   navigateToDetailPane: (exerciseID: String) -> Unit,
 ) {
-  val exercises by
-  exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
+  val uiState by exercisesViewModel.uiState.collectAsState()
 
-  val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsState()
-  val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsState()
+  val exercises = uiState.exercises
+
+  val muscleGroupsChecked = uiState.muscleGroupsChecked
+  val equipmentsChecked = uiState.equipmentsChecked
   val movementTypesChecked = exercisesViewModel.movementTypesChecked
 
-  val musclesChecked = muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }
-  val selectedEquipment = equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }
-  val selectedMovementTypes = movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }
+  val musclesChecked = uiState.selectedMuscleGroups
+  val selectedEquipment = uiState.selectedEquipments
+  val selectedMovementTypes = uiState.selectedMovementTypes
 
-  val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
-
-  fun getMuscleGroups() {
-    /*TODO*/
-  }
+  val muscleGroups = uiState.muscleGroups
 
   fun filterExercises(search: String) {
     exercisesViewModel.setSearchExerciseName(search)

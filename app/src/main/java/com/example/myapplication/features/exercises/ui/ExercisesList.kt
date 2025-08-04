@@ -55,7 +55,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -82,27 +81,19 @@ fun ExercisesLazyColumn(
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
-  //    val selectedCategoriesMap by
-  // exercisesViewModel.selectedCategories.collectAsStateWithLifecycle()
-  //    val selectedCategoriesList = selectedCategoriesMap.keys.toList()
+  val uiState by exercisesViewModel.uiState.collectAsState()
 
-  val exercises by
-  exercisesViewModel.exercises.collectAsStateWithLifecycle(initialValue = emptyList())
+  val exercises = uiState.exercises
 
-  val muscleGroupsChecked by exercisesViewModel.muscleGroupsChecked.collectAsState()
-  val equipmentsChecked by exercisesViewModel.equipmentsChecked.collectAsState()
+  val muscleGroupsChecked = uiState.muscleGroupsChecked
+  val equipmentsChecked = uiState.equipmentsChecked
   val movementTypesChecked = exercisesViewModel.movementTypesChecked
 
-  val musclesChecked = muscleGroupsChecked.filterValues { it }.keys.sortedBy { it.name }
-  val selectedEquipment = equipmentsChecked.filterValues { it }.keys.sortedBy { it.name }
-  val selectedMovementTypes = movementTypesChecked.filterValues { it }.keys.sortedBy { it.name }
+  val musclesChecked = uiState.selectedMuscleGroups
+  val selectedEquipment = uiState.selectedEquipments
+  val selectedMovementTypes = uiState.selectedMovementTypes
 
-  Log.i("ExercisesLazyColumn", "muscleGroupsChecked: $muscleGroupsChecked")
-  Log.i("ExercisesLazyColumn", "equipmentsChecked: $equipmentsChecked")
-
-  Log.i("ExercisesViewModel", "filterExercises()._exercises count: ${exercises.count()}")
-
-  val muscleGroups by exercisesViewModel.muscleGroup.collectAsState(initial = emptyList())
+  val muscleGroups = uiState.muscleGroups
 
   fun filterExercises(search: String) {
     exercisesViewModel.setSearchExerciseName(search)
@@ -376,7 +367,7 @@ fun SelectedFiltersLazyRow(
         leadingIcon = {
           Icon(
             imageVector = Icons.Filled.Done,
-            contentDescription = "Done",
+            contentDescription = "${muscleGroup.name} selected",
             modifier = Modifier.size(FilterChipDefaults.IconSize),
           )
         },
@@ -393,7 +384,7 @@ fun SelectedFiltersLazyRow(
         leadingIcon = {
           Icon(
             imageVector = Icons.Filled.Done,
-            contentDescription = "Done",
+            contentDescription = "${equipment.name} selected",
             modifier = Modifier.size(FilterChipDefaults.IconSize),
           )
         },
@@ -413,7 +404,7 @@ fun SelectedFiltersLazyRow(
           leadingIcon = {
             Icon(
               imageVector = Icons.Filled.Done,
-              contentDescription = "Done",
+              contentDescription = "${movementType.printableName} selected",
               modifier = Modifier.size(FilterChipDefaults.IconSize),
             )
           },
