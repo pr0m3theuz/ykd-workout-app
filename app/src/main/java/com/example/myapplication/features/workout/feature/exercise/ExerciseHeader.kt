@@ -69,7 +69,7 @@ import java.text.DecimalFormat
 @Composable
 fun ExerciseScreen(
   navController: NavController,
-//  workoutViewModel: WorkoutViewModel,
+  //  workoutViewModel: WorkoutViewModel,
   _exerciseSets: ExerciseExerciseSets,
   weightUnit: String,
   exerciseWeightUnit: String?,
@@ -81,9 +81,7 @@ fun ExerciseScreen(
   updateExerciseWeightUnit: (weightUnit: String?) -> Unit,
   workoutComponents: List<WorkoutComponent> = listOf(),
   onCreateSuperset: (List<ExerciseExerciseSets>) -> Unit = {},
-  ExerciseOptionsDropdownMenu: @Composable (
-    addNotes: () -> Unit,
-  ) -> Unit = {},
+  ExerciseOptionsDropdownMenu: @Composable (addNotes: () -> Unit) -> Unit = {},
 ) {
 
   val exerciseSets by remember { mutableStateOf(_exerciseSets) }
@@ -121,23 +119,23 @@ fun ExerciseScreen(
         setNotesVisible(true)
         addExerciseNote()
       })
-//      ExerciseOptionsDropdownMenu(
-//        workoutViewModel = workoutViewModel,
-//        exerciseSets = exerciseSets,
-//        addNotes = ,
-//        removeExerciseSets = { removeExerciseSets() },
-//        userDefaultWeightUnit = userDefaultWeightUnit,
-//        exerciseWeightUnit = exerciseWeightUnit,
-//        updateExerciseWeightUnit = { weightUnit -> updateExerciseWeightUnit(weightUnit) },
-//        navController = navController,
-//        workoutComponents = workoutComponents,
-//        onCreateSuperset = { selectedExercises -> onCreateSuperset(selectedExercises) },
-//      )
+      //      ExerciseOptionsDropdownMenu(
+      //        workoutViewModel = workoutViewModel,
+      //        exerciseSets = exerciseSets,
+      //        addNotes = ,
+      //        removeExerciseSets = { removeExerciseSets() },
+      //        userDefaultWeightUnit = userDefaultWeightUnit,
+      //        exerciseWeightUnit = exerciseWeightUnit,
+      //        updateExerciseWeightUnit = { weightUnit -> updateExerciseWeightUnit(weightUnit) },
+      //        navController = navController,
+      //        workoutComponents = workoutComponents,
+      //        onCreateSuperset = { selectedExercises -> onCreateSuperset(selectedExercises) },
+      //      )
     },
     exerciseSetsDescription = {
-      //      if (exerciseSets.description != null) {
-      ExerciseSetDescription(exerciseSets = exerciseSets)
-      //      }
+      if (!exerciseSets.description.isNullOrBlank()) {
+        ExerciseSetDescription(exerciseSets = exerciseSets)
+      }
     },
     exerciseNotesList = {
       ExerciseNotesList(
@@ -188,9 +186,9 @@ fun ExerciseHeader(
 @Composable
 private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
   var visible by remember { mutableStateOf(false) }
-  if (exerciseSets.description == null) {
-    visible = false
-  }
+//  if (exerciseSets.description.isNullOrBlank()) {
+//    visible = false
+//  }
   //  Log.i("ExerciseSetDescription", "exerciseSets.description: ${exerciseSets.description}")
   exerciseSets.description?.let {
     Row(
@@ -246,19 +244,18 @@ private fun ExerciseNotesList(
 
   if (exerciseSets.notes.isNotEmpty()) {
     Row(
-      modifier =
-        Modifier
-          .clickable(onClick = { visible = !visible })
-          .fillMaxWidth(),
+      modifier = Modifier
+        .clickable(onClick = { visible = !visible })
+        .fillMaxWidth(),
       //        .height(40.dp)
-//          .padding(horizontal = 8.dp),
+      //          .padding(horizontal = 8.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically,
     ) {
       Text(
         text = "Notes",
         style = MaterialTheme.typography.bodyMediumEmphasized,
-        modifier = Modifier.padding(horizontal = 8.dp)
+        modifier = Modifier.padding(horizontal = 8.dp),
       )
       Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
         Icon(
@@ -328,9 +325,10 @@ private fun SetContentHeader(weightUnit: String) {
     }
 
     Box(
-      modifier = Modifier
-        .padding(PaddingValues(horizontal = 4.dp))
-        .defaultMinSize(minWidth = 80.dp),
+      modifier =
+        Modifier
+          .padding(PaddingValues(horizontal = 4.dp))
+          .defaultMinSize(minWidth = 80.dp),
       //        .weight(0.20f),
       contentAlignment = Alignment.Center,
     ) {
@@ -338,9 +336,10 @@ private fun SetContentHeader(weightUnit: String) {
     }
 
     Box(
-      modifier = Modifier
-        .padding(PaddingValues(horizontal = 4.dp))
-        .defaultMinSize(minWidth = 60.dp),
+      modifier =
+        Modifier
+          .padding(PaddingValues(horizontal = 4.dp))
+          .defaultMinSize(minWidth = 60.dp),
       //        .weight(0.15f),
       contentAlignment = Alignment.Center,
     ) {
