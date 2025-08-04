@@ -171,7 +171,7 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
             fontSize = remainingTimeTextFontSize,
             maxLines = 1,
             overflow = TextOverflow.Clip,
-            style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onPrimary),
+            style = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
             modifier = Modifier.padding(start = 4.dp),
           )
         }
