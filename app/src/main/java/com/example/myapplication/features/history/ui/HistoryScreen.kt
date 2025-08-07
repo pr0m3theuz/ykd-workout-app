@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.Workout
+import com.example.myapplication.features.exercises.ui.NoHistoryTab
 import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.workout.ui.WorkoutSummaryCard
 import kotlinx.datetime.YearMonth
@@ -71,6 +72,9 @@ fun HistoryScreen(
     // TODO .setSearchExerciseName(search)
     // TODO .filterExercises()
   }
+
+
+  val workouts by historyViewModel.workouts.collectAsState()
 
   //  var query by rememberSaveable { mutableStateOf(/* TODO .search History */ ) }
   var active by remember { mutableStateOf(false) }
@@ -147,16 +151,19 @@ fun HistoryScreen(
           windowInsets = WindowInsets(0.dp),
         ) {}
 
-        val workouts by historyViewModel.workouts.collectAsState()
 
-        HistoryLazyColumn(
-          workouts = workouts,
-          userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
-          getExerciseByExerciseID = { exerciseID ->
-            historyViewModel.getExerciseByExerciseID(exerciseID)
-          },
-          navigateToWorkoutOverview = { navigateToWorkoutOverview(it) },
-        )
+        if (workouts.isNotEmpty()) {
+          HistoryLazyColumn(
+            workouts = workouts,
+            userDefaultWeightUnit = historyViewModel.userDefaultWeightUnit,
+            getExerciseByExerciseID = { exerciseID ->
+              historyViewModel.getExerciseByExerciseID(exerciseID)
+            },
+            navigateToWorkoutOverview = { navigateToWorkoutOverview(it) },
+          )
+        } else {
+          NoHistoryTab(text = "Perform your first workout!")
+        }
       }
     },
   )
@@ -234,7 +241,9 @@ fun HistoryLazyColumn(
         // index,
 
 
-        items(workouts.size, key = { index: Int -> monthWorkouts[index].lazyListItemID }) { index ->
+        items(
+          monthWorkouts.size,
+          key = { index: Int -> monthWorkouts[index].lazyListItemID }) { index ->
           val workout = monthWorkouts[index]
           Box(
             modifier =
