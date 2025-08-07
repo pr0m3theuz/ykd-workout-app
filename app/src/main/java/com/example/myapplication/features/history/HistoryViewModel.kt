@@ -61,11 +61,10 @@ class HistoryViewModel(
 
   init {
     viewModelScope.launch {
-      // TODO Replace workoutRepository
-      _workouts.value =
+      _workouts.update {
         completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
           ?: emptyList()
-
+      }
     }
   }
 

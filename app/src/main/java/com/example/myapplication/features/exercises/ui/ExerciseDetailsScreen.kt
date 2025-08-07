@@ -161,7 +161,8 @@ fun ExerciseDetailsScreen(
                 )
               },
             )
-          } ?: NoHistoryTab() // TODO Replace with No History Content
+          }
+            ?: NoHistoryTab(text = "Perform your first set!") // TODO Replace with No History Content
         },
         chartTab = {
           ChartTab(
@@ -487,7 +488,7 @@ fun AboutTab(
 
 @Preview
 @Composable
-fun NoHistoryTab() {
+fun NoHistoryTab(text: String = "Perform your first set!") {
   Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
     Spacer(modifier = Modifier.size(32.dp))
     Box(modifier = Modifier.size(300.dp)) {
@@ -509,7 +510,7 @@ fun NoHistoryTab() {
     //    Spacer(modifier = Modifier.size(24.dp))
     Text(
       //      modifier = Modifier.padding(16.dp),
-      text = "Perform your first set!",
+      text = text,
       color = MaterialTheme.colorScheme.onSurface,
       //      fontWeight = FontWeight.Bold,
     )
