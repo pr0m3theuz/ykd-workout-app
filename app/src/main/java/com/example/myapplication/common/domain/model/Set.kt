@@ -112,14 +112,15 @@ fun Set.setVolume(weightUnit: String): Double {
 
 fun Set.setSummaryRIR(weightUnit: String): String {
   // TODO get user default weight unit or exercise specific weight unit
-
   return "${
-    if (MassUnit.POUNDS.abbreviation == weightUnit) {
-      doubleFormatted(this.weightPounds)
-    } else {
-      doubleFormatted(this.weightKilograms)
-    }
-  } $weightUnit × ${this.repetitions} reps${
+    if (this.weightPounds != null || this.weightKilograms != null) {
+      if (MassUnit.POUNDS.abbreviation == weightUnit) {
+        doubleFormatted(this.weightPounds).plus(" $weightUnit × ")
+      } else {
+        doubleFormatted(this.weightKilograms).plus(" $weightUnit × ")
+      }
+    } else ""
+  }${this.repetitions} reps${
     if (this.repetitionsInReserve != null)
       " @ ${doubleFormatted(this.repetitionsInReserve)} RIR"
     else ""
