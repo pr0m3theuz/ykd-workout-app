@@ -117,7 +117,7 @@ fun RestTimerButton(workoutViewModel: WorkoutViewModel) {
     )
   }
 
-  val timerIconModifier = Modifier.size(30.dp)
+  val timerIconModifier = Modifier.size(24.dp)
 
   val remainingTimeTextFontSize = 18.sp
 
