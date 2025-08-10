@@ -10,6 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.Barbell
 import com.example.myapplication.common.domain.model.Collar
 import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.Muscle
+import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.Plate
 import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.UserProfile
@@ -338,15 +340,35 @@ constructor(
   fun getTotalVolumeData(): List<TotalWorkoutVolume> /*ChartData*/ {
     return completedWorkoutRepository.getTotalVolumeData()
 
-//    val labels = mutableListOf<String>()
-//    val values = mutableListOf<Number>()
+    //    val labels = mutableListOf<String>()
+    //    val values = mutableListOf<Number>()
 
-//    completedWorkoutRepository.getTotalVolumePoundsData()?.forEach { (key, value) ->
-//      labels.add(key?.toLocalDateTime(TimeZone.currentSystemDefault())?.date.toString())
-//      values.add(value)
-//    }
-//
-//    return ChartData(labels.toList(), values.toList())
+    //    completedWorkoutRepository.getTotalVolumePoundsData()?.forEach { (key, value) ->
+    //      labels.add(key?.toLocalDateTime(TimeZone.currentSystemDefault())?.date.toString())
+    //      values.add(value)
+    //    }
+    //
+    //    return ChartData(labels.toList(), values.toList())
+  }
+
+  fun getMuscleEngagementData(
+    startDate: LocalDateTime,
+    endDate: LocalDateTime,
+  ): List<Pair<Muscle, List<MuscleFractionalSets>>> {
+    var list: List<Pair<Muscle, List<MuscleFractionalSets>>> = listOf()
+    viewModelScope.launch {
+      list =
+        completedWorkoutRepository
+          .getWeeklyTotalSetsPerMuscle(startDate, endDate)
+          .groupBy { it.muscle }
+          .map { (muscle, data) -> muscle to data }
+          .sortedByDescending { (_, data) -> data.sumOf { it.fractionalSets } }
+      //        .collect { result ->
+      //        list = result.groupBy { it.muscle }.map { (muscle, data) -> muscle to data}
+      //      }
+      Log.d("ProfileViewModel", "Muscle engagement data: $list")
+    }
+    return list
   }
 
   fun getWorkoutStreakWeek(): Int? {

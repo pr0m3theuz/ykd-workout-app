@@ -44,6 +44,13 @@ data class MuscleExerciseWithMuscle(
     val muscle: Muscle,
 )
 
+data class MuscleFractionalSets(
+    val muscle: Muscle,
+    val muscleExercise: MuscleExercise,
+    val exerciseName: String,
+    val fractionalSets: Double,
+)
+
 /**
  * Represents a muscle's role or function in an exercise. This class is used to store information
  * about the roles or functions a muscle can have in an exercise.

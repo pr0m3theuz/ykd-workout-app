@@ -2,6 +2,7 @@
 
 package com.example.myapplication.common.infrastructure.persistence
 
+import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.Workout
@@ -20,7 +21,7 @@ interface CompletedWorkoutRepository {
 
   fun getCompletedWorkouts(): List<Workout>?
 
-// TODO fun getCompletedWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>>
+  // TODO fun getCompletedWorkoutsByProgramID(programID: ObjectId): Flow<List<Workout>>
 
   fun getCompletedWorkoutByID(workoutID: ObjectId): Workout?
 
@@ -32,12 +33,19 @@ interface CompletedWorkoutRepository {
 
   fun getWorkoutAnalyticsForPeriod(
     startDate: LocalDateTime,
-    endDate: LocalDateTime
+    endDate: LocalDateTime,
   ): WorkoutAnalytics?
 
   fun getWorkoutAnalyticsForLifetime(): WorkoutAnalytics?
 
   fun getTotalVolumeData(): List<TotalWorkoutVolume>
+
+//  suspend fun getWeeklyTotalSetsPerMuscle(startDate: LocalDateTime, endDate: LocalDateTime):  Flow<List<MuscleFractionalSets>>
+
+  suspend fun getWeeklyTotalSetsPerMuscle(
+    startDate: LocalDateTime,
+    endDate: LocalDateTime
+  ): List<MuscleFractionalSets>
 
   fun getWorkoutStreakWeek(): Int?
 }

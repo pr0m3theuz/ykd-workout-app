@@ -6,6 +6,7 @@
 
 package com.example.myapplication.features.userProfileScreen.like.boostcamp
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -63,6 +64,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.Muscle
+import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.WorkoutAnalytics
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
@@ -117,6 +120,11 @@ fun AnalyticsScreen(
 
   val totalTrainingVolumeData = profileViewModel.getTotalVolumeData()
 
+  val muscleEngagementData =
+    profileViewModel.getMuscleEngagementData(startDate = startDate, endDate = endDate)
+
+  Log.i("AnalyticsScreen", "muscleEngagementData: $muscleEngagementData")
+
   AnalyticsScreenContent(
     onNavigateToDashboardsInfo = { onNavigateToDashboardsInfo() },
     weeklyReportCard = {
@@ -135,7 +143,13 @@ fun AnalyticsScreen(
         userMassUnit = user.defaultWeightUnit,
       )
     },
-    muscleTrackerContent = { MuscleTrackerContent(startDate = startDate, endDate = endDate) },
+    muscleTrackerContent = {
+      MuscleTrackerContent(
+        startDate = startDate,
+        endDate = endDate,
+        muscleEngagementData = muscleEngagementData
+      )
+    },
     totalTrainingVolumeData = totalTrainingVolumeData,
   )
 }
@@ -149,7 +163,7 @@ fun AnalyticsScreenContent(
   muscleTrackerContent: @Composable () -> Unit = {},
   totalTrainingVolumeData: List<TotalWorkoutVolume>,
 ) {
-  var selectedTabIndex by remember { mutableStateOf(1) }
+  var selectedTabIndex by remember { mutableStateOf(0) }
   val tabs = listOf("Muscle Engagement", "Workout Summary")
 
   Scaffold(
@@ -367,7 +381,11 @@ fun StatItem(value: String, label: String) {
 }
 
 @Composable
-fun MuscleTrackerContent(startDate: LocalDateTime, endDate: LocalDateTime) {
+fun MuscleTrackerContent(
+  startDate: LocalDateTime,
+  endDate: LocalDateTime,
+  muscleEngagementData: List<Pair<Muscle, List<MuscleFractionalSets>>>
+) {
   var showDatePicker by remember { mutableStateOf(false) }
 
   val state =
@@ -416,13 +434,13 @@ fun MuscleTrackerContent(startDate: LocalDateTime, endDate: LocalDateTime) {
       }
     }
   }
-  MuscleEngagementContent()
+  MuscleEngagementContent(muscleEngagementData = muscleEngagementData)
   //  }
 }
 
 @Composable
-fun MuscleEngagementContent() {
-  MuscleEngagementScreen(muscleDataList = emptyList())
+fun MuscleEngagementContent(muscleEngagementData: List<Pair<Muscle, List<MuscleFractionalSets>>>) {
+  MuscleEngagementScreen(muscleEngagementData = muscleEngagementData)
 }
 
 enum class Period(val displayName: String, val value: Duration, val sequenceLimit: Int) {

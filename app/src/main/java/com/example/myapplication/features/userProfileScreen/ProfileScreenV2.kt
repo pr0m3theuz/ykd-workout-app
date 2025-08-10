@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -173,25 +174,29 @@ fun ProfileScreenV2(
             )
 
           1 ->
-            StatsContent(
-              navigateToAnalyticsScreen = { navigateToAnalyticsScreen() },
-              weeklyReportCard = {
-                WeeklyReportCard(
-                  workoutAnalytics = weeklyWorkoutAnalytics,
-                  startDate = startDate,
-                  endDate = endDate,
-                  userMassUnit = user.defaultWeightUnit,
-                  navigateToWeeklyReport = { navigateToWeeklyReport() },
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+              item {
+                StatsContent(
+                  navigateToAnalyticsScreen = { navigateToAnalyticsScreen() },
+                  weeklyReportCard = {
+                    WeeklyReportCard(
+                      workoutAnalytics = weeklyWorkoutAnalytics,
+                      startDate = startDate,
+                      endDate = endDate,
+                      userMassUnit = user.defaultWeightUnit,
+                      navigateToWeeklyReport = { navigateToWeeklyReport() },
+                    )
+                  },
+                  lifetimeStatsCard = {
+                    LifetimeStatsCard(
+                      workoutAnalytics = lifetimeWorkoutAnalytics,
+                      weeklyWorkoutStreak = weeklyWorkoutStreak,
+                      userMassUnit = user.defaultWeightUnit,
+                    )
+                  },
                 )
-              },
-              lifetimeStatsCard = {
-                LifetimeStatsCard(
-                  workoutAnalytics = lifetimeWorkoutAnalytics,
-                  weeklyWorkoutStreak = weeklyWorkoutStreak,
-                  userMassUnit = user.defaultWeightUnit,
-                )
-              },
-            )
+              }
+            }
         }
       }
     },

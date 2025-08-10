@@ -15,7 +15,11 @@ import com.couchbase.lite.UnitOfWork
 import com.couchbase.lite.queryChangeFlow
 import com.example.myapplication.common.domain.model.CompletedSetsDao
 import com.example.myapplication.common.domain.model.CompletedWorkoutsDao
+import com.example.myapplication.common.domain.model.ExerciseDao
 import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.MuscleDao
+import com.example.myapplication.common.domain.model.MuscleExerciseDao
+import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.TotalWorkoutVolume
@@ -126,26 +130,22 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       requireNotNull(collection) { COLLECTION_IS_NULL }
 
       val query = "SELECT Count(*) as count FROM `CompletedWorkouts` WHERE isCompleted = true"
-//        QueryBuilder.select(
-//          SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
-//        )
-//          .from(DataSource.collection(collection))
-//          .where(
-//            Expression.property("isCompleted")
-//              .equalTo(Expression.booleanValue(true))
-//              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
-//          )
+      //        QueryBuilder.select(
+      //          SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
+      //        )
+      //          .from(DataSource.collection(collection))
+      //          .where(
+      //            Expression.property("isCompleted")
+      //              .equalTo(Expression.booleanValue(true))
+      //
+      // .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+      //          )
 
       //      val query =
       // QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
 
       val workoutCount =
-        db
-          .createQuery(query)
-          .execute()
-          .allResults()
-          .firstOrNull()
-          ?.getInt("count") ?: 0
+        db.createQuery(query).execute().allResults().firstOrNull()?.getInt("count") ?: 0
 
       return workoutCount
     } catch (e: Exception) {
@@ -186,6 +186,8 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return emptyFlow()
   }
 
+
+  // TODO Code Review
   override fun getCompletedWorkouts(): List<Workout>? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -218,7 +220,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       val workoutIDClause = workoutIds.joinToString(",") { "'$it'" }.let { "[$it]" }
 
-      val setsQuery = "SELECT * FROM `CompletedSets` " + "WHERE workoutID IN $workoutIDClause" // +
+      val setsQuery = "SELECT * FROM `CompletedSets` WHERE workoutID IN $workoutIDClause" // +
       //              " AND ownerID = '${user.id.toHexString()}'"
 
       val setsResult = db.createQuery(setsQuery).execute().allResults()
@@ -267,6 +269,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return null
   }
 
+  // TODO Code Review
   override fun getCompletedWorkoutByID(workoutID: ObjectId): Workout? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -333,6 +336,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return null
   }
 
+
   override fun getLatestPreviousIdenticalWorkout(currentWorkout: Workout): Workout? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -368,6 +372,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return null
   }
 
+  // TODO Code Review
   override suspend fun upsertCompletedWorkout(workout: Workout) {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -477,6 +482,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     }
   }
 
+  // TODO Code Review
   override suspend fun deleteCompletedWorkout(workout: Workout): Boolean {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -524,6 +530,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return false
   }
 
+  // TODO Code Review
   override fun getWorkoutAnalyticsForPeriod(
     // TODO Confirm DateTime is adjusted for user timezone
     startDate: LocalDateTime,
@@ -539,16 +546,12 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       // TODO Add type if needed
 
-      val query = "SELECT Count(*) as count " +
-              "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
+      val query =
+        "SELECT Count(*) as count " +
+                "FROM `CompletedWorkouts` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
 
       val workoutCount =
-        db
-          .createQuery(query)
-          .execute()
-          .allResults()
-          .firstOrNull()
-          ?.getInt("count") ?: 0
+        db.createQuery(query).execute().allResults().firstOrNull()?.getInt("count") ?: 0
 
       //        QueryBuilder.select(
       //            SelectResult.expression(Function.count(Expression.string("*"))).`as`("count")
@@ -607,6 +610,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return null
   }
 
+  // TODO Code Review
   override fun getWorkoutAnalyticsForLifetime(): WorkoutAnalytics? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -675,8 +679,9 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       // TODO Add type if needed
 
-      val query = "SELECT totalVolumeInPounds, totalVolumeInKilograms, workoutEnded " +
-              "FROM `CompletedWorkouts`"
+      val query =
+        "SELECT totalVolumeInPounds, totalVolumeInKilograms, workoutEnded " +
+                "FROM `CompletedWorkouts`"
 
       val totalVolume =
         db
@@ -689,15 +694,12 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
             val totalVolumeInKilograms = result.getDouble("totalVolumeInKilograms")
 
             return@map if (workoutEnded != null) {
-              TotalWorkoutVolume(
-                workoutEnded,
-                totalVolumeInPounds,
-                totalVolumeInKilograms,
-              )
+              TotalWorkoutVolume(workoutEnded, totalVolumeInPounds, totalVolumeInKilograms)
             } else {
               null
             }
-          }.filterNotNull()
+          }
+          .filterNotNull()
 
       if (totalVolume.isEmpty()) {
         return emptyList()
@@ -710,6 +712,97 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
     return emptyList()
   }
+
+  override suspend fun getWeeklyTotalSetsPerMuscle(
+    startDate: LocalDateTime,
+    endDate: LocalDateTime
+  ): List<MuscleFractionalSets> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedSetsCollection = db.getCollection("CompletedSets")
+      requireNotNull(completedSetsCollection) { COLLECTION_IS_NULL }
+
+      val muscleExerciseCollection = db.getCollection("MuscleExercise")
+      requireNotNull(muscleExerciseCollection) { COLLECTION_IS_NULL }
+
+      val muscleCollection = db.getCollection("Muscle")
+      requireNotNull(muscleCollection) { COLLECTION_IS_NULL }
+
+      val setsQuery =
+        "SELECT * FROM `CompletedSets` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
+
+      val sets =
+        db.createQuery(setsQuery).execute().allResults().map { result ->
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(result.toJSON()).CompletedSets
+        }
+
+      val exerciseIDs = sets.mapNotNull { it.exerciseID }
+
+      val exercisesIDClause = exerciseIDs.joinToString(",") { "'$it'" }.let { "[$it]" }
+
+      val exercisesQuery = "SELECT * FROM `Exercise` WHERE id IN $exercisesIDClause"
+
+      val exercises =
+        db.createQuery(exercisesQuery).execute().allResults().map { result ->
+          withUnknownKeys.decodeFromString<ExerciseDao>(result.toJSON()).Exercise
+        }
+
+      val muscleExerciseWithMuscleList = exercises.flatMap { exercise ->
+
+        val muscleExerciseQuery =
+          "SELECT * FROM `MuscleExercise` WHERE exerciseID = '${exercise.exrxExerciseID}' and (roleFunction = 'target' or roleFunction = 'synergist')"
+
+        val muscleExerciseResult =
+          db.createQuery(muscleExerciseQuery).execute().allResults().mapNotNull {
+            try {
+              withUnknownKeys.decodeFromString<MuscleExerciseDao>(it.toJSON()).MuscleExercise
+            } catch (e: Exception) {
+              Log.e(e.message, e.stackTraceToString())
+              null
+            }
+          }
+
+        val list = muscleExerciseResult.mapNotNull { muscleExercise ->
+          val muscleQuery =
+            QueryBuilder.select(SelectResult.all())
+              .from(DataSource.collection(muscleCollection))
+              .where(Expression.property("id").equalTo(Expression.string(muscleExercise.muscleID)))
+
+          val result =
+            muscleQuery.execute().allResults().firstOrNull()?.toJSON()?.let {
+              withUnknownKeys.decodeFromString<MuscleDao>(it).Muscle
+            }
+
+          result?.let { muscle ->
+            MuscleFractionalSets(muscle, muscleExercise, exercise.name, 0.0)
+          }
+        }
+
+        list
+      }
+
+      val result = muscleExerciseWithMuscleList.map { muscleExercise ->
+        val exercise =
+          exercises.firstOrNull { exercise -> exercise.exrxExerciseID == muscleExercise.muscleExercise.exerciseID }
+
+        val setsPerformed = sets.count { set -> set.exerciseID == exercise?.id }.toDouble()
+
+        val fractionalSets = when (muscleExercise.muscleExercise.roleFunction) {
+          "target" -> setsPerformed
+          "synergist" -> setsPerformed.div(2)
+          else -> 0.toDouble()
+        }
+
+        muscleExercise.copy(fractionalSets = fractionalSets)
+      }
+
+      return result
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return emptyList()
+  }
+
 
   override fun getWorkoutStreakWeek(): Int? {
     try {
