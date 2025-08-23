@@ -731,6 +731,8 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       val setsQuery =
         "SELECT * FROM `CompletedSets` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
 
+      Log.i("CompletedWorkoutRepositoryImpl.getWeeklyTotalSetsPerMuscle()", "Query: $setsQuery")
+
       val sets =
         db.createQuery(setsQuery).execute().allResults().map { result ->
           withUnknownKeys.decodeFromString<CompletedSetsDao>(result.toJSON()).CompletedSets

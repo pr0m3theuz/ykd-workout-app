@@ -37,16 +37,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.history.ui.HistoryLazyColumn
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.LifetimeStatsCard
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.WeeklyReportCard
-import kotlinx.datetime.toKotlinLocalDateTime
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 
 @Preview(showBackground = true)
 @Composable
@@ -76,26 +73,15 @@ fun ProfileScreenV2(
 ) {
   // TODO REWRITE THIS
   val user by profileViewModel.userProfile.collectAsState()
+  val uiState by profileViewModel.analyticsUiState.collectAsStateWithLifecycle()
 
-  val startDate =
-    LocalDate.now()
-      .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-      .atStartOfDay()
-      .toKotlinLocalDateTime()
+  profileViewModel.getWorkoutAnalyticsForPeriod(uiState.initStartDateWeek, uiState.initEndDateWeek)
+  profileViewModel.getWorkoutAnalyticsForLifetime()
+  profileViewModel.getWorkoutStreakWeek()
 
-  val endDate =
-    LocalDate.now()
-      .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-      .atStartOfDay()
-      .minusNanos(1)
-      .toKotlinLocalDateTime()
-
-  val weeklyWorkoutAnalytics =
-    profileViewModel.getWorkoutAnalyticsForPeriod(startDate = startDate, endDate = endDate)
-
-  val lifetimeWorkoutAnalytics = profileViewModel.getWorkoutAnalyticsForLifetime()
-
-  val weeklyWorkoutStreak = profileViewModel.getWorkoutStreakWeek() ?: 0
+  val weeklyWorkoutAnalytics = uiState.weeklyWorkoutAnalytics
+  val lifetimeWorkoutAnalytics = uiState.lifetimeWorkoutAnalytics
+  val weeklyWorkoutStreak = uiState.weeklyWorkoutStreak ?: 0
   //  val user = "Anonymous"
   //  val userProfileManager by inject<UserProfileManager>(UserProfileManager::class.java)
   //  val user = userProfileManager.userProfile.collectAsState().value
@@ -181,8 +167,8 @@ fun ProfileScreenV2(
                   weeklyReportCard = {
                     WeeklyReportCard(
                       workoutAnalytics = weeklyWorkoutAnalytics,
-                      startDate = startDate,
-                      endDate = endDate,
+                      startDate = uiState.initStartDateWeek,
+                      endDate = uiState.initEndDateWeek,
                       userMassUnit = user.defaultWeightUnit,
                       navigateToWeeklyReport = { navigateToWeeklyReport() },
                     )

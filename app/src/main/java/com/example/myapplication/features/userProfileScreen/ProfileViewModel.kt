@@ -3,6 +3,7 @@
 package com.example.myapplication.features.userProfileScreen
 
 import android.util.Log
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -26,11 +27,31 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toKotlinLocalDateTime
 import org.bson.types.ObjectId
 import java.io.IOException
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 import kotlin.time.ExperimentalTime
+
+@Immutable
+data class AnalyticsUiState(
+  val user: UserProfile? = null,
+  val weeklyWorkoutAnalytics: WorkoutAnalytics? = null,
+  val weeklyWorkoutStreak: Int? = 0,
+  val lifetimeWorkoutAnalytics: WorkoutAnalytics? = null,
+  val muscleEngagementData: List<Pair<Muscle, List<MuscleFractionalSets>>> = emptyList(),
+  val muscleEngagementDataIsLoading: Boolean = true,
+  val totalTrainingVolumeData: List<TotalWorkoutVolume> = emptyList(),
+  val initStartDateWeek: LocalDateTime,
+  val initEndDateWeek: LocalDateTime,
+  val startDateMuscleEngagement: LocalDateTime,
+  val endDateMuscleEngagement: LocalDateTime,
+)
 
 class ProfileViewModel
 constructor(
@@ -48,7 +69,35 @@ constructor(
   private val _defaultWeightUnit = MutableStateFlow<MassUnit>(_userProfile.value.defaultWeightUnit)
   val defaultWeightUnit: StateFlow<MassUnit?> = _defaultWeightUnit.asStateFlow()
 
-  //  var _currentUser: UserProfile = userProfileManager.getCurrentUser()
+  private val _analyticsUiState: MutableStateFlow<AnalyticsUiState> =
+    MutableStateFlow(
+      AnalyticsUiState(
+        user = _userProfile.value,
+        initStartDateWeek =
+          LocalDate.now()
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            .atStartOfDay()
+            .toKotlinLocalDateTime(),
+        initEndDateWeek =
+          LocalDate.now()
+            .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+            .atStartOfDay()
+            .minusNanos(1)
+            .toKotlinLocalDateTime(),
+        startDateMuscleEngagement =
+          LocalDate.now()
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            .atStartOfDay()
+            .toKotlinLocalDateTime(),
+        endDateMuscleEngagement =
+          LocalDate.now()
+            .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+            .atStartOfDay()
+            .minusNanos(1)
+            .toKotlinLocalDateTime(),
+      )
+    )
+  val analyticsUiState: StateFlow<AnalyticsUiState> = _analyticsUiState.asStateFlow()
 
   fun getRoundingPreference(): Flow<RoundingOption?> {
     return flow {
@@ -329,16 +378,30 @@ constructor(
     // TODO Confirm DateTime is adjusted for user timezone
     startDate: LocalDateTime,
     endDate: LocalDateTime,
-  ): WorkoutAnalytics? {
-    return completedWorkoutRepository.getWorkoutAnalyticsForPeriod(startDate, endDate)
+  ) {
+    _analyticsUiState.update {
+      it.copy(
+        weeklyWorkoutAnalytics =
+          completedWorkoutRepository.getWorkoutAnalyticsForPeriod(startDate, endDate)
+      )
+    }
+    //    return completedWorkoutRepository.getWorkoutAnalyticsForPeriod(startDate, endDate)
   }
 
-  fun getWorkoutAnalyticsForLifetime(): WorkoutAnalytics? {
-    return completedWorkoutRepository.getWorkoutAnalyticsForLifetime()
+  fun getWorkoutAnalyticsForLifetime() {
+    _analyticsUiState.update {
+      it.copy(
+        lifetimeWorkoutAnalytics = completedWorkoutRepository.getWorkoutAnalyticsForLifetime()
+      )
+    }
+    //    return completedWorkoutRepository.getWorkoutAnalyticsForLifetime()
   }
 
-  fun getTotalVolumeData(): List<TotalWorkoutVolume> /*ChartData*/ {
-    return completedWorkoutRepository.getTotalVolumeData()
+  fun getTotalVolumeData() /*ChartData*/ {
+    _analyticsUiState.update {
+      it.copy(totalTrainingVolumeData = completedWorkoutRepository.getTotalVolumeData())
+    }
+    //    return completedWorkoutRepository.getTotalVolumeData()
 
     //    val labels = mutableListOf<String>()
     //    val values = mutableListOf<Number>()
@@ -351,11 +414,9 @@ constructor(
     //    return ChartData(labels.toList(), values.toList())
   }
 
-  fun getMuscleEngagementData(
-    startDate: LocalDateTime,
-    endDate: LocalDateTime,
-  ): List<Pair<Muscle, List<MuscleFractionalSets>>> {
+  fun getMuscleEngagementData(startDate: LocalDateTime, endDate: LocalDateTime) {
     var list: List<Pair<Muscle, List<MuscleFractionalSets>>> = listOf()
+
     viewModelScope.launch {
       list =
         completedWorkoutRepository
@@ -368,10 +429,21 @@ constructor(
       //      }
       Log.d("ProfileViewModel", "Muscle engagement data: $list")
     }
-    return list
+    _analyticsUiState.update { it.copy(muscleEngagementDataIsLoading = false) }
+    _analyticsUiState.update {
+      it.copy(
+        muscleEngagementData = list,
+        startDateMuscleEngagement = startDate,
+        endDateMuscleEngagement = endDate,
+      )
+    }
+    //    return list
   }
 
-  fun getWorkoutStreakWeek(): Int? {
-    return completedWorkoutRepository.getWorkoutStreakWeek()
+  fun getWorkoutStreakWeek() {
+    _analyticsUiState.update {
+      it.copy(weeklyWorkoutStreak = completedWorkoutRepository.getWorkoutStreakWeek() ?: 0)
+    }
+    //    return completedWorkoutRepository.getWorkoutStreakWeek()
   }
 }

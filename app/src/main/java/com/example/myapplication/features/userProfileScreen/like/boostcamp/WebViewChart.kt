@@ -24,6 +24,11 @@ import kotlin.time.ExperimentalTime
 // TODO Add hover text
 data class ChartData(val labels: List<String>, val values: List<Number>)
 
+enum class ChartType(val type: String) {
+  VOLUME("volume"),
+  FREQUENCY("frequency"),
+}
+
 @ExperimentalTime
 fun generateRandomExerciseVolumeData(): ChartData {
   val labels = mutableListOf<String>()

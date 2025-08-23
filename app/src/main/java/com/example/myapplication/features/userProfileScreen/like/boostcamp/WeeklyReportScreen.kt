@@ -47,11 +47,7 @@ import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.datetime.toLocalDateTime
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -80,31 +76,20 @@ fun WeeklyReportPreview() {
 @Composable
 fun WeeklyReportScreen(profileViewModel: ProfileViewModel, onBackClick: () -> Unit) {
   val user by profileViewModel.userProfile.collectAsState()
+  val uiState by profileViewModel.analyticsUiState.collectAsState()
 
-  val startDate =
-    LocalDate.now()
-      .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-      .atStartOfDay()
-      .toKotlinLocalDateTime()
+  profileViewModel.getWorkoutAnalyticsForPeriod(uiState.initStartDateWeek, uiState.initEndDateWeek)
+  profileViewModel.getWorkoutStreakWeek()
 
-  val endDate =
-    LocalDate.now()
-      .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-      .atStartOfDay()
-      .minusNanos(1)
-      .toKotlinLocalDateTime()
-
-  val weeklyWorkoutAnalytics =
-    profileViewModel.getWorkoutAnalyticsForPeriod(startDate = startDate, endDate = endDate)
-
-  val weeklyWorkoutStreak = profileViewModel.getWorkoutStreakWeek() ?: 0
+  val weeklyWorkoutAnalytics = uiState.weeklyWorkoutAnalytics
+  val weeklyWorkoutStreak = uiState.weeklyWorkoutStreak ?: 0
 
   WeeklyReportScreenContent(
     onBackClick = { onBackClick() },
     workoutAnalytics = weeklyWorkoutAnalytics,
     weeklyWorkoutStreak = weeklyWorkoutStreak,
-    startDate = startDate,
-    endDate = endDate,
+    startDate = uiState.initStartDateWeek,
+    endDate = uiState.initEndDateWeek,
     userMassUnit = user.defaultWeightUnit,
   )
 }
