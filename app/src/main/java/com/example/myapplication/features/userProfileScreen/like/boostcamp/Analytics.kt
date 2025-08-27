@@ -8,7 +8,6 @@ package com.example.myapplication.features.userProfileScreen.like.boostcamp
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,9 +25,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
-import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,18 +43,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.getSelectedEndDate
-import androidx.compose.material3.getSelectedStartDate
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +64,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Muscle
@@ -72,10 +74,10 @@ import com.example.myapplication.common.domain.model.WorkoutAnalytics
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -97,6 +99,7 @@ fun AnalyticsScreen(
   profileViewModel: ProfileViewModel,
   onNavigateToDashboardsInfo: () -> Unit,
   onNavigateToWeeklyReport: () -> Unit,
+  onNavigateToDateRangePicker: () -> Unit,
 ) {
   val user by profileViewModel.userProfile.collectAsState()
 
@@ -104,11 +107,11 @@ fun AnalyticsScreen(
 
   profileViewModel.getMuscleEngagementData(
     startDate = uiState.startDateMuscleEngagement,
-    endDate = uiState.endDateMuscleEngagement
+    endDate = uiState.endDateMuscleEngagement,
   )
   profileViewModel.getWorkoutAnalyticsForPeriod(
     startDate = uiState.initStartDateWeek,
-    endDate = uiState.initEndDateWeek
+    endDate = uiState.initEndDateWeek,
   )
   profileViewModel.getTotalVolumeData()
   profileViewModel.getWorkoutStreakWeek()
@@ -142,16 +145,14 @@ fun AnalyticsScreen(
     },
     muscleTrackerContent = {
       MuscleTrackerContent(
-        startDate = uiState.startDateMuscleEngagement,
-        endDate = uiState.endDateMuscleEngagement,
         muscleEngagementData = muscleEngagementData,
-        updateMuscleEngagementData = { startDate, endDate ->
-          Log.i(
-            "AnalyticsScreen",
-            "updateMuscleEngagementData startTime: $startDate, endTime: $endDate"
+        dateRangeTextButton = {
+          DateRangeTextButton(
+            startDate = uiState.startDateMuscleEngagement,
+            endDate = uiState.endDateMuscleEngagement,
+            openDateRangePicker = { onNavigateToDateRangePicker() },
           )
-          profileViewModel.getMuscleEngagementData(startDate = startDate, endDate = endDate)
-        }
+        },
       )
     },
     totalTrainingVolumeData = totalTrainingVolumeData,
@@ -385,14 +386,10 @@ fun StatItem(value: String, label: String) {
 }
 
 @Composable
-fun MuscleTrackerContent(
-  startDate: LocalDateTime,
-  endDate: LocalDateTime,
-  muscleEngagementData: List<Pair<Muscle, List<MuscleFractionalSets>>>,
-  updateMuscleEngagementData: (startDate: LocalDateTime, endDate: LocalDateTime) -> Unit = { _, _ ->
-  },
-) {
-  var showDatePicker by remember { mutableStateOf(false) }
+fun DateRangePickerOverlay(startDate: LocalDateTime, endDate: LocalDateTime) {
+  val snackState = remember { SnackbarHostState() }
+  val snackScope = rememberCoroutineScope()
+  SnackbarHost(hostState = snackState, Modifier.zIndex(1f))
 
   val state =
     rememberDateRangePickerState(
@@ -400,66 +397,138 @@ fun MuscleTrackerContent(
       initialSelectedEndDate = endDate.toJavaLocalDateTime().toLocalDate(),
     )
 
-  if (showDatePicker) {
-    // TODO Refactor using https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#DateRangePicker(androidx.compose.material3.DateRangePickerState,androidx.compose.ui.Modifier,androidx.compose.material3.DatePickerFormatter,androidx.compose.material3.DatePickerColors,kotlin.Function0,kotlin.Function0,kotlin.Boolean,androidx.compose.ui.focus.FocusRequester)
-    DatePickerDialog(
-      onDismissRequest = { showDatePicker = false },
-      confirmButton = {
-        TextButton(
-          onClick = {
-            showDatePicker = false
-
-            if (state.selectedEndDateMillis != null && state.selectedStartDateMillis != null) {
-              updateMuscleEngagementData(
-                Instant.fromEpochMilliseconds(state.selectedStartDateMillis!!)
-                  .toLocalDateTime(kotlinx.datetime.TimeZone.UTC),
-                Instant.fromEpochMilliseconds(state.selectedEndDateMillis!!).plus(1.days)
-                  .toLocalDateTime(kotlinx.datetime.TimeZone.UTC),
-              )
-            }
-          }
-        ) {
-          Text("OK")
-        }
-      },
-      dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } },
+  Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
+    Row(
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .background(DatePickerDefaults.colors().containerColor)
+          .padding(start = 12.dp, end = 12.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-      DateRangePicker(state = state)
+      //      TooltipBox(
+      //        positionProvider =
+      //          TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+      //        tooltip = { PlainTooltip { Text("Close") } },
+      //        state = rememberTooltipState(),
+      //      ) {
+      IconButton(onClick = { /* dismiss the UI */ }) {
+        Icon(Icons.Filled.Close, contentDescription = "Close")
+      }
+      //      }
     }
+    DateRangePicker(state = state)
   }
+}
 
+@Composable
+fun MuscleTrackerContent(
+  muscleEngagementData: List<Pair<Muscle, List<MuscleFractionalSets>>>,
+  dateRangeTextButton: @Composable () -> Unit = {},
+) {
   //  Column(modifier = Modifier.fillMaxSize()) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(4.dp),
   ) {
-    Box(
-      modifier = Modifier
-        .padding(horizontal = 0.dp)
-        .clickable(onClick = { showDatePicker = true })
-    ) {
-      val startDateString =
-        "${
-          state.getSelectedStartDate()?.toKotlinLocalDate()?.month?.name?.substring(0, 3)
-        }" +
-                " ${state.getSelectedStartDate()?.toKotlinLocalDate()?.day}"
-
-      val endDateString =
-        "${
-          state.getSelectedEndDate()?.toKotlinLocalDate()?.month?.name?.substring(0, 3)
-        }" +
-                " ${state.getSelectedEndDate()?.toKotlinLocalDate()?.day}"
-
-      TextButton(
-        onClick = { showDatePicker = true },
-        modifier = Modifier.padding(horizontal = 0.dp),
-      ) {
-        Text("$startDateString – $endDateString", style = MaterialTheme.typography.bodyMedium)
-      }
-    }
+    //    Box(
+    //      modifier = Modifier.padding(horizontal = 0.dp).clickable(onClick = { showDatePicker =
+    // true })
+    //    ) {
+    dateRangeTextButton()
+    //    }
   }
   MuscleEngagementContent(muscleEngagementData = muscleEngagementData)
   //  }
+}
+
+@Composable
+fun DateRangeTextButton(
+  startDate: LocalDateTime,
+  endDate: LocalDateTime,
+  openDateRangePicker: () -> Unit
+) {
+  val startDateString = startDate.month.name.substring(0, 3) + " ${startDate.day}"
+
+  val endDateString = endDate.month.name.substring(0, 3) + " ${endDate.day}"
+
+  TextButton(onClick = { openDateRangePicker() }, modifier = Modifier.padding(horizontal = 0.dp)) {
+    Text("$startDateString – $endDateString", style = MaterialTheme.typography.bodyMedium)
+  }
+}
+
+@Composable
+fun DateRangePickerScreen(
+  profileViewModel: ProfileViewModel,
+  onNavigateBack: () -> Unit,
+) {
+  val uiState by profileViewModel.analyticsUiState.collectAsState()
+
+  val dateRangePickerState =
+    rememberDateRangePickerState(
+      initialSelectedStartDate =
+        uiState.startDateMuscleEngagement.toJavaLocalDateTime().toLocalDate(),
+      initialSelectedEndDate = uiState.endDateMuscleEngagement.toJavaLocalDateTime().toLocalDate(),
+    )
+
+  val snackState = remember { SnackbarHostState() }
+  val snackScope = rememberCoroutineScope()
+  SnackbarHost(hostState = snackState, Modifier.zIndex(1f))
+
+  Scaffold() { paddingValues ->
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues),
+      verticalArrangement = Arrangement.Top
+    ) {
+      Row(
+        modifier =
+          Modifier
+            .fillMaxWidth()
+            .background(DatePickerDefaults.colors().containerColor)
+            .padding(start = 12.dp, end = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+      ) {
+        //        TooltipBox(
+        //          positionProvider =
+        //            TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        //          tooltip = { PlainTooltip { Text("Close") } },
+        //          state = rememberTooltipState(),
+        //        ) {
+        IconButton(onClick = { onNavigateBack() }) {
+          Icon(Icons.Filled.Close, contentDescription = "Close")
+          //          }
+        }
+        TextButton(
+          onClick = {
+
+            if (dateRangePickerState.selectedEndDateMillis != null && dateRangePickerState.selectedStartDateMillis != null) {
+              profileViewModel.getMuscleEngagementData(
+                Instant.fromEpochMilliseconds(dateRangePickerState.selectedStartDateMillis!!)
+                  .toLocalDateTime(kotlinx.datetime.TimeZone.UTC),
+                Instant.fromEpochMilliseconds(dateRangePickerState.selectedEndDateMillis!!)
+                  .plus(1.days)
+                  .toLocalDateTime(kotlinx.datetime.TimeZone.UTC),
+              )
+            }
+            snackScope.launch {
+              val range =
+                dateRangePickerState.selectedStartDateMillis!!..dateRangePickerState.selectedEndDateMillis!!
+              snackState.showSnackbar("Saved range (timestamps): $range")
+            }
+            onNavigateBack()
+          },
+          enabled = dateRangePickerState.selectedEndDateMillis != null,
+        ) {
+          Text(text = "Save")
+        }
+      }
+      DateRangePicker(state = dateRangePickerState)
+    }
+  }
 }
 
 @Composable

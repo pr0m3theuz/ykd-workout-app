@@ -81,6 +81,7 @@ import com.example.myapplication.features.userProfileScreen.ProfileScreen
 import com.example.myapplication.features.userProfileScreen.ProfileScreenV2
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.AnalyticsScreen
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.DateRangePickerScreen
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.WeeklyReportScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.CalculatorsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.ChooseUnitsScreen
@@ -930,6 +931,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
         profileViewModel = profileViewModel,
         onNavigateToDashboardsInfo = {},
         onNavigateToWeeklyReport = { navController.navigate("weeklyReportScreen") },
+        onNavigateToDateRangePicker = { navController.navigate("dateRangePickerScreen") },
       )
     }
 
@@ -1017,6 +1019,16 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
             },
           )
         },
+        onNavigateBack = { navController.popBackStack() },
+      )
+    }
+
+    composable("dateRangePickerScreen") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
+      DateRangePickerScreen(
+        profileViewModel = profileViewModel,
         onNavigateBack = { navController.popBackStack() },
       )
     }
