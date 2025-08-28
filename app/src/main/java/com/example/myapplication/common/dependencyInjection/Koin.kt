@@ -4,6 +4,7 @@ package com.example.myapplication.common.dependencyInjection
 //import com.example.myapplication.data.database.RealmDatabase
 //import com.example.myapplication.data.network.ImportWorkoutProgramRepository
 //import org.koin.android.ext.koin.androidContext
+//import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepositoryImpl
 import com.example.myapplication.MainViewModel
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
@@ -13,8 +14,6 @@ import com.example.myapplication.common.infrastructure.persistence.ExerciseNotes
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepositoryImpl
-import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
-import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
 import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistoryImpl
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
@@ -25,7 +24,7 @@ import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesR
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepositoryImpl
-import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore // Added WorkoutDatastore import
+import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorServiceImpl
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
@@ -107,7 +106,7 @@ val commonModule = module {
   singleOf(::ExerciseNotesRepositoryImpl) bind ExerciseNotesRepository::class
   singleOf(::WorkoutNotesRepositoryImpl) bind WorkoutNotesRepository::class
   singleOf(::ReplicatorServiceImpl) bind ReplicatorService::class
-  singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
+//  singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
   singleOf(::CompletedWorkoutRepositoryImpl) bind CompletedWorkoutRepository::class
   singleOf(::ModernizedLoadRIRReposistoryImpl) bind ModernizedLoadRIRReposistory::class
 //  singleOf(::ImportWorkoutProgramRepository)
@@ -120,7 +119,7 @@ val commonModule = module {
 //  singleOf(::ImportWorkoutProgram)
 
   viewModel { MainViewModel(get(), get(), get()) }
-  viewModel { ProgramsViewModel(get(), get(), get(), get()) }
+  viewModel { ProgramsViewModel(get(), get(), get()) }
   viewModel { ExercisesViewModel(get(), get(), get()) }
   viewModel {
     WorkoutViewModel(

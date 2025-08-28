@@ -20,7 +20,7 @@ class ExerciseNotesRepositoryImpl(private val databaseManager: DatabaseManager) 
   val db: Database? = databaseManager.database
 
   // TODO Decide if I should create a repository for user data
-  val userDatabase: Database? = databaseManager.userDatabase
+//  val userDatabase: Database? = databaseManager.userDatabase
 
   override fun getPinnedExerciseNotes(exercise: ObjectId): List<ExerciseNote> {
     return emptyList<ExerciseNote>()
@@ -36,7 +36,7 @@ class WorkoutNotesRepositoryImpl(private val databaseManager: DatabaseManager) :
   val db: Database? = databaseManager.database
 
   // TODO Decide if I should create a repository for user data
-  val userDatabase: Database? = databaseManager.userDatabase
+//  val userDatabase: Database? = databaseManager.userDatabase
 
   override fun getPinnedWorkoutNotes(workoutUUID: Uuid): List<WorkoutNote> {
     return emptyList<WorkoutNote>()

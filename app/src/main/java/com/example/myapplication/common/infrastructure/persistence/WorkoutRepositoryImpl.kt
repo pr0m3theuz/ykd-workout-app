@@ -53,7 +53,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
   val db: Database? = databaseManager.database
 
   // TODO Decide if I should create a repository for user data
-  val userDatabase: Database? = databaseManager.userDatabase
+//  val userDatabase: Database? = databaseManager.userDatabase
 
   private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 

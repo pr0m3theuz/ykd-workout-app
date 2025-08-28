@@ -699,7 +699,9 @@ class ExercisesRepositoryImpl(
         db?.getCollection("Exercise") ?: throw IllegalStateException("collection not found")
 
       collection.getDocument(exerciseID.toString())?.toMutable()?.let {
+        var json = it.toJSON()
         it.setBoolean("warmUpSetRestTimerEnabled", enable)
+        json = it.toJSON()
 
         collection.save(it)
       }

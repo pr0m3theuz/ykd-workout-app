@@ -7,7 +7,6 @@ import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
-import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
@@ -23,7 +22,7 @@ class ManagePreviewWorkoutUseCase(
   private val exercisesRepository: ExercisesRepository,
   private val workoutNotesRepository: WorkoutNotesRepository,
   private val exerciseNotesRepository: ExerciseNotesRepository,
-  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
+//  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
   private val completedWorkoutRepository: CompletedWorkoutRepository,
   private val userRepository: UserRepository,
 ) {

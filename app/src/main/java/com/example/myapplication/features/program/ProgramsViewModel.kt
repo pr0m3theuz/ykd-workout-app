@@ -10,7 +10,6 @@ import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
-import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +26,7 @@ import kotlin.uuid.Uuid
 class ProgramsViewModel
 constructor(
   private val programsRepository: ProgramsRepository,
-  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
+//  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
   // TODO Replace workoutRepository
   private val workoutRepository: WorkoutRepository,
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
@@ -212,12 +211,14 @@ constructor(
 
   fun getCurrentlyActiveWorkouts(): Flow<List<Workout>> {
 //    TODO "Implement getCurrentlyActiveWorkouts"
-    return inProgressWorkoutRepository.getWorkouts()
+    TODO()
+//    return inProgressWorkoutRepository.getWorkouts()
   }
 
   fun deleteCurrentlyActiveWorkout(workoutID: ObjectId): Boolean {
 //    TODO "Implement deleteCurrentlyActiveWorkout"
-    return inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
+    TODO()
+//    return false // inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
   }
 
   fun getProgramData() {
