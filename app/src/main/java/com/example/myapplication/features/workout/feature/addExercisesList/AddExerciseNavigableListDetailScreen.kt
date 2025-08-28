@@ -20,7 +20,7 @@ fun AddExerciseNavigableListDetailScreen(
   val coroutineScope = rememberCoroutineScope()
   val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator<Any>()
 
-  // TODO does this need window insets?
+  // TODO add BackHandler to handle back navigation
 
   NavigableListDetailPaneScaffold(
     navigator = scaffoldNavigator,
