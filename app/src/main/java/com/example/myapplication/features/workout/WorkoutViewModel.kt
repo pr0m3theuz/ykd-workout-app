@@ -1649,8 +1649,8 @@ class WorkoutViewModel(
   fun updateExerciseWeightUnit(exercise: Exercise?, weightUnit: String?) {
     exercise?.weightUnit = weightUnit
     viewModelScope.launch {
-      if (exercise != null) {
-        exerciseRepository.updateExercise(exercise)
+      if (exercise != null && weightUnit != null) {
+        exerciseRepository.updateWeightUnitsForExercise(exercise.id, weightUnit)
       }
     }
   }
@@ -1658,19 +1658,41 @@ class WorkoutViewModel(
   fun updateExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, time: Duration) {
     if (tabRowState == 1) {
       exercise.warmUpSetRestInWholeMilliseconds = time.inWholeMilliseconds
+      viewModelScope.launch {
+        exerciseRepository.updateWarmUpSetRestTimerForExercise(
+          exercise.id,
+          time.inWholeMilliseconds
+        )
+      }
     } else if (tabRowState == 0) {
       exercise.workingSetRestInWholeMilliseconds = time.inWholeMilliseconds
+      viewModelScope.launch {
+        exerciseRepository.updateWorkingSetRestTimerForExercise(
+          exercise.id,
+          time.inWholeMilliseconds
+        )
+      }
     }
-    viewModelScope.launch { exerciseRepository.updateExercise(exercise) }
   }
 
   fun enableExerciseAutoRestTimer(tabRowState: Int, exercise: Exercise, enable: Boolean) {
     if (tabRowState == 1) {
       exercise.warmUpSetRestTimerEnabled = enable
+      viewModelScope.launch {
+        exerciseRepository.enableWarmUpSetRestTimerForExercise(
+          exercise.id,
+          enable
+        )
+      }
     } else if (tabRowState == 0) {
       exercise.workingSetRestTimerEnabled = enable
+      viewModelScope.launch {
+        exerciseRepository.enableWorkingSetRestTimerForExercise(
+          exercise.id,
+          enable
+        )
+      }
     }
-    viewModelScope.launch { exerciseRepository.updateExercise(exercise) }
   }
 
   // endregion
