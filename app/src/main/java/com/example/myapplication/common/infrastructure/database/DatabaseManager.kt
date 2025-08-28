@@ -6,20 +6,18 @@ import com.couchbase.lite.CouchbaseLite
 import com.couchbase.lite.Database
 import com.couchbase.lite.DatabaseConfigurationFactory
 import com.couchbase.lite.newConfig
+import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 
 class DatabaseManager(private val context: Context) {
 
   var database: Database? = null
 
   // store User Data & Active & Completed Programs & Workouts
-  var userDatabase: Database? = null
-
-  // persist currently active workout
-  var currentActiveWorkoutDatabase: Database? = null
 
   private val databaseName = "workouts" // "database"
-  private val userWorkoutsDatabaseName = "userDatabase"
-  private val currentActiveWorkoutDatabaseName = "currentActiveWorkoutsDatabase"
 
   init {
     // setup couchbase lite
@@ -32,10 +30,17 @@ class DatabaseManager(private val context: Context) {
     try {
       val dbConfig = DatabaseConfigurationFactory.newConfig(context.filesDir.toString())
 
+      val bundledDatabaseName = "${databaseName}.zip"
       // create or open a database to share between team members to store
       // projects, assets, and user profiles
       // calculate database name based on current logged in users team name
 
+
+      if (!Database.exists(databaseName, context.filesDir)) {
+        unzip(bundledDatabaseName, File(context.filesDir.toString()))
+        val dbFile = File("${context.filesDir}/${databaseName}.cblite2")
+        Database.copy(dbFile, databaseName, dbConfig)
+      }
       database = Database(databaseName, dbConfig)
 
       requireNotNull(database) { "DatabaseManager: Database was not created!" }
@@ -81,14 +86,14 @@ class DatabaseManager(private val context: Context) {
 //      }
 
 //    create user scope
-      userDatabase = Database(userWorkoutsDatabaseName, dbConfig)
-      currentActiveWorkoutDatabase = Database(currentActiveWorkoutDatabaseName, dbConfig)
-
-      requireNotNull(userDatabase) { "DatabaseManager: User Database was not created!" }
-      requireNotNull(currentActiveWorkoutDatabase) { "DatabaseManager: Current Active Database was not created!" }
-
-      currentActiveWorkoutDatabase!!.createCollection("ActiveWorkout", "_default")
-      currentActiveWorkoutDatabase!!.createCollection("CurrentProgram", "_default")
+//      userDatabase = Database(userWorkoutsDatabaseName, dbConfig)
+//      currentActiveWorkoutDatabase = Database(currentActiveWorkoutDatabaseName, dbConfig)
+//
+//      requireNotNull(userDatabase) { "DatabaseManager: User Database was not created!" }
+//      requireNotNull(currentActiveWorkoutDatabase) { "DatabaseManager: Current Active Database was not created!" }
+//
+//      currentActiveWorkoutDatabase!!.createCollection("ActiveWorkout", "_default")
+//      currentActiveWorkoutDatabase!!.createCollection("CurrentProgram", "_default")
 
       // setup the Database
       //            setupUserDatabase(dbConfig)
@@ -103,8 +108,6 @@ class DatabaseManager(private val context: Context) {
   fun closeDatabases() {
     try {
       database?.close()
-      userDatabase?.close()
-      currentActiveWorkoutDatabase?.close()
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())
     }
@@ -152,4 +155,33 @@ class DatabaseManager(private val context: Context) {
     //        currentActiveWorkoutDatabase = Database(currentActiveWorkoutDatabaseName, dbConfig)
     //    }*/
 
+  private fun unzip(
+    file: String,
+    destination: File
+  ) {
+    context.assets.open(file).use { stream ->
+      val buffer = ByteArray(1024)
+      val zis = ZipInputStream(stream)
+      var ze: ZipEntry? = zis.nextEntry
+      while (ze != null) {
+        val fileName: String = ze.name
+        val newFile = File(destination, fileName)
+        if (ze.isDirectory) {
+          newFile.mkdirs()
+        } else {
+          File(newFile.parent!!).mkdirs()
+          val fos = FileOutputStream(newFile)
+          var len: Int
+          while (zis.read(buffer).also { len = it } > 0) {
+            fos.write(buffer, 0, len)
+          }
+          fos.close()
+        }
+        ze = zis.nextEntry
+      }
+      zis.closeEntry()
+      zis.close()
+      stream.close()
+    }
+  }
 }
