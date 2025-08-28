@@ -51,7 +51,7 @@ class ReplicatorServiceImpl(
       ReplicatorConfig(
         username = loggedInUser.username ?: "user",
         password = loggedInUser.password ?: "password",
-        endpointUrl = "ws://192.168.1.98:4984/workouts",
+        endpointUrl = "wss://192.168.1.1:4984/workouts", // TODO store in user profile
         replicatorType = "PUSH AND PULL",
         heartBeat = 60L,
         continuous = true,
