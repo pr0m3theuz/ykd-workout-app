@@ -71,6 +71,8 @@ fun ReplaceExerciseScreen(
   workoutViewModel: WorkoutViewModel,
   navController: NavController,
 ) {
+
+  //TODO Refactor: Navigate to new screen and add Back Gesture handler
   val uiState by exercisesViewModel.uiState.collectAsState()
 
   val exercises = uiState.exercises
