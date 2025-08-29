@@ -28,13 +28,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.CreateNewFolder
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
-import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -94,7 +91,7 @@ fun ProgramsScreen(
   val titleMedium = MaterialTheme.typography.titleMedium
   val scrollState = rememberScrollState()
 
-  val (programVisible, setProgramVisible) = rememberSaveable { mutableStateOf(false) }
+  val (programVisible, setProgramVisible) = rememberSaveable { mutableStateOf(true) }
   val (mesocycleVisible, setMesocycleVisible) = rememberSaveable { mutableStateOf(false) }
   val (workoutVisible, setWorkoutVisible) = rememberSaveable { mutableStateOf(false) }
 
@@ -135,7 +132,7 @@ fun ProgramsScreen(
             )
           }*/
         },
-        actions = { ProgramDetailsOptionsDropdownMenu() },
+//        actions = { ProgramDetailsOptionsDropdownMenu() },
       )
     },
     bottomBar = {
@@ -153,14 +150,36 @@ fun ProgramsScreen(
         .padding(horizontal = 12.dp),
       //      verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-      stickyHeader { WorkoutSearchBar() }
+//      stickyHeader { WorkoutSearchBar() } // TODO Implement Search & Filtering
 
       item {
-        Row(modifier = Modifier.padding(top = 16.dp)) {
-          if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
-            Text("Start a Program", style = titleMedium)
-            // TODO No Active Programs Card
-          } else {
+        Text("Quick Start", style = titleMedium, modifier = Modifier.padding(top = 16.dp))
+        Button(
+          onClick = {
+            // TODO Navigate to Workout Screen
+            navController.navigate(Screens.Workout.baseRoute) {
+              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+              // Avoid multiple copies of the same destination when
+              // reselecting the same item
+              launchSingleTop = true
+              // Restore state when reselecting a previously selected item
+              restoreState = true
+            }
+          }
+        ) {
+          Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
+          Text(text = "Start An Empty Workout")
+        }
+      }
+
+      item {
+        if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
+//          Row(modifier = Modifier.padding(top = 16.dp)) {
+//            Text("Start a Program", style = titleMedium)
+//            // TODO No Active Programs Card
+//          }
+        } else {
+          Row(modifier = Modifier.padding(top = 16.dp)) {
             Text("Continue Program", style = titleMedium)
           }
         }
@@ -244,26 +263,6 @@ fun ProgramsScreen(
       }
 
       item {
-        Text("Quick Start", style = titleMedium)
-        Button(
-          onClick = {
-            // TODO Navigate to Workout Screen
-            navController.navigate(Screens.Workout.baseRoute) {
-              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-              // Avoid multiple copies of the same destination when
-              // reselecting the same item
-              launchSingleTop = true
-              // Restore state when reselecting a previously selected item
-              restoreState = true
-            }
-          }
-        ) {
-          Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
-          Text(text = "Start An Empty Workout")
-        }
-      }
-
-      item {
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
@@ -271,34 +270,34 @@ fun ProgramsScreen(
         ) {
           Text(text = "Programs", style = titleMedium)
 
-          Box {
+          /*Box {
             Row {
-              IconButton(onClick = { /*TODO*/ }) {
+              IconButton(onClick = { *//*TODO*//* }) {
                 Icon(
                   imageVector = Icons.Outlined.FileUpload,
                   contentDescription = "Import/Export New Program",
                 )
               }
-              IconButton(onClick = { /*TODO*/ }) {
+              IconButton(onClick = { *//*TODO*//* }) {
                 Icon(
                   imageVector = Icons.Outlined.CreateNewFolder,
                   contentDescription = "Add New Program",
                 )
               }
             }
-          }
+          }*/
         }
       }
 
-      item {
-        Button(onClick = { /*TODO*/ }) {
+      /*      item {
+              Button(onClick = { *//*TODO*//* }) {
           Icon(
             imageVector = Icons.AutoMirrored.Outlined.Assignment,
             contentDescription = "Add New Program",
           )
           Text(text = "New Program", Modifier.padding(start = 8.dp))
         }
-      }
+      }*/
 
       item {
         Row(
@@ -306,12 +305,6 @@ fun ProgramsScreen(
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically,
         ) {
-          IconButton(onClick = { setProgramVisible(!programVisible) }) {
-            Icon(
-              imageVector = getExpandCollapseIcon(programVisible),
-              contentDescription = "Show more programs",
-            )
-          }
           TextButton(
             onClick = { setProgramVisible(!programVisible) },
             modifier = Modifier.weight(1f),
@@ -321,12 +314,18 @@ fun ProgramsScreen(
           ) {
             Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
           }
-          IconButton(onClick = { /*TODO*/ }) {
+          IconButton(onClick = { setProgramVisible(!programVisible) }) {
             Icon(
-              imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description",
+              imageVector = getExpandCollapseIcon(programVisible),
+              contentDescription = "Show more programs",
             )
           }
+//          IconButton(onClick = { TODO }) {
+//            Icon(
+//              imageVector = Icons.Outlined.MoreVert,
+//              contentDescription = "Localized Description",
+//            )
+//          }
         }
       }
 
@@ -363,42 +362,42 @@ fun ProgramsScreen(
         }
       }
 
-      item {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
-            Icon(
-              imageVector = getExpandCollapseIcon(mesocycleVisible),
-              contentDescription = "Show more mesocycles",
-            )
-          }
-          Text(text = "Mesocycle (###)")
-          IconButton(onClick = { /*TODO*/ }) {
+      /*      item {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
+                  Icon(
+                    imageVector = getExpandCollapseIcon(mesocycleVisible),
+                    contentDescription = "Show more mesocycles",
+                  )
+                }
+                Text(text = "Mesocycle (###)")
+                IconButton(onClick = { *//*TODO*//* }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
               contentDescription = "Localized Description",
             )
           }
         }
-      }
+      }*/
 
-      item {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
-            Icon(
-              imageVector = getExpandCollapseIcon(workoutVisible),
-              contentDescription = "Show more workouts",
-            )
-          }
-          Text(text = "Workouts (###)")
-          IconButton(onClick = { /*TODO*/ }) {
+      /*      item {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
+                  Icon(
+                    imageVector = getExpandCollapseIcon(workoutVisible),
+                    contentDescription = "Show more workouts",
+                  )
+                }
+                Text(text = "Workouts (###)")
+                IconButton(onClick = { *//*TODO*//* }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
               contentDescription = "Localized Description",
@@ -415,7 +414,7 @@ fun ProgramsScreen(
         ) {
           WorkoutCard()
         }
-      }
+      }*/
     }
   }
 }
