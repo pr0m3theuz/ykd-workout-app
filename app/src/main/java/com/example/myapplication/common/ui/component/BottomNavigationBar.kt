@@ -12,9 +12,14 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
+import androidx.compose.material.icons.filled.HistoryEdu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.HistoryEdu
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -28,15 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.example.myapplication.R
+import com.example.myapplication.common.ui.icon.Exercise
 import com.example.myapplication.common.ui.icon.ExerciseFilled
 import com.example.myapplication.common.ui.icon.MyIconPack
 
 @OptIn(ExperimentalAnimationSpecApi::class)
 @Composable
-fun BottomNavigationBar(
-  currentDestination: NavDestination?,
-  onNavigate: (route: String) -> Unit
-) {
+fun BottomNavigationBar(currentDestination: NavDestination?, onNavigate: (route: String) -> Unit) {
   //    var selectedItem by remember { mutableIntStateOf(0) }
   //    val items = listOf("Profile", "History", "Workout", "Programs", "Exercise", "Settings")
 
@@ -47,45 +50,40 @@ fun BottomNavigationBar(
       Screens.Workout,
       Screens.Programs,
       Screens.Exercise,
-//      Screens.Settings
-      Screens.Replicator
+      //      Screens.Settings
+      //      Screens.Replicator
     )
 
-//  Log.i("BottomNavigationBar", "currentDestination: $currentDestination")
+  //  Log.i("BottomNavigationBar", "currentDestination: $currentDestination")
 
   NavigationBar(windowInsets = WindowInsets.navigationBars) {
     items.forEach { item ->
-//      Log.i("BottomNavigationBar", "item.route: ${item.route}")
+      //      Log.i("BottomNavigationBar", "item.route: ${item.route}")
       val isSelected =
-        currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) ?: false } ==
-                true
+        currentDestination?.hierarchy?.any { it.route?.contains(item.baseRoute) ?: false } == true
 
-      val animatedColor by animateColorAsState(
+      val animatedColor by
+      animateColorAsState(
         if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
         label = "colorAnimation",
-        animationSpec = tween(500, easing = LinearEasing)
+        animationSpec = tween(500, easing = LinearEasing),
       )
 
       NavigationBarItem(
         icon = {
-          when {
-            item.baseRoute == "Profile" -> ProfileIcon(isSelected)
-            else ->
-              Icon(
-                item.icon,
-                contentDescription = stringResource(item.resourceId),
-                modifier = Modifier
-                  .size(24.dp),
-                tint = animatedColor
-              )
-          }
+          Icon(
+            if (isSelected) item.iconSelected else item.icon,
+            contentDescription = stringResource(item.resourceId),
+            modifier = Modifier.size(24.dp),
+            tint = animatedColor,
+          )
         },
         label = {
-            Text(
-              stringResource(item.resourceId),
-              color = animatedColor,
-              style = MaterialTheme.typography.labelSmall
-            )
+          Text(
+            stringResource(item.resourceId),
+            color = animatedColor,
+            style = MaterialTheme.typography.labelSmall,
+          )
         },
         selected = false, // isSelected,
         onClick = {
@@ -95,7 +93,7 @@ fun BottomNavigationBar(
           ) {
             onNavigate(item.route)
           }
-        }
+        },
       )
     }
   }
@@ -105,28 +103,63 @@ sealed class Screens(
   val route: String,
   val baseRoute: String,
   @StringRes val resourceId: Int,
-  val icon: ImageVector
+  val icon: ImageVector,
+  val iconSelected: ImageVector,
 ) {
-  object Profile : Screens("profile", "profile", R.string.profile, Icons.Filled.Person)
+  object Profile :
+    Screens("profile", "profile", R.string.profile, Icons.Outlined.Person, Icons.Filled.Person)
 
-  object History : Screens("history", "history", R.string.history, Icons.Filled.History)
+  object History :
+    Screens(
+      "history",
+      "history",
+      R.string.history,
+      Icons.Outlined.HistoryEdu,
+      Icons.Filled.HistoryEdu,
+    )
 
   object Workout :
     Screens(
       "workout",
       "workout",
       R.string.workout,
-      Icons.AutoMirrored.Filled.Assignment
+      Icons.AutoMirrored.Outlined.Assignment,
+      Icons.AutoMirrored.Filled.Assignment,
     )
 
   object Programs :
-    Screens("programs", "programs", R.string.programs, Icons.AutoMirrored.Filled.LibraryBooks)
+    Screens(
+      "programs",
+      "programs",
+      R.string.programs,
+      Icons.AutoMirrored.Outlined.LibraryBooks,
+      Icons.AutoMirrored.Filled.LibraryBooks,
+    )
 
   object Exercise :
-    Screens("exercises", "exercises", R.string.exercises, MyIconPack.ExerciseFilled)
+    Screens(
+      "exercises",
+      "exercises",
+      R.string.exercises,
+      MyIconPack.Exercise,
+      MyIconPack.ExerciseFilled,
+    )
 
-  object Settings : Screens("settings", "settings", R.string.settings, Icons.Filled.Settings)
+  object Settings :
+    Screens(
+      "settings",
+      "settings",
+      R.string.settings,
+      Icons.Outlined.Settings,
+      Icons.Filled.Settings,
+    )
 
   object Replicator :
-    Screens("replicator", "replicator", R.string.replicator, Icons.Filled.Settings)
+    Screens(
+      "replicator",
+      "replicator",
+      R.string.replicator,
+      Icons.Outlined.Settings,
+      Icons.Filled.Settings,
+    )
 }
