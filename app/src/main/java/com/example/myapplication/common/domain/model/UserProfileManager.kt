@@ -28,27 +28,31 @@ class UserProfileManager(private val context: Context, private val userRepositor
   private val _userProfile = MutableStateFlow(UserProfile(ObjectId())) // Default empty profile
   val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
 
-  val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+  val json = Json {
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+  }
 
-  val name = listOf(
-    "James",
-    "Mary",
-    "Michael",
-    "Patricia",
-    "John",
-    "Jennifer",
-    "Robert",
-    "Linda",
-    "David",
-    "Elizabeth",
-    "William",
-    "Barbara",
-    "Richard",
-    "Susan",
-    "Joseph",
-    "Jessica",
-    "Lisa"
-  )
+  val name =
+    listOf(
+      "James",
+      "Mary",
+      "Michael",
+      "Patricia",
+      "John",
+      "Jennifer",
+      "Robert",
+      "Linda",
+      "David",
+      "Elizabeth",
+      "William",
+      "Barbara",
+      "Richard",
+      "Susan",
+      "Joseph",
+      "Jessica",
+      "Lisa",
+    )
 
   // Use a dedicated scope for DataStore operations that outlive viewModelScope
   private val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -94,32 +98,35 @@ class UserProfileManager(private val context: Context, private val userRepositor
           }
         }
         .map { preferences ->
-          val platesList: List<Plate> = try {
-            preferences[UserProfileDataStoreKeys.PLATES_JSON]?.let {
-              json.decodeFromString<List<Plate>>(it)
-            } ?: emptyList()
-          } catch (e: SerializationException) {
-            // Handle corrupted data by returning an empty list
-            emptyList()
-          }
+          val platesList: List<Plate> =
+            try {
+              preferences[UserProfileDataStoreKeys.PLATES_JSON]?.let {
+                json.decodeFromString<List<Plate>>(it)
+              } ?: emptyList()
+            } catch (e: SerializationException) {
+              // Handle corrupted data by returning an empty list
+              emptyList()
+            }
 
           // Deserialize Barbells list
-          val barbellsList: List<Barbell> = try {
-            preferences[UserProfileDataStoreKeys.BARBELLS_JSON]?.let {
-              json.decodeFromString<List<Barbell>>(it)
-            } ?: emptyList()
-          } catch (e: SerializationException) {
-            emptyList()
-          }
+          val barbellsList: List<Barbell> =
+            try {
+              preferences[UserProfileDataStoreKeys.BARBELLS_JSON]?.let {
+                json.decodeFromString<List<Barbell>>(it)
+              } ?: emptyList()
+            } catch (e: SerializationException) {
+              emptyList()
+            }
 
           // Deserialize Collars list
-          val collarsList: List<Collar> = try {
-            preferences[UserProfileDataStoreKeys.COLLARS_JSON]?.let {
-              json.decodeFromString<List<Collar>>(it)
-            } ?: emptyList()
-          } catch (e: SerializationException) {
-            emptyList()
-          }
+          val collarsList: List<Collar> =
+            try {
+              preferences[UserProfileDataStoreKeys.COLLARS_JSON]?.let {
+                json.decodeFromString<List<Collar>>(it)
+              } ?: emptyList()
+            } catch (e: SerializationException) {
+              emptyList()
+            }
 
           UserProfile(
             id =
@@ -151,6 +158,11 @@ class UserProfileManager(private val context: Context, private val userRepositor
             email = preferences[UserProfileDataStoreKeys.USER_EMAIL] ?: "user",
             username = preferences[UserProfileDataStoreKeys.USER_USERNAME] ?: "user",
             password = preferences[UserProfileDataStoreKeys.USER_PASSWORD] ?: "password",
+            endpointUrl =
+              if (preferences[UserProfileDataStoreKeys.USER_ENDPOINT_URL].isNullOrBlank()) null
+              else preferences[UserProfileDataStoreKeys.USER_ENDPOINT_URL],
+            imageUri = if (preferences[UserProfileDataStoreKeys.USER_IMAGE].isNullOrBlank()) null
+            else preferences[UserProfileDataStoreKeys.USER_IMAGE],
             defaultWeightUnit =
               MassUnit.fromString(preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT]),
             intensity =
@@ -163,7 +175,7 @@ class UserProfileManager(private val context: Context, private val userRepositor
             barbells = barbellsList,
             collars = collarsList,
             authToken = preferences[UserProfileDataStoreKeys.AUTH_TOKEN],
-            isLoggedIn = preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] ?: false
+            isLoggedIn = preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] ?: false,
           )
         }
         .distinctUntilChanged() // Only emit if the profile actually changed
@@ -218,6 +230,8 @@ class UserProfileManager(private val context: Context, private val userRepositor
         preferences[UserProfileDataStoreKeys.USER_EMAIL] = newProfile.email ?: name.random()
         preferences[UserProfileDataStoreKeys.USER_USERNAME] = newProfile.username ?: ""
         preferences[UserProfileDataStoreKeys.USER_PASSWORD] = newProfile.password ?: ""
+        preferences[UserProfileDataStoreKeys.USER_ENDPOINT_URL] = newProfile.endpointUrl ?: ""
+        preferences[UserProfileDataStoreKeys.USER_IMAGE] = newProfile.imageUri ?: ""
         preferences[UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT] =
           newProfile.defaultWeightUnit.abbreviation
         preferences[UserProfileDataStoreKeys.DEFAULT_INTENSITY] = newProfile.intensity
@@ -228,8 +242,7 @@ class UserProfileManager(private val context: Context, private val userRepositor
         preferences[UserProfileDataStoreKeys.PLATES_JSON] = json.encodeToString(newProfile.plates)
         preferences[UserProfileDataStoreKeys.BARBELLS_JSON] =
           json.encodeToString(newProfile.barbells)
-        preferences[UserProfileDataStoreKeys.COLLARS_JSON] =
-          json.encodeToString(newProfile.collars)
+        preferences[UserProfileDataStoreKeys.COLLARS_JSON] = json.encodeToString(newProfile.collars)
         preferences[UserProfileDataStoreKeys.AUTH_TOKEN] = newProfile.authToken ?: ""
         preferences[UserProfileDataStoreKeys.IS_LOGGED_IN] = true
       }
@@ -251,6 +264,8 @@ class UserProfileManager(private val context: Context, private val userRepositor
         preferences.remove(UserProfileDataStoreKeys.USER_EMAIL)
         preferences.remove(UserProfileDataStoreKeys.USER_USERNAME)
         preferences.remove(UserProfileDataStoreKeys.USER_PASSWORD)
+        preferences.remove(UserProfileDataStoreKeys.USER_ENDPOINT_URL)
+        preferences.remove(UserProfileDataStoreKeys.USER_IMAGE)
         preferences.remove(UserProfileDataStoreKeys.DEFAULT_WEIGHT_UNIT)
         preferences.remove(UserProfileDataStoreKeys.DEFAULT_INTENSITY)
         preferences.remove(UserProfileDataStoreKeys.ROUNDING_PREFERENCE_LBS)

@@ -858,10 +858,11 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
       EditProfileScreen(
         profileViewModel = profileViewModel,
         onNavigateBack = { navController.popBackStack() },
-        onSaveChanges = { name, username, email, password ->
+        onSaveChanges = { name, username, email, password, imageUri ->
           profileViewModel.updateName(name)
           profileViewModel.updateUsername(username)
           profileViewModel.updateEmail(email)
+          profileViewModel.updateUserProfileImage(imageUri)
           if (password.isNotBlank()) { // Only update password if something is entered
             profileViewModel.updatePassword(password)
           }

@@ -3,6 +3,8 @@
 package com.example.myapplication.features.userProfileScreen.like.strengthLog
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -40,22 +42,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.example.myapplication.R
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
 
 @Preview(showBackground = true)
 @Composable
 fun EditProfileScreenPreview() {
-//  MyApplicationTheme { EditProfileScreen() }
+  //  MyApplicationTheme { EditProfileScreen() }
 }
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun EditProfileScreenPreviewDarkMode() {
-//  MyApplicationTheme { EditProfileScreen() }
+  //  MyApplicationTheme { EditProfileScreen() }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,17 +69,22 @@ fun EditProfileScreenPreviewDarkMode() {
 fun EditProfileScreen(
   profileViewModel: ProfileViewModel,
   onNavigateBack: () -> Unit = {},
-  onSaveChanges: (name: String, username: String, email: String, password: String) -> Unit =
-    { _, _, _, _ ->
+  onSaveChanges:
+    (name: String, username: String, email: String, password: String, imageUri: Uri?) -> Unit =
+    { _, _, _, _, _ ->
     },
 ) {
+  val context = LocalContext.current
+  val userProfileState by profileViewModel.userProfile.collectAsState()
 
+  val imageUri = remember { mutableStateOf<Uri?>(userProfileState.imageUri?.toUri()) }
   val pickMedia =
     rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
       // Callback is invoked after the user selects a media item or closes the
       // photo picker.
       if (uri != null) {
         Log.d("PhotoPicker", "Selected URI: $uri")
+        imageUri.value = uri
         // TODO save the selected image URI or image bitmap to app data
         //   Potentially: profileViewModel.updateProfilePicture(uri)
       } else {
@@ -84,8 +95,6 @@ fun EditProfileScreen(
   fun selectImage() {
     pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
   }
-
-  val userProfileState by profileViewModel.userProfile.collectAsState()
 
   var name by remember { mutableStateOf("") }
   var username by remember { mutableStateOf("") }
@@ -110,7 +119,7 @@ fun EditProfileScreen(
         actions = {
           TextButton(
             onClick = {
-              onSaveChanges(name, username, email, password)
+              onSaveChanges(name, username, email, password, imageUri.value)
               onNavigateBack()
               // TODO: Add navigation back or success message (e.g., using a Snackbar)
             }
@@ -130,28 +139,54 @@ fun EditProfileScreen(
     ) {
       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Box {
-          // TODO: Load actual profile picture, e.g., from userProfileState?.profilePictureUri
-          if (true) {
-            Image(
-              painterResource(R.drawable.guy_fawkes_mask), // Placeholder
-              modifier = Modifier
-                .padding(8.dp)
-                .size(200.dp)
-                .clip(shape = CircleShape),
-              contentDescription = "profile picture",
-            )
-          } else {
-            Icon(
-              imageVector = Icons.Filled.AccountCircle,
-              tint = MaterialTheme.colorScheme.outlineVariant,
-              modifier =
-                Modifier
-                  //                .padding(8.dp)
+          var image: ImageBitmap? = null
+
+          imageUri.value?.let {
+            context.contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
+              parcelFileDescriptor?.fileDescriptor?.let { fileDescriptor ->
+                image = BitmapFactory.decodeFileDescriptor(fileDescriptor).asImageBitmap()
+              }
+            }
+          }
+
+          Log.i("EditProfileScreen", "imageFile: $image")
+          Log.i("EditProfileScreen", "imageFile exists: ${image}")
+          when {
+            image != null -> {
+              Image(
+                bitmap = image,
+                modifier = Modifier
+                  .padding(8.dp)
                   .size(200.dp)
                   .clip(shape = CircleShape),
-              //                .background(color = MaterialTheme.colorScheme.outlineVariant)
-              contentDescription = "profile picture",
-            )
+                contentDescription = "profile picture",
+              )
+            }
+
+            true -> {
+              Image(
+                painterResource(R.drawable.guy_fawkes_mask), // Placeholder
+                modifier = Modifier
+                  .padding(8.dp)
+                  .size(200.dp)
+                  .clip(shape = CircleShape),
+                contentDescription = "profile picture",
+              )
+            }
+
+            else -> {
+              Icon(
+                imageVector = Icons.Filled.AccountCircle,
+                tint = MaterialTheme.colorScheme.outlineVariant,
+                modifier =
+                  Modifier
+                    //                .padding(8.dp)
+                    .size(200.dp)
+                    .clip(shape = CircleShape),
+                //                .background(color = MaterialTheme.colorScheme.outlineVariant)
+                contentDescription = "profile picture",
+              )
+            }
           }
           IconButton(
             onClick = { selectImage() },

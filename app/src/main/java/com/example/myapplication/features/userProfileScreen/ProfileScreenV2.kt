@@ -2,6 +2,8 @@
 
 package com.example.myapplication.features.userProfileScreen
 
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,10 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Workout
@@ -72,8 +78,23 @@ fun ProfileScreenV2(
   navigateToWeeklyReport: () -> Unit,
 ) {
   // TODO REWRITE THIS
+  val context = LocalContext.current
   val user by profileViewModel.userProfile.collectAsState()
   val uiState by profileViewModel.analyticsUiState.collectAsStateWithLifecycle()
+
+  val image = remember { mutableStateOf<ImageBitmap?>(null) }
+  Log.i("ProfileScreenV2", "user.imageUri: ${user.imageUri}")
+  user.imageUri?.toUri()?.apply {
+    try {
+      context.contentResolver.openFileDescriptor(this, "r").use { parcelFileDescriptor ->
+        parcelFileDescriptor?.fileDescriptor?.let { fileDescriptor ->
+          image.value = BitmapFactory.decodeFileDescriptor(fileDescriptor).asImageBitmap()
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("ProfileScreenV2", "Error loading image: ${e.message}")
+    }
+  }
 
   profileViewModel.getWorkoutAnalyticsForPeriod(uiState.initStartDateWeek, uiState.initEndDateWeek)
   profileViewModel.getWorkoutAnalyticsForLifetime()
@@ -110,14 +131,25 @@ fun ProfileScreenV2(
         verticalArrangement = Arrangement.spacedBy(0.dp),
       ) {
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-          Image(
-            painterResource(R.drawable.guy_fawkes_mask),
-            modifier = Modifier
-              .padding(8.dp)
-              .size(200.dp)
-              .clip(shape = CircleShape),
-            contentDescription = "profile picture",
-          )
+          if (image.value != null) {
+            Image(
+              bitmap = image.value!!,
+              modifier = Modifier
+                .padding(8.dp)
+                .size(200.dp)
+                .clip(shape = CircleShape),
+              contentDescription = "profile picture",
+            )
+          } else {
+            Image(
+              painterResource(R.drawable.guy_fawkes_mask), // Placeholder
+              modifier = Modifier
+                .padding(8.dp)
+                .size(200.dp)
+                .clip(shape = CircleShape),
+              contentDescription = "profile picture",
+            )
+          }
           Text(
             text = user.name ?: "MISSING",
             fontSize = MaterialTheme.typography.titleLarge.fontSize,

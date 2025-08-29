@@ -2,6 +2,7 @@
 
 package com.example.myapplication.features.userProfileScreen
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
@@ -240,6 +241,13 @@ constructor(
   fun updatePassword(password: String) {
     _userProfile.value.let { currentUserProfile ->
       _userProfile.value = currentUserProfile.copy(password = password)
+    }
+  }
+
+  fun updateUserProfileImage(imageUri: Uri?) {
+    if (imageUri == null) return
+    _userProfile.value.let { currentUserProfile ->
+      _userProfile.value = currentUserProfile.copy(imageUri = imageUri.toString())
     }
   }
 

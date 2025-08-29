@@ -58,7 +58,7 @@ data class UserProfile(
   var email: String? = null,
   var password: String? = null,
   var endpointUrl: String? = null,
-  var imageURI: String? = null,
+  var imageUri: String? = null,
   var defaultWeightUnit: MassUnit = MassUnit.POUNDS,
   var intensity: String = Intensity.RIR.abbreviation, // TODO have enum class??????
   var roundingPreferencePounds: Double = 5.0,
@@ -78,6 +78,9 @@ object UserProfileDataStoreKeys {
   val USER_EMAIL = stringPreferencesKey("user_email")
   val USER_USERNAME = stringPreferencesKey("user_username")
   val USER_PASSWORD = stringPreferencesKey("user_password")
+
+  val USER_ENDPOINT_URL = stringPreferencesKey("user_endpoint_url")
+  val USER_IMAGE = stringPreferencesKey("user_image")
   val DEFAULT_WEIGHT_UNIT = stringPreferencesKey("default_weight_unit")
   val DEFAULT_INTENSITY = stringPreferencesKey("default_intensity")
   val ROUNDING_PREFERENCE_LBS = doublePreferencesKey("rounding_preference_lbs")
