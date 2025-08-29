@@ -18,22 +18,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -97,17 +89,17 @@ fun HistoryScreen(
         navigationIcon = {},
         actions = {
           val iconColors = IconButtonDefaults.iconButtonColors()
-          IconButton(
+          /*IconButton(
             onClick = { setSearchBarVisibility(!searchBarVisibility) },
             enabled = true,
             colors = iconColors,
           ) {
             Icon(
-              imageVector = Icons.Outlined.Search,
+              imageVector = Icons.Outlined.DateRange,
               tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Search Workouts",
+              contentDescription = "Filter Dates",
             )
-          }
+          }*/
           //          TODO ExercisesFilterMenu(/*modifier =
           // Modifier.align(Alignment.CenterVertically)*/ )
           //          TODO ExerciseOptionsDropdownMenu()
@@ -117,10 +109,10 @@ fun HistoryScreen(
     bottomBar = { bottomNavigationBar() },
     content = { contentPadding ->
       Column(Modifier.padding(contentPadding)) {
-        SearchBar(
+        /*SearchBar(
           inputField = {
             SearchBarDefaults.InputField(
-              query = "TODO", /* TODO query */
+              query = "TODO", *//* TODO query *//*
               onQueryChange = {
                 //            query = it
                 //         TODO filterExercises(it)
@@ -149,7 +141,7 @@ fun HistoryScreen(
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
           windowInsets = WindowInsets(0.dp),
-        ) {}
+        ) {}*/
 
 
         if (workouts.isNotEmpty()) {
