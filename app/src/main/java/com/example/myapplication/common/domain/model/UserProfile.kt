@@ -57,6 +57,8 @@ data class UserProfile(
   var username: String? = null,
   var email: String? = null,
   var password: String? = null,
+  var endpointUrl: String? = null,
+  var imageURI: String? = null,
   var defaultWeightUnit: MassUnit = MassUnit.POUNDS,
   var intensity: String = Intensity.RIR.abbreviation, // TODO have enum class??????
   var roundingPreferencePounds: Double = 5.0,
