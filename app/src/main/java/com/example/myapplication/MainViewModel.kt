@@ -28,7 +28,7 @@ class MainViewModel(
 
   val startDatabase: () -> Unit = {
     Log.i("MainViewModel", "startDatabase called")
-    viewModelScope.launch(Dispatchers.IO) {
+//    viewModelScope.launch(Dispatchers.IO) {
       databaseManager.initializeDatabases(/*authService.getCurrentUser()*/)
 
       /*when (replicationStatus.value) {
@@ -93,7 +93,7 @@ class MainViewModel(
           replicatorService.stopReplication()
         }
       }*/
-    }
+//    }
   }
 
   val closeDatabase: () -> Unit = {
