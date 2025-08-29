@@ -27,6 +27,7 @@ class DatabaseManager(private val context: Context) {
   fun initializeDatabases(
 //            currentUser: User
   ) {
+    Log.i("DatabaseManager", "DatabaseManager.initializeDatabases()")
     try {
       val dbConfig = DatabaseConfigurationFactory.newConfig(context.filesDir.toString())
 
