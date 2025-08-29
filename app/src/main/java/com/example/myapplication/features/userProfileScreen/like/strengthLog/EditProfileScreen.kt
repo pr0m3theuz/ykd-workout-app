@@ -62,6 +62,7 @@ fun EditProfileScreenPreviewDarkMode() {
 @Composable
 fun EditProfileScreen(
   profileViewModel: ProfileViewModel,
+  onNavigateBack: () -> Unit = {},
   onSaveChanges: (name: String, username: String, email: String, password: String) -> Unit =
     { _, _, _, _ ->
     },
@@ -110,6 +111,7 @@ fun EditProfileScreen(
           TextButton(
             onClick = {
               onSaveChanges(name, username, email, password)
+              onNavigateBack()
               // TODO: Add navigation back or success message (e.g., using a Snackbar)
             }
           ) {
