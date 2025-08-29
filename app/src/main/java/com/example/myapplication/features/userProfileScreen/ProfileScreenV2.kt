@@ -126,7 +126,7 @@ fun ProfileScreenV2(
 
         // Tab Layout
         // Tab Layout
-        var selectedTabIndex by remember { mutableStateOf(0) }
+        var selectedTabIndex by remember { mutableStateOf(1) }
         val tabs = listOf("Activity", "Stats")
 
         SecondaryTabRow(selectedTabIndex) {
