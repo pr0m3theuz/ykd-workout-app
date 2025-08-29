@@ -69,7 +69,6 @@ import com.example.myapplication.features.history.ui.EditWorkoutScreen
 import com.example.myapplication.features.history.ui.HistoryScreen
 import com.example.myapplication.features.history.ui.WorkoutOverview
 import com.example.myapplication.features.history.ui.WorkoutOverviewContent
-import com.example.myapplication.features.homeScreen.HomeScreen
 import com.example.myapplication.features.importWorkoutProgram.ImportWorkoutProgramScreen
 import com.example.myapplication.features.previewNextWorkout.PreviewNextWorkoutScreen
 import com.example.myapplication.features.program.ui.ProgramDetailsScreen
@@ -157,6 +156,10 @@ class MainActivity : ComponentActivity() {
 
     userProfileManager = inject<UserProfileManager>(UserProfileManager::class.java).value
     Log.d("MainActivity", "MainActivity.onCreate(): userProfileManager: $userProfileManager")
+    Log.d(
+      "MainActivity",
+      "MainActivity.onCreate(): current user: ${userProfileManager.getCurrentUser()}"
+    )
     val authService: AuthenticationService by inject()
     // TODO Add User Profile Manager here by injecting it
     //      val userProfileRepository: KeyValueRepository by inject()
@@ -214,10 +217,10 @@ class MainActivity : ComponentActivity() {
           }
         }
         // <<< --- END OF LOGGING --- >>>
+        mainViewModel.startDatabase()
+//        MainView(mainViewModel.startDatabase, mainViewModel.closeDatabase)
 
-        MainView(mainViewModel.startDatabase, mainViewModel.closeDatabase)
-
-        NavHost(navController = navController, startDestination = Screens.Replicator.route) {
+        NavHost(navController = navController, startDestination = Screens.Programs.route) {
           addExercisesGraph(navController)
           addWorkoutGraph(navController)
           addWorkoutSummaryGraph(navController)
@@ -225,7 +228,7 @@ class MainActivity : ComponentActivity() {
           addHistoryGraph(navController)
           addProfileGraph(navController)
           addReplicatorGraph(navController)
-          navigation("homeScreen", route = "home") { composable("homeScreen") { HomeScreen() } }
+//          navigation("homeScreen", route = "home") { composable("homeScreen") { HomeScreen() } }
         }
       }
     }
@@ -854,6 +857,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
 
       EditProfileScreen(
         profileViewModel = profileViewModel,
+        onNavigateBack = { navController.popBackStack() },
         onSaveChanges = { name, username, email, password ->
           profileViewModel.updateName(name)
           profileViewModel.updateUsername(username)
