@@ -83,6 +83,10 @@ class ReplicatorServiceImpl(
     } else {
       replicationConfig.value.username = loggedInUser.username ?: "user"
       replicationConfig.value.password = loggedInUser.password ?: "password"
+      Log.i(
+        "ReplicatorServiceImpl.updateAuthentication",
+        "databaseManager.database == null: ${databaseManager.database == null}"
+      )
       databaseManager.database?.let { replicatorManager = ReplicatorManager(it) }
     }
   }
