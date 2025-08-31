@@ -6,11 +6,13 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.Exercise
+import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.WorkoutItem
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
+import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
 import com.example.myapplication.features.workout.ManageExercisesUseCase
 import com.example.myapplication.features.workout.ManageWorkoutUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,6 +35,7 @@ class HistoryViewModel(
   private val manageExercisesUseCase: ManageExercisesUseCase,
   private val completedWorkoutRepository: CompletedWorkoutRepository,
   private val exerciseRepository: ExercisesRepository,
+  private val programsRepository: ProgramsRepository,
 ) : ViewModel() {
   val userDefaultWeightUnit: String = manageWorkoutUseCase.userDefaultWeightUnit
 
@@ -51,6 +54,10 @@ class HistoryViewModel(
   val workouts: StateFlow<List<Workout>>
     get() = _workouts.asStateFlow()
 
+  private val _programs: MutableStateFlow<List<Program>> = MutableStateFlow(emptyList())
+  val programs: StateFlow<List<Program>>
+    get() = _programs.asStateFlow()
+
   private var _workout: MutableStateFlow<Workout?> = MutableStateFlow(null)
   val workout
     get() = _workout.asStateFlow()
@@ -65,6 +72,10 @@ class HistoryViewModel(
         completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
           ?: emptyList()
       }
+    }
+
+    viewModelScope.launch {
+      programsRepository.getAllDistinctProgramTemplates().collect { _programs.value = it }
     }
   }
 
@@ -94,9 +105,9 @@ class HistoryViewModel(
 
       // Update workouts list
       _workouts.update {
-        completedWorkoutRepository.getCompletedWorkouts()
-          ?.sortedByDescending { workout -> workout.workoutEnded }
-          ?: emptyList()
+        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { workout ->
+          workout.workoutEnded
+        } ?: emptyList()
       }
     }
   }
