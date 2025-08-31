@@ -525,8 +525,8 @@ fun HistoryTab(
     { _, _, _ ->
     },
 ) {
-  //    TODO Write query to get Workout Data for an Exercise, return a List
-  //    TODO Change to LazyColumn
+  // TODO navigate to workout screen or workout overview screen on click
+
   LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
     items(
       workoutSetsMap.count(),

@@ -27,20 +27,22 @@ class DatabaseManager(private val context: Context) {
   fun initializeDatabases(
 //            currentUser: User
   ) {
+    val filesDir = context.filesDir
     Log.i("DatabaseManager", "DatabaseManager.initializeDatabases()")
+    Log.d("DatabaseManager", "database exists: ${!Database.exists(databaseName, context.filesDir)}")
+
     try {
-      val dbConfig = DatabaseConfigurationFactory.newConfig(context.filesDir.toString())
+      val dbConfig = DatabaseConfigurationFactory.newConfig("$filesDir")
 
       val bundledDatabaseName = "${databaseName}.zip"
       // create or open a database to share between team members to store
       // projects, assets, and user profiles
       // calculate database name based on current logged in users team name
 
-
       if (!Database.exists(databaseName, context.filesDir)) {
-        unzip(bundledDatabaseName, File(context.filesDir.toString()))
-        val dbFile = File("${context.filesDir}/${databaseName}.cblite2")
-        Database.copy(dbFile, databaseName, dbConfig)
+        unzip(bundledDatabaseName, File("$filesDir"))
+//        val dbFile = File("$filesDir/$databaseName.cblite2")
+//        Database.copy(dbFile, databaseName, dbConfig)
       }
       database = Database(databaseName, dbConfig)
 

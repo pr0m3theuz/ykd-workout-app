@@ -212,7 +212,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       val workouts =
         completedWorkoutQuery.execute().allResults().map {
-          Log.d("CompletedWorkoutRepositoryImpl.getCompletedWorkouts()", it.toJSON())
+//          Log.d("CompletedWorkoutRepositoryImpl.getCompletedWorkouts()", it.toJSON())
           withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it.toJSON()).CompletedWorkouts
         }
 
