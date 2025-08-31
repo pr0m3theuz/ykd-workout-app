@@ -72,11 +72,11 @@ class ReplicatorServiceImpl(
     get() = _canStartReplication.asStateFlow()
 
   override fun updateAuthentication(isReset: Boolean) {
-    Log.i("ReplicatorServiceImpl.updateAuthentication", "updateReplicationConfig() called")
-    Log.i(
-      "ReplicatorServiceImpl.updateAuthentication",
-      "ReplicatorServiceImpl.updateAuthentication(): loggedInUser: $loggedInUser\nReplicatorService: $this"
-    )
+//    Log.i("ReplicatorServiceImpl.updateAuthentication", "updateReplicationConfig() called")
+//    Log.i(
+//      "ReplicatorServiceImpl.updateAuthentication",
+//      "ReplicatorServiceImpl.updateAuthentication(): loggedInUser: $loggedInUser\nReplicatorService: $this"
+//    )
 //    loggedInUser = userProfileManager.getCurrentUser()
     if (isReset) {
       replicationConfig.value.username = ""
@@ -84,16 +84,16 @@ class ReplicatorServiceImpl(
     } else {
       replicationConfig.value.username = loggedInUser.username ?: "user"
       replicationConfig.value.password = loggedInUser.password ?: "password"
-      Log.i(
-        "ReplicatorServiceImpl.updateAuthentication",
-        "databaseManager.database == null: ${databaseManager.database == null}"
-      )
+//      Log.i(
+//        "ReplicatorServiceImpl.updateAuthentication",
+//        "databaseManager.database == null: ${databaseManager.database == null}"
+//      )
       databaseManager.database?.let { replicatorManager = ReplicatorManager(it) }
     }
   }
 
   override fun updateReplicationConfig(replicationConfig: ReplicatorConfig) {
-    Log.i("updateReplicationConfig()", "called")
+//    Log.i("updateReplicationConfig()", "called")
     updateAuthentication(false)
     if (
       replicatorManager?.replicatorConfiguration == null ||
