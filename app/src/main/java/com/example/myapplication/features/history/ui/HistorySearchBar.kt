@@ -135,7 +135,7 @@ fun HistorySearchBar(
             onSearch(query)
             expanded = false
           },
-          expanded = expanded,
+          expanded = true,
           onExpandedChange = {
             expanded = it
             onDismissRequest
@@ -145,7 +145,7 @@ fun HistorySearchBar(
           trailingIcon = trailingIcon,
         )
       },
-      expanded = expanded,
+      expanded = true,
       onExpandedChange = {
         expanded = it
         onDismissRequest()
