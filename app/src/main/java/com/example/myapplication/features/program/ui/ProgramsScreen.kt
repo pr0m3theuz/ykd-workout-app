@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,12 +48,17 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -92,11 +98,13 @@ fun ProgramsScreen(
   val scrollState = rememberScrollState()
 
   val (programVisible, setProgramVisible) = rememberSaveable { mutableStateOf(true) }
+  val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
   val (mesocycleVisible, setMesocycleVisible) = rememberSaveable { mutableStateOf(false) }
   val (workoutVisible, setWorkoutVisible) = rememberSaveable { mutableStateOf(false) }
 
   //  TODO Get unique list of programs
   val programs by programsViewModel.programs.collectAsState()
+  val authorsMap by programsViewModel.authorsMap.collectAsState()
   val activePrograms by
   programsViewModel.activePrograms.collectAsState() // TODO Get List of Active Programs
 
@@ -111,310 +119,405 @@ fun ProgramsScreen(
   val toastMessage = programsViewModel.toastMessage.collectAsStateWithLifecycle("")
 
   if (toastMessage.value.isNotEmpty()) {
-    Snackbar {
-      Text(text = toastMessage.value)
+    Snackbar { Text(text = toastMessage.value) }
+  }
+
+  var query by rememberSaveable { mutableStateOf("") }
+  //  val programs by remember { mutableStateOf(relevantPrograms) }
+  val dateRangePickerState = rememberDateRangePickerState()
+
+  val levels = listOf("Beginner", "Intermediate", "Advanced")
+
+  val levelsMap = remember {
+    levels.zip(List(levels.size, { false })).toMutableStateMap()
+  }
+
+  val selectedAuthors = remember { mutableStateListOf<String>() }
+  val selectedLevels = remember { mutableStateListOf<String>() }
+
+  fun selectAuthor(author: String, isSelected: Boolean) {
+    programsViewModel.selectAuthor(author, isSelected)
+    if (isSelected) {
+      selectedAuthors.add(author)
+    } else {
+      selectedAuthors.remove(author)
     }
   }
 
-  Scaffold(
-    modifier = Modifier.imePadding(),
-    topBar = {
-      TopAppBar(
-        title = { Text(text = "Programs", style = MaterialTheme.typography.titleLarge) },
-        navigationIcon = {
-          /* IconButton(
-            onClick = { navController.navigateUp() },
-          ) {
-            Icon(
-              imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-              tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen"
-            )
-          }*/
-        },
-//        actions = { ProgramDetailsOptionsDropdownMenu() },
-      )
-    },
-    bottomBar = {
-      BottomNavigationBar(
-        currentDestination = currentDestination,
-        onNavigate = onNavigateBottomBar,
-      )
-    },
-  ) { contentPadding ->
-    LazyColumn(
-      contentPadding = contentPadding,
-      modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .padding(horizontal = 12.dp),
-      //      verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-//      stickyHeader { WorkoutSearchBar() } // TODO Implement Search & Filtering
+  fun selectLevel(level: String, isSelected: Boolean) {
+    levelsMap[level] = isSelected
+    if (isSelected) {
+      selectedLevels.add(level)
+    } else {
+      selectedLevels.remove(level)
+    }
+  }
 
-      item {
-        Text("Quick Start", style = titleMedium, modifier = Modifier.padding(top = 16.dp))
-        Button(
-          onClick = {
-            // TODO Navigate to Workout Screen
-            navController.navigate(Screens.Workout.baseRoute) {
-              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-              // Avoid multiple copies of the same destination when
-              // reselecting the same item
-              launchSingleTop = true
-              // Restore state when reselecting a previously selected item
-              restoreState = true
+  val searchResults by remember {
+    derivedStateOf {
+      if (query.isEmpty() && selectedAuthors.isEmpty() && selectedLevels.isEmpty()
+      // &&
+      // dateRangePickerState.selectedStartDateMillis == null &&
+      // dateRangePickerState.selectedEndDateMillis == null
+      ) {
+        programs
+      } else {
+        val filteredAuthors = programs.filter { selectedAuthors.contains(it.author) }
+        val filteredLevels =
+          programs.filter {
+            selectedLevels.any { level -> it.level?.contains(level, ignoreCase = true) ?: false }
+          }
+
+        val filteredName =
+          if (query.isNotEmpty()) {
+            programs.filter { it.name?.contains(query, ignoreCase = true) == true }
+          } else emptyList()
+
+        val uniqueFilteredWorkouts =
+          (filteredName + filteredAuthors + filteredLevels).distinctBy { it.id }
+        return@derivedStateOf uniqueFilteredWorkouts
+      }
+    }
+  }
+
+  if (searchBarVisibility) {
+    ProgramSearchBar(
+      query = query,
+      onQueryChange = { query = it },
+      onSearch = {},
+      searchResults = searchResults,
+      authors = authorsMap.toMap(),
+      levels = levelsMap.toMap(),
+      onResultClick = { program ->
+        navController.navigate(
+          "programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}"
+        )
+      },
+      onAuthorSelected = { author, isSelected -> selectAuthor(author, isSelected) },
+      onLevelSelected = { level, isSelected -> selectLevel(level, isSelected) },
+      onDismissRequest = { setSearchBarVisibility(false) },
+    )
+  } else {
+    Scaffold(
+      modifier = Modifier.imePadding(),
+      topBar = {
+        TopAppBar(
+          title = { Text(text = "Programs", style = MaterialTheme.typography.titleLarge) },
+          navigationIcon = {
+            /* IconButton(
+              onClick = { navController.navigateUp() },
+            ) {
+              Icon(
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                tint = MaterialTheme.colorScheme.onSurface,
+                contentDescription = "Go to the previous screen"
+              )
+            }*/
+          },
+          actions = {
+            //          ProgramDetailsOptionsDropdownMenu()
+            IconButton(onClick = { setSearchBarVisibility(true) }, enabled = true) {
+              Icon(
+                imageVector = Icons.Outlined.Search,
+                tint = MaterialTheme.colorScheme.onSurface,
+                contentDescription = "Search workouts",
+              )
+            }
+          },
+        )
+      },
+      bottomBar = {
+        BottomNavigationBar(
+          currentDestination = currentDestination,
+          onNavigate = onNavigateBottomBar,
+        )
+      },
+    ) { contentPadding ->
+      LazyColumn(
+        contentPadding = contentPadding,
+        modifier = Modifier
+          .fillMaxWidth()
+          .fillMaxHeight()
+          .padding(horizontal = 12.dp),
+        //      verticalArrangement = Arrangement.spacedBy(12.dp)
+      ) {
+        //      stickyHeader { WorkoutSearchBar() } // TODO Implement Search & Filtering
+
+        item {
+          Text("Quick Start", style = titleMedium, modifier = Modifier.padding(top = 16.dp))
+          Button(
+            onClick = {
+              // TODO Navigate to Workout Screen
+              navController.navigate(Screens.Workout.baseRoute) {
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            }
+          ) {
+            Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
+            Text(text = "Start An Empty Workout")
+          }
+        }
+
+        item {
+          if (activePrograms.isEmpty()) {
+            // TODO Change back to activeProgram == null
+            //   Row(modifier = Modifier.padding(top = 16.dp)) {
+            //     Text("Start a Program", style = titleMedium)
+            //     // TODO No Active Programs Card
+            //   }
+          } else {
+            Row(modifier = Modifier.padding(top = 16.dp)) {
+              Text("Continue Program", style = titleMedium)
             }
           }
-        ) {
-          Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
-          Text(text = "Start An Empty Workout")
         }
-      }
 
-      item {
-        if (activePrograms.isEmpty()) { // TODO Change back to activeProgram == null
-//          Row(modifier = Modifier.padding(top = 16.dp)) {
-//            Text("Start a Program", style = titleMedium)
-//            // TODO No Active Programs Card
-//          }
-        } else {
-          Row(modifier = Modifier.padding(top = 16.dp)) {
-            Text("Continue Program", style = titleMedium)
-          }
-        }
-      }
+        item {
+          // TODO Implement Horizontal Pager/LazyRow
+          // https://developer.android.com/jetpack/compose/layouts/pager
+          val pagerState = rememberPagerState(pageCount = { activePrograms.size })
+          HorizontalPager(
+            state = pagerState,
+            pageSpacing = 8.dp,
+            contentPadding = PaddingValues(0.dp),
+          ) { page ->
+            activePrograms[page].let { program ->
+              Column(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(vertical = 0.dp),
+                verticalArrangement = Arrangement.spacedBy(padding8),
+              ) {
+                if (activePrograms.isEmpty()) {
+                  // TODO Change back to activeProgram == null
+                  // Text("Start a Program", style = titleMedium)
+                  // TODO No Active Programs Card
+                } else {
+                  // Text("Continue Program", style = titleMedium)
+                  val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program.id)
+                  // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
 
-      item {
-        // TODO Implement Horizontal Pager/LazyRow
-        // https://developer.android.com/jetpack/compose/layouts/pager
-        val pagerState = rememberPagerState(pageCount = { activePrograms.size })
-        HorizontalPager(
-          state = pagerState,
-          pageSpacing = 8.dp,
-          contentPadding = PaddingValues(0.dp),
-        ) { page ->
-          activePrograms[page].let { program ->
-            Column(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 0.dp),
-              verticalArrangement = Arrangement.spacedBy(padding8)
-            ) {
-              if (activePrograms.isEmpty()) {
-                // TODO Change back to activeProgram == null
-                // Text("Start a Program", style = titleMedium)
-                // TODO No Active Programs Card
-              } else {
-                // Text("Continue Program", style = titleMedium)
-                val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program.id)
-                // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
-
-                // TODO resume current workout
-                val currentlyActiveWorkout = programsViewModel.getCurrentlyActiveWorkouts()
-                  .collectAsState(initial = emptyList())
-                if (currentlyActiveWorkout.value.isNotEmpty()) {
-                  currentlyActiveWorkout.value.forEach {
-                    ActiveWorkoutCard(
+                  // TODO resume current workout
+                  val currentlyActiveWorkout =
+                    programsViewModel
+                      .getCurrentlyActiveWorkouts()
+                      .collectAsState(initial = emptyList())
+                  if (currentlyActiveWorkout.value.isNotEmpty()) {
+                    currentlyActiveWorkout.value.forEach {
+                      ActiveWorkoutCard(navController, it, programsViewModel = programsViewModel)
+                    }
+                  }
+                  if (nextWorkout != null) {
+                    CurrentProgramCard(
                       navController,
-                      it,
+                      program,
+                      nextWorkout,
                       programsViewModel = programsViewModel,
+                    )
+                  } else {
+                    Text(
+                      text =
+                        "This program has no workouts or all workouts have been completed. You can start a new program."
                     )
                   }
                 }
-                if (nextWorkout != null) {
-                  CurrentProgramCard(
-                    navController,
-                    program,
-                    nextWorkout,
-                    programsViewModel = programsViewModel,
-                  )
-                } else {
-                  Text(
-                    text =
-                      "This program has no workouts or all workouts have been completed. You can start a new program."
-                  )
-                }
               }
             }
           }
-        }
-        Row(
-          Modifier
-            .height(20.dp)
-            .fillMaxWidth(),
-          //                    .align(Alignment.BottomCenter),
-          //          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Center,
-        ) {
-          repeat(pagerState.pageCount) { iteration ->
-            val primary = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
-            val color =
-              if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
-            Box(
-              modifier = Modifier
+          Row(
+            Modifier
+              .height(20.dp)
+              .fillMaxWidth(),
+            //                    .align(Alignment.BottomCenter),
+            //          verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+          ) {
+            repeat(pagerState.pageCount) { iteration ->
+              val primary = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
+              val color =
+                if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
+              Box(modifier = Modifier
                 .padding(2.dp)
                 .clip(CircleShape)
                 .background(color)
-                .size(8.dp)
-            )
-          }
-        }
-      }
-
-      item {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Text(text = "Programs", style = titleMedium)
-
-          /*Box {
-            Row {
-              IconButton(onClick = { *//*TODO*//* }) {
-                Icon(
-                  imageVector = Icons.Outlined.FileUpload,
-                  contentDescription = "Import/Export New Program",
-                )
-              }
-              IconButton(onClick = { *//*TODO*//* }) {
-                Icon(
-                  imageVector = Icons.Outlined.CreateNewFolder,
-                  contentDescription = "Add New Program",
-                )
-              }
+                .size(8.dp))
             }
-          }*/
+          }
         }
-      }
 
-      /*      item {
-              Button(onClick = { *//*TODO*//* }) {
-          Icon(
-            imageVector = Icons.AutoMirrored.Outlined.Assignment,
-            contentDescription = "Add New Program",
-          )
-          Text(text = "New Program", Modifier.padding(start = 8.dp))
+        item {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Text(text = "Programs", style = titleMedium)
+
+            /*Box {
+            Row {
+              IconButton(onClick = { */
+            /*TODO*/
+            /* }) {
+              Icon(
+                imageVector = Icons.Outlined.FileUpload,
+                contentDescription = "Import/Export New Program",
+              )
+            }
+            IconButton(onClick = { */
+            /*TODO*/
+            /* }) {
+                  Icon(
+                    imageVector = Icons.Outlined.CreateNewFolder,
+                    contentDescription = "Add New Program",
+                  )
+                }
+              }
+            }*/
+          }
         }
-      }*/
 
-      item {
+        /*      item {
+        Button(onClick = { */
+        /*TODO*/
+        /* }) {
+            Icon(
+              imageVector = Icons.AutoMirrored.Outlined.Assignment,
+              contentDescription = "Add New Program",
+            )
+            Text(text = "New Program", Modifier.padding(start = 8.dp))
+          }
+        }*/
+
+        item {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            TextButton(
+              onClick = { setProgramVisible(!programVisible) },
+              modifier = Modifier.weight(1f),
+              enabled = true,
+              contentPadding = PaddingValues(0.dp),
+              //            style = MaterialTheme.typography.bodySmall
+            ) {
+              Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
+            }
+            IconButton(onClick = { setProgramVisible(!programVisible) }) {
+              Icon(
+                imageVector = getExpandCollapseIcon(programVisible),
+                contentDescription = "Show more programs",
+              )
+            }
+            //          IconButton(onClick = { TODO }) {
+            //            Icon(
+            //              imageVector = Icons.Outlined.MoreVert,
+            //              contentDescription = "Localized Description",
+            //            )
+            //          }
+          }
+        }
+
+        if (programs.isNotEmpty()) {
+          items(programs, key = { it.lazyListItemID }) { programTemplate ->
+            val program = activePrograms.find { it.uuid == programTemplate.uuid } ?: programTemplate
+
+            AnimatedVisibility(
+              visible = programVisible,
+              enter = expandVertically(animationSpec = tween(500)),
+              exit = shrinkVertically(animationSpec = tween(500)),
+            ) {
+              ProgramCard(
+                program = program,
+                onNavigate = {
+                  navController.navigate(
+                    "programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}"
+                  )
+                },
+                programDetailsOptionsDropdownMenu = {
+                  ProgramDetailsOptionsDropdownMenu(
+                    isProgramActive = program.isActive,
+                    onDelete = { programsViewModel.deleteActiveProgram(program) },
+                  )
+                },
+              )
+            }
+          }
+        } else {
+          item {
+            AnimatedVisibility(
+              visible = programVisible,
+              enter = expandVertically(animationSpec = tween(500)),
+              exit = shrinkVertically(animationSpec = tween(500)),
+            ) {
+              Text("No Programs")
+            }
+          }
+        }
+
+        /*      item {
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically,
         ) {
-          TextButton(
-            onClick = { setProgramVisible(!programVisible) },
-            modifier = Modifier.weight(1f),
-            enabled = true,
-            contentPadding = PaddingValues(0.dp),
-            //            style = MaterialTheme.typography.bodySmall
-          ) {
-            Text("Programs (${programs.size})", style = MaterialTheme.typography.bodyLarge)
-          }
-          IconButton(onClick = { setProgramVisible(!programVisible) }) {
+          IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
             Icon(
-              imageVector = getExpandCollapseIcon(programVisible),
-              contentDescription = "Show more programs",
+              imageVector = getExpandCollapseIcon(mesocycleVisible),
+              contentDescription = "Show more mesocycles",
             )
           }
-//          IconButton(onClick = { TODO }) {
-//            Icon(
-//              imageVector = Icons.Outlined.MoreVert,
-//              contentDescription = "Localized Description",
-//            )
-//          }
-        }
-      }
-
-      if (programs.isNotEmpty()) {
-        items(programs, key = { it.lazyListItemID }) { programTemplate ->
-          val program = activePrograms.find { it.uuid == programTemplate.uuid } ?: programTemplate
-
-          AnimatedVisibility(
-            visible = programVisible,
-            enter = expandVertically(animationSpec = tween(500)),
-            exit = shrinkVertically(animationSpec = tween(500)),
-          ) {
-            ProgramCard(
-              program = program,
-              onNavigate = { navController.navigate("programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}") },
-              programDetailsOptionsDropdownMenu = {
-                ProgramDetailsOptionsDropdownMenu(
-                  isProgramActive = program.isActive,
-                  onDelete = { programsViewModel.deleteActiveProgram(program) },
-                )
-              },
-            )
+          Text(text = "Mesocycle (###)")
+          IconButton(onClick = { */
+        /*TODO*/
+        /* }) {
+              Icon(
+                imageVector = Icons.Outlined.MoreVert,
+                contentDescription = "Localized Description",
+              )
+            }
           }
-        }
-      } else {
-        item {
-          AnimatedVisibility(
-            visible = programVisible,
-            enter = expandVertically(animationSpec = tween(500)),
-            exit = shrinkVertically(animationSpec = tween(500)),
-          ) {
-            Text("No Programs")
-          }
-        }
-      }
+        }*/
 
-      /*      item {
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-              ) {
-                IconButton(onClick = { setMesocycleVisible(!mesocycleVisible) }) {
-                  Icon(
-                    imageVector = getExpandCollapseIcon(mesocycleVisible),
-                    contentDescription = "Show more mesocycles",
-                  )
-                }
-                Text(text = "Mesocycle (###)")
-                IconButton(onClick = { *//*TODO*//* }) {
-            Icon(
-              imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description",
-            )
-          }
-        }
-      }*/
-
-      /*      item {
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-              ) {
-                IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
-                  Icon(
-                    imageVector = getExpandCollapseIcon(workoutVisible),
-                    contentDescription = "Show more workouts",
-                  )
-                }
-                Text(text = "Workouts (###)")
-                IconButton(onClick = { *//*TODO*//* }) {
-            Icon(
-              imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description",
-            )
-          }
-        }
-      }
-
-      items(20) {
-        AnimatedVisibility(
-          visible = workoutVisible,
-          enter = expandVertically(animationSpec = tween(500)),
-          exit = shrinkVertically(animationSpec = tween(500)),
+        /*      item {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
         ) {
-          WorkoutCard()
+          IconButton(onClick = { setWorkoutVisible(!workoutVisible) }) {
+            Icon(
+              imageVector = getExpandCollapseIcon(workoutVisible),
+              contentDescription = "Show more workouts",
+            )
+          }
+          Text(text = "Workouts (###)")
+          IconButton(onClick = { */
+        /*TODO*/
+        /* }) {
+              Icon(
+                imageVector = Icons.Outlined.MoreVert,
+                contentDescription = "Localized Description",
+              )
+            }
+          }
         }
-      }*/
+
+        items(20) {
+          AnimatedVisibility(
+            visible = workoutVisible,
+            enter = expandVertically(animationSpec = tween(500)),
+            exit = shrinkVertically(animationSpec = tween(500)),
+          ) {
+            WorkoutCard()
+          }
+        }*/
+      }
     }
   }
 }
@@ -491,11 +594,9 @@ fun WorkoutCard() {
         }
       }
     }
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, bottom = padding)
-    ) {
+    Row(modifier = Modifier
+      .fillMaxWidth()
+      .padding(start = 16.dp, bottom = padding)) {
       Column() {
         // TODO List Exercises
         Text("Workout Summary", style = MaterialTheme.typography.bodySmall)
@@ -508,7 +609,7 @@ fun WorkoutCard() {
 fun ProgramCard(
   program: Program,
   onNavigate: () -> Unit,
-  programDetailsOptionsDropdownMenu: @Composable () -> Unit = {}
+  programDetailsOptionsDropdownMenu: @Composable () -> Unit = {},
 ) {
   val padding = 16.dp
   val titleMedium = MaterialTheme.typography.titleMedium
@@ -522,43 +623,44 @@ fun ProgramCard(
           onNavigate()
         }
   ) {
-//    Row(
-//      modifier = Modifier
-//        .fillMaxWidth()
-//        .padding(padding),
-//      horizontalArrangement = Arrangement.Center,
-//      verticalAlignment = Alignment.CenterVertically,
-//    ) {
-//      Icon(
-//        imageVector = Icons.Outlined.BrokenImage,
-//        contentDescription = "Missing Image",
-//        tint = MaterialTheme.colorScheme.primary,
-//      )
-//    }
+    //    Row(
+    //      modifier = Modifier
+    //        .fillMaxWidth()
+    //        .padding(padding),
+    //      horizontalArrangement = Arrangement.Center,
+    //      verticalAlignment = Alignment.CenterVertically,
+    //    ) {
+    //      Icon(
+    //        imageVector = Icons.Outlined.BrokenImage,
+    //        contentDescription = "Missing Image",
+    //        tint = MaterialTheme.colorScheme.primary,
+    //      )
+    //    }
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 0.dp),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 0.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.Top,
     ) {
-      Column(
-        modifier = Modifier.weight(1f),
-      ) {
+      Column(modifier = Modifier.weight(1f)) {
         Text(text = program.name ?: "New Program", style = titleMedium)
         Text(text = program.author ?: "", style = MaterialTheme.typography.bodyMedium)
       }
       if (program.isActive) {
         Box(
-          modifier = Modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.tertiaryContainer)
-//            .padding(4.dp)
+          modifier =
+            Modifier
+              .clip(CircleShape)
+              .background(MaterialTheme.colorScheme.tertiaryContainer)
+          //            .padding(4.dp)
         ) {
           Text(
-            text = "Active", style = MaterialTheme.typography.titleSmallEmphasized,
+            text = "Active",
+            style = MaterialTheme.typography.titleSmallEmphasized,
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.onTertiaryContainer
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
           )
         }
       }

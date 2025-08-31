@@ -26,7 +26,7 @@ import kotlin.uuid.Uuid
 class ProgramsViewModel
 constructor(
   private val programsRepository: ProgramsRepository,
-//  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
+  //  private val inProgressWorkoutRepository: InProgressWorkoutRepository,
   // TODO Replace workoutRepository
   private val workoutRepository: WorkoutRepository,
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
@@ -49,6 +49,10 @@ constructor(
   val programs: StateFlow<List<Program>>
     get() = _programs
 
+  private val _authorsMap = MutableStateFlow(mutableMapOf<String, Boolean>())
+  val authorsMap: StateFlow<Map<String, Boolean>>
+    get() = _authorsMap
+
   private val _selectedProgram = MutableStateFlow<Program?>(null)
   val selectedProgram: StateFlow<Program?>
     get() = _selectedProgram
@@ -60,7 +64,11 @@ constructor(
   init {
     viewModelScope.launch {
       //      programsRepository.migrateData() // Used to import data
-      programsRepository.getAllDistinctProgramTemplates().collect() { _programs.value = it }
+      programsRepository.getAllDistinctProgramTemplates().collect() {
+        _programs.value = it
+        _authorsMap.value =
+          it.mapNotNull { it.author }.distinct().associateWith { false }.toMutableMap()
+      }
     }
 
     viewModelScope.launch {
@@ -80,9 +88,7 @@ constructor(
   fun getCurrentlyActiveProgramByID(programID: ObjectId): Program? {
     var program: Program? = null
 
-    viewModelScope.launch {
-      program = programsRepository.getProgramByID(programID)
-    }
+    viewModelScope.launch { program = programsRepository.getProgramByID(programID) }
 
     return program
   }
@@ -174,16 +180,19 @@ constructor(
         _selectedProgramMicrocycles.value =
           microcycleList.sortedWith(compareBy({ it.mesocycleID }, { it.order }))
 
-
         _selectedProgramMicrocycles.value.forEach { microcycle ->
           microcycle.workouts =
             workoutRepository.getWorkoutsByMicrocycleID(microcycle, microcycle.id)
         }
 
-        microcycleList.groupBy { it.mesocycleID }.forEach {
-          _selectedProgram.value?.mesocycles?.find { mesocycle -> mesocycle.id == it.key }?.microcycles =
-            it.value
-        }
+        microcycleList
+          .groupBy { it.mesocycleID }
+          .forEach {
+            _selectedProgram.value
+              ?.mesocycles
+              ?.find { mesocycle -> mesocycle.id == it.key }
+              ?.microcycles = it.value
+          }
       }
     }
   }
@@ -210,15 +219,15 @@ constructor(
   }
 
   fun getCurrentlyActiveWorkouts(): Flow<List<Workout>> {
-//    TODO "Implement getCurrentlyActiveWorkouts"
+    //    TODO "Implement getCurrentlyActiveWorkouts"
     TODO()
-//    return inProgressWorkoutRepository.getWorkouts()
+    //    return inProgressWorkoutRepository.getWorkouts()
   }
 
   fun deleteCurrentlyActiveWorkout(workoutID: ObjectId): Boolean {
-//    TODO "Implement deleteCurrentlyActiveWorkout"
+    //    TODO "Implement deleteCurrentlyActiveWorkout"
     TODO()
-//    return false // inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
+    //    return false // inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
   }
 
   fun getProgramData() {
@@ -234,6 +243,10 @@ constructor(
     //        exerciseSetsRepository.getSetsWithExercise(workoutID).toString()
     //      )
     //    }
+  }
+
+  fun selectAuthor(author: String, isSelected: Boolean) {
+    _authorsMap.value[author] = isSelected
   }
 
   //  fun getWorkoutWithSetsAndExerciseByWorkoutID(
