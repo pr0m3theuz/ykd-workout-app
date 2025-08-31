@@ -71,14 +71,13 @@ fun HistoryScreen(
   navigateToWorkoutOverview: (Workout) -> Unit = {},
 ) {
   val workouts by historyViewModel.workouts.collectAsState()
-  val allPrograms by historyViewModel.programs.collectAsState()
-  Log.i("HistoryScreen", "programs count: ${allPrograms.size}")
+  val relevantPrograms by historyViewModel.programs.collectAsState()
+  val programsMap by historyViewModel.programsMap.collectAsState()
+  val authorsMap by historyViewModel.authorsMap.collectAsState()
+
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
-  val programIdsList by remember { derivedStateOf { workouts.map { it.programID }.distinct() } }
-  val relevantPrograms by remember {
-    derivedStateOf { allPrograms.filter { programIdsList.contains(it.id) } }
-  }
+
 
   var query by rememberSaveable { mutableStateOf("") }
   //  val programs by remember { mutableStateOf(relevantPrograms) }
@@ -86,14 +85,10 @@ fun HistoryScreen(
 
   val levels = listOf("Beginner", "Intermediate", "Advanced")
 
-  val falseList = List(relevantPrograms.size, { false })
 
-  val programsMap = relevantPrograms.zip(falseList).toMap().toMutableMap()
-
-  val authorsMap =
-    relevantPrograms.mapNotNull { it.author }.distinct().zip(falseList).toMap().toMutableMap()
-
-  val levelsMap = remember { levels.zip(List(levels.size, { false })).toMutableStateMap() }
+  val levelsMap = remember {
+    levels.zip(List(levels.size, { false })).toMutableStateMap()
+  }
 
   Log.i("HistoryScreen", "programsMap: ${programsMap.size}")
   Log.i("HistoryScreen", "authorsMap: $authorsMap")
@@ -103,27 +98,27 @@ fun HistoryScreen(
   val selectedAuthors = remember { mutableStateListOf<String>() }
   val selectedLevels = remember { mutableStateListOf<String>() }
 
-  fun selectProgram(program: Program, checked: Boolean) {
-    programsMap[program] = checked
-    if (checked) {
+  fun selectProgram(program: Program, isSelected: Boolean) {
+    historyViewModel.selectProgram(program, isSelected)
+    if (isSelected) {
       selectedPrograms.add(program)
     } else {
       selectedPrograms.remove(program)
     }
   }
 
-  fun selectAuthor(author: String, checked: Boolean) {
-    authorsMap[author] = checked
-    if (checked) {
+  fun selectAuthor(author: String, isSelected: Boolean) {
+    historyViewModel.selectAuthor(author, isSelected)
+    if (isSelected) {
       selectedAuthors.add(author)
     } else {
       selectedAuthors.remove(author)
     }
   }
 
-  fun selectLevel(level: String, checked: Boolean) {
-    levelsMap[level] = checked
-    if (checked) {
+  fun selectLevel(level: String, isSelected: Boolean) {
+    levelsMap[level] = isSelected
+    if (isSelected) {
       selectedLevels.add(level)
     } else {
       selectedLevels.remove(level)
@@ -145,10 +140,11 @@ fun HistoryScreen(
 
         val filteredPrograms = relevantPrograms.filter { selectedPrograms.contains(it) }
         val filteredAuthors = relevantPrograms.filter { selectedAuthors.contains(it.author) }
-        val filteredLevels = relevantPrograms.filter {
-          // Log.i("HistoryScreen", "level: ${it.level}")
-          selectedLevels.any { level -> it.level?.contains(level, ignoreCase = true) ?: false }
-        }
+        val filteredLevels =
+          relevantPrograms.filter {
+            // Log.i("HistoryScreen", "level: ${it.level}")
+            selectedLevels.any { level -> it.level?.contains(level, ignoreCase = true) ?: false }
+          }
 
         val filteredProgramsIDs =
           (filteredPrograms + filteredAuthors + filteredLevels).distinctBy { it.id }.map { it.id }
@@ -177,7 +173,9 @@ fun HistoryScreen(
           }
 
         val uniqueFilteredWorkouts =
-          (filteredWorkoutsName + filteredWorkoutsProgram + filteredWorkoutsDate).distinctBy { it.id }
+          (filteredWorkoutsName + filteredWorkoutsProgram + filteredWorkoutsDate).distinctBy {
+            it.id
+          }
         return@derivedStateOf uniqueFilteredWorkouts
       }
     }
@@ -200,10 +198,7 @@ fun HistoryScreen(
           },
           navigationIcon = {},
           actions = {
-            IconButton(
-              onClick = { setSearchBarVisibility(true) },
-              enabled = true,
-            ) {
+            IconButton(onClick = { setSearchBarVisibility(true) }, enabled = true) {
               Icon(
                 imageVector = Icons.Outlined.Search,
                 tint = MaterialTheme.colorScheme.onSurface,
@@ -246,9 +241,9 @@ fun HistoryScreen(
       authors = authorsMap.toMap(),
       levels = levelsMap.toMap(),
       onResultClick = { navigateToWorkoutOverview(it) },
-      onProgramSelected = { program, checked -> selectProgram(program, checked) },
-      onAuthorSelected = { author, checked -> selectAuthor(author, checked) },
-      onLevelSelected = { level, checked -> selectLevel(level, checked) },
+      onProgramSelected = { program, isSelected -> selectProgram(program, isSelected) },
+      onAuthorSelected = { author, isSelected -> selectAuthor(author, isSelected) },
+      onLevelSelected = { level, isSelected -> selectLevel(level, isSelected) },
       onDismissRequest = { setSearchBarVisibility(false) },
     )
   }

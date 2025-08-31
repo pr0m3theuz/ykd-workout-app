@@ -58,6 +58,14 @@ class HistoryViewModel(
   val programs: StateFlow<List<Program>>
     get() = _programs.asStateFlow()
 
+  private val _programsMap = MutableStateFlow(mutableMapOf<Program, Boolean>())
+  val programsMap: StateFlow<Map<Program, Boolean>>
+    get() = _programsMap
+
+  private val _authorsMap = MutableStateFlow(mutableMapOf<String, Boolean>())
+  val authorsMap: StateFlow<Map<String, Boolean>>
+    get() = _authorsMap
+
   private var _workout: MutableStateFlow<Workout?> = MutableStateFlow(null)
   val workout
     get() = _workout.asStateFlow()
@@ -72,10 +80,16 @@ class HistoryViewModel(
         completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
           ?: emptyList()
       }
-    }
 
-    viewModelScope.launch {
-      programsRepository.getAllDistinctProgramTemplates().collect { _programs.value = it }
+      val programsIDs = _workouts.value.map { it.programID }.distinct()
+
+      programsRepository.getAllDistinctProgramTemplates().collect {
+        val filteredResults = it.filter { it.id in programsIDs }
+        _programs.value = filteredResults
+        _programsMap.value = filteredResults.associateWith { false }.toMutableMap()
+        _authorsMap.value =
+          filteredResults.mapNotNull { it.author }.distinct().associateWith { false }.toMutableMap()
+      }
     }
   }
 
@@ -110,5 +124,13 @@ class HistoryViewModel(
         } ?: emptyList()
       }
     }
+  }
+
+  fun selectProgram(program: Program, isSelected: Boolean) {
+    _programsMap.value[program] = isSelected
+  }
+
+  fun selectAuthor(author: String, isSelected: Boolean) {
+    _authorsMap.value[author] = isSelected
   }
 }
