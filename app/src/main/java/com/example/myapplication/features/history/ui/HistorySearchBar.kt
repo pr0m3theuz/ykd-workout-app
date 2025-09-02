@@ -5,11 +5,11 @@ package com.example.myapplication.features.history.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DateRangePickerState
@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.getSelectedEndDate
+import androidx.compose.material3.getSelectedStartDate
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -37,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Workout
@@ -45,6 +48,7 @@ import com.example.myapplication.common.ui.component.AuthorPartialBottomSheet
 import com.example.myapplication.common.ui.component.DateRangePickerDialog
 import com.example.myapplication.common.ui.component.LevelsPartialBottomSheet
 import com.example.myapplication.common.ui.component.ProgramPartialBottomSheet
+import java.time.format.DateTimeFormatter
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -89,6 +93,9 @@ fun HistorySearchBar(
 
   // TODO Move to parent
 
+  val dateFormatter =
+    DateTimeFormatter.ofPattern("MM/dd/yy").withLocale(Locale.current.platformLocale)
+
   Box(
     modifier
       .fillMaxWidth()
@@ -125,36 +132,52 @@ fun HistorySearchBar(
       },
     ) {
       // Show search results in a lazy column for better performance
-      Row(
+      LazyRow(
         modifier = Modifier
           .fillMaxWidth()
           .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
-        FilterChip(
-          selected = false,
-          onClick = { showDateRangePickerDialog = true },
-          label = { Text("Date") }, // TODO change to be selected date range
-//          "${dateRangePickerState.getSelectedStartDate()} - ${dateRangePickerState.selectedEndDate}"
+        val startDate = dateRangePickerState.getSelectedStartDate()
+        val endDate = dateRangePickerState.getSelectedEndDate()
 
-        )
-
-        FilterChip(
-          selected = programs.values.any { it },
-          onClick = { showProgramsBottomSheet = true },
-          label = { Text("Program") },
-        )
-
-        FilterChip(
-          selected = authors.values.any { it },
-          onClick = { showAuthorsBottomSheet = true },
-          label = { Text("Author") },
-        )
-        FilterChip(
-          selected = levels.values.any { it },
-          onClick = { showLevelsBottomSheet = true },
-          label = { Text("Levels") },
-        )
+        item {
+          FilterChip(
+            selected = if (startDate != null && endDate != null) true else false,
+            onClick = { showDateRangePickerDialog = true },
+            label = {
+              Text(
+                text =
+                  if (startDate != null && endDate != null) {
+                    startDate.format(dateFormatter) + " - " + endDate.format(dateFormatter)
+                  } else {
+                    "Date"
+                  }
+              )
+            },
+          )
+        }
+        item {
+          FilterChip(
+            selected = programs.values.any { it },
+            onClick = { showProgramsBottomSheet = true },
+            label = { Text("Program") },
+          )
+        }
+        item {
+          FilterChip(
+            selected = authors.values.any { it },
+            onClick = { showAuthorsBottomSheet = true },
+            label = { Text("Author") },
+          )
+        }
+        item {
+          FilterChip(
+            selected = levels.values.any { it },
+            onClick = { showLevelsBottomSheet = true },
+            label = { Text("Levels") },
+          )
+        }
       }
 
       LazyColumn {
