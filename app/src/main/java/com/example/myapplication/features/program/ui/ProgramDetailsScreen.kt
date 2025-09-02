@@ -752,7 +752,7 @@ fun WorkoutDayCard(
           .padding(bottom = 8.dp),
         horizontalArrangement = Arrangement.Center,
       ) {
-        Text(text = "Day ${index.plus(1)}", style = labelMedium)
+        Text(text = workout.name, style = labelMedium)
       }
       if (workoutItems.isNotEmpty()) {
         workoutItems

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -30,10 +31,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarViewWeek
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.FitnessCenter
+import androidx.compose.material.icons.outlined.HourglassTop
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Stairs
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -636,6 +643,25 @@ fun ProgramCard(
     //        tint = MaterialTheme.colorScheme.primary,
     //      )
     //    }
+    val tertiaryAssistChipColors = AssistChipDefaults.assistChipColors(
+      disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+      disabledLabelColor = MaterialTheme.colorScheme.onTertiaryContainer,
+      disabledLeadingIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+      disabledTrailingIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+    )
+    val primaryAssistChipColors = AssistChipDefaults.assistChipColors(
+      disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+      disabledLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+      disabledLeadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+      disabledTrailingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    )
+    val secondaryAssistChipColors = AssistChipDefaults.assistChipColors(
+      disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+      disabledLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+      disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+      disabledTrailingIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+
     Row(
       modifier =
         Modifier
@@ -647,6 +673,85 @@ fun ProgramCard(
       Column(modifier = Modifier.weight(1f)) {
         Text(text = program.name ?: "New Program", style = titleMedium)
         Text(text = program.author ?: "", style = MaterialTheme.typography.bodyMedium)
+        // TODO Add Assist Chips for Level, Equipment, Days per Week, Program Length
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          item {
+            program.level?.let { level ->
+              AssistChip(
+                onClick = { /* Do something! */ },
+                enabled = false,
+                label = { Text(level.replace(", ", " - ")) },
+                colors = tertiaryAssistChipColors,
+                border = AssistChipDefaults.assistChipBorder(
+                  enabled = true,
+//                  AssistChipTokens.FlatOutlineColor.value,
+//                  AssistChipTokens.FlatDisabledOutlineColor.value.copy(
+//                              alpha = AssistChipTokens.FlatDisabledOutlineOpacity
+//                          ),
+//                  AssistChipTokens.FlatOutlineWidth
+                ),
+                leadingIcon = {
+                  Icon(
+                    Icons.Outlined.Stairs,
+                    contentDescription = "Localized description",
+                    Modifier.size(AssistChipDefaults.IconSize),
+                  )
+                },
+              )
+            }
+          }
+          item {
+            program.daysPerWeek?.let { daysPerWeek ->
+              AssistChip(
+                onClick = { /* Do something! */ },
+                enabled = false,
+                colors = secondaryAssistChipColors,
+                label = { Text("$daysPerWeek days/week") },
+                leadingIcon = {
+                  Icon(
+                    Icons.Outlined.CalendarViewWeek,
+                    contentDescription = "Localized description",
+                    Modifier.size(AssistChipDefaults.IconSize),
+                  )
+                },
+              )
+            }
+          }
+          item {
+            program.programLength?.let { length ->
+              AssistChip(
+                onClick = { /* Do something! */ },
+                enabled = false,
+                label = { Text(length) },
+                colors = secondaryAssistChipColors,
+                leadingIcon = {
+                  Icon(
+                    Icons.Outlined.HourglassTop,
+                    contentDescription = "Localized description",
+                    Modifier.size(AssistChipDefaults.IconSize),
+                  )
+                },
+              )
+            }
+          }
+          item {
+            program.programEquipment?.let { equipment ->
+              AssistChip(
+                onClick = { /* Do something! */ },
+                enabled = false,
+                colors = secondaryAssistChipColors,
+                label = { Text(equipment) },
+                leadingIcon = {
+                  Icon(
+                    Icons.Outlined.FitnessCenter,
+                    contentDescription = "Localized description",
+                    Modifier.size(AssistChipDefaults.IconSize),
+                  )
+                },
+              )
+            }
+          }
+        }
       }
       if (program.isActive) {
         Box(
@@ -664,7 +769,7 @@ fun ProgramCard(
           )
         }
       }
-      programDetailsOptionsDropdownMenu()
+//      programDetailsOptionsDropdownMenu()
     }
   }
 }
