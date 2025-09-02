@@ -107,7 +107,7 @@ constructor(
     }
   }
 
-  suspend fun updateRoundingPreference(roundingOption: RoundingOption) {
+  fun updateRoundingPreference(roundingOption: RoundingOption) {
     try {
       val metricValue =
         when {
@@ -179,6 +179,7 @@ constructor(
 
   fun updateDefaultWeightUnit(newUnit: MassUnit) {
     userProfileManager.updateUserProfile(_userProfile.value.copy(defaultWeightUnit = newUnit))
+    _userProfile.value = userProfileManager.getCurrentUser()
   }
 
   // Placeholder for other functions that might have existed or will be added.
