@@ -269,6 +269,10 @@ dependencies {
   // couchbase lite
   implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.4")
 //  implementation("com.couchbase.client:kotlin-client:1.4.9")
+
+  // rive
+  implementation("app.rive:rive-android:10.4.2")
+  implementation("androidx.startup:startup-runtime:1.2.0")
 }
 
 /*kapt {

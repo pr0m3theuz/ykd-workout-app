@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,8 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import app.rive.runtime.kotlin.RiveAnimationView
+import app.rive.runtime.kotlin.core.Fit
+import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Muscle
 import com.example.myapplication.common.domain.model.MuscleFractionalSets
+import com.example.myapplication.common.ui.component.ComposableRiveAnimationView
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.common.util.doubleFormatted
 import java.util.Locale
@@ -69,6 +74,77 @@ val muscleDataList =
     MuscleData("Quads", 6.5f, -10, mediumOrange),
   )
 
+data class RiveMuscleData(
+  val name: String,
+  val correspondingMuscles: List<String>,
+  var color: Int = 0,
+)
+
+private val riveMuscleListSource =
+  listOf(
+    RiveMuscleData(name = "biceps", correspondingMuscles = listOf("BicepsBrachii", "Brachialis")),
+    RiveMuscleData(name = "triceps", correspondingMuscles = listOf("TricepsBrachii")),
+    RiveMuscleData(name = "infraspinatus", correspondingMuscles = listOf("Infraspinatus")),
+    RiveMuscleData(name = "latissimusDorsi", correspondingMuscles = listOf("LatissimusDorsi")),
+    RiveMuscleData(name = "rhomboidMajor", correspondingMuscles = listOf("Rhomboids")),
+    RiveMuscleData(
+      name = "trapezius",
+      correspondingMuscles = listOf("TrapeziusLower", "TrapeziusMiddle", "TrapeziusUpper"),
+    ),
+    RiveMuscleData(
+      name = "calves",
+      correspondingMuscles = listOf("Gastrocnemius", "Soleus", "Propliteus", "TibialisAnterior"),
+    ),
+    RiveMuscleData(
+      name = "chest",
+      correspondingMuscles = listOf("PectoralisClavicular", "PectoralisMinor", "PectoralisSternal"),
+    ),
+    RiveMuscleData(name = "serratus", correspondingMuscles = listOf("SerratusAnterior")),
+    RiveMuscleData(
+      name = "forearms",
+      correspondingMuscles =
+        listOf("Brachioradialis", "Pronators", "Supinators", "WristExtensors", "WristFlexors"),
+    ),
+    RiveMuscleData(
+      name = "gluteMax",
+      correspondingMuscles = listOf("GluteusMaximus", "GluteusMinimus"),
+    ),
+    RiveMuscleData(name = "gluteMedius", correspondingMuscles = listOf("GluteusMedius")),
+    RiveMuscleData(name = "sartorius", correspondingMuscles = listOf("Sartorius")),
+    RiveMuscleData(
+      name = "adductors",
+      correspondingMuscles =
+        listOf(
+          "Gracilis",
+          "HipAdductor",
+          "HipExternalRotator",
+          "HipFlexors",
+          "Iliopsoas",
+          "Pectineus",
+          "Popliteus",
+          "TensorFasciaeLatae",
+          "Adductors",
+        ),
+    ),
+    RiveMuscleData(
+      name = "neck",
+      correspondingMuscles = listOf("Splenius", "Sternocleidomastoid", "LevatorScapulae"),
+    ),
+    RiveMuscleData(
+      name = "deltoids",
+      correspondingMuscles = listOf("DeltoidAnterior", "DeltoidLateral", "DeltoidPosterior"),
+    ),
+    RiveMuscleData(name = "teresMajor", correspondingMuscles = listOf("TeresMajor")),
+    RiveMuscleData(name = "teresMinor", correspondingMuscles = listOf("TeresMinor")),
+    RiveMuscleData(name = "hamstring", correspondingMuscles = listOf("Hamstrings")),
+    RiveMuscleData(name = "quadriceps", correspondingMuscles = listOf("Quadriceps")),
+    RiveMuscleData(name = "obliques", correspondingMuscles = listOf("Obliques")),
+    RiveMuscleData(
+      name = "rectusAbdominis",
+      correspondingMuscles = listOf("QuadratusLumborum", "RectusAbdominis", "TransverseAbdominis"),
+    ),
+  )
+
 // Preview for Android Studio
 @Preview(showBackground = true)
 @Composable
@@ -93,6 +169,8 @@ fun MuscleEngagementScreen(
   muscleEngagementData: List<Pair<Muscle, List<MuscleFractionalSets>>> = emptyList(),
   muscleDataList: List<MuscleData> = emptyList(),
 ) {
+  val riveMuscleList = rememberSaveable { riveMuscleListSource }
+
   Column(
     modifier = Modifier
       .fillMaxSize()
@@ -114,27 +192,148 @@ fun MuscleEngagementScreen(
       }
     } else if (muscleEngagementData.isNotEmpty()) {
       // --- List Header ---
+
+      val muscleFractionalSetsList =
+        muscleEngagementData
+          .flatMap { it.second }
+          .groupBy { it.muscle }
+          .map { (muscle, data) -> muscle to data.sumOf { it.fractionalSets } }
+
+      val maxFractionalSets = muscleFractionalSetsList.maxOf { it.second }
+
+      if (muscleFractionalSetsList.isNotEmpty()) {
+        riveMuscleList.forEach { muscleData ->
+          val maxFractionalSetsForGroup =
+            muscleFractionalSetsList
+              .filter { (muscle, _) -> muscleData.correspondingMuscles.contains(muscle.id) }
+              .maxOf { it.second }
+
+          val alpha = maxFractionalSetsForGroup.div(maxFractionalSets).toFloat()
+
+          muscleData.color =
+            if (maxFractionalSetsForGroup == 0.0) {
+              MaterialTheme.colorScheme.surfaceTint.toArgb()
+            } else {
+              MaterialTheme.colorScheme.primary.copy(alpha = alpha).toArgb()
+            }
+        }
+      }
+
+      MuscleEngagementRiveAnimation(riveMuscleDataList = riveMuscleList)
+
       MuscleListHeader()
       HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-      val maxFractionalSets =
-        muscleEngagementData.flatMap { it.second }.groupBy { it.muscle }.map { (muscle, data) ->
-          muscle to data.sumOf { it.fractionalSets }
-        }.maxOf { it.second }
-
-
       muscleEngagementData.forEach { muscleData ->
-
         Log.d("MuscleEngagementScreen", "maxFractionalSets: $maxFractionalSets")
 
         MuscleFractionalSetsItem(data = muscleData, maxFractionalSets = maxFractionalSets)
         HorizontalDivider(
           color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-          modifier = Modifier.padding(vertical = 2.dp)
+          modifier = Modifier.padding(vertical = 2.dp),
         )
       }
     } else {
       Text("No data available.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+  }
+}
+
+@Composable
+fun MuscleEngagementRiveAnimation(riveMuscleDataList: List<RiveMuscleData> = emptyList()) {
+  val color = MaterialTheme.colorScheme.tertiary
+  val defaultColor = MaterialTheme.colorScheme.tertiary
+  val background = MaterialTheme.colorScheme.background
+  val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+  val transparent = android.graphics.Color.TRANSPARENT
+  val legendAlpha = 1f
+  var animation: RiveAnimationView? = null
+
+  Box(modifier = Modifier
+    .fillMaxWidth()
+    .padding(8.dp)) {
+    ComposableRiveAnimationView(
+      animation = R.raw.muscular_system,
+      stateMachineName = "stateMachine",
+      fit = Fit.FIT_WIDTH,
+    ) { view ->
+      animation = view
+      val riveViewModel = animation.controller.file?.getViewModelByName("viewModel")!!
+      val riveInstance = riveViewModel.createInstanceFromIndex(0)
+      animation.controller.stateMachines.first().viewModelInstance = riveInstance
+
+      val latsissimusDorsi = riveInstance.getColorProperty("latsissimusDorsi")
+      latsissimusDorsi.value = riveMuscleDataList.first { it.name == "latissimusDorsi" }.color
+
+      val hamstring = riveInstance.getColorProperty("hamstring")
+      hamstring.value = riveMuscleDataList.first { it.name == "hamstring" }.color
+
+      val gluteMedius = riveInstance.getColorProperty("gluteMedius")
+      gluteMedius.value = riveMuscleDataList.first { it.name == "gluteMedius" }.color
+
+      val gluteMax = riveInstance.getColorProperty("gluteMax")
+      gluteMax.value = riveMuscleDataList.first { it.name == "gluteMax" }.color
+
+      val rhomboidMajor = riveInstance.getColorProperty("rhomboidMajor")
+      rhomboidMajor.value = riveMuscleDataList.first { it.name == "rhomboidMajor" }.color
+
+      val teresMinor = riveInstance.getColorProperty("teresMinor")
+      teresMinor.value = riveMuscleDataList.first { it.name == "teresMinor" }.color
+
+      val teresMajor = riveInstance.getColorProperty("teresMajor")
+      teresMajor.value = riveMuscleDataList.first { it.name == "teresMajor" }.color
+
+      val infraspinatus = riveInstance.getColorProperty("infraspinatus")
+      infraspinatus.value = riveMuscleDataList.first { it.name == "infraspinatus" }.color
+
+      val quadriceps = riveInstance.getColorProperty("quadriceps")
+      quadriceps.value = riveMuscleDataList.first { it.name == "quadriceps" }.color
+
+      val adductors = riveInstance.getColorProperty("adductors")
+      adductors.value = riveMuscleDataList.first { it.name == "adductors" }.color
+
+      val calves = riveInstance.getColorProperty("calves")
+      calves.value = riveMuscleDataList.first { it.name == "calves" }.color
+
+      val rectusAbdominis = riveInstance.getColorProperty("rectusAbdominis")
+      rectusAbdominis.value = riveMuscleDataList.first { it.name == "rectusAbdominis" }.color
+
+      val deltoids = riveInstance.getColorProperty("deltoids")
+      deltoids.value = riveMuscleDataList.first { it.name == "deltoids" }.color
+
+      val sartorius = riveInstance.getColorProperty("sartorius")
+      sartorius.value = riveMuscleDataList.first { it.name == "sartorius" }.color
+
+      val trapezius = riveInstance.getColorProperty("trapezius")
+      trapezius.value = riveMuscleDataList.first { it.name == "trapezius" }.color
+
+      val serratus = riveInstance.getColorProperty("serratus")
+      serratus.value = riveMuscleDataList.first { it.name == "serratus" }.color
+
+      val neck = riveInstance.getColorProperty("neck")
+      neck.value = riveMuscleDataList.first { it.name == "neck" }.color
+
+      val chest = riveInstance.getColorProperty("chest")
+      chest.value = riveMuscleDataList.first { it.name == "chest" }.color
+
+      val triceps = riveInstance.getColorProperty("triceps")
+      triceps.value = riveMuscleDataList.first { it.name == "triceps" }.color
+
+      val biceps = riveInstance.getColorProperty("biceps")
+      biceps.value = riveMuscleDataList.first { it.name == "biceps" }.color
+
+      val obliques = riveInstance.getColorProperty("obliques")
+      obliques.value = riveMuscleDataList.first { it.name == "obliques" }.color
+
+      val forearms = riveInstance.getColorProperty("forearms")
+      forearms.value = riveMuscleDataList.first { it.name == "forearms" }.color
+
+      val stroke = riveInstance.getColorProperty("stroke")
+      stroke.value = background.toArgb()
+
+      val misc = riveInstance.getColorProperty("misc")
+      misc.value = surfaceVariant.toArgb()
+
+      view.play()
     }
   }
 }
@@ -175,7 +374,7 @@ fun MuscleListHeader() {
 @Composable
 fun MuscleFractionalSetsItem(
   data: Pair<Muscle, List<MuscleFractionalSets>>,
-  maxFractionalSets: Double
+  maxFractionalSets: Double,
 ) {
   val muscle = data.first
   val muscleFractionalSetsList = data.second
@@ -189,16 +388,14 @@ fun MuscleFractionalSetsItem(
   var expanded by remember { mutableStateOf(false) }
 
   Column(modifier = Modifier.fillMaxWidth()) {
-    Row(
-      modifier = Modifier.fillMaxWidth(),
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
       // Dot and Muscle Name (flexible width)
       Row(modifier = Modifier.weight(0.5f), verticalAlignment = Alignment.CenterVertically) {
         Box(
-          modifier = Modifier
-            .size(10.dp)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = legendAlpha), CircleShape)
+          modifier =
+            Modifier
+              .size(10.dp)
+              .background(MaterialTheme.colorScheme.primary.copy(alpha = legendAlpha), CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
@@ -245,7 +442,10 @@ fun MuscleFractionalSetsItem(
                 modifier = Modifier.weight(1f),
               )
               Text(
-                text = muscleFractionalSet.muscleExercise.roleFunction.replaceFirstChar { it.uppercaseChar() },
+                text =
+                  muscleFractionalSet.muscleExercise.roleFunction.replaceFirstChar {
+                    it.uppercaseChar()
+                  },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(0.25f),
