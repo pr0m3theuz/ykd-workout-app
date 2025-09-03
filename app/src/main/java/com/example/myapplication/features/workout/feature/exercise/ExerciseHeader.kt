@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
-
 package com.example.myapplication.features.workout.feature.exercise
 
 import android.util.Log
@@ -34,7 +32,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -201,7 +198,7 @@ private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
     ) {
       Text(
         text = "Description",
-        style = MaterialTheme.typography.bodyMediumEmphasized,
+        style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier.padding(horizontal = 8.dp),
       )
       Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
@@ -254,7 +251,7 @@ private fun ExerciseNotesList(
     ) {
       Text(
         text = "Notes",
-        style = MaterialTheme.typography.bodyMediumEmphasized,
+        style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier.padding(horizontal = 8.dp),
       )
       Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {

@@ -1,6 +1,5 @@
 @file:OptIn(
   ExperimentalUuidApi::class,
-  ExperimentalMaterial3ExpressiveApi::class,
   ExperimentalTime::class,
 )
 
@@ -25,7 +24,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -308,7 +306,7 @@ fun HistoryLazyColumn(
             verticalAlignment = Alignment.CenterVertically,
           ) {
             Text(
-              style = MaterialTheme.typography.titleMediumEmphasized,
+              style = MaterialTheme.typography.titleMedium,
               modifier = Modifier.padding(vertical = 16.dp),
               text = "${yearMonth.month} ${yearMonth.year}",
             )

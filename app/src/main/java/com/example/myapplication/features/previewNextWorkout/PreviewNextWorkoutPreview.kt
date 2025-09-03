@@ -23,6 +23,7 @@ import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.defaultDragHandleSemantics
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
@@ -41,53 +42,58 @@ import com.example.myapplication.features.history.ui.WorkoutOverviewContent
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
+// TODO try a different layout e.g. list-detail layout
+
 @RequiresApi(Build.VERSION_CODES.S)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewNextWorkoutScreenPreview() {
   val json = Json {
     ignoreUnknownKeys = true // Recommended for flexibility
-    isLenient = true         // If JSON might be slightly malformed
+    isLenient = true // If JSON might be slightly malformed
   }
 
-  val nextWorkoutFile = LocalContext.current.assets.open("next_workout.json").bufferedReader()
-    .readLines()
+  val nextWorkoutFile =
+    LocalContext.current.assets.open("next_workout.json").bufferedReader().readLines()
 
   val nextWorkoutComponentsFile =
-    LocalContext.current.assets.open("next_workoutComponents.json").bufferedReader()
-      .readText()
+    LocalContext.current.assets.open("next_workoutComponents.json").bufferedReader().readText()
 
   val previousWorkoutFile =
-    LocalContext.current.assets.open("previous_workout.json").bufferedReader()
-      .readLines()
+    LocalContext.current.assets.open("previous_workout.json").bufferedReader().readLines()
 
   val previousWorkoutComponentsFile =
-    LocalContext.current.assets.open("previous_workoutComponents.json").bufferedReader()
-      .readText()
+    LocalContext.current.assets.open("previous_workoutComponents.json").bufferedReader().readText()
 
-  val previousWorkout = previousWorkoutFile.mapNotNull map@{
-    var workout: Workout? = null
-    try {
-      workout = json.decodeFromString<Workout>(it)
-    } catch (e: Exception) {
-      println("Error processing document ID : ${e.message}")
-      println(it)
-      e.printStackTrace()
-    }
-    return@map workout
-  }.firstOrNull()
+  val previousWorkout =
+    previousWorkoutFile
+      .mapNotNull map@{
+        var workout: Workout? = null
+        try {
+          workout = json.decodeFromString<Workout>(it)
+        } catch (e: Exception) {
+          println("Error processing document ID : ${e.message}")
+          println(it)
+          e.printStackTrace()
+        }
+        return@map workout
+      }
+      .firstOrNull()
 
-  val nextWorkout = nextWorkoutFile.mapNotNull map@{
-    var workout: Workout? = null
-    try {
-      workout = json.decodeFromString<Workout>(it)
-    } catch (e: Exception) {
-      println("Error processing document ID : ${e.message}")
-      println(it)
-      e.printStackTrace()
-    }
-    return@map workout
-  }.firstOrNull()
+  val nextWorkout =
+    nextWorkoutFile
+      .mapNotNull map@{
+        var workout: Workout? = null
+        try {
+          workout = json.decodeFromString<Workout>(it)
+        } catch (e: Exception) {
+          println("Error processing document ID : ${e.message}")
+          println(it)
+          e.printStackTrace()
+        }
+        return@map workout
+      }
+      .firstOrNull()
 
   val nextWorkoutComponents =
     json.decodeFromString(WorkoutComponentListSerializer, nextWorkoutComponentsFile)
@@ -95,25 +101,27 @@ fun PreviewNextWorkoutScreenPreview() {
   val previousWorkoutComponents =
     json.decodeFromString(WorkoutComponentListSerializer, previousWorkoutComponentsFile)
 
-  val nextWorkoutUiState = EditNextWorkoutUiState(
-    workout = nextWorkout,
-    workoutComponents = nextWorkoutComponents,
-    workoutNotes = nextWorkout?.notes ?: emptyList(),
-    workoutName = nextWorkout?.name ?: "No Name",
-    isLoading = false,
-    errorMessage = null,
-    userDefaultWeightUnit = MassUnit.POUNDS.abbreviation
-  )
+  val nextWorkoutUiState =
+    EditNextWorkoutUiState(
+      workout = nextWorkout,
+      workoutComponents = nextWorkoutComponents,
+      workoutNotes = nextWorkout?.notes ?: emptyList(),
+      workoutName = nextWorkout?.name ?: "No Name",
+      isLoading = false,
+      errorMessage = null,
+      userDefaultWeightUnit = MassUnit.POUNDS.abbreviation,
+    )
 
-  val previousWorkoutUiState = EditNextWorkoutUiState(
-    workout = previousWorkout,
-    workoutComponents = previousWorkoutComponents,
-    workoutNotes = previousWorkout?.notes ?: emptyList(),
-    workoutName = previousWorkout?.name ?: "No Name",
-    isLoading = false,
-    errorMessage = null,
-    userDefaultWeightUnit = MassUnit.POUNDS.abbreviation
-  )
+  val previousWorkoutUiState =
+    EditNextWorkoutUiState(
+      workout = previousWorkout,
+      workoutComponents = previousWorkoutComponents,
+      workoutNotes = previousWorkout?.notes ?: emptyList(),
+      workoutName = previousWorkout?.name ?: "No Name",
+      isLoading = false,
+      errorMessage = null,
+      userDefaultWeightUnit = MassUnit.POUNDS.abbreviation,
+    )
 
   val coroutineScope = rememberCoroutineScope()
   val scaffoldNavigator = rememberSupportingPaneScaffoldNavigator()
@@ -128,17 +136,17 @@ fun PreviewNextWorkoutScreenPreview() {
       value = scaffoldNavigator.scaffoldValue,
       paneExpansionState = rememberPaneExpansionState(scaffoldNavigator.scaffoldValue),
       paneExpansionDragHandle = { state ->
-        val interactionSource =
-          remember { MutableInteractionSource() }
-
+        val interactionSource = remember { MutableInteractionSource() }
 
         VerticalDragHandle(
           modifier =
             Modifier.paneExpansionDraggable(
               state,
-              LocalMinimumInteractiveComponentSize.current,
-              interactionSource
-            ), interactionSource = interactionSource
+              minTouchTargetSize = LocalMinimumInteractiveComponentSize.current,
+              interactionSource = interactionSource,
+              semanticsProperties = state.defaultDragHandleSemantics(),
+            ),
+          interactionSource = interactionSource,
         )
       },
       mainPane = {
@@ -169,14 +177,15 @@ fun PreviewNextWorkoutScreenPreview() {
                   Text("Supporting pane is shown")
                 }*/
             }
-// TODO Design Better Screen. Replace Set Content with CommonComponents.SetContent & use target values
+            // TODO Design Better Screen. Replace Set Content with CommonComponents.SetContent & use
+            // target values
             EditNextWorkoutScreenContent(
               uiState = nextWorkoutUiState,
-              onEvent = { }, // Pass the event handler
+              onEvent = {}, // Pass the event handler
               navController = rememberNavController(),
               editable = false,
               populatePreviousSetField = { _, _ -> null },
-              ExerciseOptionsDropdownMenu = { exerciseSets, addNotes -> }
+              ExerciseOptionsDropdownMenu = { exerciseSets, addNotes -> },
             )
           }
         }
@@ -197,16 +206,15 @@ fun PreviewNextWorkoutScreenPreview() {
             previousWorkoutUiState.workout?.let {
               WorkoutOverviewContent(
                 workout = it,
-                setOpenDeleteWorkoutDialog = { },
+                setOpenDeleteWorkoutDialog = {},
                 performAgain = false,
                 userDefaultWeightUnit = previousWorkoutUiState.userDefaultWeightUnit,
                 workoutComponents = previousWorkoutUiState.workoutComponents,
-                navigateUp = { },
+                navigateUp = {},
                 navigateToEditWorkout = { workout -> },
                 navigateToWorkout = { workout -> },
               )
             }
-
           }
         }
       },

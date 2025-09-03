@@ -1,5 +1,4 @@
 @file:OptIn(
-  ExperimentalMaterial3ExpressiveApi::class,
   ExperimentalMaterial3Api::class,
   ExperimentalTime::class,
 )
@@ -32,7 +31,6 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -180,7 +178,7 @@ fun AnalyticsScreenContent(
           /* TODO Handle Exercises click */
           /* }) {
             Text("Exercises",
-              style = MaterialTheme.typography.bodySmallEmphasized)
+              style = MaterialTheme.typography.bodySmall)
           }*/
         },
       )

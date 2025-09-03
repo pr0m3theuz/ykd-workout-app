@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalMaterial3ExpressiveApi::class)
+@file:OptIn(ExperimentalUuidApi::class)
 
-package com.example.myapplication.features
+package com.example.myapplication.features.workout.feature.workoutDialogs.workingSets
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonShapes
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,13 +29,12 @@ import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.checkDoubleInput
 import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.WarmUpSetLayout
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.workoutDialogs.DialogInput
 import com.example.myapplication.features.workout.feature.workoutDialogs.ModernizedLoadRIRHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetsHeaderRow
 import com.example.myapplication.features.workout.feature.workoutDialogs.SwipeToDismissBoxListItem
-import com.example.myapplication.features.workout.feature.workoutDialogs.workingSets.WorkingSetLazyColumn
-import com.example.myapplication.features.workout.feature.workoutDialogs.workingSets.WorkingSetViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -118,11 +114,6 @@ fun AddWorkingSetsScreen(
             applySettingsToSelectedSets(currentModernizedLoadRIRState)
           }
         },
-        shapes =
-          ButtonShapes(
-            shape = MaterialTheme.shapes.small,
-            pressedShape = MaterialTheme.shapes.small,
-          ),
       ) {
         Text("Apply Settings to Selected Sets")
       }
@@ -180,12 +171,12 @@ fun AddWorkingSetsDialog(
           .takeIf { it.isNotEmpty() }
           ?.let { list ->
             val selectedRir =
-              list.firstOrNull {
-                it.repsPerformed ==
+              list.firstOrNull { first ->
+                first.repsPerformed ==
                         workingSets
                           .firstOrNull { it.setTypeID != SetType.warmUpSet }
                           ?.targetRepetitions ||
-                        it.rir ==
+                        first.rir ==
                         workingSets
                           .firstOrNull { it.setTypeID != SetType.warmUpSet }
                           ?.targetRepetitionsInReserve

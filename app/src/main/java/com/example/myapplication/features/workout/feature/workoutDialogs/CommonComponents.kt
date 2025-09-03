@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 
 package com.example.myapplication.features.workout.feature.workoutDialogs
 
@@ -40,7 +40,6 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -231,7 +230,7 @@ fun SetNumber(setTypeText: String) {
     Text(
       text = setTypeText,
       color = MaterialTheme.colorScheme.onSurface,
-      style = MaterialTheme.typography.bodyLargeEmphasized,
+      style = MaterialTheme.typography.bodyLarge,
       modifier = Modifier.padding(8.dp)
     )
   }
@@ -987,7 +986,7 @@ fun ModernizedLoadRIRHeaderRow(
   //endregion
 
   //region UI Layout
-  val style = MaterialTheme.typography.bodyMediumEmphasized
+  val style = MaterialTheme.typography.bodyMedium
 
   Spacer(modifier = Modifier.height(16.dp))
   Column(modifier = Modifier.fillMaxWidth()) {

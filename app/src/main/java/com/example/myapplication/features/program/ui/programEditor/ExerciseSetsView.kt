@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
-
 package com.example.myapplication.features.program.ui.programEditor
 
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +20,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +44,7 @@ fun ExerciseSetsView(exerciseItem: ExerciseWorkoutItem, editMode: Boolean) {
       Column(Modifier.Companion.padding(16.dp)) {
         Text(
           exerciseItem.exercise.name,
-          style = MaterialTheme.typography.titleLargeEmphasized,
+          style = MaterialTheme.typography.titleLarge,
           color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Text(

@@ -1,5 +1,4 @@
 @file:OptIn(
-  ExperimentalMaterial3ExpressiveApi::class,
   ExperimentalMaterial3Api::class,
   ExperimentalUuidApi::class,
 )
@@ -16,9 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -158,11 +155,6 @@ fun AddWarmUpSetsScreen(
             applySettingsToSelectedSets(currentModernizedLoadRIRState)
           }
         },
-        shapes =
-          ButtonShapes(
-            shape = MaterialTheme.shapes.small,
-            pressedShape = MaterialTheme.shapes.small,
-          ),
       ) {
         Text("Apply Settings to Selected Sets")
       }
@@ -177,7 +169,6 @@ fun AddWarmUpSetsScreen(
   )
 }
 
-@ExperimentalMaterial3ExpressiveApi
 @Composable
 fun AddWarmUpSetsContent(
   warmUpSetsViewModel: WarmUpSetsViewModel = koinViewModel(),

@@ -22,12 +22,12 @@ tasks.withType<Test> { useJUnitPlatform() }
 
 android {
   namespace = "com.example.myapplication"
-  compileSdk = 35
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "com.example.myapplication"
     minSdk = 26
-    targetSdk = 35
+    targetSdk = 36
     versionCode = 1
     versionName = "1.0"
 
@@ -45,7 +45,7 @@ android {
 
   buildTypes {
     getByName("release") {
-      isMinifyEnabled = false
+      isMinifyEnabled = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
@@ -112,7 +112,7 @@ protobuf {
 }
 
 dependencies {
-  implementation("androidx.core:core-ktx:1.16.0")
+  implementation("androidx.core:core-ktx:1.17.0")
   implementation("androidx.activity:activity-compose:1.10.1")
 
   // Jetpack DataStore Preferences
@@ -130,10 +130,10 @@ dependencies {
   implementation("androidx.compose.material3.adaptive:adaptive-navigation:$adaptiveLayout")
   implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.2")
   implementation("com.google.firebase:firebase-perf-ktx:21.0.5")
-  androidTestImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
+  androidTestImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
 
-  val composeVersion = "1.8.2"
-  implementation(platform("androidx.compose:compose-bom:2025.05.01"))
+  val composeVersion = "1.9.0"
+  implementation(platform("androidx.compose:compose-bom:2025.08.01"))
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
   implementation("androidx.compose.material:material:$composeVersion")
@@ -141,8 +141,8 @@ dependencies {
   implementation("androidx.compose.ui:ui-text-google-fonts:$composeVersion")
 
   implementation("com.google.android.material:material:1.12.0")
-  implementation("androidx.compose.material3:material3:1.4.0-alpha15")
-  val lifecycleVersion = "2.9.0"
+  implementation("androidx.compose.material3:material3:1.4.0-beta03")
+  val lifecycleVersion = "2.9.3"
   implementation("androidx.navigation:navigation-compose:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
@@ -151,28 +151,28 @@ dependencies {
 //  implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:1.0.0-alpha01")
 
   implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-  implementation("com.google.dagger:hilt-android:2.56.2")
+//  implementation("com.google.dagger:hilt-android:2.56.2")
   //    testImplementation "junit:junit:4.13.2"
   //    testImplementation "org.robolectric:robolectric:4.10.3"
 
   // Core library
-  val testing = "1.6.1"
+  val testing = "1.7.0"
   androidTestImplementation("androidx.test:core:$testing")
   testImplementation("androidx.test:core-ktx:$testing")
-  val testingJunit = "1.2.1"
+  val testingJunit = "1.3.0"
   testImplementation("androidx.test.ext:junit-ktx:$testingJunit")
-  testImplementation("org.robolectric:robolectric:4.14.1")
+  testImplementation("org.robolectric:robolectric:4.16")
 
   // AndroidJUnitRunner and JUnit Rules
-  androidTestImplementation("androidx.test:runner:1.6.2")
+  androidTestImplementation("androidx.test:runner:1.7.0")
   androidTestImplementation("androidx.test:rules:$testing")
 
   // Assertions
   androidTestImplementation("androidx.test.ext:junit:$testingJunit")
-  androidTestImplementation("androidx.test.ext:truth:1.6.0")
+  androidTestImplementation("androidx.test.ext:truth:1.7.0")
 
   // Espresso dependencies
-  val espressoVersion = "3.6.1"
+  val espressoVersion = "3.7.0"
   androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
   androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion")
   androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
@@ -186,11 +186,11 @@ dependencies {
   // classpath.
   androidTestImplementation("androidx.test.espresso:espresso-idling-resource:$espressoVersion")
 
-  testImplementation("io.mockk:mockk:1.14.2")
+  testImplementation("io.mockk:mockk:1.14.5")
 
   testImplementation("junit:junit:4.13.2")
 
-  val junitJupiter = "5.13.0"
+  val junitJupiter = "5.13.4"
   testImplementation(platform("org.junit:junit-bom:$junitJupiter"))
   testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiter")
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiter")
@@ -199,9 +199,9 @@ dependencies {
   debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
   debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
 
-  testImplementation("org.assertj:assertj-core:3.27.3")
+  testImplementation("org.assertj:assertj-core:3.27.4")
 
-  val jqwik = "1.9.2"
+  val jqwik = "1.9.3"
   testImplementation("net.jqwik:jqwik:$jqwik")
   testImplementation("net.jqwik:jqwik-kotlin:$jqwik")
   // Navigation
@@ -214,7 +214,7 @@ dependencies {
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 
 //  implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.3.0")
-  implementation("org.mongodb:bson-kotlinx:5.5.0")
+  implementation("org.mongodb:bson-kotlinx:5.5.1")
 //  implementation("live.ditto:ditto:4.8.1")
   // Add to use coroutines with the SDK
 
@@ -225,7 +225,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serialization")
 
   //    Koin
-  val koin = "4.0.4"
+  val koin = "4.1.0"
   implementation("io.insert-koin:koin-core:$koin")
   implementation("io.insert-koin:koin-android:$koin")
   //    implementation("io.insert-koin:koin-annotations:3.4.3")
@@ -238,14 +238,14 @@ dependencies {
   testImplementation("io.insert-koin:koin-test-junit5:$koin")
 
   // New Relic Crash Analytics
-  implementation("com.newrelic.agent.android:android-agent:7.6.6")
+  implementation("com.newrelic.agent.android:android-agent:7.6.8")
 
   // Apple pkl
 //  implementation("org.pkl-lang:pkl-config-kotlin:0.26.0")
 
   // Firebase
   // Import the Firebase BoM (see: https://firebase.google.com/docs/android/learn-more#bom)
-  implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+  implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
 
   // Firebase Crashlytics
   implementation("com.google.firebase:firebase-crashlytics")
@@ -267,7 +267,7 @@ dependencies {
   implementation("com.patrykandpatrick.vico:core:2.1.3")
 
   // couchbase lite
-  implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.3")
+  implementation("com.couchbase.lite:couchbase-lite-android-ktx:3.2.4")
 //  implementation("com.couchbase.client:kotlin-client:1.4.9")
 }
 

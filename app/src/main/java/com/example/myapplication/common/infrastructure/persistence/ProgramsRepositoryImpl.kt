@@ -95,13 +95,18 @@ class ProgramsRepositoryImpl(
   private fun mapQueryChangeToProgram(queryChange: QueryChange): List<Program> {
     val programs = mutableListOf<Program>() // 1
     queryChange.results?.let { results -> // 2
-      results.forEach { result -> // 3
-        val json = result.toJSON() // 4
-        val program = withUnknownKeys.decodeFromString<ProgramDao>(json).Program // 5
-        programs.add(program) // 6
+      try {
+        results.forEachIndexed { indexed, result -> // 3
+          val json = result.toJSON() // 4
+          Log.d("ProgramRepositoryImpl.mapQueryChangeToProgram()", "program $indexed: $json")
+          val program = withUnknownKeys.decodeFromString<ProgramDao>(json).Program // 5
+          programs.add(program) // 6
+        }
+      } catch (e: Exception) {
+        Log.e(e.message, e.stackTraceToString())
       }
     }
-    return programs // 7
+    return programs
   }
 
   private fun mapQueryChangeToCompletedPrograms(queryChange: QueryChange): List<Program> {

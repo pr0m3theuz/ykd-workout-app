@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalMaterial3ExpressiveApi::class)
+@file:OptIn(ExperimentalUuidApi::class)
 
 package com.example.myapplication.features.program.ui
 
@@ -44,7 +44,6 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -763,7 +762,7 @@ fun ProgramCard(
         ) {
           Text(
             text = "Active",
-            style = MaterialTheme.typography.titleSmallEmphasized,
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
             color = MaterialTheme.colorScheme.onTertiaryContainer,
           )

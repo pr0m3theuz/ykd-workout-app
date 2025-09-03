@@ -24,6 +24,7 @@ import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.CreateSupersetScreen
 import com.example.myapplication.features.workout.feature.exercise.ReplaceExerciseDialog
 import com.example.myapplication.features.workout.feature.setRestTimer.AutoRestTimerScreen
+import com.example.myapplication.features.workout.feature.workoutDialogs.workingSets.AddWorkingSetsScreen
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
