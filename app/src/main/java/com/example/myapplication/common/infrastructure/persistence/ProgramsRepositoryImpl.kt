@@ -98,7 +98,7 @@ class ProgramsRepositoryImpl(
       try {
         results.forEachIndexed { indexed, result -> // 3
           val json = result.toJSON() // 4
-          Log.d("ProgramRepositoryImpl.mapQueryChangeToProgram()", "program $indexed: $json")
+//          Log.d("ProgramRepositoryImpl.mapQueryChangeToProgram()", "program $indexed: $json")
           val program = withUnknownKeys.decodeFromString<ProgramDao>(json).Program // 5
           programs.add(program) // 6
         }
