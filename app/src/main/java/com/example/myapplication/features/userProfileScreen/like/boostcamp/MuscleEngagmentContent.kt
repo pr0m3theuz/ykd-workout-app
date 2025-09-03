@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,9 +45,12 @@ import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.Muscle
 import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.ui.component.ComposableRiveAnimationView
+import com.example.myapplication.common.ui.theme.IBMColorBlindPalette
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.common.util.doubleFormatted
 import java.util.Locale
+import kotlin.math.floor
+import kotlin.math.min
 
 // Data class to hold information for each muscle group
 data class MuscleData(
@@ -80,7 +84,7 @@ data class RiveMuscleData(
   var color: Int = 0,
 )
 
-private val riveMuscleListSource =
+val riveMuscleListSource =
   listOf(
     RiveMuscleData(name = "biceps", correspondingMuscles = listOf("BicepsBrachii", "Brachialis")),
     RiveMuscleData(name = "triceps", correspondingMuscles = listOf("TricepsBrachii")),
@@ -203,18 +207,34 @@ fun MuscleEngagementScreen(
 
       if (muscleFractionalSetsList.isNotEmpty()) {
         riveMuscleList.forEach { muscleData ->
-          val maxFractionalSetsForGroup =
-            muscleFractionalSetsList
-              .filter { (muscle, _) -> muscleData.correspondingMuscles.contains(muscle.id) }
-              .maxOf { it.second }
+          val muscleFractionalSetsList =
+            muscleFractionalSetsList.filter { (muscle, _) ->
+              muscleData.correspondingMuscles.contains(muscle.id)
+            }
 
-          val alpha = maxFractionalSetsForGroup.div(maxFractionalSets).toFloat()
+          val maxFractionalSetsForGroup =
+            if (muscleFractionalSetsList.isNotEmpty()) muscleFractionalSetsList.maxOf { it.second }
+            else 0.0
+
+          val fraction = maxFractionalSetsForGroup.div(maxFractionalSets).toFloat()
 
           muscleData.color =
             if (maxFractionalSetsForGroup == 0.0) {
-              MaterialTheme.colorScheme.surfaceTint.toArgb()
+              MaterialTheme.colorScheme.outlineVariant.toArgb()
             } else {
-              MaterialTheme.colorScheme.primary.copy(alpha = alpha).toArgb()
+              //              if (fraction == 1.0f) {
+              //                IBMColorBlindPalette.colors[4].toArgb()
+              //              } else {
+              val numberOfColors = IBMColorBlindPalette.colors.size - 1
+              val startColor = floor(fraction * numberOfColors).toInt().coerceIn(0, numberOfColors)
+              lerp(
+                IBMColorBlindPalette.colors[min(0, startColor)],
+                IBMColorBlindPalette.colors[min(startColor + 1, numberOfColors)],
+                fraction,
+              )
+                .toArgb()
+              //              }
+              //              MaterialTheme.colorScheme.primary.copy(alpha = fraction).toArgb()
             }
         }
       }
@@ -240,12 +260,10 @@ fun MuscleEngagementScreen(
 
 @Composable
 fun MuscleEngagementRiveAnimation(riveMuscleDataList: List<RiveMuscleData> = emptyList()) {
-  val color = MaterialTheme.colorScheme.tertiary
-  val defaultColor = MaterialTheme.colorScheme.tertiary
-  val background = MaterialTheme.colorScheme.background
-  val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
-  val transparent = android.graphics.Color.TRANSPARENT
-  val legendAlpha = 1f
+  val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+  val onBackground = MaterialTheme.colorScheme.onBackground
+  val outline = MaterialTheme.colorScheme.outline
+  val outlineVariant = MaterialTheme.colorScheme.outlineVariant
   var animation: RiveAnimationView? = null
 
   Box(modifier = Modifier
@@ -328,10 +346,13 @@ fun MuscleEngagementRiveAnimation(riveMuscleDataList: List<RiveMuscleData> = emp
       forearms.value = riveMuscleDataList.first { it.name == "forearms" }.color
 
       val stroke = riveInstance.getColorProperty("stroke")
-      stroke.value = background.toArgb()
+      stroke.value = onBackground.toArgb()
 
       val misc = riveInstance.getColorProperty("misc")
-      misc.value = surfaceVariant.toArgb()
+      misc.value = outline.toArgb()
+
+      val strokeWidth = riveInstance.getNumberProperty("strokeWidth")
+      strokeWidth.value = 15f
 
       view.play()
     }
@@ -360,14 +381,14 @@ fun MuscleListHeader() {
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       modifier = Modifier.width(90.dp),
     )
-    Text(
+    /*Text(
       // Use width to align with data columns below
       text = "% Change",
       textAlign = TextAlign.Center,
       style = MaterialTheme.typography.labelLarge,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       modifier = Modifier.width(90.dp),
-    )
+    )*/
   }
 }
 
@@ -381,9 +402,16 @@ fun MuscleFractionalSetsItem(
 
   val totalFractionalSets = muscleFractionalSetsList.sumOf { it.fractionalSets }
 
-  val legendAlpha = totalFractionalSets.div(maxFractionalSets).toFloat()
+  val fraction = totalFractionalSets.div(maxFractionalSets).toFloat()
 
-  Log.d("MuscleFractionalSetsItem", "legendAlpha: $legendAlpha")
+  val numberOfColors = IBMColorBlindPalette.colors.size - 1
+  val startColor = floor(fraction * numberOfColors).toInt().coerceIn(0, numberOfColors)
+  val legendColor =
+    lerp(
+      IBMColorBlindPalette.colors[min(0, startColor)],
+      IBMColorBlindPalette.colors[min(startColor + 1, numberOfColors)],
+      fraction,
+    )
 
   var expanded by remember { mutableStateOf(false) }
 
@@ -391,12 +419,9 @@ fun MuscleFractionalSetsItem(
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
       // Dot and Muscle Name (flexible width)
       Row(modifier = Modifier.weight(0.5f), verticalAlignment = Alignment.CenterVertically) {
-        Box(
-          modifier =
-            Modifier
-              .size(10.dp)
-              .background(MaterialTheme.colorScheme.primary.copy(alpha = legendAlpha), CircleShape)
-        )
+        Box(modifier = Modifier
+          .size(10.dp)
+          .background(legendColor, CircleShape))
         Spacer(modifier = Modifier.width(16.dp))
         Text(
           text = muscle.name,
