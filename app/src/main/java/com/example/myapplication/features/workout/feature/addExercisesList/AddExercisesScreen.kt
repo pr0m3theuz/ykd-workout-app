@@ -29,7 +29,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarDefaults.colors
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -184,10 +183,10 @@ fun AddExercisesScreen(
       Column(Modifier
         .padding(contentPadding)
         .fillMaxWidth()) {
-        TextFieldDefaults.colors(
-          unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-          unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
-        )
+//        TextFieldDefaults.colors(
+//          unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+//          unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+//        )
         val searchBarColors = colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
 
         val onActiveChange = { _active: Boolean -> active = _active }
@@ -271,7 +270,7 @@ fun AddExercisesScreen(
             }
           }
 
-          exercises.isEmpty() && query.isBlank() -> {
+          query.isBlank() -> {
             Column(
               modifier = Modifier
                 .fillMaxWidth()

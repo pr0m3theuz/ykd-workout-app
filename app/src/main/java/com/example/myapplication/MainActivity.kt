@@ -61,6 +61,7 @@ import com.example.myapplication.common.infrastructure.services.AuthenticationSe
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.MyApplicationTheme
+import com.example.myapplication.features.addExercisesList.ReplaceExerciseScreen
 import com.example.myapplication.features.exercises.ui.ExerciseDetailsScreen
 import com.example.myapplication.features.exercises.ui.ExerciseNavigableListDetailScreen
 import com.example.myapplication.features.exercises.ui.ExercisesLazyColumn
@@ -441,6 +442,28 @@ private fun NavGraphBuilder.addWorkoutGraph(
             navController = navController,
             navigateToDetailPane = onClick,
             workoutViewModel = workoutViewModel,
+          )
+        },
+        exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->
+          ExerciseDetailsScreen(navController, exerciseID, onClick)
+        },
+      )
+    }
+
+    composable("replaceExercise/{exerciseSetsID}") { navBackStackEntry ->
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
+      AddExerciseNavigableListDetailScreen(
+        exerciseListPane = { onClick ->
+          ReplaceExerciseScreen(
+            exerciseSetsID = ObjectId(exerciseSetsID),
+            setOpenDialog = { /*TODO*/ },
+            workoutViewModel = workoutViewModel,
+            navController = navController,
+            navigateToDetailPane = onClick,
+            onNavigateBack = { navController.popBackStack() },
           )
         },
         exerciseDetailPane = { exerciseID: String, onClick: () -> Unit ->

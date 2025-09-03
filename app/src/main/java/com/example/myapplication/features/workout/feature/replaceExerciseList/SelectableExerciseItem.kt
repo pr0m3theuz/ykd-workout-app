@@ -1,4 +1,4 @@
-package com.example.myapplication.features.addExercisesList
+package com.example.myapplication.features.workout.feature.replaceExerciseList
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.Exercise
 
 @Composable
@@ -28,8 +27,8 @@ fun SelectableExerciseItem(
   exercise: Exercise,
   selectedExercise: Boolean,
   muscleGroupName: String?,
-  navController: NavController,
-  selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
+  selectExercise: (exercise: Exercise, selected: Boolean) -> Unit,
+  navigateToDetailPane: (exerciseID: String) -> Unit,
 ) {
 
   val padding = 8.dp
@@ -53,7 +52,7 @@ fun SelectableExerciseItem(
           .clickable(
             enabled = true,
             onClickLabel = "See more details about ${exercise.name} ",
-            onClick = { navController.navigate("exerciseDetails/${exercise.id.toHexString()}") }
+            onClick = { navigateToDetailPane("${exercise.id.toHexString()}") }
           ),
         text = exercise.name,
         //        style = MaterialTheme.typography.titleMedium,

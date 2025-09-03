@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.WorkoutComponent
-import com.example.myapplication.features.addExercisesList.ReplaceExerciseScreen
 import com.example.myapplication.features.workout.EquateVolumeScreen
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.exercise.CreateSupersetScreen
@@ -138,7 +137,8 @@ fun ExerciseOptionsDropdownMenu(
         text = { Text("Replace Exercise") },
         onClick = {
           expandedExerciseOptionsDropdownMenu = false
-          openReplaceExerciseDialog = true
+          navController.navigate("replaceExercise/${exerciseSets.id.toHexString()}")
+//          openReplaceExerciseDialog = true
         }
       )
       HorizontalDivider()
@@ -162,7 +162,7 @@ fun ExerciseOptionsDropdownMenu(
       DropdownMenuItem(
         text = { Text("Weight Unit") },
         trailingIcon = {
-          Text(exerciseSets.exercise?.weightUnit ?: userDefaultWeightUnit, color = primaryColor)
+          Text(exerciseSets.exercise.weightUnit ?: userDefaultWeightUnit, color = primaryColor)
         },
         onClick = {
           expandedExerciseOptionsDropdownMenu = false
@@ -234,14 +234,14 @@ fun ExerciseOptionsDropdownMenu(
       )
     }
 
-    if (openReplaceExerciseScreen) {
-      ReplaceExerciseScreen(
-        workoutViewModel = workoutViewModel,
-        exerciseSets = exerciseSets,
-        setOpenDialog = { close -> openReplaceExerciseScreen = close },
-        navController = navController,
-      )
-    }
+//    if (openReplaceExerciseScreen) {
+//      ReplaceExerciseScreen(
+//        workoutViewModel = workoutViewModel,
+//        exerciseSets = exerciseSets,
+//        setOpenDialog = { close -> openReplaceExerciseScreen = close },
+//        navController = navController,
+//      )
+//    }
 
     if (openCreateSupersetScreen) {
       CreateSupersetScreen(
