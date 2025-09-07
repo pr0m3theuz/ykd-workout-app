@@ -437,7 +437,7 @@ fun MuscleTrackerContent(
     dateRangeTextButton()
     //    }
   }
-  MuscleEngagementContent(muscleEngagementData = muscleEngagementData)
+  MuscleEngagementScreen(muscleEngagementData = muscleEngagementData)
   //  }
 }
 
@@ -527,11 +527,6 @@ fun DateRangePickerScreen(
       DateRangePicker(state = dateRangePickerState)
     }
   }
-}
-
-@Composable
-fun MuscleEngagementContent(muscleEngagementData: List<Pair<Muscle, List<MuscleFractionalSets>>>) {
-  MuscleEngagementScreen(muscleEngagementData = muscleEngagementData)
 }
 
 enum class Period(val displayName: String, val value: Duration, val sequenceLimit: Int) {

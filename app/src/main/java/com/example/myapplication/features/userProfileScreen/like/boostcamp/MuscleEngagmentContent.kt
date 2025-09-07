@@ -1,7 +1,6 @@
 package com.example.myapplication.features.userProfileScreen.like.boostcamp
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -244,7 +243,7 @@ fun MuscleEngagementScreen(
       MuscleListHeader()
       HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
       muscleEngagementData.forEach { muscleData ->
-        Log.d("MuscleEngagementScreen", "maxFractionalSets: $maxFractionalSets")
+//        Log.d("MuscleEngagementScreen", "maxFractionalSets: $maxFractionalSets")
 
         MuscleFractionalSetsItem(data = muscleData, maxFractionalSets = maxFractionalSets)
         HorizontalDivider(
