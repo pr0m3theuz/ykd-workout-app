@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -76,11 +77,30 @@ constructor(
     }
   }
 
+  fun getProgram(programID: String) {
+    val id = ObjectId(programID)
+    val isProgramActive = _activePrograms.value.firstOrNull { it.id == id }?.isActive ?: false
+    if (isProgramActive) {
+      getActiveProgramByID(id)
+    } else {
+      getProgramById(id)
+    }
+  }
+
   fun getProgramById(programID: ObjectId) {
     var program: Program?
 
     viewModelScope.launch {
       program = programsRepository.getProgramByID(programID)
+      _selectedProgram.value = program
+    }
+  }
+
+  fun getActiveProgramByID(programID: ObjectId) {
+    var program: Program?
+
+    viewModelScope.launch {
+      program = programsRepository.getActiveProgramByID(programID)
       _selectedProgram.value = program
     }
   }
@@ -220,13 +240,13 @@ constructor(
 
   fun getCurrentlyActiveWorkouts(): Flow<List<Workout>> {
     //    TODO "Implement getCurrentlyActiveWorkouts"
-    TODO()
+    return flow { emptyList<Workout>() }
     //    return inProgressWorkoutRepository.getWorkouts()
   }
 
   fun deleteCurrentlyActiveWorkout(workoutID: ObjectId): Boolean {
     //    TODO "Implement deleteCurrentlyActiveWorkout"
-    TODO()
+    return false
     //    return false // inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
   }
 

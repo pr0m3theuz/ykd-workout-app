@@ -72,6 +72,7 @@ import com.example.myapplication.features.history.ui.WorkoutOverview
 import com.example.myapplication.features.history.ui.WorkoutOverviewContent
 import com.example.myapplication.features.importWorkoutProgram.ImportWorkoutProgramScreen
 import com.example.myapplication.features.previewNextWorkout.PreviewNextWorkoutScreen
+import com.example.myapplication.features.program.ProgramsViewModel
 import com.example.myapplication.features.program.ui.ProgramDetailsScreen
 import com.example.myapplication.features.program.ui.ProgramsScreen
 import com.example.myapplication.features.syncData.ReplicatorViewModel
@@ -574,9 +575,14 @@ private fun NavGraphBuilder.addExercisesGraph(navController: NavController) {
 private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 
   navigation("programsScreen", route = "programs") {
-    composable("programsScreen") {
+    composable("programsScreen") { navBackStackEntry ->
+      val programsViewModel: ProgramsViewModel =
+        navBackStackEntry.sharedViewModel<ProgramsViewModel>(navController)
+
+
       ProgramsScreen(
-        navController,
+        navController = navController,
+        programsViewModel = programsViewModel,
         currentDestination = navController.currentBackStackEntry?.destination,
         onNavigateBottomBar = { route ->
           navController.navigate(route) {
@@ -595,20 +601,21 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
     }
 
     composable(
-      "programDetails/{programID}/isProgramActive={isProgramActive}",
+      "programDetails/{programID}",
       arguments = listOf(navArgument("programID") { type = NavType.StringType }),
     ) { navBackStackEntry ->
-      val programID = navBackStackEntry.arguments?.getString("programID")
-      val isProgramActive = navBackStackEntry.arguments?.getBoolean("isProgramActive") ?: false
+      val programsViewModel: ProgramsViewModel =
+        navBackStackEntry.sharedViewModel<ProgramsViewModel>(navController)
 
-      requireNotNull(programID)
+      val programID = navBackStackEntry.arguments?.getString("programID")
+      requireNotNull(programID) { "programID is null" }
 
       // TODO This is an anti-pattern
       // https://developer.android.com/guide/navigation/use-graph/navigate
       ProgramDetailsScreen(
-        navController,
+        navController = navController,
+        programsViewModel = programsViewModel,
         _programID = programID,
-        isProgramActive = isProgramActive,
         currentDestination = navController.currentBackStackEntry?.destination,
         onNavigateBottomBar = { route ->
           navController.navigate(route) {

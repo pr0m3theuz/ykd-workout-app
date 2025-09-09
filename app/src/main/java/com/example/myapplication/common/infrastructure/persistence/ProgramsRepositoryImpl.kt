@@ -14,7 +14,9 @@ import com.couchbase.lite.SelectResult
 import com.couchbase.lite.UnitOfWork
 import com.couchbase.lite.queryChangeFlow
 import com.example.myapplication.common.domain.model.CompletedProgramsDao
+import com.example.myapplication.common.domain.model.CompletedSetsDao
 import com.example.myapplication.common.domain.model.CompletedWorkoutsDao
+import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.MesocycleDao
 import com.example.myapplication.common.domain.model.Microcycle
@@ -22,6 +24,7 @@ import com.example.myapplication.common.domain.model.MicrocycleDao
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.ProgramDao
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutDao
@@ -57,7 +60,7 @@ class ProgramsRepositoryImpl(
   val user = userProfileManager.getCurrentUser()
 
   // TODO Decide if I should create a repository for user data
-//  val userDatabase: Database? = databaseManager.userDatabase
+  //  val userDatabase: Database? = databaseManager.userDatabase
 
   private val withUnknownKeys = Json {
     encodeDefaults = true
@@ -98,7 +101,8 @@ class ProgramsRepositoryImpl(
       try {
         results.forEachIndexed { indexed, result -> // 3
           val json = result.toJSON() // 4
-//          Log.d("ProgramRepositoryImpl.mapQueryChangeToProgram()", "program $indexed: $json")
+          //          Log.d("ProgramRepositoryImpl.mapQueryChangeToProgram()", "program $indexed:
+          // $json")
           val program = withUnknownKeys.decodeFromString<ProgramDao>(json).Program // 5
           programs.add(program) // 6
         }
@@ -239,6 +243,108 @@ class ProgramsRepositoryImpl(
     return null
   }
 
+  override fun getActiveProgramByID(programID: ObjectId): Program? {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val programCollection = db.getCollection("CompletedPrograms")
+      requireNotNull(programCollection) { String.format(COLLECTION_IS_NULL) }
+
+      val workoutCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(workoutCollection) { String.format(COLLECTION_IS_NULL) }
+
+      val setCollection = db.getCollection("CompletedSets")
+      requireNotNull(setCollection) { String.format(COLLECTION_IS_NULL) }
+
+      val program =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(programCollection))
+          .where(Expression.property("id").equalTo(Expression.string(programID.toString())))
+          .execute()
+          .allResults()
+          .firstOrNull()
+          ?.toJSON()
+          ?.let { withUnknownKeys.decodeFromString<CompletedProgramsDao>(it.toString()).CompletedPrograms }
+
+      val mesocycles = program?.mesocycles ?: emptyList()
+
+      val microcycles = mesocycles.map { result -> result.microcycles }.flatten().toMutableList()
+
+      val workoutsResult =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(workoutCollection))
+          .where(Expression.property("programID").equalTo(Expression.string(programID.toString())))
+          .orderBy(Ordering.property("day").ascending())
+          .execute()
+          .allResults()
+
+      val workouts =
+        workoutsResult.map { result ->
+          val json = result.toJSON()
+          withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(json).CompletedWorkouts
+        }
+
+      val setsResult =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(setCollection))
+          .where(Expression.property("programID").equalTo(Expression.string(programID.toString())))
+          .execute()
+          .allResults()
+
+      val sets =
+        setsResult.map {
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
+        }
+
+      workouts.forEach {
+        it.workoutItems.forEach { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> {
+              workoutItem.sets =
+                sets
+                  .filter { set -> set.exerciseSetsID == workoutItem.id }
+                  .sortedBy { set -> set.setNumber }
+                  .toMutableList()
+            }
+
+            is Superset -> {
+              workoutItem.exercisesSets.forEach { exerciseSets ->
+                exerciseSets.sets =
+                  sets
+                    .filter { set -> set.exerciseSetsID == exerciseSets.id }
+                    .sortedBy { set -> set.setNumber }
+                    .toMutableList()
+              }
+            }
+          }
+        }
+      }
+
+      microcycles.forEach { microcycle ->
+        microcycle.workouts =
+          workouts.filter { it.microcycleID == microcycle.id }.sortedBy { it.day }.toMutableList()
+      }
+
+      mesocycles.forEach { mesocycle ->
+        mesocycle.microcycles =
+          microcycles
+            .filter { it.mesocycleID == mesocycle.id }
+            .sortedBy { it.order }
+            .toMutableList()
+      }
+
+      program?.mesocycles = mesocycles
+
+      //      Log.i("ProgramRepositoryImpl.getProgramByID()", "program: $program")
+
+      return program
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return null
+
+  }
+
   override fun getActivePrograms(): Flow<List<Program>> {
     //    return database.getActivePrograms()
 
@@ -249,14 +355,13 @@ class ProgramsRepositoryImpl(
 
       requireNotNull(collection) { String.format(COLLECTION_IS_NULL, "CompletedPrograms") }
 
-      val query =
-        QueryBuilder.select(SelectResult.all())
-          .from(DataSource.collection(collection))
-          .where(
-            Expression.property("isActive")
-              .equalTo(Expression.booleanValue(true))
-              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
-          )
+      val query = QueryBuilder.select(SelectResult.all()).from(DataSource.collection(collection))
+      //          .where(
+      //            Expression.property("isActive")
+      //              .equalTo(Expression.booleanValue(true))
+      //
+      // .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+      //          )
 
       val flow =
         query
@@ -299,6 +404,33 @@ class ProgramsRepositoryImpl(
     return false
   }
 
+  override fun isProgramActiveByID(programID: String): Boolean {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("CompletedPrograms")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val query =
+        QueryBuilder.select(SelectResult.property("isActive"))
+          .from(DataSource.collection(collection))
+          .where(
+            Expression.property("id")
+              .equalTo(Expression.string(programID))
+//              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+          )
+
+      val result = query.execute().allResults().firstOrNull()?.toJSON()
+
+      return result?.let { withUnknownKeys.decodeFromString<Boolean>(result.toString()) } ?: false
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return false
+  }
+
   override suspend fun createActiveProgram(program: Program): Boolean {
     //    database.copyProgramFromTemplate(program)
     //    TODO("Implement copyProgramFromTemplate")
@@ -327,45 +459,118 @@ class ProgramsRepositoryImpl(
       val (newProgram: Program, newProgramWorkouts: List<Workout>, newProgramSets: List<Set>) =
         duplicateProgramStructure(program, user)
 
+      val groupedSets = newProgramSets.groupBy { it.workoutID }
+      val workoutIDs = newProgramWorkouts.map { it.id }
+
+      require(workoutIDs == groupedSets.keys.toList()) {
+        "Sets' workoutIDs do not match new Workouts' ids"
+      }
+      require(newProgramSets.all { it.workoutID in workoutIDs }) {
+        "Sets' workoutIDs do not match new Workouts' ids"
+      }
+
       val newProgramJson = Json.encodeToString(newProgram)
-      val newProgramDocument = MutableDocument(newProgram.id.toString(), newProgramJson)
-      Log.i("ProgramRepositoryImpl.createActiveProgram()", "newProgramJson: $newProgramJson")
-      Log.i(
-        "ProgramRepositoryImpl.createActiveProgram()",
-        "newProgramDocument: $newProgramDocument",
-      )
+      val newProgramDocument = MutableDocument("Program:${newProgram.id}", newProgramJson)
+//      Log.i("ProgramRepositoryImpl.createActiveProgram()", "newProgramJson: $newProgramJson")
+//      Log.i(
+//        "ProgramRepositoryImpl.createActiveProgram()",
+//        "newProgramDocument: $newProgramDocument",
+//      )
       completedProgramsCollection.save(newProgramDocument)
 
       db.inBatch(
         UnitOfWork {
           newProgramWorkouts.forEach { workout ->
             val workoutJson = Json.encodeToString(workout)
-            val newProgramWorkoutsDocument = MutableDocument(workout.id.toString(), workoutJson)
-            Log.i(
-              "ProgramRepositoryImpl.createActiveProgram()",
-              "newProgramWorkoutsDocument: $newProgramWorkoutsDocument",
-            )
+            val newProgramWorkoutsDocument = MutableDocument("Workout:${workout.id}", workoutJson)
+//            Log.i(
+//              "ProgramRepositoryImpl.createActiveProgram()",
+//              "newProgramWorkoutsDocument: $newProgramWorkoutsDocument",
+//            )
             completedWorkoutsCollection.save(newProgramWorkoutsDocument)
           }
         }
       )
 
-      db.inBatch(
-        UnitOfWork {
-          newProgramSets.forEach { set ->
-            Log.i("ProgramRepositoryImpl.createActiveProgram()", "set: $set")
+      groupedSets.forEach { (workoutID, sets) ->
+        db.inBatch(
+          UnitOfWork {
+            sets.forEach { set ->
+              //            Log.i("ProgramRepositoryImpl.createActiveProgram()", "set: $set")
 
-            val setJson = Json.encodeToString(set)
-            Log.i("ProgramRepositoryImpl.createActiveProgram()", "setJson: $setJson")
+              val setJson = Json.encodeToString(set)
+              //            Log.i("ProgramRepositoryImpl.createActiveProgram()", "setJson:
+              // $setJson")
 
-            val newProgramSetsDocument = MutableDocument(newProgram.id.toString(), setJson)
-            Log.i(
-              "ProgramRepositoryImpl.createActiveProgram()",
-              "newProgramSetsDocument: $newProgramSetsDocument",
-            )
-            completedSetsCollection.save(newProgramSetsDocument)
+              val newProgramSetsDocument = MutableDocument("Set:${set.id}", setJson)
+//              Log.i(
+//                "ProgramRepositoryImpl.createActiveProgram()",
+//                "newProgramSetsDocument: $newProgramSetsDocument",
+//              )
+              completedSetsCollection.save(newProgramSetsDocument)
+            }
           }
+        )
+      }
+
+      val programQuery = QueryBuilder.selectDistinct(SelectResult.all())
+        .from(DataSource.collection(completedProgramsCollection))
+        .where(Expression.property("id").equalTo(Expression.string(newProgram.id.toString())))
+
+      val programResult = programQuery.execute().allResults()
+      val completedProgram =
+        withUnknownKeys.decodeFromString<ProgramDao>(programResult.first().toJSON()).Program
+
+      val workoutQuery =
+        QueryBuilder.selectDistinct(SelectResult.all())
+          .from(DataSource.collection(completedWorkoutsCollection))
+          .where(
+            Expression.property("programID").equalTo(Expression.string(newProgram.id.toString()))
+          )
+
+      val workoutResult = workoutQuery.execute().allResults()
+
+      val workouts =
+        workoutResult.map {
+          withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it.toJSON()).CompletedWorkouts
         }
+
+      val completedSetsQueryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(completedSetsCollection))
+          .where(
+            //
+            // Expression.property("workoutID").equalTo(Expression.string(workout?.id.toString()))
+            Expression.property("programID").equalTo(Expression.string(newProgram.id.toString()))
+          )
+
+      val setsResult = completedSetsQueryBuilder.execute().allResults()
+      val sets =
+        setsResult.map {
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
+        }
+
+      require(newProgram.id == completedProgram.id) { "Program ID's do not match" }
+      require(completedProgram.isActive) { "Program is not active" }
+
+      require(newProgramSets.size == sets.size) {
+        "ProgramRepositoryImpl.createActiveProgram(): Sets do not match"
+      }
+      require(newProgramWorkouts.size == workouts.size) {
+        "ProgramRepositoryImpl.createActiveProgram(): Workouts do not match"
+      }
+
+      Log.i(
+        "ProgramRepositoryImpl.createActiveProgram()",
+        "prgrams have been written to database is active: ${completedProgram.isActive}",
+      )
+      Log.i(
+        "ProgramRepositoryImpl.createActiveProgram()",
+        "all sets have been written to database: ${newProgramSets.size == sets.size}",
+      )
+      Log.i(
+        "ProgramRepositoryImpl.createActiveProgram()",
+        "all workouts have been written to database: ${newProgramWorkouts.size == workouts.size}",
       )
 
       return true
@@ -863,26 +1068,76 @@ class ProgramsRepositoryImpl(
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
-      val collection = db.getCollection("CompletedWorkouts")
+      val workoutCollection = db.getCollection("CompletedWorkouts")
+      requireNotNull(workoutCollection) { COLLECTION_IS_NULL.format("CompletedWorkouts") }
 
-      requireNotNull(collection) { COLLECTION_IS_NULL.format("CompletedWorkouts") }
+      val setCollection = db.getCollection("CompletedSets")
+      requireNotNull(setCollection) { COLLECTION_IS_NULL }
 
       val query =
         QueryBuilder.selectDistinct(SelectResult.all())
-          .from(DataSource.collection(collection))
+          .from(DataSource.collection(workoutCollection))
           .where(
             Expression.property("programID")
               .equalTo(Expression.string(programID.toString()))
               .and(Expression.property("workoutEnded").isNotValued)
-              .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
+            //
+            // .and(Expression.property("ownerID").equalTo(Expression.string(user.id.toHexString())))
           )
           .limit(Expression.intValue(1))
 
-      val result = query.execute().allResults().firstOrNull()?.toJSON()
+      val workoutResult = query.execute().allResults().firstOrNull()?.toJSON()
 
       val workout =
-        result?.let { withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts }
+        workoutResult?.let {
+          withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts
+        }
 
+      val completedSetsQueryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(setCollection))
+          .where(
+            //
+            Expression.property("workoutID").equalTo(Expression.string(workout?.id.toString()))
+            //
+            // Expression.property("programID").equalTo(Expression.string(programID.toString()))
+          )
+
+      val setsResult = completedSetsQueryBuilder.execute().allResults()
+      val sets =
+        setsResult.map {
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
+        }
+
+      //      val filteredSets = sets.filter { it.workoutID == workout?.id }
+
+      workout?.let {
+        it.workoutItems.forEach { workoutItem ->
+          when (workoutItem) {
+            is ExerciseSets -> {
+              workoutItem.sets =
+                sets
+                  .filter { set -> set.exerciseSetsID == workoutItem.id }
+                  .sortedBy { set -> set.setNumber }
+                  .toMutableList()
+            }
+
+            is Superset -> {
+              workoutItem.exercisesSets.forEach { exerciseSets ->
+                exerciseSets.sets =
+                  sets
+                    .filter { set -> set.exerciseSetsID == exerciseSets.id }
+                    .sortedBy { set -> set.setNumber }
+                    .toMutableList()
+              }
+            }
+          }
+        }
+      }
+      Log.d(
+        "ProgramRepositoryImpl.getNextWorkoutByProgramID()",
+        "ownerID & user.id are identical: ${workout?.ownerID == user.id.toHexString()}",
+      )
       return workout
     } catch (e: Exception) {
       Log.e(e.message, e.stackTraceToString())

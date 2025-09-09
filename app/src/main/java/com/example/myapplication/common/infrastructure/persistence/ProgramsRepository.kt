@@ -24,9 +24,13 @@ interface ProgramsRepository {
 
   fun getProgramByID(programID: ObjectId): Program?
 
+  fun getActiveProgramByID(programID: ObjectId): Program?
+
   fun getActivePrograms(): Flow<List<Program>>
 
   fun isProgramActive(programUUID: Uuid): Boolean
+
+  fun isProgramActiveByID(programID: String): Boolean
 
   suspend fun createActiveProgram(program: Program): Boolean
 

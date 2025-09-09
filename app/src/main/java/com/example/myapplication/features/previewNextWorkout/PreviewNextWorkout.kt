@@ -84,7 +84,7 @@ fun PreviewNextWorkoutScreen(
       directive = scaffoldNavigator.scaffoldDirective,
       value = scaffoldNavigator.scaffoldValue,
       mainPane = {
-        AnimatedPane(modifier = Modifier.safeContentPadding()) {
+        AnimatedPane() {
           Column {
             Row(
               modifier = Modifier

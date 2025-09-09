@@ -104,7 +104,6 @@ import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.util.createAnnotatedLinkString
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.program.ProgramsViewModel
-import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
@@ -112,9 +111,9 @@ import kotlin.uuid.ExperimentalUuidApi
 @Composable
 fun ProgramDetailsScreen(
   navController: NavController,
-  programsViewModel: ProgramsViewModel = koinViewModel(),
+  programsViewModel: ProgramsViewModel,
   _programID: String,
-  isProgramActive: Boolean = false,
+//  isProgramActive: Boolean,
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
@@ -131,7 +130,7 @@ fun ProgramDetailsScreen(
 
   // 2. Use LaunchedEffect to trigger loading when programID changes
   LaunchedEffect(programID) {
-    programsViewModel.getProgramById(ObjectId(programID))
+    programsViewModel.getProgram(programID)
 //    programsViewModel.getMesocyclesByProgram(ObjectId(programID))
 //    programsViewModel.getMicrocyclesByProgram(ObjectId(programID))
   }

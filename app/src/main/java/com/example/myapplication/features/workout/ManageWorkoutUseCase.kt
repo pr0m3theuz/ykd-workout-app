@@ -355,6 +355,7 @@ class ManageWorkoutUseCase(
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
     return try {
       // Delegate the actual data fetching to the repository
+      // TODO Add SetType to getPreviousSetForExercise
       completedWorkoutRepository.getPreviousSetForExercise(exerciseID, setNumber)
     } catch (e: Exception) {
       // Optional: Log the error or handle specific exceptions

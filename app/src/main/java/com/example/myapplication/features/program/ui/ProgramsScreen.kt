@@ -78,7 +78,6 @@ import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.features.program.ProgramsViewModel
-import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
 // TODO Add a placeholder card if there is no active program
@@ -95,7 +94,7 @@ import kotlin.uuid.ExperimentalUuidApi
 @Composable
 fun ProgramsScreen(
   navController: NavController,
-  programsViewModel: ProgramsViewModel = koinViewModel(),
+  programsViewModel: ProgramsViewModel,
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
@@ -442,7 +441,7 @@ fun ProgramsScreen(
                 program = program,
                 onNavigate = {
                   navController.navigate(
-                    "programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}"
+                    "programDetails/${program.id.toHexString()}"
                   )
                 },
                 programDetailsOptionsDropdownMenu = {
@@ -751,21 +750,25 @@ fun ProgramCard(
             }
           }
         }
-      }
-      if (program.isActive) {
-        Box(
-          modifier =
-            Modifier
-              .clip(CircleShape)
-              .background(MaterialTheme.colorScheme.tertiaryContainer)
-          //            .padding(4.dp)
-        ) {
-          Text(
-            text = "Active",
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.onTertiaryContainer,
-          )
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+          if (program.isActive) {
+            Box(
+              modifier =
+                Modifier
+                  .clip(CircleShape)
+                  .background(MaterialTheme.colorScheme.primaryContainer)
+//                  .weight(1f)
+              //            .padding(4.dp)
+            ) {
+              Text(
+                text = "Active",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+              )
+            }
+          }
         }
       }
 //      programDetailsOptionsDropdownMenu()
