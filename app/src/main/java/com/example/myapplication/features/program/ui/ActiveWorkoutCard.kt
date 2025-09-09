@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.LoadingWorkout
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.util.doubleFormatted
@@ -294,7 +295,7 @@ fun ActiveWorkoutCard(
       ) {
         Button(
           onClick = {
-            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=false") {
+            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.LoadWorkoutFromActiveProgram.value}") {
               popUpTo(navController.graph.findStartDestination().id) { saveState = true }
               // Avoid multiple copies of the same destination when
               // reselecting the same item

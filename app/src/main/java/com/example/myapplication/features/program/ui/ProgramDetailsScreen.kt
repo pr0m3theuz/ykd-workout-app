@@ -94,6 +94,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import coil.compose.AsyncImage
 import com.example.myapplication.R
 import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.LoadingWorkout
 import com.example.myapplication.common.domain.model.Mesocycle
 import com.example.myapplication.common.domain.model.Microcycle
 import com.example.myapplication.common.domain.model.Program
@@ -172,7 +173,7 @@ fun ProgramDetailsLayout(
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val titles = listOf("Overview", "Mesocycles", "Workouts")
 
-  val programActive = programsViewModel.isProgramActive(program.uuid)
+  val programActive = program.isActive
   //  Log.i("ProgramDetailsLayout", "program mesocycles: ${program.mesocycles.size}")
   //  Log.i("ProgramDetailsLayout", "programActive: $programActive")
   //  Log.i("ProgramDetailsLayout", "mesocycles: ${program.mesocycles}")
@@ -1032,7 +1033,7 @@ fun MicrocycleCard(
                       if (!activeProgram) {
                         // this workout in a Active Program, so copy Workout from Workout Template
                         val workoutRoute =
-                          "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true"
+                          "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromPreviousWorkout.value}"
                         if (workout.workoutEnded == null) {
                           Button(
                             enabled = true, // activeProgram,
@@ -1054,7 +1055,7 @@ fun MicrocycleCard(
                         } else {
                           // this workout in a Active Program, so view it
                           val workoutRoute =
-                            "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=false"
+                            "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value}"
                           OutlinedButton(
                             enabled = activeProgram,
                             onClick = {

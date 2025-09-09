@@ -54,6 +54,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.example.myapplication.common.domain.model.LoadingWorkout
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorServiceImpl
@@ -286,9 +287,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
       val loadPreviousWorkout =
         navBackStackEntry.arguments?.getBoolean("loadPreviousWorkout") ?: false
-      val copyWorkoutFromPreviousWorkout =
-        navBackStackEntry.arguments?.getBoolean("copyWorkoutFromPreviousWorkout") ?: false
-
+      val loadingWorkout =
+        navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
       //      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel:
       // $workoutViewModel")
 
@@ -297,11 +297,25 @@ private fun NavGraphBuilder.addWorkoutGraph(
       LaunchedEffect(workoutID) {
         Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
         Log.d("WorkoutNavGraph", "workoutID: $workoutID")
-        if (!workoutID.isNullOrBlank() && !copyWorkoutFromPreviousWorkout) {
-          Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
-          workoutViewModel.getWorkoutByID(ObjectId(workoutID))
-        } else if (!workoutID.isNullOrBlank() && copyWorkoutFromPreviousWorkout) {
-          workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
+        if (!workoutID.isNullOrBlank()) {
+          when (loadingWorkout) {
+            LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value -> {
+              Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
+              workoutViewModel.getWorkoutByID(ObjectId(workoutID))
+            }
+
+            LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
+              workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
+            }
+
+            LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
+              workoutViewModel.loadWorkoutFromActiveProgram(ObjectId(workoutID))
+            }
+
+            else -> {
+              require(false) { "Unknown loadingWorkout value: $loadingWorkout. Update LoadingWorkout enum class in WorkoutViewModel.kt." }
+            }
+          }
         }
       }
 
@@ -311,8 +325,8 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navController = navController,
         workoutViewModel = workoutViewModel,
         workoutID = workoutID,
-        loadPreviousWorkout = loadPreviousWorkout,
-        copyWorkoutFromPreviousWorkout = copyWorkoutFromPreviousWorkout,
+//        loadPreviousWorkout = loadPreviousWorkout,
+//        copyWorkoutFromPreviousWorkout = copyWorkoutFromPreviousWorkout,
         currentDestination = navController.currentBackStackEntry?.destination,
         onNavigateBottomBar = { route ->
           navController.navigate(route) {
@@ -735,7 +749,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
               },
               navigateToWorkout = { workout ->
                 navController.navigate(
-                  "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=true"
+                  "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromPreviousWorkout.value}"
                 ) {
                   popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                   launchSingleTop = true

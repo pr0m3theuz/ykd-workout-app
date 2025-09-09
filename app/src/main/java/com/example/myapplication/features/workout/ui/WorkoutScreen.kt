@@ -57,8 +57,8 @@ fun WorkoutScreen(
   navController: NavController,
   workoutViewModel: WorkoutViewModel,
   workoutID: String?,
-  loadPreviousWorkout: Boolean,
-  copyWorkoutFromPreviousWorkout: Boolean,
+//  loadPreviousWorkout: Boolean,
+//  copyWorkoutFromPreviousWorkout: Boolean,
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {

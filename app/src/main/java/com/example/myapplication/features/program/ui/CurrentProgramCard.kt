@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.ExerciseSets
+import com.example.myapplication.common.domain.model.LoadingWorkout
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
@@ -86,7 +87,7 @@ fun CurrentProgramCard(
           IconButton(onClick = { setExpandMenu(true) }) {
             Icon(
               imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
+              contentDescription = "Localized Description",
             )
           }
 
@@ -121,11 +122,7 @@ fun CurrentProgramCard(
         }
       }
 
-      Text(
-        text = workout.name,
-        modifier = Modifier.padding(horizontal = 8.dp),
-        style = bodySmall,
-      )
+      Text(text = workout.name, modifier = Modifier.padding(horizontal = 8.dp), style = bodySmall)
       Row(
         modifier =
           Modifier
@@ -160,11 +157,9 @@ fun CurrentProgramCard(
         }
       }
 
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = padding)
-      ) {
+      Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = padding)) {
         Column() {
           // TODO List Exercises
           //        Text("Workout Summary", style = bodySmall)
@@ -181,8 +176,9 @@ fun CurrentProgramCard(
                   // Log.i("getExerciseNameByID", "exercise ID: " +
                   // workoutItem.exerciseID?.toHexString())
                   Text(
-                    text = programsViewModel.getExerciseNameByID(workoutItem.exerciseID)
-                      ?: "Exercise not found.",
+                    text =
+                      programsViewModel.getExerciseNameByID(workoutItem.exerciseID)
+                        ?: "Exercise not found.",
                     style = bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -205,8 +201,7 @@ fun CurrentProgramCard(
                           if (
                             workoutItem.sets
                               .maxBy { it.targetRepetitions ?: 0 }
-                              .targetRepetitions
-                            != null
+                              .targetRepetitions != null
                           )
                             "${workoutItem.sets.maxBy { it.targetRepetitions ?: 0 }.targetRepetitions} reps"
                           else "-",
@@ -240,8 +235,9 @@ fun CurrentProgramCard(
                     verticalAlignment = Alignment.CenterVertically,
                   ) {
                     Text(
-                      text = programsViewModel.getExerciseNameByID(exerciseSets.exerciseID)
-                        ?: "Exercise not found.",
+                      text =
+                        programsViewModel.getExerciseNameByID(exerciseSets.exerciseID)
+                          ?: "Exercise not found.",
                       style = bodySmall,
                       maxLines = 1,
                       overflow = TextOverflow.Ellipsis,
@@ -262,10 +258,8 @@ fun CurrentProgramCard(
                         Text(
                           text =
                             if (
-                              exerciseSets.sets
-                                .maxBy { it.repetitions ?: 0 }
-                                .targetRepetitions
-                              != null
+                              exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions !=
+                              null
                             )
                               "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
                             else "-",
@@ -304,7 +298,9 @@ fun CurrentProgramCard(
         Button(
           onClick = {
             // TODO
-            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=false") {
+            navController.navigate(
+              "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.LoadWorkoutFromActiveProgram.value}"
+            ) {
               popUpTo(navController.graph.findStartDestination().id) { saveState = true }
               // Avoid multiple copies of the same destination when
               // reselecting the same item
@@ -314,7 +310,7 @@ fun CurrentProgramCard(
             }
           }
         ) {
-//        Text(text = "Start ${workout.name}")
+          //        Text(text = "Start ${workout.name}")
           Text(text = "Start Workout")
         }
 

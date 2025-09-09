@@ -21,7 +21,6 @@ import com.example.myapplication.common.util.InstantSerializer
 import com.example.myapplication.common.util.ObjectIdSerializer
 import com.example.myapplication.common.util.UuidSerializer
 import com.example.myapplication.common.util.newLazyListItemID
-
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
@@ -52,8 +51,7 @@ data class ActiveWorkoutDao(var ActiveWorkout: Workout)
 
 @Serializable
 data class Workout(
-  @SerialName("id")
-  var id: ObjectId = ObjectId(),
+  @SerialName("id") var id: ObjectId = ObjectId(),
   var lazyListItemID: Long = newLazyListItemID(),
   @Serializable(UuidSerializer::class) var uuid: Uuid = Uuid.random(),
   var name: String, // TODO make name default = User
@@ -61,15 +59,19 @@ data class Workout(
   var notes: List<WorkoutNote> = emptyList(),
   var workoutDuration: Long = Duration.ZERO.inWholeMilliseconds,
   var workoutType: String? = null,
-  var dateCreated: kotlin.time.Instant = Clock.System.now(), // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
-  var workoutStarted: kotlin.time.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
-  var workoutEnded: kotlin.time.Instant? = null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var dateCreated: kotlin.time.Instant =
+    Clock.System.now(), // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var workoutStarted: kotlin.time.Instant? =
+    null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
+  var workoutEnded: kotlin.time.Instant? =
+    null, // TODO Decide on whether to use Kotlinx.DateTime or Java.Time
   var isCompleted: Boolean = false,
   var day: Int? = null,
-  @Serializable(with = WorkoutItemListSerializer::class) var workoutItems: List<WorkoutItem> = emptyList(),
+  @Serializable(with = WorkoutItemListSerializer::class)
+  var workoutItems: List<WorkoutItem> = emptyList(),
   var totalVolumeInPounds: Double? = 0.0,
   var totalVolumeInKilograms: Double? = 0.0,
-//  var order: Int? = null, // For sorting workouts in a program
+  //  var order: Int? = null, // For sorting workouts in a program
   var programID: ObjectId? = null,
   var mesocycleID: ObjectId? = null,
   var microcycleID: ObjectId? = null,
@@ -124,8 +126,9 @@ fun Workout.formatWorkoutDate(): String {
 }
 
 fun Workout.formatLongWorkoutStarted(): String {
-  val dayTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a")
-    .withLocale(Locale.current.platformLocale)
+  val dayTimeFormatter =
+    DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a")
+      .withLocale(Locale.current.platformLocale)
   val offset = ZoneId.systemDefault().rules.getOffset(Instant.now())
   //  TODO Confirm if UTC or local
   return if (workoutStarted != null) {
@@ -149,13 +152,10 @@ fun Workout.totalSets(): Int {
       }
 
       is Superset -> {
-        workoutItem.exercisesSets.forEach { exerciseSets ->
-          totalSets += exerciseSets.sets.size
-        }
+        workoutItem.exercisesSets.forEach { exerciseSets -> totalSets += exerciseSets.sets.size }
       }
     }
   }
-
 
   return totalSets
 }
@@ -183,7 +183,6 @@ fun Workout.calculateTotalVolume(userDefaultWeightUnit: String): Double? {
         }
       }
     }
-
   }
   return when (userDefaultWeightUnit) {
     MassUnit.POUNDS.abbreviation -> totalVolumeInPounds
@@ -214,3 +213,9 @@ fun Workout.calculateTotalVolumeInKilograms(): Double? {
   Log.i("Workout.totalVolumeInKilograms", "$totalVolumeInKilograms")
   return totalVolumeInKilograms
 }*/
+
+enum class LoadingWorkout(val value: Int) {
+  CopyWorkoutFromWorkoutTemplate(0),
+  CopyWorkoutFromPreviousWorkout(1),
+  LoadWorkoutFromActiveProgram(2)
+}
