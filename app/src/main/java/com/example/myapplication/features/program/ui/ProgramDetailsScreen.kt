@@ -221,6 +221,7 @@ fun ProgramDetailsLayout(
             if (!startButtonPressed) {
               programsViewModel.startNewProgram(program = program)
               setStartButtonPressed(true)
+              navController.navigateUp()
             }
           }
         ) {
@@ -1027,8 +1028,6 @@ fun MicrocycleCard(
 
                         Text(text = "${workout.workoutItems.size} Exercises", style = bodyMedium)
                       }
-
-
 
                       if (!activeProgram) {
                         // this workout in a Active Program, so copy Workout from Workout Template
