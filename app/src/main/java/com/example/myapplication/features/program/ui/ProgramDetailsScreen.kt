@@ -1032,7 +1032,7 @@ fun MicrocycleCard(
                       if (!activeProgram) {
                         // this workout in a Active Program, so copy Workout from Workout Template
                         val workoutRoute =
-                          "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromPreviousWorkout.value}"
+                          "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value}"
                         if (workout.workoutEnded == null) {
                           Button(
                             enabled = true, // activeProgram,
