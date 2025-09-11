@@ -678,7 +678,13 @@ class WorkoutViewModel(
     workoutToPrepare: Workout,
     previousWorkout: Workout, // Needed for look-back progression
   ) {
+    require(previousWorkout.workoutItems.isNotEmpty()) { "Previous workout must have items" }
+    require(workoutToPrepare.workoutItems.isNotEmpty()) { "WorkoutToPrepare workout must have items" }
+
     originalWorkout = workoutToPrepare.deepCopy() // Store a deep copy of the original state
+
+    // TODO If previous workout's targetWeight is null, use the completed weight from the previous workout
+    // TODO If previous workout's increment weight is null, use the user default or prompt user
 
     // --- Simulate Running Progression Logic (Method B: Look Back) ---
     // In a real app, this would call your actual WorkoutProgressorB logic
@@ -754,6 +760,7 @@ class WorkoutViewModel(
         }
       }
     }
+
     progressionResults = results
     // --- End Simulation ---
 
@@ -1161,13 +1168,24 @@ class WorkoutViewModel(
     // Similar to getWorkoutByID, this could override DataStore's loaded workout.
     // Ensure this is the desired behavior.
     manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)?.let { workout ->
+      managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(workout)
+        ?.let { previousWorkout ->
+          setupWorkoutPreview(
+            workoutToPrepare = workout,
+            previousWorkout = previousWorkout,
+          )
+        }
+
       _workoutName.value = workout.name
-      workoutDetails = workout
+      workoutDetails = if (originalWorkout != null) originalWorkout else workout
       _workout.value = workoutDetails
 
+      requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
+
       getPinnedWorkoutNotes(workout.uuid, workout.id)
+
       Log.d("WorkoutViewModel", "loadWorkoutFromActiveProgram: calling setWorkoutComponents")
-      setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.workoutItems))
+      setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workoutDetails!!.workoutItems))
 
       val TAG = "WorkoutViewModel.loadWorkoutFromActiveProgram(): "
       val allSets = _workoutComponents.flatMap { component ->
@@ -1227,15 +1245,29 @@ class WorkoutViewModel(
   fun copyWorkoutFromPreviousWorkout(previousWorkout: ObjectId) {
 
     manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkout)?.let { workout ->
+      // TODO newWorkout's workoutItems are empty
       val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(workout)
-      _workoutName.value = newWorkout.name
-      workoutDetails = newWorkout
+
+
+      setupWorkoutPreview(
+        workoutToPrepare = workout,
+        previousWorkout = workout,
+      )
+
+      _workoutName.value = originalWorkout?.name ?: workout.name
+      workoutDetails = originalWorkout ?: workout
       _workout.value = workoutDetails
 
-      getPinnedWorkoutNotes(newWorkout.uuid, newWorkout.id)
+      requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
+
+//      _workoutName.value = newWorkout.name
+//      workoutDetails = newWorkout
+//      _workout.value = workoutDetails
+
+      getPinnedWorkoutNotes(workout.uuid, workout.id)
       Log.d("WorkoutViewModel", "copyWorkoutFromPreviousWorkout: calling setWorkoutComponents")
       setWorkoutComponents(
-        copyWorkoutItemsFromPreviousWorkout(newWorkout.workoutItems, newWorkout.id).toList()
+        copyWorkoutItemsFromPreviousWorkout(workout.workoutItems, newWorkout.id).toList()
       )
 
       val TAG = "WorkoutViewModel.copyWorkoutFromPreviousWorkout(): "
@@ -1291,8 +1323,8 @@ class WorkoutViewModel(
   /* private fun copySetsFromPreviousWorkout(previousSets: List<Set>): List<Set> {
     return manageWorkoutUseCase.copySetsFromPreviousWorkout(previousSets)
   }*/
-  fun populatePreviousSetField(exerciseID: ObjectId, setNumber: Int): Set? {
-    return manageWorkoutUseCase.getPreviousSetForExercise(exerciseID, setNumber)
+  fun populatePreviousSetField(exerciseID: ObjectId, setNumber: Int, setType: SetType): Set? {
+    return manageWorkoutUseCase.getPreviousSetForExercise(exerciseID, setNumber, setType)
   }
 
   // endregion

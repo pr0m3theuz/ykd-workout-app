@@ -4,6 +4,7 @@ package com.example.myapplication.common.infrastructure.persistence
 
 import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutAnalytics
@@ -13,7 +14,7 @@ import org.bson.types.ObjectId
 import kotlin.time.ExperimentalTime
 
 interface CompletedWorkoutRepository {
-  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set?
+  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int, setType: SetType): Set?
 
   fun getCompletedWorkoutsCount(): Int
 

@@ -184,7 +184,7 @@ fun PreviewNextWorkoutScreenPreview() {
               onEvent = {}, // Pass the event handler
               navController = rememberNavController(),
               editable = false,
-              populatePreviousSetField = { _, _ -> null },
+              populatePreviousSetField = { _, _, _ -> null },
               ExerciseOptionsDropdownMenu = { exerciseSets, addNotes -> },
             )
           }

@@ -245,6 +245,7 @@ fun EditWorkoutScreen(
                           workoutViewModel.populatePreviousSetField(
                             exercise.id,
                             setNumber = setNumber,
+                            set.setTypeID
                           )
                         }
                       }

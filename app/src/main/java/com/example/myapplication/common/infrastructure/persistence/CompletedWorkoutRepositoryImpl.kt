@@ -21,6 +21,7 @@ import com.example.myapplication.common.domain.model.MuscleDao
 import com.example.myapplication.common.domain.model.MuscleExerciseDao
 import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.UserProfileManager
@@ -93,7 +94,11 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return workouts // 7
   }
 
-  override fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
+  override fun getPreviousSetForExercise(
+    exerciseID: ObjectId,
+    setNumber: Int,
+    setType: SetType
+  ): Set? {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
@@ -108,6 +113,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
             Expression.property("exerciseID")
               .equalTo(Expression.string(exerciseID.toString()))
               .and(Expression.property("setNumber").equalTo(Expression.intValue(setNumber)))
+              .and(Expression.property("setType").equalTo(Expression.intValue(setType.setTypeID)))
               .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
           )
           .orderBy(Ordering.property("dateCreated").descending()) // Get latest set

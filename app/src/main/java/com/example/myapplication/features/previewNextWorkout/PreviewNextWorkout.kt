@@ -47,6 +47,7 @@ import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
+import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.features.ExerciseOptionsDropdownMenu
 import com.example.myapplication.features.history.ui.ConfirmChangesToWorkout
 import com.example.myapplication.features.workout.WorkoutViewModel
@@ -210,7 +211,7 @@ fun EditNextWorkoutScreenContent(
   uiState: EditNextWorkoutUiState,
   onEvent: (EditNextWorkoutUiEvent) -> Unit,
   editable: Boolean,
-  populatePreviousSetField: (exerciseID: ObjectId, setNumber: Int) -> Set?,
+  populatePreviousSetField: (exerciseID: ObjectId, setNumber: Int, setType: SetType) -> Set?,
   ExerciseOptionsDropdownMenu: @Composable (exerciseSets: ExerciseExerciseSets, addNotes: () -> Unit) -> Unit,
 ) {
 
@@ -381,7 +382,8 @@ fun EditNextWorkoutScreenContent(
                         set.setNumber?.let { setNumber ->
                           populatePreviousSetField(
                             exercise.id,
-                            setNumber
+                            setNumber,
+                            set.setTypeID
                           )
                         }
                       }

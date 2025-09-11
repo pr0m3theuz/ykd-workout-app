@@ -242,7 +242,11 @@ class ManageWorkoutUseCase(
       if (set.setNumber != null) {
         set.exerciseID?.let { exerciseID ->
           val previousSet =
-            completedWorkoutRepository.getPreviousSetForExercise(exerciseID, set.setNumber!!)
+            completedWorkoutRepository.getPreviousSetForExercise(
+              exerciseID,
+              set.setNumber!!,
+              set.setTypeID
+            )
           previousSet?.let { latestPreviousSets.add(it) }
         }
       }
@@ -352,11 +356,11 @@ class ManageWorkoutUseCase(
    * @param setNumber The specific set number (e.g., 1st working set).
    * @return The historical Set object if found and no error occurs, null otherwise.
    */
-  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int): Set? {
+  fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int, setType: SetType): Set? {
     return try {
       // Delegate the actual data fetching to the repository
       // TODO Add SetType to getPreviousSetForExercise
-      completedWorkoutRepository.getPreviousSetForExercise(exerciseID, setNumber)
+      completedWorkoutRepository.getPreviousSetForExercise(exerciseID, setNumber, setType)
     } catch (e: Exception) {
       // Optional: Log the error or handle specific exceptions
       Log.e(

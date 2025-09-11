@@ -43,10 +43,7 @@ import kotlin.uuid.Uuid
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun ExercisesSetsScreen(
-  navController: NavController,
-  workoutViewModel: WorkoutViewModel,
-) {
+fun ExercisesSetsScreen(navController: NavController, workoutViewModel: WorkoutViewModel) {
   val workoutComponents by workoutViewModel.workoutComponents.collectAsState(emptyList())
   val workoutNotes by workoutViewModel.workoutNotes.collectAsState(emptyList())
 
@@ -82,7 +79,7 @@ fun ExercisesSetsScreen(
         onCreateSuperset = { selectedExercises ->
           workoutViewModel.createSupersetFromExercisesSets(selectedExercises)
         },
-//        workoutViewModel = workoutViewModel,
+        //        workoutViewModel = workoutViewModel,
         ExerciseOptionsDropdownMenu = { addNotes ->
           ExerciseOptionsDropdownMenu(
             workoutViewModel = workoutViewModel,
@@ -98,7 +95,7 @@ fun ExercisesSetsScreen(
             workoutComponents = workoutComponents,
             onCreateSuperset = { selectedExercises -> /*TODO*/ },
           )
-        }
+        },
       )
     },
     SetItem = { supersetUuid, exerciseSets, set, index ->
@@ -107,89 +104,88 @@ fun ExercisesSetsScreen(
         set = set,
         index = index,
         addSetAtIndex = {
-          workoutViewModel.addSetAtIndex(
-            supersetUuid,
-            exerciseSets.exSetsUUID,
-            index
-          )
+          workoutViewModel.addSetAtIndex(supersetUuid, exerciseSets.exSetsUUID, index)
         },
         removeSet = { workoutViewModel.removeSet(exerciseSets, set) },
         setContent = {
           // TODO Why is SetLazyListItem() nested?
           val setUUID = set.uuid
-//          SetLazyListItem(
-//            exerciseSets = exerciseSets,
-//            set = set,
-//            index = index,
-//            addSet = { /* TODO */ },
-//            removeSet = { /*workoutViewModel.removeSet(exerciseSets, set)*/ },
-//            setContent = {
-              SetContent(
-                setIndex = index,
-                set = set,
-                getWeightUnit = { workoutViewModel.getWeightUnit(exerciseSets) },
-                populatePreviousSetField = {
-                  exerciseSets.exercise.let { exercise ->
-                    set.setNumber?.let { setNumber ->
-                      workoutViewModel.populatePreviousSetField(exercise.id, setNumber = setNumber)
-                    }
-                  }
-                },
-                updateSetReps = { reps ->
-                  workoutViewModel.updateSetReps(
-                    exerciseSets = exerciseSets,
-                    setUUID = setUUID,
-                    newReps = reps.toIntOrNull(),
+          //          SetLazyListItem(
+          //            exerciseSets = exerciseSets,
+          //            set = set,
+          //            index = index,
+          //            addSet = { /* TODO */ },
+          //            removeSet = { /*workoutViewModel.removeSet(exerciseSets, set)*/ },
+          //            setContent = {
+          SetContent(
+            setIndex = index,
+            set = set,
+            getWeightUnit = { workoutViewModel.getWeightUnit(exerciseSets) },
+            populatePreviousSetField = {
+              exerciseSets.exercise.let { exercise ->
+                set.setNumber?.let { setNumber ->
+                  workoutViewModel.populatePreviousSetField(
+                    exercise.id,
+                    setNumber = setNumber,
+                    setType = set.setTypeID,
                   )
-                },
-                updateSetRIR = { rir ->
-                  workoutViewModel.updateSetRIR(
-                    exerciseSets = exerciseSets,
-                    setUUID = setUUID,
-                    newRIR = rir.toDoubleOrNull(),
-                  )
-                },
-                updateSetWeight = { weight ->
-                  workoutViewModel.updateSetWeight(
-                    exerciseSets = exerciseSets,
-                    setUUID = setUUID,
-                    newWeight = weight.toDoubleOrNull(),
-                  )
-                },
-                updateSetType = { setType ->
-                  workoutViewModel.updateSetType(
-                    exerciseSets = exerciseSets,
-                    setUUID = setUUID,
-                    setType = setType,
-                  )
-                },
-                setComplete = { setComplete ->
-                  workoutViewModel.completeSet(
-                    exerciseSets = exerciseSets,
-                    setUUID = setUUID,
-                    completed = setComplete,
-                  )
-                },
-                startSetCompletedTimer = {
-                  workoutViewModel.startSetCompletedTimer(
-//                    exerciseSets,
-                    setUUID,
-                    setLazyListItemID = set.lazyListItemID,
-                  )
-                },
+                }
+              }
+            },
+            updateSetReps = { reps ->
+              workoutViewModel.updateSetReps(
+                exerciseSets = exerciseSets,
+                setUUID = setUUID,
+                newReps = reps.toIntOrNull(),
               )
-//            },
-//          )
+            },
+            updateSetRIR = { rir ->
+              workoutViewModel.updateSetRIR(
+                exerciseSets = exerciseSets,
+                setUUID = setUUID,
+                newRIR = rir.toDoubleOrNull(),
+              )
+            },
+            updateSetWeight = { weight ->
+              workoutViewModel.updateSetWeight(
+                exerciseSets = exerciseSets,
+                setUUID = setUUID,
+                newWeight = weight.toDoubleOrNull(),
+              )
+            },
+            updateSetType = { setType ->
+              workoutViewModel.updateSetType(
+                exerciseSets = exerciseSets,
+                setUUID = setUUID,
+                setType = setType,
+              )
+            },
+            setComplete = { setComplete ->
+              workoutViewModel.completeSet(
+                exerciseSets = exerciseSets,
+                setUUID = setUUID,
+                completed = setComplete,
+              )
+            },
+            startSetCompletedTimer = {
+              workoutViewModel.startSetCompletedTimer(
+                //                    exerciseSets,
+                setUUID,
+                setLazyListItemID = set.lazyListItemID,
+              )
+            },
+          )
+          //            },
+          //          )
         },
       )
     },
     AddSet = { supersetUuid, targetExSetsUuid ->
-      AddSet(addSet = {
-        workoutViewModel.addSet(
-          supersetUuid = supersetUuid,
-          targetExSetsUuid = targetExSetsUuid
-        )
-      })
+      AddSet(
+        addSet = {
+          workoutViewModel.addSet(supersetUuid = supersetUuid, targetExSetsUuid = targetExSetsUuid)
+        }
+      )
     },
     AddExercise = { AddExercise(navController = navController) },
     CancelWorkout = {
@@ -211,9 +207,11 @@ fun ExerciseSetLazyColumn(
   //  removeWorkoutNote: (WorkoutNote) -> Unit,
   enableCancelWorkout: Boolean,
   WorkoutNoteItem: @Composable (workoutNote: WorkoutNote) -> Unit,
-//  SupersetItem: @Composable (superset: SupersetExercisesSets) -> Unit,
+  //  SupersetItem: @Composable (superset: SupersetExercisesSets) -> Unit,
   ExerciseItem: @Composable (exerciseSets: ExerciseExerciseSets) -> Unit,
-  SetItem: @Composable (supersetUuid: Uuid?, exerciseSets: ExerciseExerciseSets, set: Set, index: Int) -> Unit,
+  SetItem:
+  @Composable
+    (supersetUuid: Uuid?, exerciseSets: ExerciseExerciseSets, set: Set, index: Int) -> Unit,
   AddSet: @Composable (supersetUuid: Uuid?, targetExSetsUuid: Uuid) -> Unit,
   AddExercise: @Composable () -> Unit,
   CancelWorkout: @Composable () -> Unit,
@@ -234,20 +232,20 @@ fun ExerciseSetLazyColumn(
       WorkoutNoteItem(workoutNote)
     }
 
-
-    items(workoutComponents, contentType = { it.type },
-      key = { component -> component.lazyListItemID }
-    )
-    { component ->
-/*
-Log.i(
-  "ExerciseSetLazyColumn",
-  "exSetsLazyListItemID: ${exerciseSets.exercise?.name}:
-  $ { exerciseSets.exSetsLazyListItemID }"
-)
-Log.i("ExerciseSetLazyColumn", "${exerciseSets.notes}")
-Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
-*/
+    items(
+      workoutComponents,
+      contentType = { it.type },
+      key = { component -> component.lazyListItemID },
+    ) { component ->
+      /*
+      Log.i(
+        "ExerciseSetLazyColumn",
+        "exSetsLazyListItemID: ${exerciseSets.exercise?.name}:
+        $ { exerciseSets.exSetsLazyListItemID }"
+      )
+      Log.i("ExerciseSetLazyColumn", "${exerciseSets.notes}")
+      Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
+      */
 
       when (component) {
         is ExerciseExerciseSets -> {
@@ -262,36 +260,30 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
 
         is SupersetExercisesSets -> {
           val supersetCardBackgroundColor: Color =
-            remember(component.lazyListItemID) { IBMColorBlindPalette.stableColorFor(component.uuid) }
+            remember(component.lazyListItemID) {
+              IBMColorBlindPalette.stableColorFor(component.uuid)
+            }
 
           Card(
             modifier = Modifier
               .fillMaxWidth()
               .padding(vertical = 8.dp),
             shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(
-              containerColor = supersetCardBackgroundColor
-            )
+            colors = CardDefaults.cardColors(containerColor = supersetCardBackgroundColor),
           ) {
             Column(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp, bottom = 4.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surface)
+              modifier =
+                Modifier
+                  .fillMaxWidth()
+                  .padding(top = 4.dp, bottom = 4.dp)
+                  .clip(RoundedCornerShape(12.dp))
+                  .background(MaterialTheme.colorScheme.surface)
             ) {
               component.exercisesSets.forEach { exerciseSets: ExerciseExerciseSets ->
                 key(exerciseSets.lazyListItemID) { ExerciseItem(exerciseSets) }
 
                 exerciseSets.sets.forEachIndexed { setIndex: Int, set: Set ->
-                  key(set.lazyListItemID) {
-                    SetItem(
-                      component.uuid,
-                      exerciseSets,
-                      set,
-                      setIndex
-                    )
-                  }
+                  key(set.lazyListItemID) { SetItem(component.uuid, exerciseSets, set, setIndex) }
                 }
 
                 AddSet(component.uuid, exerciseSets.exSetsUUID)
@@ -304,13 +296,9 @@ Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
 
     item { AddExercise() }
     if (enableCancelWorkout) item { CancelWorkout() }
-    item {
-      Spacer(
-        modifier = Modifier
-          .height(200.dp)
-          .fillMaxWidth()
-      )
-    }
+    item { Spacer(modifier = Modifier
+      .height(200.dp)
+      .fillMaxWidth()) }
   }
 }
 
@@ -319,14 +307,14 @@ fun SwipeToDismissWorkoutNote(
   workoutNote: WorkoutNote,
   pinWorkoutNote: (WorkoutNote, Boolean) -> Unit,
   updateWorkoutNote: (WorkoutNote, String) -> Unit,
-  removeWorkoutNote: () -> Unit
+  removeWorkoutNote: () -> Unit,
 ) {
   SwipeToDismissItem(onDismissRequest = { removeWorkoutNote() }, dismissStateBoolean = true) {
     WorkoutNoteTextField(
       workoutNote = workoutNote,
       pinWorkoutNote = { note, pinned -> pinWorkoutNote(note, pinned) },
       setWorkoutNote = { note, text -> updateWorkoutNote(note, text) },
-      placeholder = "Workout Note"
+      placeholder = "Workout Note",
     )
   }
 }
