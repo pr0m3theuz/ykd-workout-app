@@ -1,0 +1,173 @@
+RP Hypertrophy Training in Liftosaur! 💪
+A highly configurable implementation of RP Strength's (a.k.a. Renaissance Periodization) hypertrophy training methodology with some tweaks based on critiques & insight from other well-known exercise scientists/researchers like Dr. Eric Helms and the MASS research review.
+
+100% free and designed for the advanced lifter who wants more control over their training than offered by the official RP App. Or for those who feel the official app is overpriced 😆.
+
+Also automates more and has numerous features not available in the RP App!
+
+If you like my work, please consider donating and help me buy some more protein shakes 😁.
+
+More updates and features to come!!
+
+Existing Core features
+Autoregulated volume manipulation based on rating prompts
+
+Configurable deload weight, reps, and sets based on percentage of accumulation week values
+
+Automatic weight adjustment up or down based on performance
+
+Autoregulated and fixed mesocycle length support
+
+Restart mesocycle or deload any time
+
+Automatic starting weight estimates based on last meso performance
+
+Start a recovery session (pause progression) anytime based by simply setting RPE rating value of 3
+
+Match or beat progression system
+
+Fixed weight or percentage-based increments
+
+Linear or double progression
+
+Many options configurable per-exercise
+
+What's New
+Automatic Down Sets
+
+Configurable variable autoDownSetMode allows automatically dropping weight on subsequent sets when last completed set is at or below certain reps to keep you in the hypertrophy rep range or target rep range.
+
+New 3-day and 6-day ready-to-use templates
+
+Bug fixes around unilateral exercises
+
+Bug fixes around auto calculating starting weight for next meso
+
+Bug fixes around set count going negative
+
+Bug fixes with deload weight/reps not always calculating correctly
+
+Getting Started
+Pick your template and import it into Liftosaur:
+
+3-Day Full Body - Good for beginners, hits most of the body each day.
+
+4-Day Upper/Lower - Good balance for everyone. Classic program alternating between Upper and Lower body days.
+
+6-Day PPL - Good for more intermediate-advanced lifters who need higher volume. Classic program focusing on a Push day (Chest/Front+Side Delts/Triceps), Pull day (Back/Biceps/Rear Delts), and Leg day (Quads/Glutes/Hamstrings/Calves). Ab work is distributed between the days.
+
+Configure the Start week weights with your best estimate that will land you in the target rep range (targetMinReps and targetMaxReps) and RPE/RIR on the first set
+
+You can do this ahead of time or just set the weight mid-workout as you do each day in week 1
+
+No need to be 100% accurate, if you fall outside the range it will auto-adjust for the next week.
+
+[optional] - set the progressType and/or increment variables to change how the exercise progresses week to week based on available equipment/weights.
+
+Go!
+
+Weights, reps, and/or # of sets will be automatically calculated and adjusted based on your performance and ratings moving forward after week 1.
+
+Your meant to do week 1, then manually repeat week 2 as many times as needed to create your desired meso length, then move to week 3 (deload), then repeat.
+
+i.e. after completing the final day in week 2 make sure you manually set the Next Workout back to Accumulation (week 2) Day 1 if you don't want to deload.
+
+You can check what week it is in the meso by looking at the mesoWeek variable on any exercise. This tells the number of times you've done this exercise in the meso.
+
+If you're keeping the same exercises it'll also calculate next meso's starting weights automatically so you can repeat the meso and keep progressing.
+
+Completing Workouts
+As you complete the last set for an exercise you'll get a rating prompt:
+
+r/liftosaur - Only shown after completing the last exercise for each muscle group in that day
+Only shown after completing the last exercise for each muscle group in that day
+Enter a value which corresponds to the following scale (relative ONLY to the muscle group you're training in this exercise)
+
+-2: I was very under-recovered from last time. Still extremely sore, felt weak, the pump and/or workload was too much and beyond my limits. Reduce sets a lot.
+
+-1: I was not fully recovered from last time. Still sore, felt weak, the pump and/or workload was very challenging. Reduce sets slightly.
+
+0: I recovered well from last time. Soreness healed just in time or still only very slightly sore, got a good pump and/or workload felt reasonable and had a great workout. Keep set volume the same.
+
+1: I recovered early from last time. I wasn't sore at all and/or healed way ahead of time, pump was minor and/or workload felt somewhat easy. Increase sets slightly.
+
+2: I never got challenged. No soreness at all. I felt very strong/fresh today. Pump was non-existent and/or workload today was trivial to complete. Increase sets notably.
+
+If there is no previous session to rate (i.e. first half of week 1) just put in 0.
+
+These ratings will then impact set volume on the previous day in the week which works the same muscle group since this is what made you sore and/or impacts recovery.
+
+For example, in the 6-day PPL, ratings on Push A day will modify volume for Push B day exercises and vice-versa.
+
+For more details about RP's volume methodology read the mini-volume guide.
+
+Advanced Configuration & Usage
+The program is highly configurable and you can modify how most of it works if you want to customize it.
+
+Read the ///***PARAMETERS***/// section of the progress code for a description of each state variable.
+
+Perform a one-time recovery session
+
+Manually set the RPE value to 3 and whatever lighter weight (if needed) on the next set and complete the set
+
+All remaining sets will be set to RPE 3 and use this lighter weight
+
+Progression will be paused on this exercise for this session
+
+Increment by percentage rather than fixed weight
+
+Set the increment value to a decimal percentage less than var.FIXED_WEIGHT_INCR_MIN (i.e. less than 0.25).
+
+Ex: increment set to0.1lb would increase by 10% whenever incrementing (depending on progressType)
+
+0.25lb would increment by 0.25lb
+
+Changing progression type
+
+Set progressType
+
+0 = disable progression and match or beat system
+
+1 = linear progression - add weight every time targets are hit
+
+2 = double progression - add reps until top of target rep range is hit, then add weight
+
+Note: If reps fall below the hypertrophy range (6 reps) on set 1 it will always add reps even if progress type is set to linear progression to ensure you have some room to drop reps in subsequent sets and remain in the hypertrophy range
+
+Setting target rep range
+
+Set targetMinReps and targetMaxReps variables.
+
+Add more sets in week 1
+
+Set startNumSets to desired number of sets to start each mesocycle
+
+Or simply add them using the + button quick-add feature mid-session. It will save however many sets you did in week 1 for next time you start the meso.
+
+Denoting an exercise as unilateral or bilateral
+
+Use type variable
+
+1 = bilateral
+
+2 = unilateral (will display double numSets during workout to allow recording left vs right sides separately)
+
+Changing deload week calculations
+
+Use deloadWeightRatio, deloadRepsRatio, and deloadSetsRatio
+
+Decimal percentage values
+
+Ex: 0.5 for half
+
+Modifying automatic down sets
+
+Use autoDownSetMode variable
+
+0 = disabled automatic down sets
+
+1 = create down set when last set was at or below hypertrophy rep range + 1 (i.e. 6 reps)
+
+2 = create down set when last set was at or below target rep range minimum (targetMinReps)
+
+Down set percentage is controlled by var.AUTO_DOWN_SET_PERCENTAGE in the update code.
