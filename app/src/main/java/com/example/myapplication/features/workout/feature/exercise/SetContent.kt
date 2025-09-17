@@ -135,9 +135,14 @@ fun SetContent(
       updateReps(set.targetRepetitions.toString())
     }
     // If actualRir is empty, use target.
-    if (ratePerceivedEffortText.isBlank() && (set.targetRepetitionsInReserve != null || set.targetRatePerceivedEffort != null)) {
+    if (repetitionsInReserveText.isBlank() && (set.targetRepetitionsInReserve != null || set.targetRatePerceivedEffort != null)) {
       updateRIR(set.targetRepetitionsInReserve.toString())
     }
+    // TODO
+    //  If actualRPE is empty, use target.
+//        if (ratePerceivedEffortText.isBlank() && (set.targetRepetitionsInReserve != null || set.targetRatePerceivedEffort != null)) {
+//          updateRPE(set.targetRatePerceivedEffort.toString())
+//        }
   }
 
   fun copyPreviousSetData() {
