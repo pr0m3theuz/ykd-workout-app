@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
@@ -53,17 +55,20 @@ android {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
-  kotlinOptions {
-    jvmTarget = "17"
+  kotlin {
+    jvmToolchain(17)
+    compilerOptions {
+      jvmTarget = JvmTarget.fromTarget("17")
 
-    freeCompilerArgs =
-      listOf(
-        "-Xjvm-default=all",
-        "-Xjsr305=strict", // Strict interpretation of nullability annotations in jqwik API
-        "-Xemit-jvm-type-annotations", // Enable annotations on type variables
-      )
+      freeCompilerArgs =
+        listOf(
+          "-Xjvm-default=all",
+          "-Xjsr305=strict", // Strict interpretation of nullability annotations in jqwik API
+          "-Xemit-jvm-type-annotations", // Enable annotations on type variables
+        )
+    }
+
   }
-  kotlin { jvmToolchain(17) }
 
   tasks.withType<Test> {
     useJUnitPlatform { includeEngines("jqwik") }
