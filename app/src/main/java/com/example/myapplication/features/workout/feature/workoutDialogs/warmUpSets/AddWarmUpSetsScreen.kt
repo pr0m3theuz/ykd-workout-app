@@ -265,7 +265,7 @@ fun AddWarmUpSetsContent(
                 onClick = { replaceWarmUpSets(warmUpSets) },
                 modifier = Modifier.padding(8.dp),
               ) {
-                Text("Update Existing Warm Up Set")
+                Text("Update Existing Warm Up Sets")
               }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
