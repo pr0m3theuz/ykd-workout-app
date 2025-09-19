@@ -48,6 +48,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -950,6 +951,17 @@ fun ModernizedLoadRIRHeaderRow(
     }
   }
 
+  fun resetFilters() {
+    updateFilters(
+      activeFilters.copy(
+        rir = null,
+        rpe = null,
+        repsPerformed = null,
+        relativeLoadPercent = null
+      )
+    )
+  }
+
   //region LaunchedEffect for onLoadRIRChange
   // Function to update state and notify parent
   // This central effect updates the state and calls the callback when primary selections change.
@@ -1079,6 +1091,12 @@ fun ModernizedLoadRIRHeaderRow(
         style = style
       )
     }
+
+    TextButton(
+      onClick = {resetFilters()}
+    ) {
+      Text("Reset Fields")
+    }
   }
   //endregion
 }
@@ -1121,7 +1139,7 @@ fun getRpeOptions(
   return list
 }
 
-@Preview
+@Preview (showBackground = true)
 @Composable
 fun ModernizedLoadRIRHeaderRowPreview() {
   val modernizedLoadRIRData = listOf(
