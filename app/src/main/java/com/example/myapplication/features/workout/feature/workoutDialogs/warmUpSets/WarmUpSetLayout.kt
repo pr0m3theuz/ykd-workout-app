@@ -5,6 +5,7 @@ package com.example.myapplication.features
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -87,17 +88,35 @@ fun WarmUpSetLayout(
     onRirChanged(warmUpSet.uuid, rirText.toDoubleOrNull())
   }
 
-  SetContent(
-    setTypeText = setIndex.inc().toString(),
-    setTypeColor = Color.White, /* TODO to get from SetType */
-    resultsText = calculateNewSetResults(
+  var resultsText by remember { mutableStateOf(
+    calculateNewSetResults(
       warmUpSet.targetWeightPounds,
       warmUpSet.targetPercentage1RM,
       repetitionsText = if (warmUpSet.targetRepetitions != null) warmUpSet.targetRepetitions.toString() else 0.toString(),
       rirText = if (warmUpSet.targetRepetitionsInReserve != null)
         doubleFormatted(warmUpSet.targetRepetitionsInReserve) else "",
       rpeText = warmUpSet.targetRatePerceivedEffort.toString()
-    ),
+    ))
+  }
+
+  LaunchedEffect(
+    currentPercentageText,
+    currentRepetitionsText,
+    currentRirText
+  ) {
+    resultsText = calculateNewSetResults(
+      warmUpSet.targetWeightPounds,
+      warmUpSet.targetPercentage1RM,
+      repetitionsText = currentRepetitionsText,
+      rirText = currentRirText,
+      rpeText = warmUpSet.targetRatePerceivedEffort.toString()
+    )
+  }
+
+  SetContent(
+    setTypeText = setIndex.inc().toString(),
+    setTypeColor = Color.White, /* TODO to get from SetType */
+    resultsText = resultsText,
     percentageText = currentPercentageText,
     repetitionsText = currentRepetitionsText,
     rirText = currentRirText,

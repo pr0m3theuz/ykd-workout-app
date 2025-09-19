@@ -3,6 +3,7 @@
 package com.example.myapplication.features.workout.feature.workoutDialogs.equateVolume
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -11,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.util.checkIntInput
 import com.example.myapplication.common.util.checkRIRInput
+import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.features.workout.feature.workoutDialogs.SetContent
 import com.example.myapplication.features.workout.feature.workoutDialogs.calculateNewSetResults
 import com.example.myapplication.features.workout.feature.workoutDialogs.calculatePercentage
@@ -71,17 +73,37 @@ fun EquateVolumeLayout(
         newRIR(rirText?.toDoubleOrNull())
     }
 
+    var resultsText by remember { mutableStateOf(
+        calculateNewSetResults(
+            workingSet.targetWeightPounds,
+            workingSet.targetPercentage1RM,
+            repetitionsText = if (workingSet.targetRepetitions != null) workingSet.targetRepetitions.toString() else 0.toString(),
+            rirText = if (workingSet.targetRepetitionsInReserve != null)
+                doubleFormatted(workingSet.targetRepetitionsInReserve) else "",
+            rpeText = workingSet.targetRatePerceivedEffort.toString()
+        ))
+    }
+
+    LaunchedEffect(
+        percentageText,
+        repetitionsText,
+        rirText
+    ) {
+        resultsText = calculateNewSetResults(
+            workingSet.targetWeightPounds,
+            workingSet.targetPercentage1RM,
+            repetitionsText = repetitionsText,
+            rirText = rirText,
+            rpeText = workingSet.targetRatePerceivedEffort.toString()
+        )
+    }
+
+
     SetContent(
 //        setNumber = setIndex.inc(),
         setTypeText = setIndex.inc().toString(),
         setTypeColor = Color.White, /* TODO to get from SetType */
-        resultsText = calculateNewSetResults(
-            workingWeight,
-            workingSetPercentage,
-            repetitionsText,
-            rirText,
-            rpeText = null
-        ),
+        resultsText = resultsText,
         percentageText = percentageText,
         repetitionsText = repetitionsText,
         rirText = rirText,
