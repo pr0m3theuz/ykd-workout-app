@@ -29,7 +29,7 @@ import com.example.myapplication.common.domain.model.updateSetWeight
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
-import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRRepository
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
@@ -58,7 +58,7 @@ class ManageWorkoutUseCase(
   private val completedWorkoutRepository: CompletedWorkoutRepository,
   private val userRepository: UserRepository,
   private val userProfileManager: UserProfileManager,
-  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory,
+  private val modernizedLoadRIRRepository: ModernizedLoadRIRRepository,
 ) {
 
   // TODO rewrite
@@ -159,7 +159,7 @@ class ManageWorkoutUseCase(
               order = workoutItem.order,
               ownerID = userID,
               isPublic = false,
-              workoutID = workoutItem.workoutID,
+              workoutID = workoutID,
               microcycleID = workoutItem.microcycleID,
               mesocycleID = workoutItem.mesocycleID,
               programID = workoutItem.programID,
@@ -167,6 +167,20 @@ class ManageWorkoutUseCase(
           }
         }
       }
+
+    val TAG = "ManageWorkoutUseCase.createNewWorkoutComponentsFromPreviousWorkout(): "
+    val allSets = workoutComponents.flatMap { component ->
+      when (component) {
+        is ExerciseExerciseSets -> component.sets
+        is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+      }
+    }
+
+    Log.d(TAG, "allSets have the same workoutID ($workoutID): ${allSets.all { set -> set.workoutID == workoutID }}")
+
+    require(allSets.all { set -> set.workoutID == workoutID }) {
+      "$TAG All sets workoutIDs does not match Workout.id!"
+    }
 
     return workoutComponents
   }
@@ -223,6 +237,8 @@ class ManageWorkoutUseCase(
           repetitionsInReserve = set.repetitionsInReserve,
           targetWeightPounds = set.targetWeightPounds,
           targetRepetitions = set.targetRepetitions,
+          targetMinimumRepetitions = set.targetMinimumRepetitions,
+          targetMaximumRepetitions = set.targetMaximumRepetitions,
           targetRatePerceivedEffort = set.targetRatePerceivedEffort,
           targetRepetitionsInReserve = set.targetRepetitionsInReserve,
           targetPercentage1RM = set.targetPercentage1RM,
@@ -234,11 +250,13 @@ class ManageWorkoutUseCase(
           exerciseID = exerciseID,
           ownerID = userID, // TODO Replace currentUser.id
         )
+      Log.d("createNewSetsFromPreviousWorkout", "set.workoutID (${newSet.workoutID}) is the same as currentWorkoutID ($currentWorkoutID): ${newSet.workoutID == currentWorkoutID}")
       newSets.add(newSet)
       //      Log.i(
       //        "createNewSetsFromPreviousWorkout",
       //        "setNumber: ${set.setNumber}, set.exerciseID: ${set.exerciseID}"
       //      )
+
       if (set.setNumber != null) {
         set.exerciseID?.let { exerciseID ->
           val previousSet =
@@ -466,7 +484,7 @@ class ManageWorkoutUseCase(
     //    TODO Only Add Completed Sets, Implement Check ond Remove Uncompleted Sets
     //    removeUncompletedSets(exercisesSets.toMutableList())
 
-    modernizedLoadRIRItems = modernizedLoadRIRReposistory.getAllModernizedLoadRIR()
+    modernizedLoadRIRItems = modernizedLoadRIRRepository.getAllModernizedLoadRIR()
 
     workoutComponents.forEach { workoutItem ->
       when (workoutItem) {
