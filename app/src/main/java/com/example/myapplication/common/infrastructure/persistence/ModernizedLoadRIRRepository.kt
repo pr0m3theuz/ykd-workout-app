@@ -5,7 +5,7 @@ import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.RepCapacity
 import kotlinx.coroutines.flow.Flow
 
-interface ModernizedLoadRIRReposistory {
+interface ModernizedLoadRIRRepository {
   fun getRelativeLoadPercentage(
     repCapacity: RepCapacity,
     rir: Double,

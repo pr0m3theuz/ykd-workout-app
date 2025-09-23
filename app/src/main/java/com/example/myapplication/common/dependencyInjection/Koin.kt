@@ -14,8 +14,8 @@ import com.example.myapplication.common.infrastructure.persistence.ExerciseNotes
 import com.example.myapplication.common.infrastructure.persistence.ExerciseNotesRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepositoryImpl
-import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
-import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistoryImpl
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRRepository
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
@@ -108,7 +108,7 @@ val commonModule = module {
   singleOf(::ReplicatorServiceImpl) bind ReplicatorService::class
 //  singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
   singleOf(::CompletedWorkoutRepositoryImpl) bind CompletedWorkoutRepository::class
-  singleOf(::ModernizedLoadRIRReposistoryImpl) bind ModernizedLoadRIRReposistory::class
+  singleOf(::ModernizedLoadRIRRepositoryImpl) bind ModernizedLoadRIRRepository::class
 //  singleOf(::ImportWorkoutProgramRepository)
 
   single { WorkoutDatastore(get()) } // Added WorkoutDatastore to Koin module

@@ -26,8 +26,8 @@ private const val DATABASE_IS_NULL = "Modernized Load RIR Repository: Database d
 private const val COLLECTION_IS_NULL =
   "Modernized Load RIR Repository: ModernizedLoadRIR Collection does not exist in the Database."
 
-class ModernizedLoadRIRReposistoryImpl(private val databaseManager: DatabaseManager) :
-  ModernizedLoadRIRReposistory {
+class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManager) :
+  ModernizedLoadRIRRepository {
   val db: Database? = databaseManager.database
 
   private val withUnknownKeys = Json { ignoreUnknownKeys = true }

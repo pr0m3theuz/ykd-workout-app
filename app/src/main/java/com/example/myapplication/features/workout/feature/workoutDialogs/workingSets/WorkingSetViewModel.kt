@@ -12,7 +12,7 @@ import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.convertKgToPound
 import com.example.myapplication.common.domain.model.convertPoundToKg
-import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRRepository
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.newLazyListItemID
@@ -27,7 +27,7 @@ import kotlin.uuid.Uuid
 
 class WorkingSetViewModel(
   private val userProfileManager: UserProfileManager,
-  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory,
+  private val modernizedLoadRIRRepository: ModernizedLoadRIRRepository,
 ) : ViewModel() {
 
   val currentUser = userProfileManager.userProfile.value
@@ -82,7 +82,7 @@ class WorkingSetViewModel(
 
   private fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
     viewModelScope.launch {
-      modernizedLoadRIRReposistory.getRepCapacityModernizedLoadRIR(repCapacity).collect {
+      modernizedLoadRIRRepository.getRepCapacityModernizedLoadRIR(repCapacity).collect {
         _modernizedLoadRIRList = it
         _modernizedLoadRIRListFlow.value = _modernizedLoadRIRList
       }

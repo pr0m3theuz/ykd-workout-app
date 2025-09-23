@@ -10,7 +10,7 @@ import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.setVolume
-import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRRepository
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.RepCapacity
@@ -29,7 +29,7 @@ import kotlin.uuid.Uuid
 
 class EquateVolumeViewModel(
   private val userRepository: UserRepository,
-  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory
+  private val modernizedLoadRIRRepository: ModernizedLoadRIRRepository
 ) : ViewModel() {
   private val WARM_UP_SET = SetType.warmUpSet
 
@@ -84,7 +84,7 @@ class EquateVolumeViewModel(
 
   private fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
     viewModelScope.launch {
-      modernizedLoadRIRReposistory.getRepCapacityModernizedLoadRIR(repCapacity).collect {
+      modernizedLoadRIRRepository.getRepCapacityModernizedLoadRIR(repCapacity).collect {
         _modernizedLoadRIRList = it
         _modernizedLoadRIRListFlow.value = _modernizedLoadRIRList
       }

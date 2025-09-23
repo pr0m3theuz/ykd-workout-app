@@ -23,7 +23,7 @@ import com.example.myapplication.common.domain.model.Utility
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
-import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRReposistory
+import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRRepository
 import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.OneRepMaxEstimateFormulas
 import com.example.myapplication.common.util.RepCapacity
@@ -129,7 +129,7 @@ class ExercisesViewModel
 constructor(
   private val userProfileManager: UserProfileManager,
   private val exercisesRepository: ExercisesRepository,
-  private val modernizedLoadRIRReposistory: ModernizedLoadRIRReposistory,
+  private val modernizedLoadRIRRepository: ModernizedLoadRIRRepository,
 ) : ViewModel() {
   private val userProfile = userProfileManager.userProfile.value
 
@@ -369,7 +369,7 @@ constructor(
   private suspend fun getAllModernizedLoadRIR() {
     //    Log.i("ExercisesViewModel", "getEquipment")
     return coroutineScope {
-      _modernizedLoadRIRItems = modernizedLoadRIRReposistory.getAllModernizedLoadRIR()
+      _modernizedLoadRIRItems = modernizedLoadRIRRepository.getAllModernizedLoadRIR()
       //        Log.i("ExercisesViewModel.getEquipment()", "getEquipment(): $it")
     }
   }
