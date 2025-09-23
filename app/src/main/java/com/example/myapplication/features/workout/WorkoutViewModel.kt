@@ -234,7 +234,7 @@ class WorkoutViewModel(
       //      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
       val activeWorkout = workoutDatastore.getActiveWorkout.first()
 
-      Log.d("WorkoutViewModel", "is _workout.value null: ${_workout.value == null}")
+      Log.d("WorkoutViewModel", "is _workout.value null: ${if (_workout.value == null) true else false}")
       Log.d("WorkoutViewModel", "_workout.name: ${_workout.value?.name}")
       Log.d("WorkoutViewModel", "isWorkoutActive: $isWorkoutActive")
       //        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance():
@@ -678,6 +678,8 @@ class WorkoutViewModel(
     workoutToPrepare: Workout,
     previousWorkout: Workout, // Needed for look-back progression
   ) {
+    // TODO rewrite using functional programming and return a result
+
     require(previousWorkout.workoutItems.isNotEmpty()) { "Previous workout must have items" }
     require(workoutToPrepare.workoutItems.isNotEmpty()) { "WorkoutToPrepare workout must have items" }
 
@@ -1248,14 +1250,21 @@ class WorkoutViewModel(
       // TODO newWorkout's workoutItems are empty
       val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(workout)
 
-
+      // TODO make this functional and store results
       setupWorkoutPreview(
         workoutToPrepare = workout,
         previousWorkout = workout,
       )
 
-      _workoutName.value = originalWorkout?.name ?: workout.name
-      workoutDetails = originalWorkout ?: workout
+      Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "workout: $workout")
+      Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "originalWorkout: $originalWorkout")
+      Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "newWorkout: $newWorkout")
+
+      // TODO is originalWorkout or newWorkout
+      // TODO rewrite using functional programming
+
+      _workoutName.value = newWorkout.name
+      workoutDetails = newWorkout
       _workout.value = workoutDetails
 
       requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
@@ -1266,9 +1275,10 @@ class WorkoutViewModel(
 
       getPinnedWorkoutNotes(workout.uuid, workout.id)
       Log.d("WorkoutViewModel", "copyWorkoutFromPreviousWorkout: calling setWorkoutComponents")
-      setWorkoutComponents(
-        copyWorkoutItemsFromPreviousWorkout(workout.workoutItems, newWorkout.id).toList()
-      )
+
+      val results = copyWorkoutItemsFromPreviousWorkout(workout.workoutItems, newWorkout.id)
+      _workoutComponents = results.toMutableList()
+      _workoutComponentFlow.value = results
 
       val TAG = "WorkoutViewModel.copyWorkoutFromPreviousWorkout(): "
       val allSets = _workoutComponents.flatMap { component ->
