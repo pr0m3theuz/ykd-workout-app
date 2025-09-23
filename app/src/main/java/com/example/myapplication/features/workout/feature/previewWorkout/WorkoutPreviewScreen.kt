@@ -167,6 +167,27 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
         }
 
       }
+
+      Text(
+        text = "Progression Scheme: ${preview.originalItem.sets.first { it.setTypeID != SetType.warmUpSet }.progressionSchemeID?.name}",
+        style = MaterialTheme.typography.labelMedium,
+      )
+
+      Text(
+        text = "Target Reps: ${preview.originalItem.sets.first { it.setTypeID != SetType.warmUpSet }.targetRepetitions}",
+        style = MaterialTheme.typography.labelMedium,
+      )
+
+      Text(
+        text = "Target Min Rep Range: ${preview.originalItem.sets.first { it.setTypeID != SetType.warmUpSet }.targetMinimumRepetitions}",
+        style = MaterialTheme.typography.labelMedium,
+      )
+
+      Text(
+        text = "Target Max Rep Range: ${preview.originalItem.sets.first { it.setTypeID != SetType.warmUpSet }.targetMaximumRepetitions}",
+        style = MaterialTheme.typography.labelMedium,
+      )
+
       when (preview.overallOutcome) {
         ProgressionOutcome.PROGRESSED -> {
           if (preview.isProgressionUniform && preview.previewSets.any { it.wasModified }) {
