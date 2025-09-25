@@ -68,7 +68,7 @@ class ManageWorkoutUseCase(
   //      ?: MassUnit.POUNDS.abbreviation
 
   private val userID = userProfileManager.userProfile.value.id.toHexString() ?: "TemporaryUserID"
-  val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
+  val userDefaultWeightUnit: String = userProfileManager.userProfile.value.defaultWeightUnit.abbreviation
 
   fun getExerciseByID(exerciseID: ObjectId?): Exercise? {
     return exercisesRepository.getExercise(exerciseID)
