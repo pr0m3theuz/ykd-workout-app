@@ -197,6 +197,7 @@ fun AddWorkingSetsDialog(
               removeSet = { workingSetViewModel.remove(workingSet) },
               SetLayout = {
                 WarmUpSetLayout(
+                  userWeightUnit = weightUnit,
                   warmUpSet = workingSet,
                   setIndex = index,
                   percentageText = percentageText,

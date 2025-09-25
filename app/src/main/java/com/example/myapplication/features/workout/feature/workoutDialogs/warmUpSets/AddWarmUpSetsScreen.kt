@@ -245,6 +245,7 @@ fun AddWarmUpSetsContent(
         //        selectedSets = selectedSets,
         warmUpSetItem = { warmUpSet, index, percentageText, repetitionsText, rirText, rpeText ->
           WarmUpSetItem(
+            userWeightUnit = weightUnit,
             warmUpSet = warmUpSet,
             index = index,
             percentageText = percentageText,

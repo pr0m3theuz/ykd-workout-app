@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.util.checkIntInput
 import com.example.myapplication.common.util.checkRIRInput
@@ -26,6 +27,8 @@ fun EquateVolumeLayout(
     setIndex: Int,
     workingSet: Set,
 ) {
+    val userWeightUnit = equateVolumeViewModel.userDefaultWeightUnit
+
     var workingSetPercentage: Double? by remember { mutableStateOf(workingSet.percentage1RM) }
 
     var percentageText by remember { mutableStateOf(getFormattedPercentageText(workingSetPercentage)) }
@@ -75,8 +78,8 @@ fun EquateVolumeLayout(
 
     var resultsText by remember { mutableStateOf(
         calculateNewSetResults(
-            workingSet.targetWeightPounds,
-            workingSet.targetPercentage1RM,
+            weight = if (userWeightUnit == MassUnit.POUNDS.abbreviation) workingSet.targetWeightPounds else workingSet.targetWeightKilograms,
+            percentage = workingSet.targetPercentage1RM,
             repetitionsText = if (workingSet.targetRepetitions != null) workingSet.targetRepetitions.toString() else 0.toString(),
             rirText = if (workingSet.targetRepetitionsInReserve != null)
                 doubleFormatted(workingSet.targetRepetitionsInReserve) else "",
@@ -90,8 +93,8 @@ fun EquateVolumeLayout(
         rirText
     ) {
         resultsText = calculateNewSetResults(
-            workingSet.targetWeightPounds,
-            workingSet.targetPercentage1RM,
+            weight = if (userWeightUnit == MassUnit.POUNDS.abbreviation) workingSet.targetWeightPounds else workingSet.targetWeightKilograms,
+            percentage = workingSet.targetPercentage1RM,
             repetitionsText = repetitionsText,
             rirText = rirText,
             rpeText = workingSet.targetRatePerceivedEffort.toString()

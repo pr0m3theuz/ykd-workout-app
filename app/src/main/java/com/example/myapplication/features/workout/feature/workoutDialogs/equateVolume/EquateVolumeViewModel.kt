@@ -9,6 +9,7 @@ import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
+import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.setVolume
 import com.example.myapplication.common.infrastructure.persistence.ModernizedLoadRIRRepository
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
@@ -28,7 +29,7 @@ import kotlin.uuid.Uuid
 
 
 class EquateVolumeViewModel(
-  private val userRepository: UserRepository,
+  private val userProfileManager: UserProfileManager,
   private val modernizedLoadRIRRepository: ModernizedLoadRIRRepository
 ) : ViewModel() {
   private val WARM_UP_SET = SetType.warmUpSet
@@ -38,8 +39,9 @@ class EquateVolumeViewModel(
 //  val userDefaultWeightUnit: String =
 //    userRepository.getCurrentUser().customDataAsBsonDocument()?.getString("weightUnit")?.value
 //      ?: MassUnit.POUNDS.abbreviation
-  private val tempOwnerId = ObjectId().toString()
-  val userDefaultWeightUnit: String = MassUnit.POUNDS.abbreviation
+  val currentUser = userProfileManager.userProfile.value
+
+  val userDefaultWeightUnit: String = currentUser.defaultWeightUnit.abbreviation
 
   private var exerciseWeightUnit: String? = null
 

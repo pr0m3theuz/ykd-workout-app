@@ -24,6 +24,7 @@ import kotlin.uuid.Uuid
 
 @Composable
 fun WarmUpSetItem(
+  userWeightUnit: String,
   warmUpSet: Set,
   index: Int,
   percentageText: String,
@@ -40,6 +41,7 @@ fun WarmUpSetItem(
     removeSet = { removeSet(warmUpSet.uuid) },
     SetLayout = {
       WarmUpSetLayout(
+        userWeightUnit = userWeightUnit,
         warmUpSet = warmUpSet,
         setIndex = index,
         percentageText = percentageText,
