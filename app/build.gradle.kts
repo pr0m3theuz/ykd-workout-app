@@ -243,7 +243,7 @@ dependencies {
   testImplementation("io.insert-koin:koin-test-junit5:$koin")
 
   // New Relic Crash Analytics
-  implementation("com.newrelic.agent.android:android-agent:7.6.8")
+  implementation("com.newrelic.agent.android:android-agent:7.6.9")
 
   // Apple pkl
 //  implementation("org.pkl-lang:pkl-config-kotlin:0.26.0")
