@@ -111,11 +111,17 @@ fun ExerciseOptionsDropdownMenu(
       )
       DropdownMenuItem(
         text = { Text("Add Working Sets") },
-        onClick = { openAddWorkingSetsDialog = true }
+        onClick = {
+//          openAddWorkingSetsDialog = true
+          navController.navigate("addWorkingSets/${exerciseSets.id.toHexString()}")
+        }
       )
       DropdownMenuItem(
         text = { Text("Equate Volume") },
-        onClick = { openEquateVolumeDialog = true }
+        onClick = {
+//          openEquateVolumeDialog = true
+          navController.navigate("equateVolume/${exerciseSets.id.toHexString()}")
+        }
       )
       DropdownMenuItem(
         text = { Text("Create Superset") },
@@ -203,13 +209,13 @@ fun ExerciseOptionsDropdownMenu(
             exerciseSets = exerciseSets
           )
         }*/
-    if (openAddWorkingSetsDialog) {
+/*    if (openAddWorkingSetsDialog) {
       AddWorkingSetsScreen(
         workoutViewModel = workoutViewModel,
         openDialog = { close -> closeWorkingSetsDialog(close) },
         exerciseSets = exerciseSets
       )
-    }
+    }*/
 
     if (openRestTimePicker) {
       AutoRestTimerScreen(
@@ -226,13 +232,13 @@ fun ExerciseOptionsDropdownMenu(
       )
     }
 
-    if (openEquateVolumeDialog) {
+/*    if (openEquateVolumeDialog) {
       EquateVolumeScreen(
         workoutViewModel = workoutViewModel,
         openDialog = { close -> closeEquateVolumeDialog(close) },
         exerciseSets = exerciseSets
       )
-    }
+    }*/
 
 //    if (openReplaceExerciseScreen) {
 //      ReplaceExerciseScreen(

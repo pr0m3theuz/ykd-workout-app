@@ -68,6 +68,8 @@ class EquateVolumeViewModel(
     get() = _newTotalVolume
 
   private var _exerciseSets: ExerciseExerciseSets? = null
+  val exerciseSets
+    get() = MutableStateFlow(_exerciseSets).asStateFlow()
 
   private var _modernizedLoadRIRList: List<ModernizedLoadRIR> = listOf()
   private val _modernizedLoadRIRListFlow = MutableStateFlow(_modernizedLoadRIRList)
@@ -84,6 +86,29 @@ class EquateVolumeViewModel(
     _setsFlow.value = _sets.toList()
   }
 
+  fun setExerciseSets(exerciseSets: ExerciseExerciseSets) {
+    _exerciseSets = exerciseSets
+    exerciseWeightUnit = exerciseSets.exercise.weightUnit ?: userDefaultWeightUnit
+    _sets =
+      exerciseSets.sets
+        .filter { it.setTypeID != SetType.warmUpSet }
+        .toMutableList()
+        .takeIf { it.isNotEmpty() } ?: mutableListOf()
+    _setsFlow.value = _sets.toList()
+    // TODO should warm up sets be incleded in total volume calculation?
+    setNewTotalVolume(calculateTotalVolume(_sets))
+    setTotalVolume(calculateTotalVolume(_sets))
+    getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
+  }
+
+  fun getWeightUnit(): String {
+    return if (_exerciseSets?.exercise?.weightUnit != null) {
+      _exerciseSets?.exercise?.weightUnit ?: MassUnit.POUNDS.abbreviation
+    } else {
+      userDefaultWeightUnit
+    }
+  }
+
   private fun getAllModernizedLoadRIRData(repCapacity: RepCapacity = RepCapacity.Average) {
     viewModelScope.launch {
       modernizedLoadRIRRepository.getRepCapacityModernizedLoadRIR(repCapacity).collect {
@@ -94,10 +119,10 @@ class EquateVolumeViewModel(
   }
 
   fun initialize(exerciseSets: ExerciseExerciseSets) {
-    getExerciseSets(exerciseSets)
+//    getExerciseSets(exerciseSets)
     changeWorkingSets(exerciseSets.sets)
     setTotalVolume(calculateTotalVolume(exerciseSets.sets))
-    getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
+//    getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
   }
 
 

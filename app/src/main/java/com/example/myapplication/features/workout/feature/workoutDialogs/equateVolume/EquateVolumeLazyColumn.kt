@@ -22,7 +22,10 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 // @Preview
 @Composable
-fun EquateVolumeLazyColumn(equateVolumeViewModel: EquateVolumeViewModel = koinViewModel()) {
+fun EquateVolumeLazyColumn(
+  equateVolumeViewModel: EquateVolumeViewModel = koinViewModel(),
+  actionRow: @Composable () -> Unit
+) {
   val listState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
   val coroutineScope = rememberCoroutineScope()
@@ -43,23 +46,27 @@ fun EquateVolumeLazyColumn(equateVolumeViewModel: EquateVolumeViewModel = koinVi
         SetLayout = { EquateVolumeLayout(setIndex = index, workingSet = workingSet) },
       )
     }
-  }
 
-  Row(
-    modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.Center,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    TextButton(
-      onClick = {
-        equateVolumeViewModel.addSet()
-        coroutineScope.launch {
-          // Animate scroll to the last item
-          listState.animateScrollToItem(index = workingSets.size.dec())
+    item {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        TextButton(
+          onClick = {
+            equateVolumeViewModel.addSet()
+            coroutineScope.launch {
+              // Animate scroll to the last item
+              listState.animateScrollToItem(index = workingSets.size.dec())
+            }
+          }
+        ) {
+          AddSetText()
         }
       }
-    ) {
-      AddSetText()
     }
+
+    item { actionRow() }
   }
 }

@@ -35,7 +35,8 @@ class WorkingSetViewModel(
   val userDefaultWeightUnit: String = currentUser.defaultWeightUnit.abbreviation
 
   private var _exerciseSets: ExerciseExerciseSets? = null
-
+  val exerciseSets
+    get() = MutableStateFlow(_exerciseSets).asStateFlow()
   private var exerciseWeightUnit: String? = null
   private var _oneRepMax: Double = 100.0
   val oneRepMax: Double
@@ -58,6 +59,26 @@ class WorkingSetViewModel(
   fun updateWorkingSetWeight(newWorkingWeight: Double) {
     _workingSetWeight.value = newWorkingWeight
     updateSetsOnWorkingSetWeightChange()
+  }
+
+  fun setExerciseSets(exerciseSets: ExerciseExerciseSets) {
+    _exerciseSets = exerciseSets
+    exerciseWeightUnit = exerciseSets.exercise.weightUnit ?: userDefaultWeightUnit
+    _sets =
+      exerciseSets.sets
+        .filter { it.setTypeID != SetType.warmUpSet }
+        .toMutableList()
+        .takeIf { it.isNotEmpty() } ?: mutableListOf()
+    _setsFlow.value = _sets.toList()
+    getAllModernizedLoadRIRData(exerciseSets.exercise.repCapacity)
+  }
+
+  fun getWeightUnit(): String {
+    return if (_exerciseSets?.exercise?.weightUnit != null) {
+      _exerciseSets?.exercise?.weightUnit ?: MassUnit.POUNDS.abbreviation
+    } else {
+      userDefaultWeightUnit
+    }
   }
 
   //  private var exerciseID: Long = 0

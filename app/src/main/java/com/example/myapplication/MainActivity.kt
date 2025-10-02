@@ -92,11 +92,13 @@ import com.example.myapplication.features.userProfileScreen.like.strengthLog.Equ
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundOffScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.SettingsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.TimerSettingsScreen
+import com.example.myapplication.features.workout.EquateVolumeScreen
 import com.example.myapplication.features.workout.WorkoutViewModel
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExerciseNavigableListDetailScreen
 import com.example.myapplication.features.workout.feature.addExercisesList.AddExercisesScreen
 import com.example.myapplication.features.workout.feature.previewWorkout.WorkoutPreviewScreen
 import com.example.myapplication.features.workout.feature.workoutDialogs.warmUpSets.AddWarmUpSetsScreen
+import com.example.myapplication.features.workout.feature.workoutDialogs.workingSets.AddWorkingSetsScreen
 import com.example.myapplication.features.workout.ui.WorkoutScreen
 import com.example.myapplication.features.workout.ui.WorkoutSummaryScreen
 import com.google.firebase.Firebase
@@ -534,6 +536,34 @@ private fun NavGraphBuilder.addWorkoutGraph(
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
       Log.d("AddWarmUpSetsScreen", "exerciseSetsID: $exerciseSetsID")
       AddWarmUpSetsScreen(
+        workoutViewModel = workoutViewModel,
+        onNavigateBack = { navController.popBackStack() },
+        exerciseSetsID = ObjectId(exerciseSetsID),
+        // workoutViewModel can be koinViewModel() here if not passed from parent
+      )
+    }
+
+    composable("addWorkingSets/{exerciseSetsID}") { navBackStackEntry ->
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
+      Log.d("AddWorkingSetsScreen", "exerciseSetsID: $exerciseSetsID")
+      AddWorkingSetsScreen(
+        workoutViewModel = workoutViewModel,
+        onNavigateBack = { navController.popBackStack() },
+        exerciseSetsID = ObjectId(exerciseSetsID),
+        // workoutViewModel can be koinViewModel() here if not passed from parent
+      )
+    }
+
+    composable("equateVolume/{exerciseSetsID}") { navBackStackEntry ->
+      val workoutViewModel: WorkoutViewModel =
+        navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+
+      val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
+      Log.d("EquateVolumeScreen", "exerciseSetsID: $exerciseSetsID")
+      EquateVolumeScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
         exerciseSetsID = ObjectId(exerciseSetsID),
