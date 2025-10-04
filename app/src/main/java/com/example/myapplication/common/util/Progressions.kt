@@ -7,6 +7,8 @@ import com.example.myapplication.common.util.ProgressionOutcome.PROGRESSED
 import com.example.myapplication.common.util.ProgressionOutcome.REJECTED
 import com.example.myapplication.common.util.ProgressionOutcome.UNCHANGED
 
+// TODO Update/set warm up set target weights based on the updated target weights.
+
 // TODO update the next workout
 //  add screen that asks the user to confirm the changes/progression applied to the next workout
 //  allow user to edit and confirm the next workout. Show the just completed workout next to the
@@ -522,9 +524,15 @@ fun dynamicDoubleProgression(
   val targetWeightKilogramsList =
     previousCompletedSets.mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
 
+  // TODO How to handle cases where target repetitions are not the same across all sets?
+  // TODO How to handle cases where there are no target repetitions? Just increment the first working set? Determine the min & max rep for working sets or use common rep ranges?
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
-    if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
+    if (targetMinimumRepetitionsList.isEmpty()) {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "There are no target minimum repetitions!"
+      return progressionResults
+    } else if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
     else {
       progressionResults.outcome = ProgressionOutcome.FAILED
@@ -533,7 +541,11 @@ fun dynamicDoubleProgression(
     }
 
   val targetMaximumRepetitions =
-    if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
+    if (targetMaximumRepetitionsList.isEmpty()) {
+      progressionResults.outcome = ProgressionOutcome.FAILED
+      progressionResults.message = "There are no target maximum repetitions!"
+      return progressionResults
+    } else if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()
     else {
       progressionResults.outcome = ProgressionOutcome.FAILED

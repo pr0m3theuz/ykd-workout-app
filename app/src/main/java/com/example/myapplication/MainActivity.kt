@@ -356,11 +356,11 @@ private fun NavGraphBuilder.addWorkoutGraph(
         onBack = { navController.popBackStack() },
         onAccept = {
           workoutViewModel.acceptProgressions()
-          navController.navigate("workoutScreen?workoutID=${it.id}")
+          navController.navigate(Screens.Workout.route)
         },
         onReject = {
           workoutViewModel.rejectProgressions()
-          navController.navigate("workoutScreen?workoutID=${it.id}")
+          navController.navigate(Screens.Workout.route)
         },
       )
     }

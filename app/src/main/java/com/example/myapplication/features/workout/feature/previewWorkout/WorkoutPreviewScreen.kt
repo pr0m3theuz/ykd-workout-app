@@ -76,8 +76,8 @@ import kotlin.uuid.ExperimentalUuidApi
 @Composable
 fun WorkoutPreviewScreen(
   viewModel: WorkoutViewModel,
-  onAccept: (Workout) -> Unit,
-  onReject: (Workout) -> Unit,
+  onAccept: () -> Unit,
+  onReject: () -> Unit,
   onBack: () -> Unit
 ) {
   val previewItems by remember { derivedStateOf { viewModel.previewItems.toList() } } // Observe list changes
@@ -97,8 +97,8 @@ fun WorkoutPreviewScreen(
       PreviewBottomBar(
         overallSuccess = overallSuccess,
         message = message,
-        onAccept = { },
-        onReject = { }
+        onAccept = { onAccept() },
+        onReject = { onReject() }
       )
     }
   ) { paddingValues ->
@@ -506,13 +506,14 @@ fun PreviewBottomBar(
         horizontalArrangement = Arrangement.SpaceAround
       ) {
         Button(
-          onClick = onAccept,
+          enabled = overallSuccess,
+          onClick = { onAccept() },
           colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
           Text("Accept Progression")
         }
         OutlinedButton(
-          onClick = onReject,
+          onClick = { onReject() },
           colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
           border = ButtonDefaults.outlinedButtonBorder(true)
 //            brush = SolidColor(MaterialTheme.colorScheme.error) // Temporary fix if needed)

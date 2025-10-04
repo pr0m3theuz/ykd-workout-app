@@ -65,6 +65,7 @@ import com.example.myapplication.common.infrastructure.persistence.datastore.toP
 import com.example.myapplication.common.util.AlarmReceiver
 import com.example.myapplication.common.util.ProgressionOutcome
 import com.example.myapplication.common.util.ProgressionResults
+import com.example.myapplication.common.util.ProgressionType
 import com.example.myapplication.common.util.cancelNotifications
 import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.common.util.selectProgression
@@ -714,16 +715,25 @@ class WorkoutViewModel(
                   selectProgression(progressionType).invoke(it, currentWorkoutItem.sets)
               }
           } else {
+            // TODO Replace with user default progression
+            previousExerciseSets
+              ?.sets
+              ?.filter { it.setCompleted }
+              ?.let {
+                results[currentWorkoutItem.id.toString()] =
+                  selectProgression(ProgressionType.DYNAMIC_DOUBLE_PROGRESSION).invoke(it, currentWorkoutItem.sets)
+              }
+
             // No progression for this currentWorkoutItem]
-            results[currentWorkoutItem.id.toString()] =
-              ProgressionResults(
-                // TODO Should this be null if no progression logic applied?
-                // TODO Or should previous workout be shown regardless?
-                completedSets = previousExerciseSets?.sets,
-                currentSets = currentWorkoutItem.sets,
-                outcome = ProgressionOutcome.NULL,
-                message = "No progression logic applied",
-              )
+//            results[currentWorkoutItem.id.toString()] =
+//              ProgressionResults(
+//                // TODO Should this be null if no progression logic applied?
+//                // TODO Or should previous workout be shown regardless?
+//                completedSets = previousExerciseSets?.sets,
+//                currentSets = currentWorkoutItem.sets,
+//                outcome = ProgressionOutcome.NULL,
+//                message = "No progression logic applied",
+//              )
           }
         }
 
@@ -747,16 +757,26 @@ class WorkoutViewModel(
                     selectProgression(progressionType).invoke(it, currentSupersetExerciseSets.sets)
                 }
             } else {
+              // TODO Replace with user default progression
+
+              previousSupersetExerciseSets
+                ?.sets
+                ?.filter { it.setCompleted }
+                ?.let {
+                  results[currentSupersetExerciseSets.id.toString()] =
+                    selectProgression(ProgressionType.DYNAMIC_DOUBLE_PROGRESSION).invoke(it, currentSupersetExerciseSets.sets)
+                }
+
               // No progression for this currentWorkoutItem]
-              results[currentSupersetExerciseSets.id.toString()] =
-                ProgressionResults(
-                  // TODO Should this be null if no progression logic applied?
-                  // TODO Or should previous workout be shown regardless?
-                  completedSets = previousSupersetExerciseSets?.sets,
-                  currentSets = currentSupersetExerciseSets.sets,
-                  outcome = ProgressionOutcome.NULL,
-                  message = "No progression logic applied",
-                ) // No progression for this currentWorkoutItem]
+//              results[currentSupersetExerciseSets.id.toString()] =
+//                ProgressionResults(
+//                  // TODO Should this be null if no progression logic applied?
+//                  // TODO Or should previous workout be shown regardless?
+//                  completedSets = previousSupersetExerciseSets?.sets,
+//                  currentSets = currentSupersetExerciseSets.sets,
+//                  outcome = ProgressionOutcome.NULL,
+//                  message = "No progression logic applied",
+//                ) // No progression for this currentWorkoutItem]
             }
           }
         }
