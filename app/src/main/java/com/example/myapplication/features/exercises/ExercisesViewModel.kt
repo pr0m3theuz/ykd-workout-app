@@ -28,6 +28,7 @@ import com.example.myapplication.common.util.ModernizedLoadRIR
 import com.example.myapplication.common.util.OneRepMaxEstimateFormulas
 import com.example.myapplication.common.util.RepCapacity
 import com.example.myapplication.common.util.estimateTargetOneRepMaxModernized
+import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.ChartData
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -303,6 +304,15 @@ constructor(
         _exercises.value = list.sortedBy { exercise -> exercise.name }
         allExercises = list.sortedBy { exercise -> exercise.name }
 
+        val duplicateLazyListItemIDs = _exercises.value.groupingBy { it.lazyListItemID }.eachCount().filter { it.value > 1 }.keys
+        Log.i("ExercisesViewModel", "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}")
+
+        _exercises.value.forEach {
+          if (it.lazyListItemID in duplicateLazyListItemIDs) {
+            it.lazyListItemID = newLazyListItemID()
+          }
+        }
+
         _uiState.update { it.copy(exercises = _exercises.value, allExercises = allExercises) }
 
         //        _uiState.update { it.copy(exercises = _exercises.value, allExercises =
@@ -539,15 +549,29 @@ constructor(
         .sortedBy { exercise -> exercise.name }
     }
 
+    val duplicateLazyListItemIDs = _exercises.value.groupingBy { it.lazyListItemID }.eachCount().filter { it.value > 1 }.keys.toList()
+//    Log.i("ExercisesViewModel", "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}")
+//    Log.i("ExercisesViewModel", "filterExercises()._exercises has duplicate lazyListItemID: ${_exercises.value.groupingBy { it.lazyListItemID }.eachCount().filter { it.value > 1 }}")
+
+    _exercises.value.forEach {
+      if (it.lazyListItemID in duplicateLazyListItemIDs) {
+        it.lazyListItemID = newLazyListItemID()
+      }
+    }
+
+//    duplicateLazyListItemIDs = _exercises.value.groupingBy { it.lazyListItemID }.eachCount().filter { it.value > 1 }.keys.toList()
+//
+//    Log.i("ExercisesViewModel", "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}")
+
     // Update the UI state with the filtered list
     _uiState.update {
       it.copy(
-        exercises =
-          allExercises
-            .filter { exercise -> exercise.name.contains(_searchExerciseName, ignoreCase = true) }
-            .filter { exercise -> selectedMuscleGroups.contains(exercise.muscleGroupID) }
-            .filter { exercise -> selectedEquipments.contains(exercise.equipmentID) }
-            .sortedBy { exercise -> exercise.name }
+        exercises = _exercises.value
+//          allExercises
+//            .filter { exercise -> exercise.name.contains(_searchExerciseName, ignoreCase = true) }
+//            .filter { exercise -> selectedMuscleGroups.contains(exercise.muscleGroupID) }
+//            .filter { exercise -> selectedEquipments.contains(exercise.equipmentID) }
+//            .sortedBy { exercise -> exercise.name }
       )
     }
 
