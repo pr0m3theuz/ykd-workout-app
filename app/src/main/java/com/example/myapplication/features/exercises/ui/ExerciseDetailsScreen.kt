@@ -1055,7 +1055,7 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
             "Estimated Rep Maxes are calculated using Data Driven Strength's Modernized Load/RIR " +
                     "tables if Rate of Perceived Effort (RPE) or Repetitions In Reserve (RIR) were recorded for the set and uses the Repetition Capacity of the exercise. " +
                     "1RM Percentage selected for Rep Max calculation uses RPE is 10 and RIR is 0." +
-                    "Alternatively, Brzyckyi's formuala is used to calculate estimated rep maxes if RPE or RIR were not recorded. " +
+                    "Alternatively, Brzyckyi's formula is used to calculate estimated rep maxes if RPE or RIR were not recorded. " +
                     "Actual Rep Maxes show your best performance for each rep.",
           color = subtitle,
           style = MaterialTheme.typography.bodySmall,
