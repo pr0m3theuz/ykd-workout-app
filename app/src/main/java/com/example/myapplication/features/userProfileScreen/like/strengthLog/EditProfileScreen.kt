@@ -2,10 +2,12 @@
 
 package com.example.myapplication.features.userProfileScreen.like.strengthLog
 
+import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.example.myapplication.R
 import com.example.myapplication.features.userProfileScreen.ProfileViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
+import java.io.File
+
 
 @Preview(showBackground = true)
 @Composable
@@ -85,12 +92,18 @@ fun EditProfileScreen(
       if (uri != null) {
         Log.d("PhotoPicker", "Selected URI: $uri")
         imageUri.value = uri
+
+        val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+
         // TODO save the selected image URI or image bitmap to app data
         //   Potentially: profileViewModel.updateProfilePicture(uri)
       } else {
         Log.d("PhotoPicker", "No media selected")
       }
     }
+
+  val contentResolver = context.contentResolver
 
   fun selectImage() {
     pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -138,14 +151,31 @@ fun EditProfileScreen(
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        var image: ImageBitmap? = null
+        fun setImage(bitmap: ImageBitmap) {
+          image = bitmap
+        }
+
         Box {
-          var image: ImageBitmap? = null
+          Firebase.crashlytics.log("EditProfileScreen.imageUri: ${imageUri.value.toString()}")
+          Log.e("EditProfileScreen", "imageUri: ${imageUri.value.toString()}")
 
           imageUri.value?.let {
-            context.contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
-              parcelFileDescriptor?.fileDescriptor?.let { fileDescriptor ->
-                image = BitmapFactory.decodeFileDescriptor(fileDescriptor).asImageBitmap()
+            try {
+              contentResolver.query(imageUri.value!!, null, null, null, null).use { cursor ->
+                if (cursor != null && cursor.moveToFirst()) {
+                  // URI exists
+                  contentResolver.openFileDescriptor(imageUri.value!!, "r")
+                    .use { parcelFileDescriptor ->
+                      parcelFileDescriptor?.fileDescriptor?.let { fileDescriptor ->
+                        setImage(BitmapFactory.decodeFileDescriptor(fileDescriptor).asImageBitmap())
+                      }
+                    }
+                }
               }
+            } catch (e: Exception) {
+              Toast.makeText(context, "Error: Can't access image. ${e.message}", Toast.LENGTH_LONG).show()
+              // Handle exception
             }
           }
 
@@ -160,6 +190,7 @@ fun EditProfileScreen(
                   .size(200.dp)
                   .clip(shape = CircleShape),
                 contentDescription = "profile picture",
+                contentScale = ContentScale.FillWidth
               )
             }
 
