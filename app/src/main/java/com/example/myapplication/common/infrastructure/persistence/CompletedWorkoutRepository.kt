@@ -16,6 +16,8 @@ import kotlin.time.ExperimentalTime
 interface CompletedWorkoutRepository {
   fun getPreviousSetForExercise(exerciseID: ObjectId, setNumber: Int, setType: SetType): Set?
 
+  fun getPreviousSetsForExercise(exerciseID: ObjectId): List<Set>
+
   fun getCompletedWorkoutsCount(): Int
 
   fun getCompletedSetsForExercise(exerciseID: ObjectId): Flow<List<Set>>

@@ -100,6 +100,8 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     setType: SetType
   ): Set? {
     try {
+
+//      TODO Doesn't work as intended. need to use a more sophisticated query to match setType and SetNumber
       requireNotNull(db) { DATABASE_IS_NULL }
 
       val collection = db.getCollection("CompletedSets")
@@ -113,11 +115,15 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
             Expression.property("exerciseID")
               .equalTo(Expression.string(exerciseID.toString()))
               .and(Expression.property("setNumber").equalTo(Expression.intValue(setNumber)))
-              .and(Expression.property("setType").equalTo(Expression.intValue(setType.setTypeID)))
+              .and(Expression.property("setTypeID").equalTo(Expression.intValue(setType.setTypeID)))
               .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
           )
           .orderBy(Ordering.property("dateCreated").descending()) // Get latest set
+          // TODO order by setNumber
           .limit(Expression.intValue(1))
+
+      // TODO change the limit to be the number of sets to return (max of 10), return 1 list of sets for Warm Up Sets and 1 for Working Sets
+      //  zip previous sets to current sets
 
       val result = queryBuilder.execute().allResults().firstOrNull()?.toJSON()
 
@@ -126,6 +132,74 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       Log.e(e.message, e.stackTraceToString())
     }
     return null
+  }
+
+  override fun getPreviousSetsForExercise(
+    exerciseID: ObjectId,
+  ): List<Set> {
+    try {
+
+//      TODO Doesn't work as intended. need to use a more sophisticated query to match setType and SetNumber
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("CompletedSets")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+      // TODO Missing ownerID = user.id.toHexString()
+      // TODO change the limit to be the number of sets to return (max of 10), return 1 list of sets for Warm Up Sets and 1 for Working Sets
+      //  zip previous sets to current sets
+
+      val warmUpQueryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection)) // Replace with your database instance
+          .where(
+            Expression.property("exerciseID")
+              .equalTo(Expression.string(exerciseID.toString()))
+              .and(Expression.property("setTypeID").equalTo(Expression.intValue(SetType.warmUpSet.setTypeID)))
+              .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
+          )
+          .orderBy(Ordering.property("dateCreated").descending()) // Get latest set
+          .limit(Expression.intValue(10))
+//      , Ordering.property("setNumber").ascending()
+
+      val normalSetQueryBuilder =
+        QueryBuilder.select(SelectResult.all())
+          .from(DataSource.collection(collection)) // Replace with your database instance
+          .where(
+            Expression.property("exerciseID")
+              .equalTo(Expression.string(exerciseID.toString()))
+//              .and(Expression.property("setTypeID").equalTo(Expression.intValue(SetType.normalSet.setTypeID)))
+              .and(Expression.property("setCompleted").equalTo(Expression.booleanValue(true)))
+          )
+          .orderBy(Ordering.property("dateCreated").descending()) // Get latest set
+          .limit(Expression.intValue(50))
+      //      , Ordering.property("setNumber").ascending()
+
+      val warmUpResult = warmUpQueryBuilder.execute().allResults().map {
+        try {
+          val json = it.toJSON()
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(json).CompletedSets
+        } catch (e: Exception) {
+          Log.e(e.message, e.stackTraceToString())
+          null
+        }
+      }
+
+      val normalSetResult = normalSetQueryBuilder.execute().allResults().mapNotNull {
+        try {
+          val json = it.toJSON()
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(json).CompletedSets
+        } catch (e: Exception) {
+          Log.e(e.message, e.stackTraceToString())
+          null
+        }
+      }
+
+      return normalSetResult
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return emptyList()
   }
 
   override fun getCompletedWorkoutsCount(): Int {

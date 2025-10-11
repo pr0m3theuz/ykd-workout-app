@@ -312,6 +312,14 @@ class ManageWorkoutUseCase(
     val exercise = exercisesRepository.getExercise(previousExerciseSets.exerciseID)
     requireNotNull(exercise) { "Exercise not found." }
 
+/*
+    // TODO Create a wrapper class for previous exercise sets to be stored in WorkoutViewModel
+//    TODO Check if results make sense, try grouping by Date and WorkoutID sort by setNumber and filter by SetType
+    val previousSets = getPreviousSetsForExercise(exercise.id)
+    val warmUpSets = previousSets.filter { it.setTypeID == SetType.warmUpSet }.zip(previousExerciseSets.sets.filter { it.setTypeID == SetType.warmUpSet })
+    val workingSets = previousSets.filter { it.setTypeID != SetType.warmUpSet }.zip(previousExerciseSets.sets.filter { it.setTypeID != SetType.warmUpSet })
+*/
+
     return ExerciseExerciseSets(
       id = previousExerciseSets.id,
       exSetsUUID = previousExerciseSets.exSetsUUID,
@@ -390,6 +398,24 @@ class ManageWorkoutUseCase(
       null
     }
   }
+
+  fun getPreviousSetsForExercise(exerciseID: ObjectId): List<Set> {
+    return try {
+      // Delegate the actual data fetching to the repository
+      // TODO Add SetType to getPreviousSetForExercise
+      completedWorkoutRepository.getPreviousSetsForExercise(exerciseID)
+    } catch (e: Exception) {
+      // Optional: Log the error or handle specific exceptions
+      Log.e(
+        "ManageWorkoutUseCase",
+        "Error fetching previous set for exercise $exerciseID",
+        e,
+      )
+      // Return null if any exception occurs during repository access
+      emptyList<Set>()
+    }
+  }
+
 
   fun addWorkoutNote(
     workoutNotes: MutableList<WorkoutNote>,
