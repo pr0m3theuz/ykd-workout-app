@@ -3,9 +3,6 @@
 package com.example.myapplication.features.exercises.ui
 
 import android.content.Intent
-import android.icu.util.LocaleData
-import android.icu.util.ULocale
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -612,28 +609,14 @@ private fun WorkoutCard(
         // TODO Simplify
         Text(
           text =
-            if (SDK_INT >= Build.VERSION_CODES.P) {
-              val measurmentSystem = LocaleData.getMeasurementSystem(ULocale.getDefault())
-              when (measurmentSystem) {
-                LocaleData.MeasurementSystem.US -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)} lbs"
-                }
-
-                LocaleData.MeasurementSystem.UK -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)} kg"
-                }
-
-                LocaleData.MeasurementSystem.SI -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)} kg"
-                }
-
-                else -> {
-                  "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)} lbs"
-                }
+            when (userDefaultWeightUnit) {
+              MassUnit.POUNDS -> {
+                "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)} lbs"
               }
-            } else {
-              // Default
-              "Total Volume: ${doubleFormatted(it.totalVolumeInPounds)} lbs"
+
+              MassUnit.KILOGRAMS -> {
+                "Total Volume: ${doubleFormatted(it.totalVolumeInKilograms)} kg"
+              }
             },
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,
@@ -1093,7 +1076,7 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
 
             MassUnit.KILOGRAMS -> {
               "${exerciseRecords?.totalVolumeKilograms?.let { doubleFormatted(it) } ?: "-"} kg"
-              }
+            }
           },
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,
