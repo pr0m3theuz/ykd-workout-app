@@ -149,6 +149,7 @@ fun ExerciseDetailsScreen(
               workoutSetsMap = workoutSetsMap.toList(),
               workoutCard = { workout, sets, program ->
                 WorkoutCard(
+                  userDefaultWeightUnit = exerciseDetailsUiState.userDefaultWeightUnit,
                   workout = workout,
                   sets = sets,
                   program = program,
@@ -545,6 +546,7 @@ fun HistoryTab(
 
 @Composable
 private fun WorkoutCard(
+  userDefaultWeightUnit: MassUnit,
   workout: Workout,
   sets: List<Set>,
   program: Program?,
@@ -657,7 +659,7 @@ private fun WorkoutCard(
                 } else {
                   set.setTypeID.abbreviation
                 }
-              }.   ${set.setSummaryRIR(MassUnit.POUNDS.abbreviation)}",
+              }.   ${set.setSummaryRIR(userDefaultWeightUnit.abbreviation)}",
             style = MaterialTheme.typography.bodyMedium,
             fontFamily = FontFamily.Monospace,
             color = onSurface,
