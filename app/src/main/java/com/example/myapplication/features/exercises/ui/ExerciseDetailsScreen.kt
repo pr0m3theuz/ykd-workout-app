@@ -109,7 +109,6 @@ fun ExerciseDetailsScreen(
 ) {
   val tabState by exercisesViewModel.exerciseDetailsLayoutTabState.collectAsStateWithLifecycle()
 
-  val exerciseUiState by exercisesViewModel.uiState.collectAsStateWithLifecycle()
   val exerciseDetailsUiState by
   exercisesViewModel.exerciseDetailsUiState.collectAsStateWithLifecycle()
 
@@ -271,9 +270,11 @@ private fun ExerciseDetailsLayout(
         }
       }
 
-      Column(Modifier
-        .padding(16.dp)
-        .fillMaxWidth()) {
+      Column(
+        Modifier
+          .padding(16.dp)
+          .fillMaxWidth()
+      ) {
         when (tabState) {
           0 -> aboutTab()
           1 -> historyTab()
@@ -550,11 +551,10 @@ private fun WorkoutCard(
   defaultTimeZone: TimeZone,
   navigateToWorkoutScreen: () -> Unit = {},
 ) {
-  val cardColors =
-    CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
-      contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-    )
+  CardDefaults.cardColors(
+    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+  )
   val subtitle = MaterialTheme.colorScheme.onSurfaceVariant
   val onSurface = MaterialTheme.colorScheme.onSurface
 
@@ -610,7 +610,7 @@ private fun WorkoutCard(
         // TODO Simplify
         Text(
           text =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (SDK_INT >= Build.VERSION_CODES.P) {
               val measurmentSystem = LocaleData.getMeasurementSystem(ULocale.getDefault())
               when (measurmentSystem) {
                 LocaleData.MeasurementSystem.US -> {
@@ -648,7 +648,7 @@ private fun WorkoutCard(
 
       sets.forEach { set ->
         // TODO use user.intensity and user's preferred mass units
-        Row() {
+        Row {
           Text(
             text =
               "${
@@ -675,7 +675,7 @@ fun PlaceholderChart() {
     .aspectRatio(16f / 9f)
     .padding(bottom = 16.dp)
 
-  val workoutFrequencyChartData = generateRandomExerciseVolumeData()
+  generateRandomExerciseVolumeData()
 
   val gifEnabledLoader =
     ImageLoader.Builder(LocalContext.current)
@@ -856,13 +856,28 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
 
     item {
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text("Estimated 1RM", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        Text(
+          "Estimated 1RM (${uiState.userDefaultWeightUnit.abbreviation})",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium
+        )
         // TODO Add Kilograms
         Text(
-          "${
-            exerciseRecords?.bestPerformanceByRepetitions?.firstOrNull()
-              ?.let { doubleFormatted(it.estimated1RMPounds) }?.ifEmpty { "-" }
-          } lbs",
+          when (uiState.userDefaultWeightUnit) {
+            MassUnit.POUNDS -> {
+              "${
+                exerciseRecords?.bestPerformanceByRepetitions?.firstOrNull()
+                  ?.let { doubleFormatted(it.estimated1RMPounds) }?.ifEmpty { "-" }
+              } lbs"
+            }
+
+            MassUnit.KILOGRAMS -> {
+              "${
+                exerciseRecords?.bestPerformanceByRepetitions?.firstOrNull()
+                  ?.let { doubleFormatted(it.estimated1RMKilograms) }?.ifEmpty { "-" }
+              } kg"
+            }
+          },
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,
         )
@@ -871,10 +886,22 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
 
     item {
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text("Max Volume", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        Text(
+          "Max Volume (${uiState.userDefaultWeightUnit.abbreviation})",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium
+        )
         // TODO Add Kilograms
         Text(
-          "${exerciseRecords?.maxVolumePounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+          when (uiState.userDefaultWeightUnit) {
+            MassUnit.POUNDS -> {
+              "${exerciseRecords?.maxVolumePounds?.let { doubleFormatted(it) } ?: "-"} lbs"
+            }
+
+            MassUnit.KILOGRAMS -> {
+              "${exerciseRecords?.maxVolumeKilograms?.let { doubleFormatted(it) } ?: "-"} kg"
+            }
+          },
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,
         )
@@ -883,10 +910,22 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
 
     item {
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text("Max Weight", color = onSurface, style = MaterialTheme.typography.bodyMedium)
+        Text(
+          "Max Weight Lifted (${uiState.userDefaultWeightUnit.abbreviation})",
+          color = onSurface,
+          style = MaterialTheme.typography.bodyMedium
+        )
         // TODO Add Kilograms
         Text(
-          "${exerciseRecords?.maxWeightLiftedPounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+          when (uiState.userDefaultWeightUnit) {
+            MassUnit.POUNDS -> {
+              "${exerciseRecords?.maxWeightLiftedPounds?.let { doubleFormatted(it) } ?: "-"} lbs"
+            }
+
+            MassUnit.KILOGRAMS -> {
+              "${exerciseRecords?.maxWeightLiftedKilograms?.let { doubleFormatted(it) } ?: "-"} kg"
+            }
+          },
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,
         )
@@ -923,7 +962,7 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
           fontWeight = FontWeight.Bold,
         )
         Text(
-          "Estimated RM",
+          "Estimated RM (${uiState.userDefaultWeightUnit.abbreviation})",
           color = onSurface,
           modifier = Modifier.weight(1f),
           textAlign = TextAlign.Center,
@@ -955,7 +994,15 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
           ) {
             Text(
               text =
-                "${set?.weightPounds?.let { doubleFormatted(it) } ?: "-"} lbs (${set?.repetitionsPerformed ?: "-"} Reps)",
+                when (uiState.userDefaultWeightUnit) {
+                  MassUnit.POUNDS -> {
+                    "${set?.weightPounds?.let { doubleFormatted(it) } ?: "-"} lbs (${set?.repetitionsPerformed ?: "-"} Reps)"
+                  }
+
+                  MassUnit.KILOGRAMS -> {
+                    "${set?.weightKilograms?.let { doubleFormatted(it) } ?: "-"} kg (${set?.repetitionsPerformed ?: "-"} Reps)"
+                  }
+                },
               color = onSurface,
               textAlign = TextAlign.Center,
               style = MaterialTheme.typography.bodyMedium,
@@ -981,7 +1028,15 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
           }
 
           Text(
-            text = "${set?.estimated1RMPounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+            text = when (uiState.userDefaultWeightUnit) {
+              MassUnit.POUNDS -> {
+                "${set?.estimated1RMPounds?.let { doubleFormatted(it) } ?: "-"} lbs"
+              }
+
+              MassUnit.KILOGRAMS -> {
+                "${set?.estimated1RMKilograms?.let { doubleFormatted(it) } ?: "-"} kg"
+              }
+            },
             color = onSurface,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center,
@@ -1029,7 +1084,15 @@ fun RecordsTab(uiState: ExerciseDetailsUiState) {
         Text("Total Volume", color = onSurface, style = MaterialTheme.typography.bodyMedium)
         // TODO Add Kilograms
         Text(
-          "${exerciseRecords?.totalVolumePounds?.let { doubleFormatted(it) } ?: "-"} lbs",
+          when (uiState.userDefaultWeightUnit) {
+            MassUnit.POUNDS -> {
+              "${exerciseRecords?.totalVolumePounds?.let { doubleFormatted(it) } ?: "-"} lbs"
+            }
+
+            MassUnit.KILOGRAMS -> {
+              "${exerciseRecords?.totalVolumeKilograms?.let { doubleFormatted(it) } ?: "-"} kg"
+              }
+          },
           color = onSurface,
           style = MaterialTheme.typography.bodyMedium,
         )

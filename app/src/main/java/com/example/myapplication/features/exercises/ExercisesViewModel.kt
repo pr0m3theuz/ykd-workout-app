@@ -678,7 +678,17 @@ constructor(
 
     for (reps in 1..15) {
       val bestPerformanceByRepetitionsItem =
-        BestPerformanceByRepetitions(reps, null, null, null, null, null, null, null, null)
+        BestPerformanceByRepetitions(
+          repetitions = reps,
+          repetitionsPerformed = null,
+          repetitionsInReserve = null,
+          ratePerceivedEffort = null,
+          weightPounds = null,
+          weightKilograms = null,
+          datePerformed = null,
+          estimated1RMPounds = null,
+          estimated1RMKilograms = null
+        )
 
       val sortedSets =
         sets.sortedWith(compareByDescending(Set::weightPounds).thenByDescending(Set::repetitions))
