@@ -163,6 +163,11 @@ fun SetContent(
     }
   }
 
+  val targetWeight = when (weightUnit) {
+    MassUnit.POUNDS.abbreviation -> doubleFormatted(set.targetWeightPounds)
+    MassUnit.KILOGRAMS.abbreviation -> doubleFormatted(set.targetWeightKilograms)
+    else -> doubleFormatted(set.targetWeightPounds)
+  }
   SetContentFrame(
     setTypeOptionsMenu = {
       SetTypeComposable(
@@ -191,7 +196,7 @@ fun SetContent(
       )
     },
     exerciseWeightText = exerciseWeightText,
-    targetWeight = doubleFormatted(set.targetWeightPounds),
+    targetWeight = targetWeight,
     onWeightChange = {
       exerciseWeightText =
         when {
@@ -233,6 +238,7 @@ fun SetContent(
     completeSetWithCurrentOrTargetValues = { completeSetWithCurrentOrTargetValues() }
   )
 }
+
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
