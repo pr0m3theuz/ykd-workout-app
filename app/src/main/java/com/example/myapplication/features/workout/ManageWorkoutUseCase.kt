@@ -236,6 +236,7 @@ class ManageWorkoutUseCase(
           ratePerceivedEffort = set.ratePerceivedEffort,
           repetitionsInReserve = set.repetitionsInReserve,
           targetWeightPounds = set.targetWeightPounds,
+          targetWeightKilograms = set.targetWeightKilograms,
           targetRepetitions = set.targetRepetitions,
           targetMinimumRepetitions = set.targetMinimumRepetitions,
           targetMaximumRepetitions = set.targetMaximumRepetitions,
