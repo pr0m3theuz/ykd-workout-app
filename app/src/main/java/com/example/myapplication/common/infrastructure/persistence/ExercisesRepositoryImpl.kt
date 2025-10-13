@@ -70,6 +70,7 @@ class ExercisesRepositoryImpl(
   private val withUnknownKeys = Json { ignoreUnknownKeys = true }
 
   override fun getAllExercises(): Flow<List<Exercise>> {
+  // TODO get count of all sets performed for each exercise
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
 
