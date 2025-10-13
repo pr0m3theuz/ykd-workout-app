@@ -356,11 +356,19 @@ private fun NavGraphBuilder.addWorkoutGraph(
         onBack = { navController.popBackStack() },
         onAccept = {
           workoutViewModel.acceptProgressions()
-          navController.navigate(Screens.Workout.route)
+          navController.navigate(Screens.Workout.route) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = false }
+            launchSingleTop = true
+            restoreState = false
+          }
         },
         onReject = {
           workoutViewModel.rejectProgressions()
-          navController.navigate(Screens.Workout.route)
+          navController.navigate(Screens.Workout.route) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = false }
+            launchSingleTop = true
+            restoreState = false
+          }
         },
       )
     }
@@ -1168,9 +1176,11 @@ private fun TestScreen() {
 
       val fontFamily = FontFamily(Font(googleFont = fontName, fontProvider = provider))
 
-      Box(modifier = Modifier
-        .fillMaxWidth()
-        .height(250.dp), contentAlignment = Alignment.Center) {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(250.dp), contentAlignment = Alignment.Center
+      ) {
         AsyncImage(
           contentScale = ContentScale.FillWidth,
           alignment = Alignment.TopCenter,
