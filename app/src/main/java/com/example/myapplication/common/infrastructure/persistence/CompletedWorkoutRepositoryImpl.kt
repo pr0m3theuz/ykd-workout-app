@@ -56,6 +56,8 @@ private const val DATABASE_IS_NULL = "Completed Repository: Database does not ex
 private const val COLLECTION_IS_NULL =
   "Completed Repository: Completed * Collection does not exist in the Database."
 
+private const val WARM_UP_SET = 2
+
 class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
   CompletedWorkoutRepository {
   val userProfileManager: UserProfileManager by inject(UserProfileManager::class.java)
@@ -808,8 +810,9 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       val muscleCollection = db.getCollection("Muscle")
       requireNotNull(muscleCollection) { COLLECTION_IS_NULL }
 
+      // Only count working sets & hard sets, i.e. sets with RIR <= 3
       val setsQuery =
-        "SELECT * FROM `CompletedSets` WHERE dateCreated BETWEEN '$startDate' AND '$endDate'"
+        "SELECT * FROM `CompletedSets` WHERE dateCreated BETWEEN '$startDate' AND '$endDate' AND setTypeID != $WARM_UP_SET"
 
       Log.i("CompletedWorkoutRepositoryImpl.getWeeklyTotalSetsPerMuscle()", "Query: $setsQuery")
 
