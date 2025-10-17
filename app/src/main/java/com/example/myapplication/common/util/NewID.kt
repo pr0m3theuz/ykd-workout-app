@@ -3,14 +3,15 @@ package com.example.myapplication.common.util
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 import kotlin.random.Random
 import kotlin.random.nextUInt
+import kotlin.uuid.Uuid
 
 val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmAS")
 
 fun newLazyListItemID(): Long {
-    return LocalDateTime.now().format(formatter).toLong().div(Random.nextLong(1, 9999))
-        .plus(Random.nextUInt().toLong())
+    return UUID.randomUUID().toString().hashCode().toLong()
 }
 
 fun fakeULID(): Long {
