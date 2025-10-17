@@ -75,4 +75,5 @@ interface ExercisesRepository {
 
   fun createExercise(exercise: Exercise): Boolean
 
+  fun getCompletedSetsCountForAllExercises(): Map<ObjectId, Int>
 }

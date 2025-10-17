@@ -80,6 +80,7 @@ data class ExercisesUiState(
   val exerciseDetailsLayoutTabState: Int = 0,
   val exercises: List<Exercise> = emptyList(), // Filtered list of exercises shown in UI
   val allExercises: List<Exercise> = emptyList(), // Full list of exercises from repository
+  val allExercisesSetsPerformed: Map<ObjectId, Int> = emptyMap(),
   val equipment: List<Equipment> = emptyList(),
   val muscleGroups: List<MuscleGroup> = emptyList(),
   val muscles: List<Muscle> = emptyList(),
@@ -204,6 +205,10 @@ constructor(
     }
 
     viewModelScope.launch {
+      getCompletedSetsCountForAllExercises()
+    }
+
+    viewModelScope.launch {
       //      Log.i("ExercisesViewModel", "init: getEquipment")
       getAllEquipment()
     }
@@ -319,6 +324,13 @@ constructor(
         // allExercises) }
         //        Log.i("ExercisesViewModel.getAllExercises()", list.toString())
       }
+    }
+  }
+
+  private suspend fun getCompletedSetsCountForAllExercises() {
+    return coroutineScope {
+//      val result = exercisesRepository.getCompletedSetsCountForAllExercises()
+      _uiState.update { it.copy(allExercisesSetsPerformed = exercisesRepository.getCompletedSetsCountForAllExercises()) }
     }
   }
 

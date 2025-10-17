@@ -21,6 +21,7 @@ import com.example.myapplication.common.domain.model.Exercise
 fun ExerciseItem(
   exercise: Exercise,
   muscleGroupName: String?,
+  setsPerformedCount: Int?,
   navigateToDetailPane: (exerciseID: String) -> Unit,
 ) {
 
@@ -35,16 +36,16 @@ fun ExerciseItem(
   ListItem(
     colors = colors,
     modifier =
-    Modifier /*.padding(vertical = 8.dp)*/
-      .fillMaxWidth()
-      .clickable(
-        enabled = true,
-        onClickLabel = "See more details about ${exercise.name} ",
-        onClick = {
+      Modifier /*.padding(vertical = 8.dp)*/
+        .fillMaxWidth()
+        .clickable(
+          enabled = true,
+          onClickLabel = "See more details about ${exercise.name} ",
+          onClick = {
 //            navController.navigate("exerciseDetails/${exercise._id.toHexString()}")
-          navigateToDetailPane(exercise.id.toHexString())
-        },
-      ),
+            navigateToDetailPane(exercise.id.toHexString())
+          },
+        ),
     headlineContent = {
       Text(
         text = exercise.name,
@@ -59,7 +60,15 @@ fun ExerciseItem(
         color = MaterialTheme.colorScheme.onBackground,
       )
     },
-    trailingContent = {},
+    trailingContent = {
+      setsPerformedCount?.let {
+        Text(
+          text = it.toString(),
+          //        style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.onBackground,
+        )
+      }
+    },
     leadingContent = {
       // TODO Get Image from YouTube Thumbnail
       Icon(

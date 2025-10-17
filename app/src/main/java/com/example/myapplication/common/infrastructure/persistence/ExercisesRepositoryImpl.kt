@@ -20,6 +20,7 @@ import com.example.myapplication.common.domain.model.Equipment
 import com.example.myapplication.common.domain.model.EquipmentDao
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.ExerciseDao
+import com.example.myapplication.common.domain.model.ExerciseSetCount
 import com.example.myapplication.common.domain.model.Force
 import com.example.myapplication.common.domain.model.ForceDao
 import com.example.myapplication.common.domain.model.Mechanic
@@ -44,10 +45,12 @@ import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import com.example.myapplication.common.util.newLazyListItemID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import org.bson.types.ObjectId
 import kotlin.time.ExperimentalTime
 
@@ -97,6 +100,31 @@ class ExercisesRepositoryImpl(
     }
 
     return flow {}
+  }
+
+  override fun getCompletedSetsCountForAllExercises(): Map<ObjectId, Int> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+
+      val collection = db.getCollection("CompletedSets")
+
+      requireNotNull(collection) { COLLECTION_IS_NULL }
+
+      val exercisesSetsCountQuery =
+        "SELECT exerciseID, Count(*) as count FROM `CompletedSets` WHERE setCompleted = true GROUP BY exerciseID"
+
+      val exercisesSetsCount =
+        db.createQuery(exercisesSetsCountQuery).execute().allResults().mapNotNull {
+          val item = withUnknownKeys.decodeFromString<ExerciseSetCount>(it.toJSON())
+          item.exerciseID to item.count
+        }.toMap()
+
+      return exercisesSetsCount
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+
+    return emptyMap()
   }
 
   private fun mapQueryChangeToExercise(queryChange: QueryChange): List<Exercise> {

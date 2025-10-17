@@ -65,6 +65,7 @@ import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.features.exercises.ExercisesViewModel
 import kotlinx.coroutines.launch
+import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
 
 // TODO Create Advanced Search Options & Exercise Creation & Editing Screens
@@ -228,16 +229,17 @@ fun ExercisesLazyColumn(
       when {
         exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
         exercises.isNotEmpty() -> {
-          ExercisesLazyList(exercises, muscleGroups) { exercise, muscleGroupName ->
+          ExercisesLazyList(exercises, muscleGroups, uiState.allExercisesSetsPerformed) { exercise, muscleGroupName, setsPerformedCount ->
             ExerciseItem(
               exercise = exercise,
               muscleGroupName = muscleGroupName,
+              setsPerformedCount = setsPerformedCount,
               navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
             )
           }
         }
 
-        exercises.isEmpty() && query.isBlank() -> {
+        query.isBlank() -> {
           Column(
             modifier = Modifier
               .fillMaxWidth()
@@ -283,9 +285,10 @@ fun NoResultsFound(query: String) {
 private fun ExercisesLazyList(
   exercises: List<Exercise>,
   muscleGroups: List<MuscleGroup>,
+  exercisesSetsPerformedCount: Map<ObjectId, Int>,
   //  navController: NavController,
   //  navigateToDetailPane: (exerciseID: String) -> Unit,
-  exerciseItem: @Composable (exercise: Exercise, muscleGroupName: String?) -> Unit,
+  exerciseItem: @Composable (exercise: Exercise, muscleGroupName: String?, setsPerformedCount: Int?) -> Unit,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -318,7 +321,7 @@ private fun ExercisesLazyList(
       //        navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
       //      )
 
-      exerciseItem(exercise, muscleGroupName)
+      exerciseItem(exercise, muscleGroupName, exercisesSetsPerformedCount[exercise.id])
     }
   }
 }

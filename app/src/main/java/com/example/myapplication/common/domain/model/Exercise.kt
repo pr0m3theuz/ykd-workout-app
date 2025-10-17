@@ -31,6 +31,12 @@ data class Exercises(val exercises: List<Exercise>)
 @Serializable
 data class ExerciseDao(var Exercise: Exercise)
 
+@Serializable
+data class ExerciseSetCount(
+  @Serializable(with = ObjectIdSerializer::class) var exerciseID: ObjectId,
+  var count: Int,
+)
+
 @Keep
 @Serializable
 data class Exercise(
