@@ -529,7 +529,7 @@ fun HistoryTab(
   LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
     items(
       workoutSetsMap.count(),
-      key = { index -> workoutSetsMap[index].first.lazyListItemID }) { index ->
+      key = { index -> workoutSetsMap[index].second.first().lazyListItemID }) { index ->
       val workout = workoutSetsMap[index].first
 
       workoutCard(
