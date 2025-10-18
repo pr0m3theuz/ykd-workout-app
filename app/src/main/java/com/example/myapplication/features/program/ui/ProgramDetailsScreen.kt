@@ -2,7 +2,6 @@
 
 package com.example.myapplication.features.program.ui
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -47,7 +46,6 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.ShapeDefaults
@@ -1051,26 +1049,39 @@ fun MicrocycleCard(
                           ) {
                             Text(text = "Start")
                           }
-                        } else {
-                          // this workout in a Active Program, so view it
-                          val workoutRoute =
-                            "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value}"
-                          OutlinedButton(
-                            enabled = activeProgram,
-                            onClick = {
-                              // TODO Create EditWorkoutScreen
-                              // TODO Implement Navigate to Edit Workout
-                              //                        navController.navigate(workoutRoute)
-                              Toast.makeText(
-                                context,
-                                "TODO: Implement View/Edit Workout",
-                                Toast.LENGTH_SHORT,
-                              )
-                                .show()
-                            },
-                          ) {
-                            Text(text = "View")
-                          }
+                        }
+                      } else {
+                        // this workout in a Active Program, so view it
+
+                        val startWorkoutRoute =
+                          "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.LoadWorkoutFromActiveProgram.value}"
+
+                        val viewWorkoutRoute = "history?workoutOverview=${workout.id.toHexString()}"
+                        Button(
+                          enabled = activeProgram,
+                          onClick = {
+                            navController.navigate(if (workout.workoutEnded == null) startWorkoutRoute else viewWorkoutRoute) {
+                              popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                              }
+                              // Avoid multiple copies of the same destination when
+                              // reselecting the same item
+                              launchSingleTop = true
+                              // Restore state when reselecting a previously selected item
+                              restoreState = true
+                            }
+                            // TODO Create EditWorkoutScreen
+                            // TODO Implement Navigate to Edit Workout
+                            //                        navController.navigate(workoutRoute)
+//                              Toast.makeText(
+//                                context,
+//                                "TODO: Implement View/Edit Workout",
+//                                Toast.LENGTH_SHORT,
+//                              )
+//                                .show()
+                          },
+                        ) {
+                          Text(text = if (workout.workoutEnded == null) "Start" else "View")
                         }
                       }
                     }
