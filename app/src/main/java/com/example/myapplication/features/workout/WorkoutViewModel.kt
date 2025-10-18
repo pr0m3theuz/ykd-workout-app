@@ -34,6 +34,8 @@ import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.ExerciseNote
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.Muscle
+import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.PreviewExerciseSets
 import com.example.myapplication.common.domain.model.PreviewSuperset
 import com.example.myapplication.common.domain.model.Quadruple
@@ -235,7 +237,10 @@ class WorkoutViewModel(
       //      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
       val activeWorkout = workoutDatastore.getActiveWorkout.first()
 
-      Log.d("WorkoutViewModel", "is _workout.value null: ${if (_workout.value == null) true else false}")
+      Log.d(
+        "WorkoutViewModel",
+        "is _workout.value null: ${if (_workout.value == null) true else false}"
+      )
       Log.d("WorkoutViewModel", "_workout.name: ${_workout.value?.name}")
       Log.d("WorkoutViewModel", "isWorkoutActive: $isWorkoutActive")
       //        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance():
@@ -721,7 +726,10 @@ class WorkoutViewModel(
               ?.filter { it.setCompleted }
               ?.let {
                 results[currentWorkoutItem.id.toString()] =
-                  selectProgression(ProgressionType.DYNAMIC_DOUBLE_PROGRESSION).invoke(it, currentWorkoutItem.sets)
+                  selectProgression(ProgressionType.DYNAMIC_DOUBLE_PROGRESSION).invoke(
+                    it,
+                    currentWorkoutItem.sets
+                  )
               }
 
             // No progression for this currentWorkoutItem]
@@ -764,7 +772,10 @@ class WorkoutViewModel(
                 ?.filter { it.setCompleted }
                 ?.let {
                   results[currentSupersetExerciseSets.id.toString()] =
-                    selectProgression(ProgressionType.DYNAMIC_DOUBLE_PROGRESSION).invoke(it, currentSupersetExerciseSets.sets)
+                    selectProgression(ProgressionType.DYNAMIC_DOUBLE_PROGRESSION).invoke(
+                      it,
+                      currentSupersetExerciseSets.sets
+                    )
                 }
 
               // No progression for this currentWorkoutItem]
@@ -1119,11 +1130,11 @@ class WorkoutViewModel(
         manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
           managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
             ?.let { previousWorkout ->
-            setupWorkoutPreview(
-              workoutToPrepare = currentWorkout,
-              previousWorkout = previousWorkout,
-            )
-          }
+              setupWorkoutPreview(
+                workoutToPrepare = currentWorkout,
+                previousWorkout = previousWorkout,
+              )
+            }
           currentWorkout
         } ?: initWorkout()
 
@@ -1815,6 +1826,10 @@ class WorkoutViewModel(
   val completedWorkout
     get() = _completedWorkout.asStateFlow()
 
+  private var _workoutTotalSetsPerMuscle = MutableStateFlow<List<Pair<Muscle, List<MuscleFractionalSets>>>>(emptyList())
+  val workoutTotalSetsPerMuscle
+    get() = _workoutTotalSetsPerMuscle.asStateFlow()
+
   private fun stopWorkoutTimer() {
     workoutCountUpTimer.stop()
     workoutDetails!!.workoutEnded = Clock.System.now()
@@ -1876,6 +1891,18 @@ class WorkoutViewModel(
   fun getCompletedWorkout(workoutID: ObjectId) {
     if (_completedWorkout.value == null) {
       _completedWorkout.value = manageWorkoutUseCase.getCompletedWorkout(workoutID)
+
+    }
+  }
+
+  fun getWorkoutTotalSetsPerMuscle(workoutID: ObjectId) {
+    if (_completedWorkout.value == null) {
+      viewModelScope.launch {
+        _workoutTotalSetsPerMuscle.value =
+          manageWorkoutUseCase.getWorkoutTotalSetsPerMuscle(workoutID).groupBy { it.muscle }
+            .map { (muscle, data) -> muscle to data }
+            .sortedByDescending { (_, data) -> data.sumOf { it.fractionalSets } }
+      }
     }
   }
 

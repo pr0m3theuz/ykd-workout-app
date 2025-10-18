@@ -50,7 +50,9 @@ interface CompletedWorkoutRepository {
     endDate: LocalDateTime
   ): List<MuscleFractionalSets>
 
+  suspend fun getWorkoutTotalSetsPerMuscle(
+    workoutID: ObjectId
+  ): List<MuscleFractionalSets>
+
   fun getWorkoutStreakWeek(): Int?
-
-
 }

@@ -8,6 +8,7 @@ import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.ExerciseNote
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.MassUnit
+import com.example.myapplication.common.domain.model.MuscleFractionalSets
 import com.example.myapplication.common.domain.model.Set
 import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.Superset
@@ -1470,6 +1471,13 @@ class ManageWorkoutUseCase(
     workoutComponents.removeAll { exercisesSets.contains(it) }
 
     return workoutComponents.sortedBy { it.order }
+  }
+
+
+  suspend fun getWorkoutTotalSetsPerMuscle(
+    workoutID: ObjectId
+  ): List<MuscleFractionalSets> {
+    return completedWorkoutRepository.getWorkoutTotalSetsPerMuscle(workoutID)
   }
 }
 

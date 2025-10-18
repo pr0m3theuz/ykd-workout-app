@@ -91,6 +91,7 @@ fun WorkoutOverviewContent(
       )
     },
     bottomBar = {
+      // TODO BUG This is causing a lot of recompositions only when "Confirm Delete" dialog is opened
       if (performAgain) {
         Button(
           modifier = Modifier
@@ -98,8 +99,6 @@ fun WorkoutOverviewContent(
             .padding(32.dp),
           onClick = {
             navigateToWorkout(workout)
-
-
           },
         ) {
           Text(text = "Perform Again")

@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalUuidApi::class)
+@file:OptIn(
+  ExperimentalUuidApi::class, ExperimentalUuidApi::class,
+  ExperimentalMaterial3AdaptiveApi::class
+)
 
 package com.example.myapplication.features.workout.ui
 
@@ -14,7 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ErrorOutline
@@ -32,8 +38,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.NavigableSupportingPaneScaffold
+import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -58,7 +70,9 @@ import com.example.myapplication.common.ui.component.BottomNavigationBar
 import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.common.ui.theme.IBMColorBlindPalette
 import com.example.myapplication.common.util.doubleFormatted
+import com.example.myapplication.features.userProfileScreen.like.boostcamp.MuscleEngagementScreen
 import com.example.myapplication.features.workout.WorkoutViewModel
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -73,81 +87,125 @@ fun WorkoutSummaryScreen(
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
   workoutViewModel.getCompletedWorkout(ObjectId(workoutID))
+  workoutViewModel.getWorkoutTotalSetsPerMuscle(ObjectId(workoutID))
   val totalWorkoutCount = workoutViewModel.getWorkoutsCount()
   val completedWorkout by workoutViewModel.completedWorkout.collectAsStateWithLifecycle()
+  val workoutTotalSetsPerMuscle by workoutViewModel.workoutTotalSetsPerMuscle.collectAsStateWithLifecycle()
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
 
   Log.i("WorkoutSummaryScreen", "workoutID: $workoutID")
   Log.i("WorkoutSummaryScreen", "completedWorkout: ${Json.encodeToString(completedWorkout)}")
 
   //  Log.i("WorkoutSummaryScreen", "workoutViewModel: $workoutViewModel")
+  val scaffoldNavigator = rememberSupportingPaneScaffoldNavigator()
+  val scope = rememberCoroutineScope()
 
-  Scaffold(
-    topBar = {
-      TopAppBar(
-        title = {},
-        navigationIcon = {
-          IconButton(
-            onClick = {
-              /*TODO Navigate to Previous Screen */
-              // TODO This is an anti-pattern
-              // https://developer.android.com/guide/navigation/use-graph/navigate
-              // TODO Fix bug, can't navigate to Workout screen after navigating to Programs
+  NavigableSupportingPaneScaffold(
+    navigator = scaffoldNavigator,
+    mainPane = {
+      AnimatedPane {
+        Scaffold(
+          topBar = {
+            TopAppBar(
+              title = {},
+              navigationIcon = {
+                IconButton(
+                  onClick = {
+                    /*TODO Navigate to Previous Screen */
+                    // TODO This is an anti-pattern
+                    // https://developer.android.com/guide/navigation/use-graph/navigate
+                    // TODO Fix bug, can't navigate to Workout screen after navigating to Programs
 
-              navController.navigate(Screens.Programs.baseRoute) {
-                popUpTo(navController.graph.findStartDestination().id)
-                launchSingleTop = true
-                restoreState = true
-              }
-            }
-          ) {
-            Icon(
-              imageVector = Icons.Default.Close,
-              tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen",
+                    navController.navigate(Screens.Programs.baseRoute) {
+                      popUpTo(navController.graph.findStartDestination().id)
+                      launchSingleTop = true
+                      restoreState = true
+                    }
+                  }
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.Close,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    contentDescription = "Go to the previous screen",
+                  )
+                }
+              },
+              actions = {},
             )
-          }
-        },
-        actions = {},
-      )
-    },
-    // TODO This is an anti-pattern
-    // https://developer.android.com/guide/navigation/use-graph/navigate
-    bottomBar = {
-      BottomNavigationBar(
-        currentDestination = currentDestination,
-        onNavigate = onNavigateBottomBar,
-      )
-    },
-  ) { contentPadding ->
-    Column(Modifier.padding(contentPadding)) {
-      if (completedWorkout != null) {
-        WorkoutSummaryContent(
-          completedWorkout = completedWorkout!!,
-          totalWorkoutCount,
-          userDefaultWeightUnit,
-          workoutViewModel,
-        )
-      }
-      // TODO Handle Null Case
-      else {
-        NoWorkoutFound()
+          },
+          // TODO This is an anti-pattern
+          // https://developer.android.com/guide/navigation/use-graph/navigate
+          bottomBar = {
+            BottomNavigationBar(
+              currentDestination = currentDestination,
+              onNavigate = onNavigateBottomBar,
+            )
+          },
+        ) { contentPadding ->
+          Column(Modifier
+            .padding(contentPadding)
+            .verticalScroll(state = rememberScrollState())) {
+            if (completedWorkout != null) {
+              WorkoutSummaryContent(
+                completedWorkout = completedWorkout!!,
+                totalWorkoutCount,
+                userDefaultWeightUnit,
+                workoutViewModel,
+              )
+            }
+            // TODO Handle Null Case
+            else {
+              NoWorkoutFound()
 //        navController.navigate("programs")
 //       { popUpTo("programs") { inclusive = false } }
-      }
-      if (completedWorkout?.programID != null) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Center,
-        ) {
-          Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!.id.toHexString()}") }) {
-            Text(text = "Preview Your Next Workout!")
+            }
+            if (completedWorkout?.programID != null) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+              ) {
+                Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!.id.toHexString()}") }) {
+                  Text(text = "Preview Your Next Workout!")
+                }
+              }
+            }
+
+            if (workoutTotalSetsPerMuscle.isNotEmpty()) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+              ) {
+                Button(
+                  modifier = Modifier
+                    .wrapContentSize(),
+                  onClick = {
+                    scope.launch {
+                      scaffoldNavigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
+                    }
+                  }
+                ) {
+                  Text("Show muscle engagement for this workout")
+                }
+              }
+            }
           }
         }
       }
-    }
-  }
+    },
+    supportingPane = {
+      if (completedWorkout != null) {
+        AnimatedPane {
+          Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+            Column(modifier = Modifier.padding(paddingValues)) {
+              MuscleEngagementScreen(muscleEngagementData = workoutTotalSetsPerMuscle)
+            }
+          }
+        }
+      }
+    },
+  )
 }
 
 // @Preview(showSystemUi = true, showBackground = true)
@@ -166,14 +224,14 @@ fun WorkoutSummaryContent(
         .padding(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(24.dp),
-        horizontalArrangement = Arrangement.Center,
-      ) {
-        Text(text = "You crushed it!", style = MaterialTheme.typography.titleLarge)
-      }
+//      Row(
+//        modifier = Modifier
+//          .fillMaxWidth()
+//          .padding(24.dp),
+//        horizontalArrangement = Arrangement.Center,
+//      ) {
+//        Text(text = "You crushed it!", style = MaterialTheme.typography.titleLarge)
+//      }
 
       Row(
         modifier = Modifier
@@ -181,8 +239,12 @@ fun WorkoutSummaryContent(
           .padding(0.dp),
         horizontalArrangement = Arrangement.Center,
       ) {
-        //        TODO Query Workout Count
-        Text(text = "You completed your ${workoutsCount + 1} workout!")
+        when (workoutsCount.toString().last()) {
+          '1' -> Text(text = "You crushed your ${workoutsCount}st workout!")
+          '2' -> Text(text = "You crushed your ${workoutsCount}nd workout!")
+          '3' -> Text(text = "You crushed your ${workoutsCount}rd workout!")
+          else -> Text(text = "You crushed your ${workoutsCount}th workout!")
+        }
       }
       Spacer(modifier = Modifier.height(24.dp))
       WorkoutSummaryCard(completedWorkout, userDefaultWeightUnit) { exerciseID ->
@@ -476,38 +538,45 @@ private fun NoDataContent(message: String) {
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 private fun NoWorkoutFound() {
-  Column(
-    modifier = Modifier
-      .fillMaxSize() // Fill the whole screen for the "empty" state
-//      .padding(16.dp)
-    ,
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center // Center content vertically
-  ) {
-    Icon(
-      imageVector = Icons.Filled.Info, // Or any other suitable icon
-      contentDescription = "No workout data",
-      modifier = Modifier.size(48.dp),
-      tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) // Softer color
-    )
-    Spacer(modifier = Modifier.height(16.dp))
-    Text(
-      text = "Workout data not available.",
-      style = MaterialTheme.typography.titleMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(
-      text = "There's no completed workout to display right now.",
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-    Text(
-      text = "An unknown error occurred while saving.",
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
+  Scaffold(
+    topBar = {},
+    bottomBar = {},
+    modifier = Modifier.fillMaxSize(),
+  ) { paddingValues ->
+    Column(
+      modifier = Modifier
+        .fillMaxSize() // Fill the whole screen for the "empty" state
+        .padding(paddingValues),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center // Center content vertically
+    ) {
+      Icon(
+        imageVector = Icons.Filled.Info, // Or any other suitable icon
+        contentDescription = "No workout data",
+        modifier = Modifier.size(48.dp),
+        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) // Softer color
+      )
+      Spacer(modifier = Modifier.height(16.dp))
+      Text(
+        text = "Workout data not available.",
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+      )
+      Spacer(modifier = Modifier.height(8.dp))
+      Text(
+        text = "There's no completed workout to display right now.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+      )
+      Text(
+        text = "An unknown error occurred while saving.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+      )
+    }
   }
+
+
 }
 
 /*

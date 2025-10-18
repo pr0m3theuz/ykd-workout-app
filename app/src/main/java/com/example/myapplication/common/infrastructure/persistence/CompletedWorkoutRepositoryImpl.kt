@@ -888,6 +888,98 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
     return emptyList()
   }
 
+  override suspend fun getWorkoutTotalSetsPerMuscle(
+    workoutID: ObjectId
+  ): List<MuscleFractionalSets> {
+    try {
+      requireNotNull(db) { DATABASE_IS_NULL }
+      val completedSetsCollection = db.getCollection("CompletedSets")
+      requireNotNull(completedSetsCollection) { COLLECTION_IS_NULL }
+
+      val muscleExerciseCollection = db.getCollection("MuscleExercise")
+      requireNotNull(muscleExerciseCollection) { COLLECTION_IS_NULL }
+
+      val muscleCollection = db.getCollection("Muscle")
+      requireNotNull(muscleCollection) { COLLECTION_IS_NULL }
+
+      // Only count working sets & hard sets, i.e. sets with RIR <= 3
+      val setsQuery =
+        "SELECT * FROM `CompletedSets` WHERE workoutID = '$workoutID' AND setTypeID != $WARM_UP_SET"
+
+      Log.i("CompletedWorkoutRepositoryImpl.getWeeklyTotalSetsPerMuscle()", "Query: $setsQuery")
+
+      val sets =
+        db.createQuery(setsQuery).execute().allResults().map { result ->
+          withUnknownKeys.decodeFromString<CompletedSetsDao>(result.toJSON()).CompletedSets
+        }
+
+      val exerciseIDs = sets.mapNotNull { it.exerciseID }
+
+      val exercisesIDClause = exerciseIDs.joinToString(",") { "'$it'" }.let { "[$it]" }
+
+      val exercisesQuery = "SELECT * FROM `Exercise` WHERE id IN $exercisesIDClause"
+
+      val exercises =
+        db.createQuery(exercisesQuery).execute().allResults().map { result ->
+          withUnknownKeys.decodeFromString<ExerciseDao>(result.toJSON()).Exercise
+        }
+
+      val muscleExerciseWithMuscleList = exercises.flatMap { exercise ->
+
+        val muscleExerciseQuery =
+          "SELECT * FROM `MuscleExercise` WHERE exerciseID = '${exercise.exrxExerciseID}' and (roleFunction = 'target' or roleFunction = 'synergist')"
+
+        val muscleExerciseResult =
+          db.createQuery(muscleExerciseQuery).execute().allResults().mapNotNull {
+            try {
+              withUnknownKeys.decodeFromString<MuscleExerciseDao>(it.toJSON()).MuscleExercise
+            } catch (e: Exception) {
+              Log.e(e.message, e.stackTraceToString())
+              null
+            }
+          }
+
+        val list = muscleExerciseResult.mapNotNull { muscleExercise ->
+          val muscleQuery =
+            QueryBuilder.select(SelectResult.all())
+              .from(DataSource.collection(muscleCollection))
+              .where(Expression.property("id").equalTo(Expression.string(muscleExercise.muscleID)))
+
+          val result =
+            muscleQuery.execute().allResults().firstOrNull()?.toJSON()?.let {
+              withUnknownKeys.decodeFromString<MuscleDao>(it).Muscle
+            }
+
+          result?.let { muscle ->
+            MuscleFractionalSets(muscle, muscleExercise, exercise.name, 0.0)
+          }
+        }
+
+        list
+      }
+
+      val result = muscleExerciseWithMuscleList.map { muscleExercise ->
+        val exercise =
+          exercises.firstOrNull { exercise -> exercise.exrxExerciseID == muscleExercise.muscleExercise.exerciseID }
+
+        val setsPerformed = sets.count { set -> set.exerciseID == exercise?.id }.toDouble()
+
+        val fractionalSets = when (muscleExercise.muscleExercise.roleFunction) {
+          "target" -> setsPerformed
+          "synergist" -> setsPerformed.div(2)
+          else -> 0.toDouble()
+        }
+
+        muscleExercise.copy(fractionalSets = fractionalSets)
+      }
+
+      return result
+    } catch (e: Exception) {
+      Log.e(e.message, e.stackTraceToString())
+    }
+    return emptyList()
+  }
+
 
   override fun getWorkoutStreakWeek(): Int? {
     try {

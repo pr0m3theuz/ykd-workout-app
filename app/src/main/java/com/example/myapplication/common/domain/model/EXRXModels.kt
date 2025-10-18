@@ -44,6 +44,7 @@ data class MuscleExerciseWithMuscle(
     val muscle: Muscle,
 )
 
+@Serializable
 data class MuscleFractionalSets(
     val muscle: Muscle,
     val muscleExercise: MuscleExercise,
