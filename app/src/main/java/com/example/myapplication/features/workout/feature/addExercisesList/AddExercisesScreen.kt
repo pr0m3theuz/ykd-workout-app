@@ -56,6 +56,7 @@ import com.example.myapplication.features.exercises.ui.ExercisesFilterMenu
 import com.example.myapplication.features.exercises.ui.SelectedFiltersLazyRow
 import com.example.myapplication.features.workout.WorkoutViewModel
 import kotlinx.coroutines.launch
+import org.bson.types.ObjectId
 import org.koin.androidx.compose.koinViewModel
 
 // TODO Create Advanced Search Options & Exercise Creation & Editing Screens
@@ -256,14 +257,15 @@ fun AddExercisesScreen(
             ExercisesLazyList(
               exercises = exercises,
               muscleGroups = muscleGroups,
+              uiState.allExercisesSetsPerformed
               //              selectExercise = { _exercise, isSelected -> selectExercise(_exercise,
               // isSelected) },
               //              navController = navController,
-            ) { exercise, muscleGroupName ->
+            ) { exercise, muscleGroupName, setsPerformedCount ->
               ToggleableExerciseItem(
                 exercise = exercise,
                 muscleGroupName = muscleGroupName,
-                navController = navController,
+                setsPerformedCount = setsPerformedCount,
                 selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
                 navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
               )
@@ -317,9 +319,10 @@ fun NoResultsFound(query: String) {
 private fun ExercisesLazyList(
   exercises: List<Exercise>,
   muscleGroups: List<MuscleGroup>,
+  exercisesSetsPerformedCount: Map<ObjectId, Int>,
   //  selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
   //  navController: NavController,
-  exerciseItem: @Composable (exercise: Exercise, muscleGroupName: String?) -> Unit,
+  exerciseItem: @Composable (exercise: Exercise, muscleGroupName: String?, setsPerformedCount: Int?) -> Unit,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -350,7 +353,7 @@ private fun ExercisesLazyList(
       //
       //      )
 
-      exerciseItem(exercise, muscleGroupName)
+      exerciseItem(exercise, muscleGroupName, exercisesSetsPerformedCount[exercise.id])
     }
   }
 }

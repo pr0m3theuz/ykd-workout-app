@@ -27,7 +27,7 @@ import com.example.myapplication.common.domain.model.Exercise
 fun ToggleableExerciseItem(
   exercise: Exercise,
   muscleGroupName: String?,
-  navController: NavController,
+  setsPerformedCount: Int?,
   selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
   navigateToDetailPane: (exerciseID: String) -> Unit,
 ) {
@@ -52,7 +52,6 @@ fun ToggleableExerciseItem(
             enabled = true,
             onClickLabel = "See more details about ${exercise.name} ",
             onClick = {
-              // navController.navigate("exerciseDetails/${exercise._id.toHexString()}")
               navigateToDetailPane(exercise.id.toHexString())
             },
           ),
@@ -68,7 +67,15 @@ fun ToggleableExerciseItem(
         color = MaterialTheme.colorScheme.onBackground,
       )
     },
-    trailingContent = {},
+    trailingContent = {
+      setsPerformedCount?.let {
+        Text(
+          text = it.toString(),
+          //        style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.onBackground,
+        )
+      }
+    },
     leadingContent = {
       IconToggleButton(
         modifier = Modifier.size(40.dp),

@@ -257,12 +257,14 @@ fun ReplaceExerciseScreen(
             ExercisesLazyList(
               exercises = exercises,
               muscleGroups = muscleGroups,
+              uiState.allExercisesSetsPerformed,
               selectedExercise = exerciseSelectedToBeAddedToWorkout.firstOrNull(),
-            ) { exercise, muscleGroupName, isSelectedExercise ->
+            ) { exercise, muscleGroupName, setsPerformedCount, isSelectedExercise ->
               SelectableExerciseItem(
                 exercise = exercise,
                 muscleGroupName = muscleGroupName,
                 selectedExercise = isSelectedExercise,
+                setsPerformedCount = setsPerformedCount,
                 selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
                 navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
               )
@@ -294,12 +296,13 @@ fun ReplaceExerciseScreen(
 private fun ExercisesLazyList(
   exercises: List<Exercise>,
   muscleGroups: List<MuscleGroup>,
+  exercisesSetsPerformedCount: Map<ObjectId, Int>,
   selectedExercise: Exercise?,
   //  selectExercise: (_exercise: Exercise, selected: Boolean) -> Unit,
   //  navController: NavController,
   exerciseItem:
   @Composable
-    (exercise: Exercise, muscleGroupName: String?, isSelectedExercise: Boolean) -> Unit,
+    (exercise: Exercise, muscleGroupName: String?, setsPerformedCount: Int?, isSelectedExercise: Boolean) -> Unit,
 ) {
   val lazyListState = rememberLazyListState()
   // Remember a CoroutineScope to be able to launch
@@ -331,7 +334,7 @@ private fun ExercisesLazyList(
       //        navController = navController,
       //        selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
       //      )
-      exerciseItem(exercise, muscleGroupName, isSelectedExercise)
+      exerciseItem(exercise, muscleGroupName,  exercisesSetsPerformedCount[exercise.id], isSelectedExercise)
     }
   }
 }

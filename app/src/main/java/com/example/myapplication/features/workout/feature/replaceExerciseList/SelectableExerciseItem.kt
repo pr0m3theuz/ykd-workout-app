@@ -26,6 +26,7 @@ import com.example.myapplication.common.domain.model.Exercise
 fun SelectableExerciseItem(
   exercise: Exercise,
   selectedExercise: Boolean,
+  setsPerformedCount: Int?,
   muscleGroupName: String?,
   selectExercise: (exercise: Exercise, selected: Boolean) -> Unit,
   navigateToDetailPane: (exerciseID: String) -> Unit,
@@ -66,7 +67,15 @@ fun SelectableExerciseItem(
         color = MaterialTheme.colorScheme.onBackground
       )
     },
-    trailingContent = {},
+    trailingContent = {
+      setsPerformedCount?.let {
+        Text(
+          text = it.toString(),
+          //        style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.onBackground,
+        )
+      }
+    },
     leadingContent = {
       IconToggleButton(
         checked = selectedExercise,
