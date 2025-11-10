@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -126,6 +127,7 @@ fun ExerciseSearchBar(
             showMuscleGroupsBottomSheet = true
           },
           label = { Text("Muscle Groups") },
+          trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
         )
         FilterChip(
           selected = equipment.values.any { it },
@@ -133,6 +135,7 @@ fun ExerciseSearchBar(
             showEquipmentBottomSheet = true
           },
           label = { Text("Equipment") },
+          trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
         )
         FilterChip(
           selected = movementTypes.values.any { it },
@@ -140,6 +143,7 @@ fun ExerciseSearchBar(
             showMovementTypeBottomSheet = true
           },
           label = { Text("Movement Types") },
+          trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
         )
       }
 
