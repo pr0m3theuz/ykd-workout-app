@@ -128,7 +128,11 @@ fun SetContent(
     // If actualWeight is empty AND there was a target, use target.
     // (You might want different logic: e.g., only complete if weight is filled)
     if (exerciseWeightText.isBlank() && (set.targetWeightPounds != null || set.targetWeightKilograms != null)) {
-      updateWeight(set.targetWeightPounds.toString())
+      if (weightUnit == MassUnit.POUNDS.abbreviation) {
+        updateWeight(set.targetWeightPounds.toString())
+      } else {
+        updateWeight(set.targetWeightKilograms.toString())
+      }
     }
     // If actualReps is empty, use target. (It's pre-filled, but user might clear it)
     if (repetitionsText.isBlank() && set.targetRepetitions != null) {
@@ -168,6 +172,7 @@ fun SetContent(
     MassUnit.KILOGRAMS.abbreviation -> doubleFormatted(set.targetWeightKilograms)
     else -> doubleFormatted(set.targetWeightPounds)
   }
+
   SetContentFrame(
     setTypeOptionsMenu = {
       SetTypeComposable(
