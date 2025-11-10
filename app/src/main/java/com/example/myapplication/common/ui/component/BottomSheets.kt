@@ -24,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.myapplication.common.domain.model.Equipment
+import com.example.myapplication.common.domain.model.MovementType
+import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.domain.model.Program
 
 
@@ -202,6 +205,191 @@ fun LevelsPartialBottomSheet(
               Text(
                 style = MaterialTheme.typography.bodyMedium,
                 text = level,
+                modifier = Modifier.padding(start = 16.dp),
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EquipmentPartialBottomSheet(
+  showBottomSheet: Boolean,
+  equipmentMap: Map<Equipment, Boolean>,
+  sheetState: SheetState,
+  onEquipmentSelected: (Equipment, Boolean) -> Unit = { _, _ -> },
+  onDismissRequest: () -> Unit,
+) {
+  if (showBottomSheet) {
+    Column {
+      ModalBottomSheet(
+        modifier = Modifier
+          .fillMaxHeight()
+          .zIndex(2f),
+        sheetState = sheetState,
+        onDismissRequest = {
+//          showSheet = false
+          onDismissRequest()
+        },
+      ) {
+        Row {
+          Text(
+            "Equipment",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.titleSmall,
+          )
+        }
+
+        Column(modifier = Modifier.selectableGroup()) {
+          equipmentMap.keys.forEach { equipment ->
+            val selected = equipmentMap[equipment] ?: false
+            Row(
+              Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .selectable(
+                  selected = selected,
+                  onClick = { onEquipmentSelected(equipment, !selected) },
+                  role = Role.Checkbox,
+                )
+                .padding(horizontal = 16.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Checkbox(
+                checked = selected,
+                onCheckedChange = null, // null recommended for accessibility with screen readers
+              )
+              Text(
+                style = MaterialTheme.typography.bodyMedium,
+                text = equipment.name,
+                modifier = Modifier.padding(start = 16.dp),
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MuscleGroupsPartialBottomSheet(
+  showBottomSheet: Boolean,
+  muscleGoupsMap: Map<MuscleGroup, Boolean>,
+  sheetState: SheetState,
+  onMuscleGroupSelected: (MuscleGroup, Boolean) -> Unit = { _, _ -> },
+  onDismissRequest: () -> Unit,
+) {
+  if (showBottomSheet) {
+    Column {
+      ModalBottomSheet(
+        modifier = Modifier
+          .fillMaxHeight()
+          .zIndex(2f),
+        sheetState = sheetState,
+        onDismissRequest = {
+//          showSheet = false
+          onDismissRequest()
+        },
+      ) {
+        Row {
+          Text(
+            "Muscle Groups",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.titleSmall,
+          )
+        }
+
+        Column(modifier = Modifier.selectableGroup()) {
+          muscleGoupsMap.keys.forEach { muscleGroup ->
+            val selected = muscleGoupsMap[muscleGroup] ?: false
+            Row(
+              Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .selectable(
+                  selected = selected,
+                  onClick = { onMuscleGroupSelected(muscleGroup, !selected) },
+                  role = Role.Checkbox,
+                )
+                .padding(horizontal = 16.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Checkbox(
+                checked = selected,
+                onCheckedChange = null, // null recommended for accessibility with screen readers
+              )
+              Text(
+                style = MaterialTheme.typography.bodyMedium,
+                text = muscleGroup.name,
+                modifier = Modifier.padding(start = 16.dp),
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MovementTypePartialBottomSheet(
+  showBottomSheet: Boolean,
+  movementTypesMap: Map<MovementType, Boolean>,
+  sheetState: SheetState,
+  onMovementTypeSelected: (MovementType, Boolean) -> Unit = { _, _ -> },
+  onDismissRequest: () -> Unit,
+) {
+  if (showBottomSheet) {
+    Column {
+      ModalBottomSheet(
+        modifier = Modifier
+          .fillMaxHeight()
+          .zIndex(2f),
+        sheetState = sheetState,
+        onDismissRequest = {
+//          showSheet = false
+          onDismissRequest()
+        },
+      ) {
+        Row {
+          Text(
+            "Movement Type",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.titleSmall,
+          )
+        }
+
+        Column(modifier = Modifier.selectableGroup()) {
+          movementTypesMap.keys.forEach { movementType ->
+            val selected = movementTypesMap[movementType] ?: false
+            Row(
+              Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .selectable(
+                  selected = selected,
+                  onClick = { onMovementTypeSelected(movementType, !selected) },
+                  role = Role.Checkbox,
+                )
+                .padding(horizontal = 16.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Checkbox(
+                checked = selected,
+                onCheckedChange = null, // null recommended for accessibility with screen readers
+              )
+              Text(
+                style = MaterialTheme.typography.bodyMedium,
+                text = movementType.name,
                 modifier = Modifier.padding(start = 16.dp),
               )
             }

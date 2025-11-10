@@ -51,7 +51,9 @@ import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.features.exercises.ExercisesViewModel
+import com.example.myapplication.features.exercises.ui.ExerciseItem
 import com.example.myapplication.features.exercises.ui.ExerciseOptionsDropdownMenu
+import com.example.myapplication.features.exercises.ui.ExerciseSearchBar
 import com.example.myapplication.features.exercises.ui.ExercisesFilterMenu
 import com.example.myapplication.features.exercises.ui.SelectedFiltersLazyRow
 import com.example.myapplication.features.workout.WorkoutViewModel
@@ -105,128 +107,77 @@ fun AddExercisesScreen(
   }
 
   //  TODO EDGE TO EDGE isn't working
-  Scaffold(
-    topBar = {
-      TopAppBar(
-        //        windowInsets = WindowInsets.statusBars,
-        title = {
-          Text(
-            text = "Add Exercises",
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            // modifier = Modifier.align(Alignment.CenterVertically),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-          )
-        },
-        navigationIcon = {
-          /*IconButton(
-            onClick = {
-              setOpenDialog(false)
-              // workoutViewModel.cancelExerciseSelection()
-            }
-          ) {
-            Icon(
-              imageVector = Icons.Outlined.Close,
-              tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Go to the previous screen",
-            )
-          }*/
-        },
-        //        scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-        actions = {
-          val iconColors = IconButtonDefaults.iconButtonColors()
-          IconButton(
-            onClick = { setSearchBarVisibility(!searchBarVisibility) },
-            enabled = true,
-            colors = iconColors,
-          ) {
-            Icon(
-              imageVector = Icons.Outlined.Search,
-              tint = MaterialTheme.colorScheme.onSurface,
-              contentDescription = "Search Exercises",
-            )
-          }
-          ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
-          ExerciseOptionsDropdownMenu()
-        },
-      )
-    },
-    bottomBar = {
-      //      NavigationBar {  }
-    },
-    floatingActionButton = {
-      FloatingActionButton(
-        modifier = Modifier.imePadding(),
-        onClick = {
-          Log.i(
-            "AddExercisesScreen.WorkoutViewModel",
-            "AddExercisesScreen.WorkoutViewModel: $workoutViewModel",
-          )
-          workoutViewModel.addMultipleEmptyExerciseSets(
-            exercisesSelectedToBeAddedToWorkout.toList()
-          )
-          //          setOpenDialog(false)
-          navController.navigateUp()
-        },
-      ) {
-        // TODO Figure out right icon for this
-        Icon(
-          modifier = Modifier.size(24.dp),
-          imageVector = Icons.Filled.Check,
-          tint = MaterialTheme.colorScheme.primary,
-          contentDescription = "Add Selected Exercises",
+  if (searchBarVisibility) {
+    /*          val searchBarColors =
+                colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+
+              val onActiveChange = { _active: Boolean -> active = _active }
+              SearchBar(
+                windowInsets = WindowInsets(0.dp),
+                inputField = {
+                  SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = {
+                      query = it
+                      filterExercises(it)
+                    },
+                    onSearch = { active = false },
+                    expanded = false,
+                    onExpandedChange = onActiveChange,
+                    enabled = true,
+                    placeholder = {
+                      Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    },
+                    leadingIcon = {
+                      Icon(
+                        Icons.Default.Search,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                      )
+                    },
+                    trailingIcon = { Icon(Icons.Default.Clear, contentDescription = null) },
+                    interactionSource = null,
+                  )
+                },
+                expanded = false,
+                onExpandedChange = {},
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 8.dp),
+                shape = SearchBarDefaults.inputFieldShape,
+                colors = searchBarColors,
+              ) {}*/
+
+
+    ExerciseSearchBar(
+      query = query,
+      onQueryChange = {
+        query = it
+        filterExercises(it)
+      },
+      onSearch = {},
+      searchResults = exercises,
+      onDismissRequest = { setSearchBarVisibility(false) },
+      muscleGroups = muscleGroupsChecked,
+      equipment = equipmentsChecked,
+      movementTypes = movementTypesChecked,
+      onMuscleGroupsSelected = { muscleGroup, checked -> },
+      onEquipmentSelected = { equipment, checked -> },
+      onMovementTypeSelected = { movementType, checked -> },
+      placeholder = {
+        Text(
+          "Search Exercises",
+          color = MaterialTheme.colorScheme.onSecondaryContainer
         )
-      }
-    },
-    content = { contentPadding ->
-      Column(Modifier
-        .padding(contentPadding)
-        .fillMaxWidth()) {
-//        TextFieldDefaults.colors(
-//          unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-//          unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
-//        )
-        val searchBarColors = colors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-
-        val onActiveChange = { _active: Boolean -> active = _active }
-        SearchBar(
-          windowInsets = WindowInsets(0.dp),
-          inputField = {
-            SearchBarDefaults.InputField(
-              query = query,
-              onQueryChange = {
-                query = it
-                filterExercises(it)
-              },
-              onSearch = { active = false },
-              expanded = false,
-              onExpandedChange = onActiveChange,
-              enabled = true,
-              placeholder = {
-                Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
-              },
-              leadingIcon = {
-                Icon(
-                  Icons.Default.Search,
-                  contentDescription = null,
-                  tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
-              },
-              trailingIcon = { Icon(Icons.Default.Clear, contentDescription = null) },
-              interactionSource = null,
-            )
-          },
-          expanded = false,
-          onExpandedChange = {},
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-          shape = SearchBarDefaults.inputFieldShape,
-          colors = searchBarColors,
-        ) {}
-
+      },
+      leadingIcon = {
+        Icon(
+          Icons.Default.Search,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+      },
+      selectedFiltersLazyRow = {
         val visible =
           muscleGroupsChecked.isNotEmpty() ||
                   selectedEquipment.isNotEmpty() ||
@@ -237,7 +188,6 @@ fun AddExercisesScreen(
             selectedEquipment.isNotEmpty() ||
             selectedMovementTypes.isNotEmpty()
           ) {
-
             SelectedFiltersLazyRow(
               exercisesViewModel,
               muscleGroupsChecked,
@@ -249,47 +199,166 @@ fun AddExercisesScreen(
             )
           }
         }
-
-        when {
-          exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
-          exercises.isNotEmpty() -> {
-            exercises.forEach { exercise -> exercise.lazyListItemID = newLazyListItemID() }
-            ExercisesLazyList(
-              exercises = exercises,
-              muscleGroups = muscleGroups,
-              uiState.allExercisesSetsPerformed
-              //              selectExercise = { _exercise, isSelected -> selectExercise(_exercise,
-              // isSelected) },
-              //              navController = navController,
-            ) { exercise, muscleGroupName, setsPerformedCount ->
-              ToggleableExerciseItem(
-                exercise = exercise,
-                muscleGroupName = muscleGroupName,
-                setsPerformedCount = setsPerformedCount,
-                selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
-                navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
+      },
+      exerciseItem = { exercise -> },
+      exercisesLazyList = {
+        ExercisesLazyList(
+          exercises = exercises,
+          muscleGroups = muscleGroups,
+          uiState.allExercisesSetsPerformed
+          //              selectExercise = { _exercise, isSelected -> selectExercise(_exercise,
+          // isSelected) },
+          //              navController = navController,
+        ) { exercise, muscleGroupName, setsPerformedCount ->
+          ToggleableExerciseItem(
+            exercise = exercise,
+            muscleGroupName = muscleGroupName,
+            setsPerformedCount = setsPerformedCount,
+            selectExercise = { _exercise, isSelected ->
+              selectExercise(
+                _exercise,
+                isSelected
+              )
+            },
+            navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
+          )
+        }
+      }
+    )
+  } else {
+    Scaffold(
+      topBar = {
+        TopAppBar(
+          //        windowInsets = WindowInsets.statusBars,
+          title = {
+            Text(
+              text = "Add Exercises",
+              color = MaterialTheme.colorScheme.onSurface,
+              style = MaterialTheme.typography.titleLarge,
+              textAlign = TextAlign.Center,
+              // modifier = Modifier.align(Alignment.CenterVertically),
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+            )
+          },
+          navigationIcon = {
+            /*IconButton(
+            onClick = {
+              setOpenDialog(false)
+              // workoutViewModel.cancelExerciseSelection()
+            }
+          ) {
+            Icon(
+              imageVector = Icons.Outlined.Close,
+              tint = MaterialTheme.colorScheme.onSurface,
+              contentDescription = "Go to the previous screen",
+            )
+          }*/
+          },
+          //        scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+          actions = {
+            val iconColors = IconButtonDefaults.iconButtonColors()
+            IconButton(
+              onClick = { setSearchBarVisibility(!searchBarVisibility) },
+              enabled = true,
+              colors = iconColors,
+            ) {
+              Icon(
+                imageVector = Icons.Outlined.Search,
+                tint = MaterialTheme.colorScheme.onSurface,
+                contentDescription = "Search Exercises",
               )
             }
-          }
+            ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
+            ExerciseOptionsDropdownMenu()
+          },
+        )
+      },
+      bottomBar = {
+        //      NavigationBar {  }
+      },
+      floatingActionButton = {
+        FloatingActionButton(
+          modifier = Modifier.imePadding(),
+          onClick = {
+            Log.i(
+              "AddExercisesScreen.WorkoutViewModel",
+              "AddExercisesScreen.WorkoutViewModel: $workoutViewModel",
+            )
+            workoutViewModel.addMultipleEmptyExerciseSets(
+              exercisesSelectedToBeAddedToWorkout.toList()
+            )
+            //          setOpenDialog(false)
+            navController.navigateUp()
+          },
+        ) {
+          // TODO Figure out right icon for this
+          Icon(
+            modifier = Modifier.size(24.dp),
+            imageVector = Icons.Filled.Check,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = "Add Selected Exercises",
+          )
+        }
+      },
+      content = { contentPadding ->
+        Column(
+          Modifier
+            .padding(contentPadding)
+            .fillMaxWidth()
+        ) {
+//        TextFieldDefaults.colors(
+//          unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+//          unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
+//        )
 
-          query.isBlank() -> {
-            Column(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp),
-              horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-              LinearProgressIndicator(
+
+          when {
+            exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
+            exercises.isNotEmpty() -> {
+//              exercises.forEach { exercise -> exercise.lazyListItemID = newLazyListItemID() }
+              ExercisesLazyList(
+                exercises = exercises,
+                muscleGroups = muscleGroups,
+                uiState.allExercisesSetsPerformed
+                //              selectExercise = { _exercise, isSelected -> selectExercise(_exercise,
+                // isSelected) },
+                //              navController = navController,
+              ) { exercise, muscleGroupName, setsPerformedCount ->
+                ToggleableExerciseItem(
+                  exercise = exercise,
+                  muscleGroupName = muscleGroupName,
+                  setsPerformedCount = setsPerformedCount,
+                  selectExercise = { _exercise, isSelected ->
+                    selectExercise(
+                      _exercise,
+                      isSelected
+                    )
+                  },
+                  navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
+                )
+              }
+            }
+
+            query.isBlank() -> {
+              Column(
                 modifier = Modifier
-                  .semantics(mergeDescendants = true) {}
-                  .padding(10.dp)
-              )
+                  .fillMaxWidth()
+                  .padding(top = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+              ) {
+                LinearProgressIndicator(
+                  modifier = Modifier
+                    .semantics(mergeDescendants = true) {}
+                    .padding(10.dp)
+                )
+              }
             }
           }
         }
-      }
-    },
-  )
+      },
+    )
+  }
 }
 
 @Composable

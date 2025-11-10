@@ -49,7 +49,9 @@ import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.MuscleGroup
 import com.example.myapplication.features.exercises.ExercisesViewModel
+import com.example.myapplication.features.exercises.ui.ExerciseItem
 import com.example.myapplication.features.exercises.ui.ExerciseOptionsDropdownMenu
+import com.example.myapplication.features.exercises.ui.ExerciseSearchBar
 import com.example.myapplication.features.exercises.ui.ExercisesFilterMenu
 import com.example.myapplication.features.exercises.ui.SelectedFiltersLazyRow
 import com.example.myapplication.features.workout.WorkoutViewModel
@@ -178,9 +180,11 @@ fun ReplaceExerciseScreen(
       }
     },
     content = { contentPadding ->
-      Column(Modifier
-        .padding(contentPadding)
-        .fillMaxWidth()) {
+      Column(
+        Modifier
+          .padding(contentPadding)
+          .fillMaxWidth()
+      ) {
         val searchBarColors =
           SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -191,65 +195,115 @@ fun ReplaceExerciseScreen(
 //              ),
           )
 
-        val onActiveChange = { _active: Boolean -> active = _active }
-        SearchBar(
-          windowInsets = WindowInsets(0.dp),
-          inputField = {
-            SearchBarDefaults.InputField(
-              query = query,
-              onQueryChange = {
-                query = it
-                filterExercises(it)
-              },
-              onSearch = { active = false },
-              expanded = false,
-              onExpandedChange = onActiveChange,
-              enabled = true,
-              placeholder = {
-                Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
-              },
-              leadingIcon = {
-                Icon(
-                  Icons.Default.Search,
-                  contentDescription = null,
-                  tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
-              },
-              trailingIcon = { Icon(Icons.Default.Clear, contentDescription = null) },
-              interactionSource = null,
-            )
-          },
-          expanded = false,
-          onExpandedChange = {},
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-          shape = SearchBarDefaults.inputFieldShape,
-          colors = searchBarColors,
-        ) {}
-
-        val visible =
-          muscleGroupsChecked.isNotEmpty() ||
+        if (searchBarVisibility) {
+/*          val onActiveChange = { _active: Boolean -> active = _active }
+          SearchBar(
+            windowInsets = WindowInsets(0.dp),
+            inputField = {
+              SearchBarDefaults.InputField(
+                query = query,
+                onQueryChange = {
+                  query = it
+                  filterExercises(it)
+                },
+                onSearch = { active = false },
+                expanded = false,
+                onExpandedChange = onActiveChange,
+                enabled = true,
+                placeholder = {
+                  Text("Search Exercises", color = MaterialTheme.colorScheme.onSecondaryContainer)
+                },
+                leadingIcon = {
+                  Icon(
+                    Icons.Default.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                  )
+                },
+                trailingIcon = { Icon(Icons.Default.Clear, contentDescription = null) },
+                interactionSource = null,
+              )
+            },
+            expanded = false,
+            onExpandedChange = {},
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 8.dp),
+            shape = SearchBarDefaults.inputFieldShape,
+            colors = searchBarColors,
+          ) {}*/
+          ExerciseSearchBar(
+            query = query,
+            onQueryChange = {
+              query = it
+              filterExercises(it)
+            },
+            onSearch = {},
+            searchResults = exercises,
+            onDismissRequest = { setSearchBarVisibility(false) },
+            muscleGroups = muscleGroupsChecked,
+            equipment = equipmentsChecked,
+            movementTypes = movementTypesChecked,
+            onMuscleGroupsSelected = { muscleGroup, checked -> },
+            onEquipmentSelected = { equipment, checked -> },
+            onMovementTypeSelected = { movementType, checked -> },
+            placeholder = {
+              Text(
+                "Search Exercises",
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+              )
+            },
+            leadingIcon = {
+              Icon(
+                Icons.Default.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+              )
+            },
+            selectedFiltersLazyRow = {
+              val visible =
+                muscleGroupsChecked.isNotEmpty() ||
+                        selectedEquipment.isNotEmpty() ||
+                        selectedMovementTypes.isNotEmpty()
+              AnimatedVisibility(visible) {
+                if (
+                  musclesChecked.isNotEmpty() ||
                   selectedEquipment.isNotEmpty() ||
                   selectedMovementTypes.isNotEmpty()
-        AnimatedVisibility(visible) {
-          if (
-            musclesChecked.isNotEmpty() ||
-              selectedEquipment.isNotEmpty() ||
-              selectedMovementTypes.isNotEmpty()
-          ) {
-
-            SelectedFiltersLazyRow(
-              exercisesViewModel,
-              muscleGroupsChecked,
-              equipmentsChecked,
-              movementTypesChecked,
-              musclesChecked,
-              selectedEquipment,
-              selectedMovementTypes,
-            )
-          }
+                ) {
+                  SelectedFiltersLazyRow(
+                    exercisesViewModel,
+                    muscleGroupsChecked,
+                    equipmentsChecked,
+                    movementTypesChecked,
+                    musclesChecked,
+                    selectedEquipment,
+                    selectedMovementTypes,
+                  )
+                }
+              }
+            },
+            exerciseItem = {},
+            exercisesLazyList = {
+              ExercisesLazyList(
+                exercises = exercises,
+                muscleGroups = muscleGroups,
+                uiState.allExercisesSetsPerformed,
+                selectedExercise = exerciseSelectedToBeAddedToWorkout.firstOrNull(),
+              ) { exercise, muscleGroupName, setsPerformedCount, isSelectedExercise ->
+                SelectableExerciseItem(
+                  exercise = exercise,
+                  muscleGroupName = muscleGroupName,
+                  selectedExercise = isSelectedExercise,
+                  setsPerformedCount = setsPerformedCount,
+                  selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
+                  navigateToDetailPane = { exerciseID: String -> navigateToDetailPane(exerciseID) },
+                )
+              }
+            }
+          )
         }
+
 
         when {
           exercises.isEmpty() && query.isNotBlank() -> NoResultsFound(query = query)
@@ -334,7 +388,12 @@ private fun ExercisesLazyList(
       //        navController = navController,
       //        selectExercise = { _exercise, isSelected -> selectExercise(_exercise, isSelected) },
       //      )
-      exerciseItem(exercise, muscleGroupName,  exercisesSetsPerformedCount[exercise.id], isSelectedExercise)
+      exerciseItem(
+        exercise,
+        muscleGroupName,
+        exercisesSetsPerformedCount[exercise.id],
+        isSelectedExercise
+      )
     }
   }
 }
