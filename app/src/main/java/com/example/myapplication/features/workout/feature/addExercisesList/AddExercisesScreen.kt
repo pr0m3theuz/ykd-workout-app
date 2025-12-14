@@ -161,8 +161,14 @@ fun AddExercisesScreen(
       muscleGroups = muscleGroupsChecked,
       equipment = equipmentsChecked,
       movementTypes = movementTypesChecked,
-      onMuscleGroupsSelected = { muscleGroup, checked -> },
-      onEquipmentSelected = { equipment, checked -> },
+      onMuscleGroupsSelected = { muscleGroup, checked ->
+        exercisesViewModel.updateMuscleGroupsChecked(muscleGroup, checked)
+        exercisesViewModel.filterExercises()
+      },
+      onEquipmentSelected = { equipment, checked ->
+        exercisesViewModel.updateEquipmentsChecked(equipment, checked)
+        exercisesViewModel.filterExercises()
+      },
       onMovementTypeSelected = { movementType, checked -> },
       placeholder = {
         Text(
@@ -269,7 +275,7 @@ fun AddExercisesScreen(
                 contentDescription = "Search Exercises",
               )
             }
-            ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
+//            ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
             ExerciseOptionsDropdownMenu()
           },
         )

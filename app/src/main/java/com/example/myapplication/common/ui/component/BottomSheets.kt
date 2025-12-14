@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Checkbox
@@ -245,30 +246,71 @@ fun EquipmentPartialBottomSheet(
           )
         }
 
-        Column(modifier = Modifier.selectableGroup()) {
-          equipmentMap.keys.forEach { equipment ->
-            val selected = equipmentMap[equipment] ?: false
-            Row(
-              Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .selectable(
-                  selected = selected,
-                  onClick = { onEquipmentSelected(equipment, !selected) },
-                  role = Role.Checkbox,
+        LazyColumn(modifier = Modifier.selectableGroup()) {
+          equipmentMap.filter { (_, value) -> value }
+            .toSortedMap(compareBy<Equipment> { it.name }).keys.forEach { equipment ->
+            item {
+              val selected = equipmentMap[equipment] ?: false
+              val (checked, onCheckedChange) = remember { mutableStateOf(selected) }
+              Row(
+                Modifier
+                  .fillMaxWidth()
+                  .height(56.dp)
+                  .selectable(
+                    selected = selected,
+                    onClick = {
+                      onCheckedChange(!checked)
+                      onEquipmentSelected(equipment, !selected)
+                    },
+                    role = Role.Checkbox,
+                  )
+                  .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Checkbox(
+                  checked = selected,
+                  onCheckedChange = null, // null recommended for accessibility with screen readers
                 )
-                .padding(horizontal = 16.dp),
-              verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Checkbox(
-                checked = selected,
-                onCheckedChange = null, // null recommended for accessibility with screen readers
-              )
-              Text(
-                style = MaterialTheme.typography.bodyMedium,
-                text = equipment.name,
-                modifier = Modifier.padding(start = 16.dp),
-              )
+                Text(
+                  style = MaterialTheme.typography.bodyMedium,
+                  text = equipment.name,
+                  modifier = Modifier.padding(start = 16.dp),
+                )
+              }
+
+            }
+          }
+          equipmentMap.filter { (_, value) -> !value }
+            .toSortedMap(compareBy<Equipment> { it.name }).keys.forEach { equipment ->
+            item {
+              val selected = equipmentMap[equipment] ?: false
+              val (checked, onCheckedChange) = remember { mutableStateOf(selected) }
+              Row(
+                Modifier
+                  .fillMaxWidth()
+                  .height(56.dp)
+                  .selectable(
+                    selected = selected,
+                    onClick = {
+                      onCheckedChange(!checked)
+                      onEquipmentSelected(equipment, !selected)
+                    },
+                    role = Role.Checkbox,
+                  )
+                  .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Checkbox(
+                  checked = selected,
+                  onCheckedChange = null, // null recommended for accessibility with screen readers
+                )
+                Text(
+                  style = MaterialTheme.typography.bodyMedium,
+                  text = equipment.name,
+                  modifier = Modifier.padding(start = 16.dp),
+                )
+              }
+
             }
           }
         }
@@ -306,30 +348,69 @@ fun MuscleGroupsPartialBottomSheet(
           )
         }
 
-        Column(modifier = Modifier.selectableGroup()) {
-          muscleGoupsMap.keys.forEach { muscleGroup ->
-            val selected = muscleGoupsMap[muscleGroup] ?: false
-            Row(
-              Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .selectable(
-                  selected = selected,
-                  onClick = { onMuscleGroupSelected(muscleGroup, !selected) },
-                  role = Role.Checkbox,
+        LazyColumn(modifier = Modifier.selectableGroup()) {
+          muscleGoupsMap.filter { (_, value) -> value }
+            .toSortedMap(compareBy<MuscleGroup> { it.name }).keys.forEach { muscleGroup ->
+            item {
+              val selected = muscleGoupsMap[muscleGroup] ?: false
+              val (checked, onCheckedChange) = remember { mutableStateOf(selected) }
+              Row(
+                Modifier
+                  .fillMaxWidth()
+                  .height(56.dp)
+                  .selectable(
+                    selected = selected,
+                    onClick = {
+                      onCheckedChange(!checked)
+                      onMuscleGroupSelected(muscleGroup, !selected)
+                    },
+                    role = Role.Checkbox,
+                  )
+                  .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Checkbox(
+                  checked = selected,
+                  onCheckedChange = null, // null recommended for accessibility with screen readers
                 )
-                .padding(horizontal = 16.dp),
-              verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Checkbox(
-                checked = selected,
-                onCheckedChange = null, // null recommended for accessibility with screen readers
-              )
-              Text(
-                style = MaterialTheme.typography.bodyMedium,
-                text = muscleGroup.name,
-                modifier = Modifier.padding(start = 16.dp),
-              )
+                Text(
+                  style = MaterialTheme.typography.bodyMedium,
+                  text = muscleGroup.name,
+                  modifier = Modifier.padding(start = 16.dp),
+                )
+              }
+            }
+          }
+          muscleGoupsMap.filter { (_, value) -> !value }
+            .toSortedMap(compareBy<MuscleGroup> { it.name }).keys.forEach { muscleGroup ->
+            item {
+              val selected = muscleGoupsMap[muscleGroup] ?: false
+              val (checked, onCheckedChange) = remember { mutableStateOf(selected) }
+              Row(
+                Modifier
+                  .fillMaxWidth()
+                  .height(56.dp)
+                  .selectable(
+                    selected = selected,
+                    onClick = {
+                      onCheckedChange(!checked)
+                      onMuscleGroupSelected(muscleGroup, !selected)
+                    },
+                    role = Role.Checkbox,
+                  )
+                  .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Checkbox(
+                  checked = selected,
+                  onCheckedChange = null, // null recommended for accessibility with screen readers
+                )
+                Text(
+                  style = MaterialTheme.typography.bodyMedium,
+                  text = muscleGroup.name,
+                  modifier = Modifier.padding(start = 16.dp),
+                )
+              }
             }
           }
         }
@@ -369,22 +450,26 @@ fun MovementTypePartialBottomSheet(
         }
 
         Column(modifier = Modifier.selectableGroup()) {
-          movementTypesMap.keys.forEach { movementType ->
+          movementTypesMap.toSortedMap(compareBy<MovementType> { it.name }).keys.forEach { movementType ->
             val selected = movementTypesMap[movementType] ?: false
+            val (checked, onCheckedChange) = remember { mutableStateOf(selected) }
             Row(
               Modifier
                 .fillMaxWidth()
                 .height(56.dp)
                 .selectable(
                   selected = selected,
-                  onClick = { onMovementTypeSelected(movementType, !selected) },
+                  onClick = {
+                    onCheckedChange(!checked)
+                    onMovementTypeSelected(movementType, !selected)
+                  },
                   role = Role.Checkbox,
                 )
                 .padding(horizontal = 16.dp),
               verticalAlignment = Alignment.CenterVertically,
             ) {
               Checkbox(
-                checked = selected,
+                checked = checked,
                 onCheckedChange = null, // null recommended for accessibility with screen readers
               )
               Text(

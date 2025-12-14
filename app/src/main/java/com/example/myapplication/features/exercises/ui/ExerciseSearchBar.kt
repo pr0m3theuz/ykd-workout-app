@@ -5,11 +5,10 @@ package com.example.myapplication.features.exercises.ui
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
@@ -115,48 +114,54 @@ fun ExerciseSearchBar(
       // Show search results in a lazy column for better performance
       selectedFiltersLazyRow()
 
-      Row(
+      LazyRow(
         modifier = Modifier
           .fillMaxWidth()
           .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
-        FilterChip(
-          selected = muscleGroups.values.any { it },
-          onClick = {
-            showMuscleGroupsBottomSheet = true
-          },
-          label = { Text("Muscle Groups") },
-          trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
-        )
-        FilterChip(
-          selected = equipment.values.any { it },
-          onClick = {
-            showEquipmentBottomSheet = true
-          },
-          label = { Text("Equipment") },
-          trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
-        )
-        FilterChip(
-          selected = movementTypes.values.any { it },
-          onClick = {
-            showMovementTypeBottomSheet = true
-          },
-          label = { Text("Movement Types") },
-          trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
-        )
+        item {
+          FilterChip(
+            selected = muscleGroups.values.any { it },
+            onClick = {
+              showMuscleGroupsBottomSheet = true
+            },
+            label = { Text("Muscle Groups") },
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
+          )
+        }
+        item {
+          FilterChip(
+            selected = equipment.values.any { it },
+            onClick = {
+              showEquipmentBottomSheet = true
+            },
+            label = { Text("Equipment") },
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
+          )
+        }
+        item {
+          FilterChip(
+            selected = movementTypes.values.any { it },
+            onClick = {
+              showMovementTypeBottomSheet = true
+            },
+            label = { Text("Movement Types") },
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "More Items") }
+          )
+        }
       }
 
       exercisesLazyList()
 
-/*      LazyColumn {
-        items(
-          count = searchResults.size,
-          key = { index: Int -> searchResults[index].lazyListItemID }) { index ->
-          val exercise = searchResults[index]
-          exerciseItem(exercise)
-        }
-      }*/
+      /*      LazyColumn {
+              items(
+                count = searchResults.size,
+                key = { index: Int -> searchResults[index].lazyListItemID }) { index ->
+                val exercise = searchResults[index]
+                exerciseItem(exercise)
+              }
+            }*/
     }
 
 

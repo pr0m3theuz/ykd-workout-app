@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -33,8 +32,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -104,6 +101,7 @@ fun ExercisesLazyColumn(
   var query by rememberSaveable { mutableStateOf(exercisesViewModel.searchExerciseName) }
   var active by remember { mutableStateOf(false) }
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
+
   if (searchBarVisibility) {
     /*        SearchBar(
               inputField = {
@@ -154,8 +152,14 @@ fun ExercisesLazyColumn(
       muscleGroups = muscleGroupsChecked,
       equipment = equipmentsChecked,
       movementTypes = movementTypesChecked,
-      onMuscleGroupsSelected = { muscleGroup, checked -> },
-      onEquipmentSelected = { equipment, checked -> },
+      onMuscleGroupsSelected = { muscleGroup, checked ->
+        exercisesViewModel.updateMuscleGroupsChecked(muscleGroup, checked)
+        exercisesViewModel.filterExercises()
+      },
+      onEquipmentSelected = { equipment, checked ->
+        exercisesViewModel.updateEquipmentsChecked(equipment, checked)
+        exercisesViewModel.filterExercises()
+      },
       onMovementTypeSelected = { movementType, checked -> },
       placeholder = {
         Text(
@@ -256,7 +260,7 @@ fun ExercisesLazyColumn(
                 contentDescription = "Search Exercises",
               )
             }
-            ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
+//            ExercisesFilterMenu(/*modifier = Modifier.align(Alignment.CenterVertically)*/)
             ExerciseOptionsDropdownMenu()
           },
         )
