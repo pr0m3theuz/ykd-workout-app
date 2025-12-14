@@ -969,7 +969,11 @@ class ManageWorkoutUseCase(
           // lastSet
         )
       // Return a new list combining the old list and the new set
-      currentSets + newSet
+      currentSets.add(newSet)
+      currentSets.mapIndexed { i, set ->
+        // Create a new object with the updated order
+        set.copy(setNumber = i + 1)
+      }
     } else {
       // --- Case: Add the very first set ---
       // Return a new list containing only the first default set
@@ -1091,12 +1095,16 @@ class ManageWorkoutUseCase(
     // Use map to create a new list based on transformations
     return workoutComponent.map { component ->
       // Find the target Superset component by its UUID
-      when {
-        component is ExerciseExerciseSets && component.exSetsUUID == targetExSetsUuid -> {
-          component.copy(sets = addSet(component).toMutableList())
+      when (component) {
+        is ExerciseExerciseSets if component.exSetsUUID == targetExSetsUuid -> {
+          val newSetsList = addSet(component).toMutableList()
+
+          component.copy(
+            lazyListItemID = newLazyListItemID(),
+            sets = newSetsList)
         }
 
-        component is SupersetExercisesSets && component.uuid == supersetUuid -> {
+        is SupersetExercisesSets if component.uuid == supersetUuid -> {
           var supersetModified = false // Flag to track if modification occurred
 
           // Map the inner exercisesSets list to potentially update the target
@@ -1112,7 +1120,9 @@ class ManageWorkoutUseCase(
                   addSet(innerExSets) // Assuming addSet(ExerciseExerciseSets) returns List<Set>
 
                 // Return a copy of the innerExSets with the new list of sets
-                innerExSets.copy(sets = newSetsList.toMutableList()) // Update the sets
+                innerExSets.copy(
+                  lazyListItemID = newLazyListItemID(),
+                  sets = newSetsList.toMutableList()) // Update the sets
               } else {
                 // Not the target ExerciseExerciseSets, return it unmodified
                 innerExSets
@@ -1147,12 +1157,15 @@ class ManageWorkoutUseCase(
     // Use map to create a new list based on transformations
     return workoutComponent.map { component ->
       // Find the target Superset component by its UUID
-      when {
-        component is ExerciseExerciseSets && component.exSetsUUID == targetExSetsUuid -> {
-          component.copy(sets = addSetAtIndex(component, index).toMutableList())
+      when (component) {
+        is ExerciseExerciseSets if component.exSetsUUID == targetExSetsUuid -> {
+          component.copy(
+            lazyListItemID = newLazyListItemID(),
+            sets = addSetAtIndex(component, index).toMutableList()
+          )
         }
 
-        component is SupersetExercisesSets && component.uuid == supersetUuid -> {
+        is SupersetExercisesSets if component.uuid == supersetUuid -> {
           var supersetModified = false // Flag to track if modification occurred
 
           // Map the inner exercisesSets list to potentially update the target
@@ -1171,7 +1184,11 @@ class ManageWorkoutUseCase(
                   ) // Assuming addSet(ExerciseExerciseSets) returns List<Set>
 
                 // Return a copy of the innerExSets with the new list of sets
-                innerExSets.copy(sets = newSetsList.toMutableList()) // Update the sets
+                innerExSets.copy(
+                  lazyListItemID = newLazyListItemID(),
+                  sets = newSetsList.toMutableList()
+                ) // Update the sets
+
               } else {
                 // Not the target ExerciseExerciseSets, return it unmodified
                 innerExSets
@@ -1196,7 +1213,10 @@ class ManageWorkoutUseCase(
   }
 
   fun removeSet(exerciseSets: ExerciseExerciseSets, set: Set): List<Set> {
-    return exerciseSets.sets.minusElement(set)
+    return exerciseSets.sets.minusElement(set).mapIndexed { index, set ->
+      set.setNumber = index + 1
+      set
+    }
   }
 
   fun updateExercisesSetsData(exerciseSets: ExerciseExerciseSets, temporarySets: List<Set>) {
