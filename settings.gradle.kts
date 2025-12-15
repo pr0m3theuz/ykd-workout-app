@@ -13,5 +13,5 @@ dependencyResolutionManagement {
       maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
-rootProject.name = "My Application"
+rootProject.name = "YKD"
 include(":app")
