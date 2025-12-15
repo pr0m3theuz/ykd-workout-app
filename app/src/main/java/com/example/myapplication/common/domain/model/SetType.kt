@@ -161,5 +161,40 @@ Example Myo Reps Set:<ol><li>Start by doing an activation set: Use a weight that
                 "partner or compromising a prescribed form or technique.",
         abbreviation = "F",
       )
+
+    val clusterSet = SetType(
+      9,
+      "Cluster Set",
+      description = "",
+      abbreviation = "C"
+    )
+
+    val leftSet = SetType(
+      10,
+      "Left Set",
+      description = "For unilateral exercises. Use this to log the left side separately and spot asymmetries over time.",
+      abbreviation = "L"
+    )
+
+    val rightSet = SetType(
+      11,
+      "Right Set",
+      description = "For unilateral exercises. Use this to log the right side separately and spot asymmetries over time.",
+      abbreviation = "R"
+    )
+
+    val partialReps = SetType(
+      12,
+      "Partial Reps",
+      description = "Reps performed through a shortened range of motion (e.g. lengthened partials, top half squats, etc.)",
+      abbreviation = "P"
+    )
+
+    val negativeReps = SetType(
+      13,
+      "Negative Reps",
+      description = "Reps performed the lowering portion of the lift only.",
+      abbreviation = "N"
+    )
   }
 }

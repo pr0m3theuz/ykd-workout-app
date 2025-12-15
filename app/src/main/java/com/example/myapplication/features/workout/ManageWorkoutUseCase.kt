@@ -1071,8 +1071,7 @@ class ManageWorkoutUseCase(
       )
     }
   }
-
-  // TODO Debug Causes Crash
+  
   /**
    * Adds a new set to a specific ExerciseExerciseSets instance nested within a specific
    * SupersetExercisesSets. This function operates immutably, returning a new list of
