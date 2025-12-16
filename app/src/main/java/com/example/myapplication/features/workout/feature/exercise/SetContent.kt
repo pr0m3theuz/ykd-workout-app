@@ -438,6 +438,11 @@ private fun SetTypeComposable(
         SetType.giantSet -> "G"
         SetType.amrapSet -> "A"
         SetType.failureSet -> "F"
+        SetType.clusterSet -> "C"
+        SetType.leftSet -> "L"
+        SetType.rightSet -> "R"
+        SetType.partialReps -> "P"
+        SetType.negativeReps -> "N"
         else -> {
           setIndex
         }
@@ -519,7 +524,7 @@ private fun SetTypeComposable(
     SetTypeOptionsMenu(
       expandMenu = { expandedSetTypeOptionsDropdownMenu },
       onDismiss = { expandedSetTypeOptionsDropdownMenu = false },
-      updateSetType = { setTypeID -> updateSetType(SetType.getSetType(setTypeID)) },
+      updateSetType = { setType -> updateSetType(setType) },
       changeIconText = { abbreviation ->
         //        iconText = abbreviation
         //        Log.i("setTypeAbbreviation", "setType iconText: $iconText")

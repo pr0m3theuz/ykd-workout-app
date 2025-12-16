@@ -34,7 +34,7 @@ import com.example.myapplication.common.util.createAnnotatedLinkString
 fun SetTypeOptionsMenu(
   expandMenu: () -> Boolean,
   onDismiss: () -> Unit,
-  updateSetType: (setTypeID: Int) -> Unit,
+  updateSetType: (setType: SetType) -> Unit,
   changeIconText: (iconText: String) -> Unit,
 ) {
 
@@ -56,6 +56,7 @@ fun SetTypeOptionsMenu(
     val normalSet = SetType.normalSet
     normalSet.lightTextColor = MaterialTheme.colorScheme.onSurface
     normalSet.darkTextColor = MaterialTheme.colorScheme.onSurface
+    normalSet.abbreviation = "1"
     menu.add(normalSet)
 
     val warmUpSet = SetType.warmUpSet
@@ -82,6 +83,22 @@ fun SetTypeOptionsMenu(
     failureSet.lightTextColor = MaterialTheme.colorScheme.error
     failureSet.darkTextColor = MaterialTheme.colorScheme.error
     menu.add(failureSet)
+
+    val clusterSet = SetType.clusterSet
+    menu.add(clusterSet)
+
+    val leftSet = SetType.leftSet
+    menu.add(leftSet)
+
+    val rightSet = SetType.rightSet
+    menu.add(rightSet)
+
+    val partialReps = SetType.partialReps
+    menu.add(partialReps)
+
+    val negativeReps = SetType.negativeReps
+    menu.add(negativeReps)
+
 
     return menu
   }
@@ -132,7 +149,7 @@ fun SetTypeOptionsMenu(
         },
         onClick = {
           onDismiss()
-          updateSetType(setType.setTypeID)
+          updateSetType(setType)
           changeIconText(setType.abbreviation ?: setType.name[0].toString())
         },
       )

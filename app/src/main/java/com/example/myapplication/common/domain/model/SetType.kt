@@ -64,7 +64,7 @@ data class SetType(
 <a href="https://www.youtube.com/watch?v=51TKExRtxZM">How Get The Most Muscle Growth From Dropsets</a>"""
           .trimIndent(),
         lightTextColor = Color(0, 0, 139),
-        darkTextColor = Color(0, 204, 255), /* Color: Purple */
+        darkTextColor = Color(0, 204, 255),
         abbreviation = "D",
       )
 
@@ -165,7 +165,9 @@ Example Myo Reps Set:<ol><li>Start by doing an activation set: Use a weight that
     val clusterSet = SetType(
       9,
       "Cluster Set",
-      description = "",
+      description = "Cluster reps, Rest-Pause or Myo-Reps are performed by taking mini-rests on Normal Sets (e.g. 10 reps, rest 10-20s, 5 reps, rest 10-20s, 5 reps etc.) Use this to track the additional reps after a Normal Set.",
+      lightTextColor = Color(139, 0, 0), // Dark Red
+      darkTextColor = Color(255, 102, 102), // Light Red
       abbreviation = "C"
     )
 
@@ -173,6 +175,8 @@ Example Myo Reps Set:<ol><li>Start by doing an activation set: Use a weight that
       10,
       "Left Set",
       description = "For unilateral exercises. Use this to log the left side separately and spot asymmetries over time.",
+      lightTextColor = Color(0, 128, 128), // Teal
+      darkTextColor = Color(0, 255, 255), // Cyan
       abbreviation = "L"
     )
 
@@ -180,6 +184,8 @@ Example Myo Reps Set:<ol><li>Start by doing an activation set: Use a weight that
       11,
       "Right Set",
       description = "For unilateral exercises. Use this to log the right side separately and spot asymmetries over time.",
+      lightTextColor = Color(184, 134, 11), // Dark Goldenrod
+      darkTextColor = Color(255, 255, 0), // Yellow
       abbreviation = "R"
     )
 
@@ -187,13 +193,17 @@ Example Myo Reps Set:<ol><li>Start by doing an activation set: Use a weight that
       12,
       "Partial Reps",
       description = "Reps performed through a shortened range of motion (e.g. lengthened partials, top half squats, etc.)",
+      lightTextColor = Color(101, 67, 33), // Dark Brown
+      darkTextColor = Color(210, 180, 140), // Tan
       abbreviation = "P"
     )
 
     val negativeReps = SetType(
       13,
       "Negative Reps",
-      description = "Reps performed the lowering portion of the lift only.",
+      description = "Reps where only the lowering portion of the lift are performed.",
+      lightTextColor = Color(47, 79, 79), // Dark Slate Gray
+      darkTextColor = Color(176, 196, 222), // Light Steel Blue
       abbreviation = "N"
     )
   }
