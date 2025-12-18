@@ -179,19 +179,27 @@ fun linearProgression(
   requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
   requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
 
-  val repetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.repetitions }.toMutableList()
-  val weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.weightPounds }.toMutableList()
-  val weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.weightKilograms }.toMutableList()
+  val repetitionsList =
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.repetitions }
+      .toMutableList()
+  val weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.weightPounds }.toMutableList()
+  val weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.weightKilograms }.toMutableList()
 
   var targetMinimumRepetitionsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetMinimumRepetitions }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetMinimumRepetitions }
   var targetMaximumRepetitionsList =
     previousCompletedSets.mapNotNull { it.targetMaximumRepetitions }
-  val targetRepetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetRepetitions }
+  val targetRepetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.targetRepetitions }
   val targetWeightPoundsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightPounds ?: it.weightPounds }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightPounds ?: it.weightPounds }
   val targetWeightKilogramsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
 
   /*    var targetMinimumRepetitions =
         if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.firstOrNull() })
@@ -247,16 +255,31 @@ fun linearProgression(
 
   // Update setsToUpdate with new values
 
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList).forEach { (set, weight) ->
-    set.targetWeightKilograms = weight
-  }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList)
+    .forEach { (set, rep) ->
+      set.targetRepetitions = rep
+      set.repetitions = rep
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList)
+    .forEach { (set, weight) ->
+      set.targetWeightPounds = weight
+      set.weightPounds = weight
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList)
+    .forEach { (set, weight) ->
+      set.targetWeightKilograms = weight
+      set.weightKilograms = weight
+    }
 
   setsToUpdate.filter { it.setTypeID == SetType.warmUpSet }.forEach { set ->
     val firstWorkingSet = setsToUpdate.first { it.setTypeID != SetType.warmUpSet }
-    set.targetWeightPounds = set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
-    set.targetWeightKilograms = set.targetPercentage1RM?.let {firstWorkingSet.targetWeightKilograms?.times(it) }
+    set.targetWeightPounds =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
+    set.targetWeightKilograms =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightKilograms?.times(it) }
+
+    set.weightPounds = set.targetWeightPounds
+    set.weightKilograms = set.targetWeightKilograms
   }
 
   progressionResults.currentSets = setsToUpdate
@@ -323,19 +346,34 @@ fun doubleProgression(
   requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
   requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
 
-  val repetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.map { it.repetitions!! }.toMutableList()
-  val weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.map { it.weightPounds!! }.toMutableList()
-  val weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.map { it.weightKilograms!! }.toMutableList()
+  val repetitionsList =
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.map { it.repetitions!! }
+      .toMutableList()
+  val weightPoundsList =
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.map { it.weightPounds!! }
+      .toMutableList()
+  val weightKilogramsList =
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.map { it.weightKilograms!! }
+      .toMutableList()
 
   val targetMinimumRepetitionsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetMinimumRepetitions }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetMinimumRepetitions }
+
   val targetMaximumRepetitionsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetMaximumRepetitions }
-  val targetRepetitionsList = previousCompletedSets.mapNotNull { it.targetRepetitions }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetMaximumRepetitions }
+
+  val targetRepetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.targetRepetitions }
+
   val targetWeightPoundsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightPounds ?: it.weightPounds }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightPounds ?: it.weightPounds }
+
   val targetWeightKilogramsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
 
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
@@ -374,12 +412,14 @@ fun doubleProgression(
       weightKilogramsList.clear()
       weightKilogramsList.addAll(targetWeightKilogramsList)
     }
+
     /*    (repetitionsList == targetRepetitionsList) ||
     // if any repetitions are below the maximum repetitions performed in the workout
     (repetitionsList.any { it < maxRepetitionsCompleted } ||
       // if all repetitions are at the maximum repetitions performed in the workout and below the
       // target maximum repetitions
       (repetitionsList.all { it == maxRepetitionsCompleted && it < targetMaximumRepetitions })) &&*/
+
     // If repetition is within target range, increment
     (repetitionsList.zip(targetRepetitionsList).all { (actual, target) ->
       (actual == target) && (actual < targetMaximumRepetitions)
@@ -393,14 +433,15 @@ fun doubleProgression(
         break
       }
     }
+
     // If actual repetitions are above target, increment target values
-    repetitionsList.zip(targetRepetitionsList).any { (actual, target) ->
-      (actual >= target) && (actual < targetMaximumRepetitions)
+    repetitionsList.zip(targetRepetitionsList).all { (actual, target) ->
+      (actual >= target) && (actual <= targetMaximumRepetitions)
     } && actualWeightsPerformedEqualTargetWeight -> {
       progressionResults.outcome = ProgressionOutcome.PROGRESSED
       progressionResults.message = "Targets were exceeded. Incrementing targets."
 
-      val tempRepetitionsList = targetRepetitionsList.toMutableList()
+      val tempRepetitionsList = repetitionsList.toMutableList()
 
       val tempPair = repetitionsList.zip(targetRepetitionsList)
       for ((index, pair) in tempPair.withIndex()) {
@@ -449,16 +490,31 @@ fun doubleProgression(
     }
   }
 
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList).forEach { (set, weight) ->
-    set.targetWeightKilograms = weight
-  }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList)
+    .forEach { (set, rep) ->
+      set.targetRepetitions = rep
+      set.repetitions = rep
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList)
+    .forEach { (set, weight) ->
+      set.targetWeightPounds = weight
+      set.weightPounds = weight
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList)
+    .forEach { (set, weight) ->
+      set.targetWeightKilograms = weight
+      set.weightKilograms = weight
+    }
 
   setsToUpdate.filter { it.setTypeID == SetType.warmUpSet }.forEach { set ->
     val firstWorkingSet = setsToUpdate.first { it.setTypeID != SetType.warmUpSet }
-    set.targetWeightPounds = set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
-    set.targetWeightKilograms = set.targetPercentage1RM?.let {firstWorkingSet.targetWeightKilograms?.times(it) }
+    set.targetWeightPounds =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
+    set.targetWeightKilograms =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightKilograms?.times(it) }
+
+    set.weightPounds = set.targetWeightPounds
+    set.weightKilograms = set.targetWeightKilograms
   }
 
   progressionResults.currentSets = setsToUpdate
@@ -522,20 +578,29 @@ fun dynamicDoubleProgression(
   requireNotNull(incrementWeightPounds) { "set incrementWeightPounds is null" }
   requireNotNull(incrementWeightKilograms) { "set incrementWeightKilograms is null" }
 
-  var repetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.repetitions }.toMutableList()
-  var weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.weightPounds }.toMutableList()
-  var weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.weightKilograms }.toMutableList()
+  var repetitionsList =
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.repetitions }
+      .toMutableList()
+  var weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.weightPounds }.toMutableList()
+  var weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.weightKilograms }.toMutableList()
 
   val targetMinimumRepetitionsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetMinimumRepetitions }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetMinimumRepetitions }
   val targetMaximumRepetitionsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetMaximumRepetitions }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetMaximumRepetitions }
 
-  val targetRepetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetRepetitions }
+  val targetRepetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.targetRepetitions }
   val targetWeightPoundsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightPounds ?: it.weightPounds }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightPounds ?: it.weightPounds }
   val targetWeightKilogramsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
 
   // TODO How to handle cases where target repetitions are not the same across all sets?
   // TODO How to handle cases where there are no target repetitions? Just increment the first working set? Determine the min & max rep for working sets or use common rep ranges?
@@ -603,23 +668,42 @@ fun dynamicDoubleProgression(
 
     repetitionsList = previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
 
-    weightPoundsList = previousCompletedSets.mapNotNull { if (it.targetWeightPounds != null) it.targetWeightPounds else it.weightPounds }.toMutableList()
-    weightKilogramsList = previousCompletedSets.mapNotNull { if (it.targetWeightKilograms != null) it.targetWeightKilograms else it.weightKilograms }.toMutableList()
+    weightPoundsList =
+      previousCompletedSets.mapNotNull { if (it.targetWeightPounds != null) it.targetWeightPounds else it.weightPounds }
+        .toMutableList()
+    weightKilogramsList =
+      previousCompletedSets.mapNotNull { if (it.targetWeightKilograms != null) it.targetWeightKilograms else it.weightKilograms }
+        .toMutableList()
 
 
   }
 
   // Update setsToUpdate with new values
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList).forEach { (set, weight) ->
-    set.targetWeightKilograms = weight
-  }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList)
+    .forEach { (set, rep) ->
+      set.targetRepetitions = rep
+      set.repetitions = rep
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList)
+    .forEach { (set, weight) ->
+      set.targetWeightPounds = weight
+      set.weightPounds = weight
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList)
+    .forEach { (set, weight) ->
+      set.targetWeightKilograms = weight
+      set.weightKilograms = weight
+    }
 
   setsToUpdate.filter { it.setTypeID == SetType.warmUpSet }.forEach { set ->
     val firstWorkingSet = setsToUpdate.first { it.setTypeID != SetType.warmUpSet }
-    set.targetWeightPounds = set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
-    set.targetWeightKilograms = set.targetPercentage1RM?.let {firstWorkingSet.targetWeightKilograms?.times(it) }
+    set.targetWeightPounds =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
+    set.targetWeightKilograms =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightKilograms?.times(it) }
+
+    set.weightPounds = set.targetWeightPounds
+    set.weightKilograms = set.targetWeightKilograms
   }
 
   progressionResults.currentSets = setsToUpdate
@@ -767,24 +851,43 @@ fun waveProgression(
 
         repetitionsList =
           previousCompletedSets.map { it.targetRepetitions!!.toInt() }.toMutableList()
-        weightPoundsList = previousCompletedSets.mapNotNull { if (it.targetWeightPounds != null) it.targetWeightPounds else it.weightPounds }.toMutableList()
+        weightPoundsList =
+          previousCompletedSets.mapNotNull { if (it.targetWeightPounds != null) it.targetWeightPounds else it.weightPounds }
+            .toMutableList()
         weightKilogramsList =
-          previousCompletedSets.mapNotNull { if (it.targetWeightKilograms != null) it.targetWeightKilograms else it.weightKilograms}.toMutableList()
+          previousCompletedSets.mapNotNull { if (it.targetWeightKilograms != null) it.targetWeightKilograms else it.weightKilograms }
+            .toMutableList()
       }
     }
   }
 
   // Update setsToUpdate with new values
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList).forEach { (set, weight) ->
-    set.targetWeightKilograms = weight
-  }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList)
+    .forEach { (set, rep) ->
+      set.targetRepetitions = rep
+      set.repetitions = rep
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList)
+    .forEach { (set, weight) ->
+      set.targetWeightPounds = weight
+      set.weightPounds = weight
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList)
+    .forEach { (set, weight) ->
+      set.targetWeightKilograms = weight
+      set.weightKilograms = weight
+    }
 
   setsToUpdate.filter { it.setTypeID == SetType.warmUpSet }.forEach { set ->
     val firstWorkingSet = setsToUpdate.first { it.setTypeID != SetType.warmUpSet }
-    set.targetWeightPounds = set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
-    set.targetWeightKilograms = set.targetPercentage1RM?.let {firstWorkingSet.targetWeightKilograms?.times(it) }
+    set.targetWeightPounds =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
+    set.targetWeightKilograms =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightKilograms?.times(it) }
+
+
+    set.weightPounds = set.targetWeightPounds
+    set.weightKilograms = set.targetWeightKilograms
   }
 
   progressionResults.currentSets = setsToUpdate
@@ -855,20 +958,29 @@ fun amrapProgression(
   progressionResults.outcome = ProgressionOutcome.FAILED
   progressionResults.message = "Targets were missed. Repeating previous workout targets."
 
-  var repetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.repetitions }.toMutableList()
-  var weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.weightPounds }.toMutableList()
-  var weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.weightKilograms }.toMutableList()
+  var repetitionsList =
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.repetitions }
+      .toMutableList()
+  var weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.weightPounds }.toMutableList()
+  var weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.weightKilograms }.toMutableList()
 
   val targetMinimumRepetitionsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetMinimumRepetitions }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetMinimumRepetitions }
   val targetMaximumRepetitionsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetMaximumRepetitions }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetMaximumRepetitions }
 
-  var targetRepetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetRepetitions }
+  var targetRepetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+    .mapNotNull { it.targetRepetitions }
   val targetWeightPoundsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightPounds ?: it.weightPounds }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightPounds ?: it.weightPounds }
   val targetWeightKilogramsList =
-    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
+    previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { it.targetWeightKilograms ?: it.weightKilograms }
 
   // Check if all target repetitions are the same
   val targetMinimumRepetitions =
@@ -923,23 +1035,43 @@ fun amrapProgression(
     progressionResults.outcome = ProgressionOutcome.UNCHANGED
     progressionResults.message = "Targets were missed. Repeating previous workout targets."
 
-    repetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.map { it.targetRepetitions!!.toInt() }.toMutableList()
-    weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { if (it.targetWeightPounds != null) it.targetWeightPounds else it.weightPounds }.toMutableList()
-    weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }.mapNotNull { if (it.targetWeightKilograms != null) it.targetWeightKilograms else it.weightKilograms }.toMutableList()
+    repetitionsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .map { it.targetRepetitions!!.toInt() }.toMutableList()
+    weightPoundsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { if (it.targetWeightPounds != null) it.targetWeightPounds else it.weightPounds }
+      .toMutableList()
+    weightKilogramsList = previousCompletedSets.filter { it.setTypeID != SetType.warmUpSet }
+      .mapNotNull { if (it.targetWeightKilograms != null) it.targetWeightKilograms else it.weightKilograms }
+      .toMutableList()
   }
 
   // Update setsToUpdate with new values
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList).forEach { (set, rep) -> set.targetRepetitions = rep }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList).forEach { (set, weight) -> set.targetWeightPounds = weight }
-  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList).forEach { (set, weight) ->
-    set.targetWeightKilograms = weight
-  }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(repetitionsList)
+    .forEach { (set, rep) ->
+      set.targetRepetitions = rep
+      set.repetitions = rep
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightPoundsList)
+    .forEach { (set, weight) ->
+      set.targetWeightPounds = weight
+      set.weightPounds = weight
+    }
+  setsToUpdate.filter { it.setTypeID != SetType.warmUpSet }.zip(weightKilogramsList)
+    .forEach { (set, weight) ->
+      set.targetWeightKilograms = weight
+      set.weightKilograms = weight
+    }
 
 
   setsToUpdate.filter { it.setTypeID == SetType.warmUpSet }.forEach { set ->
     val firstWorkingSet = setsToUpdate.first { it.setTypeID != SetType.warmUpSet }
-    set.targetWeightPounds = set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
-    set.targetWeightKilograms = set.targetPercentage1RM?.let {firstWorkingSet.targetWeightKilograms?.times(it) }
+    set.targetWeightPounds =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightPounds?.times(it) }
+    set.targetWeightKilograms =
+      set.targetPercentage1RM?.let { firstWorkingSet.targetWeightKilograms?.times(it) }
+
+    set.weightPounds = set.targetWeightPounds
+    set.weightKilograms = set.targetWeightKilograms
   }
 
   progressionResults.currentSets = setsToUpdate
