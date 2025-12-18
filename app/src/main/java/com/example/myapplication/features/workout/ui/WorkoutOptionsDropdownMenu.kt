@@ -32,6 +32,7 @@ fun WorkoutOptionsDropdownMenu(
   addWorkoutNote: () -> Unit,
   enableWorkoutNameTextfield: () -> Unit,
   workoutNameDialog: @Composable (dismissWorkoutNameDialog: () -> Unit) -> Unit,
+  resetAllFields: () -> Unit,
   //  workoutName: String,
   //  setWorkoutName: (String) -> Unit,
 ) {
@@ -65,6 +66,13 @@ fun WorkoutOptionsDropdownMenu(
       DropdownMenuItem(
         text = { Text("Adjust Start/End Time") },
         onClick = { /* TODO */
+          expanded = false
+        },
+      )
+      DropdownMenuItem(
+        text = { Text("Reset All Fields") },
+        onClick = {
+          resetAllFields()
           expanded = false
         },
       )

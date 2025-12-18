@@ -263,6 +263,7 @@ fun WorkoutContent(
                 setWorkoutName = { workoutViewModel.setWorkoutName(it) },
               )
             },
+            resetAllFields = { workoutViewModel.resetAllFields() }
           )
         },
       )

@@ -237,11 +237,11 @@ class WorkoutViewModel(
       //      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
       val activeWorkout = workoutDatastore.getActiveWorkout.first()
 
-      Log.d(
-        "WorkoutViewModel",
-        "is _workout.value null: ${if (_workout.value == null) true else false}"
-      )
-      Log.d("WorkoutViewModel", "_workout.name: ${_workout.value?.name}")
+//      Log.d(
+//        "WorkoutViewModel",
+//        "is _workout.value null: ${_workout.value == null}"
+//      )
+//      Log.d("WorkoutViewModel", "_workout.name: ${_workout.value?.name}")
       Log.d("WorkoutViewModel", "isWorkoutActive: $isWorkoutActive")
       //        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance():
       // ${ActiveWorkout.getDefaultInstance()}")
@@ -1826,7 +1826,8 @@ class WorkoutViewModel(
   val completedWorkout
     get() = _completedWorkout.asStateFlow()
 
-  private var _workoutTotalSetsPerMuscle = MutableStateFlow<List<Pair<Muscle, List<MuscleFractionalSets>>>>(emptyList())
+  private var _workoutTotalSetsPerMuscle =
+    MutableStateFlow<List<Pair<Muscle, List<MuscleFractionalSets>>>>(emptyList())
   val workoutTotalSetsPerMuscle
     get() = _workoutTotalSetsPerMuscle.asStateFlow()
 
@@ -2021,6 +2022,45 @@ class WorkoutViewModel(
       SharingStarted.WhileSubscribed(5000),
       EditNextWorkoutUiState(isLoading = true)
     )
+
+  fun resetAllFields() {
+    val newWorkoutComponents = _workoutComponents.map { workoutComponent ->
+      when (workoutComponent) {
+        is ExerciseExerciseSets -> {
+          workoutComponent.sets.forEach { set ->
+            set.lazyListItemID = newLazyListItemID()
+            set.weightKilograms = null
+            set.weightPounds = null
+            set.repetitions = null
+            set.ratePerceivedEffort = null
+            set.repetitionsInReserve = null
+          }
+
+          workoutComponent.copy(lazyListItemID = newLazyListItemID())
+        }
+
+        is SupersetExercisesSets -> {
+          workoutComponent.exercisesSets.forEach { exerciseSets ->
+            exerciseSets.sets.forEach { set ->
+              set.lazyListItemID = newLazyListItemID()
+              set.weightKilograms = null
+              set.weightPounds = null
+              set.repetitions = null
+              set.ratePerceivedEffort = null
+              set.repetitionsInReserve = null
+            }
+          }
+          workoutComponent.copy(
+            lazyListItemID = newLazyListItemID(),
+            exercisesSets = workoutComponent.exercisesSets.map { it.copy(lazyListItemID = newLazyListItemID()) })
+        }
+      }
+    }
+
+
+
+    setWorkoutComponents(newWorkoutComponents)
+  }
 
   /**
    * Handles all incoming UI events from the Composable.

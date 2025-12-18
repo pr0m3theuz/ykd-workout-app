@@ -211,7 +211,7 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
                 "${
                   when {
                     it > 0.0 -> "+"
-                    else -> "-"
+                    else -> ""
                   }
                 }${doubleFormatted(it)} lbs"
               )
@@ -223,7 +223,7 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
                   "${
                     when {
                       it > 0 -> "+"
-                      else -> "-"
+                      else -> ""
                     }
                   }$repChange reps"
                 )

@@ -128,6 +128,7 @@ fun EditWorkoutScreen(
               addWorkoutNote = { if (editable) workoutViewModel.addWorkoutNote() },
               enableWorkoutNameTextfield = {},
               workoutNameDialog = {},
+              resetAllFields = {}
             )
           },
         )
