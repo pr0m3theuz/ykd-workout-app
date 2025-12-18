@@ -443,6 +443,7 @@ private fun SetTypeComposable(
         SetType.rightSet -> "R"
         SetType.partialReps -> "P"
         SetType.negativeReps -> "N"
+        SetType.backOff -> "B"
         else -> {
           setIndex
         }

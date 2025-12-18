@@ -206,5 +206,14 @@ Example Myo Reps Set:<ol><li>Start by doing an activation set: Use a weight that
       darkTextColor = Color(176, 196, 222), // Light Steel Blue
       abbreviation = "N"
     )
+
+    val backOff = SetType(
+      14,
+      "Back Off",
+      description = "",
+      lightTextColor = Color(0, 0, 0),
+      darkTextColor = Color(0, 0, 0),
+      abbreviation = "B"
+    )
   }
 }

@@ -99,6 +99,8 @@ fun SetTypeOptionsMenu(
     val negativeReps = SetType.negativeReps
     menu.add(negativeReps)
 
+    val backOff = SetType.backOff
+    menu.add(backOff)
 
     return menu
   }
