@@ -726,7 +726,7 @@ class WorkoutViewModel(
               ?.filter { it.setCompleted }
               ?.let {
                 results[currentWorkoutItem.id.toString()] =
-                  selectProgression(ProgressionType.DOUBLE_PROGRESSION).invoke(
+                  selectProgression(ProgressionType.DYNAMIC_DOUBLE_PROGRESSION).invoke(
                     it,
                     currentWorkoutItem.sets
                   )
