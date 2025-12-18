@@ -193,12 +193,12 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
           if (preview.isProgressionUniform && preview.previewSets.any { it.wasModified }) {
             // Show Summary for Uniform Progression
             val firstModifiedSet = preview.previewSets.first { it.wasModified }
-            val weightChange = firstModifiedSet.previousSet?.weightPounds?.let {
+            val weightChange = firstModifiedSet.originalSet.weightPounds?.let {
               firstModifiedSet.progressedSet.targetWeightPounds?.minus(
                 it
               )
             }
-            val repChange = firstModifiedSet.previousSet?.repetitions?.let {
+            val repChange = firstModifiedSet.originalSet.repetitions?.let {
               firstModifiedSet.progressedSet.targetRepetitions?.minus(
                 it
               )
@@ -436,9 +436,7 @@ fun SetPreviewRow(
       )
       // TODO Show progress from previous workout or change from template
       Text(
-        text = previousSet?.setSummaryRIR("lbs") ?: "No previous set was found. ➔ ".plus(
-          progressedSet.setTargetSummaryRIR("lbs")
-        ),
+        text = originalSet.setSummaryRIR("lbs"),
         fontSize = 14.sp,
         textDecoration = if (wasModified) TextDecoration.LineThrough else TextDecoration.None,
         color = if (wasModified) LocalContentColor.current.copy(alpha = 0.6f) else LocalContentColor.current
