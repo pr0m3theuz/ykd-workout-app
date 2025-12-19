@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -65,11 +66,14 @@ import com.example.myapplication.common.domain.model.convertPoundToKg
 import com.example.myapplication.common.domain.model.setSummaryRIR
 import com.example.myapplication.common.domain.model.setTargetSummaryRIR
 import com.example.myapplication.common.util.ProgressionOutcome
+import com.example.myapplication.common.util.ProgressionType
 import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.features.workout.WorkoutViewModel
 import kotlinx.serialization.json.Json
 import org.bson.types.ObjectId
+import java.util.Locale
+import java.util.Locale.getDefault
 import kotlin.uuid.ExperimentalUuidApi
 
 //import com.example.rphypertrophy.* // Core model imports
@@ -171,7 +175,8 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets, getExercise: (exerciseID: 
       }
 
       Text(
-        text = "Progression Scheme: ${preview.originalItem.sets.first { it.setTypeID != SetType.warmUpSet }.progressionSchemeID?.name}",
+        text = "Progression Scheme: ${preview.originalItem.sets.first { it.setTypeID != SetType.warmUpSet }.progressionSchemeID?.name ?: ProgressionType.DYNAMIC_DOUBLE_PROGRESSION.progression.split(' ')
+          .joinToString(" ") { it.replaceFirstChar(Char::uppercaseChar) }       }",
         style = MaterialTheme.typography.labelMedium,
       )
 
