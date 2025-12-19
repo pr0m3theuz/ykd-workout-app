@@ -25,7 +25,8 @@ data class PreviewExerciseSets @OptIn(ExperimentalUuidApi::class) constructor(
   val originalItem: ExerciseSets, // TODO Change to ExerciseExerciseSets The item before progression
   val previewSets: List<PreviewSet>, // List of sets with before/after state
   val overallOutcome: ProgressionOutcome, // Derived from individual set outcomes
-  val isProgressionUniform: Boolean = checkIfProgressionIsUniform(previewSets) // Calculate this on creation
+  val isProgressionUniform: Boolean = checkIfProgressionIsUniform(previewSets), // Calculate this on creation
+  val progressionResultMessage: String? // TODO
 )
 
 // Wrapper for Superset
@@ -48,9 +49,11 @@ fun createWorkoutPreview(
       is ExerciseSets -> {
         val previousExerciseSets =
           previousWorkout.workoutItems.find { (it as? ExerciseSets)?.exerciseID == originalItem.exerciseID } as? ExerciseSets
+
         // Fetch the ProgressionResults for this specific ExerciseSets item
         val progressionResultForThisItem =
           progressionResultsMap[originalItem.id.toString()] // Use itemId
+
         val previewSets = mutableListOf<PreviewSet>()
         var overallExerciseOutcome: ProgressionOutcome
 
@@ -120,7 +123,8 @@ fun createWorkoutPreview(
           originalItem,
           previewSets,
           overallExerciseOutcome,
-          isUniform
+          isUniform,
+          progressionResultMessage = progressionResultForThisItem?.message
         )
       }
 
@@ -188,7 +192,8 @@ fun createWorkoutPreview(
             originalInnerExSets.deepCopy(),
             innerPreviewSets,
             innerExerciseOutcome,
-            isUniform
+            isUniform,
+            progressionResultMessage = progressionResultForInnerItem?.message
           )
         }
         PreviewSuperset(

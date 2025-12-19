@@ -608,7 +608,7 @@ fun dynamicDoubleProgression(
   val targetMinimumRepetitions =
     if (targetMinimumRepetitionsList.isEmpty()) {
       progressionResults.outcome = ProgressionOutcome.FAILED
-      progressionResults.message = "There are no target minimum repetitions!"
+      progressionResults.message = "There are no minimum target repetitions!"
       return progressionResults
     } else if (targetMinimumRepetitionsList.all { it == targetMinimumRepetitionsList.first() })
       targetMinimumRepetitionsList.first()
@@ -621,7 +621,7 @@ fun dynamicDoubleProgression(
   val targetMaximumRepetitions =
     if (targetMaximumRepetitionsList.isEmpty()) {
       progressionResults.outcome = ProgressionOutcome.FAILED
-      progressionResults.message = "There are no target maximum repetitions!"
+      progressionResults.message = "There are no maximum target repetitions!"
       return progressionResults
     } else if (targetMaximumRepetitionsList.all { it == targetMaximumRepetitionsList.firstOrNull() })
       targetMaximumRepetitionsList.first()

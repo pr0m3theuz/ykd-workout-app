@@ -352,7 +352,7 @@ class WorkoutViewModel(
         )
         testSaveStateHandle() // Fallback to SavedStateHandle logic
         if (
-          _workout.value == null || _workout.value?.name == initWorkout().name
+          _workout.value == null // || _workout.value?.name == initWorkout().name
         ) { // Check if it's still default/uninitialized
           initWorkoutData() // Or specific logic to init new if not relying on this func for
           // DataStore load
@@ -751,6 +751,7 @@ class WorkoutViewModel(
               currentSupersetExerciseSets.sets
                 .firstOrNull { it.setTypeID != SetType.warmUpSet }
                 ?.progressionSchemeID
+
             val previousSupersetExerciseSets =
               previousWorkout.workoutItems.find {
                 (it as? ExerciseSets)?.exerciseID == currentSupersetExerciseSets.exerciseID
@@ -1646,7 +1647,7 @@ class WorkoutViewModel(
     setWorkoutComponents(
       manageWorkoutUseCase.refreshWorkoutComponentLazyListItemID(
         workoutComponents = _workoutComponents,
-        targetExerciseEerciseSets = workoutComponent,
+        targetExerciseExerciseSets = workoutComponent,
       )
     )
     //    _allSets.value = allSets(_exercisesSets.value).toList()

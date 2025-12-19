@@ -1281,18 +1281,18 @@ class ManageWorkoutUseCase(
    */
   fun refreshWorkoutComponentLazyListItemID(
     workoutComponents: List<WorkoutComponent>,
-    targetExerciseEerciseSets: ExerciseExerciseSets,
+    targetExerciseExerciseSets: ExerciseExerciseSets,
   ): List<WorkoutComponent> {
     return workoutComponents.map { component ->
       when (component) {
-        // Case 1: The component itself IS the target ExerciseExerciseSetsc
+        // Case 1: The component itself IS the target ExerciseExerciseSets
         is ExerciseExerciseSets -> {
-          if (component.exSetsUUID == targetExerciseEerciseSets.exSetsUUID) {
+          if (component.exSetsUUID == targetExerciseExerciseSets.exSetsUUID) {
             // Return a copy with a new lazy ID
-            targetExerciseEerciseSets.copy(
+            targetExerciseExerciseSets.copy(
               lazyListItemID = newLazyListItemID(),
               sets =
-                targetExerciseEerciseSets.sets
+                targetExerciseExerciseSets.sets
                   .map { set -> set.copy(lazyListItemID = newLazyListItemID()) }
                   .toMutableList(),
             )
@@ -1305,7 +1305,7 @@ class ManageWorkoutUseCase(
         is SupersetExercisesSets -> {
           val targetIndex =
             component.exercisesSets.indexOfFirst {
-              it.exSetsUUID == targetExerciseEerciseSets.exSetsUUID
+              it.exSetsUUID == targetExerciseExerciseSets.exSetsUUID
             }
 
           // If the target ExerciseExerciseSets was found in this Superset
@@ -1315,10 +1315,10 @@ class ManageWorkoutUseCase(
               component.exercisesSets.toMutableList().apply {
                 // Replace item at the index
                 this[targetIndex] =
-                  targetExerciseEerciseSets.copy(
+                  targetExerciseExerciseSets.copy(
                     lazyListItemID = newLazyListItemID(),
                     sets =
-                      targetExerciseEerciseSets.sets
+                      targetExerciseExerciseSets.sets
                         .map { set -> set.copy(lazyListItemID = newLazyListItemID()) }
                         .toMutableList(),
                   )

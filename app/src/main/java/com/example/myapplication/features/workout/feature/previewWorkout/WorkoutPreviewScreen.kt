@@ -52,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.common.domain.model.Exercise
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.PreviewExerciseSets
 import com.example.myapplication.common.domain.model.PreviewSet
@@ -68,6 +69,7 @@ import com.example.myapplication.common.util.doubleFormatted
 import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.features.workout.WorkoutViewModel
 import kotlinx.serialization.json.Json
+import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
 
 //import com.example.rphypertrophy.* // Core model imports
@@ -110,7 +112,7 @@ fun WorkoutPreviewScreen(
     ) {
       items(previewItems, key = { getItemId(it) }) { item ->
         when (item) {
-          is PreviewExerciseSets -> ExercisePreviewItem(item)
+          is PreviewExerciseSets -> ExercisePreviewItem(item, viewModel::getExerciseByID)
           is PreviewSuperset -> SupersetPreviewItem(item)
           // Handle other WorkoutItem types if necessary
         }
@@ -139,7 +141,7 @@ fun getItemId(item: Any): Long {
 
 
 @Composable
-fun ExercisePreviewItem(preview: PreviewExerciseSets) {
+fun ExercisePreviewItem(preview: PreviewExerciseSets, getExercise: (exerciseID: ObjectId?) -> Exercise?) {
   Card(
     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     modifier = Modifier.fillMaxWidth(),
@@ -150,7 +152,7 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
     Column(modifier = Modifier.padding(12.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-          text = "Exercise", // TODO Replace with exercise name
+          text = getExercise(preview.originalItem.exerciseID)?.name ?: "Unknown Exercise", // TODO Replace with exercise name
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.Bold,
           modifier = Modifier.weight(1f)
@@ -266,7 +268,7 @@ fun ExercisePreviewItem(preview: PreviewExerciseSets) {
 
         ProgressionOutcome.FAILED -> {
           Text(
-            "Progression Failed",
+            "Progression Failed. ${preview.progressionResultMessage}",
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(top = 8.dp)
@@ -338,14 +340,14 @@ fun SupersetPreviewItem(preview: PreviewSuperset) {
         }
         if (exercisePreview.overallOutcome == ProgressionOutcome.FAILED) {
           Text(
-            "Progression Failed",
+            "Progression Failed. ${exercisePreview.progressionResultMessage}",
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.labelSmall
           )
         }
         if (exercisePreview.overallOutcome == ProgressionOutcome.UNCHANGED && exercisePreview.previewSets.none { it.wasModified }) {
           Text(
-            "No changes applied",
+            "No changes applied. ${exercisePreview.progressionResultMessage}",
             style = MaterialTheme.typography.labelSmall,
             fontStyle = FontStyle.Italic
           )
