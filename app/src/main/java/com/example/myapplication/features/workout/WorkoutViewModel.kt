@@ -350,13 +350,13 @@ class WorkoutViewModel(
           "WorkoutViewModel",
           "No active workout in DataStore, using SavedStateHandle or init new.",
         )
-        testSaveStateHandle() // Fallback to SavedStateHandle logic
-        if (
-          _workout.value == null // || _workout.value?.name == initWorkout().name
-        ) { // Check if it's still default/uninitialized
+//        testSaveStateHandle() // Fallback to SavedStateHandle logic
+//        if (
+//          _workout.value == null || _workout.value?.name == initWorkout().name
+//        ) { // Check if it's still default/uninitialized
           initWorkoutData() // Or specific logic to init new if not relying on this func for
           // DataStore load
-        }
+//        }
       }
       //      }
     }
@@ -1284,8 +1284,8 @@ class WorkoutViewModel(
 
       // TODO make this functional and store results
       setupWorkoutPreview(
-        workoutToPrepare = workout,
-        previousWorkout = workout,
+        workoutToPrepare = workout.deepCopy(),
+        previousWorkout = workout.deepCopy(),
       )
 
       Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "workout: $workout")

@@ -28,6 +28,8 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -321,6 +323,21 @@ private fun NavGraphBuilder.addWorkoutGraph(
         }
       }
 
+//      val hasPreviewItems by remember { derivedStateOf { workoutViewModel.previewItems.isNotEmpty() } } // Observe list changes
+//
+//      // FIX: Use LaunchedEffect to handle navigation as a side-effect
+//      LaunchedEffect(hasPreviewItems) {
+//        if (hasPreviewItems) {
+//          // Check current destination to prevent navigating if already there
+//          if (navController.currentDestination?.route != "previewWorkoutScreen") {
+//            navController.navigate("previewWorkoutScreen") {
+//              // Key fix: Prevents multiple copies of the same destination on the back stack
+//              launchSingleTop = true
+//            }
+//          }
+//        }
+//      }
+
       WorkoutScreen(
         // TODO This is an anti-pattern
         // https://developer.android.com/guide/navigation/use-graph/navigate
@@ -344,12 +361,50 @@ private fun NavGraphBuilder.addWorkoutGraph(
           }
         },
       )
+
     }
 
-    composable("previewWorkoutScreen") { navBackStackEntry ->
+    composable("previewWorkoutScreen?workoutID={workoutID}/copyWorkoutFromPreviousWorkout={copyWorkoutFromPreviousWorkout}") { navBackStackEntry ->
       //      Log.d("WorkoutNavGraph", "Navigated to Preview Workout Screen")
+
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
+      val loadPreviousWorkout =
+        navBackStackEntry.arguments?.getBoolean("loadPreviousWorkout") ?: false
+      val loadingWorkout =
+        navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
+      //      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel:
+      // $workoutViewModel")
+
+      val workoutID = navBackStackEntry.arguments?.getString("workoutID")
+
+      LaunchedEffect(workoutID) {
+        Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
+        Log.d("WorkoutNavGraph", "workoutID: $workoutID")
+        if (!workoutID.isNullOrBlank()) {
+          when (loadingWorkout) {
+            LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value -> {
+              Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
+              workoutViewModel.getWorkoutByID(ObjectId(workoutID))
+            }
+
+            LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
+              workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
+            }
+
+            LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
+              workoutViewModel.loadWorkoutFromActiveProgram(ObjectId(workoutID))
+            }
+
+            else -> {
+              require(false) { "Unknown loadingWorkout value: $loadingWorkout. Update LoadingWorkout enum class in WorkoutViewModel.kt." }
+            }
+          }
+        }
+      }
+
+//      val hasPreviewItems by remember { derivedStateOf { workoutViewModel.previewItems.isNotEmpty() } } // Observe list changes
+
 
       WorkoutPreviewScreen(
         viewModel = workoutViewModel,
@@ -787,7 +842,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
               },
               navigateToWorkout = { workout ->
                 navController.navigate(
-                  "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromPreviousWorkout.value}"
+                  "previewWorkoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromPreviousWorkout.value}"
                 ) {
                   popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                   launchSingleTop = true
