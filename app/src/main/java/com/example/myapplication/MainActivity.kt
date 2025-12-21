@@ -289,12 +289,12 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
-      val loadPreviousWorkout =
-        navBackStackEntry.arguments?.getBoolean("loadPreviousWorkout") ?: false
+
+//      val loadPreviousWorkout = navBackStackEntry.arguments?.getBoolean("loadPreviousWorkout") ?: false
+
       val loadingWorkout =
         navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
-      //      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel:
-      // $workoutViewModel")
+      Log.d("WorkoutNavGraph", "Workout Screen: workoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
 
@@ -309,11 +309,21 @@ private fun NavGraphBuilder.addWorkoutGraph(
             }
 
             LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
+              Log.d("WorkoutScreen", "Copy Workout From Previous Workout. workoutID: $workoutID")
               workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
             }
 
             LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
+              Log.d("WorkoutScreen", "Load Workout From Active Program. workoutID: $workoutID")
               workoutViewModel.loadWorkoutFromActiveProgram(ObjectId(workoutID))
+            }
+
+            LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value -> {
+              Log.d("WorkoutScreen", "Workout Loaded From Workout Progression. workout: ${workoutViewModel.workout.value?.name}")
+            }
+
+            LoadingWorkout.CopyPreviousWorkoutToProgress.value -> {
+              Log.d("WorkoutScreen", "Copy Previous Workout To Progress. workoutID: $workoutID")
             }
 
             else -> {
@@ -323,29 +333,12 @@ private fun NavGraphBuilder.addWorkoutGraph(
         }
       }
 
-//      val hasPreviewItems by remember { derivedStateOf { workoutViewModel.previewItems.isNotEmpty() } } // Observe list changes
-//
-//      // FIX: Use LaunchedEffect to handle navigation as a side-effect
-//      LaunchedEffect(hasPreviewItems) {
-//        if (hasPreviewItems) {
-//          // Check current destination to prevent navigating if already there
-//          if (navController.currentDestination?.route != "previewWorkoutScreen") {
-//            navController.navigate("previewWorkoutScreen") {
-//              // Key fix: Prevents multiple copies of the same destination on the back stack
-//              launchSingleTop = true
-//            }
-//          }
-//        }
-//      }
-
       WorkoutScreen(
         // TODO This is an anti-pattern
         // https://developer.android.com/guide/navigation/use-graph/navigate
         navController = navController,
         workoutViewModel = workoutViewModel,
         workoutID = workoutID,
-//        loadPreviousWorkout = loadPreviousWorkout,
-//        copyWorkoutFromPreviousWorkout = copyWorkoutFromPreviousWorkout,
         currentDestination = navController.currentBackStackEntry?.destination,
         onNavigateBottomBar = { route ->
           navController.navigate(route) {
@@ -369,12 +362,12 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
-      val loadPreviousWorkout =
-        navBackStackEntry.arguments?.getBoolean("loadPreviousWorkout") ?: false
+
+//      val loadPreviousWorkout = navBackStackEntry.arguments?.getBoolean("loadPreviousWorkout") ?: false
+
       val loadingWorkout =
         navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
-      //      Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel:
-      // $workoutViewModel")
+      Log.d("WorkoutNavGraph", "Workout Preview: workoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
 
@@ -384,16 +377,22 @@ private fun NavGraphBuilder.addWorkoutGraph(
         if (!workoutID.isNullOrBlank()) {
           when (loadingWorkout) {
             LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value -> {
-              Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
-              workoutViewModel.getWorkoutByID(ObjectId(workoutID))
+              Log.d("Workout Preview", "workoutID: $workoutID, calling getWorkoutByID()")
             }
 
             LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
-              workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
+              Log.d("Workout Preview", "Copy Workout From Previous Workout. workoutID: $workoutID")
             }
 
             LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
-              workoutViewModel.loadWorkoutFromActiveProgram(ObjectId(workoutID))
+              Log.d("Workout Preview", "Load Workout From Active Program. workoutID: $workoutID")
+            }
+
+            LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value -> {}
+
+            LoadingWorkout.CopyPreviousWorkoutToProgress.value -> {
+              Log.d("Workout Preview", "Copy Previous Workout To Progress. workoutID: $workoutID")
+              workoutViewModel.copyPreviousWorkoutToProgress(ObjectId(workoutID))
             }
 
             else -> {
@@ -403,24 +402,21 @@ private fun NavGraphBuilder.addWorkoutGraph(
         }
       }
 
-//      val hasPreviewItems by remember { derivedStateOf { workoutViewModel.previewItems.isNotEmpty() } } // Observe list changes
-
-
       WorkoutPreviewScreen(
         viewModel = workoutViewModel,
         onBack = { navController.popBackStack() },
         onAccept = {
           workoutViewModel.acceptProgressions()
-          navController.navigate(Screens.Workout.route) {
-            popUpTo(navController.graph.findStartDestination().id) { saveState = false }
+          navController.navigate("workoutScreen?workoutID=null/copyWorkoutFromPreviousWorkout=${LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value}") {
+//            popUpTo(navController.graph.findStartDestination().id) { saveState = false }
             launchSingleTop = true
             restoreState = false
           }
         },
         onReject = {
           workoutViewModel.rejectProgressions()
-          navController.navigate(Screens.Workout.route) {
-            popUpTo(navController.graph.findStartDestination().id) { saveState = false }
+          navController.navigate("workoutScreen?workoutID=null/copyWorkoutFromPreviousWorkout=${LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value}") {
+//            popUpTo(navController.graph.findStartDestination().id) { saveState = false }
             launchSingleTop = true
             restoreState = false
           }
@@ -428,44 +424,13 @@ private fun NavGraphBuilder.addWorkoutGraph(
       )
     }
 
-    /* TODO not used
-        composable("workoutScreen?workoutID={workoutID}?isCurrentWorkout={isCurrentWorkout}") { navBackStackEntry ->
-    //      Log.d("WorkoutNavGraph", "Navigated to Workout Screen")
-
-          val workoutViewModel: WorkoutViewModel =
-            navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
-
-          val isCurrentWorkout = navBackStackEntry.arguments?.getBoolean("isCurrentWorkout") ?: false
-
-          Log.d("WorkoutNavGraph.WorkoutScreen", "WorkoutScreen.WorkoutViewModel: $workoutViewModel")
-
-          val workoutID = navBackStackEntry.arguments?.getString("workoutID")
-          WorkoutScreen(
-            // TODO This is an anti-pattern
-            // https://developer.android.com/guide/navigation/use-graph/navigate
-            navController = navController,
-            workoutViewModel = workoutViewModel,
-            workoutID = workoutID,
-            loadPreviousWorkout = false,
-            copyWorkoutFromPreviousWorkout = false
-          )
-        }*/
-
     composable("workoutSummary/{workoutID}/{workoutCount}") { navBackStackEntry ->
       //      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
       val workoutsCount = navBackStackEntry.arguments?.getInt("workoutsCount")
 
-      //      val workoutViewModel: WorkoutViewModel = koinViewModel(
-      //        viewModelStoreOwner = navBackStackEntry.rememberParentEntry(navController,
-      // Screens.Workout.baseRoute)
-      //      )
-
       val workoutViewModel: WorkoutViewModel =
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
-
-      //      navController.currentBackStackEntry?.savedStateHandle?.get<Workout>(key =
-      // WORKOUT_DETAILS)
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
@@ -844,7 +809,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
                 navController.navigate(
                   "previewWorkoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromPreviousWorkout.value}"
                 ) {
-                  popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+//                  popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                   launchSingleTop = true
                   restoreState = true
                 }

@@ -354,8 +354,8 @@ class WorkoutViewModel(
 //        if (
 //          _workout.value == null || _workout.value?.name == initWorkout().name
 //        ) { // Check if it's still default/uninitialized
-          initWorkoutData() // Or specific logic to init new if not relying on this func for
-          // DataStore load
+        initWorkoutData() // Or specific logic to init new if not relying on this func for
+        // DataStore load
 //        }
       }
       //      }
@@ -669,6 +669,7 @@ class WorkoutViewModel(
 
   // The workout plan *before* progression logic ran
   private var originalWorkout: Workout? = null
+  private var progressedWorkout: Workout? = null
 
   // The results of running progression logic on each applicable item
   private lateinit var progressionResults: Map<String, ProgressionResults>
@@ -679,8 +680,21 @@ class WorkoutViewModel(
   val overallProgressionSuccess = mutableStateOf(true)
   val progressionMessage = mutableStateOf("")
 
+  fun copyPreviousWorkoutToProgress(previousWorkout: ObjectId, saveWorkout: Boolean = true) {
+    manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkout)?.let { workout ->
+      originalWorkout = workout.deepCopy()
+
+      setupWorkoutPreview(
+        originalWorkout = originalWorkout!!,
+        workoutToPrepare = workout.deepCopy(),
+        previousWorkout = workout.deepCopy(),
+      )
+    }
+  }
+
   @OptIn(ExperimentalUuidApi::class)
   fun setupWorkoutPreview(
+    originalWorkout: Workout,
     workoutToPrepare: Workout,
     previousWorkout: Workout, // Needed for look-back progression
   ) {
@@ -688,8 +702,6 @@ class WorkoutViewModel(
 
     require(previousWorkout.workoutItems.isNotEmpty()) { "Previous workout must have items" }
     require(workoutToPrepare.workoutItems.isNotEmpty()) { "WorkoutToPrepare workout must have items" }
-
-    originalWorkout = workoutToPrepare.deepCopy() // Store a deep copy of the original state
 
     // TODO If previous workout's targetWeight is null, use the completed weight from the previous workout
     // TODO If previous workout's increment weight is null, use the user default or prompt user
@@ -795,14 +807,15 @@ class WorkoutViewModel(
       }
     }
 
+    progressedWorkout = workoutToPrepare.deepCopy()
+
     progressionResults = results
     // --- End Simulation ---
 
     // Create the preview data structure
     previewItems.clear()
-    requireNotNull(originalWorkout) { "Original workout cannot be null" }
     previewItems.addAll(
-      createWorkoutPreview(previousWorkout, originalWorkout!!, progressionResults)
+      createWorkoutPreview(previousWorkout, originalWorkout, progressionResults)
     )
 
     // Determine overall status
@@ -831,7 +844,7 @@ class WorkoutViewModel(
   fun acceptProgressions() {
     // Create the final workout object by applying successful progressions
     val finalWorkoutItems =
-      originalWorkout
+      progressedWorkout
         ?.workoutItems
         ?.map { originalItem ->
           when (originalItem) {
@@ -886,12 +899,14 @@ class WorkoutViewModel(
 
     if (finalWorkoutItems != null) {
       // TODO Add support Workouts in Active Programs
-      originalWorkout?.copy(workoutItems = finalWorkoutItems)?.let {
+      progressedWorkout?.copy(workoutItems = finalWorkoutItems)?.let {
         Log.d("WorkoutViewModel", "Applying progressions to workout")
         Log.d("WorkoutViewModel", "acceptProgressions() calling copyWorkoutFromWorkoutTemplate")
-        copyWorkoutFromWorkoutTemplate(it)
+        copyWorkoutFromWorkoutTemplate(it, true)
         previewItems.clear()
       }
+      progressedWorkout = null
+      previewItems.clear()
     }
   }
 
@@ -900,7 +915,7 @@ class WorkoutViewModel(
     // TODO Add support Workouts in Active Programs
     originalWorkout?.let {
       Log.d("WorkoutViewModel", "rejectProgressions() calling copyWorkoutFromWorkoutTemplate")
-      copyWorkoutFromWorkoutTemplate(it)
+      copyWorkoutFromWorkoutTemplate(it, true)
     }
     originalWorkout = null
     previewItems.clear()
@@ -1129,13 +1144,14 @@ class WorkoutViewModel(
 
       val loadedWorkout =
         manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
-          managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
-            ?.let { previousWorkout ->
-              setupWorkoutPreview(
-                workoutToPrepare = currentWorkout,
-                previousWorkout = previousWorkout,
-              )
-            }
+          // TODO Determine Use Case. Keep or Remove.
+//          managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
+//            ?.let { previousWorkout ->
+//              setupWorkoutPreview(
+//                workoutToPrepare = currentWorkout,
+//                previousWorkout = previousWorkout,
+//              )
+//            }
           currentWorkout
         } ?: initWorkout()
 
@@ -1198,17 +1214,18 @@ class WorkoutViewModel(
     }
   }
 
-  fun loadWorkoutFromActiveProgram(workoutID: ObjectId) {
+  fun loadWorkoutFromActiveProgram(workoutID: ObjectId, saveWorkout: Boolean = true) {
     // Similar to getWorkoutByID, this could override DataStore's loaded workout.
     // Ensure this is the desired behavior.
     manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)?.let { workout ->
-      managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(workout)
-        ?.let { previousWorkout ->
-          setupWorkoutPreview(
-            workoutToPrepare = workout,
-            previousWorkout = previousWorkout,
-          )
-        }
+      // TODO Determine Use Case. Keep or Remove.
+//      managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(workout)
+//        ?.let { previousWorkout ->
+//          setupWorkoutPreview(
+//            workoutToPrepare = workout,
+//            previousWorkout = previousWorkout,
+//          )
+//        }
 
       _workoutName.value = workout.name
       workoutDetails = if (originalWorkout != null) originalWorkout else workout
@@ -1244,13 +1261,18 @@ class WorkoutViewModel(
           }
         }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
 
-      isWorkoutActive = true
-      startAutoSavingWorkout()
+      if (saveWorkout) {
+        isWorkoutActive = true
+        startAutoSavingWorkout()
+      }
     }
   }
 
   // TODO Rename function
-  private fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout) {
+  private fun copyWorkoutFromWorkoutTemplate(
+    workoutTemplate: Workout,
+    saveWorkout: Boolean = true
+  ) {
     val newWorkout = manageWorkoutUseCase.copyWorkoutFromWorkoutTemplate(workoutTemplate)
 
     _workoutName.value = newWorkout.name
@@ -1263,8 +1285,10 @@ class WorkoutViewModel(
       copyWorkoutItemsFromPreviousWorkout(workoutTemplate.workoutItems, newWorkout.id).toList()
     )
 
-    isWorkoutActive = true
-    startAutoSavingWorkout()
+    if (saveWorkout) {
+      isWorkoutActive = true
+      startAutoSavingWorkout()
+    }
   }
 
   /**
@@ -1276,23 +1300,16 @@ class WorkoutViewModel(
    *
    * @param previousWorkout The [ObjectId] of the previously completed workout to copy from.
    */
-  fun copyWorkoutFromPreviousWorkout(previousWorkout: ObjectId) {
+  fun copyWorkoutFromPreviousWorkout(previousWorkout: ObjectId, saveWorkout: Boolean = true) {
 
     manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkout)?.let { workout ->
-      // TODO newWorkout's workoutItems are empty
+      // newWorkout's workoutItems are empty
       val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(workout)
-
-      // TODO make this functional and store results
-      setupWorkoutPreview(
-        workoutToPrepare = workout.deepCopy(),
-        previousWorkout = workout.deepCopy(),
-      )
 
       Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "workout: $workout")
       Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "originalWorkout: $originalWorkout")
       Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "newWorkout: $newWorkout")
 
-      // TODO is originalWorkout or newWorkout
       // TODO rewrite using functional programming
 
       _workoutName.value = newWorkout.name
@@ -1300,10 +1317,6 @@ class WorkoutViewModel(
       _workout.value = workoutDetails
 
       requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
-
-//      _workoutName.value = newWorkout.name
-//      workoutDetails = newWorkout
-//      _workout.value = workoutDetails
 
       getPinnedWorkoutNotes(workout.uuid, workout.id)
       Log.d("WorkoutViewModel", "copyWorkoutFromPreviousWorkout: calling setWorkoutComponents")
@@ -1335,10 +1348,11 @@ class WorkoutViewModel(
           }
         }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
 
-      isWorkoutActive = true
-      startAutoSavingWorkout()
+      if (saveWorkout) {
+        isWorkoutActive = true
+        startAutoSavingWorkout()
+      }
     }
-    //    _exercisesSets.value = _exercisesSetsData.toList()
   }
 
   private fun copyWorkoutItemsFromPreviousWorkout(

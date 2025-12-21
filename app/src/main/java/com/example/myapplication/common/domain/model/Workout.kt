@@ -217,5 +217,9 @@ fun Workout.calculateTotalVolumeInKilograms(): Double? {
 enum class LoadingWorkout(val value: Int) {
   CopyWorkoutFromWorkoutTemplate(0),
   CopyWorkoutFromPreviousWorkout(1),
-  LoadWorkoutFromActiveProgram(2)
+  LoadWorkoutFromActiveProgram(2),
+
+  WorkoutLoadedFromWorkoutProgression(3),
+
+  CopyPreviousWorkoutToProgress(4)
 }
