@@ -62,47 +62,6 @@ fun WorkoutScreen(
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
 ) {
-//  LaunchedEffect(workoutID) {
-//    if (!workoutID.isNullOrBlank() && !copyWorkoutFromPreviousWorkout) {
-//      Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
-//      workoutViewModel.getWorkoutByID(ObjectId(workoutID))
-//    } else if (!workoutID.isNullOrBlank() && copyWorkoutFromPreviousWorkout) {
-//      workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
-//    }
-//  }
-
-  /*else {
-    workoutViewModel.initWorkoutData()
-  }*/
-
-//  val previewItems by remember { derivedStateOf { workoutViewModel.previewItems.toList() } } // Observe list changes
-//
-////  if (previewItems.isNotEmpty()) {
-////    navController.navigate("previewWorkoutScreen")
-////  } else {
-////    WorkoutContent(
-////      navController = navController,
-////      workoutViewModel = workoutViewModel,
-////      currentDestination = currentDestination,
-////      onNavigateBottomBar = onNavigateBottomBar,
-////    )
-////  }
-//
-//  // FIX: Use LaunchedEffect to handle navigation as a side-effect
-//  LaunchedEffect(previewItems) {
-//    if (previewItems.isNotEmpty()) {
-//      // Check current destination to prevent navigating if already there
-//      if (navController.currentDestination?.route != "previewWorkoutScreen") {
-//        navController.navigate("previewWorkoutScreen") {
-//          // Key fix: Prevents multiple copies of the same destination on the back stack
-//          launchSingleTop = true
-//        }
-//      }
-//    }
-//
-//  }
-
-  // Always render the content; the navigation above will overlay the preview screen
   WorkoutContent(
     navController = navController,
     workoutViewModel = workoutViewModel,

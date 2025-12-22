@@ -807,7 +807,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
               },
               navigateToWorkout = { workout ->
                 navController.navigate(
-                  "previewWorkoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyWorkoutFromPreviousWorkout.value}"
+                  "previewWorkoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.CopyPreviousWorkoutToProgress.value}"
                 ) {
 //                  popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                   launchSingleTop = true
