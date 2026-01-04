@@ -26,6 +26,12 @@ data class SetType(
         6 -> giantSet
         7 -> amrapSet
         8 -> failureSet
+        9 -> clusterSet
+        10 -> leftSet
+        11 -> rightSet
+        12 -> partialReps
+        13 -> negativeReps
+        14 -> backOff
         else -> normalSet
       }
     }
