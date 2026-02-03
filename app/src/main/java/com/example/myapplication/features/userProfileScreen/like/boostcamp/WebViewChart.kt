@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.toRGBAString
-import com.newrelic.com.google.gson.Gson
+import com.google.gson.Gson
 import kotlinx.datetime.toKotlinTimeZone
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
