@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Straighten
@@ -354,6 +355,13 @@ fun SettingsScreen(
           icon = Icons.Filled.SyncAlt,
           title = "Sync",
           onClick = { navigateToReplicatorScreen() }, // Navigate to the CalculatorsScreen
+        )
+      }
+      item {
+        SettingsNavigationItem(
+          icon = Icons.Filled.ImportExport,
+          title = "Import/Export Data",
+          onClick = { onNavigate("importExportDataSettings") }, // Navigate to the CalculatorsScreen
         )
       }
 

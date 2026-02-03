@@ -19,13 +19,16 @@ import com.example.myapplication.common.domain.model.TotalWorkoutVolume
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.WorkoutAnalytics
+import com.example.myapplication.common.infrastructure.database.BackupManager
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.UserRepository
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundingOption
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.toHexString
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
@@ -59,6 +62,7 @@ constructor(
   private val userProfileManager: UserProfileManager,
   private val userRepository: UserRepository,
   private val completedWorkoutRepository: CompletedWorkoutRepository,
+  private val backupManager: BackupManager,
 ) : ViewModel() {
   // TODO REWRITE THIS
   //  val currentUser: User = userRepository.getCurrentUser()
@@ -69,6 +73,9 @@ constructor(
 
   private val _defaultWeightUnit = MutableStateFlow<MassUnit>(_userProfile.value.defaultWeightUnit)
   val defaultWeightUnit: StateFlow<MassUnit?> = _defaultWeightUnit.asStateFlow()
+
+  private val _backupEvent = MutableSharedFlow<String>()
+  val backupEvent = _backupEvent.asSharedFlow()
 
   private val _analyticsUiState: MutableStateFlow<AnalyticsUiState> =
     MutableStateFlow(
@@ -454,5 +461,29 @@ constructor(
       it.copy(weeklyWorkoutStreak = completedWorkoutRepository.getWorkoutStreakWeek() ?: 0)
     }
     //    return completedWorkoutRepository.getWorkoutStreakWeek()
+  }
+
+  fun importDatabase(sourceUri: Uri) {
+    viewModelScope.launch {
+      try {
+        backupManager.importDatabase(sourceUri)
+        _backupEvent.emit("Database imported successfully")
+      } catch (e: Exception) {
+        Log.e("ProfileViewModel", "Error importing database", e)
+        _backupEvent.emit("Database import failed: ${e.message}")
+      }
+    }
+  }
+
+  fun exportDatabase(destinationUri: Uri) {
+    viewModelScope.launch {
+      try {
+        backupManager.exportDatabase(destinationUri)
+        _backupEvent.emit("Database exported successfully")
+      } catch (e: Exception) {
+        Log.e("ProfileViewModel", "Error exporting database", e)
+        _backupEvent.emit("Database export failed: ${e.message}")
+      }
+    }
   }
 }

@@ -1,16 +1,22 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalSerializationApi::class)
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalSerializationApi::class,
+  ExperimentalTime::class
+)
 
 package com.example.myapplication
 
 // import androidx.compose.foundation.gestures.ModifierLocalScrollableContainerProvider.value
+import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -91,6 +99,7 @@ import com.example.myapplication.features.userProfileScreen.like.strengthLog.Cal
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.ChooseUnitsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.EditProfileScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.EquipmentProfileScreen
+import com.example.myapplication.features.userProfileScreen.like.strengthLog.ImportExportScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.RoundOffScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.SettingsScreen
 import com.example.myapplication.features.userProfileScreen.like.strengthLog.TimerSettingsScreen
@@ -107,7 +116,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.crashlytics.setCustomKeys
-import com.newrelic.agent.android.NewRelic
+//import com.newrelic.agent.android.NewRelic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -115,6 +124,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.bson.types.ObjectId
 import org.koin.android.ext.android.get
@@ -122,6 +134,9 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.java.KoinJavaComponent.inject
+import kotlin.time.Clock.System.now
+import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaInstant
 
 class MainActivity : ComponentActivity() {
 
@@ -156,10 +171,10 @@ class MainActivity : ComponentActivity() {
     crashlytics.recordException(Exception("Non-fatal exception: something went wrong!"))
 
     // New Relic
-    NewRelic.withApplicationToken("eu01xx7700dce7ae53e2b20b7cc382fcba147c93ae-NRMA")
-      .withCrashReportingEnabled(true)
-      .withLoggingEnabled(true)
-      .start(this.applicationContext)
+//    NewRelic.withApplicationToken("eu01xx7700dce7ae53e2b20b7cc382fcba147c93ae-NRMA")
+//      .withCrashReportingEnabled(true)
+//      .withLoggingEnabled(true)
+//      .start(this.applicationContext)
 
     userProfileManager = inject<UserProfileManager>(UserProfileManager::class.java).value
     Log.d("MainActivity", "MainActivity.onCreate(): userProfileManager: $userProfileManager")
@@ -1127,6 +1142,37 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
           )
         },
         onNavigateBack = { navController.popBackStack() },
+      )
+    }
+
+    composable("importExportDataSettings") { navBackStackEntry ->
+      val profileViewModel: ProfileViewModel =
+        navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
+
+      ImportExportScreen(
+//        profileViewModel = profileViewModel,
+        onNavigateBack = { navController.popBackStack() },
+        bottomNavigationBar = {
+          BottomNavigationBar(
+            currentDestination = navController.currentBackStackEntry?.destination,
+            onNavigate = { route ->
+              navController.navigate(route) {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
+                // on the back stack as users select items
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+              }
+            },
+          )
+        },
+        onImport = { file -> profileViewModel.importDatabase(file) },
+        onExport = { file -> profileViewModel.exportDatabase(file) },
+        backupEvent = profileViewModel.backupEvent
       )
     }
 

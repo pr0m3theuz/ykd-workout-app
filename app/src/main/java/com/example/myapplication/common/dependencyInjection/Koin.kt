@@ -7,6 +7,8 @@ package com.example.myapplication.common.dependencyInjection
 //import com.example.myapplication.common.infrastructure.persistence.InProgressWorkoutRepositoryImpl
 import com.example.myapplication.MainViewModel
 import com.example.myapplication.common.domain.model.UserProfileManager
+import com.example.myapplication.common.infrastructure.database.BackupManager
+import com.example.myapplication.common.infrastructure.database.BackupManagerImpl
 import com.example.myapplication.common.infrastructure.database.DatabaseManager
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepositoryImpl
@@ -109,6 +111,9 @@ val commonModule = module {
 //  singleOf(::InProgressWorkoutRepositoryImpl) bind InProgressWorkoutRepository::class
   singleOf(::CompletedWorkoutRepositoryImpl) bind CompletedWorkoutRepository::class
   singleOf(::ModernizedLoadRIRRepositoryImpl) bind ModernizedLoadRIRRepository::class
+  singleOf(::BackupManagerImpl) bind BackupManager::class
+
+//  singleOf(::ExportWorkoutProgramRepository)
 //  singleOf(::ImportWorkoutProgramRepository)
 
   single { WorkoutDatastore(get()) } // Added WorkoutDatastore to Koin module
@@ -136,7 +141,7 @@ val commonModule = module {
   viewModel { WorkingSetViewModel(get(), get()) }
   viewModel { WarmUpSetsViewModel(get(), get()) }
   viewModel { HistoryViewModel(get(), get(), get(), get(), get(), get()) }
-  viewModel { ProfileViewModel(get(), get(), get()) }
+  viewModel { ProfileViewModel(get(), get(), get(), get()) }
   viewModel { ReplicatorViewModel(get(), get()) }
   viewModel { ReplicatorConfigViewModel(get()) }
 
