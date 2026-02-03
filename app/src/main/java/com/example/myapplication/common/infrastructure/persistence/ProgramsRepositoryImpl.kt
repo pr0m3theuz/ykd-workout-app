@@ -67,6 +67,7 @@ class ProgramsRepositoryImpl(
     ignoreUnknownKeys = true
   }
 
+  // TODO Empty programs causing crashing caused by Kotlin Serialization Library
   override fun getAllDistinctProgramTemplates(): Flow<List<Program>> {
     try {
       requireNotNull(db) { DATABASE_IS_NULL }
@@ -108,6 +109,7 @@ class ProgramsRepositoryImpl(
         }
       } catch (e: Exception) {
         Log.e(e.message, e.stackTraceToString())
+        return programs
       }
     }
     return programs
