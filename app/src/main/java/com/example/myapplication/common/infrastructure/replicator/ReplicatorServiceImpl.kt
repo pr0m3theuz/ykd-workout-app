@@ -3,6 +3,7 @@ package com.example.myapplication.common.infrastructure.replicator
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.couchbase.lite.BasicAuthenticator
+import com.couchbase.lite.CollectionConfiguration
 import com.couchbase.lite.Replicator
 import com.couchbase.lite.ReplicatorActivityLevel
 import com.couchbase.lite.ReplicatorChange
@@ -52,7 +53,7 @@ class ReplicatorServiceImpl(
         username = loggedInUser.username ?: "user",
         password = loggedInUser.password ?: "password",
         endpointUrl = loggedInUser.endpointUrl
-          ?: "wss://127.0.0.1:4984/workouts", // TODO store in user profile
+          ?: "ws://127.0.0.1:4984/workouts", // TODO store in user profile
         replicatorType = "PUSH AND PULL",
         heartBeat = 60L,
         continuous = true,
@@ -125,7 +126,8 @@ class ReplicatorServiceImpl(
 
         Log.i("Database Collections", databaseManager.database!!.collections.toString())
 
-        val collections = mapOf(databaseManager.database!!.collections to null)
+//        val collections = databaseManager.database!!.collections.map { collection -> CollectionConfiguration(collection) }.toSet()
+        val collections = CollectionConfiguration.fromCollections(databaseManager.database!!.collections)
 
 //        val collections = mapOf(
 //          databaseManager.database!!.getCollection("Equipment") to CollectionConfiguration(),
