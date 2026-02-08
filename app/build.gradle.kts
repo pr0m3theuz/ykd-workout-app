@@ -186,7 +186,7 @@ dependencies {
 
   // The following Espresso dependency can be either "implementation",
   // or "androidTestImplementation", depending on whether you want the
-  // dependency to appear on your APK’"s compile classpath or the test APK
+  // dependency to appear on your APK’s compile classpath or the test APK
   // classpath.
   androidTestImplementation("androidx.test.espresso:espresso-idling-resource:$espressoVersion")
 
@@ -225,6 +225,7 @@ dependencies {
   // Add to use coroutines with the SDK
 
   // Serialization
+  // TODO serialization version 1.9.0.& 1.10.0 causes crashes
   val serialization = "1.8.1"
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serialization")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization")
@@ -299,8 +300,8 @@ class RoomSchemaArgProvider implements CommandLineArgumentProvider {
 
     @Override
     Iterable<String> asArguments() {
-        // Note: If you"re using KSP, change the line below to return
-        // ["room.schemaLocation=${schemaDir.path}".toString()].
-        return ["-Aroom.schemaLocation=${schemaDir.path}".toString()]
+        // Note: If you're using KSP, change the line below to return
+        // ["room.schemaLocation=${schemaDir.path}"].toString()].
+        return ["-Aroom.schemaLocation=${schemaDir.path}"].toString()]
     }
 }*/

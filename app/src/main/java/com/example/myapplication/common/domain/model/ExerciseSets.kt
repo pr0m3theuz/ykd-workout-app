@@ -282,6 +282,7 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
 }
 
 fun ExerciseExerciseSets.replaceWarmUpSets(warmUpSets: List<Set>) {
+  // TODO Keep old target minimum & maximum reps and target 1RM
   val TAG = "ExerciseExerciseSets"
   // Log initial state
   Log.d(TAG, "replaceWarmUpSets called. Replacing warm-up sets to ${this.sets.size} existing sets.")
@@ -344,6 +345,7 @@ fun ExerciseExerciseSets.replaceWarmUpSets(warmUpSets: List<Set>) {
 }
 
 fun ExerciseExerciseSets.replaceWorkingSets(newSets: List<Set>) {
+  // TODO Keep old target minimum & maximum reps and target 1RM
   val TAG = "ExerciseExerciseSets"
   // Log initial state
   Log.d(
