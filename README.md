@@ -1,4 +1,4 @@
-# YKD - Local-First Workout Logger
+# YKD - Private-Focused Workout Logger
 
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=android&logoColor=white)
@@ -9,6 +9,26 @@
 
 [//]: # (A modern, Local-First Android application for tracking bodybuilding and strength training progress, built with **Jetpack Compose** and **Couchbase Mobile**.)
 
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Screenshots](#-screenshots)
+- [About the Project](#-about-the-project)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+- [Features](#features)
+    - [Advanced Set Programming](#advanced-set-programming)
+    - [Complete Workout Logging & Tracking](#complete-workout-logging--tracking)
+    - [Exercise Database & Customization](#exercise-database--customization)
+    - [Structured Programming](#structured-programming)
+    - [Analytics & Insights](#analytics--insights)
+    - [Workout Customization Tools](#workout-customization-tools)
+    - [Data Management](#data-management)
+- [Future Improvements](#-future-improvements)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## Key Features
 
@@ -29,7 +49,7 @@
 - 📝 **Structured Programs** - Follow periodized training programs with mesocycle tracking and progression
 - 🎯 **Detailed Exercise Database** - Complete muscle mapping, equipment specs, and YouTube integration
 - 📱 **Complete Workout History** - Never lose a workout with full logging, searchable history, and performance trends
-- 🔒 **Privacy-First** - Your data stays local with optional sync on your terms
+- 🔒 **Privacy-First, Local-First** - Your data stays local with optional sync on your terms
 - 🔧 **Highly Customizable** - Custom exercises, equipment profiles, unit preferences, and flexible programming
 - 📈 **Progress Tracking** - Automatic 1RM estimation, volume tracking, and personal records across all rep ranges
 
@@ -198,6 +218,62 @@ The app calculates actual weights, reps, and intensity targets on the fly, showi
 * Migrate entirely to Kotlin Multiplatform (KMP) to support iOS.
 * Workout Progression (e.g. suggesting deloads based on recent performance)
 * Improved Active Program Management (e.g. skipping/rearranging workouts)
+
+## 🤝 Contributing
+
+Contributions are welcome! Whether you're fixing bugs, adding features, or improving documentation, your help makes YKD better for everyone.
+
+### How to Contribute
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m 'Add some amazing feature'
+   ```
+4. **Push to your branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. **Open a Pull Request**
+
+### Development Guidelines
+
+- Follow Kotlin coding conventions
+- Write tests for new features
+- Update documentation as needed
+- Keep commits focused and descriptive
+
+### Reporting Issues
+
+Found a bug or have a feature request? Please [open an issue](https://github.com/pr0m3theuz/workout-app/issues) with:
+- Clear description of the problem or suggestion
+- Steps to reproduce (for bugs)
+- Expected vs actual behavior
+- Screenshots if applicable
+
+## 📄 License
+
+This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
+
+### What This Means
+
+✅ **You can:**
+- Use this software for any purpose
+- Study and modify the source code
+- Distribute copies of the software
+- Distribute modified versions
+
+❗ **You must:**
+- Disclose the source code of any modifications
+- License derivative works under GPL v3
+- Include the original license and copyright notice
+- State significant changes made to the code
+
+For more information, visit the [GNU GPL v3 documentation](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 ---
 *This project is part of my portfolio as I transition from Finance to Software Engineering.*
