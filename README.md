@@ -277,4 +277,12 @@ This project is licensed under the **GNU General Public License v3.0** - see the
 For more information, visit the [GNU GPL v3 documentation](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 ---
-*This project is part of my portfolio as I transition from Finance to Software Engineering.*
+
+**Part of the YKD Ecosystem:**
+- [YKD Mobile App](https://github.com/pr0m3theuz/workout-app) - Android workout tracking application
+- [YKD Server](https://github.com/pr0m3theuz/workout-app-server) - Sync infrastructure
+- [YKD Program Importer](https://github.com/pr0m3theuz/ykd-import-programs-kmp) - Desktop program management
+- [CSV to PKL Converter](https://github.com/pr0m3theuz/csv-to-pkl-converter) - Workout program file converter
+
+
+*Part of the YKD ecosystem - Local-first workout tracking with structured programming and multi-device sync.*
