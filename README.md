@@ -91,6 +91,7 @@ YKD is a powerful, privacy-focused workout logging application designed to help 
 * **Observability:** Firebase Crashlytics & Analytics, New Relic
 * **Testing:** JUnit 5 & Jqwik (Property-based testing)
 * **Build Tool:** Gradle (Kotlin DSL)
+* **Data Visualization:** Rive & Plotly.js
 
 [//]: # (## 🏗 Architecture & Engineering Highlights)
 
