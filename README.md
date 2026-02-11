@@ -3,7 +3,8 @@
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=android&logoColor=white)
 ![Couchbase](https://img.shields.io/badge/Couchbase-EA2328?style=for-the-badge&logo=couchbase&logoColor=white)
-![License](https://img.shields.io/badge/License-GPLv3-green)
+![Rive](https://img.shields.io/badge/Made_with_Rive-0?style=for-the-badge&logo=rive&logoColor=white&labelColor=black&color=black)
+![License](https://img.shields.io/badge/License-GPLv3-green?style=for-the-badge)
 
 > A privacy-focused, open source workout logging app that helps you track your training, monitor progress, and own your fitness data.
 
