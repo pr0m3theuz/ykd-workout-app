@@ -2,10 +2,10 @@
 
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=android&logoColor=white)
-![Material Design](https://img.shields.io/badge/Made_with_Material_Design-6750A4?style=for-the-badge&logo=materialdesign&logoColor=white)
+![Material Design](https://img.shields.io/badge/Material_Design-6750A4?style=for-the-badge&logo=materialdesign&logoColor=white)
 ![Couchbase](https://img.shields.io/badge/Couchbase-EA2328?style=for-the-badge&logo=couchbase&logoColor=white)
-![Rive](https://img.shields.io/badge/Made_with_Rive-0?style=for-the-badge&logo=rive&logoColor=white&labelColor=black&color=black)
-![Plotly](https://img.shields.io/badge/Made_with_Plotly-0?style=for-the-badge&logo=plotly&logoColor=white&color=%237A76FF)
+![Rive](https://img.shields.io/badge/Rive-0?style=for-the-badge&logo=rive&logoColor=white&labelColor=black&color=black)
+![Plotly](https://img.shields.io/badge/Plotly-0?style=for-the-badge&logo=plotly&logoColor=white&color=%237A76FF)
 ![License](https://img.shields.io/badge/License-GPLv3-green?style=for-the-badge)
 
 > A privacy-focused, open source workout logging app that helps you track your training, monitor progress, and own your fitness data.
