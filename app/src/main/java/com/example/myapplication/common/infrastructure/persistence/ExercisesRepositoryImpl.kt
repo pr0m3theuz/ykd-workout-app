@@ -872,6 +872,7 @@ class ExercisesRepositoryImpl(
           .createQuery(
             "SELECT * FROM `CompletedSets` " +
                     "WHERE exerciseID = '${exercise.id}' " +
+                    "AND setCompleted = true " +
                     "ORDER BY dateCreated"
           )
           .execute()
