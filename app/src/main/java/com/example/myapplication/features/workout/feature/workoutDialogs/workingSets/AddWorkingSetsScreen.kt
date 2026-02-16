@@ -88,11 +88,11 @@ fun AddWorkingSetsScreen(
 
   fun selectSet(set: Set, isSelected: Boolean) {
     if (isSelected) {
-      Log.d("AddWarmUpSetsScreen", "selectSet add set: $set")
+//       Log.d("AddWarmUpSetsScreen", "selectSet add set: $set")
       selectedSets.add(set)
-      Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
+//       Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
     } else {
-      Log.d("AddWarmUpSetsScreen", "selectSet remove set: $set")
+//       Log.d("AddWarmUpSetsScreen", "selectSet remove set: $set")
       selectedSets.remove(set)
     }
   }
@@ -103,14 +103,14 @@ fun AddWorkingSetsScreen(
   }
 
   fun applySettingsToSelectedSets(modernizedLoadRIR: ModernizedLoadRIR?) {
-    Log.d("AddWarmUpSetsScreen", "applySettingsToSelectedSets called")
-    Log.d("AddWarmUpSetsScreen", "applySettingsToSelectedSets: $modernizedLoadRIR")
-    Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
+//     Log.d("AddWarmUpSetsScreen", "applySettingsToSelectedSets called")
+//     Log.d("AddWarmUpSetsScreen", "applySettingsToSelectedSets: $modernizedLoadRIR")
+//     Log.d("AddWarmUpSetsScreen", "selectedSets: $selectedSets")
     workingSetViewModel.applyModernizedLoadRIRSettingsToSelectedSets(
       sets = selectedSets.toList(), // selectedSets.value.keys.toList(),
       modernizedLoadRIRSetting = modernizedLoadRIR,
     )
-    Log.d("AddWarmUpSetsScreen", "selectedSets cleared")
+//     Log.d("AddWarmUpSetsScreen", "selectedSets cleared")
     clearSelectedSets()
   }
 

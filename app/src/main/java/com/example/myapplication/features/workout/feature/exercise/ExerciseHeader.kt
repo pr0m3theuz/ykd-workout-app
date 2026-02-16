@@ -269,7 +269,7 @@ private fun ExerciseNotesList(
     ) {
       Column(modifier = Modifier.fillMaxWidth()) {
         exerciseSets.notes.forEach { note ->
-          Log.i("ExerciseNotesList", "Note: $note")
+//           Log.i("ExerciseNotesList", "Note: $note")
           SwipeToDismissItem(onDismissRequest = { removeNote(note) }) {
             ExerciseNotes(exerciseNote = note, _pinNote = { pin -> _pinNote(note, pin) })
           }

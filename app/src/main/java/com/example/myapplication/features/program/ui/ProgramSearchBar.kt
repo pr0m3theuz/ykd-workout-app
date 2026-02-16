@@ -156,7 +156,7 @@ fun ProgramSearchBar(
           }
         }
       }
-
+// 
       Log.d("ProgramSearchBar", "showAuthorsBottomSheet: $showAuthorsBottomSheet")
       if (showAuthorsBottomSheet) {
         AuthorPartialBottomSheet(
@@ -169,7 +169,7 @@ fun ProgramSearchBar(
           },
         )
       }
-
+// 
       Log.d("ProgramSearchBar", "showLevelsBottomSheet: $showLevelsBottomSheet")
       if (showLevelsBottomSheet) {
         LevelsPartialBottomSheet(

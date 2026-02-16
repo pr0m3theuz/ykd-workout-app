@@ -26,7 +26,7 @@ fun applyModernizedLoadRIRSettingsToSets(
     "applyModernizedLoadRIRSettingsToSets",
     "applySettingsToSelectedSets: $modernizedLoadRIRSetting"
   )
-  Log.d("applyModernizedLoadRIRSettingsToSets", "sets: $selectedSets")
+//   Log.d("applyModernizedLoadRIRSettingsToSets", "sets: $selectedSets")
 
   modernizedLoadRIRSetting?.let { modernizedLoadRIR ->
     val updatedSets = oldSets.map { existingSet ->

@@ -87,10 +87,9 @@ fun HistoryScreen(
   val levelsMap = remember {
     levels.zip(List(levels.size, { false })).toMutableStateMap()
   }
-
-  Log.i("HistoryScreen", "programsMap: ${programsMap.size}")
-  Log.i("HistoryScreen", "authorsMap: $authorsMap")
-  Log.i("HistoryScreen", "levelsMap: $levelsMap")
+//   Log.i("HistoryScreen", "programsMap: ${programsMap.size}")
+//   Log.i("HistoryScreen", "authorsMap: $authorsMap")
+//   Log.i("HistoryScreen", "levelsMap: $levelsMap")
 
   val selectedPrograms = remember { mutableStateListOf<Program>() }
   val selectedAuthors = remember { mutableStateListOf<String>() }
@@ -287,8 +286,7 @@ fun HistoryLazyColumn(
   //      .mapValues { (_, workouts) ->
   //        workouts.groupBy { it.workoutEnded?.toLocalDateTime(defaultTimeZone)?.monthNumber }
   //      }
-
-  Log.i("HistoryLazyColumn", "workout count: ${workouts.size}")
+//   Log.i("HistoryLazyColumn", "workout count: ${workouts.size}")
 
   if (workouts.isEmpty()) {
     NoWorkoutsPerformed()

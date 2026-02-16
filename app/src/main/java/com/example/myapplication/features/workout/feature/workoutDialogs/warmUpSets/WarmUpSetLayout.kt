@@ -39,7 +39,7 @@ fun WarmUpSetLayout(
   onRepetitionsChanged: (uuid: Uuid, reps: Int) -> Unit,
   onRirChanged: (uuid: Uuid, rir: Double?) -> Unit,
 ) {
-  Log.d("WarmUpSetLayout", "warmUpSet ${warmUpSet.setNumber}:\n ${Json.encodeToString(warmUpSet)}")
+//   Log.d("WarmUpSetLayout", "warmUpSet ${warmUpSet.setNumber}:\n ${Json.encodeToString(warmUpSet)}")
   var currentPercentageText by remember { mutableStateOf(percentageText) }
   var currentRepetitionsText by remember { mutableStateOf(repetitionsText) }
   var currentRirText by remember { mutableStateOf(rirText) }
@@ -138,7 +138,7 @@ fun WarmUpSetLayoutContainer(
 //  checked: Boolean,
   onCheckedChange: (warmUpSet: Set, isChecked: Boolean) -> Unit,
 ) {
-  Log.d("WarmUpSetLayout", "warmUpSet ${warmUpSet.setNumber}:\n ${Json.encodeToString(warmUpSet)}")
+//   Log.d("WarmUpSetLayout", "warmUpSet ${warmUpSet.setNumber}:\n ${Json.encodeToString(warmUpSet)}")
   val percentageText by remember {
     mutableStateOf(
       getFormattedPercentageText(

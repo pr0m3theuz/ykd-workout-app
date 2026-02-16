@@ -54,7 +54,7 @@ fun ExerciseNotes(
   _pinNote: (pin: Boolean) -> Unit,
   placeholder: String = "Write a note",
 ) {
-  Log.i("ExerciseNotes", "$exerciseNote")
+//   Log.i("ExerciseNotes", "$exerciseNote")
 
   var note by remember { mutableStateOf(TextFieldValue(exerciseNote.note ?: "")) }
 
@@ -162,7 +162,7 @@ fun SwipeToDismissItem(
 
 
   if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-    Log.i("SwipeToDismissItem()", "onDismissRequest() called")
+//     Log.i("SwipeToDismissItem()", "onDismissRequest() called")
     onDismissRequest()
   }
 

@@ -120,7 +120,7 @@ fun AnalyticsScreen(
   val weeklyWorkoutStreak = uiState.weeklyWorkoutStreak
   val totalTrainingVolumeData = uiState.totalTrainingVolumeData
   val muscleEngagementData = uiState.muscleEngagementData
-
+// 
   Log.i("AnalyticsScreen", "muscleEngagementData: $muscleEngagementData")
 
   AnalyticsScreenContent(

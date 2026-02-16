@@ -36,7 +36,7 @@ class ReplicatorServiceImpl(
   private var loggedInUser = userProfileManager.userProfile.value
 
   init {
-    Log.i("ReplicatorServiceImpl", "init ReplicatorService: $this")
+//     Log.i("ReplicatorServiceImpl", "init ReplicatorService: $this")
     Log.i(
       "ReplicatorServiceImpl",
       "init loggedInUser: $loggedInUser\nUserProfileManager: $userProfileManager\nReplicatorService: $this"
@@ -123,8 +123,7 @@ class ReplicatorServiceImpl(
           BasicAuthenticator(replicationConfig.username, replicationConfig.password.toCharArray())
 
         requireNotNull(databaseManager.database) { DATABASE_IS_NULL }
-
-        Log.i("Database Collections", databaseManager.database!!.collections.toString())
+//         Log.i("Database Collections", databaseManager.database!!.collections.toString())
 
 //        val collections = databaseManager.database!!.collections.map { collection -> CollectionConfiguration(collection) }.toSet()
         val collections = CollectionConfiguration.fromCollections(databaseManager.database!!.collections)
@@ -255,7 +254,7 @@ class ReplicatorServiceImpl(
       replicatorManager?.replicator?.start()
       isReplicationStarted = true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -264,7 +263,7 @@ class ReplicatorServiceImpl(
       replicatorManager?.replicator?.stop()
       isReplicationStarted = false
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 

@@ -54,7 +54,7 @@ class ReplicatorConfigViewModel(private val replicatorService: ReplicatorService
         selfSignedCert = selfSignedCertState.value
       )
       try {
-        Log.i("ReplicatorConfigViewModel.replicatorService", replicatorService.toString())
+//         Log.i("ReplicatorConfigViewModel.replicatorService", replicatorService.toString())
         replicatorService.updateReplicationConfig(config)
 
       } catch (e: Exception) {

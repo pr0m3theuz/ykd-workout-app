@@ -176,7 +176,7 @@ class ManageWorkoutUseCase(
         is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
       }
     }
-
+// 
     Log.d(TAG, "allSets have the same workoutID ($workoutID): ${allSets.all { set -> set.workoutID == workoutID }}")
 
     require(allSets.all { set -> set.workoutID == workoutID }) {
@@ -194,7 +194,7 @@ class ManageWorkoutUseCase(
     requireNotNull(exercise) { "Exercise not found." }
 
     val exerciseSetsID = ObjectId()
-    Log.d("createNewExerciseExerciseSetsFromPreviousWorkout", "exerciseSetsID: $exerciseSetsID")
+//     Log.d("createNewExerciseExerciseSetsFromPreviousWorkout", "exerciseSetsID: $exerciseSetsID")
 
     return ExerciseExerciseSets(
       id = exerciseSetsID,
@@ -252,7 +252,7 @@ class ManageWorkoutUseCase(
           exerciseID = exerciseID,
           ownerID = userID, // TODO Replace currentUser.id
         )
-      Log.d("createNewSetsFromPreviousWorkout", "set.workoutID (${newSet.workoutID}) is the same as currentWorkoutID ($currentWorkoutID): ${newSet.workoutID == currentWorkoutID}")
+//       Log.d("createNewSetsFromPreviousWorkout", "set.workoutID (${newSet.workoutID}) is the same as currentWorkoutID ($currentWorkoutID): ${newSet.workoutID == currentWorkoutID}")
       newSets.add(newSet)
       //      Log.i(
       //        "createNewSetsFromPreviousWorkout",

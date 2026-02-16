@@ -35,8 +35,8 @@ class DatabaseManager(private val context: Context) {
 //            currentUser: User
   ) {
     val filesDir = context.filesDir
-    Log.i("DatabaseManager", "DatabaseManager.initializeDatabases()")
-    Log.d("DatabaseManager", "database exists: ${!Database.exists(databaseName, context.filesDir)}")
+//     Log.i("DatabaseManager", "DatabaseManager.initializeDatabases()")
+//     Log.d("DatabaseManager", "database exists: ${!Database.exists(databaseName, context.filesDir)}")
 
     try {
       val dbConfig = DatabaseConfigurationFactory.newConfig("$filesDir")
@@ -111,7 +111,7 @@ class DatabaseManager(private val context: Context) {
       // create indexes for database queries
 
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -119,7 +119,7 @@ class DatabaseManager(private val context: Context) {
     try {
       database?.close()
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -167,7 +167,7 @@ class DatabaseManager(private val context: Context) {
 
   fun importDatabase(sourceUri: Uri) {
     val filesDir = context.filesDir
-    Log.i("DatabaseManager", "DatabaseManager.importDatabase()")
+//     Log.i("DatabaseManager", "DatabaseManager.importDatabase()")
 
     try {
       val dbConfig = DatabaseConfigurationFactory.newConfig("$filesDir")
@@ -211,7 +211,7 @@ class DatabaseManager(private val context: Context) {
         database!!.createCollection(collection, "_default")
       }
     } catch (e: Exception) {
-      Log.e("DatabaseManager", "Error importing database", e)
+//       Log.e("DatabaseManager", "Error importing database", e)
       throw e
     }
   }

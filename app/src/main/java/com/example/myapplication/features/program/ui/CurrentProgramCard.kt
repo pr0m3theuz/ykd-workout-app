@@ -55,7 +55,7 @@ fun CurrentProgramCard(
   val padding = 8.dp
 
   val context = LocalContext.current
-
+// 
   Log.i("CurrentProgramCard", "current program ${program.id} is active: ${program.isActive}")
 
   val titleSmall = MaterialTheme.typography.titleSmall

@@ -177,7 +177,7 @@ class MainActivity : ComponentActivity() {
 //      .start(this.applicationContext)
 
     userProfileManager = inject<UserProfileManager>(UserProfileManager::class.java).value
-    Log.d("MainActivity", "MainActivity.onCreate(): userProfileManager: $userProfileManager")
+//     Log.d("MainActivity", "MainActivity.onCreate(): userProfileManager: $userProfileManager")
     Log.d(
       "MainActivity",
       "MainActivity.onCreate(): current user: ${userProfileManager.getCurrentUser()}"
@@ -229,7 +229,7 @@ class MainActivity : ComponentActivity() {
           // Optional: Log the entire back stack whenever the current entry changes
           // This can be verbose but very helpful for debugging popUpTo issues.
           navController.currentBackStack.collect { backStack ->
-            Log.d("BackStackFlow", "Current full back stack:")
+//             Log.d("BackStackFlow", "Current full back stack:")
             backStack.forEachIndexed { index, entry ->
               Log.d(
                 "BackStackFlow",
@@ -309,36 +309,36 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       val loadingWorkout =
         navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
-      Log.d("WorkoutNavGraph", "Workout Screen: workoutViewModel: $workoutViewModel")
+//       Log.d("WorkoutNavGraph", "Workout Screen: workoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
 
       LaunchedEffect(workoutID) {
-        Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
-        Log.d("WorkoutNavGraph", "workoutID: $workoutID")
+//         Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
+//         Log.d("WorkoutNavGraph", "workoutID: $workoutID")
         if (!workoutID.isNullOrBlank()) {
           when (loadingWorkout) {
             LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value -> {
-              Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
+//               Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
               workoutViewModel.getWorkoutByID(ObjectId(workoutID))
             }
 
             LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
-              Log.d("WorkoutScreen", "Copy Workout From Previous Workout. workoutID: $workoutID")
+//               Log.d("WorkoutScreen", "Copy Workout From Previous Workout. workoutID: $workoutID")
               workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
             }
 
             LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
-              Log.d("WorkoutScreen", "Load Workout From Active Program. workoutID: $workoutID")
+//               Log.d("WorkoutScreen", "Load Workout From Active Program. workoutID: $workoutID")
               workoutViewModel.loadWorkoutFromActiveProgram(ObjectId(workoutID))
             }
 
             LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value -> {
-              Log.d("WorkoutScreen", "Workout Loaded From Workout Progression. workout: ${workoutViewModel.workout.value?.name}")
+//               Log.d("WorkoutScreen", "Workout Loaded From Workout Progression. workout: ${workoutViewModel.workout.value?.name}")
             }
 
             LoadingWorkout.CopyPreviousWorkoutToProgress.value -> {
-              Log.d("WorkoutScreen", "Copy Previous Workout To Progress. workoutID: $workoutID")
+//               Log.d("WorkoutScreen", "Copy Previous Workout To Progress. workoutID: $workoutID")
             }
 
             else -> {
@@ -382,31 +382,31 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       val loadingWorkout =
         navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
-      Log.d("WorkoutNavGraph", "Workout Preview: workoutViewModel: $workoutViewModel")
+//       Log.d("WorkoutNavGraph", "Workout Preview: workoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
 
       LaunchedEffect(workoutID) {
-        Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
-        Log.d("WorkoutNavGraph", "workoutID: $workoutID")
+//         Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
+//         Log.d("WorkoutNavGraph", "workoutID: $workoutID")
         if (!workoutID.isNullOrBlank()) {
           when (loadingWorkout) {
             LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value -> {
-              Log.d("Workout Preview", "workoutID: $workoutID, calling getWorkoutByID()")
+//               Log.d("Workout Preview", "workoutID: $workoutID, calling getWorkoutByID()")
             }
 
             LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
-              Log.d("Workout Preview", "Copy Workout From Previous Workout. workoutID: $workoutID")
+//               Log.d("Workout Preview", "Copy Workout From Previous Workout. workoutID: $workoutID")
             }
 
             LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
-              Log.d("Workout Preview", "Load Workout From Active Program. workoutID: $workoutID")
+//               Log.d("Workout Preview", "Load Workout From Active Program. workoutID: $workoutID")
             }
 
             LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value -> {}
 
             LoadingWorkout.CopyPreviousWorkoutToProgress.value -> {
-              Log.d("Workout Preview", "Copy Previous Workout To Progress. workoutID: $workoutID")
+//               Log.d("Workout Preview", "Copy Previous Workout To Progress. workoutID: $workoutID")
               workoutViewModel.copyPreviousWorkoutToProgress(ObjectId(workoutID))
             }
 
@@ -577,7 +577,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
-      Log.d("AddWarmUpSetsScreen", "exerciseSetsID: $exerciseSetsID")
+//       Log.d("AddWarmUpSetsScreen", "exerciseSetsID: $exerciseSetsID")
       AddWarmUpSetsScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
@@ -591,7 +591,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
-      Log.d("AddWorkingSetsScreen", "exerciseSetsID: $exerciseSetsID")
+//       Log.d("AddWorkingSetsScreen", "exerciseSetsID: $exerciseSetsID")
       AddWorkingSetsScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
@@ -605,7 +605,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
-      Log.d("EquateVolumeScreen", "exerciseSetsID: $exerciseSetsID")
+//       Log.d("EquateVolumeScreen", "exerciseSetsID: $exerciseSetsID")
       EquateVolumeScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
@@ -729,7 +729,7 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController) {
   navigation(startDestination = "workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
     composable("workoutSummary/workoutID/workoutCount") { navBackStackEntry ->
-      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
+//       Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
 
       val workoutViewModel: WorkoutViewModel =
         koinViewModel(
@@ -774,7 +774,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 
   navigation("historyScreen", route = Screens.History.baseRoute) {
     composable("historyScreen") { navBackStackEntry ->
-      Log.d("HistoryNavGraph", "Navigated to History Screen")
+//       Log.d("HistoryNavGraph", "Navigated to History Screen")
 
       val historyViewModel: HistoryViewModel =
         navBackStackEntry.sharedViewModel<HistoryViewModel>(navController)
@@ -847,7 +847,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
   navigation("profileScreenV2", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
-      Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
+//       Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
       val profileViewModel: ProfileViewModel =
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
@@ -1191,7 +1191,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
 private fun NavGraphBuilder.addReplicatorGraph(navController: NavController) {
   navigation("replicatorScreen", route = Screens.Replicator.baseRoute) {
     composable("replicatorScreen") {
-      Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
+//       Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
         viewModel = koinViewModel<ReplicatorViewModel>(),
         replicatorConfigNav = { navController.navigate("configScreen") },

@@ -59,7 +59,7 @@ class UserProfileManager(private val context: Context, private val userRepositor
 
   init {
     // Load initial user profile from DataStore when the manager is created
-    Log.i("UserProfileManager", "UserProfileManager created")
+//     Log.i("UserProfileManager", "UserProfileManager created")
     //    println("UserProfileManager created")
     loadProfileFromDataStore()
   }
@@ -206,7 +206,7 @@ class UserProfileManager(private val context: Context, private val userRepositor
     )
     //    println("UserProfileManager.updateUserProfile(): Existing user profile:
     // ${_userProfile.value}\nUserProfileManager: ${this@UserProfileManager}")
-    Log.i("UserProfileManager", "updateUserProfile(): new profile: $newProfile")
+//     Log.i("UserProfileManager", "updateUserProfile(): new profile: $newProfile")
     //    println("UserProfileManager.updateUserProfile(): new profile: $newProfile")
     //    if (_userProfile.value.isLoggedIn != true) {
 

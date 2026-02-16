@@ -278,7 +278,7 @@ fun duplicateProgramStructure(
       isPublic = false
     )
     collectedNewSets.add(newSet)
-    Log.i("DuplicateSet", "Collected New Set: $newSet")
+//     Log.i("DuplicateSet", "Collected New Set: $newSet")
     return newSet // Though this return might not be directly used if parent's list is cleared
   }
 
@@ -392,7 +392,7 @@ fun duplicateProgramStructure(
       }
     )
     collectedNewWorkouts.add(newWorkout)
-    Log.i("DuplicateWorkout", "Collected New Workout: $newWorkout")
+//     Log.i("DuplicateWorkout", "Collected New Workout: $newWorkout")
     return newWorkout
   }
 

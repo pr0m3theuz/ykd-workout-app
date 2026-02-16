@@ -220,7 +220,7 @@ class WorkingSetViewModel(
       "WarmUpSetsViewModel.applySettingsToSelectedSets",
       "applySettingsToSelectedSets: $modernizedLoadRIRSetting"
     )
-    Log.d("WarmUpSetsViewModel.applySettingsToSelectedSets", "sets: $sets")
+//     Log.d("WarmUpSetsViewModel.applySettingsToSelectedSets", "sets: $sets")
 
 
 

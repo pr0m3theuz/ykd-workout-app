@@ -163,7 +163,7 @@ fun ExerciseSearchBar(
               }
             }*/
     }
-
+// 
 
     Log.d("ExerciseSearchBar", "showEquipmentBottomSheet: $showEquipmentBottomSheet")
     if (showEquipmentBottomSheet) {
@@ -177,7 +177,7 @@ fun ExerciseSearchBar(
         },
       )
     }
-
+// 
     Log.d("ExerciseSearchBar", "showMuscleGroupsBottomSheet: $showMuscleGroupsBottomSheet")
     if (showMuscleGroupsBottomSheet) {
       MuscleGroupsPartialBottomSheet(
@@ -195,7 +195,7 @@ fun ExerciseSearchBar(
         },
       )
     }
-
+// 
     Log.d("ExerciseSearchBar", "showMovementTypeBottomSheet: $showMovementTypeBottomSheet")
     if (showMovementTypeBottomSheet) {
       MovementTypePartialBottomSheet(

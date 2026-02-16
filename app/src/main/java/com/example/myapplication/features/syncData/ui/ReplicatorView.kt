@@ -107,7 +107,7 @@ fun ReplicatorWidget(
   onStopClick: () -> Unit,
   onClearLogs: () -> Unit
 ) {
-  Log.i("ReplicatorWidget: isButtonShown", isButtonShown.toString())
+//   Log.i("ReplicatorWidget: isButtonShown", isButtonShown.toString())
   LazyColumn(
     modifier = Modifier
       .fillMaxWidth()

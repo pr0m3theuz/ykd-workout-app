@@ -92,9 +92,9 @@ fun WorkoutSummaryScreen(
   val completedWorkout by workoutViewModel.completedWorkout.collectAsStateWithLifecycle()
   val workoutTotalSetsPerMuscle by workoutViewModel.workoutTotalSetsPerMuscle.collectAsStateWithLifecycle()
   val userDefaultWeightUnit = workoutViewModel.userDefaultWeightUnit
-
+// 
   Log.i("WorkoutSummaryScreen", "workoutID: $workoutID")
-  Log.i("WorkoutSummaryScreen", "completedWorkout: ${Json.encodeToString(completedWorkout)}")
+//   Log.i("WorkoutSummaryScreen", "completedWorkout: ${Json.encodeToString(completedWorkout)}")
 
   //  Log.i("WorkoutSummaryScreen", "workoutViewModel: $workoutViewModel")
   val scaffoldNavigator = rememberSupportingPaneScaffoldNavigator()

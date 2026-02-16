@@ -440,7 +440,7 @@ fun SwipeToDismissBoxListItem(removeSet: () -> Unit, SetLayout: @Composable () -
   val dismissState = rememberDismissState(confirmStateChange = { true })
 
   if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-    Log.i("SwipeToDismissItem()", "onDismissRequest() called")
+//     Log.i("SwipeToDismissItem()", "onDismissRequest() called")
     removeSet()
   }
 
@@ -1133,7 +1133,7 @@ fun getRpeOptions(
     .distinct()
     .sortedDescending()
     .toList() // RPE often shown high to low
-
+// 
   Log.i("getRpeOptions", "RPE Dropdown Items: $list")
 
   return list
@@ -1156,7 +1156,7 @@ fun ModernizedLoadRIRHeaderRowPreview() {
     initialLoadRIR = selectedLoadRIR,
     onLoadRIRChange = { newLoadRIR ->
       selectedLoadRIR = newLoadRIR
-      Log.d("ModernizedLoadRIRHeaderRowPreview", "Selected RIR: $newLoadRIR")
+//       Log.d("ModernizedLoadRIRHeaderRowPreview", "Selected RIR: $newLoadRIR")
     }
   )
 }
@@ -1190,7 +1190,7 @@ fun getRirOptions(
     .distinct()
     .sorted()
     .toList()
-
+// 
   Log.i("getRirOptions", "RIR Dropdown Items: $list")
 
   return list
@@ -1226,7 +1226,7 @@ fun getRepsPerformedOptions(
     .distinct()
     .sorted()
     .toList()
-
+// 
   Log.i("getRepsPerformedOptions", "Reps Performed Dropdown Items: $list")
 
   return list
@@ -1266,7 +1266,7 @@ fun getRelativeLoadPercentOptions(
     .distinct()
     .sortedDescending()
     .toList()
-
+// 
   Log.i("getRelativeLoadPercentOptions", "Relative Load Percent Dropdown Items: $list")
 
   return list
