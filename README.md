@@ -59,9 +59,9 @@
 ## 📱 Screenshots
 
 <div style="display: flex; gap: 10px;">
-  <img src="screenshots/app_settings.png" width="30%" alt="App Settings" />
-  <img src="screenshots/full_workout_summary.png" width="30%" alt="Workout Summary" />
-  <img src="screenshots/workout_program_overview.png" width="30%" alt="Workout Program Overview" />
+  <img src="screenshots/Screenshot_20260211_161606.png" width="30%" overflow="hidden" alt="Muscle Engagement" />
+  <img src="screenshots/Screenshot_20260211_162121.png" width="30%" alt="Workout Summary" />
+  <img src="screenshots/Screenshot_20260211_161735.png" width="30%" alt="Workout Program Overview" />
 </div>
 
 
