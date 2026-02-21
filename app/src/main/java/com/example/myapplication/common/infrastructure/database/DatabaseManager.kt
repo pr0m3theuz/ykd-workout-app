@@ -3,8 +3,6 @@ package com.example.myapplication.common.infrastructure.database
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.util.Log
-import androidx.core.net.toUri
 import com.couchbase.lite.CouchbaseLite
 import com.couchbase.lite.Database
 import com.couchbase.lite.DatabaseConfigurationFactory
