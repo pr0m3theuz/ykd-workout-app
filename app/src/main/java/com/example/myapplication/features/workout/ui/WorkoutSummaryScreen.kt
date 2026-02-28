@@ -80,11 +80,12 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutSummaryScreen(
-  navController: NavController,
   workoutViewModel: WorkoutViewModel,
   workoutID: String,
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
+  onClose: () -> Unit,
+  onNavigateToPreviewNextWorkout: (completedWorkoutID: String) -> Unit
 ) {
   workoutViewModel.getCompletedWorkout(ObjectId(workoutID))
   workoutViewModel.getWorkoutTotalSetsPerMuscle(ObjectId(workoutID))
@@ -110,18 +111,7 @@ fun WorkoutSummaryScreen(
               title = {},
               navigationIcon = {
                 IconButton(
-                  onClick = {
-                    /*TODO Navigate to Previous Screen */
-                    // TODO This is an anti-pattern
-                    // https://developer.android.com/guide/navigation/use-graph/navigate
-                    // TODO Fix bug, can't navigate to Workout screen after navigating to Programs
-
-                    navController.navigate(Screens.Programs.baseRoute) {
-                      popUpTo(navController.graph.findStartDestination().id)
-                      launchSingleTop = true
-                      restoreState = true
-                    }
-                  }
+                  onClick = onClose
                 ) {
                   Icon(
                     imageVector = Icons.Default.Close,
@@ -165,7 +155,10 @@ fun WorkoutSummaryScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
               ) {
-                Button(onClick = { navController.navigate("previewNextWorkout/${completedWorkout!!.id.toHexString()}") }) {
+                Button(onClick = {
+                  onNavigateToPreviewNextWorkout(completedWorkout!!.id.toHexString())
+
+                }) {
                   Text(text = "Preview Your Next Workout!")
                 }
               }

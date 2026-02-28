@@ -84,7 +84,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -235,7 +235,7 @@ class WorkoutViewModel(
       // This triggered each item the current workout is saved to the DataStore due to collecting
       // the updated activeWorkout
       //      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
-      val activeWorkout = workoutDatastore.getActiveWorkout.first()
+      val activeWorkout = workoutDatastore.getActiveWorkout.firstOrNull()
 
 //      Log.d(
 //        "WorkoutViewModel",
@@ -250,6 +250,13 @@ class WorkoutViewModel(
       //        "activeWorkout == getDefaultInstance(): ${activeWorkout !=
       // ActiveWorkout.getDefaultInstance()}"
       //      )
+
+      if (activeWorkout == null) {
+        Log.d("WorkoutViewModel", "activeWorkout: $activeWorkout")
+        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}")
+      }
+
+      require(activeWorkout != null) { "ActiveWorkout is null" }
 
       if (activeWorkout != ActiveWorkout.getDefaultInstance() && !isWorkoutActive) {
         val domainWorkout = activeWorkout.toDomainWorkout()

@@ -67,6 +67,18 @@ fun WorkoutScreen(
     workoutViewModel = workoutViewModel,
     currentDestination = currentDestination,
     onNavigateBottomBar = onNavigateBottomBar,
+    onNavigateToWorkoutSummary = { thisWorkoutID, workoutsCount ->
+      navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount") {
+        val route = navController.currentBackStackEntry?.destination?.route
+        route?.let {
+          popUpTo(it)
+          {
+            inclusive = true
+          }
+        }
+      }
+    },
+    onNavigateUp = { navController.navigateUp() },
   )
 }
 
@@ -79,6 +91,8 @@ fun WorkoutContent(
   workoutViewModel: WorkoutViewModel,
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
+  onNavigateUp: () -> Unit,
+  onNavigateToWorkoutSummary: (completedWorkoutID: String, workoutsCount: Int) -> Unit,
 ) {
   val workout by workoutViewModel.workout.collectAsState()
 
@@ -92,15 +106,7 @@ fun WorkoutContent(
     val workoutsCount = workoutViewModel.getWorkoutsCount()
 // 
     Log.i("navigateToWorkoutSummaryScreen()", "workoutCount: $workoutsCount")
-    navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount") {
-      val route = navController.currentBackStackEntry?.destination?.route
-      route?.let {
-        popUpTo(it)
-        {
-          inclusive = true
-        }
-      }
-    }
+    thisWorkoutID?.let { onNavigateToWorkoutSummary(it, workoutsCount) }
   }
 
   //  if (openFinishWorkoutDialog) {
@@ -158,7 +164,7 @@ fun WorkoutContent(
       cancelWorkout = {
         closeDiscardWorkoutDialog()
         workoutViewModel.cancelWorkout()
-        navController.navigateUp()
+        onNavigateUp()
       },
     )
   }
@@ -186,7 +192,7 @@ fun WorkoutContent(
 
   BackHandler(enabled = true) {
     if (exercisesSets.isEmpty() && isWorkoutCountUpTimerPaused) {
-      navController.navigateUp()
+      onNavigateUp()
     } else {
       openFinishWorkoutDialog()
     }

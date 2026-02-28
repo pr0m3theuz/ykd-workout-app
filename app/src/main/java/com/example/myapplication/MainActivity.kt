@@ -1,22 +1,20 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalSerializationApi::class,
+@file:OptIn(
+  ExperimentalMaterialApi::class, ExperimentalSerializationApi::class,
   ExperimentalTime::class
 )
 
 package com.example.myapplication
 
 // import androidx.compose.foundation.gestures.ModifierLocalScrollableContainerProvider.value
-import android.app.Application
+//import com.newrelic.agent.android.NewRelic
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +32,6 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,8 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -116,7 +110,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.crashlytics.setCustomKeys
-//import com.newrelic.agent.android.NewRelic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -124,9 +117,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.bson.types.ObjectId
 import org.koin.android.ext.android.get
@@ -134,9 +124,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.java.KoinJavaComponent.inject
-import kotlin.time.Clock.System.now
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJavaInstant
 
 class MainActivity : ComponentActivity() {
 
@@ -449,9 +437,6 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
-          // TODO This is an anti-pattern
-          // https://developer.android.com/guide/navigation/use-graph/navigate
-          navController = navController,
           workoutID = workoutID,
           workoutViewModel = workoutViewModel,
           currentDestination = navController.currentBackStackEntry?.destination,
@@ -468,6 +453,16 @@ private fun NavGraphBuilder.addWorkoutGraph(
               restoreState = true
             }
           },
+          onClose = {
+            navController.navigate(Screens.Programs.baseRoute) {
+              popUpTo(navController.graph.findStartDestination().id)
+              launchSingleTop = true
+              restoreState = true
+            }
+          },
+          onNavigateToPreviewNextWorkout = { completedWorkoutID ->
+            navController.navigate("previewNextWorkout/${completedWorkoutID}")
+          }
         )
       }
     }
@@ -808,7 +803,6 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
-          navController = navController,
           workoutID = workoutID,
           workoutViewModel = workoutViewModel,
           currentDestination = navController.currentBackStackEntry?.destination,
@@ -825,6 +819,16 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
               restoreState = true
             }
           },
+          onClose = {
+            navController.navigate(Screens.Programs.baseRoute) {
+              popUpTo(navController.graph.findStartDestination().id)
+              launchSingleTop = true
+              restoreState = true
+            }
+          },
+          onNavigateToPreviewNextWorkout = { completedWorkoutID ->
+            navController.navigate("previewNextWorkout/${completedWorkoutID}")
+          }
         )
       }
     }
