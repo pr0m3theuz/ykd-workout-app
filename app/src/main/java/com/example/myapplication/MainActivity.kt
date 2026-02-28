@@ -668,7 +668,6 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 
 
       ProgramsScreen(
-        navController = navController,
         programsViewModel = programsViewModel,
         currentDestination = navController.currentBackStackEntry?.destination,
         onNavigateBottomBar = { route ->
@@ -684,6 +683,35 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
             restoreState = true
           }
         },
+        navigateToProgramDetails = { program ->
+          navController.navigate(
+//          "programDetails/${program.id.toHexString()}"
+            "programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}" // TODO Causes crashes
+          )
+        },
+        navigateToNewWorkout = {
+          navController.navigate(Screens.Workout.baseRoute) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        },
+        navigateToActiveProgramDetails = { programID ->
+          navController.navigate("programDetails/${programID}/isProgramActive=true")
+        },
+        navigateToWorkout = { workoutID, loadWorkoutFromActiveProgram ->
+          navController.navigate("workoutScreen?workoutID=${workoutID}/copyWorkoutFromPreviousWorkout=${loadWorkoutFromActiveProgram}") {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        }
       )
     }
 
@@ -719,6 +747,43 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
         },
       )
     }
+
+    composable(
+      "programDetails/{programID}/isProgramActive={isActive}",
+//      arguments = listOf(navArgument("programID") { type = NavType.StringType },
+//        navArgument("isActive") { type = NavType.StringType }),
+    ) { navBackStackEntry ->
+      val programsViewModel: ProgramsViewModel =
+        navBackStackEntry.sharedViewModel<ProgramsViewModel>(navController)
+
+      val programID = navBackStackEntry.arguments?.getString("programID")
+      val isProgramActive = navBackStackEntry.arguments?.getString("isActive")
+      requireNotNull(programID) { "programID is null" }
+      requireNotNull(isProgramActive) { "isActive is null" }
+
+      // TODO This is an anti-pattern
+      // https://developer.android.com/guide/navigation/use-graph/navigate
+      ProgramDetailsScreen(
+        navController = navController,
+        programsViewModel = programsViewModel,
+        _programID = programID,
+        currentDestination = navController.currentBackStackEntry?.destination,
+        onNavigateBottomBar = { route ->
+          navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        },
+      )
+    }
+
 
     composable("importWorkoutProgram") { ImportWorkoutProgramScreen(navController) }
   }

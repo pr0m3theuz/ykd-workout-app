@@ -42,9 +42,10 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalUuidApi::class)
 @Composable
 fun ActiveWorkoutCard(
-  navController: NavController,
   workout: Workout,
   programsViewModel: ProgramsViewModel,
+  navigateToActiveProgramDetails: (String) -> Unit = {},
+  navigateToPausedWorkout: (String, Int) -> Unit = { _, _ -> },
 ) {
   // TODO Get the next workout in the program
   // TODO Add programID to Workout
@@ -75,8 +76,7 @@ fun ActiveWorkoutCard(
             modifier =
             Modifier
               .clickable {
-                /* TODO Navigate to Program Details Screen */
-                navController.navigate("programDetails/${workout.programID?.toHexString()}/isProgramActive=true")
+                workout.programID?.toHexString()?.let { p1 -> navigateToActiveProgramDetails(p1) }
               }
               .weight(1f, fill = true),
           )
@@ -295,14 +295,10 @@ fun ActiveWorkoutCard(
       ) {
         Button(
           onClick = {
-            navController.navigate("workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.LoadWorkoutFromActiveProgram.value}") {
-              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-              // Avoid multiple copies of the same destination when
-              // reselecting the same item
-              launchSingleTop = true
-              // Restore state when reselecting a previously selected item
-              restoreState = true
-            }
+            navigateToPausedWorkout(
+              workout.id.toHexString(),
+              LoadingWorkout.LoadWorkoutFromActiveProgram.value
+            )
           }
         ) {
           Text(text = "Resume ${workout.name}")
@@ -310,9 +306,8 @@ fun ActiveWorkoutCard(
 
         if (workout.programID != null) {
           IconButton(
-            onClick = { /*TODO*/
-              // TODO Navigate to Program's Workout Tab
-              navController.navigate("programDetails/${workout.programID?.toHexString()}/isProgramActive=true")
+            onClick = {
+              workout.programID?.toHexString()?.let { p1 -> navigateToActiveProgramDetails(p1) }
             }
           ) {
             Icon(

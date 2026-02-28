@@ -29,8 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.LoadingWorkout
 import com.example.myapplication.common.domain.model.Program
@@ -44,10 +42,11 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalUuidApi::class)
 @Composable
 fun CurrentProgramCard(
-  navController: NavController,
   program: Program,
   workout: Workout,
   programsViewModel: ProgramsViewModel,
+  navigateToProgramDetails: (Program) -> Unit,
+  navigateToWorkout: (String, Int) -> Unit = { _, _ -> },
 ) {
   // TODO Get the next workout in the program
   // TODO Add programID to Workout
@@ -78,8 +77,7 @@ fun CurrentProgramCard(
           modifier =
             Modifier
               .clickable {
-                /* TODO Navigate to Program Details Screen */
-                navController.navigate("programDetails/${program.id.toHexString()}")
+                navigateToProgramDetails(program)
               }
               .weight(1f, fill = true),
         )
@@ -157,9 +155,11 @@ fun CurrentProgramCard(
         }
       }
 
-      Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = padding)) {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = padding)
+      ) {
         Column() {
           // TODO List Exercises
           //        Text("Workout Summary", style = bodySmall)
@@ -297,28 +297,18 @@ fun CurrentProgramCard(
       ) {
         Button(
           onClick = {
-            // TODO
-            navController.navigate(
-              "workoutScreen?workoutID=${workout.id.toHexString()}/copyWorkoutFromPreviousWorkout=${LoadingWorkout.LoadWorkoutFromActiveProgram.value}"
-            ) {
-              popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-              // Avoid multiple copies of the same destination when
-              // reselecting the same item
-              launchSingleTop = true
-              // Restore state when reselecting a previously selected item
-              restoreState = true
-            }
+            navigateToWorkout(
+              workout.id.toHexString(),
+              LoadingWorkout.LoadWorkoutFromActiveProgram.value
+            )
           }
         ) {
-          //        Text(text = "Start ${workout.name}")
+          // Text(text = "Start ${workout.name}")
           Text(text = "Start Workout")
         }
 
         IconButton(
-          onClick = { /*TODO*/
-            // TODO Navigate to Program's Workout Tab
-            navController.navigate("programDetails/${program.id.toHexString()}")
-          }
+          onClick = { navigateToProgramDetails(program) }
         ) {
           Icon(
             imageVector = Icons.AutoMirrored.Outlined.LibraryBooks,
