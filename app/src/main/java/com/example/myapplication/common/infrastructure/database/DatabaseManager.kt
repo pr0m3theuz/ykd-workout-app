@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
-import androidx.core.net.toUri
 import com.couchbase.lite.CouchbaseLite
 import com.couchbase.lite.Database
 import com.couchbase.lite.DatabaseConfigurationFactory
@@ -111,22 +110,40 @@ class DatabaseManager(private val context: Context) {
       // create indexes for database queries
 
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+      Log.e("DatabaseManager", "Error initializing database", e)
     }
   }
 
-  fun closeDatabases() {
+  fun closeDatabase() {
     try {
-      database?.close()
+      database?.let {
+        it.close()
+        database = null
+      }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+      Log.e("DatabaseManager", "Error closing database", e)
+    }
+  }
+
+  fun deleteDatabase() {
+    try {
+      database?.let {
+        it.delete()
+        database = null
+      } ?: run {
+        if (Database.exists(databaseName, context.filesDir)) {
+          Database.delete(databaseName, context.filesDir)
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("DatabaseManager", "Error deleting database", e)
     }
   }
 
   /*  //    private fun setupUserDatabase(dbConfig: DatabaseConfiguration) {
     //        // create the warehouse database if it doesn't already exist
     //        if (!Database.exists(warehouseDatabaseName, context.filesDir)) {
-    //            unzip(startingWarehouseFileName, File(context.filesDir.toString()))
+    //            unzip(startingwarehouseFileName, File(context.filesDir.toString()))
     //
     //            // copy the warehouse database to the project database
     //            // never open the database directly as this will cause issues
@@ -168,13 +185,47 @@ class DatabaseManager(private val context: Context) {
   fun importDatabase(sourceUri: Uri) {
     val filesDir = context.filesDir
     Log.i("DatabaseManager", "DatabaseManager.importDatabase()")
+    Log.i("DatabaseManager", "DatabaseManager.importDatabase() - source Uri: $sourceUri")
+    Log.i("DatabaseManager", "DatabaseManager.importDatabase() - source path: ${sourceUri.path}")
+    Log.d("DatabaseManager", "database exists: ${Database.exists(databaseName, context.filesDir)}")
 
     try {
+      closeDatabase()
+
+      deleteDatabase()
+
+      try {
+        database?.let {
+          it.close()
+          database = null
+        }
+      } catch (e: Exception) {
+        Log.e("DatabaseManager", "Error closing database", e)
+      }
+
+      try {
+        database?.let {
+          it.close()
+          it.delete()
+          database = null
+        } ?: run {
+          if (Database.exists(databaseName, context.filesDir)) {
+            Database.delete(databaseName, context.filesDir)
+          }
+        }
+      } catch (e: Exception) {
+        Log.e("DatabaseManager", "Error deleting database", e)
+      }
+
+
       val dbConfig = DatabaseConfigurationFactory.newConfig("$filesDir")
 
-      if (!Database.exists(databaseName, context.filesDir)) {
-        unzipFile(sourceUri, File("$filesDir"))
-      }
+//      if (!Database.exists(databaseName, context.filesDir)) {
+      unzipFile(sourceUri, File("$filesDir/imported"))
+//      }
+
+
+      Database.copy(File("$filesDir/imported/workouts.cblite2"), databaseName, dbConfig)
 
       database = Database(databaseName, dbConfig)
 
