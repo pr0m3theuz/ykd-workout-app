@@ -90,8 +90,10 @@ class ManageWorkoutUseCase(
   }
 
   fun copyWorkoutFromWorkoutTemplate(workoutTemplate: Workout): Workout {
+    // id & lazyListItemID need to be unique
     return workoutTemplate.copy(
       id = ObjectId(),
+      lazyListItemID = newLazyListItemID(),
       notes = workoutTemplate.notes, // .filter { it.pinned }.toMutableList(),
       dateCreated = Clock.System.now(),
       workoutStarted = Clock.System.now(),

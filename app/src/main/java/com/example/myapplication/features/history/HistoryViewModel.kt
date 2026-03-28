@@ -3,6 +3,7 @@
 package com.example.myapplication.features.history
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.common.domain.model.Exercise
@@ -13,6 +14,7 @@ import com.example.myapplication.common.domain.model.WorkoutItem
 import com.example.myapplication.common.infrastructure.persistence.CompletedWorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
+import com.example.myapplication.common.util.newLazyListItemID
 import com.example.myapplication.features.workout.ManageExercisesUseCase
 import com.example.myapplication.features.workout.ManageWorkoutUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -77,8 +79,24 @@ class HistoryViewModel(
   init {
     viewModelScope.launch {
       _workouts.update {
-        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded }
-          ?: emptyList()
+        val workouts = completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded } ?: emptyList()
+        if (workouts.isNotEmpty()) {
+          val duplicateLazyListItemIDs =
+            workouts.groupingBy { it.lazyListItemID }.eachCount()
+              .filter { it.value > 1 }.keys
+          Log.i(
+            "ExercisesViewModel",
+            "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}"
+          )
+
+          workouts.forEach {
+            if (it.lazyListItemID in duplicateLazyListItemIDs) {
+              it.lazyListItemID = newLazyListItemID()
+            }
+          }
+        }
+
+        workouts
       }
 
       val programsIDs = _workouts.value.map { it.programID }.distinct()
