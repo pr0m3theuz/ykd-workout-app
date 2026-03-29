@@ -12,15 +12,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -221,8 +224,23 @@ fun ExerciseSetLazyColumn(
   //    navController.popBackStack(Screens.Workout.route, inclusive = true)
   //  }
 
+  val listState = rememberLazyListState()
+
+  LaunchedEffect(workoutComponents.size) {
+    if (workoutComponents.isNotEmpty()) {
+      // We target the index of the last item in workoutComponents.
+      // Note: workoutNotes are at the top, so the index would actually be
+      // workoutNotes.size + workoutComponents.size - 1
+      val targetIndex = workoutNotes.size + workoutComponents.size - 1
+      if (targetIndex >= 0) {
+        listState.animateScrollToItem(targetIndex)
+      }
+    }
+  }
+
   LazyColumn(
-    modifier = Modifier.fillMaxWidth()
+    modifier = Modifier.fillMaxWidth(),
+    state = listState,
     //  verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
     items(
