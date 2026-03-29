@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,8 @@ import com.example.myapplication.common.ui.theme.MyApplicationTheme
 import com.example.myapplication.features.history.ui.HistoryLazyColumn
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.LifetimeStatsCard
 import com.example.myapplication.features.userProfileScreen.like.boostcamp.WeeklyReportCard
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @Composable
@@ -109,6 +112,9 @@ fun ProfileScreenV2(
   //  val userEmail = "TEMP@anon.anon"
 
   //  val user = UserProfile(ObjectId())
+
+  var isRefreshing by remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
 
   Scaffold(
     modifier = Modifier.imePadding(),
@@ -187,6 +193,14 @@ fun ProfileScreenV2(
                   workouts = emptyList(),
                   getExerciseByExerciseID = { exerciseID -> null },
                   navigateToWorkoutOverview = { navigateToWorkoutOverview(it) },
+                  onRefresh = {
+                    isRefreshing = true
+                    coroutineScope.launch {
+                      delay(1500)
+                      isRefreshing = false
+                    }
+                  },
+                  isRefreshing = isRefreshing
                 )
               },
             )

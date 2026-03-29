@@ -124,6 +124,31 @@ class HistoryViewModel(
     _workoutComponents.value = manageWorkoutUseCase.loadWorkoutItemsFromWorkout(workoutItems)
   }
 
+  fun refreshWorkouts() {
+    viewModelScope.launch {
+      _workouts.update {
+        val workouts = completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded } ?: emptyList()
+        if (workouts.isNotEmpty()) {
+          val duplicateLazyListItemIDs =
+            workouts.groupingBy { it.lazyListItemID }.eachCount()
+              .filter { it.value > 1 }.keys
+          Log.i(
+            "ExercisesViewModel",
+            "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}"
+          )
+
+          workouts.forEach {
+            if (it.lazyListItemID in duplicateLazyListItemIDs) {
+              it.lazyListItemID = newLazyListItemID()
+            }
+          }
+        }
+
+        workouts
+      }
+    }
+  }
+
   fun deleteWorkout(workout: Workout) {
     // TODO Add toast
     viewModelScope.launch {
@@ -137,9 +162,24 @@ class HistoryViewModel(
 
       // Update workouts list
       _workouts.update {
-        completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { workout ->
-          workout.workoutEnded
-        } ?: emptyList()
+        val workouts = completedWorkoutRepository.getCompletedWorkouts()?.sortedByDescending { it.workoutEnded } ?: emptyList()
+        if (workouts.isNotEmpty()) {
+          val duplicateLazyListItemIDs =
+            workouts.groupingBy { it.lazyListItemID }.eachCount()
+              .filter { it.value > 1 }.keys
+          Log.i(
+            "ExercisesViewModel",
+            "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}"
+          )
+
+          workouts.forEach {
+            if (it.lazyListItemID in duplicateLazyListItemIDs) {
+              it.lazyListItemID = newLazyListItemID()
+            }
+          }
+        }
+
+        workouts
       }
     }
   }

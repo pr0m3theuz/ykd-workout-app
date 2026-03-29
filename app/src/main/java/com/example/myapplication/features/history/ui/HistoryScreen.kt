@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateMap
@@ -51,7 +53,11 @@ import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.features.exercises.ui.NoHistoryTab
 import com.example.myapplication.features.history.HistoryViewModel
+import com.example.myapplication.features.history.ui.HistoryLazyColumn
 import com.example.myapplication.features.workout.ui.WorkoutSummaryCard
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -75,14 +81,14 @@ fun HistoryScreen(
 
   val (searchBarVisibility, setSearchBarVisibility) = remember { mutableStateOf(false) }
 
-
-
   var query by rememberSaveable { mutableStateOf("") }
   //  val programs by remember { mutableStateOf(relevantPrograms) }
   val dateRangePickerState = rememberDateRangePickerState()
 
   val levels = listOf("Beginner", "Intermediate", "Advanced")
 
+  var isRefreshing by remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
 
   val levelsMap = remember {
     levels.zip(List(levels.size, { false })).toMutableStateMap()
@@ -221,6 +227,15 @@ fun HistoryScreen(
                 historyViewModel.getExerciseByExerciseID(exerciseID)
               },
               navigateToWorkoutOverview = { navigateToWorkoutOverview(it) },
+              onRefresh = {
+                isRefreshing = true
+                coroutineScope.launch {
+                  delay(1500)
+                  isRefreshing = false
+                }
+                historyViewModel.refreshWorkouts()
+              },
+              isRefreshing = isRefreshing
             )
           } else {
             NoHistoryTab(text = "Perform your first workout!")
@@ -276,6 +291,8 @@ fun HistoryLazyColumn(
   userDefaultWeightUnit: String = "lbs",
   getExerciseByExerciseID: (exerciseID: ObjectId?) -> Exercise?,
   navigateToWorkoutOverview: (Workout) -> Unit,
+  isRefreshing: Boolean,
+  onRefresh: () -> Unit,
 ) {
   val defaultTimeZone = java.util.TimeZone.getDefault().toZoneId().toKotlinTimeZone()
 
@@ -293,44 +310,49 @@ fun HistoryLazyColumn(
   if (workouts.isEmpty()) {
     NoWorkoutsPerformed()
   } else {
-    LazyColumn(
-      contentPadding = PaddingValues(16.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
+    PullToRefreshBox(
+      isRefreshing = isRefreshing,
+      onRefresh = onRefresh,
     ) {
-      groupedWorkouts.forEach { (yearMonth, monthWorkouts) ->
-        stickyHeader {
-          Row(
-            modifier = Modifier
-              .background(MaterialTheme.colorScheme.background)
-              .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Text(
-              style = MaterialTheme.typography.titleMedium,
-              modifier = Modifier.padding(vertical = 16.dp),
-              text = "${yearMonth.month} ${yearMonth.year}",
-            )
-          }
-        }
-
-        items(
-          monthWorkouts.size,
-          key = { index: Int -> monthWorkouts[index].lazyListItemID }) { index ->
-          val workout = monthWorkouts[index]
-          Box(
-            modifier =
-              Modifier.clickable(
-                onClick = { navigateToWorkoutOverview(workout) },
-                enabled = true,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = LocalIndication.current,
+      LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        groupedWorkouts.forEach { (yearMonth, monthWorkouts) ->
+          stickyHeader {
+            Row(
+              modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text(
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(vertical = 16.dp),
+                text = "${yearMonth.month} ${yearMonth.year}",
               )
-          ) {
-            WorkoutSummaryCard(
-              completedWorkout = workout,
-              userDefaultWeightUnit = userDefaultWeightUnit,
-              getExercise = { exerciseID -> getExerciseByExerciseID(exerciseID) },
-            )
+            }
+          }
+
+          items(
+            monthWorkouts.size,
+            key = { index: Int -> monthWorkouts[index].lazyListItemID }) { index ->
+            val workout = monthWorkouts[index]
+            Box(
+              modifier =
+                Modifier.clickable(
+                  onClick = { navigateToWorkoutOverview(workout) },
+                  enabled = true,
+                  interactionSource = remember { MutableInteractionSource() },
+                  indication = LocalIndication.current,
+                )
+            ) {
+              WorkoutSummaryCard(
+                completedWorkout = workout,
+                userDefaultWeightUnit = userDefaultWeightUnit,
+                getExercise = { exerciseID -> getExerciseByExerciseID(exerciseID) },
+              )
+            }
           }
         }
       }
