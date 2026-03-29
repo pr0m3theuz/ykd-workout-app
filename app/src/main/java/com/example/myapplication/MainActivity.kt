@@ -1,22 +1,20 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalSerializationApi::class,
+@file:OptIn(
+  ExperimentalMaterialApi::class, ExperimentalSerializationApi::class,
   ExperimentalTime::class
 )
 
 package com.example.myapplication
 
 // import androidx.compose.foundation.gestures.ModifierLocalScrollableContainerProvider.value
-import android.app.Application
+//import com.newrelic.agent.android.NewRelic
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +32,6 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,8 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -116,7 +110,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.crashlytics.setCustomKeys
-//import com.newrelic.agent.android.NewRelic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -124,9 +117,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.bson.types.ObjectId
 import org.koin.android.ext.android.get
@@ -134,9 +124,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.java.KoinJavaComponent.inject
-import kotlin.time.Clock.System.now
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJavaInstant
 
 class MainActivity : ComponentActivity() {
 
@@ -177,7 +165,7 @@ class MainActivity : ComponentActivity() {
 //      .start(this.applicationContext)
 
     userProfileManager = inject<UserProfileManager>(UserProfileManager::class.java).value
-    Log.d("MainActivity", "MainActivity.onCreate(): userProfileManager: $userProfileManager")
+//     Log.d("MainActivity", "MainActivity.onCreate(): userProfileManager: $userProfileManager")
     Log.d(
       "MainActivity",
       "MainActivity.onCreate(): current user: ${userProfileManager.getCurrentUser()}"
@@ -229,7 +217,7 @@ class MainActivity : ComponentActivity() {
           // Optional: Log the entire back stack whenever the current entry changes
           // This can be verbose but very helpful for debugging popUpTo issues.
           navController.currentBackStack.collect { backStack ->
-            Log.d("BackStackFlow", "Current full back stack:")
+//             Log.d("BackStackFlow", "Current full back stack:")
             backStack.forEachIndexed { index, entry ->
               Log.d(
                 "BackStackFlow",
@@ -309,36 +297,36 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       val loadingWorkout =
         navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
-      Log.d("WorkoutNavGraph", "Workout Screen: workoutViewModel: $workoutViewModel")
+//       Log.d("WorkoutNavGraph", "Workout Screen: workoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
 
       LaunchedEffect(workoutID) {
-        Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
-        Log.d("WorkoutNavGraph", "workoutID: $workoutID")
+//         Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
+//         Log.d("WorkoutNavGraph", "workoutID: $workoutID")
         if (!workoutID.isNullOrBlank()) {
           when (loadingWorkout) {
             LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value -> {
-              Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
+//               Log.d("WorkoutScreen", "workoutID: $workoutID, calling getWorkoutByID()")
               workoutViewModel.getWorkoutByID(ObjectId(workoutID))
             }
 
             LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
-              Log.d("WorkoutScreen", "Copy Workout From Previous Workout. workoutID: $workoutID")
+//               Log.d("WorkoutScreen", "Copy Workout From Previous Workout. workoutID: $workoutID")
               workoutViewModel.copyWorkoutFromPreviousWorkout(ObjectId(workoutID))
             }
 
             LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
-              Log.d("WorkoutScreen", "Load Workout From Active Program. workoutID: $workoutID")
+//               Log.d("WorkoutScreen", "Load Workout From Active Program. workoutID: $workoutID")
               workoutViewModel.loadWorkoutFromActiveProgram(ObjectId(workoutID))
             }
 
             LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value -> {
-              Log.d("WorkoutScreen", "Workout Loaded From Workout Progression. workout: ${workoutViewModel.workout.value?.name}")
+//               Log.d("WorkoutScreen", "Workout Loaded From Workout Progression. workout: ${workoutViewModel.workout.value?.name}")
             }
 
             LoadingWorkout.CopyPreviousWorkoutToProgress.value -> {
-              Log.d("WorkoutScreen", "Copy Previous Workout To Progress. workoutID: $workoutID")
+//               Log.d("WorkoutScreen", "Copy Previous Workout To Progress. workoutID: $workoutID")
             }
 
             else -> {
@@ -382,31 +370,31 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       val loadingWorkout =
         navBackStackEntry.arguments?.getString("copyWorkoutFromPreviousWorkout")?.toInt()
-      Log.d("WorkoutNavGraph", "Workout Preview: workoutViewModel: $workoutViewModel")
+//       Log.d("WorkoutNavGraph", "Workout Preview: workoutViewModel: $workoutViewModel")
 
       val workoutID = navBackStackEntry.arguments?.getString("workoutID")
 
       LaunchedEffect(workoutID) {
-        Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
-        Log.d("WorkoutNavGraph", "workoutID: $workoutID")
+//         Log.d("WorkoutNavGraph", "LaunchedEffect launched!")
+//         Log.d("WorkoutNavGraph", "workoutID: $workoutID")
         if (!workoutID.isNullOrBlank()) {
           when (loadingWorkout) {
             LoadingWorkout.CopyWorkoutFromWorkoutTemplate.value -> {
-              Log.d("Workout Preview", "workoutID: $workoutID, calling getWorkoutByID()")
+//               Log.d("Workout Preview", "workoutID: $workoutID, calling getWorkoutByID()")
             }
 
             LoadingWorkout.CopyWorkoutFromPreviousWorkout.value -> {
-              Log.d("Workout Preview", "Copy Workout From Previous Workout. workoutID: $workoutID")
+//               Log.d("Workout Preview", "Copy Workout From Previous Workout. workoutID: $workoutID")
             }
 
             LoadingWorkout.LoadWorkoutFromActiveProgram.value -> {
-              Log.d("Workout Preview", "Load Workout From Active Program. workoutID: $workoutID")
+//               Log.d("Workout Preview", "Load Workout From Active Program. workoutID: $workoutID")
             }
 
             LoadingWorkout.WorkoutLoadedFromWorkoutProgression.value -> {}
 
             LoadingWorkout.CopyPreviousWorkoutToProgress.value -> {
-              Log.d("Workout Preview", "Copy Previous Workout To Progress. workoutID: $workoutID")
+//               Log.d("Workout Preview", "Copy Previous Workout To Progress. workoutID: $workoutID")
               workoutViewModel.copyPreviousWorkoutToProgress(ObjectId(workoutID))
             }
 
@@ -449,9 +437,6 @@ private fun NavGraphBuilder.addWorkoutGraph(
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
-          // TODO This is an anti-pattern
-          // https://developer.android.com/guide/navigation/use-graph/navigate
-          navController = navController,
           workoutID = workoutID,
           workoutViewModel = workoutViewModel,
           currentDestination = navController.currentBackStackEntry?.destination,
@@ -468,6 +453,16 @@ private fun NavGraphBuilder.addWorkoutGraph(
               restoreState = true
             }
           },
+          onClose = {
+            navController.navigate(Screens.Programs.baseRoute) {
+              popUpTo(navController.graph.findStartDestination().id)
+              launchSingleTop = true
+              restoreState = true
+            }
+          },
+          onNavigateToPreviewNextWorkout = { completedWorkoutID ->
+            navController.navigate("previewNextWorkout/${completedWorkoutID}")
+          }
         )
       }
     }
@@ -577,7 +572,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
-      Log.d("AddWarmUpSetsScreen", "exerciseSetsID: $exerciseSetsID")
+//       Log.d("AddWarmUpSetsScreen", "exerciseSetsID: $exerciseSetsID")
       AddWarmUpSetsScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
@@ -591,7 +586,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
-      Log.d("AddWorkingSetsScreen", "exerciseSetsID: $exerciseSetsID")
+//       Log.d("AddWorkingSetsScreen", "exerciseSetsID: $exerciseSetsID")
       AddWorkingSetsScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
@@ -605,7 +600,7 @@ private fun NavGraphBuilder.addWorkoutGraph(
         navBackStackEntry.sharedViewModel<WorkoutViewModel>(navController)
 
       val exerciseSetsID = navBackStackEntry.arguments?.getString("exerciseSetsID")
-      Log.d("EquateVolumeScreen", "exerciseSetsID: $exerciseSetsID")
+//       Log.d("EquateVolumeScreen", "exerciseSetsID: $exerciseSetsID")
       EquateVolumeScreen(
         workoutViewModel = workoutViewModel,
         onNavigateBack = { navController.popBackStack() },
@@ -668,7 +663,6 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 
 
       ProgramsScreen(
-        navController = navController,
         programsViewModel = programsViewModel,
         currentDestination = navController.currentBackStackEntry?.destination,
         onNavigateBottomBar = { route ->
@@ -684,6 +678,35 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
             restoreState = true
           }
         },
+        navigateToProgramDetails = { program ->
+          navController.navigate(
+//          "programDetails/${program.id.toHexString()}"
+            "programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}" // TODO Causes crashes
+          )
+        },
+        navigateToNewWorkout = {
+          navController.navigate(Screens.Workout.baseRoute) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        },
+        navigateToActiveProgramDetails = { programID ->
+          navController.navigate("programDetails/${programID}/isProgramActive=true")
+        },
+        navigateToWorkout = { workoutID, loadWorkoutFromActiveProgram ->
+          navController.navigate("workoutScreen?workoutID=${workoutID}/copyWorkoutFromPreviousWorkout=${loadWorkoutFromActiveProgram}") {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        }
       )
     }
 
@@ -720,6 +743,43 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
       )
     }
 
+    composable(
+      "programDetails/{programID}/isProgramActive={isActive}",
+//      arguments = listOf(navArgument("programID") { type = NavType.StringType },
+//        navArgument("isActive") { type = NavType.StringType }),
+    ) { navBackStackEntry ->
+      val programsViewModel: ProgramsViewModel =
+        navBackStackEntry.sharedViewModel<ProgramsViewModel>(navController)
+
+      val programID = navBackStackEntry.arguments?.getString("programID")
+      val isProgramActive = navBackStackEntry.arguments?.getString("isActive")
+      requireNotNull(programID) { "programID is null" }
+      requireNotNull(isProgramActive) { "isActive is null" }
+
+      // TODO This is an anti-pattern
+      // https://developer.android.com/guide/navigation/use-graph/navigate
+      ProgramDetailsScreen(
+        navController = navController,
+        programsViewModel = programsViewModel,
+        _programID = programID,
+        currentDestination = navController.currentBackStackEntry?.destination,
+        onNavigateBottomBar = { route ->
+          navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        },
+      )
+    }
+
+
     composable("importWorkoutProgram") { ImportWorkoutProgramScreen(navController) }
   }
 }
@@ -729,7 +789,7 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
 private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController) {
   navigation(startDestination = "workoutSummary/workoutID/workoutCount", route = "workoutSummary") {
     composable("workoutSummary/workoutID/workoutCount") { navBackStackEntry ->
-      Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
+//       Log.d("WorkoutSummaryNavGraph", "Navigated to Workout Summary Screen")
 
       val workoutViewModel: WorkoutViewModel =
         koinViewModel(
@@ -743,7 +803,6 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
 
       if (workoutID != null && workoutsCount != null) {
         WorkoutSummaryScreen(
-          navController = navController,
           workoutID = workoutID,
           workoutViewModel = workoutViewModel,
           currentDestination = navController.currentBackStackEntry?.destination,
@@ -760,6 +819,16 @@ private fun NavGraphBuilder.addWorkoutSummaryGraph(navController: NavController)
               restoreState = true
             }
           },
+          onClose = {
+            navController.navigate(Screens.Programs.baseRoute) {
+              popUpTo(navController.graph.findStartDestination().id)
+              launchSingleTop = true
+              restoreState = true
+            }
+          },
+          onNavigateToPreviewNextWorkout = { completedWorkoutID ->
+            navController.navigate("previewNextWorkout/${completedWorkoutID}")
+          }
         )
       }
     }
@@ -774,7 +843,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 
   navigation("historyScreen", route = Screens.History.baseRoute) {
     composable("historyScreen") { navBackStackEntry ->
-      Log.d("HistoryNavGraph", "Navigated to History Screen")
+//       Log.d("HistoryNavGraph", "Navigated to History Screen")
 
       val historyViewModel: HistoryViewModel =
         navBackStackEntry.sharedViewModel<HistoryViewModel>(navController)
@@ -847,7 +916,7 @@ private fun NavGraphBuilder.addHistoryGraph(navController: NavController) {
 private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
   navigation("profileScreenV2", route = Screens.Profile.baseRoute) {
     composable("profileScreen") { navBackStackEntry ->
-      Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
+//       Log.d("ProfileNavGraph", "Navigated to User Profile Screen")
       val profileViewModel: ProfileViewModel =
         navBackStackEntry.sharedViewModel<ProfileViewModel>(navController)
 
@@ -1191,7 +1260,7 @@ private fun NavGraphBuilder.addProfileGraph(navController: NavController) {
 private fun NavGraphBuilder.addReplicatorGraph(navController: NavController) {
   navigation("replicatorScreen", route = Screens.Replicator.baseRoute) {
     composable("replicatorScreen") {
-      Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
+//       Log.d("ReplicatorNavGraph", "Navigated to Replicator Screen")
       ReplicatorView(
         viewModel = koinViewModel<ReplicatorViewModel>(),
         replicatorConfigNav = { navController.navigate("configScreen") },

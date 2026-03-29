@@ -272,7 +272,7 @@ constructor(
           updatedMap[event.equipment] = event.checked
           currentState.copy(equipmentsChecked = updatedMap)
         }
-        Log.i("ExercisesViewModel", "updateEquipmentsChecked(): ${uiState.value.equipmentsChecked}")
+//         Log.i("ExercisesViewModel", "updateEquipmentsChecked(): ${uiState.value.equipmentsChecked}")
       }
 
       is ExercisesUiEvent.SetMovementTypesChecked -> {
@@ -310,7 +310,7 @@ constructor(
         allExercises = list.sortedBy { exercise -> exercise.name }
 
         val duplicateLazyListItemIDs = _exercises.value.groupingBy { it.lazyListItemID }.eachCount().filter { it.value > 1 }.keys
-        Log.i("ExercisesViewModel", "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}")
+//         Log.i("ExercisesViewModel", "filterExercises()._exercises has duplicate lazyListItemID: ${duplicateLazyListItemIDs}")
 
         _exercises.value.forEach {
           if (it.lazyListItemID in duplicateLazyListItemIDs) {
@@ -477,7 +477,7 @@ constructor(
         selectedEquipments = _equipmentsChecked.value.filterValues { it }.keys.sortedBy { it.name })
 
     }
-
+// 
     Log.i("ExercisesViewModel", "updateEquipmentsChecked(): ${_equipmentsChecked.value}")
   }
 
@@ -541,12 +541,12 @@ constructor(
     */
 
     // Start with all exercises and apply filters sequentially
-
+// 
     Log.i("ExercisesViewModel", "filterExercises().selectedMuscleGroups: $selectedMuscleGroups")
-    Log.i("ExercisesViewModel", "filterExercises().selectedEquipments: $selectedEquipments")
+//     Log.i("ExercisesViewModel", "filterExercises().selectedEquipments: $selectedEquipments")
     //    Log.i("ExercisesViewModel", "filterExercises().selectedMovementTypes:
     // $selectedMovementTypes")
-    Log.i("ExercisesViewModel", "filterExercises()._searchExerciseName: $_searchExerciseName")
+//     Log.i("ExercisesViewModel", "filterExercises()._searchExerciseName: $_searchExerciseName")
 
     // TODO If _exercises is empty, display "No results" Message
     // TODO replace with _exercises.value.filter { exercise ->

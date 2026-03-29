@@ -55,7 +55,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
 
       collection.save(document)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -75,7 +75,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
 
       collection.save(document)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -89,7 +89,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
 
       collection.delete(document)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -111,7 +111,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
         withUnknownKeys.decodeFromString<UserProfile>(doc.toJSON())
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
       return null // Return null on error
     }
   }
@@ -139,7 +139,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       document.setString("plates", withUnknownKeys.encodeToString(platesList))
       collection.save(document)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -159,7 +159,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
         collection.save(document)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -181,7 +181,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       document.setString("barbells", withUnknownKeys.encodeToString(barbellsList))
       collection.save(document)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -201,7 +201,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
         collection.save(document)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -223,7 +223,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
       document.setString("collars", withUnknownKeys.encodeToString(collarsList))
       collection.save(document)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -243,7 +243,7 @@ class UserRepositoryImpl(private val databaseManager: DatabaseManager) : UserRep
         collection.save(document)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 }

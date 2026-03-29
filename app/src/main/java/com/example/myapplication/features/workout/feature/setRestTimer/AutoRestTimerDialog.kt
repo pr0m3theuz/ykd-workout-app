@@ -156,8 +156,8 @@ fun AutoRestTimerDialog(
         val restTime = windows[0].toInt().toDuration(DurationUnit.HOURS) +
             windows[1].toInt().toDuration(DurationUnit.MINUTES) +
             windows[2].toInt().toDuration(DurationUnit.SECONDS)
-        Log.i("setGoogleClockTimer() windows", windows.toList().toString())
-        Log.i("setGoogleClockTimer() restTime", restTime.toString())
+//         Log.i("setGoogleClockTimer() windows", windows.toList().toString())
+//         Log.i("setGoogleClockTimer() restTime", restTime.toString())
 
         return restTime
     }
@@ -174,10 +174,10 @@ fun AutoRestTimerDialog(
         if (timeString.length <= 3) {
             if ((input != "0") && (input != "00") && (timeString == "")) {
                 timeString = input
-                Log.i("setGoogleClockTimer().add() 0 && 00", timeString)
+//                 Log.i("setGoogleClockTimer().add() 0 && 00", timeString)
             } else if (timeString.isNotEmpty()) {
                 timeString += input
-                Log.i("setGoogleClockTimer().add() timeString.length >", timeString)
+//                 Log.i("setGoogleClockTimer().add() timeString.length >", timeString)
             }
         }
 //    TODO Figure out why value isn't changing
@@ -193,7 +193,7 @@ fun AutoRestTimerDialog(
     }
 
     fun remove() {
-        Log.i("setGoogleClockTimer().remove()", "Called")
+//         Log.i("setGoogleClockTimer().remove()", "Called")
         if (timeString.isNotEmpty()) {
 //            Log.i("GoogleClockTimer().remove() timeString.last()", timeString.last().toString())
             timeString = timeString.dropLast(1)
@@ -217,12 +217,12 @@ fun AutoRestTimerDialog(
         if (timeString.isEmpty()) {
             visible = false
         }
-
+// 
         Log.i("setGoogleClockTimer().removeAll()", timeString)
     }
-
+// 
     Log.i("setRestTimerDialog() tabRowState", tabRowState.toString())
-    Log.i("setRestTimerDialog() timeString", timeString)
+//     Log.i("setRestTimerDialog() timeString", timeString)
 
     //    TODO Doesn't change enable or disable. FIX!
     fun changeRestTimerStatus() {

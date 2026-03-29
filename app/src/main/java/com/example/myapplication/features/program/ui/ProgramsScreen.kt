@@ -73,10 +73,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.ui.component.BottomNavigationBar
-import com.example.myapplication.common.ui.component.Screens
 import com.example.myapplication.features.program.ProgramsViewModel
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -93,10 +91,13 @@ import kotlin.uuid.ExperimentalUuidApi
 // @Preview
 @Composable
 fun ProgramsScreen(
-  navController: NavController,
   programsViewModel: ProgramsViewModel,
   currentDestination: NavDestination? = null,
+  navigateToProgramDetails: (Program) -> Unit,
   onNavigateBottomBar: (route: String) -> Unit,
+  navigateToNewWorkout: () -> Unit,
+  navigateToActiveProgramDetails: (String) -> Unit,
+  navigateToWorkout: (String, Int) -> Unit = { _, _ -> },
 ) {
   val padding8 = 8.dp
   val titleMedium = MaterialTheme.typography.titleMedium
@@ -193,11 +194,7 @@ fun ProgramsScreen(
       searchResults = searchResults,
       authors = authorsMap.toMap(),
       levels = levelsMap.toMap(),
-      onResultClick = { program ->
-        navController.navigate(
-          "programDetails/${program.id.toHexString()}/isProgramActive=${program.isActive}"
-        )
-      },
+      onResultClick = { program -> navigateToProgramDetails(program) },
       onAuthorSelected = { author, isSelected -> selectAuthor(author, isSelected) },
       onLevelSelected = { level, isSelected -> selectLevel(level, isSelected) },
       onDismissRequest = { setSearchBarVisibility(false) },
@@ -251,17 +248,7 @@ fun ProgramsScreen(
         item {
           Text("Quick Start", style = titleMedium, modifier = Modifier.padding(top = 16.dp))
           Button(
-            onClick = {
-              // TODO Navigate to Workout Screen
-              navController.navigate(Screens.Workout.baseRoute) {
-                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                // Avoid multiple copies of the same destination when
-                // reselecting the same item
-                launchSingleTop = true
-                // Restore state when reselecting a previously selected item
-                restoreState = true
-              }
-            }
+            onClick = { navigateToNewWorkout() }
           ) {
             Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
             Text(text = "Start An Empty Workout")
@@ -314,15 +301,27 @@ fun ProgramsScreen(
                       .collectAsState(initial = emptyList())
                   if (currentlyActiveWorkout.value.isNotEmpty()) {
                     currentlyActiveWorkout.value.forEach {
-                      ActiveWorkoutCard(navController, it, programsViewModel = programsViewModel)
+                      ActiveWorkoutCard(
+                        workout = it, programsViewModel = programsViewModel,
+                        navigateToActiveProgramDetails = { programID ->
+                          navigateToActiveProgramDetails(programID)
+                        },
+                        navigateToPausedWorkout = { programID, workoutID ->
+                          navigateToWorkout(programID, workoutID)
+                        })
                     }
                   }
                   if (nextWorkout != null) {
                     CurrentProgramCard(
-                      navController,
                       program,
                       nextWorkout,
                       programsViewModel = programsViewModel,
+                      navigateToProgramDetails = { program ->
+                        navigateToProgramDetails(program)
+                      },
+                      navigateToWorkout = { programID, workoutID ->
+                        navigateToWorkout(programID, workoutID)
+                      }
                     )
                   } else {
                     Text(
@@ -346,11 +345,13 @@ fun ProgramsScreen(
               val primary = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
               val color =
                 if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
-              Box(modifier = Modifier
-                .padding(2.dp)
-                .clip(CircleShape)
-                .background(color)
-                .size(8.dp))
+              Box(
+                modifier = Modifier
+                  .padding(2.dp)
+                  .clip(CircleShape)
+                  .background(color)
+                  .size(8.dp)
+              )
             }
           }
         }
@@ -440,9 +441,7 @@ fun ProgramsScreen(
               ProgramCard(
                 program = program,
                 onNavigate = {
-                  navController.navigate(
-                    "programDetails/${program.id.toHexString()}"
-                  )
+                  navigateToProgramDetails(program)
                 },
                 programDetailsOptionsDropdownMenu = {
                   ProgramDetailsOptionsDropdownMenu(
@@ -599,9 +598,11 @@ fun WorkoutCard() {
         }
       }
     }
-    Row(modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 16.dp, bottom = padding)) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 16.dp, bottom = padding)
+    ) {
       Column() {
         // TODO List Exercises
         Text("Workout Summary", style = MaterialTheme.typography.bodySmall)

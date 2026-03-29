@@ -90,7 +90,7 @@ fun EditProfileScreen(
       // Callback is invoked after the user selects a media item or closes the
       // photo picker.
       if (uri != null) {
-        Log.d("PhotoPicker", "Selected URI: $uri")
+//         Log.d("PhotoPicker", "Selected URI: $uri")
         imageUri.value = uri
 
         val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -99,7 +99,7 @@ fun EditProfileScreen(
         // TODO save the selected image URI or image bitmap to app data
         //   Potentially: profileViewModel.updateProfilePicture(uri)
       } else {
-        Log.d("PhotoPicker", "No media selected")
+//         Log.d("PhotoPicker", "No media selected")
       }
     }
 
@@ -158,7 +158,7 @@ fun EditProfileScreen(
 
         Box {
           Firebase.crashlytics.log("EditProfileScreen.imageUri: ${imageUri.value.toString()}")
-          Log.e("EditProfileScreen", "imageUri: ${imageUri.value.toString()}")
+//           Log.e("EditProfileScreen", "imageUri: ${imageUri.value.toString()}")
 
           imageUri.value?.let {
             try {
@@ -178,9 +178,9 @@ fun EditProfileScreen(
               // Handle exception
             }
           }
-
+// 
           Log.i("EditProfileScreen", "imageFile: $image")
-          Log.i("EditProfileScreen", "imageFile exists: ${image}")
+//           Log.i("EditProfileScreen", "imageFile exists: ${image}")
           when {
             image != null -> {
               Image(

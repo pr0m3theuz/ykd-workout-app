@@ -67,6 +67,18 @@ fun WorkoutScreen(
     workoutViewModel = workoutViewModel,
     currentDestination = currentDestination,
     onNavigateBottomBar = onNavigateBottomBar,
+    onNavigateToWorkoutSummary = { thisWorkoutID, workoutsCount ->
+      navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount") {
+        val route = navController.currentBackStackEntry?.destination?.route
+        route?.let {
+          popUpTo(it)
+          {
+            inclusive = true
+          }
+        }
+      }
+    },
+    onNavigateUp = { navController.navigateUp() },
   )
 }
 
@@ -79,6 +91,8 @@ fun WorkoutContent(
   workoutViewModel: WorkoutViewModel,
   currentDestination: NavDestination? = null,
   onNavigateBottomBar: (route: String) -> Unit,
+  onNavigateUp: () -> Unit,
+  onNavigateToWorkoutSummary: (completedWorkoutID: String, workoutsCount: Int) -> Unit,
 ) {
   val workout by workoutViewModel.workout.collectAsState()
 
@@ -90,17 +104,9 @@ fun WorkoutContent(
     //    val workoutSerialized = Json.encodeToString(workoutViewModel.completedWorkout)
     val thisWorkoutID = workoutViewModel.workout.value?.id?.toHexString()
     val workoutsCount = workoutViewModel.getWorkoutsCount()
-
+// 
     Log.i("navigateToWorkoutSummaryScreen()", "workoutCount: $workoutsCount")
-    navController.navigate("workoutSummary/$thisWorkoutID/$workoutsCount") {
-      val route = navController.currentBackStackEntry?.destination?.route
-      route?.let {
-        popUpTo(it)
-        {
-          inclusive = true
-        }
-      }
-    }
+    thisWorkoutID?.let { onNavigateToWorkoutSummary(it, workoutsCount) }
   }
 
   //  if (openFinishWorkoutDialog) {
@@ -126,8 +132,8 @@ fun WorkoutContent(
 
   fun openFinishWorkoutDialog() {
     val (countSetsCompleted, countSets) = workoutViewModel.checkAllSetsComplete()
-    Log.i("openFinishWorkoutDialog()", "countSetsCompleted: $countSetsCompleted")
-    Log.i("openFinishWorkoutDialog()", "countSets: $countSets")
+//     Log.i("openFinishWorkoutDialog()", "countSetsCompleted: $countSetsCompleted")
+//     Log.i("openFinishWorkoutDialog()", "countSets: $countSets")
     when (countSetsCompleted) {
       0 -> openCancelWorkoutDialog.value = true
       countSets -> openFinishWorkoutDialog.value = true
@@ -158,7 +164,7 @@ fun WorkoutContent(
       cancelWorkout = {
         closeDiscardWorkoutDialog()
         workoutViewModel.cancelWorkout()
-        navController.navigateUp()
+        onNavigateUp()
       },
     )
   }
@@ -186,7 +192,7 @@ fun WorkoutContent(
 
   BackHandler(enabled = true) {
     if (exercisesSets.isEmpty() && isWorkoutCountUpTimerPaused) {
-      navController.navigateUp()
+      onNavigateUp()
     } else {
       openFinishWorkoutDialog()
     }

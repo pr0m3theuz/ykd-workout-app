@@ -90,7 +90,7 @@ class ProgramsRepositoryImpl(
       query.execute()
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -108,7 +108,7 @@ class ProgramsRepositoryImpl(
           programs.add(program) // 6
         }
       } catch (e: Exception) {
-        Log.e(e.message, e.stackTraceToString())
+//         Log.e(e.message, e.stackTraceToString())
         return programs
       }
     }
@@ -239,7 +239,7 @@ class ProgramsRepositoryImpl(
 
       return program
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -343,7 +343,7 @@ class ProgramsRepositoryImpl(
 
       return program
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -375,7 +375,7 @@ class ProgramsRepositoryImpl(
       query.execute()
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return flow {}
   }
@@ -401,7 +401,7 @@ class ProgramsRepositoryImpl(
 
       return result?.let { withUnknownKeys.decodeFromString<Boolean>(result.toString()) } ?: false
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return false
@@ -428,7 +428,7 @@ class ProgramsRepositoryImpl(
 
       return result?.let { withUnknownKeys.decodeFromString<Boolean>(result.toString()) } ?: false
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return false
@@ -581,7 +581,7 @@ class ProgramsRepositoryImpl(
 
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -601,7 +601,7 @@ class ProgramsRepositoryImpl(
       //      collection.save(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -626,7 +626,7 @@ class ProgramsRepositoryImpl(
         return true
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -647,7 +647,7 @@ class ProgramsRepositoryImpl(
       collection.delete(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -694,8 +694,8 @@ class ProgramsRepositoryImpl(
 //          val document = completedProgramsCollection.getDocument("CompletedProgram:${program.id}")
           val document = completedProgramsCollection.getDocument("Program:${program.id}")
           requireNotNull(document) { "Program Repository: Program does not exist!" }
-          Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "program: $program")
-          Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "deleted document: $document")
+//           Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "program: $program")
+//           Log.i("ProgramRepositoryImpl.deleteActiveProgram()", "deleted document: $document")
           completedProgramsCollection.delete(document)
         }
       )
@@ -752,7 +752,7 @@ class ProgramsRepositoryImpl(
 
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -782,7 +782,7 @@ class ProgramsRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -809,7 +809,7 @@ class ProgramsRepositoryImpl(
         withUnknownKeys.decodeFromString<MesocycleDao>(result.toString()).Mesocycle
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -840,7 +840,7 @@ class ProgramsRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -861,7 +861,7 @@ class ProgramsRepositoryImpl(
       collection.save(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -880,7 +880,7 @@ class ProgramsRepositoryImpl(
       collection.save(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -898,7 +898,7 @@ class ProgramsRepositoryImpl(
       collection.delete(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -926,7 +926,7 @@ class ProgramsRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -951,7 +951,7 @@ class ProgramsRepositoryImpl(
         withUnknownKeys.decodeFromString<MicrocycleDao>(result.toString()).Microcycle
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -983,7 +983,7 @@ class ProgramsRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -1013,7 +1013,7 @@ class ProgramsRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -1037,7 +1037,7 @@ class ProgramsRepositoryImpl(
       collection.save(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -1056,7 +1056,7 @@ class ProgramsRepositoryImpl(
       collection.save(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -1074,7 +1074,7 @@ class ProgramsRepositoryImpl(
       collection.delete(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -1158,7 +1158,7 @@ class ProgramsRepositoryImpl(
       )
       return workout
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null

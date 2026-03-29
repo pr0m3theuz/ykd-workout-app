@@ -34,9 +34,9 @@ class ReplicatorViewModel(
 
   fun onStopClick() {
     viewModelScope.launch(Dispatchers.IO) {
-      Log.i("ReplicatorChange", "INFORMATION:: Stopping Replication...")
+//       Log.i("ReplicatorChange", "INFORMATION:: Stopping Replication...")
       replicatorService.stopReplication()
-      Log.i("ReplicatorChange", "INFORMATION:: Replication Service notified to stop...")
+//       Log.i("ReplicatorChange", "INFORMATION:: Replication Service notified to stop...")
     }
   }
 
@@ -46,55 +46,55 @@ class ReplicatorViewModel(
         ReplicationStatus.STOPPED,
         ReplicationStatus.IDlE,
         "" -> {
-
+// 
           Log.i("ReplicatorChange", "INFORMATION:: Starting Replication...")
           replicatorService.startReplication()
-
+// 
           Log.i("ReplicatorChange", "INFORMATION:: Getting Replication Change Flow...")
           replicatorFlow = replicatorService.getReplicatorChangeFlow()
           replicatorFlow?.let { flowChange ->
             viewModelScope.launch(Dispatchers.Main) {
-              Log.i("ReplicatorChange", "INFORMATION:: Collecting Replicator Changes")
+//               Log.i("ReplicatorChange", "INFORMATION:: Collecting Replicator Changes")
               flowChange.collect { replicatorChange ->
-                Log.i("ReplicatorChange", "INFORMATION:: Collecting Replication Change Flow...")
+//                 Log.i("ReplicatorChange", "INFORMATION:: Collecting Replication Change Flow...")
 
                 when (replicatorChange.status.activityLevel) {
                   ReplicatorActivityLevel.OFFLINE -> {
                     replicatorService.updateReplicationStatus(ReplicationStatus.OFFLINE)
-                    Log.i("ReplicatorChange", "INFORMATION:: returned Status OFFLINE...")
+//                     Log.i("ReplicatorChange", "INFORMATION:: returned Status OFFLINE...")
                   }
 
                   ReplicatorActivityLevel.IDLE -> {
                     replicatorService.updateReplicationStatus(ReplicationStatus.IDlE)
-                    Log.i("ReplicatorChange", "INFORMATION:: returned Status IDLE...")
+//                     Log.i("ReplicatorChange", "INFORMATION:: returned Status IDLE...")
                   }
 
                   ReplicatorActivityLevel.STOPPED -> {
                     replicatorService.updateReplicationStatus(ReplicationStatus.STOPPED)
-                    Log.i("ReplicatorChange", "INFORMATION:: returned Status STOPPED...")
+//                     Log.i("ReplicatorChange", "INFORMATION:: returned Status STOPPED...")
                   }
 
                   ReplicatorActivityLevel.BUSY -> {
                     replicatorService.updateReplicationStatus(ReplicationStatus.BUSY)
-                    Log.i("ReplicatorChange", "INFORMATION:: returned Status BUSY...")
+//                     Log.i("ReplicatorChange", "INFORMATION:: returned Status BUSY...")
                   }
 
                   ReplicatorActivityLevel.CONNECTING -> {
                     replicatorService.updateReplicationStatus(ReplicationStatus.CONNECTING)
-                    Log.i("ReplicatorChange", "INFORMATION:: returned Status CONNECTING...")
+//                     Log.i("ReplicatorChange", "INFORMATION:: returned Status CONNECTING...")
                   }
                 }
                 replicatorChange.status.error?.let { error ->
-                  Log.i("ReplicatorChange", "ERROR:: ${error.code} - ${error.message}")
+//                   Log.i("ReplicatorChange", "ERROR:: ${error.code} - ${error.message}")
                 }
-                Log.i("ReplicatorChange", "INFORMATION:: Checking replication progress...")
+//                 Log.i("ReplicatorChange", "INFORMATION:: Checking replication progress...")
                 if (
                   replicatorChange.status.progress.completed ==
                   replicatorChange.status.progress.total ||
                   replicatorChange.status.progress.completed.toInt() == 0
                 ) {
                   replicationProgress.value = "Completed"
-                  Log.i("ReplicatorChange", "INFORMATION:: returned STATUS Completed...")
+//                   Log.i("ReplicatorChange", "INFORMATION:: returned STATUS Completed...")
                 } else {
                   replicationProgress.value =
                     "${replicatorChange.status.progress.total / replicatorChange.status.progress.completed}"
@@ -102,11 +102,11 @@ class ReplicatorViewModel(
               }
             }
           }
-          Log.i("ReplicatorChange", "INFORMATION:: Replication Started method completed...")
+//           Log.i("ReplicatorChange", "INFORMATION:: Replication Started method completed...")
         }
 
         else -> {
-          Log.i("ReplicatorChange", "INFORMATION:: Stopping replication...")
+//           Log.i("ReplicatorChange", "INFORMATION:: Stopping replication...")
           replicatorService.stopReplication()
         }
       }
@@ -151,7 +151,7 @@ class ReplicatorViewModel(
           selfSignedCert = selfSignedCertState.value,
         )
       try {
-        Log.i("ReplicatorViewModel.replicatorService", replicatorService.toString())
+//         Log.i("ReplicatorViewModel.replicatorService", replicatorService.toString())
 
         replicatorService.updateReplicationConfig(config)
 
@@ -162,7 +162,7 @@ class ReplicatorViewModel(
 
         val userProfile = userProfileManager.getCurrentUser()
         userProfile.endpointUrl = config.endpointUrl
-        Log.d("ReplicatorViewModel", "user profile endpointUrl: ${userProfile.endpointUrl}")
+//         Log.d("ReplicatorViewModel", "user profile endpointUrl: ${userProfile.endpointUrl}")
         userProfileManager.updateUserProfile(userProfile)
 
       } catch (e: Exception) {

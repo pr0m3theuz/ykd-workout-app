@@ -200,7 +200,7 @@ fun Workout.calculateTotalVolumeInPounds(): Double? {
       this.totalVolumeInPounds?.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
         ?: 0.0.plus(exerciseSets.totalVolumeInPounds ?: 0.0)
   }
-  Log.i("Workout.totalVolumeInPounds", "$totalVolumeInPounds")
+//   Log.i("Workout.totalVolumeInPounds", "$totalVolumeInPounds")
   return totalVolumeInPounds
 }
 
@@ -210,7 +210,7 @@ fun Workout.calculateTotalVolumeInKilograms(): Double? {
       totalVolumeInKilograms?.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
         ?: 0.0.plus(exerciseSets.totalVolumeInKilograms ?: 0.0)
   }
-  Log.i("Workout.totalVolumeInKilograms", "$totalVolumeInKilograms")
+//   Log.i("Workout.totalVolumeInKilograms", "$totalVolumeInKilograms")
   return totalVolumeInKilograms
 }*/
 

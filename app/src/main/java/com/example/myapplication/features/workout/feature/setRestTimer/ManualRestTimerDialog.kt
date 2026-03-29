@@ -94,10 +94,10 @@ fun ManualRestTimerDialog(
     if (timeString.length <= 3) {
       if ((input != "0") && (input != "00") && (timeString == "")) {
         timeString = input
-        Log.i("setGoogleClockTimer().add() 0 && 00", timeString)
+//         Log.i("setGoogleClockTimer().add() 0 && 00", timeString)
       } else if (timeString.isNotEmpty()) {
         timeString += input
-        Log.i("setGoogleClockTimer().add() timeString.length >", timeString)
+//         Log.i("setGoogleClockTimer().add() timeString.length >", timeString)
       }
     }
 
@@ -111,7 +111,7 @@ fun ManualRestTimerDialog(
   }
 
   fun remove() {
-    Log.i("setGoogleClockTimer().remove()", "Called")
+//     Log.i("setGoogleClockTimer().remove()", "Called")
     if (timeString.isNotEmpty()) {
       //            Log.i("GoogleClockTimer().remove() timeString.last()",
       // timeString.last().toString())
@@ -132,7 +132,7 @@ fun ManualRestTimerDialog(
     if (timeString.isEmpty()) {
       visible = false
     }
-
+// 
     Log.i("setGoogleClockTimer().removeAll()", timeString)
   }
 
@@ -143,8 +143,8 @@ fun ManualRestTimerDialog(
       windows[0].toInt().toDuration(DurationUnit.HOURS) +
         windows[1].toInt().toDuration(DurationUnit.MINUTES) +
         windows[2].toInt().toDuration(DurationUnit.SECONDS)
-    Log.i("setGoogleClockTimer() windows", windows.toList().toString())
-    Log.i("setGoogleClockTimer() restTime", restTime.toString())
+//     Log.i("setGoogleClockTimer() windows", windows.toList().toString())
+//     Log.i("setGoogleClockTimer() restTime", restTime.toString())
 
     return restTime
   }

@@ -135,7 +135,7 @@ constructor(
       _userProfile.value = userProfileManager.getCurrentUser()
       _defaultWeightUnit.value = userProfileManager.getCurrentUser().defaultWeightUnit
     } catch (exception: IOException) {
-      Log.e("ProfileViewModel", "Error updating rounding preference.", exception)
+//       Log.e("ProfileViewModel", "Error updating rounding preference.", exception)
       // Optionally, rethrow or handle as per specific app requirements
     }
   }
@@ -198,7 +198,7 @@ constructor(
     // 2. If profile exists, create a copy with updated intensity
     // 3. Call userRepository.updateCurrentUser(updatedProfile)
     // 4. Update _userProfile.value and any related StateFlow for intensity
-    Log.d("ProfileViewModel", "updateIntensity called with $newIntensity - NOT IMPLEMENTED")
+//     Log.d("ProfileViewModel", "updateIntensity called with $newIntensity - NOT IMPLEMENTED")
   }
 
   // Initialize with a default or empty UserProfile if needed, or load it
@@ -223,7 +223,7 @@ constructor(
         _plates.value = fetchedProfile.plates
         _barbells.value = fetchedProfile.barbells
         _collars.value = fetchedProfile.collars
-        Log.d("ProfileViewModel", "User profile loaded: ${fetchedProfile.name}")
+//         Log.d("ProfileViewModel", "User profile loaded: ${fetchedProfile.name}")
       }
     }
   }
@@ -276,7 +276,7 @@ constructor(
   fun addPlate(plate: Plate) {
     val currentUserId = _userProfile.value.id.toHexString()
     if (currentUserId == null) {
-      Log.e("ProfileViewModel", "Cannot add plate: User ID is null.")
+//       Log.e("ProfileViewModel", "Cannot add plate: User ID is null.")
       return
     }
     _userProfile.value.let { currentUserProfile -> }
@@ -285,9 +285,9 @@ constructor(
       try {
         userRepository.addPlate(currentUserId, plate)
         _plates.value = _plates.value + plate // Update local state
-        Log.d("ProfileViewModel", "Plate added successfully for user $currentUserId")
+//         Log.d("ProfileViewModel", "Plate added successfully for user $currentUserId")
       } catch (e: Exception) {
-        Log.e("ProfileViewModel", "Error adding plate for user $currentUserId: ${e.message}", e)
+//         Log.e("ProfileViewModel", "Error adding plate for user $currentUserId: ${e.message}", e)
         // Optionally, could try to refetch or revert local state
       }
     }
@@ -296,14 +296,14 @@ constructor(
   fun removePlate(plateId: String) {
     val currentUserId = _userProfile.value.id.toHexString()
     if (currentUserId == null) {
-      Log.e("ProfileViewModel", "Cannot remove plate: User ID is null.")
+//       Log.e("ProfileViewModel", "Cannot remove plate: User ID is null.")
       return
     }
     viewModelScope.launch {
       try {
         userRepository.removePlate(currentUserId, plateId)
         _plates.value = _plates.value.filterNot { it.id == plateId } // Update local state
-        Log.d("ProfileViewModel", "Plate removed successfully for user $currentUserId")
+//         Log.d("ProfileViewModel", "Plate removed successfully for user $currentUserId")
       } catch (e: Exception) {
         Log.e(
           "ProfileViewModel",
@@ -317,16 +317,16 @@ constructor(
   fun addBarbell(barbell: Barbell) {
     val currentUserId = _userProfile.value?.id?.toHexString()
     if (currentUserId == null) {
-      Log.e("ProfileViewModel", "Cannot add barbell: User ID is null.")
+//       Log.e("ProfileViewModel", "Cannot add barbell: User ID is null.")
       return
     }
     viewModelScope.launch {
       try {
         userRepository.addBarbell(currentUserId, barbell)
         _barbells.value = _barbells.value + barbell // Update local state
-        Log.d("ProfileViewModel", "Barbell added successfully for user $currentUserId")
+//         Log.d("ProfileViewModel", "Barbell added successfully for user $currentUserId")
       } catch (e: Exception) {
-        Log.e("ProfileViewModel", "Error adding barbell for user $currentUserId: ${e.message}", e)
+//         Log.e("ProfileViewModel", "Error adding barbell for user $currentUserId: ${e.message}", e)
       }
     }
   }
@@ -334,14 +334,14 @@ constructor(
   fun removeBarbell(barbellId: String) {
     val currentUserId = _userProfile.value?.id?.toHexString()
     if (currentUserId == null) {
-      Log.e("ProfileViewModel", "Cannot remove barbell: User ID is null.")
+//       Log.e("ProfileViewModel", "Cannot remove barbell: User ID is null.")
       return
     }
     viewModelScope.launch {
       try {
         userRepository.removeBarbell(currentUserId, barbellId)
         _barbells.value = _barbells.value.filterNot { it.id == barbellId } // Update local state
-        Log.d("ProfileViewModel", "Barbell removed successfully for user $currentUserId")
+//         Log.d("ProfileViewModel", "Barbell removed successfully for user $currentUserId")
       } catch (e: Exception) {
         Log.e(
           "ProfileViewModel",
@@ -355,16 +355,16 @@ constructor(
   fun addCollar(collar: Collar) {
     val currentUserId = _userProfile.value.id.toHexString()
     if (currentUserId == null) {
-      Log.e("ProfileViewModel", "Cannot add collar: User ID is null.")
+//       Log.e("ProfileViewModel", "Cannot add collar: User ID is null.")
       return
     }
     viewModelScope.launch {
       try {
         userRepository.addCollar(currentUserId, collar)
         _collars.value = _collars.value + collar // Update local state
-        Log.d("ProfileViewModel", "Collar added successfully for user $currentUserId")
+//         Log.d("ProfileViewModel", "Collar added successfully for user $currentUserId")
       } catch (e: Exception) {
-        Log.e("ProfileViewModel", "Error adding collar for user $currentUserId: ${e.message}", e)
+//         Log.e("ProfileViewModel", "Error adding collar for user $currentUserId: ${e.message}", e)
       }
     }
   }
@@ -372,14 +372,14 @@ constructor(
   fun removeCollar(collarId: String) {
     val currentUserId = _userProfile.value.id.toHexString()
     if (currentUserId == null) {
-      Log.e("ProfileViewModel", "Cannot remove collar: User ID is null.")
+//       Log.e("ProfileViewModel", "Cannot remove collar: User ID is null.")
       return
     }
     viewModelScope.launch {
       try {
         userRepository.removeCollar(currentUserId, collarId)
         _collars.value = _collars.value.filterNot { it.id == collarId } // Update local state
-        Log.d("ProfileViewModel", "Collar removed successfully for user $currentUserId")
+//         Log.d("ProfileViewModel", "Collar removed successfully for user $currentUserId")
       } catch (e: Exception) {
         Log.e(
           "ProfileViewModel",
@@ -443,7 +443,7 @@ constructor(
       //        .collect { result ->
       //        list = result.groupBy { it.muscle }.map { (muscle, data) -> muscle to data}
       //      }
-      Log.d("ProfileViewModel", "Muscle engagement data: $list")
+//       Log.d("ProfileViewModel", "Muscle engagement data: $list")
     }
     _analyticsUiState.update { it.copy(muscleEngagementDataIsLoading = false) }
     _analyticsUiState.update {
@@ -469,7 +469,7 @@ constructor(
         backupManager.importDatabase(sourceUri)
         _backupEvent.emit("Database imported successfully")
       } catch (e: Exception) {
-        Log.e("ProfileViewModel", "Error importing database", e)
+//         Log.e("ProfileViewModel", "Error importing database", e)
         _backupEvent.emit("Database import failed: ${e.message}")
       }
     }
@@ -481,7 +481,7 @@ constructor(
         backupManager.exportDatabase(destinationUri)
         _backupEvent.emit("Database exported successfully")
       } catch (e: Exception) {
-        Log.e("ProfileViewModel", "Error exporting database", e)
+//         Log.e("ProfileViewModel", "Error exporting database", e)
         _backupEvent.emit("Database export failed: ${e.message}")
       }
     }

@@ -143,7 +143,7 @@ class DatabaseManager(private val context: Context) {
   /*  //    private fun setupUserDatabase(dbConfig: DatabaseConfiguration) {
     //        // create the warehouse database if it doesn't already exist
     //        if (!Database.exists(warehouseDatabaseName, context.filesDir)) {
-    //            unzip(startingwarehouseFileName, File(context.filesDir.toString()))
+    //            unzip(startingWarehouseFileName, File(context.filesDir.toString()))
     //
     //            // copy the warehouse database to the project database
     //            // never open the database directly as this will cause issues

@@ -47,11 +47,11 @@ fun ChooseUnitsScreen(
   val scope = rememberCoroutineScope()
 
   val currentUser by profileViewModel.userProfile.collectAsState()
-  Log.i("ChooseUnitsScreen", "currentUser: $currentUser")
+//   Log.i("ChooseUnitsScreen", "currentUser: $currentUser")
 
   val radioOptions = MassUnit.entries.sortedBy { it.displayText }
   val (selectedOption, onOptionSelected) = remember { mutableStateOf(currentUser.defaultWeightUnit) }
-
+// 
   Log.i("ChooseUnitsScreen", "selectedOption: $selectedOption")
 
   Scaffold(

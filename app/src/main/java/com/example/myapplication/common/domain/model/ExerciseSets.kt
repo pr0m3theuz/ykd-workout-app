@@ -153,8 +153,7 @@ if (sets.isNotEmpty()) {
             )
         )
     }
-
-    Log.i("workoutViewModel.addSet()", "${sets.size}")
+//     Log.i("workoutViewModel.addSet()", "${sets.size}")
 }
 
 fun ExerciseSets.removeSet(uuid: RealmUUID) {
@@ -190,11 +189,11 @@ fun ExerciseExerciseSets.updateSetRIR(uuid: Uuid, newRIR: Double?) {
   sets.forEach { set ->
     if (set.uuid == uuid) {
       set.repetitionsInReserve = newRIR
-      Log.d("ExerciseExerciseSets", "updateSetRIR: $newRIR")
+//       Log.d("ExerciseExerciseSets", "updateSetRIR: $newRIR")
       println("updateSetRIR: ${set.repetitionsInReserve}")
       // TODO Why does this not work?
       newRIR?.let { set.ratePerceivedEffort = 10.0 - it }
-      Log.d("ExerciseExerciseSets", "updateSetRIR: ${set.ratePerceivedEffort}")
+//       Log.d("ExerciseExerciseSets", "updateSetRIR: ${set.ratePerceivedEffort}")
     }
   }
 }
@@ -204,10 +203,10 @@ fun ExerciseExerciseSets.updateSetRPE(uuid: Uuid, newRPE: Double?) {
   sets.forEach { set ->
     if (set.uuid == uuid) {
       set.ratePerceivedEffort = newRPE
-      Log.d("ExerciseExerciseSets", "updateSetRPE: $newRPE")
+//       Log.d("ExerciseExerciseSets", "updateSetRPE: $newRPE")
       newRPE?.let { set.repetitionsInReserve = 10.0 - it }
       // TODO Why does this not work?
-      Log.d("ExerciseExerciseSets", "updateSetRPE: ${set.repetitionsInReserve}")
+//       Log.d("ExerciseExerciseSets", "updateSetRPE: ${set.repetitionsInReserve}")
     }
   }
 }
@@ -259,11 +258,11 @@ fun ExerciseExerciseSets.addWarmUpSets(warmUpSets: List<Set>) {
         isPublic = this@addWarmUpSets.isPublic,
       )
     }
-  Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
+//   Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
 
   // 2. Combine the new warm-up sets and existing sets into a single list.
   val allSets = newWarmUpSets + this.sets
-  Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
+//   Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
 
   // 3. Create the final list by re-numbering every set based on its new index.
   val renumberedSets =
@@ -285,7 +284,7 @@ fun ExerciseExerciseSets.replaceWarmUpSets(warmUpSets: List<Set>) {
   // TODO Keep old target minimum & maximum reps and target 1RM
   val TAG = "ExerciseExerciseSets"
   // Log initial state
-  Log.d(TAG, "replaceWarmUpSets called. Replacing warm-up sets to ${this.sets.size} existing sets.")
+//   Log.d(TAG, "replaceWarmUpSets called. Replacing warm-up sets to ${this.sets.size} existing sets.")
 
   // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
   val newWarmUpSets =
@@ -317,16 +316,16 @@ fun ExerciseExerciseSets.replaceWarmUpSets(warmUpSets: List<Set>) {
         isPublic = this@replaceWarmUpSets.isPublic,
       )
     }
-  Log.d(TAG, "replaceWarmUpSets: set.id - ${newWarmUpSets.firstOrNull()?.id}.")
-  Log.d(
+//   Log.d(TAG, "replaceWarmUpSets: set.id - ${newWarmUpSets.firstOrNull()?.id}.")
+/*  Log.d(
     TAG,
     "replaceWarmUpSets: set.targetWeightPounds - ${newWarmUpSets.firstOrNull()?.targetWeightPounds}.",
-  )
-  Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
+  )*/
+//   Log.d(TAG, "Mapped ${newWarmUpSets.size} warm-up sets with new context IDs.")
 
   // 2. Combine the new warm-up sets and existing sets into a single list.
   val allSets = newWarmUpSets + this.sets.filter { it.setTypeID != WARM_UP_SET }
-  Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
+//   Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
 
   // 3. Create the final list by re-numbering every set based on its new index.
   val renumberedSets =
@@ -348,10 +347,10 @@ fun ExerciseExerciseSets.replaceWorkingSets(newSets: List<Set>) {
   // TODO Keep old target minimum & maximum reps and target 1RM
   val TAG = "ExerciseExerciseSets"
   // Log initial state
-  Log.d(
+/*  Log.d(
     TAG,
     "replaceWorkingSets called. Replacing warm-up sets to ${this.sets.size} existing sets.",
-  )
+  )*/
 
   // 1. Map the incoming warmUpSets to new Set objects with correct context IDs.
   val newWorkingSets =
@@ -383,16 +382,16 @@ fun ExerciseExerciseSets.replaceWorkingSets(newSets: List<Set>) {
         isPublic = this@replaceWorkingSets.isPublic,
       )
     }
-  Log.d(TAG, "replaceWorkingSets: set.id - ${newWorkingSets.firstOrNull()?.id}.")
+//   Log.d(TAG, "replaceWorkingSets: set.id - ${newWorkingSets.firstOrNull()?.id}.")
   Log.d(
     TAG,
     "replaceWorkingSets: set.targetWeightPounds - ${newWorkingSets.firstOrNull()?.targetWeightPounds}.",
   )
-  Log.d(TAG, "Mapped ${newWorkingSets.size} working sets with new context IDs.")
+//   Log.d(TAG, "Mapped ${newWorkingSets.size} working sets with new context IDs.")
 
   // 2. Combine the new warm-up sets and existing sets into a single list.
   val allSets = this.sets.filter { it.setTypeID == WARM_UP_SET } + newWorkingSets
-  Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
+//   Log.d(TAG, "Combined lists. Total sets to process: ${allSets.size}.")
 
   // 3. Create the final list by re-numbering every set based on its new index.
   val renumberedSets =

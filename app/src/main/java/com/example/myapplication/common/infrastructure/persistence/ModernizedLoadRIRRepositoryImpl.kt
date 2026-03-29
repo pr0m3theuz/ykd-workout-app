@@ -93,7 +93,7 @@ class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManag
         withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -132,7 +132,7 @@ class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManag
         withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -170,7 +170,7 @@ class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManag
         withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(it).ModernizedLoadRIR
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -196,7 +196,7 @@ class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManag
         withUnknownKeys.decodeFromString<LoadRepCapacityDao>(it).LoadRepCapacity
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -224,7 +224,7 @@ class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManag
       query.execute() // <4>
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -246,7 +246,7 @@ class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManag
 
       return result
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return emptyList()
@@ -297,7 +297,7 @@ class ModernizedLoadRIRRepositoryImpl(private val databaseManager: DatabaseManag
         withUnknownKeys.decodeFromString<ModernizedLoadRIRDao>(json).ModernizedLoadRIR
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }

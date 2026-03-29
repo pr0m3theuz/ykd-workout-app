@@ -96,7 +96,7 @@ class ExercisesRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -121,7 +121,7 @@ class ExercisesRepositoryImpl(
 
       return exercisesSetsCount
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return emptyMap()
@@ -137,7 +137,7 @@ class ExercisesRepositoryImpl(
         exercises.add(exercise) // 6
       }
     }
-    Log.i("ExercisesRepositoryImpl.mapQueryChangeToExercise()", exercises.firstOrNull().toString())
+//     Log.i("ExercisesRepositoryImpl.mapQueryChangeToExercise()", exercises.firstOrNull().toString())
     return exercises // 7
   }
 
@@ -269,7 +269,7 @@ class ExercisesRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -299,7 +299,7 @@ class ExercisesRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -328,7 +328,7 @@ class ExercisesRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -357,7 +357,7 @@ class ExercisesRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -387,7 +387,7 @@ class ExercisesRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -416,7 +416,7 @@ class ExercisesRepositoryImpl(
       query.execute() // <4>
       return flow // <5>
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -441,7 +441,7 @@ class ExercisesRepositoryImpl(
         }
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return result
@@ -492,7 +492,7 @@ class ExercisesRepositoryImpl(
 
       collection.save(mutableDoc)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -518,7 +518,7 @@ class ExercisesRepositoryImpl(
         }
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -550,7 +550,7 @@ class ExercisesRepositoryImpl(
             try {
               withUnknownKeys.decodeFromString<MuscleExerciseDao>(it.toJSON()).MuscleExercise
             } catch (e: Exception) {
-              Log.e(e.message, e.stackTraceToString())
+//               Log.e(e.message, e.stackTraceToString())
               null
             }
           }
@@ -575,7 +575,7 @@ class ExercisesRepositoryImpl(
         }
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return emptyList()
@@ -603,7 +603,7 @@ class ExercisesRepositoryImpl(
         }
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -651,7 +651,7 @@ class ExercisesRepositoryImpl(
 
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -667,7 +667,7 @@ class ExercisesRepositoryImpl(
         collection.save(it)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -685,7 +685,7 @@ class ExercisesRepositoryImpl(
         collection.save(it)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -703,7 +703,7 @@ class ExercisesRepositoryImpl(
         collection.save(it)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -718,7 +718,7 @@ class ExercisesRepositoryImpl(
         collection.save(it)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -735,7 +735,7 @@ class ExercisesRepositoryImpl(
         collection.save(it)
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -775,9 +775,9 @@ class ExercisesRepositoryImpl(
       // A real implementation might need more robust logic here depending on desired behavior
       val muscleCondition = " AND muscleGroupID IN $muscleGroupInClause" // Or omit if appropriate
       val equipmentCondition = " AND equipmentID IN $equipmentInClause" // Or omit if appropriate
-
+// 
       Log.i("ExercisesRepositoryImpl.filterExercises()", "muscleCondition: $muscleCondition")
-      Log.i("ExercisesRepositoryImpl.filterExercises()", "equipmentCondition: $equipmentCondition")
+//       Log.i("ExercisesRepositoryImpl.filterExercises()", "equipmentCondition: $equipmentCondition")
 
       val queryExpression =
         "SELECT *" +
@@ -788,7 +788,7 @@ class ExercisesRepositoryImpl(
                 equipmentCondition
       //              " AND muscleGroupID IN $muscleGroupIDs" +
       //              " AND equipmentID IN $equipmentIDs;"
-
+// 
       Log.i("ExercisesRepositoryImpl.filterExercises()", "queryExpression: $queryExpression")
 
       val sqlQuery = db.createQuery(queryExpression)
@@ -803,7 +803,7 @@ class ExercisesRepositoryImpl(
 
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -834,7 +834,7 @@ class ExercisesRepositoryImpl(
         }
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -881,7 +881,7 @@ class ExercisesRepositoryImpl(
             try {
               withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
             } catch (e: Exception) {
-              Log.e(e.message, e.stackTraceToString())
+//               Log.e(e.message, e.stackTraceToString())
               null
             }
           }
@@ -906,7 +906,7 @@ class ExercisesRepositoryImpl(
             try {
               withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it.toJSON()).CompletedWorkouts
             } catch (e: Exception) {
-              Log.e(e.message, e.stackTraceToString())
+//               Log.e(e.message, e.stackTraceToString())
               null
             }
           }
@@ -938,7 +938,7 @@ class ExercisesRepositoryImpl(
                   .decodeFromString<CompletedProgramsDao>(it.toJSON())
                   .CompletedPrograms
               } catch (e: Exception) {
-                Log.e(e.message, e.stackTraceToString())
+//                 Log.e(e.message, e.stackTraceToString())
                 null
               }
             }
@@ -946,7 +946,7 @@ class ExercisesRepositoryImpl(
 
       return Pair(completedPrograms, workoutSetsMap)
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }

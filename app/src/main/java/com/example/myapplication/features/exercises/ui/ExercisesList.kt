@@ -421,7 +421,7 @@ fun SelectedFiltersLazyRow(
     contentPadding = PaddingValues(0.dp),
   ) {
     items(items = musclesChecked) { muscleGroup ->
-      Log.i("SelectedFiltersLazyRow", "filter chip: ${muscleGroup.name}")
+//       Log.i("SelectedFiltersLazyRow", "filter chip: ${muscleGroup.name}")
       //      if (muscleGroupsChecked[muscleGroup] == true) {
       FilterChip(
         selected = muscleGroupsChecked[muscleGroup] == true,

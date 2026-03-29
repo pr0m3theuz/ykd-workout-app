@@ -86,7 +86,7 @@ fun ProfileScreenV2(
   val uiState by profileViewModel.analyticsUiState.collectAsStateWithLifecycle()
 
   val image = remember { mutableStateOf<ImageBitmap?>(null) }
-  Log.i("ProfileScreenV2", "user.imageUri: ${user.imageUri}")
+//   Log.i("ProfileScreenV2", "user.imageUri: ${user.imageUri}")
   user.imageUri?.toUri()?.apply {
     try {
       context.contentResolver.openFileDescriptor(this, "r").use { parcelFileDescriptor ->
@@ -95,7 +95,7 @@ fun ProfileScreenV2(
         }
       }
     } catch (e: Exception) {
-      Log.e("ProfileScreenV2", "Error loading image: ${e.message}")
+//       Log.e("ProfileScreenV2", "Error loading image: ${e.message}")
     }
   }
 

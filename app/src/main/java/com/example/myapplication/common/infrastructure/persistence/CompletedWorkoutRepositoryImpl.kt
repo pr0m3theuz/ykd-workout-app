@@ -131,7 +131,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return result?.let { withUnknownKeys.decodeFromString<CompletedSetsDao>(it).CompletedSets }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -182,7 +182,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
           val json = it.toJSON()
           withUnknownKeys.decodeFromString<CompletedSetsDao>(json).CompletedSets
         } catch (e: Exception) {
-          Log.e(e.message, e.stackTraceToString())
+//           Log.e(e.message, e.stackTraceToString())
           null
         }
       }
@@ -192,14 +192,14 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
           val json = it.toJSON()
           withUnknownKeys.decodeFromString<CompletedSetsDao>(json).CompletedSets
         } catch (e: Exception) {
-          Log.e(e.message, e.stackTraceToString())
+//           Log.e(e.message, e.stackTraceToString())
           null
         }
       }
 
       return normalSetResult
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return emptyList()
   }
@@ -231,7 +231,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return workoutCount
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return 0
   }
@@ -262,7 +262,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return emptyFlow()
@@ -311,7 +311,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
           try {
             withUnknownKeys.decodeFromString<CompletedSetsDao>(it.toJSON()).CompletedSets
           } catch (e: Exception) {
-            Log.e(e.message, e.stackTraceToString())
+//             Log.e(e.message, e.stackTraceToString())
             null
           }
         }
@@ -346,7 +346,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return workouts
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -412,7 +412,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return workout
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -448,7 +448,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
         withUnknownKeys.decodeFromString<CompletedWorkoutsDao>(it).CompletedWorkouts
       }
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -560,7 +560,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       // TODO Implement using https://aistudio.google.com/prompts/1jjNZH2UMm80XgZpwu8_qy9Mu1vekKtII
 
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
   }
 
@@ -607,7 +607,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -686,7 +686,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
         totalVolumeInKilograms,
       )
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -747,7 +747,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
         totalVolumeInKilograms,
       )
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return null
@@ -789,7 +789,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return totalVolume
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return emptyList()
@@ -813,7 +813,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       // Only count working sets & hard sets, i.e. sets with RIR <= 3
       val setsQuery =
         "SELECT * FROM `CompletedSets` WHERE dateCreated BETWEEN '$startDate' AND '$endDate' AND setTypeID != $WARM_UP_SET"
-
+// 
       Log.i("CompletedWorkoutRepositoryImpl.getWeeklyTotalSetsPerMuscle()", "Query: $setsQuery")
 
       val sets =
@@ -842,7 +842,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
             try {
               withUnknownKeys.decodeFromString<MuscleExerciseDao>(it.toJSON()).MuscleExercise
             } catch (e: Exception) {
-              Log.e(e.message, e.stackTraceToString())
+//               Log.e(e.message, e.stackTraceToString())
               null
             }
           }
@@ -883,7 +883,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return result
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return emptyList()
   }
@@ -905,7 +905,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
       // Only count working sets & hard sets, i.e. sets with RIR <= 3
       val setsQuery =
         "SELECT * FROM `CompletedSets` WHERE workoutID = '$workoutID' AND setTypeID != $WARM_UP_SET"
-
+// 
       Log.i("CompletedWorkoutRepositoryImpl.getWeeklyTotalSetsPerMuscle()", "Query: $setsQuery")
 
       val sets =
@@ -934,7 +934,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
             try {
               withUnknownKeys.decodeFromString<MuscleExerciseDao>(it.toJSON()).MuscleExercise
             } catch (e: Exception) {
-              Log.e(e.message, e.stackTraceToString())
+//               Log.e(e.message, e.stackTraceToString())
               null
             }
           }
@@ -975,7 +975,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return result
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return emptyList()
   }
@@ -1041,7 +1041,7 @@ class CompletedWorkoutRepositoryImpl(databaseManager: DatabaseManager) :
 
       return workoutWeekStreakMap.count()
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }

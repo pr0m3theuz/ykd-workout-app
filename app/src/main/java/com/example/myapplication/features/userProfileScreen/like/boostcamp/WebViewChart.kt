@@ -84,7 +84,7 @@ fun WebViewChart(
   val paperBGColor = MaterialTheme.colorScheme.surface.toRGBAString()
   val axesColor = MaterialTheme.colorScheme.onSurface.toRGBAString()
   val gridColor = MaterialTheme.colorScheme.outlineVariant.toRGBAString()
-
+// 
   Log.i("WebViewChart", "$chartDataJson")
 
   val context = LocalContext.current
@@ -112,7 +112,7 @@ fun WebViewChart(
                       "'$xMinAllowed', '$xMaxAllowed', $yMinAllowed, $yMaxAllowed, $staticPlot, " +
                       "'$color', '$fillColor', '$paperBGColor', " +
                       "'$paperBGColor', '$axesColor', '$gridColor')"
-
+// 
             Log.i("WebViewChart", "Initial WebView with new data. Script: $script")
 
             view?.evaluateJavascript(script, null)
@@ -147,7 +147,7 @@ fun WebViewChart(
       }
     },
     update = {
-      Log.i("WebViewChart", "Updating WebView with new data. ChartData: $chartDataJson")
+//       Log.i("WebViewChart", "Updating WebView with new data. ChartData: $chartDataJson")
 
       val baseFunctionName =
         when (chartType) {
@@ -158,7 +158,7 @@ fun WebViewChart(
         "$baseFunctionName($chartDataJson, '$xMinAllowed', '$xMaxAllowed', " +
                 "$yMinAllowed, $yMaxAllowed, $staticPlot, '$color', '$fillColor', " +
                 "'$paperBGColor', '$paperBGColor', '$axesColor', '$gridColor')"
-
+// 
       Log.i("WebViewChart", "Updating WebView with new data. Script: $script")
 
       webView.evaluateJavascript(script, null)
@@ -305,7 +305,7 @@ fun WebViewChart(
           }
           webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(message: ConsoleMessage): Boolean {
-              Log.d("WebViewChart", "${message.message()} -- From line " +
+//               Log.d("WebViewChart", "${message.message()} -- From line " +
                       "${message.lineNumber()} of ${message.sourceId()}")
               return true
             }

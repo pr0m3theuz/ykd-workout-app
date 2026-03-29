@@ -101,13 +101,13 @@ class FilterManager(private val allData: List<ModernizedLoadRIR>) {
               (newFilters.rpe == null || item.rpe == newFilters.rpe) &&
               (newFilters.repsPerformed == null || item.repsPerformed == newFilters.repsPerformed)
     }.map { it.relativeLoadPercent }.distinct().sorted()
-
+// 
 
     Log.i("FilterManager", "repCapacityOptions: $repCapacityOptions")
-    Log.i("FilterManager", "rirOptions: $rirOptions")
-    Log.i("FilterManager", "rpeOptions: $rpeOptions")
-    Log.i("FilterManager", "repsPerformedOptions: $repsPerformedOptions")
-    Log.i("FilterManager", "relativeLoadPercentOptions: $relativeLoadPercentOptions")
+//     Log.i("FilterManager", "rirOptions: $rirOptions")
+//     Log.i("FilterManager", "rpeOptions: $rpeOptions")
+//     Log.i("FilterManager", "repsPerformedOptions: $repsPerformedOptions")
+//     Log.i("FilterManager", "relativeLoadPercentOptions: $relativeLoadPercentOptions")
 
     return DropdownOptions(
       repCapacityOptions,

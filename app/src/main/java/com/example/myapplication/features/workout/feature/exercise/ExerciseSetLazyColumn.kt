@@ -261,8 +261,8 @@ fun ExerciseSetLazyColumn(
         "exSetsLazyListItemID: ${exerciseSets.exercise?.name}:
         $ { exerciseSets.exSetsLazyListItemID }"
       )
-      Log.i("ExerciseSetLazyColumn", "${exerciseSets.notes}")
-      Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
+//       Log.i("ExerciseSetLazyColumn", "${exerciseSets.notes}")
+//       Log.i("ExerciseSetLazyColumn", "${exerciseSets.sets}")
       */
 
       when (component) {

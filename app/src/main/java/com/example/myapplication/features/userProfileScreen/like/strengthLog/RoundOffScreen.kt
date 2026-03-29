@@ -70,7 +70,7 @@ fun RoundOffScreen(
   val radioOptions = RoundingOption.entries
 
   val currentUser by profileViewModel.userProfile.collectAsState()
-  Log.i("RoundOffScreen", "currentUser: $currentUser")
+//   Log.i("RoundOffScreen", "currentUser: $currentUser")
 
   val currentRoundingPreference by profileViewModel.getRoundingPreference().collectAsState(
     RoundingOption.fromImperial(currentUser.roundingPreferencePounds)
@@ -80,7 +80,7 @@ fun RoundOffScreen(
   val (selectedOption, onOptionSelected) = remember(currentRoundingPreference) {
     mutableStateOf(currentRoundingPreference ?: RoundingOption.ROUND_TO_NEAREST_5_LB)
   }
-
+// 
   Log.i("RoundOffScreen", "selectedOption: $selectedOption lbs")
 
   Scaffold(

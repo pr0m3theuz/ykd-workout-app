@@ -194,7 +194,7 @@ constructor(
   fun getMicrocyclesByProgram(programID: ObjectId) /*: List<Microcycle>*/ {
     TODO("Implement getMicrocyclesByProgram")
     //        var microcycles = emptyList<Microcycle>()
-    Log.i("getMicrocyclesByProgram", "programID: $programID")
+//     Log.i("getMicrocyclesByProgram", "programID: $programID")
     viewModelScope.launch {
       programsRepository.getMicrocyclesByProgram(programID).collect() { microcycleList ->
         _selectedProgramMicrocycles.value =

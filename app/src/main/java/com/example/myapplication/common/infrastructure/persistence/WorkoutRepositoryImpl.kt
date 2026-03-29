@@ -87,7 +87,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       return workout
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -132,7 +132,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 //      }
 
     } catch (e: Exception) {
-      Log.e(e.message, "microcycleID: $microcycleID\n${e.stackTraceToString()}")
+//       Log.e(e.message, "microcycleID: $microcycleID\n${e.stackTraceToString()}")
     }
     return workouts.toList()
   }
@@ -155,7 +155,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       // TODO
 
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return workouts.toList()
   }
@@ -184,7 +184,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 //      collection.save(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -207,7 +207,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -225,7 +225,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       collection.delete(document)
       return true
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return false
   }
@@ -254,7 +254,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       query.execute()
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -301,7 +301,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       query.execute()
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -360,7 +360,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       query.execute()
       return flow
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
 
     return flow {}
@@ -425,7 +425,7 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       val results = query.execute().allResults()
       // TODO return results
     } catch (e: Exception) {
-      Log.e(e.message, e.stackTraceToString())
+//       Log.e(e.message, e.stackTraceToString())
     }
     return null
   }
@@ -494,13 +494,13 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       val nextWorkout = query.execute().use { resultSet ->
         resultSet.firstOrNull()?.toJSON()?.let { result ->
-          Log.d(TAG, "Parsing workout JSON for order $nextDay: $result")
+//           Log.d(TAG, "Parsing workout JSON for order $nextDay: $result")
           withUnknownKeys.decodeFromString<WorkoutDao>(result).Workout
         }
       }
 
       if (nextWorkout != null) {
-        Log.d(TAG, "Found next workout (order $nextDay): ${nextWorkout.id}")
+//         Log.d(TAG, "Found next workout (order $nextDay): ${nextWorkout.id}")
         return nextWorkout
       } else {
         // If no workout with the next order number exists, we are at the end of the program
@@ -512,15 +512,15 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       }
     } catch (e: IllegalStateException) {
       // Catch specific exceptions from requireNotNull or collection checks
-      Log.e(TAG, "Precondition failed: ${e.message}", e)
+//       Log.e(TAG, "Precondition failed: ${e.message}", e)
       return null
     } catch (cblExc: com.couchbase.lite.CouchbaseLiteException) {
       // Catch Couchbase Lite specific errors
-      Log.e(TAG, "Couchbase Lite error during query: ${cblExc.message}", cblExc)
+//       Log.e(TAG, "Couchbase Lite error during query: ${cblExc.message}", cblExc)
       return null
     } catch (e: Exception) {
       // General catch block
-      Log.e(TAG, "An unexpected error occurred: ${e.message}", e)
+//       Log.e(TAG, "An unexpected error occurred: ${e.message}", e)
       return null
     }
   }
@@ -552,13 +552,13 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
 
       val nextWorkout = query.execute().use { resultSet ->
         resultSet.firstOrNull()?.toJSON()?.let { result ->
-          Log.d(TAG, "Parsing workout JSON for order $currentWorkoutOrder: $result")
+//           Log.d(TAG, "Parsing workout JSON for order $currentWorkoutOrder: $result")
           withUnknownKeys.decodeFromString<WorkoutDao>(result).Workout
         }
       }
 
       if (nextWorkout != null) {
-        Log.d(TAG, "Found next workout (order ${nextWorkout.day}): ${nextWorkout.id}")
+//         Log.d(TAG, "Found next workout (order ${nextWorkout.day}): ${nextWorkout.id}")
         return nextWorkout
       } else {
         // If no workout with the next order number exists, we are at the end of the program
@@ -570,15 +570,15 @@ class WorkoutRepositoryImpl(private val databaseManager: DatabaseManager) : Work
       }
     } catch (e: IllegalStateException) {
       // Catch specific exceptions from requireNotNull or collection checks
-      Log.e(TAG, "Precondition failed: ${e.message}", e)
+//       Log.e(TAG, "Precondition failed: ${e.message}", e)
       return null
     } catch (cblExc: com.couchbase.lite.CouchbaseLiteException) {
       // Catch Couchbase Lite specific errors
-      Log.e(TAG, "Couchbase Lite error during query: ${cblExc.message}", cblExc)
+//       Log.e(TAG, "Couchbase Lite error during query: ${cblExc.message}", cblExc)
       return null
     } catch (e: Exception) {
       // General catch block
-      Log.e(TAG, "An unexpected error occurred: ${e.message}", e)
+//       Log.e(TAG, "An unexpected error occurred: ${e.message}", e)
       return null
     }
   }
