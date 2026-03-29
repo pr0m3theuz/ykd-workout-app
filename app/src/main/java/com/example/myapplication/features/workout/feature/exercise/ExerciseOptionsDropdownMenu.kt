@@ -147,6 +147,11 @@ fun ExerciseOptionsDropdownMenu(
 //          openReplaceExerciseDialog = true
         }
       )
+
+      DropdownMenuItem(
+        text = { Text("Clear Fields") },
+        onClick = { workoutViewModel.clearExerciseSetsFields(exerciseSets) }
+      )
       HorizontalDivider()
       DropdownMenuItem(
         text = { Text("Auto Rest Timer") },

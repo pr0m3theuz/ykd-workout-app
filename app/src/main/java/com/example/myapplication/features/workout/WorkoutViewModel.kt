@@ -2072,8 +2072,46 @@ class WorkoutViewModel(
       }
     }
 
+    setWorkoutComponents(newWorkoutComponents)
+  }
 
+  fun clearExerciseSetsFields(exerciseSets: ExerciseExerciseSets) {
 
+    val newWorkoutComponents = _workoutComponents.map { workoutComponent ->
+      when (workoutComponent) {
+        is ExerciseExerciseSets -> {
+          if (workoutComponent.id == exerciseSets.id) {
+            workoutComponent.sets.forEach { set ->
+              set.lazyListItemID = newLazyListItemID()
+              set.weightKilograms = null
+              set.weightPounds = null
+              set.repetitions = null
+              set.ratePerceivedEffort = null
+              set.repetitionsInReserve = null
+            }
+          }
+          workoutComponent.copy(lazyListItemID = newLazyListItemID())
+        }
+
+        is SupersetExercisesSets -> {
+          workoutComponent.exercisesSets.forEach { exerciseSets ->
+            if (workoutComponent.id == exerciseSets.id) {
+              exerciseSets.sets.forEach { set ->
+                set.lazyListItemID = newLazyListItemID()
+                set.weightKilograms = null
+                set.weightPounds = null
+                set.repetitions = null
+                set.ratePerceivedEffort = null
+                set.repetitionsInReserve = null
+              }
+            }
+          }
+          workoutComponent.copy(
+            lazyListItemID = newLazyListItemID(),
+            exercisesSets = workoutComponent.exercisesSets.map { it.copy(lazyListItemID = newLazyListItemID()) })
+        }
+      }
+    }
     setWorkoutComponents(newWorkoutComponents)
   }
 
