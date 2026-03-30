@@ -27,11 +27,12 @@ class WorkoutDatastore(private val context: Context) {
         }
 
     suspend fun saveActiveWorkout(activeWorkout: ActiveWorkout) {
-        context.activeWorkoutStore.updateData { currentSettings ->
+        context.activeWorkoutStore.updateData { savedWorkout ->
             // currentSettings is the current ActiveWorkout object stored in DataStore
             // You merge the new activeWorkout with the current one or simply replace it
             // For simplicity, this example replaces the current settings with the new one.
-            activeWorkout 
+            activeWorkout
+//            savedWorkout
         }
     }
     

@@ -116,11 +116,11 @@ class WorkoutViewModel(
   private val exerciseRepository: ExercisesRepository,
   private val workoutDatastore: WorkoutDatastore, // Added WorkoutDatastore
   private val savedStateHandle: SavedStateHandle,
-  private val userProfileManager: UserProfileManager,
+  private val userProfileManager: UserProfileManager
 ) : ViewModel() {
 
   // region User Profile
-  private val user: UserProfile? = userProfileManager.userProfile.value
+  private val user: UserProfile = userProfileManager.userProfile.value
 
   val userDefaultWeightUnit: String = manageWorkoutUseCase.userDefaultWeightUnit
 
@@ -129,9 +129,9 @@ class WorkoutViewModel(
   private val WARM_UP_SET = SetType.warmUpSet
 
   // region Workout Count-up Timer
-  var isWorkoutActive: Boolean
-    get() = savedStateHandle.get<Boolean>(IS_WORKOUT_ACTIVE) ?: false
-    set(value) = savedStateHandle.set(IS_WORKOUT_ACTIVE, value)
+  var isWorkoutActive: Boolean = false
+//    get() = savedStateHandle.get<Boolean>(IS_WORKOUT_ACTIVE) ?: false
+//    set(value) = savedStateHandle.set(IS_WORKOUT_ACTIVE, value)
 
   private val REQUEST_CODE = 0
 
@@ -164,27 +164,28 @@ class WorkoutViewModel(
   val workoutDurationString: StateFlow<String>
     get() = _workoutDurationString.asStateFlow()
 
+  private fun onWorkoutTimerTick(elapsedTime: Long) {
+    workoutDuration.value = elapsedTime
+
+    _workoutDurationString.value =
+      workoutDuration.value.toDuration(DurationUnit.MILLISECONDS)
+        .toComponents { hours, minutes, seconds, _ ->
+          if (hours > 0) {
+            "$hours:" +
+                    minutes.toString().padStart(2, '0') +
+                    ":" +
+                    seconds.toString().padStart(2, '0')
+          } else {
+            "$minutes:${seconds.toString().padStart(2, '0')}"
+          }
+        }
+  }
+
   private val workoutCountUpTimer =
     object : CountUpTimer(1000) {
-      override fun onTick(elapsedTime: Long) {
-        workoutDuration.value = elapsedTime
-
-        _workoutDurationString.value =
-          workoutDuration.value.toDuration(DurationUnit.MILLISECONDS).toComponents { hours,
-                                                                                     minutes,
-                                                                                     seconds,
-                                                                                     _ ->
-            if (hours > 0) {
-              "$hours:" +
-                      minutes.toString().padStart(2, '0') +
-                      ":" +
-                      seconds.toString().padStart(2, '0')
-            } else {
-              "$minutes:${seconds.toString().padStart(2, '0')}"
-            }
-          }
-      }
+      override fun onTick(elapsedTime: Long) = onWorkoutTimerTick(elapsedTime)
     }
+
 
   // TODO Create WorkoutCountUpTimer State Object to use to manage timer TextButton
   fun startWorkoutTimer() {
@@ -251,10 +252,13 @@ class WorkoutViewModel(
       // ActiveWorkout.getDefaultInstance()}"
       //      )
 
-      if (activeWorkout == null) {
-        Log.d("WorkoutViewModel", "activeWorkout: $activeWorkout")
-        Log.d("WorkoutViewModel", "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}")
-      }
+
+      Log.d("WorkoutViewModel", "activeWorkout: $activeWorkout")
+      Log.d(
+        "WorkoutViewModel",
+        "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}"
+      )
+
 
       require(activeWorkout != null) { "ActiveWorkout is null" }
 
@@ -337,7 +341,7 @@ class WorkoutViewModel(
         if (
           !domainWorkout.isCompleted &&
           domainWorkout.workoutStarted != null &&
-          domainWorkout.workoutEnded == null
+          (domainWorkout.workoutEnded == null || domainWorkout.workoutEnded?.epochSeconds == 0L)
         ) {
           isWorkoutActive = true
           // If the workout was active and not paused, timer might need to be restarted

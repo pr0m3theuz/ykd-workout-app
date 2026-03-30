@@ -18,9 +18,8 @@ plugins {
 //  id("org.pkl-lang")
 
   //  id("org.jetbrains.compose")
+  id("tech.apter.junit5.jupiter.robolectric-extension-gradle-plugin") version ("0.9.0")
 }
-
-tasks.withType<Test> { useJUnitPlatform() }
 
 android {
   namespace = "com.example.myapplication"
@@ -74,14 +73,14 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 
   kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
     compilerOptions {
-      jvmTarget = JvmTarget.fromTarget("17")
+      jvmTarget = JvmTarget.fromTarget("21")
 
       freeCompilerArgs =
         listOf(
@@ -93,7 +92,9 @@ android {
   }
 
   tasks.withType<Test> {
-    useJUnitPlatform { includeEngines("jqwik") }
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
+    useJUnitPlatform()
+//    useJUnitPlatform { includeEngines("jqwik") }
     include("**/*Properties.class")
     include("**/*Test.class")
     include("**/*Tests.class")
@@ -111,6 +112,29 @@ android {
     excludes += "META-INF/LICENSE-notice.md"
     excludes += "META-INF/native-image/native-image.properties"
     excludes += "META-INF/native-image/reflect-config.json"
+  }
+  testOptions {
+    unitTests {
+      isIncludeAndroidResources = true
+    }
+    suites {
+      create("journeysTest") {
+        assets {
+        }
+        targets {
+          create("default") {
+          }
+        }
+        useJunitEngine {
+          inputs += listOf(com.android.build.api.dsl.AgpTestSuiteInputParameters.TESTED_APKS)
+          includeEngines += listOf("journeys-test-engine")
+          enginesDependencies("org.junit.platform:junit-platform-launcher:1.13.4")
+          enginesDependencies("org.junit.platform:junit-platform-engine:1.13.4")
+          enginesDependencies("com.android.tools.journeys:journeys-junit-engine:0.2.1")
+        }
+        targetVariants += listOf("debug")
+      }
+    }
   }
 }
 
@@ -149,7 +173,8 @@ dependencies {
 //  implementation("androidx.datastore:datastore-core-android:1.1.7")
   implementation("androidx.datastore:datastore-preferences:1.2.0")
   implementation("androidx.datastore:datastore-core:1.2.0") // For Proto DataStore
-  implementation("androidx.datastore:datastore:1.2.0") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
+  implementation("androidx.datastore:datastore:1.2.0")
+  implementation("androidx.compose.ui:ui-test-junit4:1.10.6") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
 
   val adaptiveLayout = "1.2.0"
   implementation("androidx.compose.material3.adaptive:adaptive:$adaptiveLayout")
@@ -177,9 +202,6 @@ dependencies {
 //  implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:1.0.0-alpha01")
 
   implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-//  implementation("com.google.dagger:hilt-android:2.56.2")
-  //    testImplementation "junit:junit:4.13.2"
-  //    testImplementation "org.robolectric:robolectric:4.10.3"
 
   // Core library
   val testing = "1.7.0"
@@ -222,6 +244,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiter")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiter")
   androidTestImplementation("org.junit.jupiter:junit-jupiter:$junitJupiter")
+  testImplementation("org.junit.platform:junit-platform-launcher:$junitJupiter")
 
   androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
   debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
@@ -232,7 +255,8 @@ dependencies {
   val jqwik = "1.9.3"
   testImplementation("net.jqwik:jqwik:$jqwik")
   testImplementation("net.jqwik:jqwik-kotlin:$jqwik")
-  // Navigation
+
+  testImplementation("app.cash.turbine:turbine:1.2.1")
 
 
   // realm
@@ -304,26 +328,3 @@ dependencies {
   implementation("app.rive:rive-android:11.1.1")
   implementation("androidx.startup:startup-runtime:1.2.0")
 }
-
-/*kapt {
-     correctErrorTypes true
- }*/
-
-/*
-class RoomSchemaArgProvider implements CommandLineArgumentProvider {
-
-    @InputDirectory
-    @PathSensitive(PathSensitivity.RELATIVE)
-    File schemaDir
-
-    RoomSchemaArgProvider(File schemaDir) {
-        this.schemaDir = schemaDir
-    }
-
-    @Override
-    Iterable<String> asArguments() {
-        // Note: If you're using KSP, change the line below to return
-        // ["room.schemaLocation=${schemaDir.path}"].toString()].
-        return ["-Aroom.schemaLocation=${schemaDir.path}"].toString()]
-    }
-}*/

@@ -109,8 +109,10 @@ constructor(
 
   fun getRoundingPreference(): Flow<RoundingOption?> {
     return flow {
+      emit(
       RoundingOption.fromImperial(_userProfile.value.roundingPreferencePounds)
         ?: RoundingOption.fromImperial(5.0)
+      )
     }
   }
 
@@ -208,6 +210,16 @@ constructor(
   // init {
   //     _userProfile.value = UserProfile(id = ObjectId(), username = "Guest") // Example default
   // }
+
+  init {
+    // Listen for the DataStore finishing its asynchronous load
+    viewModelScope.launch {
+      userProfileManager.userProfile.collect { loadedProfile ->
+        _userProfile.value = loadedProfile
+        _defaultWeightUnit.value = loadedProfile.defaultWeightUnit
+      }
+    }
+  }
 
   fun loadUserProfile(userId: String) {
     viewModelScope.launch {
