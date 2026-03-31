@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<journey name="WorkoutViewModel Proto DataStore Test">
+    <description></description>
+    <actions xml:space="preserve">
+        <action>tap 'Workout' in the Bottom Navigation Bar</action>
+    </actions>
+</journey>
