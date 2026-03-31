@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -397,11 +398,13 @@ fun SettingsScreen(
             .padding(vertical = 16.dp, horizontal = 16.dp),
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-          Text(
-            "v0.0.1", // Replace with actual app version
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
+          SelectionContainer {
+            Text(
+              "Version: 2026.03.31-03a9ae05", // Replace with actual app version
+              style = MaterialTheme.typography.bodySmall,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+          }
 
           /*          Text(
             "Logged in with:",
