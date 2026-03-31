@@ -59,8 +59,6 @@ fun ActiveWorkoutCard(
   val bodySmall = MaterialTheme.typography.bodySmall
 
   Card(modifier = Modifier.padding(vertical = padding)) {
-
-
     Row(
       modifier = Modifier
         .fillMaxWidth()
@@ -140,48 +138,48 @@ fun ActiveWorkoutCard(
         Text("No exercises have been added to this workout.", style = bodySmall)
       }
     } else {
-    Row(
-      modifier =
-        Modifier
-          .fillMaxWidth()
-          .padding(horizontal = padding)
-          .padding(top = 12.dp, bottom = 2.dp),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Text(text = "Exercise", style = titleSmall, modifier = Modifier.weight(0.5f))
-      Box(Modifier.weight(0.5f)) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-          Text(
-            text = "Sets",
-            style = titleSmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.weight(weight = 1f, fill = true),
-          )
-          Text(
-            text = "Top Set",
-            style = titleSmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.weight(weight = 1f, fill = true),
-          )
-          Text(
-            text = "RIR",
-            style = titleSmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.weight(weight = 1f, fill = true),
-          )
+      Row(
+        modifier =
+          Modifier
+            .fillMaxWidth()
+            .padding(horizontal = padding)
+            .padding(top = 12.dp, bottom = 2.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text(text = "Exercise", style = titleSmall, modifier = Modifier.weight(0.5f))
+        Box(Modifier.weight(0.5f)) {
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+            Text(
+              text = "Sets",
+              style = titleSmall,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.weight(weight = 1f, fill = true),
+            )
+            Text(
+              text = "Top Set",
+              style = titleSmall,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.weight(weight = 1f, fill = true),
+            )
+            Text(
+              text = "RIR",
+              style = titleSmall,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.weight(weight = 1f, fill = true),
+            )
+          }
         }
       }
-    }
 
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = padding)
-    ) {
-      Column() {
-        // TODO List Exercises
-        //        Text("Workout Summary", style = bodySmall)
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = padding)
+      ) {
+        Column() {
+          // TODO List Exercises
+          //        Text("Workout Summary", style = bodySmall)
 
           workout.workoutItems.forEach { workoutItem ->
             when (workoutItem) {
@@ -215,26 +213,36 @@ fun ActiveWorkoutCard(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(weight = 1f, fill = true),
                       )
+
                       Text(
                         text =
-                          if (
-                            workoutItem.sets
-                              .maxBy { it.repetitions ?: 0 }
-                              .targetRepetitions != null
-                          )
-                            "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
-                          else "-",
+                          if (workoutItem.sets.all { it.repetitions != null }) {
+                            if (
+                              workoutItem.sets
+                                .maxBy { it.repetitions ?: 0 }
+                                .targetRepetitions != null
+                            )
+                              "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
+                            else "-"
+                          } else {
+                            "-"
+                          },
                         style = bodySmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(weight = 1f, fill = true),
                       )
                       Text(
+
                         text =
-                          doubleFormatted(
-                            workoutItem.sets
-                              .minBy { it.repetitionsInReserve ?: 10.0 }
-                              .targetRepetitionsInReserve
-                          ),
+                          if (workoutItem.sets.all { it.repetitions != null }) {
+                            doubleFormatted(
+                              workoutItem.sets
+                                .minBy { it.repetitionsInReserve ?: 10.0 }
+                                .targetRepetitionsInReserve
+                            )
+                          } else {
+                            "-"
+                          },
                         style = bodySmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(weight = 1f, fill = true),
