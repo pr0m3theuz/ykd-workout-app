@@ -1,5 +1,6 @@
 package com.example.myapplication.features.program.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,8 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.common.domain.model.ExerciseSets
 import com.example.myapplication.common.domain.model.LoadingWorkout
 import com.example.myapplication.common.domain.model.Superset
@@ -58,73 +57,85 @@ fun ActiveWorkoutCard(
   val (expandMenu, setExpandMenu) = remember { mutableStateOf(false) }
 
   val bodySmall = MaterialTheme.typography.bodySmall
+
   Card(modifier = Modifier.padding(vertical = padding)) {
+
     workout.programID?.let { programID ->
       val program = programsViewModel.getCurrentlyActiveProgramByID(programID)
-      program?.let {
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = padding),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Text(
-            text = program.name ?: "Program Name",
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleMedium,
-            modifier =
-            Modifier
-              .clickable {
-                workout.programID?.toHexString()?.let { p1 -> navigateToActiveProgramDetails(p1) }
-              }
-              .weight(1f, fill = true),
-          )
-          Box {
-            IconButton(onClick = { setExpandMenu(true) }) {
-              Icon(
-                imageVector = Icons.Outlined.MoreVert,
-                contentDescription = "Localized Description"
-              )
-            }
 
-            DropdownMenu(expanded = expandMenu, onDismissRequest = { setExpandMenu(false) }) {
-              // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
-              DropdownMenuItem(
-                text = { Text(text = "Delete Workout") },
-                onClick = {
+
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(start = padding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text(
+          text = workout.name,
+          modifier = Modifier.padding(horizontal = 8.dp),
+          style = MaterialTheme.typography.titleMedium,
+        )
+        Box {
+          IconButton(onClick = { setExpandMenu(true) }) {
+            Icon(
+              imageVector = Icons.Outlined.MoreVert,
+              contentDescription = "Localized Description"
+            )
+          }
+
+          DropdownMenu(expanded = expandMenu, onDismissRequest = { setExpandMenu(false) }) {
+            // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
+            DropdownMenuItem(
+              text = { Text(text = "Delete Workout") },
+              onClick = {
+                programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
+
+                val result =
                   programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
-
-                  val result =
-                    programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
-                  if (result) {
-                    Toast.makeText(context, "Workout deleted successfully.", Toast.LENGTH_SHORT)
-                      .show()
-                  } else {
-                    Toast.makeText(
-                      context,
-                      "Workout was not deleted successfully.",
-                      Toast.LENGTH_SHORT
-                    ).show()
-                  }
-                },
-              )
-            }
+                if (result) {
+                  Toast.makeText(context, "Workout deleted successfully.", Toast.LENGTH_SHORT)
+                    .show()
+                } else {
+                  Toast.makeText(
+                    context,
+                    "Workout was not deleted successfully.",
+                    Toast.LENGTH_SHORT
+                  ).show()
+                }
+              },
+            )
           }
         }
       }
 
-      Text(
-        text = workout.name,
-        modifier = Modifier.padding(horizontal = 8.dp),
-        style = bodySmall,
-      )
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(start = padding),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        program?.let {
+          Log.d("Programs", "program: $program")
+          Text(
+            text = program.name ?: "Program Name",
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier =
+              Modifier
+                .clickable {
+                  workout.programID?.toHexString()?.let { p1 -> navigateToActiveProgramDetails(p1) }
+                }
+          )
+        }
+      }
+
       Row(
         modifier =
-        Modifier
-          .fillMaxWidth()
-          .padding(horizontal = padding)
-          .padding(top = 12.dp, bottom = 2.dp),
+          Modifier
+            .fillMaxWidth()
+            .padding(horizontal = padding)
+            .padding(top = 12.dp, bottom = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {
@@ -195,24 +206,24 @@ fun ActiveWorkoutCard(
                       )
                       Text(
                         text =
-                        if (
-                          workoutItem.sets
-                            .maxBy { it.repetitions ?: 0 }
-                            .targetRepetitions != null
-                        )
-                          "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
-                        else "-",
+                          if (
+                            workoutItem.sets
+                              .maxBy { it.repetitions ?: 0 }
+                              .targetRepetitions != null
+                          )
+                            "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
+                          else "-",
                         style = bodySmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(weight = 1f, fill = true),
                       )
                       Text(
                         text =
-                        doubleFormatted(
-                          workoutItem.sets
-                            .minBy { it.repetitionsInReserve ?: 10.0 }
-                            .targetRepetitionsInReserve
-                        ),
+                          doubleFormatted(
+                            workoutItem.sets
+                              .minBy { it.repetitionsInReserve ?: 10.0 }
+                              .targetRepetitionsInReserve
+                          ),
                         style = bodySmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(weight = 1f, fill = true),
@@ -253,25 +264,25 @@ fun ActiveWorkoutCard(
                         )
                         Text(
                           text =
-                          if (
-                            exerciseSets.sets
-                              .maxBy { it.repetitions ?: 0 }
-                              .targetRepetitions
-                            != null
-                          )
-                            "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
-                          else "-",
+                            if (
+                              exerciseSets.sets
+                                .maxBy { it.repetitions ?: 0 }
+                                .targetRepetitions
+                              != null
+                            )
+                              "${exerciseSets.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
+                            else "-",
                           style = bodySmall,
                           textAlign = TextAlign.Center,
                           modifier = Modifier.weight(weight = 1f, fill = true),
                         )
                         Text(
                           text =
-                          doubleFormatted(
-                            exerciseSets.sets
-                              .minBy { it.repetitionsInReserve ?: 10.0 }
-                              .targetRepetitionsInReserve
-                          ),
+                            doubleFormatted(
+                              exerciseSets.sets
+                                .minBy { it.repetitionsInReserve ?: 10.0 }
+                                .targetRepetitionsInReserve
+                            ),
                           style = bodySmall,
                           textAlign = TextAlign.Center,
                           modifier = Modifier.weight(weight = 1f, fill = true),
@@ -301,7 +312,8 @@ fun ActiveWorkoutCard(
             )
           }
         ) {
-          Text(text = "Resume ${workout.name}")
+//          Text(text = "Resume ${workout.name}")
+          Text(text = "Resume Workout")
         }
 
         if (workout.programID != null) {
@@ -312,7 +324,7 @@ fun ActiveWorkoutCard(
           ) {
             Icon(
               imageVector = Icons.AutoMirrored.Outlined.LibraryBooks,
-              contentDescription = "Localized Description",
+              contentDescription = "Navigate to Program for Workout",
             )
           }
         }

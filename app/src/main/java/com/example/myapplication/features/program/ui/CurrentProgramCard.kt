@@ -312,7 +312,7 @@ fun CurrentProgramCard(
         ) {
           Icon(
             imageVector = Icons.AutoMirrored.Outlined.LibraryBooks,
-            contentDescription = "Localized Description",
+            contentDescription = "Navigate to Program for Workout",
           )
         }
       }

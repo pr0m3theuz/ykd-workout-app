@@ -12,13 +12,20 @@ import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
 import com.example.myapplication.common.infrastructure.persistence.ProgramsRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
+import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
+import com.example.myapplication.common.infrastructure.persistence.datastore.toDomainWorkout
+import com.example.myapplication.datastore.ActiveWorkout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import kotlin.uuid.ExperimentalUuidApi
@@ -33,6 +40,7 @@ constructor(
   //  private val exerciseSetsRepository: ExerciseSetsRepository,
   //  private val setsRepository: SetsRepository,
   private val exercisesRepository: ExercisesRepository,
+  private val workoutDatastore: WorkoutDatastore
 ) : ViewModel() {
   fun getExerciseNameByID(exerciseID: ObjectId?): String? {
     //    Log.i("ProgramsViewModel", "getExerciseNameByID: ${exerciseID?.toHexString()}")
@@ -240,14 +248,33 @@ constructor(
 
   fun getCurrentlyActiveWorkouts(): Flow<List<Workout>> {
     //    TODO "Implement getCurrentlyActiveWorkouts"
-    return flow { emptyList<Workout>() }
+//    viewModelScope.launch {
+//      val activeWorkout = workoutDatastore.getActiveWorkout.firstOrNull()
+//      require(activeWorkout != null) { "ActiveWorkout is null" }
+//      if (activeWorkout != ActiveWorkout.getDefaultInstance()) {
+//        val domainWorkout = activeWorkout.toDomainWorkout()
+//      }
+//    }
+
+     return workoutDatastore.getActiveWorkout
+      .map { activeWorkoutProto ->
+        val list = mutableListOf<Workout>()
+        if (activeWorkoutProto != ActiveWorkout.getDefaultInstance()) {
+          list.add(activeWorkoutProto.toDomainWorkout())
+        }
+        list
+      }
+
+
+//    return flow { emptyList<Workout>() }
     //    return inProgressWorkoutRepository.getWorkouts()
   }
 
   fun deleteCurrentlyActiveWorkout(workoutID: ObjectId): Boolean {
-    //    TODO "Implement deleteCurrentlyActiveWorkout"
-    return false
-    //    return false // inProgressWorkoutRepository.deleteActiveWorkout(workoutID = workoutID)
+    viewModelScope.launch {
+      workoutDatastore.clearActiveWorkout()
+    }
+    return true
   }
 
   fun getProgramData() {

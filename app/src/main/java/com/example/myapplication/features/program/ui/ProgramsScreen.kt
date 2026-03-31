@@ -71,7 +71,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.example.myapplication.common.domain.model.Program
 import com.example.myapplication.common.ui.component.BottomNavigationBar
@@ -113,6 +112,9 @@ fun ProgramsScreen(
   val authorsMap by programsViewModel.authorsMap.collectAsState()
   val activePrograms by
   programsViewModel.activePrograms.collectAsState() // TODO Get List of Active Programs
+
+  val currentlyActiveWorkouts by programsViewModel.getCurrentlyActiveWorkouts()
+    .collectAsState(initial = emptyList())
 
   fun getExpandCollapseIcon(visible: Boolean): ImageVector {
     return if (visible) {
@@ -246,12 +248,16 @@ fun ProgramsScreen(
         //      stickyHeader { WorkoutSearchBar() } // TODO Implement Search & Filtering
 
         item {
-          Text("Quick Start", style = titleMedium, modifier = Modifier.padding(top = 16.dp))
-          Button(
-            onClick = { navigateToNewWorkout() }
-          ) {
-            Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
-            Text(text = "Start An Empty Workout")
+          if (currentlyActiveWorkouts.isEmpty()) {
+            Text("Quick Start", style = titleMedium, modifier = Modifier.padding(top = 16.dp))
+            Button(
+              onClick = { navigateToNewWorkout() }
+            ) {
+              Icon(imageVector = Icons.Outlined.Add, contentDescription = "Localized Description")
+              Text(text = "Start An Empty Workout")
+            }
+          } else {
+            Text("Active Workouts", style = titleMedium, modifier = Modifier.padding(top = 16.dp))
           }
         }
 
@@ -270,7 +276,59 @@ fun ProgramsScreen(
         }
 
         item {
-          // TODO Implement Horizontal Pager/LazyRow
+          // https://developer.android.com/jetpack/compose/layouts/pager
+          val pagerState = rememberPagerState(pageCount = { currentlyActiveWorkouts.size })
+          HorizontalPager(
+            state = pagerState,
+            pageSpacing = 8.dp,
+            contentPadding = PaddingValues(0.dp),
+          ) { page ->
+            currentlyActiveWorkouts[page].let { activeWorkout ->
+              Column(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(vertical = 0.dp),
+                verticalArrangement = Arrangement.spacedBy(padding8),
+              ) {
+                // TODO resume current workout
+
+                ActiveWorkoutCard(
+                  workout = activeWorkout,
+                  programsViewModel = programsViewModel,
+                  navigateToActiveProgramDetails = { programID ->
+                    navigateToActiveProgramDetails(programID)
+                  },
+                  navigateToPausedWorkout = { programID, workoutID ->
+                    navigateToWorkout(programID, workoutID)
+                  })
+              }
+            }
+          }
+
+          Row(
+            Modifier
+              .height(20.dp)
+              .fillMaxWidth(),
+            //                    .align(Alignment.BottomCenter),
+            //          verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+          ) {
+            repeat(pagerState.pageCount) { iteration ->
+              val primary = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
+              val color =
+                if (pagerState.currentPage == iteration) primary else primary.copy(alpha = 0.5f)
+              Box(
+                modifier = Modifier
+                  .padding(2.dp)
+                  .clip(CircleShape)
+                  .background(color)
+                  .size(8.dp)
+              )
+            }
+          }
+        }
+
+        item {
           // https://developer.android.com/jetpack/compose/layouts/pager
           val pagerState = rememberPagerState(pageCount = { activePrograms.size })
           HorizontalPager(
@@ -286,31 +344,13 @@ fun ProgramsScreen(
                 verticalArrangement = Arrangement.spacedBy(padding8),
               ) {
                 if (activePrograms.isEmpty()) {
-                  // TODO Change back to activeProgram == null
                   // Text("Start a Program", style = titleMedium)
-                  // TODO No Active Programs Card
+                  // No Active Programs Card
                 } else {
                   // Text("Continue Program", style = titleMedium)
                   val nextWorkout = programsViewModel.getNextWorkoutByProgramID(program.id)
                   // Log.i("PROGRAMS", "nextWorkout: $nextWorkout")
 
-                  // TODO resume current workout
-                  val currentlyActiveWorkout =
-                    programsViewModel
-                      .getCurrentlyActiveWorkouts()
-                      .collectAsState(initial = emptyList())
-                  if (currentlyActiveWorkout.value.isNotEmpty()) {
-                    currentlyActiveWorkout.value.forEach {
-                      ActiveWorkoutCard(
-                        workout = it, programsViewModel = programsViewModel,
-                        navigateToActiveProgramDetails = { programID ->
-                          navigateToActiveProgramDetails(programID)
-                        },
-                        navigateToPausedWorkout = { programID, workoutID ->
-                          navigateToWorkout(programID, workoutID)
-                        })
-                    }
-                  }
                   if (nextWorkout != null) {
                     CurrentProgramCard(
                       program,
