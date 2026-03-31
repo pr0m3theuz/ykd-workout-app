@@ -219,10 +219,9 @@ fun ActiveWorkoutCard(
                           if (workoutItem.sets.all { it.repetitions != null }) {
                             if (
                               workoutItem.sets
-                                .maxBy { it.repetitions ?: 0 }
-                                .targetRepetitions != null
+                                .maxByOrNull { it.repetitions ?: 0 }?.targetRepetitions != null
                             )
-                              "${workoutItem.sets.maxBy { it.repetitions ?: 0 }.targetRepetitions} reps"
+                              "${workoutItem.sets.maxByOrNull { it.repetitions ?: 0 }?.targetRepetitions  ?: "-"} reps"
                             else "-"
                           } else {
                             "-"
@@ -237,8 +236,8 @@ fun ActiveWorkoutCard(
                           if (workoutItem.sets.all { it.repetitions != null }) {
                             doubleFormatted(
                               workoutItem.sets
-                                .minBy { it.repetitionsInReserve ?: 10.0 }
-                                .targetRepetitionsInReserve
+                                .minByOrNull { it.repetitionsInReserve ?: 10.0 }
+                                ?.targetRepetitionsInReserve
                             )
                           } else {
                             "-"
