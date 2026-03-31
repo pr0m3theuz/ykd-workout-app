@@ -174,7 +174,8 @@ dependencies {
   implementation("androidx.datastore:datastore-preferences:1.2.0")
   implementation("androidx.datastore:datastore-core:1.2.0") // For Proto DataStore
   implementation("androidx.datastore:datastore:1.2.0")
-  implementation("androidx.compose.ui:ui-test-junit4:1.10.6") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
+  implementation("androidx.compose.ui:ui-test-junit4:1.10.6")
+  implementation("androidx.navigation:navigation-testing:2.9.7") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
 
   val adaptiveLayout = "1.2.0"
   implementation("androidx.compose.material3.adaptive:adaptive:$adaptiveLayout")

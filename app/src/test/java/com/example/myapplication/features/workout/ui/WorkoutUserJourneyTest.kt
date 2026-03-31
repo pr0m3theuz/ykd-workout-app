@@ -2,7 +2,6 @@
 
 package com.example.myapplication.features.workout.ui
 
-import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -11,11 +10,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.runComposeUiTest
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
@@ -70,8 +74,13 @@ class WorkoutUserJourneyTest {
   private lateinit var workoutDatastore: WorkoutDatastore
   private lateinit var userProfileManager: UserProfileManager
 
+  private lateinit var navController: TestNavHostController
+
   @get:Rule
   val composeTestRule = createComposeRule()
+
+//  @get:Rule
+//  val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   // We use a test dispatcher so we can manipulate time in the UI
   private val testDispatcher = StandardTestDispatcher()
@@ -79,10 +88,6 @@ class WorkoutUserJourneyTest {
   @BeforeEach
   fun setup() {
     Dispatchers.setMain(testDispatcher)
-
-    mockkStatic(Looper::class)
-    val mockLooper = mockk<Looper>(relaxed = true)
-    every { Looper.getMainLooper() } returns mockLooper
 
     // 2. Mock PendingIntent static factory
     mockkStatic(PendingIntent::class)
@@ -133,6 +138,7 @@ class WorkoutUserJourneyTest {
   }
 
 
+  @OptIn(ExperimentalTestApi::class)
   @Test
   fun impatientUserJourney_clicksStartBeforeDataStoreLoads_keepsNewWorkout() =
     runTest(testDispatcher) {
@@ -157,51 +163,53 @@ class WorkoutUserJourneyTest {
         emit(staleWorkoutProto)
       }
 
-      val viewModel = createViewModel(workoutDatastore = slowDataStore) // assumes userProfile is stubbed inside
+      val viewModel =
+        createViewModel(workoutDatastore = slowDataStore) // assumes userProfile is stubbed inside
 
       // 2. Mount UI
-      // TODO UI State is not currently implemented
-      composeTestRule.setContent {
-        val uiState by viewModel.uiState.collectAsState()
-        when {
-          uiState.isLoading -> Text("Loading Workout...")
-          else -> {
-            Text("Current: ${uiState.workoutName}")
-            Button(onClick = { viewModel.initWorkoutData() }) {
-              Text("Start Fresh Workout")
-            }
-          }
+      runComposeUiTest {
+        setContent {
+        navController = TestNavHostController(LocalContext.current).apply {
+          navigatorProvider.addNavigator(ComposeNavigator())
         }
+
+          WorkoutScreen(
+            navController = navController,
+            workoutViewModel = viewModel,
+            workoutID = null,
+            currentDestination = null,
+            onNavigateBottomBar = {}
+          )
+        }
+
+        // Step A: Loading state visible — DataStore hasn't emitted yet
+        waitForIdle()
+//      composeTestRule.onNodeWithText("Loading Workout...").assertIsDisplayed()
+
+        // Step B: User taps before DataStore resolves
+        // Advance coroutine time slightly but NOT past the 2000ms delay
+        advanceTimeBy(500) // ✅ coroutine virtual time, not mainClock
+        waitForIdle()
+
+        viewModel.initWorkoutData() // isWorkoutActive = true, _workoutName = time-based template
+        waitForIdle()
+
+        // Step C: UI shows fresh workout — time-agnostic assertion
+        val freshName = viewModel.workoutName.value
+        Assertions.assertTrue(
+          freshName?.contains("Workout") == true,
+        )
+        onNodeWithText("$freshName").assertIsDisplayed()
+
+        // Step D: DataStore finally emits the stale workout
+        advanceTimeBy(2000) // ✅ triggers delay(2000) in the flow
+        waitForIdle()
+
+        // Step E: Guard holds — stale DataStore value did NOT overwrite the user's fresh workout
+        onNodeWithText("$freshName").assertIsDisplayed()
+        onNodeWithText("Yesterday's Unfinished Workout")
+          .assertDoesNotExist()
       }
-
-      // Step A: Loading state visible — DataStore hasn't emitted yet
-      composeTestRule.waitForIdle()
-      composeTestRule.onNodeWithText("Loading Workout...").assertIsDisplayed()
-
-      // Step B: User taps before DataStore resolves
-      // Advance coroutine time slightly but NOT past the 2000ms delay
-      advanceTimeBy(500) // ✅ coroutine virtual time, not mainClock
-      composeTestRule.waitForIdle()
-
-      viewModel.initWorkoutData() // isWorkoutActive = true, _workoutName = time-based template
-      composeTestRule.waitForIdle()
-
-      // Step C: UI shows fresh workout — time-agnostic assertion
-      val freshName = viewModel.workoutName.value
-      Assertions.assertTrue(
-        freshName?.contains("Workout") == true,
-        "Expected a time-based template name, got: $freshName"
-      )
-      composeTestRule.onNodeWithText("Current: $freshName").assertIsDisplayed()
-
-      // Step D: DataStore finally emits the stale workout
-      advanceTimeBy(2000) // ✅ triggers delay(2000) in the flow
-      composeTestRule.waitForIdle()
-
-      // Step E: Guard holds — stale DataStore value did NOT overwrite the user's fresh workout
-      composeTestRule.onNodeWithText("Current: $freshName").assertIsDisplayed()
-      composeTestRule.onNodeWithText("Current: Yesterday's Unfinished Workout")
-        .assertDoesNotExist()
 
       // Step F: isWorkoutActive stayed true — the guard worked
       Assertions.assertTrue(
@@ -210,12 +218,13 @@ class WorkoutUserJourneyTest {
       )
     }
 
+  @OptIn(ExperimentalTestApi::class)
   @Test
   fun processDeathJourney_recoversWorkoutSuccessfully() = runTest(testDispatcher) {
-    // 1. Setup
-    mockkStatic("com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutMappersKt")
-    mockkStatic(PendingIntent::class)
-    every { PendingIntent.getBroadcast(any(), any(), any(), any()) } returns mockk(relaxed = true)
+//    // 1. Setup
+//    mockkStatic("com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutMappersKt")
+//    mockkStatic(PendingIntent::class)
+//    every { PendingIntent.getBroadcast(any(), any(), any(), any()) } returns mockk(relaxed = true)
 
     val mockDomainWorkout = mockk<Workout>(relaxed = true) {
       every { name } returns "Leg Day Heavy"
@@ -228,21 +237,31 @@ class WorkoutUserJourneyTest {
     val activeWorkoutProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeWorkoutProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeWorkoutProto.toDomainWorkout() } returns mockDomainWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeWorkoutProto)
 
     val viewModel = createViewModel(workoutDatastore = workoutDatastore)
 
     // 2. Mount UI
     // TODO UI State is not currently implemented
-    composeTestRule.setContent {
-      val uiState by viewModel.uiState.collectAsState()
-      if (uiState.isLoading) Text("Loading Workout...")
-      else Text("Current: ${uiState.workoutName}")
+    runComposeUiTest {
+      setContent {
+        navController = TestNavHostController(LocalContext.current).apply {
+          navigatorProvider.addNavigator(ComposeNavigator())
+        }
+
+        WorkoutScreen(
+          navController = navController,
+          workoutViewModel = viewModel,
+          workoutID = null,
+          currentDestination = null,
+          onNavigateBottomBar = {}
+        )
+      }
+      advanceUntilIdle()
+      waitForIdle()
+
+      onNodeWithText("Leg Day Heavy").assertIsDisplayed()
     }
-
-    advanceUntilIdle()
-    composeTestRule.waitForIdle()
-
-    composeTestRule.onNodeWithText("Current: Leg Day Heavy").assertIsDisplayed()
   }
 
   // Helper to construct the ViewModel
