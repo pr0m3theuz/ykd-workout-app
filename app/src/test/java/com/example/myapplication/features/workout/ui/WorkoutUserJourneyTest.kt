@@ -25,6 +25,7 @@ import com.example.myapplication.common.domain.model.UserProfile
 import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
+import com.example.myapplication.common.infrastructure.persistence.datastore.ActiveWorkoutsDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.toDomainWorkout
 import com.example.myapplication.datastore.ActiveWorkout
@@ -71,7 +72,7 @@ class WorkoutUserJourneyTest {
   private lateinit var manageWorkoutUseCase: ManageWorkoutUseCase
   private lateinit var managePreviewWorkoutUseCase: ManagePreviewWorkoutUseCase
   private lateinit var exerciseRepository: ExercisesRepository
-  private lateinit var workoutDatastore: WorkoutDatastore
+  private lateinit var workoutDatastore: ActiveWorkoutsDatastore
   private lateinit var userProfileManager: UserProfileManager
 
   private lateinit var navController: TestNavHostController
@@ -157,8 +158,8 @@ class WorkoutUserJourneyTest {
       every { staleWorkoutProto == ActiveWorkout.getDefaultInstance() } returns false
       every { staleWorkoutProto.toDomainWorkout() } returns staleDomainWorkout
 
-      val slowDataStore = mockk<WorkoutDatastore>(relaxed = true)
-      every { slowDataStore.getActiveWorkout } returns flow {
+      val slowDataStore = mockk<ActiveWorkoutsDatastore>(relaxed = true)
+      every { slowDataStore.getLatestActiveWorkout() } returns flow {
         delay(2000)
         emit(staleWorkoutProto)
       }
@@ -237,7 +238,7 @@ class WorkoutUserJourneyTest {
     val activeWorkoutProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeWorkoutProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeWorkoutProto.toDomainWorkout() } returns mockDomainWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeWorkoutProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeWorkoutProto)
 
     val viewModel = createViewModel(workoutDatastore = workoutDatastore)
 
@@ -267,7 +268,7 @@ class WorkoutUserJourneyTest {
   // Helper to construct the ViewModel
   private fun createViewModel(
     savedStateHandle: SavedStateHandle = SavedStateHandle(),
-    workoutDatastore: WorkoutDatastore,
+    workoutDatastore: ActiveWorkoutsDatastore,
   ): WorkoutViewModel {
     every { userProfileManager.userProfile } returns MutableStateFlow(UserProfile(id = ObjectId()))
 

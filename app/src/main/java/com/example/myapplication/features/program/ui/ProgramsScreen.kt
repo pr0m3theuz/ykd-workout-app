@@ -95,6 +95,7 @@ fun ProgramsScreen(
   navigateToProgramDetails: (Program) -> Unit,
   onNavigateBottomBar: (route: String) -> Unit,
   navigateToNewWorkout: () -> Unit,
+  navigateToActiveWorkout: (String, Int) -> Unit = { _, _ -> },
   navigateToActiveProgramDetails: (String) -> Unit,
   navigateToWorkout: (String, Int) -> Unit = { _, _ -> },
 ) {
@@ -298,8 +299,8 @@ fun ProgramsScreen(
                   navigateToActiveProgramDetails = { programID ->
                     navigateToActiveProgramDetails(programID)
                   },
-                  navigateToPausedWorkout = { programID, workoutID ->
-                    navigateToWorkout(programID, workoutID)
+                  navigateToPausedWorkout = { workoutID, loadWorkoutFromActiveWorkoutsDatastore ->
+                    navigateToActiveWorkout(workoutID, loadWorkoutFromActiveWorkoutsDatastore)
                   })
               }
             }

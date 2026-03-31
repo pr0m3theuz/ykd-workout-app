@@ -329,6 +329,10 @@ private fun NavGraphBuilder.addWorkoutGraph(
 //               Log.d("WorkoutScreen", "Copy Previous Workout To Progress. workoutID: $workoutID")
             }
 
+            LoadingWorkout.LoadWorkoutFromActiveWorkoutsDatastore.value -> {
+              workoutViewModel.loadWorkoutFromActiveWorkoutsDatastore(workoutID)
+            }
+
             else -> {
               require(false) { "Unknown loadingWorkout value: $loadingWorkout. Update LoadingWorkout enum class in WorkoutViewModel.kt." }
             }
@@ -686,6 +690,16 @@ private fun NavGraphBuilder.addProgramsGraph(navController: NavController) {
         },
         navigateToNewWorkout = {
           navController.navigate(Screens.Workout.baseRoute) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+          }
+        },
+        navigateToActiveWorkout = { workoutID, loadWorkoutFromActiveWorkoutsDatastore ->
+          navController.navigate("workoutScreen?workoutID=${workoutID}/copyWorkoutFromPreviousWorkout=${loadWorkoutFromActiveWorkoutsDatastore}") {
             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
             // Avoid multiple copies of the same destination when
             // reselecting the same item

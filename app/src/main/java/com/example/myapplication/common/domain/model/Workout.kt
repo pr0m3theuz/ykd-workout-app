@@ -221,5 +221,6 @@ enum class LoadingWorkout(val value: Int) {
 
   WorkoutLoadedFromWorkoutProgression(3),
 
-  CopyPreviousWorkoutToProgress(4)
+  CopyPreviousWorkoutToProgress(4),
+  LoadWorkoutFromActiveWorkoutsDatastore(5)
 }

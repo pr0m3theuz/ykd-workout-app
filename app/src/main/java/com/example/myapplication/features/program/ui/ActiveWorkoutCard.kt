@@ -86,7 +86,7 @@ fun ActiveWorkoutCard(
           DropdownMenuItem(
             text = { Text(text = "Delete Workout") },
             onClick = {
-              programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
+              // programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
 
               val result =
                 programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
@@ -320,7 +320,7 @@ fun ActiveWorkoutCard(
         onClick = {
           navigateToPausedWorkout(
             workout.id.toHexString(),
-            LoadingWorkout.LoadWorkoutFromActiveProgram.value
+            LoadingWorkout.LoadWorkoutFromActiveWorkoutsDatastore.value
           )
         }
       ) {

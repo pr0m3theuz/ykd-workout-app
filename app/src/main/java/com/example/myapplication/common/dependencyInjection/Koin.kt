@@ -26,11 +26,13 @@ import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesR
 import com.example.myapplication.common.infrastructure.persistence.WorkoutNotesRepositoryImpl
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepository
 import com.example.myapplication.common.infrastructure.persistence.WorkoutRepositoryImpl
+import com.example.myapplication.common.infrastructure.persistence.datastore.ActiveWorkoutsDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorService
 import com.example.myapplication.common.infrastructure.replicator.ReplicatorServiceImpl
 import com.example.myapplication.common.infrastructure.services.AuthenticationService
 import com.example.myapplication.common.infrastructure.services.AuthenticationServiceImpl
+import com.example.myapplication.datastore.ActiveWorkoutPreferences
 import com.example.myapplication.features.exercises.ExercisesViewModel
 import com.example.myapplication.features.history.HistoryViewModel
 import com.example.myapplication.features.program.ProgramsViewModel
@@ -117,6 +119,7 @@ val commonModule = module {
 //  singleOf(::ImportWorkoutProgramRepository)
 
   single { WorkoutDatastore(get()) } // Added WorkoutDatastore to Koin module
+  single { ActiveWorkoutsDatastore(get()) } // Added WorkoutDatastore to Koin module
 
   singleOf(::ManageWorkoutUseCase)
   singleOf(::ManagePreviewWorkoutUseCase)

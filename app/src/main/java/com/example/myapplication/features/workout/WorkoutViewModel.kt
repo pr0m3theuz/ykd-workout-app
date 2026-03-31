@@ -61,9 +61,10 @@ import com.example.myapplication.common.domain.model.updateSetReps
 import com.example.myapplication.common.domain.model.updateSetType
 import com.example.myapplication.common.domain.model.updateSetWeight
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
-import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
+import com.example.myapplication.common.infrastructure.persistence.datastore.ActiveWorkoutsDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.toDomainWorkout
 import com.example.myapplication.common.infrastructure.persistence.datastore.toProtoActiveWorkout
+import com.example.myapplication.common.infrastructure.persistence.datastore.toProtoString
 import com.example.myapplication.common.util.AlarmReceiver
 import com.example.myapplication.common.util.ProgressionOutcome
 import com.example.myapplication.common.util.ProgressionResults
@@ -84,6 +85,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -114,7 +116,7 @@ class WorkoutViewModel(
   private val manageWorkoutUseCase: ManageWorkoutUseCase,
   private val managePreviewWorkoutUseCase: ManagePreviewWorkoutUseCase,
   private val exerciseRepository: ExercisesRepository,
-  private val workoutDatastore: WorkoutDatastore, // Added WorkoutDatastore
+  private val workoutDatastore: ActiveWorkoutsDatastore, // Added WorkoutDatastore
   private val savedStateHandle: SavedStateHandle,
   private val userProfileManager: UserProfileManager
 ) : ViewModel() {
@@ -236,7 +238,7 @@ class WorkoutViewModel(
       // This triggered each item the current workout is saved to the DataStore due to collecting
       // the updated activeWorkout
       //      workoutDatastore.getActiveWorkout.collect { activeWorkout ->
-      val activeWorkout = workoutDatastore.getActiveWorkout.firstOrNull()
+      val latestActiveWorkout = workoutDatastore.getLatestActiveWorkout().firstOrNull()
 
 //      Log.d(
 //        "WorkoutViewModel",
@@ -252,18 +254,17 @@ class WorkoutViewModel(
       // ActiveWorkout.getDefaultInstance()}"
       //      )
 
+//      Log.d("WorkoutViewModel", "activeWorkout: $latestActiveWorkout")
+//      Log.d(
+//        "WorkoutViewModel",
+//        "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}"
+//      )
 
-      Log.d("WorkoutViewModel", "activeWorkout: $activeWorkout")
-      Log.d(
-        "WorkoutViewModel",
-        "ActiveWorkout.getDefaultInstance(): ${ActiveWorkout.getDefaultInstance()}"
-      )
 
+      require(latestActiveWorkout != null) { "ActiveWorkout is null" }
 
-      require(activeWorkout != null) { "ActiveWorkout is null" }
-
-      if (activeWorkout != ActiveWorkout.getDefaultInstance() && !isWorkoutActive) {
-        val domainWorkout = activeWorkout.toDomainWorkout()
+      if (latestActiveWorkout != ActiveWorkout.getDefaultInstance() && !isWorkoutActive) {
+        val domainWorkout = latestActiveWorkout.toDomainWorkout()
         workoutDetails = domainWorkout
         _workout.value = domainWorkout
         _workoutName.value = domainWorkout.name
@@ -1062,7 +1063,7 @@ class WorkoutViewModel(
                   // For now, assuming latestWorkout is sufficiently up-to-date for
                   // toProtoActiveWorkout()
                   val activeWorkoutProto = workoutToSave.toProtoActiveWorkout()
-                  workoutDatastore.saveActiveWorkout(activeWorkoutProto)
+                  workoutDatastore.saveActiveWorkoutById(workoutToSave.id.toProtoString(), activeWorkoutProto)
 //                   Log.d("WorkoutViewModel", "Successfully auto-saved workout to DataStore.")
 
                   // Optionally, keep the old repository call if it serves other purposes,
@@ -1270,6 +1271,66 @@ class WorkoutViewModel(
         if (saveWorkout) {
           isWorkoutActive = true
           startAutoSavingWorkout()
+        }
+      }
+    }
+  }
+
+  fun loadWorkoutFromActiveWorkoutsDatastore(workoutID: String, saveWorkout: Boolean = true) {
+    if (!isWorkoutActive) {
+      viewModelScope.launch {
+        workoutDatastore.getActiveWorkoutById(workoutID).let { activeWorkout ->
+          // TODO Determine Use Case. Keep or Remove.
+//      managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(workout)
+//        ?.let { previousWorkout ->
+//          setupWorkoutPreview(
+//            workoutToPrepare = workout,
+//            previousWorkout = previousWorkout,
+//          )
+//        }
+
+          val workout = activeWorkout.firstOrNull()?.toDomainWorkout()
+
+          requireNotNull(workout) { "Active Workout cannot be found in ActiveWorkouts Proto Datastore" }
+
+          _workoutName.value = workout.name
+          workoutDetails = workout
+          _workout.value = workoutDetails
+
+          requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
+
+          getPinnedWorkoutNotes(workout.uuid, workout.id)
+//
+          Log.d("WorkoutViewModel", "loadWorkoutFromActiveProgram: calling setWorkoutComponents")
+          setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workoutDetails!!.workoutItems))
+
+          val TAG = "WorkoutViewModel.loadWorkoutFromActiveProgram(): "
+          val allSets = _workoutComponents.flatMap { component ->
+            when (component) {
+              is ExerciseExerciseSets -> component.sets
+              is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
+            }
+          }
+          require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
+            "$TAG All sets workoutIDs does not match Workout.id!"
+          }
+
+          val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+          require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+          require(
+            _workoutComponents.all { component ->
+              when (component) {
+                is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
+                is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+              }
+            }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+
+          if (saveWorkout) {
+            isWorkoutActive = true
+            startAutoSavingWorkout()
+          }
         }
       }
     }
@@ -1939,7 +2000,7 @@ class WorkoutViewModel(
     cancelSetCompletedTimer()
     stopWorkoutTimer()
 
-    workoutDetails?.ownerID = user?.id?.toHexString() ?: "MISSING USER ID"
+    workoutDetails?.ownerID = user.id.toHexString() ?: "MISSING USER ID"
 
     saveWorkout()
 
@@ -1951,7 +2012,7 @@ class WorkoutViewModel(
 
     stopAutoSavingWorkout()
     viewModelScope.launch {
-      workoutDatastore.clearActiveWorkout()
+      workoutDatastore.clearActiveWorkout(workoutDetails?.id.toString())
 //       Log.d("WorkoutViewModel", "Active workout cleared from DataStore in finishWorkout.")
     }
   }
@@ -1962,7 +2023,7 @@ class WorkoutViewModel(
     cancelSetCompletedTimer()
     stopWorkoutTimer()
     viewModelScope.launch {
-      workoutDatastore.clearActiveWorkout()
+      workoutDatastore.clearActiveWorkout(_workout.value?.id.toString())
       stopAutoSavingWorkout()
 
       workoutDetails = initWorkout() // Resets ViewModel state

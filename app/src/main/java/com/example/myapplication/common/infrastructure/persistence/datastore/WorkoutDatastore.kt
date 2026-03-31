@@ -53,7 +53,7 @@ private val Context.activeWorkoutPreferencesStore: DataStore<ActiveWorkoutPrefer
 
 class ActiveWorkoutsDatastore(private val context: Context) {
 
-  val getActiveWorkouts: Flow<ActiveWorkoutPreferences> = context.activeWorkoutPreferencesStore.data
+  val activeWorkouts: Flow<ActiveWorkoutPreferences> = context.activeWorkoutPreferencesStore.data
     .catch { exception ->
       // Handle IO exceptions when reading data
       if (exception is IOException) {
@@ -62,6 +62,16 @@ class ActiveWorkoutsDatastore(private val context: Context) {
         throw exception
       }
     }
+
+  fun getLatestActiveWorkout(): Flow<ActiveWorkout?> {
+    return context.activeWorkoutPreferencesStore.data.map { preferences ->
+      if (preferences.activeWorkoutsMap.isNotEmpty()) {
+        preferences.activeWorkoutsMap.values.lastOrNull()
+      } else {
+        ActiveWorkout.getDefaultInstance()
+      }
+    }
+  }
 
   fun getActiveWorkoutById(workoutId: String): Flow<ActiveWorkout?> {
     return context.activeWorkoutPreferencesStore.data.map { preferences ->
