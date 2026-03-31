@@ -60,54 +60,54 @@ fun ActiveWorkoutCard(
 
   Card(modifier = Modifier.padding(vertical = padding)) {
 
-    workout.programID?.let { programID ->
-      val program = programsViewModel.getCurrentlyActiveProgramByID(programID)
 
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        text = workout.name,
+        modifier = Modifier.padding(horizontal = 8.dp),
+        style = MaterialTheme.typography.titleMedium,
+      )
+      Box {
+        IconButton(onClick = { setExpandMenu(true) }) {
+          Icon(
+            imageVector = Icons.Outlined.MoreVert,
+            contentDescription = "Localized Description"
+          )
+        }
 
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(start = padding),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Text(
-          text = workout.name,
-          modifier = Modifier.padding(horizontal = 8.dp),
-          style = MaterialTheme.typography.titleMedium,
-        )
-        Box {
-          IconButton(onClick = { setExpandMenu(true) }) {
-            Icon(
-              imageVector = Icons.Outlined.MoreVert,
-              contentDescription = "Localized Description"
-            )
-          }
+        DropdownMenu(expanded = expandMenu, onDismissRequest = { setExpandMenu(false) }) {
+          // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
+          DropdownMenuItem(
+            text = { Text(text = "Delete Workout") },
+            onClick = {
+              programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
 
-          DropdownMenu(expanded = expandMenu, onDismissRequest = { setExpandMenu(false) }) {
-            // DropdownMenuItem(text = { /*TODO*/}, onClick = { /*TODO*/})
-            DropdownMenuItem(
-              text = { Text(text = "Delete Workout") },
-              onClick = {
+              val result =
                 programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
-
-                val result =
-                  programsViewModel.deleteCurrentlyActiveWorkout(workoutID = workout.id)
-                if (result) {
-                  Toast.makeText(context, "Workout deleted successfully.", Toast.LENGTH_SHORT)
-                    .show()
-                } else {
-                  Toast.makeText(
-                    context,
-                    "Workout was not deleted successfully.",
-                    Toast.LENGTH_SHORT
-                  ).show()
-                }
-              },
-            )
-          }
+              if (result) {
+                Toast.makeText(context, "Workout deleted successfully.", Toast.LENGTH_SHORT)
+                  .show()
+              } else {
+                Toast.makeText(
+                  context,
+                  "Workout was not deleted successfully.",
+                  Toast.LENGTH_SHORT
+                ).show()
+              }
+            },
+          )
         }
       }
+    }
+
+    workout.programID?.let { programID ->
+      val program = programsViewModel.getCurrentlyActiveProgramByID(programID)
 
       Row(
         modifier = Modifier
@@ -129,49 +129,60 @@ fun ActiveWorkoutCard(
           )
         }
       }
+    }
 
-      Row(
-        modifier =
-          Modifier
-            .fillMaxWidth()
-            .padding(horizontal = padding)
-            .padding(top = 12.dp, bottom = 2.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Text(text = "Exercise", style = titleSmall, modifier = Modifier.weight(0.5f))
-        Box(Modifier.weight(0.5f)) {
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-            Text(
-              text = "Sets",
-              style = titleSmall,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.weight(weight = 1f, fill = true),
-            )
-            Text(
-              text = "Top Set",
-              style = titleSmall,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.weight(weight = 1f, fill = true),
-            )
-            Text(
-              text = "RIR",
-              style = titleSmall,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.weight(weight = 1f, fill = true),
-            )
-          }
-        }
-      }
-
+    if (workout.workoutItems.isEmpty()) {
       Row(
         modifier = Modifier
           .fillMaxWidth()
           .padding(horizontal = padding)
       ) {
-        Column() {
-          // TODO List Exercises
-          //        Text("Workout Summary", style = bodySmall)
+        Text("No exercises have been added to this workout.", style = bodySmall)
+      }
+    } else {
+    Row(
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = padding)
+          .padding(top = 12.dp, bottom = 2.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(text = "Exercise", style = titleSmall, modifier = Modifier.weight(0.5f))
+      Box(Modifier.weight(0.5f)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+          Text(
+            text = "Sets",
+            style = titleSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(weight = 1f, fill = true),
+          )
+          Text(
+            text = "Top Set",
+            style = titleSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(weight = 1f, fill = true),
+          )
+          Text(
+            text = "RIR",
+            style = titleSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(weight = 1f, fill = true),
+          )
+        }
+      }
+    }
+
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = padding)
+    ) {
+      Column() {
+        // TODO List Exercises
+        //        Text("Workout Summary", style = bodySmall)
+
           workout.workoutItems.forEach { workoutItem ->
             when (workoutItem) {
               is ExerciseSets -> {
@@ -296,37 +307,37 @@ fun ActiveWorkoutCard(
           }
         }
       }
+    }
 
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(padding),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Button(
+        onClick = {
+          navigateToPausedWorkout(
+            workout.id.toHexString(),
+            LoadingWorkout.LoadWorkoutFromActiveProgram.value
+          )
+        }
       ) {
-        Button(
+//          Text(text = "Resume ${workout.name}")
+        Text(text = "Resume Workout")
+      }
+
+      if (workout.programID != null) {
+        IconButton(
           onClick = {
-            navigateToPausedWorkout(
-              workout.id.toHexString(),
-              LoadingWorkout.LoadWorkoutFromActiveProgram.value
-            )
+            workout.programID?.toHexString()?.let { p1 -> navigateToActiveProgramDetails(p1) }
           }
         ) {
-//          Text(text = "Resume ${workout.name}")
-          Text(text = "Resume Workout")
-        }
-
-        if (workout.programID != null) {
-          IconButton(
-            onClick = {
-              workout.programID?.toHexString()?.let { p1 -> navigateToActiveProgramDetails(p1) }
-            }
-          ) {
-            Icon(
-              imageVector = Icons.AutoMirrored.Outlined.LibraryBooks,
-              contentDescription = "Navigate to Program for Workout",
-            )
-          }
+          Icon(
+            imageVector = Icons.AutoMirrored.Outlined.LibraryBooks,
+            contentDescription = "Navigate to Program for Workout",
+          )
         }
       }
     }
