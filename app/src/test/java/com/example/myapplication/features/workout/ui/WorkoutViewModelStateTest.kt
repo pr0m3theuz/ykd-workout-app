@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTime::class)
+@file:OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
 
 package com.example.myapplication.features.workout.ui
 
@@ -20,6 +20,7 @@ import com.example.myapplication.common.infrastructure.persistence.ExercisesRepo
 import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.toDomainWorkout
 import com.example.myapplication.datastore.ActiveWorkout
+import com.example.myapplication.features.program.ui.ActiveWorkoutCard
 import com.example.myapplication.features.workout.CountUpTimer
 import com.example.myapplication.features.workout.ManagePreviewWorkoutUseCase
 import com.example.myapplication.features.workout.ManageWorkoutUseCase
@@ -33,11 +34,13 @@ import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -59,6 +62,7 @@ import org.robolectric.RuntimeEnvironment.application
 import tech.apter.junit.jupiter.robolectric.RobolectricExtension
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(RobolectricExtension::class)
@@ -540,6 +544,396 @@ class WorkoutViewModelStateTest {
       cancelAndIgnoreRemainingEvents()
     }
   }
+
+  @Test
+  fun `getWorkoutByID overwrites active workout due to inverted guard`() = runTest {
+    // Arrange: active workout already loaded from DataStore
+    val mockWorkout = mockk<Workout>(relaxed = true) {
+      every { id } returns ObjectId()
+      every { name } returns "Saved Workout"
+      every { isCompleted } returns false
+      every { workoutStarted } returns Clock.System.now()
+      every { workoutEnded } returns null
+    }
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
+    every { activeProto.toDomainWorkout() } returns mockWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val differentWorkout = mockk<Workout>(relaxed = true) {
+      every { id } returns ObjectId()
+      every { name } returns "Different Workout"
+      every { isCompleted } returns false
+      every { workoutStarted } returns Clock.System.now()
+      every { workoutEnded } returns null
+    }
+
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    every { manageWorkoutUseCase.getWorkoutByID(differentWorkout.id) } returns differentWorkout
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    val activeWorkoutId   = viewModel.workout.value?.id
+    val differentWorkoutId = differentWorkout.id
+
+    // Simulate user navigating to a different workout while one is active
+    viewModel.getWorkoutByID(differentWorkoutId)
+
+    // active workout was not silently replaced
+    Assertions.assertEquals(
+      activeWorkoutId,
+      viewModel.workout.value?.id,
+      "Active workout was not silently overwritten — data preserved"
+    )
+
+    // Bug: active workout is silently replaced with no prompt
+    Assertions.assertNotEquals(
+      activeWorkoutId,
+      differentWorkoutId,
+      "Active workout was silently overwritten — data loss"
+    )
+  }
+
+  @Test
+  fun `loadWorkoutFromPreviousWorkout silently overwrites active workout`() = runTest {
+    // Arrange: active workout in progress
+    val mockWorkout = mockk<Workout>(relaxed = true) {
+      every { name } returns "Saved Workout"
+      every { isCompleted } returns false
+      every { workoutStarted } returns Clock.System.now()
+      every { workoutEnded } returns null
+    }
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
+    every { activeProto.toDomainWorkout() } returns mockWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    Assertions.assertTrue(viewModel.isWorkoutActive)
+    val activeWorkoutName = viewModel.workout.value?.name
+
+    // User loads a previous workout — no confirmation, no guard
+    val previousWorkoutId = ObjectId()
+    val previousWorkout = mockk<Workout>(relaxed = true) {
+      every { name }        returns "Last Week's Workout"
+      every { workoutItems } returns emptyList()
+    }
+    every { manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkoutId) } returns previousWorkout
+
+    viewModel.loadWorkoutFromPreviousWorkout(previousWorkoutId)
+
+    // Active workout silently gone
+    Assertions.assertEquals(
+      mockWorkout.name,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+
+
+    // Active workout silently gone
+    Assertions.assertNotEquals(
+      previousWorkout.name,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+  }
+
+  @Test
+  fun `copyWorkoutFromPreviousWorkout silently overwrites active workout`() = runTest {
+    // Arrange: active workout in progress
+    val mockWorkout = mockk<Workout>(relaxed = true) {
+      every { name } returns "Saved Workout"
+      every { isCompleted } returns false
+      every { workoutStarted } returns Clock.System.now()
+      every { workoutEnded } returns null
+    }
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
+    every { activeProto.toDomainWorkout() } returns mockWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    Assertions.assertTrue(viewModel.isWorkoutActive)
+    val activeWorkoutName = viewModel.workout.value?.name
+
+    // User loads a previous workout — no confirmation, no guard
+    val previousWorkoutId = ObjectId()
+    val previousWorkout = mockk<Workout>(relaxed = true) {
+      every { name }        returns "Last Week's Workout"
+      every { workoutItems } returns emptyList()
+    }
+    every { manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkoutId) } returns previousWorkout
+    every { manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(previousWorkout) } returns previousWorkout
+
+    viewModel.copyWorkoutFromPreviousWorkout(previousWorkoutId)
+
+    // Active workout silently gone
+    Assertions.assertEquals(
+      mockWorkout.name,
+      viewModel.workout.value?.name,
+      "copyWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+
+
+    // Active workout silently gone
+    Assertions.assertNotEquals(
+      previousWorkout.name,
+      viewModel.workout.value?.name,
+      "copyWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+  }
+
+
+  @Test
+  fun `loadWorkoutFromActiveProgram silently overwrites active workout`() = runTest {
+    // Arrange: active workout in progress
+    val mockWorkout = mockk<Workout>(relaxed = true) {
+      every { name } returns "Noted Workout"
+      every { isCompleted } returns false
+      every { workoutStarted } returns Clock.System.now()
+      every { workoutEnded } returns null
+    }
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
+    every { activeProto.toDomainWorkout() } returns mockWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    Assertions.assertTrue(viewModel.isWorkoutActive)
+    val activeWorkoutName = viewModel.workout.value?.name
+
+    // User loads a previous workout — no confirmation, no guard
+    val previousWorkoutId = ObjectId()
+    val previousWorkout = mockk<Workout>(relaxed = true) {
+      every { name } returns "Last Week's Workout"
+      every { workoutItems } returns emptyList()
+    }
+    every { manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkoutId) } returns previousWorkout
+
+    viewModel.loadWorkoutFromActiveProgram(previousWorkoutId)
+
+    // Active workout silently gone
+    Assertions.assertEquals(
+      mockWorkout.name,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromActiveProgram overwrote active workout without confirmation"
+    )
+
+
+    // Active workout silently gone
+    Assertions.assertNotEquals(
+      previousWorkout.name,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromActiveProgram overwrote active workout without confirmation"
+    )
+  }
+
+  // TODO the backstack creates a new WorkoutViewModel Instance for which
+  //  there is no active workout or initialized Workout loaded
+  @Test
+  fun `getWorkoutByID loads workout when no active workout`() = runTest {
+    // Arrange: active workout already loaded from DataStore
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns true
+//    every { activeProto.toDomainWorkout() } returns null
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val differentWorkout = mockk<Workout>(relaxed = true) {
+      every { id } returns ObjectId()
+      every { name } returns "Different Workout"
+      every { isCompleted } returns false
+      every { workoutStarted } returns Clock.System.now()
+      every { workoutEnded } returns null
+    }
+
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    every { manageWorkoutUseCase.getWorkoutByID(differentWorkout.id) } returns differentWorkout
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    val activeWorkoutId   = viewModel.workout.value?.id
+    val differentWorkoutId = differentWorkout.id
+
+    Assertions.assertTrue(
+      viewModel.workoutName.value?.contains("Workout") == true,
+        "Workout name should be a default template"
+      )
+
+    Assertions.assertTrue(viewModel.isWorkoutActive)
+
+    // Simulate user navigating to a different workout while one is active
+    viewModel.getWorkoutByID(differentWorkoutId)
+
+    // active workout was not silently replaced
+    Assertions.assertEquals(
+      differentWorkout.name,
+      viewModel.workout.value?.name,
+      "Different workout was not loaded"
+    )
+  }
+
+  // TODO the backstack creates a new WorkoutViewModel Instance for which
+  //  there is no active workout or initialized Workout loaded
+  @Test
+  fun `loadWorkoutFromPreviousWorkout loads workout when no active workout`() = runTest {
+    // Arrange: active workout in progress
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns true
+//    every { activeProto.toDomainWorkout() } returns null
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    Assertions.assertTrue(viewModel.isWorkoutActive)
+    val activeWorkoutName = viewModel.workout.value?.name
+
+    // User loads a previous workout — no confirmation, no guard
+    val previousWorkoutId = ObjectId()
+    val previousWorkout = mockk<Workout>(relaxed = true) {
+      every { name }        returns "Last Week's Workout"
+      every { workoutItems } returns emptyList()
+    }
+    every { manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkoutId) } returns previousWorkout
+
+    viewModel.loadWorkoutFromPreviousWorkout(previousWorkoutId)
+
+    // Active workout silently gone
+    Assertions.assertEquals(
+      previousWorkout.name,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+
+
+    // Active workout silently gone
+    Assertions.assertNotEquals(
+      activeWorkoutName,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+  }
+
+  // TODO the backstack creates a new WorkoutViewModel Instance for which
+  //  there is no active workout or initialized Workout loaded
+  @Test
+  fun `copyWorkoutFromPreviousWorkout loads workout when no active workout`() = runTest {
+    // Arrange: active workout in progress
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
+//    every { activeProto.toDomainWorkout() } returns mockWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    Assertions.assertTrue(viewModel.isWorkoutActive)
+    val activeWorkoutName = viewModel.workout.value?.name
+
+    // User loads a previous workout — no confirmation, no guard
+    val previousWorkoutId = ObjectId()
+    val previousWorkout = mockk<Workout>(relaxed = true) {
+      every { name }        returns "Last Week's Workout"
+      every { workoutItems } returns emptyList()
+    }
+    every { manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkoutId) } returns previousWorkout
+    every { manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(previousWorkout) } returns previousWorkout
+
+    viewModel.copyWorkoutFromPreviousWorkout(previousWorkoutId)
+
+    // Active workout silently gone
+    Assertions.assertEquals(
+      previousWorkout.name,
+      viewModel.workout.value?.name,
+      "copyWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+
+
+    // Active workout silently gone
+    Assertions.assertNotEquals(
+      activeWorkoutName,
+      viewModel.workout.value?.name,
+      "copyWorkoutFromPreviousWorkout overwrote active workout without confirmation"
+    )
+  }
+
+  // TODO the backstack creates a new WorkoutViewModel Instance for which
+  //  there is no active workout or initialized Workout loaded
+  @Test
+  fun `loadWorkoutFromActiveProgram loads workout when no active workout`() = runTest {
+    // Arrange: active workout in progress
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
+//    every { activeProto.toDomainWorkout() } returns mockWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    Assertions.assertTrue(viewModel.isWorkoutActive)
+    val activeWorkoutName = viewModel.workout.value?.name
+
+    // User loads a previous workout — no confirmation, no guard
+    val previousWorkoutId = ObjectId()
+    val previousWorkout = mockk<Workout>(relaxed = true) {
+      every { name } returns "Last Week's Workout"
+      every { workoutItems } returns emptyList()
+    }
+    every { manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkoutId) } returns previousWorkout
+
+    viewModel.loadWorkoutFromActiveProgram(previousWorkoutId)
+
+    // Active workout silently gone
+    Assertions.assertEquals(
+      previousWorkout.name,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromActiveProgram overwrote active workout without confirmation"
+    )
+
+
+    // Active workout silently gone
+    Assertions.assertNotEquals(
+      activeWorkoutName,
+      viewModel.workout.value?.name,
+      "loadWorkoutFromActiveProgram overwrote active workout without confirmation"
+    )
+  }
+
+  @Test
+  fun `cancelWorkout race condition writes template to DataStore if process dies before clear`() = runTest {
+    val mockWorkout = mockk<Workout>(relaxed = true) {
+      every { name } returns "Stored Workout"
+      every { isCompleted } returns false
+      every { workoutStarted } returns Clock.System.now()
+      every { workoutEnded } returns null
+    }
+    val activeProto = mockk<ActiveWorkout>(relaxed = true)
+    every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
+    every { activeProto.toDomainWorkout() } returns mockWorkout
+    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+
+    val viewModel = createViewModel()
+    advanceUntilIdle()
+
+    viewModel.cancelWorkout()
+    // Do NOT advanceUntilIdle — simulate process death after cancel but before clearActiveWorkout()
+
+    // If saveActiveWorkout was called after cancel, DataStore now has a corrupt template
+    coVerify(exactly = 1) {
+      workoutDatastore.saveActiveWorkout(any())
+    }
+  }
+
 
   private fun createViewModel(
     savedStateHandle: SavedStateHandle = SavedStateHandle()

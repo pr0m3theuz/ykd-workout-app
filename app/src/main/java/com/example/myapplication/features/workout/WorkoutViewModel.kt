@@ -1154,17 +1154,7 @@ class WorkoutViewModel(
 //       Log.d("WorkoutViewModel", "WorkoutViewModel.getWorkoutByID: $this")
 
       val loadedWorkout =
-        manageWorkoutUseCase.getWorkoutByID(workoutID)?.let { currentWorkout ->
-          // TODO Determine Use Case. Keep or Remove.
-//          managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(currentWorkout)
-//            ?.let { previousWorkout ->
-//              setupWorkoutPreview(
-//                workoutToPrepare = currentWorkout,
-//                previousWorkout = previousWorkout,
-//              )
-//            }
-          currentWorkout
-        } ?: initWorkout()
+        manageWorkoutUseCase.getWorkoutByID(workoutID) ?: initWorkout()
 
       initialWorkoutData = loadedWorkout
 //       Log.d("WorkoutViewModel", "getWorkoutByID() calling copyWorkoutFromWorkoutTemplate")
@@ -1188,48 +1178,53 @@ class WorkoutViewModel(
   fun loadWorkoutFromPreviousWorkout(workoutID: ObjectId) {
     // Similar to getWorkoutByID, this could override DataStore's loaded workout.
     // Ensure this is the desired behavior.
-    manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)?.let { workout ->
-      _workoutName.value = workout.name
-      workoutDetails = workout
-      _workout.value = workoutDetails
+    if (!isWorkoutActive) {
+      manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)?.let { workout ->
+        _workoutName.value = workout.name
+        workoutDetails = workout
+        _workout.value = workoutDetails
 
-      getPinnedWorkoutNotes(workout.uuid, workout.id)
+        getPinnedWorkoutNotes(workout.uuid, workout.id)
 //       Log.d("WorkoutViewModel", "loadWorkoutFromPreviousWorkout: calling setWorkoutComponents")
-      setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.workoutItems))
+        setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workout.workoutItems))
 
-      val TAG = "WorkoutViewModel.loadWorkoutFromPreviousWorkout(): "
-      val allSets = _workoutComponents.flatMap { component ->
-        when (component) {
-          is ExerciseExerciseSets -> component.sets
-          is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
-        }
-      }
-      require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
-        "$TAG All sets workoutIDs does not match Workout.id!"
-      }
-
-      val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
-
-      require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
-
-      require(
-        _workoutComponents.all { component ->
+        val TAG = "WorkoutViewModel.loadWorkoutFromPreviousWorkout(): "
+        val allSets = _workoutComponents.flatMap { component ->
           when (component) {
-            is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
-            is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+            is ExerciseExerciseSets -> component.sets
+            is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
           }
-        }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+        }
+        require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
+          "$TAG All sets workoutIDs does not match Workout.id!"
+        }
 
-      isWorkoutActive = true
-      startAutoSavingWorkout()
+        val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+        require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) {
+          "$TAG All Supersets workoutIDs does not match Workout.id!"
+        }
+
+        require(
+          _workoutComponents.all { component ->
+            when (component) {
+              is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
+              is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+            }
+          }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+
+        isWorkoutActive = true
+        startAutoSavingWorkout()
+      }
     }
   }
 
   fun loadWorkoutFromActiveProgram(workoutID: ObjectId, saveWorkout: Boolean = true) {
     // Similar to getWorkoutByID, this could override DataStore's loaded workout.
     // Ensure this is the desired behavior.
-    manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)?.let { workout ->
-      // TODO Determine Use Case. Keep or Remove.
+    if (!isWorkoutActive) {
+      manageWorkoutUseCase.getCompletedWorkoutByID(workoutID)?.let { workout ->
+        // TODO Determine Use Case. Keep or Remove.
 //      managePreviewWorkoutUseCase.getLatestPreviousIdenticalWorkout(workout)
 //        ?.let { previousWorkout ->
 //          setupWorkoutPreview(
@@ -1238,43 +1233,44 @@ class WorkoutViewModel(
 //          )
 //        }
 
-      _workoutName.value = workout.name
-      workoutDetails = if (originalWorkout != null) originalWorkout else workout
-      _workout.value = workoutDetails
+        _workoutName.value = workout.name
+        workoutDetails = if (originalWorkout != null) originalWorkout else workout
+        _workout.value = workoutDetails
 
-      requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
+        requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
 
-      getPinnedWorkoutNotes(workout.uuid, workout.id)
+        getPinnedWorkoutNotes(workout.uuid, workout.id)
 // 
-      Log.d("WorkoutViewModel", "loadWorkoutFromActiveProgram: calling setWorkoutComponents")
-      setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workoutDetails!!.workoutItems))
+        Log.d("WorkoutViewModel", "loadWorkoutFromActiveProgram: calling setWorkoutComponents")
+        setWorkoutComponents(loadWorkoutComponentsFromPreviousWorkout(workoutDetails!!.workoutItems))
 
-      val TAG = "WorkoutViewModel.loadWorkoutFromActiveProgram(): "
-      val allSets = _workoutComponents.flatMap { component ->
-        when (component) {
-          is ExerciseExerciseSets -> component.sets
-          is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
-        }
-      }
-      require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
-        "$TAG All sets workoutIDs does not match Workout.id!"
-      }
-
-      val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
-
-      require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
-
-      require(
-        _workoutComponents.all { component ->
+        val TAG = "WorkoutViewModel.loadWorkoutFromActiveProgram(): "
+        val allSets = _workoutComponents.flatMap { component ->
           when (component) {
-            is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
-            is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+            is ExerciseExerciseSets -> component.sets
+            is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
           }
-        }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+        }
+        require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
+          "$TAG All sets workoutIDs does not match Workout.id!"
+        }
 
-      if (saveWorkout) {
-        isWorkoutActive = true
-        startAutoSavingWorkout()
+        val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+        require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+        require(
+          _workoutComponents.all { component ->
+            when (component) {
+              is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
+              is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+            }
+          }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+
+        if (saveWorkout) {
+          isWorkoutActive = true
+          startAutoSavingWorkout()
+        }
       }
     }
   }
@@ -1312,56 +1308,57 @@ class WorkoutViewModel(
    * @param previousWorkout The [ObjectId] of the previously completed workout to copy from.
    */
   fun copyWorkoutFromPreviousWorkout(previousWorkout: ObjectId, saveWorkout: Boolean = true) {
-
-    manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkout)?.let { workout ->
-      // newWorkout's workoutItems are empty
-      val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(workout)
+    if (!isWorkoutActive) {
+      manageWorkoutUseCase.getCompletedWorkoutByID(previousWorkout)?.let { workout ->
+        // newWorkout's workoutItems are empty
+        val newWorkout = manageWorkoutUseCase.copyWorkoutFromPreviousWorkout(workout)
 // 
-      Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "workout: $workout")
+        Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "workout: $workout")
 //       Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "originalWorkout: $originalWorkout")
 //       Log.d("WorkoutViewModel.copyWorkoutFromPreviousWorkout", "newWorkout: $newWorkout")
 
-      // TODO rewrite using functional programming
+        // TODO rewrite using functional programming
 
-      _workoutName.value = newWorkout.name
-      workoutDetails = newWorkout
-      _workout.value = workoutDetails
+        _workoutName.value = newWorkout.name
+        workoutDetails = newWorkout
+        _workout.value = workoutDetails
 
-      requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
+        requireNotNull(workoutDetails) { "workoutDetails cannot be null" }
 
-      getPinnedWorkoutNotes(workout.uuid, workout.id)
+        getPinnedWorkoutNotes(workout.uuid, workout.id)
 //       Log.d("WorkoutViewModel", "copyWorkoutFromPreviousWorkout: calling setWorkoutComponents")
 
-      val results = copyWorkoutItemsFromPreviousWorkout(workout.workoutItems, newWorkout.id)
-      _workoutComponents = results.toMutableList()
-      _workoutComponentFlow.value = results
+        val results = copyWorkoutItemsFromPreviousWorkout(workout.workoutItems, newWorkout.id)
+        _workoutComponents = results.toMutableList()
+        _workoutComponentFlow.value = results
 
-      val TAG = "WorkoutViewModel.copyWorkoutFromPreviousWorkout(): "
-      val allSets = _workoutComponents.flatMap { component ->
-        when (component) {
-          is ExerciseExerciseSets -> component.sets
-          is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
-        }
-      }
-      require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
-        "$TAG All sets workoutIDs does not match Workout.id!"
-      }
-
-      val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
-
-      require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
-
-      require(
-        _workoutComponents.all { component ->
+        val TAG = "WorkoutViewModel.copyWorkoutFromPreviousWorkout(): "
+        val allSets = _workoutComponents.flatMap { component ->
           when (component) {
-            is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
-            is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+            is ExerciseExerciseSets -> component.sets
+            is SupersetExercisesSets -> component.exercisesSets.flatMap { it.sets }
           }
-        }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+        }
+        require(allSets.all { set -> set.workoutID == workoutDetails?.id }) {
+          "$TAG All sets workoutIDs does not match Workout.id!"
+        }
 
-      if (saveWorkout) {
-        isWorkoutActive = true
-        startAutoSavingWorkout()
+        val allSuperSets = _workoutComponents.filterIsInstance<SupersetExercisesSets>()
+
+        require(allSuperSets.all { superset -> superset.workoutID == workoutDetails?.id }) { "$TAG All Supersets workoutIDs does not match Workout.id!" }
+
+        require(
+          _workoutComponents.all { component ->
+            when (component) {
+              is ExerciseExerciseSets -> component.workoutID == workoutDetails?.id
+              is SupersetExercisesSets -> component.exercisesSets.all { it.workoutID == workoutDetails?.id }
+            }
+          }) { "$TAG All ExerciseExerciseSets workoutIDs does not match Workout.id!" }
+
+        if (saveWorkout) {
+          isWorkoutActive = true
+          startAutoSavingWorkout()
+        }
       }
     }
   }
@@ -1964,19 +1961,19 @@ class WorkoutViewModel(
     //    TODO navController.popBackStack( route = Programs.route, inclusive = true)
     cancelSetCompletedTimer()
     stopWorkoutTimer()
-
-    workoutDetails = initWorkout() // Resets ViewModel state
-    _workout.value = workoutDetails // Ensure LiveData/StateFlow is updated
-    _workoutName.value = workoutDetails?.name
-    _workoutNotesData.clear()
-    _workoutNotes.value = _workoutNotesData.toList()
-    setWorkoutComponents(emptyList()) // Clears UI components
-    stopAutoSavingWorkout()
     viewModelScope.launch {
       workoutDatastore.clearActiveWorkout()
+      stopAutoSavingWorkout()
+
+      workoutDetails = initWorkout() // Resets ViewModel state
+      _workout.value = workoutDetails // Ensure LiveData/StateFlow is updated
+      _workoutName.value = workoutDetails?.name
+      _workoutNotesData.clear()
+      _workoutNotes.value = _workoutNotesData.toList()
+      setWorkoutComponents(emptyList()) // Clears UI components
 //       Log.d("WorkoutViewModel", "Active workout cleared from DataStore in cancelWorkout.")
+      isWorkoutActive = false // Ensure workout is marked as not active
     }
-    isWorkoutActive = false // Ensure workout is marked as not active
   }
 
   private fun removeUncompletedSets() {
