@@ -50,6 +50,11 @@ android {
       isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
+    getByName("debug") {
+      vcsInfo {
+        include = true
+      }
+    }
   }
 
   splits {
@@ -174,8 +179,6 @@ dependencies {
   implementation("androidx.datastore:datastore-preferences:1.2.0")
   implementation("androidx.datastore:datastore-core:1.2.0") // For Proto DataStore
   implementation("androidx.datastore:datastore:1.2.0")
-  implementation("androidx.compose.ui:ui-test-junit4:1.10.6")
-  implementation("androidx.navigation:navigation-testing:2.9.7") // For Preferences DataStore (if needed elsewhere, good to have consistent versions)
 
   val adaptiveLayout = "1.2.0"
   implementation("androidx.compose.material3.adaptive:adaptive:$adaptiveLayout")
@@ -184,7 +187,7 @@ dependencies {
   implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.4.0")
   implementation("com.google.firebase:firebase-perf-ktx:21.0.5")
 
-  val composeVersion = "1.10.2"
+  val composeVersion = "1.10.6"
   implementation(platform("androidx.compose:compose-bom:2026.01.01"))
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
@@ -205,23 +208,23 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
   // Core library
-  val testing = "1.7.0"
+  val testing = "1.6.1"
   androidTestImplementation("androidx.test:core:$testing")
   testImplementation("androidx.test:core-ktx:$testing")
-  val testingJunit = "1.3.0"
+  val testingJunit = "1.2.1"
   testImplementation("androidx.test.ext:junit-ktx:$testingJunit")
   testImplementation("org.robolectric:robolectric:4.16.1")
 
   // AndroidJUnitRunner and JUnit Rules
-  androidTestImplementation("androidx.test:runner:1.7.0")
+  androidTestImplementation("androidx.test:runner:1.6.1")
   androidTestImplementation("androidx.test:rules:$testing")
 
   // Assertions
   androidTestImplementation("androidx.test.ext:junit:$testingJunit")
-  androidTestImplementation("androidx.test.ext:truth:1.7.0")
+  androidTestImplementation("androidx.test.ext:truth:1.6.0")
 
   // Espresso dependencies
-  val espressoVersion = "3.7.0"
+  val espressoVersion = "3.6.1"
   androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
   androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion")
   androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
@@ -247,9 +250,13 @@ dependencies {
   androidTestImplementation("org.junit.jupiter:junit-jupiter:$junitJupiter")
   testImplementation("org.junit.platform:junit-platform-launcher:$junitJupiter")
 
+  testImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
   androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
   debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
   debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
+
+  testImplementation("androidx.navigation:navigation-testing:2.9.7")
+  androidTestImplementation("androidx.navigation:navigation-testing:2.9.7")
 
   testImplementation("org.assertj:assertj-core:3.27.7")
 
