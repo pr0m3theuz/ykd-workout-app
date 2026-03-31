@@ -17,6 +17,7 @@ import com.example.myapplication.common.domain.model.UserProfileManager
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutNote
 import com.example.myapplication.common.infrastructure.persistence.ExercisesRepository
+import com.example.myapplication.common.infrastructure.persistence.datastore.ActiveWorkoutsDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.WorkoutDatastore
 import com.example.myapplication.common.infrastructure.persistence.datastore.toDomainWorkout
 import com.example.myapplication.datastore.ActiveWorkout
@@ -72,7 +73,7 @@ class WorkoutViewModelStateTest {
   private lateinit var manageWorkoutUseCase: ManageWorkoutUseCase
   private lateinit var managePreviewWorkoutUseCase: ManagePreviewWorkoutUseCase
   private lateinit var exerciseRepository: ExercisesRepository
-  private lateinit var workoutDatastore: WorkoutDatastore
+  private lateinit var workoutDatastore: ActiveWorkoutsDatastore
   private lateinit var userProfileManager: UserProfileManager
 
   // Use StandardTestDispatcher to strictly control virtual time and coroutine execution
@@ -138,7 +139,7 @@ class WorkoutViewModelStateTest {
   fun `initial state is Loading`() = runTest {
     // Arrange: DataStore emission is infinitely delayed
     val delayedFlow = MutableSharedFlow<ActiveWorkout>()
-    every { workoutDatastore.getActiveWorkout } returns delayedFlow
+    every { workoutDatastore.getLatestActiveWorkout() } returns delayedFlow
     every { userProfileManager.userProfile } returns MutableStateFlow(UserProfile(id = ObjectId()))
 
     val viewModel = createViewModel()
@@ -156,7 +157,7 @@ class WorkoutViewModelStateTest {
   @Test
   fun `Loading to Empty transition`() = runTest {
     // Arrange: DataStore returns default instance (no active workout)
-    every { workoutDatastore.getActiveWorkout } returns flowOf(ActiveWorkout.getDefaultInstance())
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(ActiveWorkout.getDefaultInstance())
     every { userProfileManager.userProfile } returns MutableStateFlow(UserProfile(id = ObjectId()))
 
     val viewModel = createViewModel()
@@ -199,7 +200,7 @@ class WorkoutViewModelStateTest {
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
 
-    every { workoutDatastore.getActiveWorkout } returns flow {
+    every { workoutDatastore.getLatestActiveWorkout() } returns flow {
       delay(2000)
       emit(activeProto)
     }
@@ -241,7 +242,7 @@ class WorkoutViewModelStateTest {
     // Simulate a scenario where the user clicks "Start", we save to DataStore,
     // but the process dies / rotates before the save coroutine finishes.
     val dataStoreFlow = MutableSharedFlow<ActiveWorkout>()
-    every { workoutDatastore.getActiveWorkout } returns dataStoreFlow
+    every { workoutDatastore.getLatestActiveWorkout() } returns dataStoreFlow
     every { userProfileManager.userProfile } returns MutableStateFlow(UserProfile(id = ObjectId()))
 
     val viewModel1 = createViewModel()
@@ -250,7 +251,7 @@ class WorkoutViewModelStateTest {
     // DataStore save is triggered via debounce/combine flow, which takes time
     // If we DON'T advanceUntilIdle() here, the save won't happen.
     advanceUntilIdle()
-    coVerify(atLeast = 1) { workoutDatastore.saveActiveWorkout(any()) }
+    coVerify(atLeast = 1) { workoutDatastore.saveActiveWorkoutById(any(), any()) }
 
     // Now recreate ViewModel simulating rotation
     val viewModel2 = createViewModel()
@@ -271,7 +272,7 @@ class WorkoutViewModelStateTest {
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
 
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
     every { userProfileManager.userProfile } returns MutableStateFlow(UserProfile(id = ObjectId()))
 
     // Pass a completely fresh SavedStateHandle simulating Android process restoration
@@ -296,7 +297,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
 
@@ -344,7 +345,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val countUpTimer = mockk<CountUpTimer>(relaxed = true)
     every { countUpTimer.stop() } just runs
@@ -365,7 +366,7 @@ class WorkoutViewModelStateTest {
     advanceUntilIdle()
 
     // Assert 1: DataStore was cleared
-    coVerify(exactly = 1) { workoutDatastore.clearActiveWorkout() }
+    coVerify(exactly = 1) { workoutDatastore.clearActiveWorkout(any()) }
 
     // Assert 2: ViewModel state flags reset
     Assertions.assertFalse(viewModel.isWorkoutActive, "Workout should not be active after cancel")
@@ -396,7 +397,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns defaultWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -419,7 +420,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns completedWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -441,7 +442,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns unstartedWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -462,7 +463,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -488,7 +489,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -502,7 +503,7 @@ class WorkoutViewModelStateTest {
 
   @Test
   fun `rapid workout mutations are debounced into a single DataStore save`() = runTest {
-    every { workoutDatastore.getActiveWorkout } returns flowOf(ActiveWorkout.getDefaultInstance())
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(ActiveWorkout.getDefaultInstance())
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -516,12 +517,12 @@ class WorkoutViewModelStateTest {
     advanceUntilIdle() // Let debounce window expire
 
     // All four mutations should collapse into a single DataStore write
-    coVerify(exactly = 1) { workoutDatastore.saveActiveWorkout(any()) }
+    coVerify(exactly = 1) { workoutDatastore.saveActiveWorkoutById(any(), any()) }
   }
 
   @Test
   fun `subscriber gap beyond WhileSubscribed timeout causes upstream restart`() = runTest {
-    every { workoutDatastore.getActiveWorkout } returns flowOf(ActiveWorkout.getDefaultInstance())
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(ActiveWorkout.getDefaultInstance())
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -558,7 +559,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val differentWorkout = mockk<Workout>(relaxed = true) {
       every { id } returns ObjectId()
@@ -568,7 +569,7 @@ class WorkoutViewModelStateTest {
       every { workoutEnded } returns null
     }
 
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     every { manageWorkoutUseCase.getWorkoutByID(differentWorkout.id) } returns differentWorkout
 
@@ -608,7 +609,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -654,7 +655,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -702,7 +703,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -744,7 +745,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns true
 //    every { activeProto.toDomainWorkout() } returns null
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val differentWorkout = mockk<Workout>(relaxed = true) {
       every { id } returns ObjectId()
@@ -754,7 +755,7 @@ class WorkoutViewModelStateTest {
       every { workoutEnded } returns null
     }
 
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     every { manageWorkoutUseCase.getWorkoutByID(differentWorkout.id) } returns differentWorkout
 
@@ -790,7 +791,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns true
 //    every { activeProto.toDomainWorkout() } returns null
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -832,7 +833,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
 //    every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -875,7 +876,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
 //    every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -920,7 +921,7 @@ class WorkoutViewModelStateTest {
     val activeProto = mockk<ActiveWorkout>(relaxed = true)
     every { activeProto == ActiveWorkout.getDefaultInstance() } returns false
     every { activeProto.toDomainWorkout() } returns mockWorkout
-    every { workoutDatastore.getActiveWorkout } returns flowOf(activeProto)
+    every { workoutDatastore.getLatestActiveWorkout() } returns flowOf(activeProto)
 
     val viewModel = createViewModel()
     advanceUntilIdle()
@@ -930,7 +931,7 @@ class WorkoutViewModelStateTest {
 
     // If saveActiveWorkout was called after cancel, DataStore now has a corrupt template
     coVerify(exactly = 1) {
-      workoutDatastore.saveActiveWorkout(any())
+      workoutDatastore.saveActiveWorkoutById(any(), any())
     }
   }
 
