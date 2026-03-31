@@ -400,7 +400,7 @@ fun SettingsScreen(
         ) {
           SelectionContainer {
             Text(
-              "Version: 2026.03.31-03a9ae05", // Replace with actual app version
+              "Version: 2026.03.31-4a97607e", // Replace with actual app version
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
