@@ -29,6 +29,12 @@ message ActiveWorkout {
   optional string hashedSignature = 23;
 }
 
+message ActiveWorkoutPreferences {
+  // A map where the Key is the Workout ID (as a string)
+  // and the Value is the ActiveWorkout itself.
+  map<string, ActiveWorkout> active_workouts = 1;
+}
+
 message WorkoutNoteProto {
   string id = 1;
   int64 lazyListID = 2;
