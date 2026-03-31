@@ -3,6 +3,7 @@
 package com.example.myapplication.features.workout.feature.exercise
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -20,10 +21,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -226,15 +229,53 @@ fun ExerciseSetLazyColumn(
 
   val listState = rememberLazyListState()
 
-  LaunchedEffect(workoutComponents.size) {
-    if (workoutComponents.isNotEmpty()) {
-      // We target the index of the last item in workoutComponents.
-      // Note: workoutNotes are at the top, so the index would actually be
-      // workoutNotes.size + workoutComponents.size - 1
-      val targetIndex = workoutNotes.size + workoutComponents.size - 1
-      if (targetIndex >= 0) {
-        listState.animateScrollToItem(targetIndex)
+  val firstVisibleItemIndex by remember {
+    derivedStateOf {
+      listState.firstVisibleItemIndex
+    }
+  }
+
+  val previousLazyListItemsSize = rememberSaveable { mutableStateOf(0) }
+
+  LaunchedEffect(firstVisibleItemIndex) {
+    Log.d("ScrollDebug", "Effect: firstVisibleItemIndex changed to $firstVisibleItemIndex")
+    if (workoutComponents.isNotEmpty() && workoutComponents.size == previousLazyListItemsSize.value) {
+      if (firstVisibleItemIndex >= 0) {
+        Log.d("ScrollDebug", "Restoring scroll position to index: $firstVisibleItemIndex")
+//        listState.animateScrollToItem(firstVisibleItemIndex)
       }
+    }
+  }
+
+  LaunchedEffect(workoutComponents.size) {
+    val totalCount = listState.layoutInfo.totalItemsCount
+    Log.d("ScrollDebug", "Effect: List size changed. Components: ${workoutComponents.size}, previousLazyListItemsSize: ${previousLazyListItemsSize.value}, Total UI Items: $totalCount")
+
+    if (workoutComponents.isNotEmpty()) {
+      val targetIndex = workoutNotes.size + workoutComponents.size - 1
+
+      when {
+        previousLazyListItemsSize.value == 0 -> {
+          Log.d("ScrollDebug", "Initial load. Scrolling to top.")
+          listState.animateScrollToItem(0)
+        }
+        targetIndex >= 0 && workoutComponents.size > previousLazyListItemsSize.value -> {
+          Log.d("ScrollDebug", "Scrolling to NEW item at targetIndex: $targetIndex")
+          listState.animateScrollToItem(targetIndex)
+        }
+        firstVisibleItemIndex >= 0 && workoutComponents.size < previousLazyListItemsSize.value -> {
+          Log.d("ScrollDebug", "Item removed. Adjusting scroll to: $firstVisibleItemIndex")
+          listState.animateScrollToItem((firstVisibleItemIndex).coerceAtLeast(0))
+        }
+        else -> {
+          Log.d("ScrollDebug", "Fallback: Scrolling to top.")
+          listState.animateScrollToItem(0)
+        }
+      }
+    }
+    if (workoutComponents.isNotEmpty()) {
+      previousLazyListItemsSize.value = workoutComponents.size
+      Log.d("ScrollDebug", "Updated previousLazyListItemsSize to: ${previousLazyListItemsSize.value}")
     }
   }
 
@@ -314,9 +355,13 @@ fun ExerciseSetLazyColumn(
 
     item { AddExercise() }
     if (enableCancelWorkout) item { CancelWorkout() }
-    item { Spacer(modifier = Modifier
-      .height(200.dp)
-      .fillMaxWidth()) }
+    item {
+      Spacer(
+        modifier = Modifier
+          .height(200.dp)
+          .fillMaxWidth()
+      )
+    }
   }
 }
 
