@@ -1293,6 +1293,7 @@ class WorkoutViewModel(
 
           requireNotNull(workout) { "Active Workout cannot be found in ActiveWorkouts Proto Datastore" }
 
+
           _workoutName.value = workout.name
           workoutDetails = workout
           _workout.value = workoutDetails
