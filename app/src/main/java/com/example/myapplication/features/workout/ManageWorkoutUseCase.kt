@@ -261,6 +261,9 @@ class ManageWorkoutUseCase(
       //        "setNumber: ${set.setNumber}, set.exerciseID: ${set.exerciseID}"
       //      )
 
+      Log.d("createNewSetsFromPreviousWorkout", "Old Set: ${set}")
+      Log.d("createNewSetsFromPreviousWorkout", "New Set: ${newSet}")
+
       if (set.setNumber != null) {
         set.exerciseID?.let { exerciseID ->
           val previousSet =

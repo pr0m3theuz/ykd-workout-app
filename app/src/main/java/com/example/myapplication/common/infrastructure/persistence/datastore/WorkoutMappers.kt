@@ -10,6 +10,7 @@ import com.example.myapplication.common.domain.model.Superset
 import com.example.myapplication.common.domain.model.Workout
 import com.example.myapplication.common.domain.model.WorkoutItem
 import com.example.myapplication.common.domain.model.WorkoutNote
+import com.example.myapplication.common.util.ProgressionType
 import com.example.myapplication.datastore.ActiveWorkout
 import com.example.myapplication.datastore.ExerciseNoteProto
 import com.example.myapplication.datastore.ExerciseSetsProto
@@ -130,11 +131,17 @@ fun Set.toProto(): SetProto {
     this.percentage1RM?.let { builder.percentage1RM = it }
     builder.setCompleted = this.setCompleted
     this.targetRepetitions?.let { builder.targetRepetitions = it }
+    this.targetMinimumRepetitions?.let { builder.targetMinimumRepetitions = it }
+    this.targetMaximumRepetitions?.let { builder.targetMaximumRepetitions = it }
     this.targetWeightPounds?.let { builder.targetWeightPounds = it }
     this.targetWeightKilograms?.let { builder.targetWeightKilograms = it }
     this.targetRatePerceivedEffort?.let { builder.targetRatePerceivedEffort = it }
     this.targetRepetitionsInReserve?.let { builder.targetRepetitionsInReserve = it }
     this.targetPercentage1RM?.let { builder.targetPercentage1RM = it }
+    this.estimated1RM?.let { builder.estimated1RM = it }
+
+    this.incrementWeightPounds?.let { builder.incrementWeightPounds = it }
+    this.incrementWeightKilograms?.let { builder.incrementWeightKilograms = it }
     // restTimerInSeconds not in domain Set, default or map if available elsewhere
     // notes (String) not in domain Set, default or map if available elsewhere
     builder.exerciseID = this.exerciseID?.toProtoString() ?: "" // Proto expects non-null string
@@ -144,6 +151,11 @@ fun Set.toProto(): SetProto {
     this.mesocycleID?.let { builder.mesocycleID = it.toProtoString() }
     this.programID?.let { builder.programID = it.toProtoString() }
     builder.ownerID = this.ownerID
+
+    this.progressionSchemeID?.let { builder.progressionSchemeID = it.progression }
+    this.hashedSetSignature?.let { builder.hashedSetSignature = it }
+    this.hashedWorkoutSignature?.let { builder.hashedWorkoutSignature = it }
+    this.dateCreated?.let { builder.dateCreated = it.toProtoLong() }
     // order is in proto but not in domain Set
     return builder.build()
 }
@@ -173,6 +185,9 @@ fun SetProto.toDomain(): Set {
     // notes (String) not in domain Set
     // order not in domain Set
     if (this.hasTargetRepetitions()) domain.targetRepetitions = this.targetRepetitions
+    if (this.hasTargetMinimumRepetitions()) domain.targetMinimumRepetitions = this.targetMinimumRepetitions
+    if (this.hasTargetMaximumRepetitions()) domain.targetMaximumRepetitions = this.targetMaximumRepetitions
+
     if (this.hasTargetWeightPounds()) domain.targetWeightPounds = this.targetWeightPounds
     if (this.hasTargetWeightKilograms()) domain.targetWeightKilograms = this.targetWeightKilograms
     if (this.hasTargetRatePerceivedEffort()) domain.targetRatePerceivedEffort =
@@ -180,9 +195,19 @@ fun SetProto.toDomain(): Set {
     if (this.hasTargetRepetitionsInReserve()) domain.targetRepetitionsInReserve =
         this.targetRepetitionsInReserve
     if (this.hasTargetPercentage1RM()) domain.targetPercentage1RM = this.targetPercentage1RM
+    if (this.hasEstimated1RM()) domain.estimated1RM = this.estimated1RM
+    if (this.hasIncrementWeightPounds()) domain.incrementWeightPounds = this.incrementWeightPounds
+    if (this.hasIncrementWeightKilograms()) domain.incrementWeightKilograms = this.incrementWeightKilograms
+    if (this.hasProgressionSchemeID()) domain.progressionSchemeID = ProgressionType.fromProgression(this.progressionSchemeID)
+    if (this.hasDateCreated()) domain.dateCreated = this.dateCreated.toDomainInstant()
+
+    if (this.hasHashedSetSignature()) domain.hashedSetSignature = this.hashedSetSignature
+    if (this.hasHashedWorkoutSignature()) domain.hashedWorkoutSignature = this.hashedWorkoutSignature
+
     if (this.hasMicrocycleID()) domain.microcycleID = this.microcycleID.toDomainObjectId()
     if (this.hasMesocycleID()) domain.mesocycleID = this.mesocycleID.toDomainObjectId()
     if (this.hasProgramID()) domain.programID = this.programID.toDomainObjectId()
+
     return domain
 }
 

@@ -122,4 +122,13 @@ message SetProto {
   optional double targetRatePerceivedEffort = 26;
   optional double targetRepetitionsInReserve = 27;
   optional double targetPercentage1RM = 28;
+  optional int32 targetMinimumRepetitions = 29;
+  optional int32 targetMaximumRepetitions = 30;
+  optional double incrementWeightPounds = 31;
+  optional double incrementWeightKilograms = 32;
+  optional double estimated1RM = 33;
+  optional string progressionSchemeID = 34;
+  optional int64 dateCreated = 35;
+  optional string hashedSetSignature = 36;
+  optional string hashedWorkoutSignature = 37;
 }

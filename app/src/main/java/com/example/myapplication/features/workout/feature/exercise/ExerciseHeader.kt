@@ -56,9 +56,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.common.domain.model.ExerciseExerciseSets
 import com.example.myapplication.common.domain.model.ExerciseNote
+import com.example.myapplication.common.domain.model.SetType
 import com.example.myapplication.common.domain.model.WorkoutComponent
 import com.example.myapplication.common.domain.model.averageWeight
 import com.example.myapplication.common.domain.model.calculateTotalVolume
+import com.example.myapplication.common.domain.model.setTargetSummaryRIR
+import com.example.myapplication.common.domain.model.setTargetsSummaryRIR
 import com.example.myapplication.common.domain.model.totalRepetitions
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -130,6 +133,9 @@ fun ExerciseScreen(
       //      )
     },
     exerciseSetsDescription = {
+//      if (!exerciseSets.sets.isEmpty()) {
+        ExerciseSetTargets(exerciseSets = exerciseSets, weightUnit = weightUnit)
+//      }
       if (!exerciseSets.description.isNullOrBlank()) {
         ExerciseSetDescription(exerciseSets = exerciseSets)
       }
@@ -180,13 +186,75 @@ fun ExerciseHeader(
   }
 }
 
+
 @Composable
-private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
+private fun ExerciseSetTargets(
+  exerciseSets: ExerciseExerciseSets,
+  weightUnit: String
+) {
+  var visible by remember { mutableStateOf(false) }
+
+  if (exerciseSets.sets.any { it.targetMinimumRepetitions != null || it.targetMaximumRepetitions != null || it.targetRepetitions != null }) {
+    Row(
+      modifier = Modifier
+        .clickable(onClick = { visible = !visible })
+        .fillMaxWidth(),
+      //        .padding(horizontal = 8.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        text = "Targets & Progression",
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.padding(horizontal = 8.dp),
+      )
+      Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+        Icon(
+          //          modifier = Modifier.padding(8.dp).size(24.dp),
+          imageVector = if (!visible) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
+          contentDescription = if (!visible) "Expand" else "Collapse",
+        )
+      }
+    }
+    AnimatedVisibility(
+      visible = visible,
+      enter = expandVertically(animationSpec = tween(250)),
+      exit = shrinkVertically(animationSpec = tween(250)),
+    ) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+      ) {
+        exerciseSets.sets.filter { it.setTypeID != SetType.warmUpSet }.forEach { set ->
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 16.dp)
+          ) {
+            Text(
+              text = "Working Set ${set.setNumber}: ".plus(set.setTargetsSummaryRIR(weightUnit)),
+              style = MaterialTheme.typography.bodyMedium
+            )
+          }
+        }
+
+      }
+    }
+  }
+}
+
+
+@Composable
+private fun ExerciseSetDescription(
+  exerciseSets: ExerciseExerciseSets,
+) {
   var visible by remember { mutableStateOf(false) }
 //  if (exerciseSets.description.isNullOrBlank()) {
 //    visible = false
 //  }
+
   //  Log.i("ExerciseSetDescription", "exerciseSets.description: ${exerciseSets.description}")
+  //  || it.targetRepetitionsInReserve != null || it.targetRatePerceivedEffort != null
   exerciseSets.description?.let {
     Row(
       modifier = Modifier
@@ -214,9 +282,11 @@ private fun ExerciseSetDescription(exerciseSets: ExerciseExerciseSets) {
       enter = expandVertically(animationSpec = tween(250)),
       exit = shrinkVertically(animationSpec = tween(250)),
     ) {
-      Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp)) {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp)
+      ) {
         Text(text = AnnotatedString.fromHtml(it), style = MaterialTheme.typography.bodyMedium)
       }
     }

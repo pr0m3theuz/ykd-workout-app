@@ -156,6 +156,29 @@ fun Set.setTargetSummaryRIR(weightUnit: String): String {
     )
 }
 
+fun Set.setTargetsSummaryRIR(weightUnit: String): String {
+  // TODO get user default weight unit or exercise specific weight unit
+
+  val targetWeight = "".plus(
+    if (this.targetWeightPounds != null || this.targetWeightKilograms != null) {
+      "${doubleFormatted(if (weightUnit == MassUnit.POUNDS.abbreviation) this.targetWeightPounds else this.targetWeightKilograms).ifBlank { "–" }} $weightUnit"
+    } else {
+      ""
+    }
+  )
+    .plus(if (this.targetPercentage1RM != null) " / ${doubleFormatted(this.targetPercentage1RM)}% 1RM" else "")
+
+  return "".plus(if (targetWeight.isNotBlank()) {targetWeight.plus(" × ")} else "")
+    .plus("${this.targetRepetitions} (${this.targetMinimumRepetitions ?: "–"} - ${this.targetMaximumRepetitions ?: "–"}) reps")
+    .plus(
+      if (this.targetRepetitionsInReserve != null)
+        " @ ${doubleFormatted(this.targetRepetitionsInReserve)} RIR"
+      else ""
+    )
+    .plus(this.progressionSchemeID?.progression?.prependIndent(" ") ?: "")
+}
+
+
 fun Set.setSummaryRPE(): String {
   return "${doubleFormatted(this.weightPounds).ifBlank { "–" }} × ${this.repetitions ?: "–"} reps @ ${
     doubleFormatted(
